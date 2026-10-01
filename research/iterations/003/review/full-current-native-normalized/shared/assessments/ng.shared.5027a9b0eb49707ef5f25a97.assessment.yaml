@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.5027a9b0eb49707ef5f25a97
+  version: 1
+  assessment_title: OL08-00-020331 - OL 8 must not allow blank or null passwords in the system-auth file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: \bnullok\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-there-no-instances-nullok-in-etc-pam-d-system-auth:
+      test_title: There are no instances of nullok in /etc/pam.d/system-auth.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-there-no-instances-nullok-in-etc-pam-d-system-auth

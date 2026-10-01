@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.bc23390d04c0b7fa9ecd6728
+  version: 1
+  assessment_title: UBTU-22-611055 - Ubuntu 22.04 LTS must store only encrypted representations of passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/common-password
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*password\s+.*pam_unix\.so\s*.*sha512\s*.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/common-password
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*password\s+.*pam_unix\.so\s*.*rounds=(\d+)(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '100000'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-pam-d-common-password-password-includes-pam-unix-so:
+      test_title: /etc/pam.d/common-password:password includes pam_unix.so sha512
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: only_one_exists
+      check: all
+    test-etc-pam-d-common-password-password-includes-pam-unix-so-2:
+      test_title: /etc/pam.d/common-password:password includes pam_unix.so rounds greater than or equals to 100000
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-etc-pam-d-common-password-password-includes-pam-unix-so
+    - test: test-etc-pam-d-common-password-password-includes-pam-unix-so-2

@@ -1,0 +1,82 @@
+assessment:
+  id: ng.shared.985900c761b12770973b91a0
+  version: 1
+  assessment_title: AZLX-23-002190 - Amazon Linux 2023 audit tools must have a mode of "0755" or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-tools-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: audit-tools-variable
+      object_title: audit tools
+  variables:
+    audit-tools-variable:
+      title: audit tools
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules
+  states:
+    state-mode-0755-or-less-permissive:
+      state_title: mode 0755 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-audit-tools-have-mode-0755-or-less-permissive:
+      test_title: audit tools have a mode of 0755 or less permissive.
+      capability: unix.file
+      object: audit-tools-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
+  evaluate:
+    test: test-audit-tools-have-mode-0755-or-less-permissive

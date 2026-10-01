@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.d95747ad88da83c02750349e
+  version: 1
+  assessment_title: Ubuntu 22.04 LTS must have directories that contain system commands group-owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-system-command-directories-not-owned-by-root-group-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: only one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        state: state-owned-by-root-group
+      - action: exclude
+        state: state-symbolic-links
+      - action: exclude
+        state: state-unix-file
+      behaviors:
+        recurse_direction: down
+      object_title: All system-command directories not owned by root-group
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  states:
+    state-owned-by-root-group:
+      state_title: owned by root-group
+      capability: unix.file
+      state:
+        field: group_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-symbolic-links:
+      state_title: symbolic links
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: file
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-command-directories-owned-by-root-group:
+      test_title: System command directories are owned by root group.
+      capability: unix.file
+      object: all-system-command-directories-not-owned-by-root-group-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-system-command-directories-owned-by-root-group

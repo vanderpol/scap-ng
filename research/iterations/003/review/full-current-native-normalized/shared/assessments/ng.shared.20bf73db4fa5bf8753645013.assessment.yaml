@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.20bf73db4fa5bf8753645013
+  version: 1
+  assessment_title: UBTU-18-010126 - The Ubuntu operating system must configure /var/log/syslog file to be owned by syslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    var-log-syslog-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /var/log
+        filename:
+          operation: pattern match
+          datatype: string
+          value: syslog
+      object_title: /var/log/syslog file
+    etc-passwd-syslog-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          value: passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^syslog:x:([0-9]+):[0-9]+::.*:.*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: /etc/passwd for syslog
+  variables:
+    id-syslog-variable:
+      title: ID for syslog
+      kind: local
+      datatype: int
+      expression:
+        values:
+          object: etc-passwd-syslog-object
+          field: subexpression
+  states:
+    state-owned-by-syslog:
+      state_title: owned by syslog
+      capability: unix.file
+      state:
+        field: user_id
+        value:
+          variable: id-syslog-variable
+        operation: equals
+        datatype: int
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-var-log-syslog-file-owned-by-syslog:
+      test_title: /var/log/syslog file must be owned by syslog
+      capability: unix.file
+      object: var-log-syslog-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-syslog
+  evaluate:
+    test: test-var-log-syslog-file-owned-by-syslog

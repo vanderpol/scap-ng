@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.22e3752d31c94a79327df4e6
+  version: 1
+  assessment_title: SPN Target Name Validation Level
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: System\CurrentControlSet\Services\LanManServer\Parameters
+        name:
+          operation: equals
+          datatype: string
+          value: SMBServerNameHardeningLevel
+      object_title: null
+  variables:
+    microsoft-network-server-spn-target-name-validation-variable:
+      title: 'Microsoft network server: SPN Target name validation'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: microsoft_network_server_server_spn_target_name_validation_level_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: 'off'
+          - literal: '1'
+            hint: accept_if_provided_by_client
+          - literal: '2'
+            hint: required_from_client
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: microsoft-network-server-spn-target-name-validation-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-microsoft-network-server-server-spn-target-name-validation-level-set:
+      test_title: '''Microsoft network server: Server SPN target name validation level'' is set to ''Off'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-microsoft-network-server-server-spn-target-name-validation-level-set

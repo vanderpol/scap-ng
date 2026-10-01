@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.4d98047a83d69d446ee987c6
+  version: 1
+  assessment_title: OL08-00-010820 - Unattended or automatic logon via the OL 8 graphical user interface must not be allowed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/gdm/custom.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\[daemon\]\s+[#\s\w=]*^\s*AutomaticLoginEnable=(\w+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'false'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-automaticloginenable-set-false-in-etc-gdm-custom-conf:
+      test_title: AutomaticLoginEnable is set to false in /etc/gdm/custom.conf.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-automaticloginenable-set-false-in-etc-gdm-custom-conf

@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.c51388b677d04563bb93cd27
+  version: 1
+  assessment_title: UAC - UIAccess Secure Desktop
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          value: EnableUIADesktopToggle
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-0:
+      state_title: Reg_Dword type and value equals 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-user-account-control-allow-uiaccess-applications-prompt-elevation-without-using:
+      test_title: '''User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop''
+        is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+  evaluate:
+    test: test-user-account-control-allow-uiaccess-applications-prompt-elevation-without-using

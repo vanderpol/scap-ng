@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.c37051f87976bb8999995105
+  version: 1
+  assessment_title: Media Player - Disable Automatic Updates
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\WindowsMediaPlayer
+        name:
+          operation: equals
+          datatype: string
+          value: DisableAutoUpdate
+      object_title: null
+  variables:
+    prevent-automatic-updates-variable:
+      title: Prevent Automatic Updates
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: prevent_automatic_updates_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: prevent-automatic-updates-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-prevent-automatic-updates-set-enabled:
+      test_title: '''Prevent Automatic Updates'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-prevent-automatic-updates-set-enabled

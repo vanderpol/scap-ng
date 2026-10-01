@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.b2db8c15f4345276a0b66c8f
+  version: 1
+  assessment_title: The Ubuntu operating system must display the Standard Mandatory DOD Notice and Consent Banner before granting
+    local access to the system via a graphical user logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    ubuntu-display-standard-mandatory-dod-notice-consent-banner-before-granting-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/gdm3/greeter.dconf-defaults
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: banner-message-text=(.*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        singleline: 'true'
+      object_title: Ubuntu must display the Standard Mandatory DOD Notice and Consent Banner before granting local access
+        to the system via a graphical user logon.
+  states:
+    state-ubuntu-must-display-the-standard-mandatory-dod-notice-an:
+      state_title: Ubuntu must display the Standard Mandatory DOD Notice and Consent Banner before granting local access to
+        the system via a graphical user logon.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '["'']You\s+are\s+accessing\s+a\s+U.S.\s+Government\s+\(USG\)\s+Information\s+System\s+\(IS\)\s+that\s+is\s+provided\s+for\s+USG-authorized\s+use\s+only.[\n\r\s\t]+By\s+using\s+this\s+IS\s+\(which\s+includes\s+any\s+device\s+attached\s+to\s+this\s+IS\),\s+you\s+consent\s+to\s+the\s+following\s+conditions:[\n\r\s\t]+-The\s+USG\s+routinely\s+intercepts\s+and\s+monitors\s+communications\s+on\s+this\s+IS\s+for\s+purposes\s+including,\s+but\s+not\s+limited\s+to,\s+penetration\s+testing,\s+COMSEC\s+monitoring,\s+network\s+operations\s+and\s+defense,\s+personnel\s+misconduct\s+\(PM\),\s+law\s+enforcement\s+\(LE\),\s+and\s+counterintelligence\s+\(CI\)\s+investigations.[\n\r\s\t]+-At\s+any\s+time,\s+the\s+USG\s+may\s+inspect\s+and\s+seize\s+data\s+stored\s+on\s+this\s+IS.[\n\r\s\t]+-Communications\s+using,\s+or\s+data\s+stored\s+on,\s+this\s+IS\s+are\s+not\s+private,\s+are\s+subject\s+to\s+routine\s+monitoring,\s+interception,\s+and\s+search,\s+and\s+may\s+be\s+disclosed\s+or\s+used\s+for\s+any\s+USG-authorized\s+purpose.[\n\r\s\t]+-This\s+IS\s+includes\s+security\s+measures\s+\(e\.g\.,\s+authentication\s+and\s+access\s+controls\)\s+to\s+protect\s+USG\s+interests\s*\-\-\s*not\s+for\s+your\s+personal\s+benefit\s+or\s+privacy.[\n\r\s\t]+-Notwithstanding\s+the\s+above,\s+using\s+this\s+IS\s+does\s+not\s+constitute\s+consent\s+to\s+PM,\s+LE\s+or\s+CI\s+investigative\s+searching\s+or\s+monitoring\s+of\s+the\s+content\s+of\s+privileged\s+communications,\s+or\s+work\s+product,\s+related\s+to\s+personal\s+representation\s+or\s+services\s+by\s+attorneys,\s+psychotherapists,\s+or\s+clergy,\s+and\s+their\s+assistants.\s+Such\s+communications\s+and\s+work\s+product\s+are\s+private\s+and\s+confidential.\s+See\s+User\s+Agreement\s+for\s+details\.["'']'
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-ubuntu-display-standard-mandatory-dod-notice-consent-banner-before-granting:
+      test_title: Ubuntu must display the Standard Mandatory DOD Notice and Consent Banner before granting local access to
+        the system via a graphical user logon.
+      capability: independent.textfilecontent54
+      object: ubuntu-display-standard-mandatory-dod-notice-consent-banner-before-granting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-display-the-standard-mandatory-dod-notice-an
+  evaluate:
+    test: test-ubuntu-display-standard-mandatory-dod-notice-consent-banner-before-granting

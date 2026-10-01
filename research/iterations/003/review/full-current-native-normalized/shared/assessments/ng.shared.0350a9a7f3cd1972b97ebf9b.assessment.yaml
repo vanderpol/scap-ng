@@ -1,0 +1,99 @@
+assessment:
+  id: ng.shared.0350a9a7f3cd1972b97ebf9b
+  version: 1
+  assessment_title: System packages must be configured with the vendor-provided files, permissions, and ownerships.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pkg-property-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: pkg property
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: signature-policy
+      object_title: pkg property
+    pkg-verify-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: pkg verify
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: 'pkg://|file:|ERROR:'
+      object_title: pkg verify
+  states:
+    state-check-that-line-returns-signature-policy-verify:
+      state_title: Check that line returns signature-policy               verify
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: signature-policy               verify
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-check-that-line-returns-1-with-an-exit-status-of-0:
+      state_title: Check that line returns '1' with an exit status of 0
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: none_exist
+  tests:
+    test-determine-what-signature-policy-pkg-publishers:
+      test_title: 'Determine what the signature policy is for pkg publishers:'
+      capability: independent.shellcommand
+      object: pkg-property-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-line-returns-signature-policy-verify
+    test-system-set-strict-multihoming:
+      test_title: The system must set strict multihoming.
+      capability: independent.shellcommand
+      object: pkg-verify-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-line-returns-1-with-an-exit-status-of-0
+  evaluate:
+    all:
+    - test: test-determine-what-signature-policy-pkg-publishers
+    - test: test-system-set-strict-multihoming

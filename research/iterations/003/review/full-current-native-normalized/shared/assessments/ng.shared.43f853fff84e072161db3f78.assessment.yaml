@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.43f853fff84e072161db3f78
+  version: 1
+  assessment_title: UBTU-22-411010 - Ubuntu 22.04 LTS must prevent direct login into the root account.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-shadow-object:
+      capability: unix.shadow
+      select:
+        username:
+          operation: equals
+          datatype: string
+          value: root
+      object_title: null
+  states:
+    state-unix-shadow:
+      state_title: null
+      capability: unix.shadow
+      state:
+        field: password
+        value: ^!
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-root-account-locked:
+      test_title: root account is locked
+      capability: unix.shadow
+      object: unix-shadow-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-shadow
+  evaluate:
+    test: test-root-account-locked

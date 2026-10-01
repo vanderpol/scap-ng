@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.2d6e6ed1af397c097da6d299
+  version: 1
+  assessment_title: The macOS system must prevent nonprivileged users from executing privileged functions to include disabling,
+    circumventing, or altering implemented security safeguards/countermeasures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-system-wide-preferences-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\"\
+            \ \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\"\
+            )\nresult=\"1\"\nfor section in ${authDBs[@]}; do\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\"\
+            \ | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"shared\")]/following-sibling::*[1])' -) != \"false\"\
+            \ ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint\
+            \ -xpath '//*[contains(text(), \"group\")]/following-sibling::*[1]/text()' - ) != \"admin\" ]]; then\n    result=\"\
+            0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(),\
+            \ \"authenticate-user\")]/following-sibling::*[1])' -) != \"true\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security\
+            \ -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"session-owner\"\
+            )]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\ndone\necho $result"
+      object_title: system_settings_system_wide_preferences_configure_recommended_object
+  states:
+    state-system-settings-system-wide-preferences-configure-recomm:
+      state_title: system_settings_system_wide_preferences_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-system-wide-preferences-configure-recommended-test:
+      test_title: system_settings_system_wide_preferences_configure_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-system-wide-preferences-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-system-wide-preferences-configure-recomm
+  evaluate:
+    test: test-system-settings-system-wide-preferences-configure-recommended-test

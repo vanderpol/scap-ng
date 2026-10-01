@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.853e26b4c82547c3f4d7571e
+  version: 1
+  assessment_title: UBTU-18-010509 - The Ubuntu operating system must disable automatic mounting of Universal Serial Bus (USB)
+    mass storage driver.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*install[ \t]+usb-storage[ \t]+/bin/false[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*blacklist[ \t]+usb-storage[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-modprobe-d-contains-file-that-contains-install-usb-storage:
+      test_title: /etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-modprobe-d-contains-file-that-contains-blacklist-usb-storage:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist usb-storage'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-etc-modprobe-d-contains-file-that-contains-install-usb-storage
+    - test: test-etc-modprobe-d-contains-file-that-contains-blacklist-usb-storage

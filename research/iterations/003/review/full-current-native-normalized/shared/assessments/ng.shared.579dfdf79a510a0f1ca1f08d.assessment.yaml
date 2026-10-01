@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.579dfdf79a510a0f1ca1f08d
+  version: 1
+  assessment_title: OL09-00-002065 - OL 9 must mount /var/log/audit with the noexec option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          value: /var/log/audit
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: noexec
+        operation: equals
+        datatype: string
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^.*noexec.*$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-var-log-audit-mounted-noexec-option:
+      test_title: /var/log/audit is mounted with the noexec option
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-partition
+    test-var-log-audit-configured-noexec-option-in-etc-fstab:
+      test_title: /var/log/audit is configured with the noexec option in /etc/fstab
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-var-log-audit-mounted-noexec-option
+    - test: test-var-log-audit-configured-noexec-option-in-etc-fstab

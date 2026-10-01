@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.ea48bb460a11ea810437ab92
+  version: 1
+  assessment_title: AZLX-23-002325 - Amazon Linux 2023 must ensure the /var/log directory be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    var-log-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /var/log
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: /var/log directory
+  states:
+    state-group-owned-by-root:
+      state_title: group-owned by root
+      capability: unix.file
+      state:
+        field: group_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-var-log-directory-group-owned-by-root:
+      test_title: /var/log directory is group-owned by root.
+      capability: unix.file
+      object: var-log-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-group-owned-by-root
+  evaluate:
+    test: test-var-log-directory-group-owned-by-root

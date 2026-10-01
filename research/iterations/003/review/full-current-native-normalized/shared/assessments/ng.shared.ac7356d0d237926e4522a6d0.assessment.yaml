@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.ac7356d0d237926e4522a6d0
+  version: 1
+  assessment_title: The Cisco router must be configured with only one local account to be used as the account of last resort
+    in the event the authentication server is unavailable.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    local-username-information-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          value: ^username
+      object_title: local username information
+    aaa-authentication-login-setting-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          value: '^aaa authentication login '
+      object_title: aaa authentication login setting
+  states:
+    state-all-usernames-must-comply-with-common-criteria-policy-pa:
+      state_title: all usernames must comply with common-criteria-policy PASSWORD_POLICY
+      capability: iosxe.global
+      state:
+        field: global_command
+        value: common-criteria-policy PASSWORD_POLICY
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-aaa-authentication-must-have-local-after-tacacs-or-radiu:
+      state_title: aaa authentication must have local after tacacs+ or radius
+      capability: iosxe.global
+      state:
+        field: global_command
+        value: tacacs|radius.+local
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-configured-common-criteria-policy-used-when-creating-or-changing-local:
+      test_title: The configured Common Criteria policy must be used when creating or changing the local account password
+      capability: iosxe.global
+      object: local-username-information-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-all-usernames-must-comply-with-common-criteria-policy-pa
+    test-verify-that-local-defined-after-radius-or-tacas-in-authentication:
+      test_title: Verify that local is defined after radius or tacas+ in the authentication order
+      capability: iosxe.global
+      object: aaa-authentication-login-setting-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-aaa-authentication-must-have-local-after-tacacs-or-radiu
+  evaluate:
+    all:
+    - test: test-configured-common-criteria-policy-used-when-creating-or-changing-local
+    - test: test-verify-that-local-defined-after-radius-or-tacas-in-authentication

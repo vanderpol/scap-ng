@@ -1,0 +1,69 @@
+assessment:
+  id: ng.shared.d53a45508a0753b701cdeb7f
+  version: 1
+  assessment_title: The .rhosts file must not be supported in PAM.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-files-pam-rhosts-auth-so-1-line-in-etc-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[^#]*pam_rhosts_auth\.so\.1.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: check for files with pam_rhosts_auth.so.1 line in /etc/pam.d/
+    check-pam-rhosts-auth-so-1-line-in-etc-pam-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          value: pam.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[^#]*pam_rhosts_auth\.so\.1.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: check for pam_rhosts_auth.so.1 line in /etc/pam.conf
+  states: {}
+  tests:
+    test-no-files-contain-pam-rhosts-auth-so-1-line-s:
+      test_title: No files contain pam_rhosts_auth.so.1 line(s) in /etc/pam.d/
+      capability: independent.textfilecontent54
+      object: check-files-pam-rhosts-auth-so-1-line-in-etc-object
+      check_existence: none_exist
+      check: all
+    test-no-pam-rhosts-auth-so-1-line-s-in-etc:
+      test_title: No pam_rhosts_auth.so.1 line(s) in /etc/pam.conf
+      capability: independent.textfilecontent54
+      object: check-pam-rhosts-auth-so-1-line-in-etc-pam-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-no-files-contain-pam-rhosts-auth-so-1-line-s
+    - test: test-no-pam-rhosts-auth-so-1-line-s-in-etc

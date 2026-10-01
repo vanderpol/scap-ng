@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.a607553c9c374830d3176692
+  version: 1
+  assessment_title: WN10-AU-000150 - The system must be configured to audit System - Security System Extension successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-security-system-extension-is-set-to-success:
+      state_title: '''Security System Extension'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_system_extension
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-security-system-extension-is-set-to-success-and-failure:
+      state_title: '''Security System Extension'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_system_extension
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-security-system-extension-set-success:
+      test_title: '''Audit Security System Extension'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-security-system-extension-is-set-to-success
+    test-audit-security-system-extension-set-success-failure:
+      test_title: '''Audit Security System Extension'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-security-system-extension-is-set-to-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-security-system-extension-set-success
+    - test: test-audit-security-system-extension-set-success-failure

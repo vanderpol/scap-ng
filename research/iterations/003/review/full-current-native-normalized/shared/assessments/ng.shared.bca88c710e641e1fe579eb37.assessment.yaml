@@ -1,0 +1,128 @@
+assessment:
+  id: ng.shared.bca88c710e641e1fe579eb37
+  version: 1
+  assessment_title: OL 8 library directories must have mode 755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-system-wide-library-directories-have-755-or-better-gwrite-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        state: state-mode-755-or-less-permissive-gwrite-should-be-false
+      - action: exclude
+        state: state-symbolic-links
+      - action: exclude
+        state: state-unix-file
+      behaviors:
+        recurse_direction: down
+      object_title: All system-wide Library Directories have 755 or better (gwrite should be = false.)
+    all-system-wide-library-directories-have-755-or-better-owrite-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        state: state-mode-755-or-less-permissive-owrite-should-be-false
+      - action: exclude
+        state: state-symbolic-links
+      - action: exclude
+        state: state-unix-file
+      behaviors:
+        recurse_direction: down
+      object_title: All system-wide Library Directories have 755 or better (owrite should be = false.)
+  variables:
+    system-wide-shared-library-files-directories-variable:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  states:
+    state-mode-755-or-less-permissive-gwrite-should-be-false:
+      state_title: Mode 755 or less permissive (gwrite should be = false.)
+      capability: unix.file
+      state:
+        field: gwrite
+        value: 'false'
+        operation: equals
+        datatype: boolean
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-symbolic-links:
+      state_title: symbolic links
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: file
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-mode-755-or-less-permissive-owrite-should-be-false:
+      state_title: Mode 755 or less permissive (owrite should be = false.)
+      capability: unix.file
+      state:
+        field: owrite
+        value: 'false'
+        operation: equals
+        datatype: boolean
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-library-directories-have-mode-755-or-less-permissive-gwrite:
+      test_title: System Library directories have mode 755 or less permissive.(gwrite should be = false.)
+      capability: unix.file
+      object: all-system-wide-library-directories-have-755-or-better-gwrite-object
+      check_existence: none_exist
+      check: all
+    test-system-library-directories-have-mode-755-or-less-permissive-owrite:
+      test_title: System Library directories have mode 755 or less permissive (owrite should be = false.)
+      capability: unix.file
+      object: all-system-wide-library-directories-have-755-or-better-owrite-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-system-library-directories-have-mode-755-or-less-permissive-gwrite
+    - test: test-system-library-directories-have-mode-755-or-less-permissive-owrite

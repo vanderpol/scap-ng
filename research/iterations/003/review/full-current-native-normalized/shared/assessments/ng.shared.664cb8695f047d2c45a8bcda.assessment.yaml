@@ -1,0 +1,119 @@
+assessment:
+  id: ng.shared.664cb8695f047d2c45a8bcda
+  version: 1
+  assessment_title: RHEL-08-040262 - RHEL 8 must not accept router advertisements on all IPv6 interfaces by default.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: net.ipv6.conf.default.accept_ra
+      object_title: null
+    other-sysctl-configuration-files-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: directories-containing-sysctl-configuration-files-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: (?:^|\.*\n)\s*net\.ipv6\.conf\.default\.accept_ra\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: other sysctl configuration files
+    etc-sysctl-conf-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: (?:^|\.*\n)\s*net\.ipv6\.conf\.default\.accept_ra\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/sysctl.conf
+    all-sysctl-configuration-files-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: other-sysctl-configuration-files-object
+        - object: etc-sysctl-conf-object
+      object_title: all sysctl configuration files
+  variables:
+    directories-containing-sysctl-configuration-files-variable:
+      title: Directories containing sysctl configuration files
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-net-ipv6-conf-default-accept-ra-setting-in-kernel-set:
+      test_title: net.ipv6.conf.default.accept_ra setting in kernel is set to 0
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
+    test-net-ipv6-conf-default-accept-ra-setting-in-sysctl-configuration:
+      test_title: net.ipv6.conf.default.accept_ra setting in the sysctl configuration files is set to 0, and nothing else
+      capability: independent.textfilecontent54
+      object: all-sysctl-configuration-files-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-net-ipv6-conf-default-accept-ra-setting-in-kernel-set
+    - test: test-net-ipv6-conf-default-accept-ra-setting-in-sysctl-configuration

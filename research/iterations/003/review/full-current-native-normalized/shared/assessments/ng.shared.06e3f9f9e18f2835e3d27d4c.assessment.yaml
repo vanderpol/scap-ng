@@ -1,0 +1,60 @@
+assessment:
+  id: ng.shared.06e3f9f9e18f2835e3d27d4c
+  version: 1
+  assessment_title: Set Password Expiration Parameters
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*PASS_MIN_DAYS\s+(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  variables:
+    minimum-password-age-in-days-variable:
+      title: Minimum password age in days
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: var_accounts_minimum_age_login_defs
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: minimum-password-age-in-days-variable
+        operation: greater than or equal
+        datatype: int
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-value-pass-min-days-should-set-appropriately-in-etc-login:
+      test_title: The value of PASS_MIN_DAYS should be set appropriately in /etc/login.defs
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-value-pass-min-days-should-set-appropriately-in-etc-login

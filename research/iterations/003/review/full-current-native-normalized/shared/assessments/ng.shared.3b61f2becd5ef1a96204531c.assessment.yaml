@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.3b61f2becd5ef1a96204531c
+  version: 1
+  assessment_title: The macOS system must configure audit retention to seven days.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-retention-configure-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/awk -F: ''/expire-after/{print $2}'' /etc/security/audit_control'
+      object_title: audit_retention_configure_stig_object
+  states:
+    state-audit-retention-configure-stig-state:
+      state_title: audit_retention_configure_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 7d
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-retention-configure-stig-test:
+      test_title: audit_retention_configure_stig_test
+      capability: independent.shellcommand
+      object: audit-retention-configure-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-retention-configure-stig-state
+  evaluate:
+    test: test-audit-retention-configure-stig-test

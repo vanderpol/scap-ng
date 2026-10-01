@@ -1,0 +1,104 @@
+assessment:
+  id: ng.shared.2f9ac34e617d04582e106894
+  version: 1
+  assessment_title: All system start-up files must be group-owned by root, sys, or bin.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-rc-etc-init-d-directories-object-2:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: run-control-scripts-dir-paths-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: The /etc/rc* and /etc/init.d directories.
+    etc-rc-etc-init-d-directories-object:
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - object: etc-rc-etc-init-d-directories-object-2
+        filters:
+        - action: exclude
+          state: state-symbolic-link
+      object_title: The /etc/rc* and /etc/init.d directories.
+  variables:
+    run-control-scripts-dir-paths-variable:
+      title: Run control scripts' dir paths.
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/init.d
+        - /etc/rc0.d
+        - /etc/rc1.d
+        - /etc/rc2.d
+        - /etc/rc3.d
+        - /etc/rcS.d
+        - /etc/rcm
+  states:
+    state-group-owner-root-gid-0:
+      state_title: group owner root (GID 0)
+      capability: unix.file
+      state:
+        field: group_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-group-owner-bin-gid-2:
+      state_title: group owner bin (GID 2)
+      capability: unix.file
+      state:
+        field: group_id
+        value: '2'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-group-owner-sys-gid-3:
+      state_title: group owner sys (GID 3)
+      capability: unix.file
+      state:
+        field: group_id
+        value: '3'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-symbolic-link:
+      state_title: symbolic link
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-files-under-etc-rc-init-d-directories-have-group:
+      test_title: All files under /etc/rc* and init.d directories have group owner root, sys, or bin
+      capability: unix.file
+      object: etc-rc-etc-init-d-directories-object
+      check_existence: any_exist
+      check: all
+      state_operator: OR
+      states:
+      - state-group-owner-root-gid-0
+      - state-group-owner-bin-gid-2
+      - state-group-owner-sys-gid-3
+  evaluate:
+    test: test-all-files-under-etc-rc-init-d-directories-have-group

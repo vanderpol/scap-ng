@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.3939c861132b0dbd7fed2b38
+  version: 1
+  assessment_title: Audit - Logon - Success
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-logon-success-only:
+      state_title: Audit - Logon - Success only
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: logon
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-logon-success-and-failure:
+      state_title: Audit - Logon - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: logon
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-logon-success-only:
+      test_title: Audit - Logon - Success only
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-logon-success-only
+    test-audit-logon-success-failure:
+      test_title: Audit - Logon - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-logon-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-logon-success-only
+    - test: test-audit-logon-success-failure

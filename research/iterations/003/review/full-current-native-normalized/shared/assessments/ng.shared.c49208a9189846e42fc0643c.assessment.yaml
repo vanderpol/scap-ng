@@ -1,0 +1,137 @@
+assessment:
+  id: ng.shared.c49208a9189846e42fc0643c
+  version: 1
+  assessment_title: Exchange must have anti-spam filtering enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-get-contentfilterconfig-determine-if-it-enabled-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ContentFilterConfig | Select-Object -Property
+            Name, Enabled | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-ContentFilterConfig to determine if it is enabled
+    run-get-senderfilterconfig-determine-if-it-enabled-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-SenderFilterConfig | Select-Object -Property
+            Name, Enabled | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-SenderFilterConfig to determine if it is enabled
+    run-get-senderidconfig-determine-if-it-enabled-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-SenderIDConfig | Select-Object -Property
+            Name, Enabled | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-SenderIDConfig to determine if it is enabled
+    run-get-senderreputationconfig-determine-if-it-enabled-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-SenderReputationConfig | Select-Object -Property
+            Name, Enabled | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-SenderReputationConfig to determine if it is enabled
+  states:
+    state-verify-true-is-returned:
+      state_title: Verify True is returned
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: (?i)True\s*$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-if-get-contentfilterconfig-not-enabled-this-finding:
+      test_title: If Get-ContentFilterConfig is not enabled, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-contentfilterconfig-determine-if-it-enabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-true-is-returned
+    test-if-get-senderfilterconfig-not-enabled-this-finding:
+      test_title: If Get-SenderFilterConfig is not enabled, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-senderfilterconfig-determine-if-it-enabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-true-is-returned
+    test-if-get-senderidconfig-not-enabled-this-finding:
+      test_title: If Get-SenderIDConfig is not enabled, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-senderidconfig-determine-if-it-enabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-true-is-returned
+    test-if-get-senderreputationconfig-not-enabled-this-finding:
+      test_title: If Get-SenderReputationConfig is not enabled, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-senderreputationconfig-determine-if-it-enabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-true-is-returned
+  evaluate:
+    all:
+    - test: test-if-get-contentfilterconfig-not-enabled-this-finding
+    - test: test-if-get-senderfilterconfig-not-enabled-this-finding
+    - test: test-if-get-senderidconfig-not-enabled-this-finding
+    - test: test-if-get-senderreputationconfig-not-enabled-this-finding

@@ -1,0 +1,132 @@
+assessment:
+  id: ng.shared.f15ccc7bd308660abc77bc90
+  version: 1
+  assessment_title: WN10-CC-000039 - Run as different user must be removed from context menus.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Classes\batfile\shell\runasuser
+        name:
+          operation: equals
+          datatype: string
+          value: SuppressionPolicy
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Classes\cmdfile\shell\runasuser
+        name:
+          operation: equals
+          datatype: string
+          value: SuppressionPolicy
+      object_title: null
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Classes\exefile\shell\runasuser
+        name:
+          operation: equals
+          datatype: string
+          value: SuppressionPolicy
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Classes\mscfile\shell\runasuser
+        name:
+          operation: equals
+          datatype: string
+          value: SuppressionPolicy
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-4096:
+      state_title: Reg_Dword type and value equals 4096
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '4096'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-remove-run-as-different-user-from-context-menus-set-enabled:
+      test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (batfile)'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4096
+    test-remove-run-as-different-user-from-context-menus-set-enabled-2:
+      test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (cmdfile)'
+      capability: windows.registry
+      object: windows-registry-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4096
+    test-remove-run-as-different-user-from-context-menus-set-enabled-3:
+      test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (exefile)'
+      capability: windows.registry
+      object: windows-registry-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4096
+    test-remove-run-as-different-user-from-context-menus-set-enabled-4:
+      test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (mscfile)'
+      capability: windows.registry
+      object: windows-registry-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4096
+  evaluate:
+    all:
+    - test: test-remove-run-as-different-user-from-context-menus-set-enabled
+    - test: test-remove-run-as-different-user-from-context-menus-set-enabled-2
+    - test: test-remove-run-as-different-user-from-context-menus-set-enabled-3
+    - test: test-remove-run-as-different-user-from-context-menus-set-enabled-4

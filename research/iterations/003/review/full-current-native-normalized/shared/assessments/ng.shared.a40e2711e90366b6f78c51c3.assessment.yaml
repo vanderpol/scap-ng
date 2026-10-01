@@ -1,0 +1,259 @@
+assessment:
+  id: ng.shared.a40e2711e90366b6f78c51c3
+  version: 1
+  assessment_title: WN10-CC-000391 - Internet Explorer must be disabled for Windows 10.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
+      object_title: null
+    editionid-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          value: EditionId
+      object_title: EditionID
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
+        name:
+          operation: equals
+          datatype: string
+          value: NotifyDisableIEOptions
+      object_title: null
+    64-bit-displayname-registry-value-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall
+        name:
+          operation: equals
+          datatype: string
+          value: DisplayName
+      behaviors:
+        max_depth: '1'
+        recurse_direction: down
+      object_title: 64-bit DisplayName registry value
+    64-bit-displayname-equals-microsoft-edge-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: 64-bit-displayname-registry-value-object
+        filters:
+        - action: include
+          state: state-registry-value-equals-microsoft-edge
+      object_title: 64-bit DisplayName equals Microsoft Edge
+    32-bit-displayname-registry-value-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+        name:
+          operation: equals
+          datatype: string
+          value: DisplayName
+      behaviors:
+        max_depth: '1'
+        recurse_direction: down
+      object_title: 32-bit DisplayName registry value
+    32-bit-displayname-equals-microsoft-edge-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: 32-bit-displayname-registry-value-object
+        filters:
+        - action: include
+          state: state-registry-value-equals-microsoft-edge
+      object_title: 32-bit DisplayName equals Microsoft Edge
+  states:
+    state-windows-wmi57:
+      state_title: null
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            entity_check: at least one
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-editionid-enterprises-reg-sz:
+      state_title: EditionID = EnterpriseS (reg_sz)
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: EnterpriseS
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-2:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-3:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-registry-value-equals-microsoft-edge:
+      state_title: registry value equals Microsoft Edge
+      capability: windows.registry
+      state:
+        field: value
+        value: Microsoft Edge
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-internet-explorer-11-optional-feature-disabled-or-not-installed:
+      test_title: Internet Explorer 11 optional feature disabled or not installed
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-windows-wmi57
+    test-os-windows-enterprise-ltsc:
+      test_title: The OS is Windows Enterprise LTSC
+      capability: windows.registry
+      object: editionid-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-editionid-enterprises-reg-sz
+    test-internet-explorer-11-disabled-as-standalone-browser:
+      test_title: Internet Explorer 11 is disabled as a standalone browser
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-registry
+      - state-windows-registry-2
+      - state-windows-registry-3
+    test-64-bit-microsoft-edge-installed:
+      test_title: 64-bit Microsoft Edge is installed
+      capability: windows.registry
+      object: 64-bit-displayname-equals-microsoft-edge-object
+      check_existence: none_exist
+      check: all
+    test-32-bit-microsoft-edge-installed:
+      test_title: 32-bit Microsoft Edge is installed
+      capability: windows.registry
+      object: 32-bit-displayname-equals-microsoft-edge-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    any:
+    - test: test-internet-explorer-11-optional-feature-disabled-or-not-installed
+    - test: test-os-windows-enterprise-ltsc
+    - all:
+      - test: test-internet-explorer-11-disabled-as-standalone-browser
+      - any:
+        - not:
+            test: test-64-bit-microsoft-edge-installed
+        - not:
+            test: test-32-bit-microsoft-edge-installed

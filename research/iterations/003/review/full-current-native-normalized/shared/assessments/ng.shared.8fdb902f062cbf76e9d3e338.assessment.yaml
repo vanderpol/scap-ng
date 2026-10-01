@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.8fdb902f062cbf76e9d3e338
+  version: 1
+  assessment_title: Restrict Anonymous SAM Enumeration
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: System\CurrentControlSet\Control\Lsa
+        name:
+          operation: equals
+          datatype: string
+          value: RestrictAnonymousSAM
+      object_title: null
+  variables:
+    network-access-do-not-allow-anonymous-enumeration-sam-accounts-variable:
+      title: 'Network access: Do not allow anonymous enumeration of SAM accounts'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: do_not_allow_anonymous_enumeration_sam_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: network-access-do-not-allow-anonymous-enumeration-sam-accounts-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-access-do-not-allow-anonymous-enumeration-sam-accounts-set:
+      test_title: '''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-network-access-do-not-allow-anonymous-enumeration-sam-accounts-set

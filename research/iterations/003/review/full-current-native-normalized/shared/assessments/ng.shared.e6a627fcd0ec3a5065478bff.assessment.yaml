@@ -1,0 +1,36 @@
+assessment:
+  id: ng.shared.e6a627fcd0ec3a5065478bff
+  version: 1
+  assessment_title: WN10-AC-000030 - The minimum password age must be configured to at least 1 day.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-passwordpolicy-object:
+      capability: windows.passwordpolicy
+      object_title: null
+  states:
+    state-windows-passwordpolicy:
+      state_title: null
+      capability: windows.passwordpolicy
+      state:
+        field: min_passwd_age
+        value: '86400'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-minimum-password-age-set-at-least-1-day:
+      test_title: '''Minimum Password Age'' is set to at least ''1'' day'
+      capability: windows.passwordpolicy
+      object: windows-passwordpolicy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-passwordpolicy
+  evaluate:
+    test: test-minimum-password-age-set-at-least-1-day

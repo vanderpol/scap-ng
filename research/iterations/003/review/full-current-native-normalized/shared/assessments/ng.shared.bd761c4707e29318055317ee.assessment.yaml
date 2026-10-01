@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.bd761c4707e29318055317ee
+  version: 1
+  assessment_title: WN10-CC-000190 - Autoplay must be disabled for all drives.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer
+        name:
+          operation: equals
+          datatype: string
+          value: NoDriveTypeAutoRun
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-255:
+      state_title: Reg_Dword type and value equals 255
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '255'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-turn-off-autoplay-set-enabled-all-drives:
+      test_title: '''Turn off AutoPlay'' is set to ''Enabled:All Drives'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-255
+  evaluate:
+    test: test-turn-off-autoplay-set-enabled-all-drives

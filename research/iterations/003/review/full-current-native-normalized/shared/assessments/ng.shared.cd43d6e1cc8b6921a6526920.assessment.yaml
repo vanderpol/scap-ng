@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.cd43d6e1cc8b6921a6526920
+  version: 1
+  assessment_title: The macOS system must disable login to other users' active and locked sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-unlock-active-user-session-disable-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: "RESULT=\"FAIL\"\nSS_RULE=$(/usr/bin/security -q authorizationdb read system.login.screensaver  2>&1 | /usr/bin/xmllint\
+            \ --xpath \"//dict/key[.='rule']/following-sibling::array[1]/string/text()\" -)\n\nif [[ \"${SS_RULE}\" == \"\
+            authenticate-session-owner\" ]]; then\n    RESULT=\"PASS\"\nelse\n    PSSO_CHECK=$(/usr/bin/security -q authorizationdb\
+            \ read \"$SS_RULE\"  2>&1 | /usr/bin/xmllint --xpath '//key[.=\"rule\"]/following-sibling::array[1]/string/text()'\
+            \ -)\n    if /usr/bin/grep -Fxq \"authenticate-session-owner\" <<<\"$PSSO_CHECK\"; then\n        RESULT=\"PASS\"\
+            \n    fi\nfi\n\necho $RESULT"
+      object_title: os_unlock_active_user_session_disable_stig_object
+  states:
+    state-os-unlock-active-user-session-disable-stig-state:
+      state_title: os_unlock_active_user_session_disable_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: PASS
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-unlock-active-user-session-disable-stig-test:
+      test_title: os_unlock_active_user_session_disable_stig_test
+      capability: independent.shellcommand
+      object: os-unlock-active-user-session-disable-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-unlock-active-user-session-disable-stig-state
+  evaluate:
+    test: test-os-unlock-active-user-session-disable-stig-test

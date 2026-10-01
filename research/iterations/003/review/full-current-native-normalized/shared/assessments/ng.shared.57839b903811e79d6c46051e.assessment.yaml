@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.57839b903811e79d6c46051e
+  version: 1
+  assessment_title: AZLX-23-002440 - Amazon Linux 2023 must restrict the use of the "su" command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/su
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*auth\s+(?:required|requisite)\s+pam_wheel\.so(?:\s|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-users-members-wheel-group-run-su-command:
+      test_title: Users must be members of the wheel group to run the su command.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-users-members-wheel-group-run-su-command

@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.3f585ae05fb4692ff399c0bd
+  version: 1
+  assessment_title: AZLX-23-005000 - Amazon Linux 2023 audit system must protect logon user identifiers (UIDs) from unauthorized
+    change.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^--loginuid-immutable$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-audit-audit-rules-loginuid-immutable-option-present:
+      test_title: '/etc/audit/audit.rules: --loginuid-immutable option is present'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-etc-audit-audit-rules-loginuid-immutable-option-present

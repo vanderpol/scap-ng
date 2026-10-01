@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.3c71581c2e9af06ecca550a9
+  version: 1
+  assessment_title: OL09-00-000360 - OL 9 must enable the hardware random number generator entropy gatherer service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-systemdunitproperty-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: rngd.service
+        property:
+          operation: equals
+          datatype: string
+          value: ActiveState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-rngd-service-active:
+      test_title: rngd.service is active
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+  evaluate:
+    test: test-rngd-service-active

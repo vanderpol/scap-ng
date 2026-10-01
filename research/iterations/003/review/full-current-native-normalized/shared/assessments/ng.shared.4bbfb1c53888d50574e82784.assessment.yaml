@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.4bbfb1c53888d50574e82784
+  version: 1
+  assessment_title: UBTU-18-010129 - The Ubuntu operating system must configure audit tools to be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-tool-executable-files-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: audit-tool-executable-files-variable
+      object_title: audit tool executable files
+  variables:
+    audit-tool-executable-files-variable:
+      title: audit tool executable files
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/audispd
+        - /sbin/augenrules
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-tool-executable-files-owned-by-root:
+      test_title: audit tool executable files owned by root
+      capability: unix.file
+      object: audit-tool-executable-files-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    test: test-audit-tool-executable-files-owned-by-root

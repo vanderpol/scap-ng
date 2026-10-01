@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.9ca26ccb5629df2bfb786fae
+  version: 1
+  assessment_title: OL 9 local interactive user home directories defined in the /etc/passwd file must exist.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-array-users-from-passwd-file-uid-1000-nologin-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: 'ls -d $(awk -F: ''($3>=1000)&&($7 !~ /nologin/){print $6}'' /etc/passwd)'
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ''
+      object_title: Retrieve array of users from passwd file with UID >=1000 and 'nologin'.
+  states:
+    state-check-that-no-directories-produce-cannot-access-errors:
+      state_title: Check that no directories produce 'cannot access' errors.
+      capability: independent.shellcommand
+      state:
+        field: stderr_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-confirm-interactive-user-s-home-directories-exist:
+      test_title: Confirm interactive user's home directories exist.
+      capability: independent.shellcommand
+      object: retrieve-array-users-from-passwd-file-uid-1000-nologin-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-check-that-no-directories-produce-cannot-access-errors
+  evaluate:
+    test: test-confirm-interactive-user-s-home-directories-exist

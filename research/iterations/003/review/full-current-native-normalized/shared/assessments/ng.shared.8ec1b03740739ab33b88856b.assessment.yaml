@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.8ec1b03740739ab33b88856b
+  version: 1
+  assessment_title: WN10-SO-000215 - The system must be configured to meet the minimum session security requirement for NTLM
+    SSP based clients.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0
+        name:
+          operation: equals
+          datatype: string
+          value: NTLMMinClientSec
+      object_title: null
+  states:
+    state-value-bitwise-and-537395200:
+      state_title: Value bitwise and 537395200
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '537395200'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-system-configured-meet-minimum-session-security-requirement-ntlm-ssp-based:
+      test_title: The system is configured to meet the minimum session security requirement for NTLM SSP based clients.
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-value-bitwise-and-537395200
+  evaluate:
+    test: test-system-configured-meet-minimum-session-security-requirement-ntlm-ssp-based

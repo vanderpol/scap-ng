@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.ce4ee240b3382614f6446206
+  version: 1
+  assessment_title: UBTU-22-271010 - Ubuntu 22.04 LTS must enable the graphical user logon banner to display the Standard
+    Mandatory DOD Notice and Consent Banner before granting local access to the system via a graphical user logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/gdm3/greeter.dconf-defaults
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*banner-message-enable\s*=\s*(\w+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'true'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-gdm3-greeter-dconf-defaults-banner-message-enable-set-true:
+      test_title: /etc/gdm3/greeter.dconf-defaults banner-message-enable is set to true
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-gdm3-greeter-dconf-defaults-banner-message-enable-set-true

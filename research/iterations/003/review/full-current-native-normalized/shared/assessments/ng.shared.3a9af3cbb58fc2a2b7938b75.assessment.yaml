@@ -1,0 +1,117 @@
+assessment:
+  id: ng.shared.3a9af3cbb58fc2a2b7938b75
+  version: 1
+  assessment_title: OL09-00-000042 - OL 9 must be configured to disable the FireWire kernel module.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-4:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/modprobe.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-modprobe-d-contains-file-that-contains-install-firewire-core:
+      test_title: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-modprobe-d-contains-file-that-contains-blacklist-firewire-core:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist firewire-core'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-modprobe-conf-contains-install-firewire-core-bin-false:
+      test_title: /etc/modprobe.conf contains 'install firewire-core /bin/false'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-3
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-modprobe-conf-contains-blacklist-firewire-core:
+      test_title: /etc/modprobe.conf contains 'blacklist firewire-core'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-4
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - all:
+      - test: test-etc-modprobe-d-contains-file-that-contains-install-firewire-core
+      - test: test-etc-modprobe-d-contains-file-that-contains-blacklist-firewire-core
+    - all:
+      - test: test-etc-modprobe-conf-contains-install-firewire-core-bin-false
+      - test: test-etc-modprobe-conf-contains-blacklist-firewire-core

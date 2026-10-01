@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.5658dc2b3fea267a321a7915
+  version: 1
+  assessment_title: WN11-AU-000505 - The security event log size must be configured to a value that holds at least one week's
+    worth of audit records.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Windows\EventLog\Security
+        name:
+          operation: case insensitive equals
+          datatype: string
+          value: MaxSize
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '5120000'
+          operation: greater than or equal
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-security-event-log-size-configured-5120000-kb-or-greater:
+      test_title: The Security event log size is configured to 5120000 KB or greater
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-security-event-log-size-configured-5120000-kb-or-greater

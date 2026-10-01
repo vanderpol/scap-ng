@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.fb4cab65a9325f96ae4ce843
+  version: 1
+  assessment_title: Require authentication upon booting into single-user and maintenance modes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-in-usr-lib-systemd-system-rescue-service-options-assinged-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /usr/lib/systemd/system
+        filename:
+          operation: equals
+          datatype: string
+          value: rescue.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*ExecStart=([^\n#]+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: check in /usr/lib/systemd/system/rescue.service for the options assinged to ExecStart
+  states:
+    state-the-options-assigned-to-execstart-includes-usr-sbin-sulo:
+      state_title: the options assigned to ExecStart includes /usr/sbin/sulogin
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '[''"; ]*\/usr\/sbin\/sulogin[''"; ]*'
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-in-usr-lib-systemd-system-rescue-service-option-usr:
+      test_title: check in /usr/lib/systemd/system/rescue.service for the option /usr/sbin/sulogin assinged to ExecStart
+      capability: independent.textfilecontent54
+      object: check-in-usr-lib-systemd-system-rescue-service-options-assinged-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-options-assigned-to-execstart-includes-usr-sbin-sulo
+  evaluate:
+    test: test-check-in-usr-lib-systemd-system-rescue-service-option-usr

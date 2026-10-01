@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.31e18add932e85d21f637798
+  version: 1
+  assessment_title: All GIDs Are Present In /etc/group
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-gids-in-etc-passwd-file-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: '^[^#\s\:]+:[^#\s\:]+:[0-9]+:([0-9]+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: All of the GIDs in the /etc/passwd file
+    all-gids-in-etc-group-file-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: '^[^#\s\:]+:[^#\s\:]*:([0-9]+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: All of the GIDs in the /etc/group file
+  variables:
+    gids-from-etc-group-variable:
+      title: GIDs from /etc/group
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: all-gids-in-etc-group-file-object
+          field: subexpression
+  states:
+    state-compare-what-is-in-etc-passwd-against-what-is-in-etc-gro:
+      state_title: Compare what is in /etc/passwd against what is in /etc/group
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: gids-from-etc-group-variable
+        operation: equals
+        datatype: string
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-verify-all-gids-referenced-in-etc-passwd-defined-in-etc:
+      test_title: Verify all GIDs referenced in /etc/passwd are defined in /etc/group
+      capability: independent.textfilecontent54
+      object: all-gids-in-etc-passwd-file-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-compare-what-is-in-etc-passwd-against-what-is-in-etc-gro
+  evaluate:
+    test: test-verify-all-gids-referenced-in-etc-passwd-defined-in-etc

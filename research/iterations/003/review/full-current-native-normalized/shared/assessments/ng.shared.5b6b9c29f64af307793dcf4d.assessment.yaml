@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.5b6b9c29f64af307793dcf4d
+  version: 1
+  assessment_title: UBTU-22-654190 - Ubuntu 22.04 LTS must generate audit records for all events that affect the systemd journal
+    files.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-w\s+/var/log/journal(\s+-p\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\s+(-k\s+|-F\s+key=)\w+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-modifications-var-log-journal:
+      test_title: Audit modifications to /var/log/journal
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-modifications-var-log-journal

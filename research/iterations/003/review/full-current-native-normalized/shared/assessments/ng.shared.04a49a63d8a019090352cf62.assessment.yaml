@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.04a49a63d8a019090352cf62
+  version: 1
+  assessment_title: The Oracle Linux operating system must label all off-loaded audit logs before sending them to the central
+    log server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-etc-audisp-audispd-conf-value-assigned-name-format-setting-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audisp/audispd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: (?i)^\s*name_format[ ]*=[ ]*([\w]+)\s*
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: Check /etc/audisp/audispd.conf for the value assigned to name_format setting.
+  states:
+    state-the-value-is-set-to-a-case-insensitive-hostname-fqd-or-n:
+      state_title: The value is set to a case insensitive hostname, fqd, or numeric
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^hostname|fqd|numeric$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-value-assigned-name-format-in-etc-audisp-audispd-conf:
+      test_title: Check the value assigned to name_format in /etc/audisp/audispd.conf
+      capability: independent.textfilecontent54
+      object: check-etc-audisp-audispd-conf-value-assigned-name-format-setting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-value-is-set-to-a-case-insensitive-hostname-fqd-or-n
+  evaluate:
+    test: test-check-value-assigned-name-format-in-etc-audisp-audispd-conf

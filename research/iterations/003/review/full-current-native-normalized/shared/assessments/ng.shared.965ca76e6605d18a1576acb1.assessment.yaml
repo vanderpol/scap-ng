@@ -1,0 +1,102 @@
+assessment:
+  id: ng.shared.965ca76e6605d18a1576acb1
+  version: 1
+  assessment_title: Amazon Linux 2023, for PKI-based authentication, must validate certificates by constructing a certification
+    path (which includes status information) to an accepted trust anchor.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-that-system-has-valid-dod-root-ca-installed-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: 'Issuer:'
+      object_title: Check that the system has a valid DOD root CA installed
+    check-that-root-certicate-date-time-valid-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: expire
+      object_title: Check that the root certicate is date/time valid
+  states:
+    state-verify-that-the-issuer-is-a-dod-root-ca:
+      state_title: Verify that the Issuer is a DOD Root CA
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: CN\s*=\s*DoD\s+Root\s+CA
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-verify-that-the-root-cert-is-date-time-valid:
+      state_title: Verify that the root cert is date/time valid
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: Certificate will not expire
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-pki-based-authentication-os-validate-certificates-by-constructing-certification-path:
+      test_title: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+        includes status information) to an accepted trust anchor.
+      capability: independent.shellcommand
+      object: check-that-system-has-valid-dod-root-ca-installed-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-that-the-issuer-is-a-dod-root-ca
+    test-pki-based-authentication-os-validate-certificates-by-constructing-certification-path-2:
+      test_title: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+        includes status information) to an accepted trust anchor.
+      capability: independent.shellcommand
+      object: check-that-root-certicate-date-time-valid-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-that-the-root-cert-is-date-time-valid
+  evaluate:
+    all:
+    - test: test-pki-based-authentication-os-validate-certificates-by-constructing-certification-path
+    - test: test-pki-based-authentication-os-validate-certificates-by-constructing-certification-path-2

@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.9d7816fef8481176490a7928
+  version: 1
+  assessment_title: The macOS system must configure sudoers timestamp type.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-sudoers-timestamp-type-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/awk -F": " ''/Type of authentication timestamp record/{print $2}'''
+      object_title: os_sudoers_timestamp_type_configure_recommended_object
+  states:
+    state-os-sudoers-timestamp-type-configure-recommended-state:
+      state_title: os_sudoers_timestamp_type_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: tty
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-sudoers-timestamp-type-configure-recommended-test:
+      test_title: os_sudoers_timestamp_type_configure_recommended_test
+      capability: independent.shellcommand
+      object: os-sudoers-timestamp-type-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-sudoers-timestamp-type-configure-recommended-state
+  evaluate:
+    test: test-os-sudoers-timestamp-type-configure-recommended-test

@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.7def886671e09f0854b7baf2
+  version: 1
+  assessment_title: UBTU-22-252020 - Ubuntu 22.04 LTS must record time stamps for audit records that can be mapped to Coordinated
+    Universal Time (UTC).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-symlink-object:
+      capability: unix.symlink
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/localtime
+      object_title: null
+  states:
+    state-unix-symlink:
+      state_title: null
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/zoneinfo/Etc/UTC
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-time-zone-set-utc:
+      test_title: time zone is set to UTC
+      capability: unix.symlink
+      object: unix-symlink-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-symlink
+  evaluate:
+    test: test-time-zone-set-utc

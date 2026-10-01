@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.b8f5077d2ba77ca55fc6d752
+  version: 1
+  assessment_title: OL09-00-002550 - OL 9 /etc/shadow file must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/shadow
+      object_title: null
+  states:
+    state-group-owned-by-root:
+      state_title: group-owned by root
+      capability: unix.file
+      state:
+        field: group_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-shadow-file-owned-by-root:
+      test_title: /etc/shadow file is owned by root
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-group-owned-by-root
+  evaluate:
+    test: test-etc-shadow-file-owned-by-root

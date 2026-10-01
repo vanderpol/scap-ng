@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.d2f204d3a02792d3706d8e32
+  version: 1
+  assessment_title: UBTU-20-010006 - The Ubuntu operating system must map the authenticated identity to the user or group
+    account for PKI-based authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam_pkcs11/pam_pkcs11.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*use_mappers\s*=([^;]*);\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: \bpwent\b
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: \bnull\b.*\bpwent\b
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-in-etc-pam-pkcs11-pam-pkcs11-conf-list-mappers-use:
+      test_title: In /etc/pam_pkcs11/pam_pkcs11.conf, the list of mappers to use includes pwent
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-in-etc-pam-pkcs11-pam-pkcs11-conf-list-mappers-use-2:
+      test_title: In /etc/pam_pkcs11/pam_pkcs11.conf, the list of mappers to use DOES NOT include null before pwent
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: none satisfy
+      states:
+      - state-independent-textfilecontent54-2
+  evaluate:
+    all:
+    - test: test-in-etc-pam-pkcs11-pam-pkcs11-conf-list-mappers-use
+    - test: test-in-etc-pam-pkcs11-pam-pkcs11-conf-list-mappers-use-2

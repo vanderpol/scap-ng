@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.e259123764e4f269a2c34a08
+  version: 1
+  assessment_title: OL09-00-000845 - OL 9 must be configured so that successful/unsuccessful uses of the umount2 system call
+    generate an audit record.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    32-bit-umount2-syscall-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+umount2\s+|(\s+|,)umount2(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: 32-bit umount2 syscall
+    64-bit-umount2-syscall-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+umount2\s+|(\s+|,)umount2(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: 64-bit umount2 syscall
+  states: {}
+  tests:
+    test-audit-32-bit-invocations-umount2-syscall:
+      test_title: Audit 32-bit invocations of umount2 syscall
+      capability: independent.textfilecontent54
+      object: 32-bit-umount2-syscall-object
+      check_existence: all_exist
+      check: all
+    test-audit-64-bit-invocations-umount2-syscall:
+      test_title: Audit 64-bit invocations of umount2 syscall
+      capability: independent.textfilecontent54
+      object: 64-bit-umount2-syscall-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-audit-32-bit-invocations-umount2-syscall
+    - test: test-audit-64-bit-invocations-umount2-syscall

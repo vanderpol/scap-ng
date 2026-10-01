@@ -1,0 +1,82 @@
+assessment:
+  id: ng.shared.25f245d0fbdfcb0118b80b07
+  version: 1
+  assessment_title: LanMan Authentication Level
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Control\Lsa
+        name:
+          operation: equals
+          datatype: string
+          value: LmCompatibilityLevel
+      object_title: null
+  variables:
+    network-security-lan-manager-authentication-level-variable:
+      title: 'Network Security: LAN Manager Authentication Level'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: lan_manager_authentication_level_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: send_LM_and_NTLM_responses
+          - literal: '1'
+            hint: send_LM_and_NTLM_use_NTLMv2_session_security_if_negotiated
+          - literal: '2'
+            hint: send_NTLM_response_only
+          - literal: '3'
+            hint: send_NTLMv2_response_only
+          - literal: '4'
+            hint: send_NTLMv2_response_only_refuse_LM
+          - literal: '5'
+            hint: send_NTLMv2_response_only_refuse_LM_and_NTLM
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: network-security-lan-manager-authentication-level-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-security-lan-manager-authentication-level-set-send-ntlmv2-response:
+      test_title: '''Network security: LAN Manager authentication level'' is set to ''Send NTLMv2 response only. Refuse LM
+        & NTLM'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-network-security-lan-manager-authentication-level-set-send-ntlmv2-response

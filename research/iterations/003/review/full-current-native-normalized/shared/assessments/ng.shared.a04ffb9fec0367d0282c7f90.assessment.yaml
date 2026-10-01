@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.a04ffb9fec0367d0282c7f90
+  version: 1
+  assessment_title: WN10-CC-000305 - Indexing of encrypted files must be turned off.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Windows\Windows Search
+        name:
+          operation: equals
+          datatype: string
+          value: AllowIndexingEncryptedStoresOrItems
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-allow-indexing-encrypted-files-set-disabled:
+      test_title: '''Allow indexing of encrypted files'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-allow-indexing-encrypted-files-set-disabled

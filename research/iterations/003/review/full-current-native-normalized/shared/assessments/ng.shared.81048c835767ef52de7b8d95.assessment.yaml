@@ -1,0 +1,91 @@
+assessment:
+  id: ng.shared.81048c835767ef52de7b8d95
+  version: 1
+  assessment_title: OL08-00-010130 - The OL 8 shadow password suite must be configured to use a sufficient number of hashing
+    rounds.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*SHA_CRYPT_MIN_ROUNDS\s+(\d+)\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*SHA_CRYPT_MAX_ROUNDS\s+(\d+)\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '100000'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-login-defs-sha-crypt-min-rounds-if-set-set:
+      test_title: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS, if set, is set to 100000 or greater'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-etc-login-defs-sha-crypt-max-rounds-if-set-set:
+      test_title: '/etc/login.defs: SHA_CRYPT_MAX_ROUNDS, if set, is set to 100000 or greater'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-etc-login-defs-sha-crypt-min-rounds-set:
+      test_title: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS is set'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-login-defs-sha-crypt-max-rounds-set:
+      test_title: '/etc/login.defs: SHA_CRYPT_MAX_ROUNDS is set'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-etc-login-defs-sha-crypt-min-rounds-if-set-set
+    - test: test-etc-login-defs-sha-crypt-max-rounds-if-set-set
+    - any:
+      - test: test-etc-login-defs-sha-crypt-min-rounds-set
+      - test: test-etc-login-defs-sha-crypt-max-rounds-set

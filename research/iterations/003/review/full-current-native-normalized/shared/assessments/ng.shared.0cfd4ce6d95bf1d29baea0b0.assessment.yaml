@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.0cfd4ce6d95bf1d29baea0b0
+  version: 1
+  assessment_title: SLES-12-010270 - The SUSE operating system must employ user passwords with a minimum lifetime of 24 hours
+    (1 day).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    minimum-password-age-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/shadow
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: '^[^:]+:[^:]+:[^:]+:0+:'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Minimum password age
+  states: {}
+  tests:
+    test-no-etc-shadow-line-has-minimum-password-age-0:
+      test_title: No /etc/shadow line has a minimum password age of 0
+      capability: independent.textfilecontent54
+      object: minimum-password-age-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-no-etc-shadow-line-has-minimum-password-age-0

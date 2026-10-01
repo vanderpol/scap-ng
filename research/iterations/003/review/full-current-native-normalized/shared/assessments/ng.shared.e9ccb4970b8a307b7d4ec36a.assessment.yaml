@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.e9ccb4970b8a307b7d4ec36a
+  version: 1
+  assessment_title: Windows Update Point and Print Driver Search
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows NT\Printers
+        name:
+          operation: equals
+          datatype: string
+          value: DoNotInstallCompatibleDriverFromWindowsUpdate
+      object_title: null
+  variables:
+    extend-point-print-connection-search-windows-update-use-alternate-connection-variable:
+      title: Extend Point and Print connection to search Windows Update and use alternate connection if needed
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: extend_point_and_print_connection_to_search_windows_update_and_use_alternate_connection_if_needed_var
+        validation:
+          alternatives:
+          - literal: '1'
+            hint: disabled
+          - literal: '0'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: extend-point-print-connection-search-windows-update-use-alternate-connection-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-extend-point-print-connection-search-windows-update-set-disabled:
+      test_title: '''Extend Point and Print connection to search Windows Update'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-extend-point-print-connection-search-windows-update-set-disabled

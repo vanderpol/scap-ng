@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.ace76afed7653299608bf03c
+  version: 1
+  assessment_title: UBTU-18-010022 - The Ubuntu operating system must be configured to preserve log records from failure events.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-dpkginfo-object:
+      capability: linux.dpkginfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: rsyslog
+      object_title: null
+    unix-process58-object:
+      capability: unix.process58
+      select:
+        command_line:
+          operation: pattern match
+          datatype: string
+          value: ^/usr/sbin/rsyslogd\b
+        pid:
+          operation: greater than
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-rsyslog-package-installed:
+      test_title: The rsyslog package is installed.
+      capability: linux.dpkginfo
+      object: linux-dpkginfo-object
+      check_existence: at_least_one_exists
+      check: all
+    test-rsyslogd-process-running:
+      test_title: The rsyslogd process is running.
+      capability: unix.process58
+      object: unix-process58-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-rsyslog-package-installed
+    - test: test-rsyslogd-process-running

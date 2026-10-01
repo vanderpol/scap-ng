@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.acc00b7b31dc879a158a408b
+  version: 1
+  assessment_title: WN10-CC-000185 - The default autorun behavior must be configured to prevent autorun commands.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Explorer
+        name:
+          operation: equals
+          datatype: string
+          value: NoAutorun
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-default-behavior-autorun-set-enabled-do-not-execute-any-autorun:
+      test_title: '''Default behavior for AutoRun'' is set to ''Enabled'' with ''Do not execute any autorun commands'' selected'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-default-behavior-autorun-set-enabled-do-not-execute-any-autorun

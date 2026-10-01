@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.dce6748e9671383b62f3f3ef
+  version: 1
+  assessment_title: OL08-00-010470 - There must be no ".shosts" files on the OL 8 operating system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /
+        filename:
+          operation: equals
+          datatype: string
+          value: .shosts
+      behaviors:
+        max_depth: '-1'
+        recurse: directories
+        recurse_direction: down
+        recurse_file_system: local
+      object_title: null
+  states: {}
+  tests:
+    test-there-no-shosts-files-on-system:
+      test_title: There are no .shosts files on the system.
+      capability: unix.file
+      object: unix-file-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-there-no-shosts-files-on-system

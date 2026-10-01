@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.6f537d1410a69f74a50cf6ae
+  version: 1
+  assessment_title: Exchange internal Receive connectors must require encryption.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-get-receiveconnector-display-authmechanism-configuration-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ReceiveConnector | Select-Object -Property
+            Name, Identity, AuthMechanism | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-ReceiveConnector to display AuthMechanism configuration
+  states:
+    state-verify-value-is-tls:
+      state_title: Verify value is Tls
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: (?i)\sTls
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-each-receive-connector-if-value-authmechanism-not-set-tls-this:
+      test_title: For each Receive connector, if the value of AuthMechanism is not set to Tls, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-receiveconnector-display-authmechanism-configuration-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-value-is-tls
+  evaluate:
+    test: test-each-receive-connector-if-value-authmechanism-not-set-tls-this

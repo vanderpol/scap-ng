@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.c5630a8f6eb15fa7f30571d7
+  version: 1
+  assessment_title: UAC - Admin Elevation Prompt
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          value: ConsentPromptBehaviorAdmin
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-4-or-less-than:
+      state_title: Reg_Dword type and value equals 4 or less than
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '4'
+          operation: less than or equal
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-is-greater-than-0:
+      state_title: Reg_Dword type and value is greater than 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: greater than
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-user-account-control-behavior-elevation-prompt-administrators-in-admin-approval:
+      test_title: '''User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode'' is
+        set to ''Prompt for consent'' or more secure options'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4-or-less-than
+    test-user-account-control-behavior-elevation-prompt-administrators-in-admin-approval-2:
+      test_title: '''User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode'' is
+        not set to ''Elevate without prompting'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-is-greater-than-0
+  evaluate:
+    all:
+    - test: test-user-account-control-behavior-elevation-prompt-administrators-in-admin-approval
+    - test: test-user-account-control-behavior-elevation-prompt-administrators-in-admin-approval-2

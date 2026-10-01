@@ -1,0 +1,103 @@
+assessment:
+  id: ng.shared.c8f22db31ea96d73943392c7
+  version: 1
+  assessment_title: Orphaned security identifiers (SIDs) must be removed from user rights on Windows 10.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-all-user-rights-only-include-orphaned-sids-object:
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: this-constant-variable-represents-all-user-rights-variable
+      filters:
+      - action: include
+        state: state-state-check-for-trustee-name-equal-to-blank-string-and-t
+      object_title: Gather all User Rights. Only include orphaned SIDs.
+  variables:
+    this-constant-variable-represents-all-user-rights-variable:
+      title: This constant_variable represents all user rights
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - SE_ASSIGNPRIMARYTOKEN_NAME
+        - SE_AUDIT_NAME
+        - SE_BACKUP_NAME
+        - SE_CHANGE_NOTIFY_NAME
+        - SE_CREATE_GLOBAL_NAME
+        - SE_CREATE_PAGEFILE_NAME
+        - SE_CREATE_PERMANENT_NAME
+        - SE_CREATE_SYMBOLIC_LINK_NAME
+        - SE_CREATE_TOKEN_NAME
+        - SE_DEBUG_NAME
+        - SE_ENABLE_DELEGATION_NAME
+        - SE_IMPERSONATE_NAME
+        - SE_INC_BASE_PRIORITY_NAME
+        - SE_INCREASE_QUOTA_NAME
+        - SE_INC_WORKING_SET_NAME
+        - SE_LOAD_DRIVER_NAME
+        - SE_LOCK_MEMORY_NAME
+        - SE_MACHINE_ACCOUNT_NAME
+        - SE_MANAGE_VOLUME_NAME
+        - SE_PROF_SINGLE_PROCESS_NAME
+        - SE_RELABEL_NAME
+        - SE_REMOTE_SHUTDOWN_NAME
+        - SE_RESTORE_NAME
+        - SE_SECURITY_NAME
+        - SE_SHUTDOWN_NAME
+        - SE_SYNC_AGENT_NAME
+        - SE_SYSTEM_ENVIRONMENT_NAME
+        - SE_SYSTEM_PROFILE_NAME
+        - SE_SYSTEMTIME_NAME
+        - SE_TAKE_OWNERSHIP_NAME
+        - SE_TCB_NAME
+        - SE_TIME_ZONE_NAME
+        - SE_TRUSTED_CREDMAN_ACCESS_NAME
+        - SE_UNDOCK_NAME
+        - SE_UNSOLICITED_INPUT_NAME
+        - SE_BATCH_LOGON_NAME
+        - SE_DENY_BATCH_LOGON_NAME
+        - SE_DENY_INTERACTIVE_LOGON_NAME
+        - SE_DENY_NETWORK_LOGON_NAME
+        - SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+        - SE_DENY_SERVICE_LOGON_NAME
+        - SE_INTERACTIVE_LOGON_NAME
+        - SE_NETWORK_LOGON_NAME
+        - SE_REMOTE_INTERACTIVE_LOGON_NAME
+        - SE_SERVICE_LOGON_NAME
+  states:
+    state-state-check-for-trustee-name-equal-to-blank-string-and-t:
+      state_title: State check for trustee_name equal to blank string and trustee_sid equal to string starting with S-
+      capability: windows.userright
+      state:
+        all:
+        - field: trustee_name
+          value: ^$
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: trustee_sid
+          value: ^S-
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-orphaned-security-identifiers-sids-removed-from-user-rights:
+      test_title: Orphaned security identifiers (SIDs) must be removed from user rights.
+      capability: windows.userright
+      object: gather-all-user-rights-only-include-orphaned-sids-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-orphaned-security-identifiers-sids-removed-from-user-rights

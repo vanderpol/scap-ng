@@ -1,0 +1,138 @@
+assessment:
+  id: ng.shared.0d5cfb73db513c482f3dda27
+  version: 1
+  assessment_title: AZLX-23-001305 - Amazon Linux 2023 must prohibit the use of cached authenticators after one day.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/sssd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*cache_credentials\s*=\s*true\b$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*cache_credentials\s*=\s*true\b$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+    independent-textfilecontent54-object-5:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/sssd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-6:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object-4:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-5
+        - object: independent-textfilecontent54-object-6
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-sssd-sssd-conf-cache-credentials-false:
+      test_title: /etc/sssd/sssd.conf:cache_credentials = false
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-etc-sssd-sssd-conf-offline-credentials-expiration-1:
+      test_title: /etc/sssd/sssd.conf:offline_credentials_expiration = 1
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    any:
+    - test: test-etc-sssd-sssd-conf-cache-credentials-false
+    - test: test-etc-sssd-sssd-conf-offline-credentials-expiration-1

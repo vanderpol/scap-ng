@@ -1,0 +1,80 @@
+assessment:
+  id: ng.shared.2b44533d70eeaebff0c4d2ff
+  version: 1
+  assessment_title: UBTU-18-010141 - The Ubuntu operating system must have system commands owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-files-in-system-command-directories-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: All files in system command directories
+    all-files-in-system-command-directories-execute-bit-set-less-object:
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - object: all-files-in-system-command-directories-object
+        filters:
+        - action: exclude
+          state: state-symbolic-links
+      object_title: all files in system command directories (with execute bit set), less symbolic links and setgid files
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  states:
+    state-0755-permissions-or-less-permissive:
+      state_title: 0755 permissions or less permissive
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-symbolic-links:
+      state_title: symbolic links
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-files-in-system-command-directories:
+      test_title: All files in system command directories
+      capability: unix.file
+      object: all-files-in-system-command-directories-execute-bit-set-less-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-0755-permissions-or-less-permissive
+  evaluate:
+    test: test-all-files-in-system-command-directories

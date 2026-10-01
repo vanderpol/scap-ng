@@ -1,0 +1,122 @@
+assessment:
+  id: ng.shared.aeeb2a0c5ebe65c5b7563241
+  version: 1
+  assessment_title: Smartcard authentication enabled for graphical user logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: dconf
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/profile/user
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^user-db:user\nsystem-db:local$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: null
+    check-value-assigned-enable-smartcard-authentication-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/db/
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^[0-9].*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\[org/gnome/login-screen\](?:[^\n]*\n+)+?enable-smartcard-authentication\s*=\s*(\w+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        multiline: 'true'
+        max_depth: '-1'
+        recurse: symlinks and directories
+        recurse_direction: down
+      object_title: check the value assigned to enable-smartcard-authentication
+  states:
+    state-the-value-assigned-to-enable-smartcard-authentication-is:
+      state_title: the value assigned to enable-smartcard-authentication is true
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^true$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-the-value-assigned-to-enable-smartcard-authentication-is-2:
+      state_title: the value assigned to enable-smartcard-authentication is false
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^false$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-dconf-installed:
+      test_title: package dconf is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: all_exist
+      check: all
+    test-dconf-user-profile-exists:
+      test_title: dconf user profile exists
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+    test-check-enable-smartcard-authentication-set-true:
+      test_title: check for enable-smartcard-authentication set to true
+      capability: independent.textfilecontent54
+      object: check-value-assigned-enable-smartcard-authentication-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-value-assigned-to-enable-smartcard-authentication-is
+    test-check-enable-smartcard-authentication-set-false:
+      test_title: check for enable-smartcard-authentication set to false
+      capability: independent.textfilecontent54
+      object: check-value-assigned-enable-smartcard-authentication-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-value-assigned-to-enable-smartcard-authentication-is-2
+  evaluate:
+    any:
+    - not:
+        test: test-package-dconf-installed
+    - all:
+      - any:
+        - not:
+            test: test-package-dconf-installed
+        - test: test-dconf-user-profile-exists
+      - test: test-check-enable-smartcard-authentication-set-true
+      - not:
+          test: test-check-enable-smartcard-authentication-set-false

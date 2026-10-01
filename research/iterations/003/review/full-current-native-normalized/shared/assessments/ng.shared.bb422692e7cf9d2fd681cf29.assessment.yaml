@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.bb422692e7cf9d2fd681cf29
+  version: 1
+  assessment_title: AZLX-23-001015 - Amazon Linux 2023 must require users to reauthenticate for privilege escalation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^(?!#).*\s+!\s*authenticate.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^(?!#).*\s+!\s*authenticate.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        recurse_direction: down
+      object_title: null
+  states: {}
+  tests:
+    test-authenticate-does-not-exist-in-etc-sudoers:
+      test_title: '''!authenticate'' does not exist in /etc/sudoers'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-authenticate-does-not-exist-in-etc-sudoers-d:
+      test_title: '''!authenticate'' does not exist in /etc/sudoers.d'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-authenticate-does-not-exist-in-etc-sudoers
+    - test: test-authenticate-does-not-exist-in-etc-sudoers-d

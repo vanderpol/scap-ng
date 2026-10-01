@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.339cff347214483bded997cb
+  version: 1
+  assessment_title: The sshd server must bind the X11 forwarding server to the loopback address.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    grep-x11uselocalhost-etc-ssh-sshd-config-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: grep "^X11UseLocalhost" /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: grep '^X11UseLocalhost' /etc/ssh/sshd_config
+  states:
+    state-stdout-line-should-return-x11uselocalhost-yes:
+      state_title: stdout_line should return 'X11UseLocalhost yes'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: X11UseLocalhost yes
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-sshd-server-bind-x11-forwarding-server-loopback-address:
+      test_title: The sshd server must bind the X11 forwarding server to the loopback address.
+      capability: independent.shellcommand
+      object: grep-x11uselocalhost-etc-ssh-sshd-config-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-stdout-line-should-return-x11uselocalhost-yes
+  evaluate:
+    test: test-sshd-server-bind-x11-forwarding-server-loopback-address

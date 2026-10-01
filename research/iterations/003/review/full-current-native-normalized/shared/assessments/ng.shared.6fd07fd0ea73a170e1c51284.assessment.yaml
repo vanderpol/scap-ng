@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.6fd07fd0ea73a170e1c51284
+  version: 1
+  assessment_title: UBTU-24-200270 - Ubuntu 24.04 LTS must audit any script or executable called by cron as root or by any
+    privileged user.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-w\s+/etc/cron\.d(\s+-p\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\s+(-k\s+|-F\s+key=)\w+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-w\s+/var/spool/cron(\s+-p\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\s+(-k\s+|-F\s+key=)\w+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-modifications-etc-cron-d:
+      test_title: Audit modifications to /etc/cron.d
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+    test-audit-modifications-var-spool-cron:
+      test_title: Audit modifications to /var/spool/cron
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: all_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-audit-modifications-etc-cron-d
+    - test: test-audit-modifications-var-spool-cron

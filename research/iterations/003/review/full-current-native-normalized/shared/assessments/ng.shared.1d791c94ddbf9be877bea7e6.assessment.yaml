@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.1d791c94ddbf9be877bea7e6
+  version: 1
+  assessment_title: WN10-CC-000105 - Web publishing and online ordering wizards must be prevented from downloading a list
+    of providers.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer
+        name:
+          operation: equals
+          datatype: string
+          value: NoWebServices
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-turn-off-internet-download-web-publishing-online-ordering-wizards-set:
+      test_title: '''Turn off Internet download for Web publishing and online ordering wizards'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-turn-off-internet-download-web-publishing-online-ordering-wizards-set

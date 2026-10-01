@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.ed5853eb4c82bc98ef547ddd
+  version: 1
+  assessment_title: OL08-00-040286 - OL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: net.core.bpf_jit_harden
+      object_title: null
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '2'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-net-core-bpf-jit-harden-set-2-in-kernel:
+      test_title: net.core.bpf_jit_harden is set to 2 in kernel
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-sysctl
+  evaluate:
+    test: test-net-core-bpf-jit-harden-set-2-in-kernel

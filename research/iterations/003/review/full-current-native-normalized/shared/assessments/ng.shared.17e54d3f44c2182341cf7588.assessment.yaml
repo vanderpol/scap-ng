@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.17e54d3f44c2182341cf7588
+  version: 1
+  assessment_title: AZLX-23-002050 - Amazon Linux 2023 must take action when allocated audit record storage volume reaches
+    95 percent of the repository maximum audit record storage capacity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: (?i)^\s*admin_space_left_action\s*=\s*(\w+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^single$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audit-auditd-conf-admin-space-left-action-single:
+      test_title: '/etc/audit/auditd.conf: admin_space_left_action = SINGLE'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-audit-auditd-conf-admin-space-left-action-single

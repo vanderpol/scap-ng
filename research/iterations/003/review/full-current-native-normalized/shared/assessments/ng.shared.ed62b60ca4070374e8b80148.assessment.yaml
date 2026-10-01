@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.ed62b60ca4070374e8b80148
+  version: 1
+  assessment_title: WN10-00-000100 - Internet Information System (IIS) or its subcomponents must not be installed on a workstation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-WebServerRole'
+      object_title: null
+    windows-wmi57-object-2:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-HostableWebCore'
+      object_title: null
+  states:
+    state-installstate-is-equal-to-2:
+      state_title: InstallState is equal to 2
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            entity_check: at least one
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-internet-information-services-feature-not-installed:
+      test_title: '''Internet Information Services'' feature is not installed'
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-installstate-is-equal-to-2
+    test-internet-information-services-hostable-web-core-feature-not-installed:
+      test_title: '''Internet Information Services Hostable Web Core'' feature is not installed'
+      capability: windows.wmi57
+      object: windows-wmi57-object-2
+      check_existence: all_exist
+      check: all
+      states:
+      - state-installstate-is-equal-to-2
+  evaluate:
+    all:
+    - test: test-internet-information-services-feature-not-installed
+    - test: test-internet-information-services-hostable-web-core-feature-not-installed

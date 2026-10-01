@@ -1,0 +1,92 @@
+assessment:
+  id: ng.shared.985745f520f2545c5a9d9b8f
+  version: 1
+  assessment_title: UBTU-22-652010 - Ubuntu 22.04 LTS must be configured to preserve log records from failure events.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-dpkginfo-object:
+      capability: linux.dpkginfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: rsyslog
+      object_title: null
+    linux-systemdunitproperty-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: rsyslog.service
+        property:
+          operation: equals
+          datatype: string
+          value: UnitFileState
+      object_title: null
+    linux-systemdunitproperty-object-2:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: rsyslog.service
+        property:
+          operation: equals
+          datatype: string
+          value: ActiveState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: enabled
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-linux-systemdunitproperty-2:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-rsyslog-package-installed:
+      test_title: The rsyslog package is installed.
+      capability: linux.dpkginfo
+      object: linux-dpkginfo-object
+      check_existence: at_least_one_exists
+      check: all
+    test-rsyslog-service-enabled:
+      test_title: rsyslog.service is enabled
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+    test-rsyslog-service-active:
+      test_title: rsyslog.service is active
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty-2
+  evaluate:
+    all:
+    - test: test-rsyslog-package-installed
+    - test: test-rsyslog-service-enabled
+    - test: test-rsyslog-service-active

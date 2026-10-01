@@ -1,0 +1,168 @@
+assessment:
+  id: ng.shared.7a8893ad032e5df9618ae347
+  version: 1
+  assessment_title: Virtualization Based Security must be enabled on Windows 10 with the platform security level configured
+    to Secure Boot or Secure Boot with DMA Protection.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    deviceguard-requiredsecurityproperties-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: classname
+              value: Win32_DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+            - name: namespace
+              value: root\Microsoft\Windows\DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: requiredsecurityproperties
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: DeviceGuard requiredsecurityproperties
+    deviceguard-virtualizationbasedsecuritystatus-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: classname
+              value: Win32_DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+            - name: namespace
+              value: root\Microsoft\Windows\DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: virtualizationbasedsecuritystatus
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: DeviceGuard virtualizationbasedsecuritystatus
+  states:
+    state-requiredsecurityproperties-must-match-a-pattern-of-2:
+      state_title: requiredsecurityproperties must match a pattern of 2
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: requiredsecurityproperties
+            value: '2'
+            operation: pattern match
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-requiredsecurityproperties-must-match-a-pattern-of-2-2:
+      state_title: requiredsecurityproperties must match a pattern of 2
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: virtualizationbasedsecuritystatus
+            value: '2'
+            operation: pattern match
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-requiredsecurityproperties-should-return-value-2:
+      test_title: RequiredSecurityProperties should return a value of 2
+      capability: windows.cmdlet
+      object: deviceguard-requiredsecurityproperties-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-requiredsecurityproperties-must-match-a-pattern-of-2
+    test-virtualizationbasedsecuritystatus-should-return-value-2:
+      test_title: VirtualizationBasedSecurityStatus should return a value of 2
+      capability: windows.cmdlet
+      object: deviceguard-virtualizationbasedsecuritystatus-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-requiredsecurityproperties-must-match-a-pattern-of-2-2
+  evaluate:
+    all:
+    - test: test-requiredsecurityproperties-should-return-value-2
+    - test: test-virtualizationbasedsecuritystatus-should-return-value-2

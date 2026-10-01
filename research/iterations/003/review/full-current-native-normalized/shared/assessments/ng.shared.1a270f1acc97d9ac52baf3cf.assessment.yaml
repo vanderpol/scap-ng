@@ -1,0 +1,111 @@
+assessment:
+  id: ng.shared.1a270f1acc97d9ac52baf3cf
+  version: 1
+  assessment_title: OL07-00-040420 - The Oracle Linux operating system must be configured so that the SSH private host key
+    files have mode 0640 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: openssh-server
+      object_title: null
+    etc-ssh-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*key$
+      object_title: /etc/ssh
+  states:
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-testing-file-permissions:
+      test_title: Testing file permissions
+      capability: unix.file
+      object: etc-ssh-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-file
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - test: test-testing-file-permissions

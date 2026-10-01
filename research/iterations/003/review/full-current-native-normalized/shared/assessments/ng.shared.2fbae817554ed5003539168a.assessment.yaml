@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.2fbae817554ed5003539168a
+  version: 1
+  assessment_title: The macOS system must set minimum password lifetime to 24 hours.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pwpolicy-minimum-lifetime-enforce-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/pwpolicy -getaccountpolicies | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()="policyAttributeMinimumLifetimeHours"]/following-sibling::integer[1]/text()'
+            - | /usr/bin/awk '{ if ($1 >= 24 ) {print "yes"} else {print "no"}}'
+      object_title: pwpolicy_minimum_lifetime_enforce_stig_object
+  states:
+    state-pwpolicy-minimum-lifetime-enforce-stig-state:
+      state_title: pwpolicy_minimum_lifetime_enforce_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'yes'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pwpolicy-minimum-lifetime-enforce-stig-test:
+      test_title: pwpolicy_minimum_lifetime_enforce_stig_test
+      capability: independent.shellcommand
+      object: pwpolicy-minimum-lifetime-enforce-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-pwpolicy-minimum-lifetime-enforce-stig-state
+  evaluate:
+    test: test-pwpolicy-minimum-lifetime-enforce-stig-test

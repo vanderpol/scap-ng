@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.1f491e0097b42e22bfab7c62
+  version: 1
+  assessment_title: The telnet service daemon must not be installed unless required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pkg-info-service-network-telnet-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: pkg info service/network/telnet
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: pkg info service/network/telnet
+  states:
+    state-stdout-line-should-not-exist:
+      state_title: stdout_line should not exist
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-telnet-daemon-not-installed-unless-required:
+      test_title: The Telnet daemon must not be installed unless required.
+      capability: independent.shellcommand
+      object: pkg-info-service-network-telnet-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-stdout-line-should-not-exist
+  evaluate:
+    test: test-telnet-daemon-not-installed-unless-required

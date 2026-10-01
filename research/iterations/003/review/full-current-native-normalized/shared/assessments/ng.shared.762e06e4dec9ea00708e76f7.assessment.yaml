@@ -1,0 +1,66 @@
+assessment:
+  id: ng.shared.762e06e4dec9ea00708e76f7
+  version: 1
+  assessment_title: OL09-00-002124 - OL 9 must prevent a user from overriding the session idle-delay setting for the graphical
+    user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-that-etc-dconf-profile-user-system-db-at-minimum-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/profile/user
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*system-db\s*:\s*local\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+    check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/db/local.d/locks
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\/org\/gnome\/desktop\/session\/idle-delay$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Check that the idle-delay setting is locked from nonprivileged user modification
+  states: {}
+  tests:
+    test-check-that-etc-dconf-profile-user-system-db-at-minimum:
+      test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+      capability: independent.textfilecontent54
+      object: check-that-etc-dconf-profile-user-system-db-at-minimum-object
+      check_existence: at_least_one_exists
+      check: all
+    test-check-that-idle-delay-setting-locked-from-nonprivileged-user-modification:
+      test_title: Check that the idle-delay setting is locked from nonprivileged user modification
+      capability: independent.textfilecontent54
+      object: check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-check-that-etc-dconf-profile-user-system-db-at-minimum
+    - test: test-check-that-idle-delay-setting-locked-from-nonprivileged-user-modification

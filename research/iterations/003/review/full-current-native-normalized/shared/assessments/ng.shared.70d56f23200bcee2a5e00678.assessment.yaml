@@ -1,0 +1,84 @@
+assessment:
+  id: ng.shared.70d56f23200bcee2a5e00678
+  version: 1
+  assessment_title: The application pools rapid fail protection settings for each IIS 10.0 website must be managed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    get-appcmd-apppool-setting-failure-rapidfailprotectioninterval-object:
+      capability: windows.appcmd
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          value: Apppool
+        identifier:
+          operation: pattern match
+          datatype: string
+          value: .*
+        parameter:
+          operation: equals
+          datatype: string
+          value: failure.rapidFailProtectionInterval
+      object_title: get appcmd apppool setting failure.rapidFailProtectionInterval
+    full-path-each-web-directory-translated-environment-paths-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          value:
+            variable: time-in-int-hhmmss-used-hh-mm-ss-variable
+      object_title: Full path of each web directory (translated environment paths)
+  variables:
+    time-in-int-hhmmss-used-hh-mm-ss-variable:
+      title: Time In Int hhmmss (used to be hh:mm:ss)
+      kind: local
+      datatype: int
+      expression:
+        concat:
+        - regex_capture:
+            value:
+              values:
+                object: get-appcmd-apppool-setting-failure-rapidfailprotectioninterval-object
+                field: result
+            pattern: (\d\d):\d\d:\d\d
+        - regex_capture:
+            value:
+              values:
+                object: get-appcmd-apppool-setting-failure-rapidfailprotectioninterval-object
+                field: result
+            pattern: \d\d:(\d\d):\d\d
+        - regex_capture:
+            value:
+              values:
+                object: get-appcmd-apppool-setting-failure-rapidfailprotectioninterval-object
+                field: result
+            pattern: \d\d:\d\d:(\d\d)
+  states:
+    state-less-than-or-equal-to-00-05-00:
+      state_title: less than or equal to 00:05:00
+      capability: independent.variable
+      state:
+        field: value
+        value: '000500'
+        operation: less than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-application-pool-s-rapid-fail-protection-value-failure-interval-set:
+      test_title: An application pool’s rapid fail protection value for Failure Interval is set to 5. If the Failure Interval
+        is not set to 5 or less, this is a finding
+      capability: independent.variable
+      object: full-path-each-web-directory-translated-environment-paths-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-less-than-or-equal-to-00-05-00
+  evaluate:
+    test: test-application-pool-s-rapid-fail-protection-value-failure-interval-set

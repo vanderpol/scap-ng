@@ -1,0 +1,65 @@
+assessment:
+  id: ng.shared.d726101a6fb7ad7c83b53588
+  version: 1
+  assessment_title: Disable .rhosts Files
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: openssh-server
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[\s]*(?i)IgnoreRhosts(?-i)[\s]+(\w+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'yes'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-tests-value-ignorerhosts-s-nocomment-setting-in-etc-ssh-sshd:
+      test_title: Tests the value of the IgnoreRhosts[\s]*(<:nocomment:>*) setting in the /etc/ssh/sshd_config file
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - test: test-tests-value-ignorerhosts-s-nocomment-setting-in-etc-ssh-sshd

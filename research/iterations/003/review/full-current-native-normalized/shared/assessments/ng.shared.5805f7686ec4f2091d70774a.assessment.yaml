@@ -1,0 +1,29 @@
+assessment:
+  id: ng.shared.5805f7686ec4f2091d70774a
+  version: 1
+  assessment_title: The system must use a separate file system for /tmp (or equivalent).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    tmp-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          value: /tmp
+      object_title: /tmp
+  states: {}
+  tests:
+    test-check-tmp:
+      test_title: check for /tmp
+      capability: linux.partition
+      object: tmp-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-check-tmp

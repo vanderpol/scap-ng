@@ -1,0 +1,142 @@
+assessment:
+  id: ng.shared.d88df3c3587cd68abab52135
+  version: 1
+  assessment_title: WN10-CC-000050 - Hardened UNC paths must be defined to require mutual authentication and integrity for
+    at least the \*\SYSVOL and \*\NETLOGON shares.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    hardened-path-config-sysvol-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+        name:
+          operation: equals
+          datatype: string
+          value: \\*\SYSVOL
+      object_title: Hardened Path Config for \\*\SYSVOL
+    hardened-path-config-netlogon-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+        name:
+          operation: equals
+          datatype: string
+          value: \\*\NETLOGON
+      object_title: Hardened Path Config for \\*\NETLOGON
+  states:
+    state-requiremutualauthentication-1:
+      state_title: RequireMutualAuthentication=1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-no-requiremutualauthentication-1:
+      state_title: No RequireMutualAuthentication!=1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
+          operation: pattern match
+          datatype: string
+          entity_check: none satisfy
+          entity_existence: at_least_one_exists
+    state-requireintegrity-1:
+      state_title: RequireIntegrity=1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: (^| *, *)RequireIntegrity=1( *, *|$)
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-no-requireintegrity-1:
+      state_title: No RequireIntegrity!=1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
+          operation: pattern match
+          datatype: string
+          entity_check: none satisfy
+          entity_existence: at_least_one_exists
+  tests:
+    test-mutual-authentication-integrity-sysvol:
+      test_title: Mutual Authentication and Integrity for \\*\SYSVOL
+      capability: windows.registry
+      object: hardened-path-config-sysvol-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-requiremutualauthentication-1
+      - state-no-requiremutualauthentication-1
+      - state-requireintegrity-1
+      - state-no-requireintegrity-1
+    test-mutual-authentication-integrity-netlogon:
+      test_title: Mutual Authentication and Integrity for \\*\NETLOGON
+      capability: windows.registry
+      object: hardened-path-config-netlogon-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-requiremutualauthentication-1
+      - state-no-requiremutualauthentication-1
+      - state-requireintegrity-1
+      - state-no-requireintegrity-1
+  evaluate:
+    all:
+    - test: test-mutual-authentication-integrity-sysvol
+    - test: test-mutual-authentication-integrity-netlogon

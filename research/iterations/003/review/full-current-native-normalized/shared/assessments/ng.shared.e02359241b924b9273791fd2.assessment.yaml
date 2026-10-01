@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.e02359241b924b9273791fd2
+  version: 1
+  assessment_title: AZLX-23-001090 - Amazon Linux 2023 must manage excess capacity, bandwidth, or other redundancy to limit
+    the effects of information flooding types of denial-of-service (DoS) attacks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/firewalld/firewalld.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*FirewallBackend\s*=\s*(\w+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: nftables
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-firewallbackend-set-nftables-in-etc-firewalld-firewalld-conf:
+      test_title: FirewallBackend is set to nftables in /etc/firewalld/firewalld.conf.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-firewallbackend-set-nftables-in-etc-firewalld-firewalld-conf

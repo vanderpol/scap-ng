@@ -1,0 +1,90 @@
+assessment:
+  id: ng.shared.03e44925834c8c44cd97c4b3
+  version: 1
+  assessment_title: AZLX-23-001245 - Amazon Linux 2023 must be configured so that all network connections associated with
+    SSH traffic are terminated after 10 minutes of becoming unresponsive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .+
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '600'
+        operation: less than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: greater than
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-ssh-sshd-config-or-etc-ssh-sshd-config-d:
+      test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.*:ClientAliveInterval == 600
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
+  evaluate:
+    test: test-etc-ssh-sshd-config-or-etc-ssh-sshd-config-d

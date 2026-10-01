@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.69e95a34a4140c65735a3dee
+  version: 1
+  assessment_title: The macOS system must be configured to disable the Network File System (NFS) daemon unless it is required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-nfsd-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /bin/launchctl print-disabled system | /usr/bin/grep '"com.apple.nfsd" => disabled'
+      object_title: os_nfsd_disable_recommended_object
+  states:
+    state-os-nfsd-disable-recommended-state:
+      state_title: os_nfsd_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-nfsd-disable-recommended-test:
+      test_title: os_nfsd_disable_recommended_test
+      capability: independent.shellcommand
+      object: os-nfsd-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-nfsd-disable-recommended-state
+  evaluate:
+    test: test-os-nfsd-disable-recommended-test

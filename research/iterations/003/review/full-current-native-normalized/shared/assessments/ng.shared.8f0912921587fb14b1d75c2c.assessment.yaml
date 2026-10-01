@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.8f0912921587fb14b1d75c2c
+  version: 1
+  assessment_title: OL09-00-001110 - OL 9 must not allow blank or null passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: \bnullok\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: \bnullok\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-there-no-instances-nullok-in-etc-pam-d-system-auth:
+      test_title: There are no instances of nullok in /etc/pam.d/system-auth.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-there-no-instances-nullok-in-etc-pam-d-password-auth:
+      test_title: There are no instances of nullok in /etc/pam.d/password-auth.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-there-no-instances-nullok-in-etc-pam-d-system-auth
+    - test: test-there-no-instances-nullok-in-etc-pam-d-password-auth

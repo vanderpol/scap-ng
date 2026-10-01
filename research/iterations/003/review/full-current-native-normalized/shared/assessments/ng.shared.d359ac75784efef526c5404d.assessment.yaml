@@ -1,0 +1,135 @@
+assessment:
+  id: ng.shared.d359ac75784efef526c5404d
+  version: 1
+  assessment_title: The Ubuntu operating system must synchronize internal information system clocks to the authoritative time
+    source when the time difference is greater than one second.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/chrony
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*\.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*makestep\s+1\s+-1\s*
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Ubuntu must synchronize internal information system clocks to the authoritative time source when the time
+        difference is greater than one second.
+    ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object-2:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: 'timedatectl | grep -Ei ''synchronized'' '
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: Ubuntu must synchronize internal information system clocks to the authoritative time source when the time
+        difference is greater than one second.
+    ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object-3:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: 'timedatectl | grep -Ei ''service'' '
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: Ubuntu must synchronize internal information system clocks to the authoritative time source when the time
+        difference is greater than one second.
+  states:
+    state-ubuntu-must-synchronize-internal-information-system-cloc:
+      state_title: Ubuntu must synchronize internal information system clocks to the authoritative time source. Check System
+        clock is synchronized.
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: \s*System\s+clock\s+synchronized:\s+yes
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-ubuntu-must-synchronize-internal-information-system-cloc-2:
+      state_title: Ubuntu must synchronize internal information system clocks to the authoritative time source. Check NTP
+        is active
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: \s*NTP\s+service:\s+active
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when:
+      test_title: Ubuntu must synchronize internal information system clocks to the authoritative time source when the time
+        difference is greater than one second.
+      capability: independent.textfilecontent54
+      object: ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object
+      check_existence: at_least_one_exists
+      check: all
+    test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-check:
+      test_title: Ubuntu must synchronize internal information system clocks to the authoritative time source. Check system
+        clock synchronized
+      capability: independent.shellcommand
+      object: ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-synchronize-internal-information-system-cloc
+    test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-check-2:
+      test_title: Ubuntu must synchronize internal information system clocks to the authoritative time source. Check NTP service
+        is active.
+      capability: independent.shellcommand
+      object: ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-synchronize-internal-information-system-cloc-2
+  evaluate:
+    all:
+    - test: test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-when
+    - test: test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-check
+    - test: test-ubuntu-synchronize-internal-information-system-clocks-authoritative-time-source-check-2

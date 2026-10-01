@@ -1,0 +1,60 @@
+assessment:
+  id: ng.shared.bfc95028b66a790e02a3d030
+  version: 1
+  assessment_title: Ensure that FAIL_DELAY is Configured in /etc/login.defs
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    fail-delay-value-from-etc-login-defs-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[\s]*FAIL_DELAY[\s]+([^#\s]*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: FAIL_DELAY value from /etc/login.defs
+  variables:
+    expected-fail-delay-variable:
+      title: Expected fail_delay
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: var_accounts_fail_delay
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: expected-fail-delay-variable
+        operation: greater than or equal
+        datatype: int
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-fail-delay-in-etc-login-defs:
+      test_title: check FAIL_DELAY in /etc/login.defs
+      capability: independent.textfilecontent54
+      object: fail-delay-value-from-etc-login-defs-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-check-fail-delay-in-etc-login-defs

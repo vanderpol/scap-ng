@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.8d277572758760469d486fbb
+  version: 1
+  assessment_title: The macOS system logon window must be configured to prompt for username and password.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-loginwindow-prompt-username-password-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.loginwindow'')\
+
+            .objectForKey(''SHOWFULLNAME'').js
+
+            EOS'
+      object_title: system_settings_loginwindow_prompt_username_password_enforce_recommended_object
+  states:
+    state-system-settings-loginwindow-prompt-username-password-enf:
+      state_title: system_settings_loginwindow_prompt_username_password_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-loginwindow-prompt-username-password-enforce-recommended-test:
+      test_title: system_settings_loginwindow_prompt_username_password_enforce_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-loginwindow-prompt-username-password-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-loginwindow-prompt-username-password-enf
+  evaluate:
+    test: test-system-settings-loginwindow-prompt-username-password-enforce-recommended-test

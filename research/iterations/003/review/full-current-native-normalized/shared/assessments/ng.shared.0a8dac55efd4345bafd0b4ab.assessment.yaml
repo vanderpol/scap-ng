@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.0a8dac55efd4345bafd0b4ab
+  version: 1
+  assessment_title: OL09-00-002302 - OL 9 must define default permissions for the c shell.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/csh.cshrc
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*(?i)umask\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '077'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-umask-set-only-077-in-etc-csh-cshrc:
+      test_title: UMASK is set to only 077 in /etc/csh.cshrc
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-umask-set-only-077-in-etc-csh-cshrc

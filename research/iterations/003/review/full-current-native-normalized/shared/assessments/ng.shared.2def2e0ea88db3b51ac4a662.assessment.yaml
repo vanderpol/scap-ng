@@ -1,0 +1,229 @@
+assessment:
+  id: ng.shared.2def2e0ea88db3b51ac4a662
+  version: 1
+  assessment_title: OL08-00-030720 - OL 8 must authenticate the remote logging server for offloading audit logs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    rsyslog-conf-actionsendstreamdriverauthmode-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.conf: ActionSendStreamDriverAuthMode'
+    rsyslog-d-conf-actionsendstreamdriverauthmode-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.d/*.conf: ActionSendStreamDriverAuthMode'
+    actionsendstreamdriverauthmode-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: rsyslog-conf-actionsendstreamdriverauthmode-object
+        - object: rsyslog-d-conf-actionsendstreamdriverauthmode-object
+      object_title: ActionSendStreamDriverAuthMode
+    rsyslog-conf-action-all-messages-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.conf: action for all messages'
+    rsyslog-d-conf-action-all-messages-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.d/*.conf: action for all messages'
+    rsyslog-action-all-messages-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: rsyslog-conf-action-all-messages-object
+        - object: rsyslog-d-conf-action-all-messages-object
+      object_title: 'rsyslog: action for all messages'
+    rsyslog-conf-module-blocks-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.conf: module blocks'
+    rsyslog-d-conf-module-blocks-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: 'rsyslog.d/*.conf: module blocks'
+    rsyslog-module-blocks-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: rsyslog-conf-module-blocks-object
+        - object: rsyslog-d-conf-module-blocks-object
+      object_title: 'rsyslog: module blocks'
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: x509/name
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-3:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\s*=\s*"x509/name"
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-4:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\b
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-actionsendstreamdriverauthmode-x509-name:
+      test_title: ActionSendStreamDriverAuthMode == x509/name
+      capability: independent.textfilecontent54
+      object: actionsendstreamdriverauthmode-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-streamdriverauthmode-set-x509-name-advanced-syntax:
+      test_title: StreamDriverAuthMode is set to x509/name (advanced syntax)
+      capability: independent.textfilecontent54
+      object: rsyslog-action-all-messages-object
+      check_existence: at_least_one_exists
+      check: at least one
+      state_operator: AND
+      states:
+      - state-independent-textfilecontent54-2
+      - state-independent-textfilecontent54-3
+    test-streamdriverauthmode-not-set-in-module-block-advanced-syntax:
+      test_title: StreamDriverAuthMode is not set in a module block (advanced syntax)
+      capability: independent.textfilecontent54
+      object: rsyslog-module-blocks-object
+      check_existence: any_exist
+      check: none satisfy
+      states:
+      - state-independent-textfilecontent54-4
+  evaluate:
+    all:
+    - any:
+      - test: test-actionsendstreamdriverauthmode-x509-name
+      - test: test-streamdriverauthmode-set-x509-name-advanced-syntax
+    - test: test-streamdriverauthmode-not-set-in-module-block-advanced-syntax

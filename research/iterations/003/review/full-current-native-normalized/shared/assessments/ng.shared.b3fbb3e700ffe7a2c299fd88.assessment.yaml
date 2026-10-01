@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.b3fbb3e700ffe7a2c299fd88
+  version: 1
+  assessment_title: UBTU-22-654080 - Ubuntu 22.04 LTS must generate audit records for successful/unsuccessful uses of the
+    passwd command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: \s*-a\s+(?:always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/bin/passwd\s+(?:-F\s+perm=[rwa]*x[rwa]*\s+)?-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-invocations-usr-bin-passwd:
+      test_title: Audit invocations of /usr/bin/passwd
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-invocations-usr-bin-passwd

@@ -1,0 +1,79 @@
+assessment:
+  id: ng.shared.f03341a84ecec88b20687d55
+  version: 1
+  assessment_title: AZLX-23-001290 - Amazon Linux 2023 must enable certificate-based smart card authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    sssd-conf-pam-cert-auth-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/sssd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: 'sssd.conf: pam_cert_auth'
+    etc-sssd-conf-d-pam-cert-auth-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/sssd/conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .+
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        recurse_direction: down
+      object_title: '/etc/sssd/conf.d: pam_cert_auth'
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: sssd-conf-pam-cert-auth-object
+        - object: etc-sssd-conf-d-pam-cert-auth-object
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'true'
+        operation: case insensitive equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-sssd-conf-pam-cert-auth-true:
+      test_title: 'sssd.conf: pam_cert_auth = True'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-sssd-conf-pam-cert-auth-true

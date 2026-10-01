@@ -1,0 +1,63 @@
+assessment:
+  id: ng.shared.ef5174539f0d0d8b7b796f0f
+  version: 1
+  assessment_title: AZLX-23-001210 - Amazon Linux 2023 SSH server must be configured to use only Message Authentication Codes
+    (MACs) employing FIPS 140-2/140-3 validated cryptographic hash algorithms to protect the confidentiality of SSH server
+    connections.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/crypto-policies/back-ends/opensshserver.config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*MACs\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-crypto-policies-back-ends-openssh-config-macs-use-fips:
+      test_title: '/etc/crypto-policies/back-ends/openssh.config: MACs use FIPS 140-3 validated cryptographic hash algorithms'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
+  evaluate:
+    test: test-etc-crypto-policies-back-ends-openssh-config-macs-use-fips

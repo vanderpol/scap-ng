@@ -1,0 +1,69 @@
+assessment:
+  id: ng.shared.6ec2dc1c8cdb48b90d3d2fbf
+  version: 1
+  assessment_title: Windows Server 2019 Active Directory user accounts, including administrators, must be configured to require
+    the use of a Common Access Card (CAC), Personal Identity Verification (PIV)-compliant hardware token, or Alternate Logon
+    Token (ALT) for user authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    no-enabled-accounts-shall-have-smartcardlogonrequired-false-list-only-first-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: ActiveDirectory
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: ADUser
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: filter
+              value: (Enabled -eq $True) -and (SmartcardLogonRequired -eq $False)
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: first
+              value: '100'
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: No enabled accounts shall have SmartcardLogonRequired = False.  (list only the first 100, if any are found)
+  states: {}
+  tests:
+    test-all-active-directory-users-have-smart-card-required-interactive-logon:
+      test_title: All Active Directory users must have the 'Smart card is required for interactive logon' option enabled'
+      capability: windows.cmdlet
+      object: no-enabled-accounts-shall-have-smartcardlogonrequired-false-list-only-first-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-all-active-directory-users-have-smart-card-required-interactive-logon

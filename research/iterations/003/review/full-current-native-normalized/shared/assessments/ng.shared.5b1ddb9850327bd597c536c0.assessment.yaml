@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.5b1ddb9850327bd597c536c0
+  version: 1
+  assessment_title: OL 8 must clear the page allocator to prevent use-after-free attacks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-grub-environment-list-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: grub2-editenv list | grep kernelopts=
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: page_poison=\d
+      object_title: Retrieve grub environment list.
+    retrieve-grub-default-configuration-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\n*[\s#]*GRUB_CMDLINE_LINUX=(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Retrieve grub default configuration.
+  states:
+    state-confirm-correct-page-poison-setting:
+      state_title: Confirm correct page_poison setting.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^kernelopts=[^#]*page_poison=1\s*
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-confirm-correct-page-poison-setting-2:
+      state_title: Confirm correct page_poison setting.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: page_poison=1\b
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-that-grub-2-configured-enable-page-poisoning-mitigate-use:
+      test_title: Check that GRUB 2 is configured to enable page poisoning to mitigate use-after-free vulnerabilities.
+      capability: independent.shellcommand
+      object: retrieve-grub-environment-list-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-correct-page-poison-setting
+    test-check-that-page-poisoning-enabled-by-default-persist-in-kernel:
+      test_title: Check that page poisoning is enabled by default to persist in kernel updates.
+      capability: independent.textfilecontent54
+      object: retrieve-grub-default-configuration-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-correct-page-poison-setting-2
+  evaluate:
+    all:
+    - test: test-check-that-grub-2-configured-enable-page-poisoning-mitigate-use
+    - test: test-check-that-page-poisoning-enabled-by-default-persist-in-kernel

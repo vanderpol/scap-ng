@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.1435bc0c79727bd9d86e219d
+  version: 1
+  assessment_title: The macOS system must be configured to use an authorized time server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-time-server-configure-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.MCX'')\
+
+            .objectForKey(''timeServer'').js
+
+            EOS'
+      object_title: system_settings_time_server_configure_stig_object
+  states:
+    state-system-settings-time-server-configure-stig-state:
+      state_title: system_settings_time_server_configure_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: time.nist.gov
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-time-server-configure-stig-test:
+      test_title: system_settings_time_server_configure_stig_test
+      capability: independent.shellcommand
+      object: system-settings-time-server-configure-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-time-server-configure-stig-state
+  evaluate:
+    test: test-system-settings-time-server-configure-stig-test

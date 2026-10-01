@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.177b2b0907e2531724b135c1
+  version: 1
+  assessment_title: OL08-00-010672 - OL 8 must disable acquiring, saving, and processing core dumps.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    systemd-coredump-socket-loadstate-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: systemd-coredump.socket
+        property:
+          operation: equals
+          datatype: string
+          value: LoadState
+      object_title: systemd-coredump.socket LoadState
+    systemd-coredump-socket-unitfilestate-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: systemd-coredump.socket
+        property:
+          operation: equals
+          datatype: string
+          value: UnitFileState
+      object_title: systemd-coredump.socket UnitFileState
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: masked
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-systemd-coredump-socket-loadstate-masked-if-exists:
+      test_title: systemd-coredump.socket LoadState is masked if exists
+      capability: linux.systemdunitproperty
+      object: systemd-coredump-socket-loadstate-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+    test-systemd-coredump-socket-unitfilestate-masked-if-exists:
+      test_title: systemd-coredump.socket UnitFileState is masked if exists
+      capability: linux.systemdunitproperty
+      object: systemd-coredump-socket-unitfilestate-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+  evaluate:
+    all:
+    - test: test-systemd-coredump-socket-loadstate-masked-if-exists
+    - test: test-systemd-coredump-socket-unitfilestate-masked-if-exists

@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.aba8c2d0f8d4f4da699a4e12
+  version: 1
+  assessment_title: The macOS system must enforce the limit of three consecutive invalid logon attempts by a user before the
+    user account is locked.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pwpolicy-account-lockout-timeout-enforce-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/pwpolicy -getaccountpolicies | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()="autoEnableInSeconds"]/following-sibling::integer[1]/text()'
+            - | /usr/bin/awk '{ if ($1/60 >= 15 ) {print "pass"} else {print "fail"}}' | /usr/bin/uniq
+      object_title: pwpolicy_account_lockout_timeout_enforce_stig_object
+  states:
+    state-pwpolicy-account-lockout-timeout-enforce-stig-state:
+      state_title: pwpolicy_account_lockout_timeout_enforce_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: pass
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pwpolicy-account-lockout-timeout-enforce-stig-test:
+      test_title: pwpolicy_account_lockout_timeout_enforce_stig_test
+      capability: independent.shellcommand
+      object: pwpolicy-account-lockout-timeout-enforce-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-pwpolicy-account-lockout-timeout-enforce-stig-state
+  evaluate:
+    test: test-pwpolicy-account-lockout-timeout-enforce-stig-test

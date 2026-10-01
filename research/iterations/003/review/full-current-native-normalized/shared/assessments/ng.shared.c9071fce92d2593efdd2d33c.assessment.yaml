@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.c9071fce92d2593efdd2d33c
+  version: 1
+  assessment_title: The macOS system must be configured so that the login command requires smart card authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    auth-pam-login-smartcard-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/grep -Ec '^(auth\s+sufficient\s+pam_smartcard.so|auth\s+required\s+pam_deny.so)' /etc/pam.d/login
+      object_title: auth_pam_login_smartcard_enforce_recommended_object
+  states:
+    state-auth-pam-login-smartcard-enforce-recommended-state:
+      state_title: auth_pam_login_smartcard_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '2'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-auth-pam-login-smartcard-enforce-recommended-test:
+      test_title: auth_pam_login_smartcard_enforce_recommended_test
+      capability: independent.shellcommand
+      object: auth-pam-login-smartcard-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-auth-pam-login-smartcard-enforce-recommended-state
+  evaluate:
+    test: test-auth-pam-login-smartcard-enforce-recommended-test

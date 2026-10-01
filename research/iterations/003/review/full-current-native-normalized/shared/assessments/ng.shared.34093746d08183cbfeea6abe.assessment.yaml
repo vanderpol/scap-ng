@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.34093746d08183cbfeea6abe
+  version: 1
+  assessment_title: 'UBTU-18-010005 - The Ubuntu operating system must implement NIST FIPS-validated cryptography to protect
+    classified information and for the following: to provision digital signatures, to generate cryptographic hashes, and to
+    protect unclassified information requiring confidentiality and cryptographic protection in accordance with applicable
+    federal laws, Executive Orders, directives, policies, regulations, and standards.'
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    proc-sys-crypto-fips-enabled-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /proc/sys/crypto/fips_enabled
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^(\d+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /proc/sys/crypto/fips_enabled
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-fips-enabled-1:
+      test_title: fips_enabled == 1
+      capability: independent.textfilecontent54
+      object: proc-sys-crypto-fips-enabled-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-fips-enabled-1

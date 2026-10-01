@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.a62826c38724f26d78527729
+  version: 1
+  assessment_title: UBTU-22-654075 - Ubuntu 22.04 LTS must generate audit records for successful/unsuccessful uses of the
+    pam_timestamp_check command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-a\s+(?:always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/pam_timestamp_check\s+(?:-F\s+perm=[rwa]*x[rwa]*\s+)?-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-invocations-usr-sbin-pam-timestamp-check:
+      test_title: Audit invocations of /usr/sbin/pam_timestamp_check
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-invocations-usr-sbin-pam-timestamp-check

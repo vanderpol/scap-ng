@@ -1,0 +1,132 @@
+assessment:
+  id: ng.shared.554783a70363ae991a2ef666
+  version: 1
+  assessment_title: Network – Mapper I/O Driver
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          value: AllowLLTDIOOnDomain
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          value: AllowLLTDIOOnPublicNet
+      object_title: null
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          value: EnableLLTDIO
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          value: ProhibitLLTDIOOnPrivateNet
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-0:
+      state_title: Reg_Dword type and value equals 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-allowlltdioondomain-value-equals-0:
+      test_title: AllowLLTDIOOnDomain value equals 0
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+    test-allowlltdioonpublicnet-value-equals-0:
+      test_title: AllowLLTDIOOnPublicNet value equals 0
+      capability: windows.registry
+      object: windows-registry-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+    test-enablelltdio-value-equals-0:
+      test_title: EnableLLTDIO value equals 0
+      capability: windows.registry
+      object: windows-registry-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+    test-prohibitlltdioonprivatenet-value-equals-0:
+      test_title: ProhibitLLTDIOOnPrivateNet value equals 0
+      capability: windows.registry
+      object: windows-registry-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+  evaluate:
+    all:
+    - test: test-allowlltdioondomain-value-equals-0
+    - test: test-allowlltdioonpublicnet-value-equals-0
+    - test: test-enablelltdio-value-equals-0
+    - test: test-prohibitlltdioonprivatenet-value-equals-0

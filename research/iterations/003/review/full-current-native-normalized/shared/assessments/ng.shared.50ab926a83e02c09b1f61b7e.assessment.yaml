@@ -1,0 +1,170 @@
+assessment:
+  id: ng.shared.50ab926a83e02c09b1f61b7e
+  version: 1
+  assessment_title: Windows Server 2016 virtualization-based security must be enabled with the platform security level configured
+    to Secure Boot or Secure Boot with DMA Protection.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    deviceguard-requiredsecurityproperties-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: classname
+              value: Win32_DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+            - name: namespace
+              value: root\Microsoft\Windows\DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: RequiredSecurityProperties
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: DeviceGuard RequiredSecurityProperties
+    deviceguard-virtualizationbasedsecuritystatus-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: classname
+              value: Win32_DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+            - name: namespace
+              value: root\Microsoft\Windows\DeviceGuard
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: VirtualizationBasedSecurityStatus
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: DeviceGuard VirtualizationBasedSecurityStatus
+  states:
+    state-requiredsecurityproperties-includes-2:
+      state_title: requiredsecurityproperties includes 2
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: requiredsecurityproperties
+            value: '2'
+            operation: pattern match
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: only one
+        entity_existence: at_least_one_exists
+    state-virtualizationbasedsecuritystatus-equals-2:
+      state_title: virtualizationbasedsecuritystatus equals 2
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: virtualizationbasedsecuritystatus
+            value: '2'
+            operation: equals
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: only one
+        entity_existence: at_least_one_exists
+  tests:
+    test-windows-server-virtualization-based-security-enabled-platform-security-level-configured:
+      test_title: Windows Server virtualization-based security must be enabled with the platform security level configured
+        to Secure Boot or Secure Boot with DMA Protection. RequiredSecurityProperties
+      capability: windows.cmdlet
+      object: deviceguard-requiredsecurityproperties-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-requiredsecurityproperties-includes-2
+    test-windows-server-virtualization-based-security-enabled-platform-security-level-configured-2:
+      test_title: Windows Server virtualization-based security must be enabled with the platform security level configured
+        to Secure Boot or Secure Boot with DMA Protection. VirtualizationBasedSecurityStatus
+      capability: windows.cmdlet
+      object: deviceguard-virtualizationbasedsecuritystatus-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-virtualizationbasedsecuritystatus-equals-2
+  evaluate:
+    all:
+    - test: test-windows-server-virtualization-based-security-enabled-platform-security-level-configured
+    - test: test-windows-server-virtualization-based-security-enabled-platform-security-level-configured-2

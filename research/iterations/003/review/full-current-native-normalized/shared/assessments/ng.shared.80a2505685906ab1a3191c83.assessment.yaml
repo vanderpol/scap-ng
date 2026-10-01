@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.80a2505685906ab1a3191c83
+  version: 1
+  assessment_title: UBTU-18-010448 - The Ubuntu operating system default filesystem permissions must be defined in such a
+    way that all authenticated users can only read and modify their own files.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-login-defs-umask-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*UMASK\s+(\d*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/login.defs:UMASK
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '077'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-login-defs-umask-077:
+      test_title: /etc/login.defs:UMASK == 077
+      capability: independent.textfilecontent54
+      object: etc-login-defs-umask-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-login-defs-umask-077

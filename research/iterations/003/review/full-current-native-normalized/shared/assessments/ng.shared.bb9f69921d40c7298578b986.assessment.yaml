@@ -1,0 +1,80 @@
+assessment:
+  id: ng.shared.bb9f69921d40c7298578b986
+  version: 1
+  assessment_title: AZLX-23-002365 - Amazon Linux 2023 must enforce password complexity by requiring that at least one numeric
+    character be used.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/security/pwquality.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*dcredit\s*=\s*(-?\d*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/security/pwquality.conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*dcredit\s*=\s*(-?\d*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: less than
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-at-least-one-numeric-character-required:
+      test_title: at least one numeric character is required
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-at-least-one-numeric-character-required

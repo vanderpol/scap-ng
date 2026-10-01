@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.0fe73244a9ea1bd6a5565b70
+  version: 1
+  assessment_title: OL09-00-002126 - OL 9 must prevent a user from overriding the disabling of the graphical user smart card
+    removal action.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    dconf-user-databases-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/profile/user
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^system-db:(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: dconf user databases
+    org-gnome-settings-daemon-peripherals-smartcard-removal-action-in-dconf-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: dconf-user-database-locks-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^/org/gnome/settings-daemon/peripherals/smartcard/removal-action$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+  variables:
+    dconf-user-database-locks-directories-variable:
+      title: dconf user database locks directories
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: /etc/dconf/db/
+            datatype: string
+        - values:
+            object: dconf-user-databases-object
+            field: subexpression
+        - literal:
+            value: .d/locks
+            datatype: string
+  states: {}
+  tests:
+    test-dconf-user-database-s-exist:
+      test_title: dconf user database(s) exist
+      capability: independent.textfilecontent54
+      object: dconf-user-databases-object
+      check_existence: at_least_one_exists
+      check: all
+    test-org-gnome-settings-daemon-peripherals-smartcard-removal-action-in-dconf:
+      test_title: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+        exists
+      capability: independent.textfilecontent54
+      object: org-gnome-settings-daemon-peripherals-smartcard-removal-action-in-dconf-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-dconf-user-database-s-exist
+    - test: test-org-gnome-settings-daemon-peripherals-smartcard-removal-action-in-dconf

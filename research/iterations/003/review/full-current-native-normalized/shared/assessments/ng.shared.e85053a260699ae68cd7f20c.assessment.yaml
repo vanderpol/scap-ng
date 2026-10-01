@@ -1,0 +1,94 @@
+assessment:
+  id: ng.shared.e85053a260699ae68cd7f20c
+  version: 1
+  assessment_title: OL08-00-020050 - OL 8 must be able to initiate directly a session lock for all connection types using
+    smartcard when the smartcard is removed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    dconf-database-directories-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/db
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: include
+        state: state-dconf-database-directories
+      behaviors:
+        max_depth: '1'
+        recurse_direction: down
+      object_title: dconf database directories
+    dconf-org-gnome-settings-daemon-peripherals-smartcard-sections-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: dconf-database-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\[org/gnome/settings-daemon/peripherals/smartcard](?:\r?\n(?:[^[\r\n].*)?)*
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: dconf org/gnome/settings-daemon/peripherals/smartcard sections
+  variables:
+    dconf-database-directories-variable:
+      title: dconf database directories
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: dconf-database-directories-object
+          field: path
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: text
+        value: \nremoval-action='lock-screen'\s*(\n|$)
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-dconf-database-directories:
+      state_title: dconf database directories
+      capability: unix.file
+      state:
+        field: path
+        value: ^/etc/dconf/db/.*\.d$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-dconf-smartcard-removal-action-lock-screen:
+      test_title: dconf smartcard removal-action lock-screen
+      capability: independent.textfilecontent54
+      object: dconf-org-gnome-settings-daemon-peripherals-smartcard-sections-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-dconf-smartcard-removal-action-lock-screen

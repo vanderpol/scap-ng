@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.944f44342f21767014570b09
+  version: 1
+  assessment_title: UAC - User Elevation Prompt
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          value: ConsentPromptBehaviorUser
+      object_title: null
+  variables:
+    behavior-elevation-prompt-standard-users-variable:
+      title: Behavior of the elevation prompt for standard users
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: behavior_elevation_prompt_standard_users_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: automatically_deny
+          - literal: '1'
+            hint: prompt_for_credentials_on_the_secure_desktop
+          - literal: '3'
+            hint: prompt_for_credentials
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: behavior-elevation-prompt-standard-users-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-user-account-control-behavior-elevation-prompt-standard-users-set-automatically:
+      test_title: '''User Account Control: Behavior of the elevation prompt for standard users'' is set to ''Automatically
+        deny elevation requests'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-user-account-control-behavior-elevation-prompt-standard-users-set-automatically

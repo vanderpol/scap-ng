@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.3946f99feeaaa069e0ddf6a5
+  version: 1
+  assessment_title: The Cisco router must be configured to generate an alert for all audit failure events.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-line-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          value: show running-config
+      object_title: null
+  states:
+    state-ensure-that-no-logging-trap-is-not-found:
+      state_title: Ensure that 'no logging trap' is not found
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: \nno logging trap
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-ensure-that-no-logging-trap-not-found:
+      test_title: Ensure that 'no logging trap' is not found
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: none satisfy
+      states:
+      - state-ensure-that-no-logging-trap-is-not-found
+  evaluate:
+    test: test-ensure-that-no-logging-trap-not-found

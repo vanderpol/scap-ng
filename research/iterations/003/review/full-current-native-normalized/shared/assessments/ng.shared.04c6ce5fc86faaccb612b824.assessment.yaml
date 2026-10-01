@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.04c6ce5fc86faaccb612b824
+  version: 1
+  assessment_title: OL09-00-002553 - OL 9 /etc/shadow- file must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-shadow-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          value: shadow-
+      object_title: /etc/shadow- file
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-shadow-file-owned-by-root:
+      test_title: /etc/shadow- file is owned by root.
+      capability: unix.file
+      object: etc-shadow-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    test: test-etc-shadow-file-owned-by-root

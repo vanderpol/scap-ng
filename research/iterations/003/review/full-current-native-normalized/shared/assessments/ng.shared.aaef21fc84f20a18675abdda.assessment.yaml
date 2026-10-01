@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.aaef21fc84f20a18675abdda
+  version: 1
+  assessment_title: Domain created Active Directory Organizational Unit (OU) objects must have proper access control permissions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-server-organization-created-active-directory-organizational-unit-ou-objects-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: import-module GroupPolicy; $dn = ([ADSI]"").distinguishedName; $c = 0; $f = New-Object System.Collections.Generic.List[Object];
+            $AdminGroupRegex = 'SYSTEM|Domain Admins|Enterprise Admins|Builtin\\Administrators|Administrators|CREATOR OWNER|SELF|Key
+            Admins|Enterprise Key Admins|Exchange Enterprise Servers|Exchange Servers|Exchange Windows Permissions|Exchange
+            Trusted Subsystem'; $ReadOnlyGroupRegex = 'Authenticated Users|Pre-Windows 2000|Enterprise Domain Controllers|Everyone|Anonymous
+            Logon'; $ModRightsRegex = 'Write|CreateChild|DeleteChild|GenericAll|GenericWrite|Delete'; :ouLoop foreach ($ou
+            in (Get-ADOrganizationalUnit -Filter "Name -ne 'Domain Controllers'")) { $aces = Get-Acl -Path "AD:$($ou.DistinguishedName)"
+            | Select-Object -ExpandProperty Access | Select-Object IdentityReference, ActiveDirectoryRights, AccessControlType
+            -Unique; foreach ($ace in $aces) { if ($ace.AccessControlType -eq 'Deny') { continue }; if ($ace.IdentityReference
+            -match $AdminGroupRegex) { continue }; if ($ace.ActiveDirectoryRights.ToString() -match $ModRightsRegex) { if
+            ($c -ge 1000) { $f.Add([PSCustomObject]@{ GPO = 'WARNING'; Status = 'FAIL'; Reason = 'Maximum reporting threshold
+            of 1000 failures reached. Further output truncated.' }); break ouLoop }; $f.Add([PSCustomObject]@{ GPO = $ou.Name;
+            Status = 'FAIL'; Reason = "Unauthorized Trustee '$($ace.IdentityReference)' holds '$($ace.ActiveDirectoryRights)'
+            modification rights." }); $c++ } } }; if ($f.Count -gt 0) { $f | Format-Table -AutoSize | Out-String -Width 4096
+            } else { [PSCustomObject]@{ GPO = 'Custom OUs'; Status = 'PASS'; Reason = 'Delegation securely restricted to authorized
+            administrative groups on all custom OUs.' } | Format-Table -AutoSize | Out-String -Width 4096 }
+        pattern:
+          operation: equals
+          datatype: string
+          value: .+
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Windows Server organization created Active Directory Organizational Unit (OU) objects must have proper
+        access control permissions.
+  states:
+    state-no-lines-shall-exist-listed-with-status-of-fail:
+      state_title: No lines shall exist listed with status of 'FAIL'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ' FAIL '
+        operation: pattern match
+        datatype: string
+        entity_check: none satisfy
+        entity_existence: at_least_one_exists
+  tests:
+    test-windows-server-organization-created-active-directory-organizational-unit-ou-objects:
+      test_title: Windows Server organization created Active Directory Organizational Unit (OU) objects must have proper access
+        control permissions.
+      capability: independent.shellcommand
+      object: windows-server-organization-created-active-directory-organizational-unit-ou-objects-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-lines-shall-exist-listed-with-status-of-fail
+  evaluate:
+    test: test-windows-server-organization-created-active-directory-organizational-unit-ou-objects

@@ -1,0 +1,119 @@
+assessment:
+  id: ng.shared.c12cf47a00439b7ba81b8cff
+  version: 1
+  assessment_title: UBTU-22-213010 - Ubuntu 22.04 LTS must restrict access to the kernel message buffer.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: kernel.dmesg_restrict
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*kernel\.dmesg_restrict\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: directories-containing-sysctl-configuration-files-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*kernel\.dmesg_restrict\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    all-sysctl-configuration-files-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object
+        - object: independent-textfilecontent54-object-2
+      object_title: all sysctl configuration files
+  variables:
+    directories-containing-sysctl-configuration-files-variable:
+      title: Directories containing sysctl configuration files
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-kernel-dmesg-restrict-setting-in-kernel-set-1:
+      test_title: kernel.dmesg_restrict setting in kernel is set to 1
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
+    test-kernel-dmesg-restrict-setting-in-system-sysctl-configuration-files-set:
+      test_title: kernel.dmesg_restrict setting in system sysctl configuration files is set to 1
+      capability: independent.textfilecontent54
+      object: all-sysctl-configuration-files-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-kernel-dmesg-restrict-setting-in-kernel-set-1
+    - test: test-kernel-dmesg-restrict-setting-in-system-sysctl-configuration-files-set

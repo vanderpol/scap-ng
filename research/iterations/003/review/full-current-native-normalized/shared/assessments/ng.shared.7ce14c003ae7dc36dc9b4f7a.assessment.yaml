@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.7ce14c003ae7dc36dc9b4f7a
+  version: 1
+  assessment_title: SLES-12-010810 - SUSE operating system file systems that are being imported via Network File System (NFS)
+    must be mounted to prevent files with the setuid and setgid bit set from being executed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\[?[\.\w:-]+\]?:[/\w-]+\s+[/\w-]+\s+nfs[4]?\s+(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/mtab
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\[?[\.\w:-]+\]?:[/\w-]+\s+[/\w-]+\s+nfs[4]?\s+(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^.*nosuid.*$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-nfs-entries-in-etc-fstab-have-nosuid:
+      test_title: all nfs entries in /etc/fstab have nosuid
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-all-nfs-entries-in-etc-mtab-have-nosuid:
+      test_title: all nfs entries in /etc/mtab have nosuid
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-all-nfs-entries-in-etc-fstab-have-nosuid
+    - test: test-all-nfs-entries-in-etc-mtab-have-nosuid

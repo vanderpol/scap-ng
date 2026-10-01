@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.be02f8e6f88047064617cf78
+  version: 1
+  assessment_title: Set OpenSSH Idle Timeout Interval
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: openssh-server
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[\s]*(?i)ClientAliveInterval[\s]+(\d+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  variables:
+    timeout-value-variable:
+      title: timeout value
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: sshd_idle_timeout_value
+  states:
+    state-upper-bound-of-clientaliveinterval-in-seconds:
+      state_title: upper bound of ClientAliveInterval in seconds
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: timeout-value-variable
+        operation: less than or equal
+        datatype: int
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-lower-bound-of-clientaliveinterval-in-seconds:
+      state_title: lower bound of ClientAliveInterval in seconds
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: greater than
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-timeout-configured:
+      test_title: timeout is configured
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      state_operator: AND
+      states:
+      - state-upper-bound-of-clientaliveinterval-in-seconds
+      - state-lower-bound-of-clientaliveinterval-in-seconds
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - test: test-timeout-configured

@@ -1,0 +1,30 @@
+assessment:
+  id: ng.shared.8441d2a22517d0f3bcf3664e
+  version: 1
+  assessment_title: OL08-00-040390 - OL 8 must not have the "tuned" package installed if not required for operational support.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: tuned
+      object_title: null
+  states: {}
+  tests:
+    test-tuned-package-installed:
+      test_title: tuned package is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    not:
+      test: test-tuned-package-installed

@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.2dbaa01b161b3ab36384c6f4
+  version: 1
+  assessment_title: The rpcbind service must be configured for local only services unless organizationally defined.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    svcprop-p-config-local-only-network-rpc-bind-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: svcprop -p config/local_only network/rpc/bind
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: svcprop -p config/local_only network/rpc/bind
+  states:
+    state-check-that-line-contains-true-and-command-exits-with-a-s:
+      state_title: 'Check that line contains: true, and command exits with a status of 0'
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-rpcbind-service-configured-local-only-services-unless-organizationally-defined:
+      test_title: The rpcbind service must be configured for local only services unless organizationally defined.
+      capability: independent.shellcommand
+      object: svcprop-p-config-local-only-network-rpc-bind-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-line-contains-true-and-command-exits-with-a-s
+  evaluate:
+    test: test-rpcbind-service-configured-local-only-services-unless-organizationally-defined

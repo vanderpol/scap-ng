@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.a8c57695a475dc51ff96fe08
+  version: 1
+  assessment_title: OL08-00-030742 - OL 8 must disable network management of the chrony daemon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/chrony.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[ \t]*cmdport[ \t]+0[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-chrony-conf-cmdport-option-set-0:
+      test_title: '/etc/chrony.conf: cmdport option is set to 0'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-etc-chrony-conf-cmdport-option-set-0

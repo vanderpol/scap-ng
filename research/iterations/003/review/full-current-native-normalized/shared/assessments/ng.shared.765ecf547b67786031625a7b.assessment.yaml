@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.765ecf547b67786031625a7b
+  version: 1
+  assessment_title: The macOS system must require passwords contain a minimum of one special character.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pwpolicy-special-character-enforce-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/pwpolicy -getaccountpolicies 2>/dev/null | /usr/bin/tail -n +2 | /usr/bin/xmllint --xpath "//string[contains(text(),
+            \"policyAttributePassword matches '(.*[^a-zA-Z0-9].*){\")]" - 2>/dev/null | /usr/bin/awk -F"{|}" '{if ($2 >= 1)
+            {print "true"} else {print "false"}}'
+      object_title: pwpolicy_special_character_enforce_stig_object
+  states:
+    state-pwpolicy-special-character-enforce-stig-state:
+      state_title: pwpolicy_special_character_enforce_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pwpolicy-special-character-enforce-stig-test:
+      test_title: pwpolicy_special_character_enforce_stig_test
+      capability: independent.shellcommand
+      object: pwpolicy-special-character-enforce-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-pwpolicy-special-character-enforce-stig-state
+  evaluate:
+    test: test-pwpolicy-special-character-enforce-stig-test

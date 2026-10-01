@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.5db8a000a000f6e55ca983e4
+  version: 1
+  assessment_title: WN10-SO-000210 - The system must be configured to the required LDAP client signing level.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Services\LDAP
+        name:
+          operation: equals
+          datatype: string
+          value: LDAPClientIntegrity
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-2:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-security-ldap-client-signing-requirements-set-negotiate-signing-or:
+      test_title: '''Network security: LDAP client signing requirements'' is set to ''Negotiate signing'' or ''Require signing'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-registry
+      - state-windows-registry-2
+  evaluate:
+    test: test-network-security-ldap-client-signing-requirements-set-negotiate-signing-or

@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.738a40954c4803230391d937
+  version: 1
+  assessment_title: UBTU-18-010136 - The Ubuntu operating system library directories must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-system-wide-library-directories-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: system-wide-library-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: All system-wide library directories
+  variables:
+    system-wide-library-directories-variable:
+      title: System-wide library directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+  states:
+    state-owned-by-root:
+      state_title: Owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-system-wide-library-directories-owned-by-root:
+      test_title: All system-wide library directories must be owned by root
+      capability: unix.file
+      object: all-system-wide-library-directories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    test: test-all-system-wide-library-directories-owned-by-root

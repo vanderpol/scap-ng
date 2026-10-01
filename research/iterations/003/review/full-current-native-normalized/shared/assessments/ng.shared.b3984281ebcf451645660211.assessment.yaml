@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.b3984281ebcf451645660211
+  version: 1
+  assessment_title: UBTU-24-300019 - Ubuntu 24.04 LTS must restrict privilege elevation to authorized personnel.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        recurse_direction: down
+      object_title: null
+  states: {}
+  tests:
+    test-all-does-not-exist-etc-sudoers:
+      test_title: ALL does not exist /etc/sudoers
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-all-does-not-exist-in-etc-sudoers-d:
+      test_title: ALL does not exist in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-all-does-not-exist-etc-sudoers
+    - test: test-all-does-not-exist-in-etc-sudoers-d

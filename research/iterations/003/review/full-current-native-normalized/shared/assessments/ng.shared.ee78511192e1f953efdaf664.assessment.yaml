@@ -1,0 +1,59 @@
+assessment:
+  id: ng.shared.ee78511192e1f953efdaf664
+  version: 1
+  assessment_title: The Cisco device must be configured to audit all administrator activity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-line-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          value: show running-config
+      object_title: null
+    iosxe-global-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: equals
+          datatype: string
+          value: logging userinfo
+      object_title: null
+  states:
+    state-check-for-archive-n-log-config-n-logging-enable-logging-:
+      state_title: Check for archive\n log config\n  logging enable\  logging size 1000\n  notify syslog contenttype plaintext\n  hidekeys
+      capability: iosxe.line
+      state:
+        field: config_line
+        value: \narchive\n log config\n(  \S+[^\n]*\n)*  logging enable\n(  \S+[^\n]*\n)*  logging size 1000\n(  \S+[^\n]*\n)*  notify
+          syslog contenttype plaintext\n(  \S+[^\n]*\n)*  hidekeys
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-archive-log-config-logging-enable-logging-size-1000-notify:
+      test_title: Check for archive - log config - logging enable - logging size 1000 - notify syslog contenttype plaintext
+        - hidekeys
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-for-archive-n-log-config-n-logging-enable-logging-
+    test-logging-userinfo:
+      test_title: logging userinfo
+      capability: iosxe.global
+      object: iosxe-global-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-check-archive-log-config-logging-enable-logging-size-1000-notify
+    - test: test-logging-userinfo

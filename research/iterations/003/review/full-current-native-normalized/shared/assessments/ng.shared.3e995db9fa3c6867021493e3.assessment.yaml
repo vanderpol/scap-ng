@@ -1,0 +1,66 @@
+assessment:
+  id: ng.shared.3e995db9fa3c6867021493e3
+  version: 1
+  assessment_title: OL09-00-002128 - OL 9 must prevent a user from overriding the disable-restart-buttons setting for the
+    graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-that-etc-dconf-profile-user-system-db-at-minimum-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/profile/user
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*system-db\s*:\s*local\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+    check-that-disable-restart-button-setting-locked-from-nonprivileged-user-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/dconf/db/local.d/locks
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\/org\/gnome\/login-screen\/disable-restart-buttons$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Check that the disable-restart-button setting is locked from nonprivileged user modification
+  states: {}
+  tests:
+    test-check-that-etc-dconf-profile-user-system-db-at-minimum:
+      test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+      capability: independent.textfilecontent54
+      object: check-that-etc-dconf-profile-user-system-db-at-minimum-object
+      check_existence: at_least_one_exists
+      check: all
+    test-check-that-disable-restart-button-setting-locked-from-nonprivileged-user:
+      test_title: Check that the disable-restart-button setting is locked from nonprivileged user modification
+      capability: independent.textfilecontent54
+      object: check-that-disable-restart-button-setting-locked-from-nonprivileged-user-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-check-that-etc-dconf-profile-user-system-db-at-minimum
+    - test: test-check-that-disable-restart-button-setting-locked-from-nonprivileged-user

@@ -1,0 +1,118 @@
+assessment:
+  id: ng.shared.96efd0dddfe8a6f98dea3809
+  version: 1
+  assessment_title: SQL Server must protect against a user falsely repudiating by ensuring only clearly unique Active Directory
+    user accounts can connect to the instance.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          value: 'SELECT name
+
+            FROM sys.server_principals
+
+            WHERE type in (''U'',''G'')
+
+            AND name LIKE ''%$'''
+      behaviors:
+        context: instance
+      object_title: null
+    check-see-if-any-logins-computer-accounts-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: adsi-call-user-computer-name-extracted-from-domain-user-string-variable
+      object_title: Check to see if any logins are computer accounts
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+    adsi-call-user-computer-name-extracted-from-domain-user-string-variable:
+      title: ADSI call with User/Computer name extracted from DOMAIN\User$ string
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: try{ ([ADSISearcher]"(&(ObjectCategory=Computer)(Name=
+            datatype: string
+        - regex_capture:
+            value:
+              values:
+                object: independent-sqlext-object
+                field: result
+                record_field: name
+            pattern: .+\\(.*)\$
+        - literal:
+            value: ))").FindAll() | foreach-object{ write-host($_.Properties.adspath + ", OS:" + $_.Properties.operatingsystem)}}
+              catch{}
+            datatype: string
+  states:
+    state-stdout-line-should-not-exist:
+      state_title: Stdout_line should not exist
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-verify-that-none-sql-logins-computer-accounts:
+      test_title: Verify that none of the SQL logins are computer accounts.
+      capability: independent.shellcommand
+      object: check-see-if-any-logins-computer-accounts-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-stdout-line-should-not-exist
+  evaluate:
+    test: test-verify-that-none-sql-logins-computer-accounts

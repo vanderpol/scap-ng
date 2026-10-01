@@ -1,0 +1,86 @@
+assessment:
+  id: ng.shared.a2e903cceaf28387bb234565
+  version: 1
+  assessment_title: The Oracle Linux operating system must enable SELinux.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    sys-fs-selinux-enforce-value-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /sys/fs/selinux/enforce
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^(\d+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /sys/fs/selinux/enforce value
+    etc-selinux-config-selinux-value-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/selinux/config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^SELINUX=(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/selinux/config:SELINUX value
+  states:
+    state-sys-fs-selinux-enforce-0:
+      state_title: /sys/fs/selinux/enforce != 0
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: not equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-etc-selinux-config-selinux-enforcing:
+      state_title: /etc/selinux/config:SELINUX=enforcing
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: enforcing
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-selinux-enforcing:
+      test_title: selinux is enforcing
+      capability: independent.textfilecontent54
+      object: sys-fs-selinux-enforce-value-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-sys-fs-selinux-enforce-0
+    test-etc-selinux-config-selinux-enforcing:
+      test_title: /etc/selinux/config:SELINUX=enforcing
+      capability: independent.textfilecontent54
+      object: etc-selinux-config-selinux-value-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-etc-selinux-config-selinux-enforcing
+  evaluate:
+    all:
+    - test: test-selinux-enforcing
+    - test: test-selinux-enforcing
+    - test: test-etc-selinux-config-selinux-enforcing

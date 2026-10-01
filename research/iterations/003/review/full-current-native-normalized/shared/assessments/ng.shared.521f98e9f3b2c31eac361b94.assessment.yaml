@@ -1,0 +1,36 @@
+assessment:
+  id: ng.shared.521f98e9f3b2c31eac361b94
+  version: 1
+  assessment_title: Anonymous SID/Name translation must not be allowed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieves-passwordpolicy-object-object:
+      capability: windows.passwordpolicy
+      object_title: Retrieves a passwordpolicy_object.
+  states:
+    state-this-passwordpolicy-state-represents-a-password-policy-t:
+      state_title: This passwordpolicy_state represents a password policy that has a anonymous_name_lookup equal to '0'.
+      capability: windows.passwordpolicy
+      state:
+        field: anonymous_name_lookup
+        value: '0'
+        operation: equals
+        datatype: boolean
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-network-access-allow-anonymous-sid-name-translation-set-disabled:
+      test_title: 'Network access: Allow anonymous SID/Name translation is set to ''Disabled'''
+      capability: windows.passwordpolicy
+      object: retrieves-passwordpolicy-object-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-this-passwordpolicy-state-represents-a-password-policy-t
+  evaluate:
+    test: test-network-access-allow-anonymous-sid-name-translation-set-disabled

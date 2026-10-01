@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.cfc52633427ac887bd86c40a
+  version: 1
+  assessment_title: UBTU-18-010415 - The Ubuntu operating system must immediately terminate all network connections associated
+    with SSH traffic after a period of inactivity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-ssh-sshd-config-clientalivecountmax-1:
+      test_title: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-ssh-sshd-config-clientalivecountmax-1

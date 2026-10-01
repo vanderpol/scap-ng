@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.f74c1e1b76406296445d1938
+  version: 1
+  assessment_title: WN10-AU-000100 - The system must be configured to audit Policy Change - Audit Policy Change successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-policy-change-is-set-to-success:
+      state_title: '''Audit Policy Change'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: audit_policy_change
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-policy-change-is-set-to-success-and-failure:
+      state_title: '''Audit Policy Change'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: audit_policy_change
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-audit-policy-change-set-success:
+      test_title: '''Audit Audit Policy Change'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-policy-change-is-set-to-success
+    test-audit-audit-policy-change-set-success-failure:
+      test_title: '''Audit Audit Policy Change'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-policy-change-is-set-to-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-audit-policy-change-set-success
+    - test: test-audit-audit-policy-change-set-success-failure

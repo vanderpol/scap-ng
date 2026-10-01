@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.ac3bbc2b7a4d20526ace8a38
+  version: 1
+  assessment_title: The Active Directory Domain object must be configured with proper audit settings.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    query-both-fail-success-auditing-settings-domain-organizational-unit-ou-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: '$path = ''AD:\'' + (Get-ADDomain).DistinguishedName; $aud = (Get-Acl $path -Audit).Audit; $hasFail = [bool]($aud
+            | Where-Object {$_.IdentityReference -match ''Everyone|S-1-1-0'' -and $_.AuditFlags -eq ''Failure'' -and ($_.ActiveDirectoryRights
+            -match ''GenericAll|FullControl|All'')}); $hasSucc = [bool]($aud | Where-Object {$_.IdentityReference -match ''Everyone|S-1-1-0''
+            -and $_.AuditFlags -eq ''Success'' -and ($_.ActiveDirectoryRights -match ''ExtendedRight|WriteProperty'')}); .
+            { if (-not $hasFail -or -not $hasSucc) { $reasons = @(); if (-not $hasFail) { $reasons += ''MISSING: Everyone
+            -> Failure -> GenericAll/FullControl audit policy'' }; if (-not $hasSucc) { $reasons += ''MISSING: Everyone ->
+            Success -> ExtendedRight/WriteProperty audit policy'' }; [PSCustomObject]@{ Target_Object = $path.Replace(''AD:\'','''');
+            IdentityReference = ''Everyone (S-1-1-0)''; Status = ''FAIL''; Details = ($reasons -join '' | '') } } else { [PSCustomObject]@{
+            Target_Object = $path.Replace(''AD:\'',''''); IdentityReference = ''Everyone (S-1-1-0)''; Status = ''PASS''; Details
+            = ''All mandatory Failure and Success audit policies are correctly configured per the STIG.'' } } } | Format-Table
+            -AutoSize | Out-String -Width 4096'
+        pattern:
+          operation: equals
+          datatype: string
+          value: .+
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Query both Fail and Success auditing settings for Domain Organizational Unit (OU)
+  states:
+    state-no-lines-shall-exist-listed-with-status-of-fail:
+      state_title: No lines shall exist listed with status of 'FAIL'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ' FAIL '
+        operation: pattern match
+        datatype: string
+        entity_check: none satisfy
+        entity_existence: at_least_one_exists
+  tests:
+    test-windows-server-active-directory-domain-object-configured-proper-audit-settings:
+      test_title: Windows Server Active Directory Domain object must be configured with proper audit settings.
+      capability: independent.shellcommand
+      object: query-both-fail-success-auditing-settings-domain-organizational-unit-ou-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-lines-shall-exist-listed-with-status-of-fail
+  evaluate:
+    test: test-windows-server-active-directory-domain-object-configured-proper-audit-settings

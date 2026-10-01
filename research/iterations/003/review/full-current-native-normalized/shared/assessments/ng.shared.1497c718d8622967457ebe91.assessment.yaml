@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.1497c718d8622967457ebe91
+  version: 1
+  assessment_title: OL08-00-010572 - OL 8 must prevent files with the setuid and setgid bit set from being executed on the
+    /boot/efi directory.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          value: /boot/efi
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*[^#\s]+\s+/boot/efi\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: nosuid
+        operation: equals
+        datatype: string
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-if-boot-efi-mounted-it-mounted-nosuid-option:
+      test_title: If /boot/efi is mounted, it is mounted with the nosuid option
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-partition
+    test-if-boot-efi-configured-in-etc-fstab-it-configured-nosuid:
+      test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-if-boot-efi-mounted-it-mounted-nosuid-option
+    - test: test-if-boot-efi-configured-in-etc-fstab-it-configured-nosuid

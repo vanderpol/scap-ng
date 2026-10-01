@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.160e5b6c7c8e0c37f6e4bcc5
+  version: 1
+  assessment_title: UBTU-18-010016 - Advance package Tool (APT) must be configured to prevent the installation of patches,
+    service packs, device drivers, or Ubuntu operating system components without verification they have been digitally signed
+    using a certificate that is recognized and approved by the organization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-apt-apt-conf-d-allowunauthenticated-setting-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/apt/apt.conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\S+::AllowUnauthenticated\s+"true";$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/apt/apt.conf.d/* AllowUnauthenticated setting
+  states: {}
+  tests:
+    test-allowunauthenticaed-s-not-set-true:
+      test_title: AllowUnauthenticaed s not set to true
+      capability: independent.textfilecontent54
+      object: etc-apt-apt-conf-d-allowunauthenticated-setting-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-allowunauthenticaed-s-not-set-true

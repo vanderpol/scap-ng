@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.40abcc87d0e89705a09476cc
+  version: 1
+  assessment_title: Everyone Anonymous Rights
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: System\CurrentControlSet\Control\Lsa
+        name:
+          operation: equals
+          datatype: string
+          value: EveryoneIncludesAnonymous
+      object_title: null
+  variables:
+    network-access-let-everyone-permissions-apply-anonymous-users-variable:
+      title: 'Network access: Let Everyone permissions apply to anonymous users'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: let_everyone_permissions_apply_to_anonymous_users_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: network-access-let-everyone-permissions-apply-anonymous-users-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-access-let-everyone-permissions-apply-anonymous-users-set-disabled:
+      test_title: '''Network access: Let Everyone permissions apply to anonymous users'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-network-access-let-everyone-permissions-apply-anonymous-users-set-disabled

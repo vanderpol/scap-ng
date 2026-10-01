@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.55a4c99fb0ff53bfc1babb43
+  version: 1
+  assessment_title: Ensure Only Protocol 2 Connections Allowed
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: openssh-server
+      object_title: null
+    ssh-protocol-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*Protocol[ \t]+([^\s#]*)[ \t]*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+      object_title: SSH Protocol
+  states:
+    state-protocol-2:
+      state_title: Protocol = 2
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(2|"2")$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-version-7-4:
+      state_title: version >= 7.4
+      capability: linux.rpminfo
+      state:
+        field: evr
+        value: 0:7.4p1-0
+        operation: greater than or equal
+        datatype: evr_string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-sshd-uses-protocol-2:
+      test_title: sshd uses protocol 2
+      capability: independent.textfilecontent54
+      object: ssh-protocol-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-protocol-2
+    test-package-openssh-server-removed-2:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-version-7-4
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - any:
+      - test: test-sshd-uses-protocol-2
+      - test: test-package-openssh-server-removed-2

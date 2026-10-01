@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.28879d02cc40c878545f2ffc
+  version: 1
+  assessment_title: Windows Installer - Vendor Signed Updates
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\Installer
+        name:
+          operation: equals
+          datatype: string
+          value: DisableLUAPatching
+      object_title: null
+  variables:
+    prohibit-non-administrators-from-applying-vendor-signed-updates-variable:
+      title: Prohibit non-administrators from applying vendor signed updates
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: prohibit_non_administrators_install_signed_updates_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: prohibit-non-administrators-from-applying-vendor-signed-updates-variable
+          operation: equals
+          datatype: int
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-prohibit-non-administrators-from-applying-vendor-signed-updates-set-enabled:
+      test_title: '''Prohibit non-administrators from applying vendor signed updates'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-prohibit-non-administrators-from-applying-vendor-signed-updates-set-enabled

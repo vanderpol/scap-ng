@@ -1,0 +1,370 @@
+assessment:
+  id: ng.shared.efb711d7e0de1702db841701
+  version: 1
+  assessment_title: Winlogon Registry Permissions
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    hkey-local-machine-software-microsoft-windows-nt-currentversion-winlogon-key-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon key
+    hkey-local-machine-software-microsoft-windows-nt-currentversion-winlogon-rights-object:
+      capability: windows.regkeyeffectiverights53
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon rights
+    winlogon-rights-except-users-group-administrators-group-system-trustedinstaller-all-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-microsoft-windows-nt-currentversion-winlogon-rights-object
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-trustedinstaller
+        - action: exclude
+          state: state-users-group
+        - action: exclude
+          state: state-system
+        - action: exclude
+          state: state-all-application-packages
+      object_title: Winlogon rights, except for Users group, Administrators group, SYSTEM, TrustedInstaller, ALL APPLICATION
+        PACKAGES
+    winlogon-rights-except-administrators-group-system-trustedinstaller-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-microsoft-windows-nt-currentversion-winlogon-rights-object
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-trustedinstaller
+        - action: exclude
+          state: state-system
+      object_title: Winlogon rights, except for Administrators group, SYSTEM, and TrustedInstaller
+  states:
+    state-no-registry-rights:
+      state_title: No registry rights
+      capability: windows.regkeyeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_read_control
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: access_system_security
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_read
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_all
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_query_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_set_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_sub_key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_enumerate_sub_keys
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_notify
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_link
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_64key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_32key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_res
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-qenr-registry-rights:
+      state_title: QENR registry rights
+      capability: windows.regkeyeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: access_system_security
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_all
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_set_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_sub_key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_link
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_64key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_32key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_res
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-administrators-group:
+      state_title: Administrators Group
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-544
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-trustedinstaller:
+      state_title: TrustedInstaller
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-users-group:
+      state_title: Users Group
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-545
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system:
+      state_title: SYSTEM
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-18
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-all-application-packages:
+      state_title: ALL APPLICATION PACKAGES
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-15-2-1
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-winlogon-key-exists:
+      test_title: Winlogon key exists
+      capability: windows.registry
+      object: hkey-local-machine-software-microsoft-windows-nt-currentversion-winlogon-key-object
+      check_existence: at_least_one_exists
+      check: at least one
+    test-winlogon-key-has-no-bad-rights-non-users-group-administrators:
+      test_title: Winlogon key has no bad rights for non-(Users group, Administrators group, SYSTEM, TrustedInstaller, ALL
+        APPLICATION PACKAGES)
+      capability: windows.regkeyeffectiverights53
+      object: winlogon-rights-except-users-group-administrators-group-system-trustedinstaller-all-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-no-registry-rights
+    test-winlogon-key-has-no-non-users-group-administrators-group-system:
+      test_title: Winlogon key has no non-(Users group, Administrators group, SYSTEM, TrustedInstaller, ALL APPLICATION PACKAGES)
+        rights to check
+      capability: windows.regkeyeffectiverights53
+      object: winlogon-rights-except-users-group-administrators-group-system-trustedinstaller-all-object
+      check_existence: none_exist
+      check: all
+    test-winlogon-key-has-no-bad-rights-non-administrators-group-system:
+      test_title: Winlogon key has no bad rights for non-(Administrators group, SYSTEM, TrustedInstaller)
+      capability: windows.regkeyeffectiverights53
+      object: winlogon-rights-except-administrators-group-system-trustedinstaller-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-qenr-registry-rights
+    test-winlogon-key-has-no-non-administrators-group-system-trustedinstaller-rights:
+      test_title: Winlogon key has no non-(Administrators group, SYSTEM, TrustedInstaller) rights to check
+      capability: windows.regkeyeffectiverights53
+      object: winlogon-rights-except-administrators-group-system-trustedinstaller-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-winlogon-key-exists
+    - any:
+      - test: test-winlogon-key-has-no-bad-rights-non-users-group-administrators
+      - test: test-winlogon-key-has-no-non-users-group-administrators-group-system
+    - any:
+      - test: test-winlogon-key-has-no-bad-rights-non-administrators-group-system
+      - test: test-winlogon-key-has-no-non-administrators-group-system-trustedinstaller-rights

@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.5fa254ad42d805e8519ad9b9
+  version: 1
+  assessment_title: Set SHA512 Password Hashing Algorithm in /etc/login.defs
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*ENCRYPT_METHOD\s+(\w+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: SHA512
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-value-encrypt-method-should-set-appropriately-in-etc-login-defs:
+      test_title: The value of ENCRYPT_METHOD should be set appropriately in /etc/login.defs
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-value-encrypt-method-should-set-appropriately-in-etc-login-defs

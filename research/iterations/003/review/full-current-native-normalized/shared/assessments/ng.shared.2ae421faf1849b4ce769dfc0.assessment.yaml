@@ -1,0 +1,65 @@
+assessment:
+  id: ng.shared.2ae421faf1849b4ce769dfc0
+  version: 1
+  assessment_title: WN19-UR-000120 - Windows Server 2019 Generate security audits user right must only be assigned to Local
+    Service and Network Service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-userright-object:
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          value: SE_AUDIT_NAME
+      object_title: null
+  states:
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ''
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-2:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: LOCAL SERVICE
+        operation: case insensitive equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-3:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: NETWORK SERVICE
+        operation: case insensitive equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-generate-security-audits-local-service-network-service:
+      test_title: Generate security audits - LOCAL SERVICE, NETWORK SERVICE
+      capability: windows.userright
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-userright
+      - state-windows-userright-2
+      - state-windows-userright-3
+  evaluate:
+    test: test-generate-security-audits-local-service-network-service

@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.e868289e38f3cbb546c2d630
+  version: 1
+  assessment_title: The macOS system must be configured with audit log folders set to mode 700 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-folders-mode-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/stat -f %A $(/usr/bin/grep ''^dir'' /etc/security/audit_control | /usr/bin/awk -F: ''{print $2}'')'
+      object_title: audit_folders_mode_configure_recommended_object
+  states:
+    state-audit-folders-mode-configure-recommended-state:
+      state_title: audit_folders_mode_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '700'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-folders-mode-configure-recommended-test:
+      test_title: audit_folders_mode_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-folders-mode-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-folders-mode-configure-recommended-state
+  evaluate:
+    test: test-audit-folders-mode-configure-recommended-test

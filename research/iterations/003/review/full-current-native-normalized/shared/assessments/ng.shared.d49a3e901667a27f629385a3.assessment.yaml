@@ -1,0 +1,149 @@
+assessment:
+  id: ng.shared.d49a3e901667a27f629385a3
+  version: 1
+  assessment_title: Event Viewer must be protected from unauthorized modification and deletion
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-root-directory-registry-object-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          value: SystemRoot
+      object_title: System Root Directory Registry Object
+    event-viewer-rights-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: systemroot-system32-variable
+        filename:
+          operation: equals
+          datatype: string
+          value: Eventvwr.exe
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: Event Viewer Rights
+    eventvwr-rights-except-trustedinstaller-object:
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: event-viewer-rights-object
+        filters:
+        - action: exclude
+          state: state-trustedinstaller
+      object_title: Eventvwr Rights except for TrustedInstaller
+  variables:
+    systemroot-system32-variable:
+      title: SystemRoot\System32
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: system-root-directory-registry-object-object
+            field: value
+        - literal:
+            value: \System32
+            datatype: string
+  states:
+    state-no-rights-except-read-and-execute:
+      state_title: No Rights except Read and Execute
+      capability: windows.fileeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_data
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_append_data
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_ea
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_delete_child
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_attributes
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-trustedinstaller:
+      state_title: TrustedInstaller
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-eventvwr-exe-only-read-execute-rights-users-other-than-trustedinstaller:
+      test_title: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
+      capability: windows.fileeffectiverights53
+      object: eventvwr-rights-except-trustedinstaller-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-no-rights-except-read-and-execute
+  evaluate:
+    test: test-eventvwr-exe-only-read-execute-rights-users-other-than-trustedinstaller

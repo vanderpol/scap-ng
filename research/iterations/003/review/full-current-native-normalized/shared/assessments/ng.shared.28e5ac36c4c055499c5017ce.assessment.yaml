@@ -1,0 +1,86 @@
+assessment:
+  id: ng.shared.28e5ac36c4c055499c5017ce
+  version: 1
+  assessment_title: Disable SSH Support for Rhosts RSA Authentication
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: openssh-server
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[\s]*(?i)RhostsRSAAuthentication(?-i)[\s]+(\w+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-version-7-4:
+      state_title: version >= 7.4
+      capability: linux.rpminfo
+      state:
+        field: evr
+        value: 0:7.4p1-0
+        operation: greater than or equal
+        datatype: evr_string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'no'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-package-openssh-server-removed-2:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-version-7-4
+    test-tests-value-rhostsrsaauthentication-s-nocomment-setting-in-etc-ssh-sshd:
+      test_title: Tests the value of the RhostsRSAAuthentication[\s]*(<:nocomment:>*) setting in the /etc/ssh/sshd_config
+        file
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - any:
+      - test: test-package-openssh-server-removed-2
+      - test: test-tests-value-rhostsrsaauthentication-s-nocomment-setting-in-etc-ssh-sshd

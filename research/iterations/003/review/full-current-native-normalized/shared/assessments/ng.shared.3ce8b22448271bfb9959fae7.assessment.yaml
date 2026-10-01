@@ -1,0 +1,92 @@
+assessment:
+  id: ng.shared.3ce8b22448271bfb9959fae7
+  version: 1
+  assessment_title: OL 8 must disable virtual syscalls.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-vsyscall-param-via-grub2-editenv-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: grub2-editenv list
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: vsyscall
+      object_title: Retrieve vsyscall param via grub2-editenv.
+    retrieve-grub-cmd-linux-vsyscall-param-from-etc-default-grub-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\n*\s*GRUB_CMDLINE_LINUX="(.*?)"
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: Retrieve the GRUB_CMD_LINUX vsyscall param from /etc/default/grub
+  states:
+    state-confirm-vsyscall-is-set-to-none:
+      state_title: Confirm vsyscall is set to 'none'.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: \svsyscall\s*=\s*none\b
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-confirm-the-vsyscall-param-is-set-to-none:
+      state_title: Confirm the vsyscall param is set to 'none'.
+      capability: independent.textfilecontent54
+      state:
+        all:
+        - field: instance
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: subexpression
+          value: \svsyscall\s*=\s*none\b
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-confirm-that-current-grub-2-configuration-disables-vsyscalls:
+      test_title: Confirm that the current GRUB 2 configuration disables vsyscalls.
+      capability: independent.shellcommand
+      object: retrieve-vsyscall-param-via-grub2-editenv-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-vsyscall-is-set-to-none
+    test-confirm-that-vsyscalls-disabled-by-default-persist-in-kernel-updates:
+      test_title: Confirm that vsyscalls are disabled by default to persist in kernel updates.
+      capability: independent.textfilecontent54
+      object: retrieve-grub-cmd-linux-vsyscall-param-from-etc-default-grub-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-the-vsyscall-param-is-set-to-none
+  evaluate:
+    all:
+    - test: test-confirm-that-current-grub-2-configuration-disables-vsyscalls
+    - test: test-confirm-that-vsyscalls-disabled-by-default-persist-in-kernel-updates

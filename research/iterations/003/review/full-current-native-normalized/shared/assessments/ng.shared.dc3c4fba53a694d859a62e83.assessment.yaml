@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.dc3c4fba53a694d859a62e83
+  version: 1
+  assessment_title: The Cisco router must be configured to send log data to at least two syslog servers for the purpose of
+    forwarding alerts to the administrators and the information system security officer (ISSO).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-line-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          value: show running-config
+      object_title: null
+  states:
+    state-check-for-two-logging-statements:
+      state_title: Check for two logging statements
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: \nlogging .+\nlogging .+
+          operation: pattern match
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-check-two-logging-servers:
+      test_title: Check for two logging servers
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-check-for-two-logging-statements
+  evaluate:
+    test: test-check-two-logging-servers

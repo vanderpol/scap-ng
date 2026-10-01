@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.ac6cc0a0f3fc1a97059ed4e2
+  version: 1
+  assessment_title: Domain controllers must have a PKI server certificate.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-certifates-in-personal-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: Microsoft.Powershell.Management
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: ChildItem
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: path
+              value: Cert:\LocalMachine\my
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: issuer,thumbprint
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: Gather certifates in 'Personal'.
+  states: {}
+  tests:
+    test-verify-pki-cerificate-being-used:
+      test_title: Verify a PKI cerificate is being used
+      capability: windows.cmdlet
+      object: gather-certifates-in-personal-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-verify-pki-cerificate-being-used

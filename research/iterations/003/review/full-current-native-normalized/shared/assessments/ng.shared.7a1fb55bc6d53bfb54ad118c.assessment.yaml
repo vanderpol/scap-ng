@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.7a1fb55bc6d53bfb54ad118c
+  version: 1
+  assessment_title: Password Uniqueness
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    password-policy-object:
+      capability: windows.passwordpolicy
+      object_title: Password policy
+  variables:
+    enforce-password-history-variable:
+      title: Enforce Password History
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: password_enforce_history_var
+        validation:
+          alternatives:
+          - literal: '5'
+            hint: 5_passwords
+          - literal: '24'
+            hint: 24_passwords
+  states:
+    state-password-history-length-is-greater-than-or-equal-to-vari:
+      state_title: Password History Length is greater than or equal to variable
+      capability: windows.passwordpolicy
+      state:
+        field: password_hist_len
+        value:
+          variable: enforce-password-history-variable
+        operation: greater than or equal
+        datatype: int
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-enforce-password-history-set-5-passwords-or-more:
+      test_title: '''Enforce password history'' is set to ''5'' passwords or more'
+      capability: windows.passwordpolicy
+      object: password-policy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-password-history-length-is-greater-than-or-equal-to-vari
+  evaluate:
+    test: test-enforce-password-history-set-5-passwords-or-more

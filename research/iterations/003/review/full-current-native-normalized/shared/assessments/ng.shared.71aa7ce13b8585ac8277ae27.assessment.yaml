@@ -1,0 +1,100 @@
+assessment:
+  id: ng.shared.71aa7ce13b8585ac8277ae27
+  version: 1
+  assessment_title: OL08-00-010490 - The OL 8 SSH private host key files must have mode "0600" or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    ssh-private-key-files-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/ssh
+        filename:
+          operation: pattern match
+          datatype: string
+          value: ^ssh_host_.*_key$
+      object_title: SSH private key files
+  states:
+    state-mode-0600-or-less-permissive:
+      state_title: Mode 0600 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-ssh-private-key-files-mode-600-or-less-permissive:
+      test_title: SSH private key files mode 600 or less permissive
+      capability: unix.file
+      object: ssh-private-key-files-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-mode-0600-or-less-permissive
+  evaluate:
+    test: test-ssh-private-key-files-mode-600-or-less-permissive

@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.4f14365636317f0f3a0f4b9b
+  version: 1
+  assessment_title: OL08-00-020020 - OL 8 systems below version 8.2 must log user name information when unsuccessful logon
+    attempts occur.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+preauth.*[ \t]+audit(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+preauth.*[ \t]+audit(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-check-audit-set-in-etc-pam-d-system-auth-preauth:
+      test_title: check audit is set in /etc/pam.d/system-auth (preauth)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+    test-check-audit-set-in-etc-pam-d-password-auth-preauth:
+      test_title: check audit is set in /etc/pam.d/password-auth (preauth)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: all_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-check-audit-set-in-etc-pam-d-system-auth-preauth
+    - test: test-check-audit-set-in-etc-pam-d-password-auth-preauth

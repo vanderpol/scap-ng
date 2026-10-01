@@ -1,0 +1,149 @@
+assessment:
+  id: ng.shared.1a90fc198b7156ce99393eb9
+  version: 1
+  assessment_title: The OS must disable information system functionality that provides the capability for automatic execution
+    of code on mobile devices without user direction.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-information-object:
+      capability: unix.uname
+      object_title: OS information
+    etc-zones-index-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/zones/index
+      object_title: /etc/zones/index
+    etc-zones-index-global-entry-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/zones/index
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: '^global:'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/zones/index global entry
+    var-share-zones-index-json-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /var/share/zones/index.json
+      object_title: /var/share/zones/index.json
+    var-share-zones-index-json-path-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /var/share/zones/index.json
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: '"path":\s+"/"'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /var/share/zones/index.json 'path:/'
+    removable-media-volume-manager-object:
+      capability: solaris.smf
+      select:
+        fmri:
+          operation: equals
+          datatype: string
+          value: svc://localhost/system/filesystem/rmvolmgr:default
+      object_title: The removable media volume manager.
+  states:
+    state-11-3-or-less:
+      state_title: 11.3 or less.
+      capability: unix.uname
+      state:
+        field: os_version
+        value: ^11($|\.[0-3]\b)
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-disabled-state:
+      state_title: Disabled state
+      capability: solaris.smf
+      state:
+        field: service_state
+        value: DISABLED
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-solaris-less-than-11-4:
+      test_title: Solaris (less than) 11.4
+      capability: unix.uname
+      object: os-information-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-11-3-or-less
+    test-etc-zones-index-does-not-exist:
+      test_title: /etc/zones/index does not exist
+      capability: unix.file
+      object: etc-zones-index-object
+      check_existence: none_exist
+      check: all
+    test-etc-zones-index-contains-global:
+      test_title: /etc/zones/index contains global
+      capability: independent.textfilecontent54
+      object: etc-zones-index-global-entry-object
+      check_existence: at_least_one_exists
+      check: all
+    test-var-share-zones-index-json-does-not-exist:
+      test_title: /var/share/zones/index.json does not exist
+      capability: unix.file
+      object: var-share-zones-index-json-object
+      check_existence: none_exist
+      check: all
+    test-var-share-zones-index-json-does-not-contain-path:
+      test_title: /var/share/zones/index.json does not contain 'path:/'
+      capability: independent.textfilecontent54
+      object: var-share-zones-index-json-path-object
+      check_existence: none_exist
+      check: all
+    test-determine-if-removable-media-volume-manager-running:
+      test_title: Determine if the removable media volume manager is running.
+      capability: solaris.smf
+      object: removable-media-volume-manager-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-disabled-state
+  evaluate:
+    any:
+    - not:
+        all:
+        - any:
+          - not:
+              test: test-solaris-less-than-11-4
+          - any:
+            - test: test-etc-zones-index-does-not-exist
+            - test: test-etc-zones-index-contains-global
+        - any:
+          - test: test-solaris-less-than-11-4
+          - any:
+            - test: test-var-share-zones-index-json-does-not-exist
+            - test: test-var-share-zones-index-json-does-not-contain-path
+    - test: test-determine-if-removable-media-volume-manager-running

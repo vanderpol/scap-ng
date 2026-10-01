@@ -1,0 +1,100 @@
+assessment:
+  id: ng.shared.7ad99caaa9ca231c4c45d16b
+  version: 1
+  assessment_title: The operating system must shut down by default upon audit failure (unless availability is an overriding
+    concern).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    auditconfig-getpolicy-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: auditconfig -getpolicy
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: active
+      object_title: auditconfig -getpolicy
+    auditconfig-getpolicy-filter-on-active-cnt-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: auditconfig -getpolicy
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: active.*cnt.*
+      object_title: auditconfig -getpolicy and filter on active and cnt
+  states:
+    state-active-is-returned-in-the-output:
+      state_title: active is returned in the output
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ahlt
+          operation: pattern match
+          datatype: string
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    state-cnt-is-should-not-be-returned-as-an-active-audit:
+      state_title: cnt is should not be returned as an active audit
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: none_exist
+  tests:
+    test-operating-system-shut-down-by-default-upon-audit-failure:
+      test_title: The operating system must shut down by default upon audit failure).
+      capability: independent.shellcommand
+      object: auditconfig-getpolicy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-active-is-returned-in-the-output
+    test-active-audit-policy-does-not-include-cnt:
+      test_title: The active audit policy does not include cnt
+      capability: independent.shellcommand
+      object: auditconfig-getpolicy-filter-on-active-cnt-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-cnt-is-should-not-be-returned-as-an-active-audit
+  evaluate:
+    all:
+    - test: test-operating-system-shut-down-by-default-upon-audit-failure
+    - test: test-active-audit-policy-does-not-include-cnt

@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.3dd2a119b151abf03615bf8c
+  version: 1
+  assessment_title: SNMP default communities disabled
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: net-snmp
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/snmp/snmpd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^[\s]*(com2se|rocommunity|rwcommunity|createUser|authcommunity)[^#]*(public|private)
+        instance:
+          operation: equals
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+      object_title: null
+  states: {}
+  tests:
+    test-package-net-snmp-removed:
+      test_title: package net-snmp is removed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: none_exist
+      check: all
+    test-check-snmpd-configuration:
+      test_title: Check snmpd configuration
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    any:
+    - test: test-package-net-snmp-removed
+    - test: test-check-snmpd-configuration

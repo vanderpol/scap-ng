@@ -1,0 +1,91 @@
+assessment:
+  id: ng.shared.330445a78385a6b675f6034b
+  version: 1
+  assessment_title: OL09-00-002508 - OL 9 SSH server configuration file must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config
+      object_title: null
+    unix-file-object-2:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      behaviors:
+        recurse: directories
+        recurse_direction: down
+      object_title: null
+    unix-file-object-3:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          value: .*
+      behaviors:
+        recurse: directories
+        recurse_direction: down
+      object_title: null
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-ssh-sshd-config-file-owned-by-root:
+      test_title: The /etc/ssh/sshd_config file is owned by root.
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+    test-etc-ssh-sshd-config-d-directory-sub-directories-owned-by:
+      test_title: The /etc/ssh/sshd_config.d directory and sub-directories are owned by root.
+      capability: unix.file
+      object: unix-file-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+    test-etc-ssh-sshd-config-d-files-owned-by-root:
+      test_title: The /etc/ssh/sshd_config.d files are owned by root.
+      capability: unix.file
+      object: unix-file-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    all:
+    - test: test-etc-ssh-sshd-config-file-owned-by-root
+    - test: test-etc-ssh-sshd-config-d-directory-sub-directories-owned-by
+    - test: test-etc-ssh-sshd-config-d-files-owned-by-root

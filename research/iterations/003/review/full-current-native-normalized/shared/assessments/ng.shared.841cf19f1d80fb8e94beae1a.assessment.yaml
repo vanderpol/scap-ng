@@ -1,0 +1,99 @@
+assessment:
+  id: ng.shared.841cf19f1d80fb8e94beae1a
+  version: 1
+  assessment_title: SLES-12-010872 - The SUSE operating system library directories must have mode 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: only one
+          value:
+            variable: operating-system-library-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: include
+        state: state-unix-file-2
+      behaviors:
+        recurse_direction: down
+      object_title: null
+  variables:
+    operating-system-library-directories-variable:
+      title: operating system library directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  states:
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-unix-file-2:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: directory
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-operating-system-library-directories-have-mode-0755-or-less-permissive:
+      test_title: operating system library directories have mode 0755 or less permissive
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-file
+  evaluate:
+    test: test-operating-system-library-directories-have-mode-0755-or-less-permissive

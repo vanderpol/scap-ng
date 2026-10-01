@@ -1,0 +1,94 @@
+assessment:
+  id: ng.shared.ef2ff6944abd9a01621cdf83
+  version: 1
+  assessment_title: WN12-00-000170
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+        name:
+          operation: equals
+          datatype: string
+          value: SMB1
+      object_title: null
+    smb-v1-protocol-win32-optionalfeature-object-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
+      object_title: SMB v1 Protocol Win32_OptionalFeature object
+  states:
+    state-reg-dword-type-and-value-equals-0:
+      state_title: REG_DWORD type and value equals 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-check-smb-v1-protocol-win32-optionalfeature-object-insta:
+      state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            entity_check: at least one
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-configure-smbv1-server-set-disabled:
+      test_title: '''Configure SMBv1 Server'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+    test-smb-1-0-cifs-file-sharing-support-feature-not-installed:
+      test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+      capability: windows.wmi57
+      object: smb-v1-protocol-win32-optionalfeature-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-smb-v1-protocol-win32-optionalfeature-object-insta
+  evaluate:
+    any:
+    - test: test-configure-smbv1-server-set-disabled
+    - test: test-smb-1-0-cifs-file-sharing-support-feature-not-installed

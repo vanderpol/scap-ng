@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.aa94c03e8e86544345ba58f8
+  version: 1
+  assessment_title: IIS 10.0 website session IDs must be sent to the client using TLS.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    get-session-keepsessionidsecure-setting-from-system-web-httpcookies-object:
+      capability: windows.appcmdlistconfig
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          value: Site
+        identifier:
+          operation: pattern match
+          datatype: string
+          value: .*
+        section:
+          operation: equals
+          datatype: string
+          value: system.webServer/asp
+        parameter:
+          operation: equals
+          datatype: string
+          value: session.keepSessionIdSecure
+      object_title: get session.keepSessionIdSecure setting from system.web/httpCookies
+  states:
+    state-appcmdlistconfig-result-must-equal-true:
+      state_title: appcmdlistconfig result must equal True.
+      capability: windows.appcmdlistconfig
+      state:
+        field: result
+        value: 'true'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-website-system-webserver-asp-sessions-keepsessionidsecure-setting:
+      test_title: Website system.webServer/asp sessions.keepSessionIdSecure setting
+      capability: windows.appcmdlistconfig
+      object: get-session-keepsessionidsecure-setting-from-system-web-httpcookies-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-appcmdlistconfig-result-must-equal-true
+  evaluate:
+    test: test-website-system-webserver-asp-sessions-keepsessionidsecure-setting

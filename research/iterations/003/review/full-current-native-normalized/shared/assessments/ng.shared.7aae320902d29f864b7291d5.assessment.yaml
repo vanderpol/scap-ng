@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.7aae320902d29f864b7291d5
+  version: 1
+  assessment_title: AZLX-23-002095 - Amazon Linux 2023 must generate audit records for all account creations, modifications,
+    disabling, and termination events that affect /etc/group.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*-w\s+/etc/group(\s+-p\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\s+(-k\s+|-F\s+key=)\w+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-modifications-etc-group:
+      test_title: Audit modifications to /etc/group
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-modifications-etc-group

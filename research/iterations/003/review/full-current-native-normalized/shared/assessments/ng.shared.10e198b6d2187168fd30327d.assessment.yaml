@@ -1,0 +1,98 @@
+assessment:
+  id: ng.shared.10e198b6d2187168fd30327d
+  version: 1
+  assessment_title: UBTU-22-611045 - Ubuntu 22.04 LTS must be configured so that when passwords are changed or new passwords
+    are established, pwquality must be used.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    enforcing-1-in-etc-security-pwquality-conf-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/security/pwquality.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*enforcing[\s]*=[\s]*(\d+)(?:[\s]|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: enforcing = 1 in /etc/security/pwquality.conf
+    etc-pam-d-common-password-uses-pam-pwquality-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/pam.d/common-password
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*\w+[\s]+requisite[\s]+pam_pwquality\.so[\s]+(?:|.+\s+)retry=([\d]+)(?:[\s]|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/pam.d/common-password uses pam_pwquality
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '3'
+        operation: less than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-3:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: greater than
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-security-pwquality-conf-enforcing-1:
+      test_title: /etc/security/pwquality.conf enforcing=1
+      capability: independent.textfilecontent54
+      object: enforcing-1-in-etc-security-pwquality-conf-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-etc-pam-d-common-password-uses-pwquality-retry-between-1:
+      test_title: /etc/pam.d/common-password uses pwquality and retry is between 1 and 3 inclusively
+      capability: independent.textfilecontent54
+      object: etc-pam-d-common-password-uses-pam-pwquality-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-independent-textfilecontent54-2
+      - state-independent-textfilecontent54-3
+  evaluate:
+    all:
+    - test: test-etc-security-pwquality-conf-enforcing-1
+    - test: test-etc-pam-d-common-password-uses-pwquality-retry-between-1

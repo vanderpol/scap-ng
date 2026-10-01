@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.441690969ec84a597d801e2b
+  version: 1
+  assessment_title: Ensure YUM Removes Previous Package Versions
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    clean-requirements-on-remove-set-in-etc-yum-conf-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/yum.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*clean_requirements_on_remove\s*=\s*(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: clean_requirements_on_remove set in /etc/yum.conf
+  states:
+    state-clean-requirements-on-remove-enabled:
+      state_title: clean_requirements_on_remove enabled
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(1|True|yes)$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-value-clean-requirements-on-remove-in-etc-yum-conf:
+      test_title: check value of clean_requirements_on_remove in /etc/yum.conf
+      capability: independent.textfilecontent54
+      object: clean-requirements-on-remove-set-in-etc-yum-conf-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-clean-requirements-on-remove-enabled
+  evaluate:
+    test: test-check-value-clean-requirements-on-remove-in-etc-yum-conf

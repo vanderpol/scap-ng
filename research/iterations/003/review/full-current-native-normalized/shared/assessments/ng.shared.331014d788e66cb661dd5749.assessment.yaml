@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.331014d788e66cb661dd5749
+  version: 1
+  assessment_title: The macOS system must be configured so that log files do not contain access control lists (ACLs).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-acls-files-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/bin/ls -le $(/usr/bin/grep ''^dir'' /etc/security/audit_control | /usr/bin/awk -F: ''{print $2}'') | /usr/bin/awk
+            ''{print $1}'' | /usr/bin/grep ":"'
+      object_title: audit_acls_files_configure_recommended_object
+  states:
+    state-audit-acls-files-configure-recommended-state:
+      state_title: audit_acls_files_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-audit-acls-files-configure-recommended-test:
+      test_title: audit_acls_files_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-acls-files-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-acls-files-configure-recommended-state
+  evaluate:
+    test: test-audit-acls-files-configure-recommended-test

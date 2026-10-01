@@ -1,0 +1,102 @@
+assessment:
+  id: ng.shared.cd1b9988242fca498658dd5c
+  version: 1
+  assessment_title: SLES-12-010878 - The SUSE operating system must have directories that contain system commands set to a
+    mode of 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      filters:
+      - action: include
+        state: state-unix-file-2
+      behaviors:
+        recurse_direction: down
+      object_title: null
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  states:
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-unix-file-2:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: directory
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-directories-that-contain-system-command-files-have-mode-0755-or:
+      test_title: Directories that contain system command files have mode 0755 or less permissive
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-file
+  evaluate:
+    test: test-directories-that-contain-system-command-files-have-mode-0755-or

@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.d6de328fd21258f008e53281
+  version: 1
+  assessment_title: AZLX-23-001030 - Amazon Linux 2023 must produce audit records containing information to establish what
+    type of events occurred.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-systemdunitproperty-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: auditd.service
+        property:
+          operation: equals
+          datatype: string
+          value: ActiveState
+      object_title: null
+    linux-systemdunitproperty-object-2:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          value: auditd.service
+        property:
+          operation: equals
+          datatype: string
+          value: SubState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-linux-systemdunitproperty-2:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: running
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-auditd-service-active:
+      test_title: auditd.service is active
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+    test-auditd-service-running:
+      test_title: auditd.service is running
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty-2
+  evaluate:
+    all:
+    - test: test-auditd-service-active
+    - test: test-auditd-service-running

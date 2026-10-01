@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.e48dbd69b8b3dc8aaf5374c4
+  version: 1
+  assessment_title: A private IIS 10.0 website must only accept Secure Socket Layer (SSL) connections.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    debug-turned-off-on-production-website-object:
+      capability: windows.appcmdlistconfig
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          value: Site
+        identifier:
+          operation: pattern match
+          datatype: string
+          value: .*
+        section:
+          operation: equals
+          datatype: string
+          value: access
+        parameter:
+          operation: equals
+          datatype: string
+          value: sslflags
+      object_title: Debug must be turned off on a production website.
+  states:
+    state-appcmdlistconfig-result-must-contain-text-ssl:
+      state_title: appcmdlistconfig result must contain text ssl
+      capability: windows.appcmdlistconfig
+      state:
+        field: result
+        value: Ssl
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-ssl-enabled-click-site-name-double-click-ssl-settings-icon:
+      test_title: SSL is enabled - Click the site name. Double-click the 'SSL Settings' icon. Verify 'Require SSL is selected'
+        If the 'Require SSL ' is not selected, this is a finding.
+      capability: windows.appcmdlistconfig
+      object: debug-turned-off-on-production-website-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-appcmdlistconfig-result-must-contain-text-ssl
+  evaluate:
+    test: test-ssl-enabled-click-site-name-double-click-ssl-settings-icon

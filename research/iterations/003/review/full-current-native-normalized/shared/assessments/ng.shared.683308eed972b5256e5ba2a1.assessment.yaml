@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.683308eed972b5256e5ba2a1
+  version: 1
+  assessment_title: UBTU-22-232110 - Ubuntu 22.04 LTS must configure audit tools to be owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-tools-object-2:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: audit-tools-variable
+      object_title: audit tools
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /sbin
+        filename:
+          operation: pattern match
+          datatype: string
+          value: audisp.*
+      object_title: null
+    audit-tools-object:
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - object: audit-tools-object-2
+        - object: unix-file-object
+      object_title: audit tools
+  variables:
+    audit-tools-variable:
+      title: audit tools
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/augenrules
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-tools-owned-by-root:
+      test_title: audit tools are owned by root
+      capability: unix.file
+      object: audit-tools-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    test: test-audit-tools-owned-by-root

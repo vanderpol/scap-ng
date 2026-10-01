@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.c14a7bf684c3c2c6be13523c
+  version: 1
+  assessment_title: AZLX-23-002060 - Amazon Linux 2023 must be configured to off-load audit records onto a different system
+    from the system being audited via syslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/plugins.d/syslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*active\s*=\s*(\w+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'yes'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audit-plugins-d-syslog-conf-active-yes:
+      test_title: '/etc/audit/plugins.d/syslog.conf: active = yes'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-audit-plugins-d-syslog-conf-active-yes

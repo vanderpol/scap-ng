@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.ea8e913f0d79efeab25278a6
+  version: 1
+  assessment_title: WINCC-000128
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\WinRM\Service
+        name:
+          operation: equals
+          datatype: string
+          value: DisableRunAs
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-1:
+      state_title: Reg_Dword type and value equals 1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-disallow-winrm-from-storing-runas-credentials-set-enabled:
+      test_title: '''Disallow WinRM from storing RunAs credentials'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-1
+  evaluate:
+    test: test-disallow-winrm-from-storing-runas-credentials-set-enabled

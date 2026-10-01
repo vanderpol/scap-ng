@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.5210b4a64563ba0270f77a78
+  version: 1
+  assessment_title: The macOS system must enforce password complexity by requiring that at least one numeric character be
+    used.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pwpolicy-alpha-numeric-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/pwpolicy -getaccountpolicies | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()="policyIdentifier"]/following-sibling::*[1]/text()'
+            - | /usr/bin/grep "requireAlphanumeric" -c
+      object_title: pwpolicy_alpha_numeric_enforce_recommended_object
+  states:
+    state-pwpolicy-alpha-numeric-enforce-recommended-state:
+      state_title: pwpolicy_alpha_numeric_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pwpolicy-alpha-numeric-enforce-recommended-test:
+      test_title: pwpolicy_alpha_numeric_enforce_recommended_test
+      capability: independent.shellcommand
+      object: pwpolicy-alpha-numeric-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-pwpolicy-alpha-numeric-enforce-recommended-state
+  evaluate:
+    test: test-pwpolicy-alpha-numeric-enforce-recommended-test

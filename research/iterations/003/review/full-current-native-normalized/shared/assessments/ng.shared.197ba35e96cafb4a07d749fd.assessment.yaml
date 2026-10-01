@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.197ba35e96cafb4a07d749fd
+  version: 1
+  assessment_title: The macOS system must disable Apple Intelligence Writing Tools.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-writing-tools-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowWritingTools'').js
+
+            EOS'
+      object_title: os_writing_tools_disable_recommended_object
+  states:
+    state-os-writing-tools-disable-recommended-state:
+      state_title: os_writing_tools_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-writing-tools-disable-recommended-test:
+      test_title: os_writing_tools_disable_recommended_test
+      capability: independent.shellcommand
+      object: os-writing-tools-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-writing-tools-disable-recommended-state
+  evaluate:
+    test: test-os-writing-tools-disable-recommended-test

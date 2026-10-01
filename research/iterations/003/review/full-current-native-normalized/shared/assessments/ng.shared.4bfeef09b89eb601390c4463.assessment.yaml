@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.4bfeef09b89eb601390c4463
+  version: 1
+  assessment_title: The macOS system must be configured to audit all failed program execution on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-flags-ex-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          value: /usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\n' | /usr/bin/grep
+            -Ec '\-ex'
+      object_title: audit_flags_ex_configure_recommended_object
+  states:
+    state-audit-flags-ex-configure-recommended-state:
+      state_title: audit_flags_ex_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-flags-ex-configure-recommended-test:
+      test_title: audit_flags_ex_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-flags-ex-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-flags-ex-configure-recommended-state
+  evaluate:
+    test: test-audit-flags-ex-configure-recommended-test

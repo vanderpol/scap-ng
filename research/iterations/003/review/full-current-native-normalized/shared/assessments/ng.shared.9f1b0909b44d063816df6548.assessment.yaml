@@ -1,0 +1,136 @@
+assessment:
+  id: ng.shared.9f1b0909b44d063816df6548
+  version: 1
+  assessment_title: Passwords must be restricted to a 1 day minimum lifetime.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    interactive-non-anonymous-users-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          value: .*
+      filters:
+      - action: include
+        state: state-interactive-non-system-users
+      - action: include
+        state: state-anonymous-users
+      object_title: interactive non-anonymous users
+    unix-shadow-object:
+      capability: unix.shadow
+      select:
+        username:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: system-users-variable
+      object_title: null
+    etc-shadow-entries-null-min-password-ages-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/shadow
+        pattern:
+          operation: pattern match
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: etc-shadow-entries-interactive-users-null-min-password-age-variable
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/shadow entries with null min password ages
+  variables:
+    anonymous-uids-variable:
+      title: anonymous UIDs
+      kind: constant
+      datatype: int
+      expression:
+        literal:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+    system-users-variable:
+      title: system users
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: interactive-non-anonymous-users-object
+          field: username
+    etc-shadow-entries-interactive-users-null-min-password-age-variable:
+      title: /etc/shadow entries for interactive users with null min password age
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: ^
+            datatype: string
+        - variable: system-users-variable
+        - literal:
+            value: ':[^:]*:[^:]*::'
+            datatype: string
+  states:
+    state-one-day-or-more:
+      state_title: one day or more
+      capability: unix.shadow
+      state:
+        field: chg_allow
+        value: '1'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-interactive-non-system-users:
+      state_title: interactive (non-system) users
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-anonymous-users:
+      state_title: anonymous users
+      capability: unix.password
+      state:
+        field: user_id
+        value:
+          variable: anonymous-uids-variable
+        operation: not equal
+        datatype: int
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-passwords-interactive-users-restricted-1-day-minimum-lifetime:
+      test_title: Passwords for interactive users must be restricted to a 1 day minimum lifetime.
+      capability: unix.shadow
+      object: unix-shadow-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-one-day-or-more
+    test-no-shadow-entries-null-minimum-password-ages:
+      test_title: no shadow entries with null minimum password ages
+      capability: independent.textfilecontent54
+      object: etc-shadow-entries-null-min-password-ages-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-passwords-interactive-users-restricted-1-day-minimum-lifetime
+    - test: test-no-shadow-entries-null-minimum-password-ages

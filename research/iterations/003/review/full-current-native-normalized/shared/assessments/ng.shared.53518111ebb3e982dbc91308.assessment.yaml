@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.53518111ebb3e982dbc91308
+  version: 1
+  assessment_title: The system must require passwords to not have more than 3 consecutive repeating characters.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    default-passwd-file-etc-default-passwd-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /etc/default
+        filename:
+          operation: equals
+          datatype: string
+          value: passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*MAXREPEATS=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: The default passwd file (/etc/default/passwd).
+  states:
+    state-greater-than-or-equal-to-one:
+      state_title: Greater than or equal to one.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '3'
+        operation: less than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-system-default-password-maxrepeats-setting:
+      test_title: Check the system default password MAXREPEATS setting.
+      capability: independent.textfilecontent54
+      object: default-passwd-file-etc-default-passwd-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-greater-than-or-equal-to-one
+  evaluate:
+    test: test-check-system-default-password-maxrepeats-setting

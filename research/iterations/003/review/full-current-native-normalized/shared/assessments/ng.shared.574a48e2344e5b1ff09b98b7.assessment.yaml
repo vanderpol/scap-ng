@@ -1,0 +1,102 @@
+assessment:
+  id: ng.shared.574a48e2344e5b1ff09b98b7
+  version: 1
+  assessment_title: AZLX-23-002015 - Amazon Linux 2023 must allocate audit record storage capacity to store at least one week's
+    worth of audit records, when audit records are not immediately sent to a central audit record storage facility.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: audit-data-directory-from-etc-audit-auditd-conf-variable
+      object_title: null
+    independent-variable-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          value:
+            variable: audit-partition-total-size-in-bytes-variable
+      object_title: null
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: independent-textfilecontent54-object
+          field: subexpression
+    audit-partition-total-size-in-bytes-variable:
+      title: audit partition total size in bytes
+      kind: local
+      datatype: string
+      expression:
+        arithmetic:
+          operation: multiply
+          operands:
+          - values:
+              object: linux-partition-object
+              field: block_size
+          - values:
+              object: linux-partition-object
+              field: total_space
+  states:
+    state-10gib:
+      state_title: 10GiB
+      capability: independent.variable
+      state:
+        field: value
+        value: '10737418240'
+        operation: greater than or equal
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-there-separate-file-system-audit-data-directory:
+      test_title: There is a separate file system for audit data directory.
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: all_exist
+      check: all
+    test-audit-file-system-total-space-10gib:
+      test_title: Audit file system total space >= 10GiB
+      capability: independent.variable
+      object: independent-variable-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-10gib
+  evaluate:
+    all:
+    - test: test-there-separate-file-system-audit-data-directory
+    - test: test-audit-file-system-total-space-10gib

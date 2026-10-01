@@ -1,0 +1,189 @@
+assessment:
+  id: ng.shared.5c4b181caed7b7546be992c4
+  version: 1
+  assessment_title: The use of FTP must be restricted.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    smf-listing-ftp-service-object:
+      capability: solaris.smf
+      select:
+        fmri:
+          operation: equals
+          datatype: string
+          value: svc://localhost/network/ftp:default
+      object_title: SMF listing of FTP service.
+    etc-ftpd-ftpusers-entries-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/ftpd/ftpusers
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/ftpd/ftpusers entries
+    all-users-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          value: ^[^-+].*$
+      object_title: All users
+    system-users-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: all-users-object
+        filters:
+        - action: include
+          state: state-system-accounts
+      object_title: system users
+    system-users-not-contained-in-ftpusers-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: system-users-object
+        filters:
+        - action: exclude
+          state: state-ftpusers-entry-for-nobody4-2
+      object_title: system users not contained in ftpusers
+  variables:
+    etc-ftpd-ftpusers-entries-variable:
+      title: /etc/ftpd/ftpusers entries
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: etc-ftpd-ftpusers-entries-object
+          field: subexpression
+  states:
+    state-ftpusers-entry-for-aiuser:
+      state_title: ftpusers entry for aiuser
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: aiuser
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ftpusers-entry-for-noaccess:
+      state_title: ftpusers entry for noaccess
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: noaccess
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ftpusers-entry-for-nobody:
+      state_title: ftpusers entry for nobody
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: nobody
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ftpusers-entry-for-nobody4:
+      state_title: ftpusers entry for nobody4
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: nobody4
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-accounts:
+      state_title: System accounts.
+      capability: unix.password
+      state:
+        field: user_id
+        value: '100'
+        operation: less than
+        datatype: int
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ftpusers-entry-for-nobody4-2:
+      state_title: ftpusers entry for nobody4
+      capability: unix.password
+      state:
+        field: username
+        value:
+          variable: etc-ftpd-ftpusers-entries-variable
+        operation: equals
+        datatype: string
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-see-if-ftp-service-listed-under-smf:
+      test_title: Check to see if the FTP service is listed under the SMF.
+      capability: solaris.smf
+      object: smf-listing-ftp-service-object
+      check_existence: none_exist
+      check: all
+    test-ftpusers-contains-aiuser:
+      test_title: ftpusers contains aiuser
+      capability: independent.textfilecontent54
+      object: etc-ftpd-ftpusers-entries-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-ftpusers-entry-for-aiuser
+    test-ftpusers-contains-noaccess:
+      test_title: ftpusers contains noaccess
+      capability: independent.textfilecontent54
+      object: etc-ftpd-ftpusers-entries-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-ftpusers-entry-for-noaccess
+    test-ftpusers-contains-nobody:
+      test_title: ftpusers contains nobody
+      capability: independent.textfilecontent54
+      object: etc-ftpd-ftpusers-entries-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-ftpusers-entry-for-nobody
+    test-ftpusers-contains-nobody4:
+      test_title: ftpusers contains nobody4
+      capability: independent.textfilecontent54
+      object: etc-ftpd-ftpusers-entries-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-ftpusers-entry-for-nobody4
+    test-ftpusers-contains-all-system-users:
+      test_title: ftpusers contains all system users
+      capability: unix.password
+      object: system-users-not-contained-in-ftpusers-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    any:
+    - test: test-check-see-if-ftp-service-listed-under-smf
+    - all:
+      - test: test-ftpusers-contains-aiuser
+      - test: test-ftpusers-contains-noaccess
+      - test: test-ftpusers-contains-nobody
+      - test: test-ftpusers-contains-nobody4
+      - test: test-ftpusers-contains-all-system-users

@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.f114461908593ffc9e1fa7ff
+  version: 1
+  assessment_title: WINCC-000025
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Policies\Microsoft\Windows\DriverSearching
+        name:
+          operation: equals
+          datatype: string
+          value: DriverServerSelection
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-1:
+      state_title: Reg_Dword type and value equals 1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-specify-search-server-device-driver-updates-set-enabled-search-managed:
+      test_title: '''Specify the search server for device driver updates'' is set to ''Enabled'' with ''Search Managed Server''
+        selected'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-1
+  evaluate:
+    test: test-specify-search-server-device-driver-updates-set-enabled-search-managed

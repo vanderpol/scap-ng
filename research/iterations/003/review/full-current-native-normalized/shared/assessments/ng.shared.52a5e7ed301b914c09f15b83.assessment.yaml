@@ -1,0 +1,82 @@
+assessment:
+  id: ng.shared.52a5e7ed301b914c09f15b83
+  version: 1
+  assessment_title: The system must be configured to audit Detailed Tracking - PNP Activity successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    secure-boot-state-setting-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: System\CurrentControlSet\Control\LSA
+        name:
+          operation: equals
+          datatype: string
+          value: SCENoApplyLegacyAuditPolicy
+      object_title: Secure Boot State Setting
+    retrieves-auditeventpolicysubcategories-object-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: Retrieves a auditeventpolicysubcategories_object.
+  variables:
+    this-variable-represents-regular-expression-audit-success-success-failure-which-variable:
+      title: This variable represents the regular expression 'AUDIT_(SUCCESS|SUCCESS_FAILURE)' which matches SUCCESS audit.
+      kind: constant
+      datatype: string
+      expression:
+        literal: AUDIT_(SUCCESS|SUCCESS_FAILURE)
+  states:
+    state-value-equal-to-1:
+      state_title: Value Equal To 1
+      capability: windows.registry
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-pnp-activity-plug-and-play-events-subcategory-must-be-su:
+      state_title: pnp_activity (Plug and Play Events) subcategory must be Success.
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: pnp_activity
+        value:
+          variable: this-variable-represents-regular-expression-audit-success-success-failure-which-variable
+        operation: pattern match
+        datatype: string
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-force-audit-policy-subcategory-settings-override-audit-policy-category:
+      test_title: 'Audit: Force audit policy subcategory settings to override audit policy category settings must be set to
+        Enabled'
+      capability: windows.registry
+      object: secure-boot-state-setting-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-value-equal-to-1
+    test-detailed-tracking-plug-play-events-successes:
+      test_title: Detailed Tracking - Plug and Play Events successes.
+      capability: windows.auditeventpolicysubcategories
+      object: retrieves-auditeventpolicysubcategories-object-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-pnp-activity-plug-and-play-events-subcategory-must-be-su
+  evaluate:
+    all:
+    - test: test-audit-force-audit-policy-subcategory-settings-override-audit-policy-category
+    - test: test-detailed-tracking-plug-play-events-successes

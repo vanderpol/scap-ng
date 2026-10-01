@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.9fe160b8e3441bb3bf7a6846
+  version: 1
+  assessment_title: Duplicate UIDs must not exist for multiple non-organizational users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    logins-d-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: logins -d
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: logins -d
+  states:
+    state-nothing-is-returned-and-command-exits-with-a-status-of-0:
+      state_title: Nothing is returned and command exits with a status of 0
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: none_exist
+  tests:
+    test-duplicate-user-ids-uids-not-exist-users-within-organization:
+      test_title: Duplicate User IDs (UIDs) must not exist for users within the organization.
+      capability: independent.shellcommand
+      object: logins-d-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-nothing-is-returned-and-command-exits-with-a-status-of-0
+  evaluate:
+    test: test-duplicate-user-ids-uids-not-exist-users-within-organization
