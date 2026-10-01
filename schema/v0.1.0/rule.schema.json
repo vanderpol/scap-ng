@@ -3,40 +3,147 @@
   "$id": "https://scap-ng.dev/schema/v0.1.0/rule.schema.json",
   "title": "SCAP-NG Rule v0.1.0",
   "type": "object",
-  "required": ["rule"],
+  "required": [
+    "rule"
+  ],
   "properties": {
     "rule": {
       "type": "object",
-      "required": ["id","version","title","severity","role","weight","discussion","rationale","extensions","warnings","identifiers","references","requires","conflicts","applicability","parameters","remediation","assessment_choices","default_assessment_choice"],
+      "required": [
+        "id",
+        "version",
+        "title",
+        "severity",
+        "role",
+        "weight",
+        "discussion",
+        "rationale",
+        "extensions",
+        "warnings",
+        "identifiers",
+        "references",
+        "requires",
+        "conflicts",
+        "applicability",
+        "parameters",
+        "remediation",
+        "assessment_choices",
+        "default_assessment_choice"
+      ],
       "properties": {
-        "id": {"type":"string","minLength":1},
-        "version": {"type":"string"},
-        "title": {"type":"string"},
-        "severity": {"type":"string"},
-        "role": {"type":"string"},
-        "weight": {"type":"number"},
-        "discussion": {"type":"string"},
-        "rationale": {"type":["string","null"]},
-        "extensions": {"type":"object"},
-        "warnings": {"type":"array"},
-        "identifiers": {"type":"array","items":{"type":"object"}},
-        "references": {"type":"array","items":{"type":"object"}},
-        "requires": {"type":"array","items":{"type":"string"}},
-        "conflicts": {"type":"array","items":{"type":"string"}},
-        "applicability": {"type":"array"},
-        "parameters": {"type":"object"},
-        "remediation": {"type":"object"},
-        "assessment_choices": {
-          "type":"object",
-          "minProperties":1,
-          "additionalProperties":{
-            "type":"object",
-            "required":["assessment"],
-            "properties":{"assessment":{"type":"string","minLength":1}},
-            "additionalProperties":false
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "discussion": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "warnings": {
+          "type": "array"
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "type": "object"
           }
         },
-        "default_assessment_choice": {"type":"string","minLength":1}
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "applicability": {
+          "type": "array"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "remediation": {
+          "type": "object"
+        },
+        "assessment_choices": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "assessment"
+            ],
+            "properties": {
+              "assessment": {
+                "type": "string",
+                "minLength": 1
+              },
+              "inputs": {
+                "type": "object",
+                "description": "Assessment input name to Benchmark Parameter binding.",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "parameter"
+                      ],
+                      "properties": {
+                        "parameter": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "default_assessment_choice": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     }
