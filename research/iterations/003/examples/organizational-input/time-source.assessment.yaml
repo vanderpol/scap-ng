@@ -1,0 +1,49 @@
+assessment:
+  id: shared.time-source-approved
+  version: 1
+  assessment_title: Configured time sources are organization approved
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  inputs:
+    required_time_sources:
+      datatype: string
+      cardinality: one_or_more
+      required: true
+      description: Approved time-source hostnames.
+
+  objects:
+    object-configured-time-sources:
+      object_title: Configured time sources
+      capability: linux.chrony
+      select: {}
+
+  variables:
+    approved-sources:
+      variable_title: Approved time sources
+      datatype: string
+      input: required_time_sources
+
+  states:
+    state-source-approved:
+      state_title: Time source is approved
+      capability: linux.chrony
+      state:
+        field: hostname
+        operation: pattern_match
+        value:
+          variable: approved-sources
+
+  tests:
+    test-time-sources:
+      test_title: All configured time sources are approved
+      capability: linux.chrony
+      object: object-configured-time-sources
+      check_existence: at_least_one_exists
+      check: all
+      states:
+        - state-source-approved
+
+  evaluate:
+    test: test-time-sources
