@@ -190,7 +190,10 @@ declared class and invocation context. In particular:
 
 `information` is reserved as a candidate SCAP-NG Assessment class for
 non-compliance, non-vulnerability observations whose primary purpose is to
-report useful information.
+report useful information. It is a semantic class/characterization, **not** a
+seventh Assessment truth-table result. An informational Assessment still uses
+the normal six-state technical result domain (`true`, `false`, `error`,
+`unknown`, `not_evaluated`, `not_applicable` as applicable).
 
 `information` is NOT an inherited OVAL class and is NOT currently normative
 SCAP-NG vocabulary.
@@ -225,7 +228,9 @@ future profiles, but it is not the authoritative home for the meaning of one
 Assessment or one Rule's reporting disposition.
 
 Canonical Results SHOULD record both the technical Assessment outcome and the
-effective informational/reporting disposition when they differ.
+effective informational/reporting disposition when they differ. A result
+consumer SHALL NOT be required to infer informational treatment by rewriting
+or replacing the technical Assessment outcome.
 
 
 ## Assessment-result dependencies
