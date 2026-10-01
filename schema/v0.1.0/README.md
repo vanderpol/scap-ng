@@ -30,11 +30,23 @@ The current executable schemas cover:
 3. Assessment
 4. Applicability catalog
 5. Tailoring (strawman)
-6. Benchmark Result (strawman)
+6. Benchmark Result (strawman with canonical Rule-result instances)
 7. Assessment Result (first-draft strawman)
+8. Organizational Input
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
+
+### Benchmark Result instance model
+
+Each effectively selected Rule has one policy-facing Rule Result. Every Rule
+Result contains a non-empty `instances` array, including the ordinary
+single-invocation case.
+
+The Rule Result's top-level `outcome` is the deterministic aggregate policy
+outcome. Invocation/check/target-specific outcomes and detailed
+`assessment_result_ref` values live in the instances. There is intentionally
+no alternate canonical direct-reference shape for the common case.
 
 It does **not** prove:
 
@@ -111,9 +123,9 @@ Collection/assertion/item-quantifier prototype.
 
 ## Planned next schemas
 
-Organizational input and package-manifest schemas remain to be added. Initial
-Tailoring, Benchmark Result, and Assessment Result schemas now exist and will
-continue to evolve with the result-model work.
+Package-manifest and deeper reusable result-component schemas remain to be
+added. Tailoring, Organizational Input, Benchmark Result, and Assessment Result
+schemas now exist and will continue to evolve with the result-model work.
 
 The full pinned NIWC Current native corpus census remains the primary evidence
 used to classify fields as required, optional, conditional, extensible, or
