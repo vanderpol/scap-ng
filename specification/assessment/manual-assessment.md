@@ -16,6 +16,26 @@ metadata merely to create a portable Manual Assessment.
 Procedure-only Manual Assessments are therefore a first-class and expected
 SCAP-NG authoring form.
 
+
+## Architectural boundary
+
+Manual Assessment is a native SCAP-NG assessment method. It is not, by default,
+part of the standalone next-generation language that succeeds OVAL.
+
+The OVAL-successor language is intended for machine-executable technical
+assessment semantics. Manual Assessment has a different execution model based
+on human procedure, observation, response provenance, and normalized policy
+outcomes.
+
+SCAP-NG provides the common Rule-level abstraction that permits a Rule to offer
+both automated and manual Assessment choices without requiring those choices to
+share the same underlying assessment language.
+
+A future governance decision MAY define a separate standalone manual-assessment
+specification, but that possibility SHALL NOT cause manual procedures,
+questionnaires, or human-response semantics to be incorporated implicitly into
+the OVAL successor.
+
 ## 2. Minimum Manual Assessment
 
 The minimum Manual Assessment SHALL contain:
