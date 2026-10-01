@@ -106,6 +106,46 @@ def aggregate_check(check, values):
     raise AssertionError("unreachable result combination")
 
 
+def decisive_partial_check(check, observed_results):
+    """Return a conclusive result from a partial item stream, or None.
+
+    This models only outcomes that cannot be changed by any additional
+    matching items. It is intentionally conservative: lack of a decisive
+    result means evaluation must continue or end as incomplete/unknown.
+    """
+    values = list(observed_results)
+    if not values:
+        return None
+    c = _counts(values)
+    t, f = c[TRUE], c[FALSE]
+
+    if check == "all":
+        return FALSE if f else None
+    if check == "at least one":
+        return TRUE if t else None
+    if check == "only one":
+        return FALSE if t >= 2 else None
+    if check == "none satisfy":
+        return FALSE if t else None
+    raise ValueError(f"unsupported CheckEnumeration: {check}")
+
+
+def decisive_partial_existence(mode, *, exists=0):
+    """Return a conclusive existence result from partial collection, or None."""
+    if not isinstance(exists, int) or exists < 0:
+        raise ValueError("exists must be a non-negative integer")
+    if mode == "at_least_one_exists":
+        return TRUE if exists >= 1 else None
+    if mode == "none_exist":
+        return FALSE if exists >= 1 else None
+    if mode == "only_one_exists":
+        return FALSE if exists >= 2 else None
+    if mode in {"all_exist", "any_exist"}:
+        return None
+    raise ValueError(f"unsupported ExistenceEnumeration: {mode}")
+
+
+
 def aggregate_operator(operator, values):
     """Apply OVAL OperatorEnumeration to individual result values."""
     c = _counts(values)
