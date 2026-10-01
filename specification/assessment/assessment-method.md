@@ -9,6 +9,55 @@ identity, or Rule compliance condition is evaluated.
 
 Rule requirements and Assessment implementation SHALL remain separate concepts.
 
+
+## Assessment specification identity and standalone role
+
+SCAP-NG uses the generic term **Assessment** for an executable assessment
+component. That term SHALL NOT by itself identify the technical assessment
+language or specification governing the Assessment.
+
+The machine-executable assessment language derived from OVAL semantics is
+expected to remain independently implementable and usable outside SCAP-NG,
+subject to OVAL Board ratification and naming. SCAP-NG SHALL therefore avoid
+making automated Assessment semantics depend unnecessarily on Benchmark or Rule
+constructs.
+
+An automated Assessment SHALL identify the exact assessment specification it
+conforms to using a stable specification identifier and version. The eventual
+name and identifier of the OVAL successor are OVAL Board decisions. The name
+`OVAL 6` SHALL NOT be reused for this work because that designation was used
+by a prior OVAL 6 effort.
+
+Conceptually:
+
+    assessment:
+      specification:
+        id: <board-defined-assessment-specification>
+        version: "1.0"
+
+An otherwise self-contained automated Assessment SHALL be independently valid
+and executable without requiring a Benchmark or Rule wrapper. Standalone
+execution MAY use an Assessment Request to supply explicitly declared inputs,
+target context, or execution parameters.
+
+Standalone Assessment execution SHALL produce an Assessment Result without
+requiring a fabricated Benchmark Result or Rule Result.
+
+This separation preserves the independent assessment role historically
+provided by OVAL for use cases such as inventory, vulnerability assessment,
+patch assessment, applicability, evaluator testing, self-assertion, reusable
+assessment libraries, and migration tooling.
+
+SCAP-NG is a consumer of such automated Assessments. It adds policy semantics
+including Benchmark, Rule, Profile, Tailoring, Organizational Input, policy
+interpretation, scoring, aggregate results, packaging, and trust.
+
+Manual Assessment is not part of the OVAL-successor language by default.
+Manual Assessment is a native SCAP-NG assessment method defined separately in
+`manual-assessment.md`. A future standards decision MAY define a separate
+manual-assessment specification, but such a decision SHALL NOT implicitly make
+manual procedures part of the OVAL successor.
+
 ## 2. Rule binding
 
 A Rule SHALL expose named Assessment selections and identify its default
