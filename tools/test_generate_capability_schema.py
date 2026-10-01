@@ -45,6 +45,23 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertIn("down", props["recurse_direction"]["enum"])
         self.assertIn("local", props["recurse_file_system"]["enum"])
 
+    def test_deprecated_behavior_values_are_annotated_not_hidden(self):
+        props=self.schema["$defs"]["object"]["properties"]["behaviors"]["properties"]
+        recurse_deprecated={
+            row["value"]
+            for row in props["recurse"]["x-oval-deprecated-enum-values"]
+        }
+        direction_deprecated={
+            row["value"]
+            for row in props["recurse_direction"]["x-oval-deprecated-enum-values"]
+        }
+        self.assertEqual(
+            recurse_deprecated,
+            {"none","files","files and directories"},
+        )
+        self.assertEqual(direction_deprecated,{"up"})
+        self.assertIn("up",props["recurse_direction"]["enum"])
+
     def test_valid_filepath_object(self):
         self.validate_def("object", {
             "object_title": "passwd",
