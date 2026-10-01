@@ -207,6 +207,18 @@ in `../assessment/manual-assessment.md`.
 Manual results SHOULD distinguish factual finding/evidence details from general
 reviewer comments.
 
+A completed Manual Assessment Result SHALL identify the evaluator/respondent
+who supplied the result and the time the result was completed. It SHALL also
+identify the corresponding Assessment execution/request context so that the
+response cannot be detached from the target/run in which it was made.
+
+Manual results SHOULD support typed evaluator identity, display name,
+organizational role, authentication/identity source, response source
+(direct/imported/delegated), comments, and evidence references.
+
+A later reviewer/approver SHALL be represented as a separate provenance event
+and SHALL NOT replace the identity or timestamp of the original evaluator.
+
 ## 13. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
