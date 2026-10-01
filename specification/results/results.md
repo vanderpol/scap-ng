@@ -287,13 +287,15 @@ An instance MAY identify:
 - an independently reported check;
 - both, when both dimensions are present.
 
-A Rule with no fan-out SHOULD still expose the common Rule-result contract
-without requiring consumers to reconstruct a legacy XCCDF multiple-result
-model. Whether the final schema represents the ordinary execution as a single
-entry in `instances` or retains direct common-case fields alongside an empty
-`instances` collection remains a serialization decision; the semantic
-requirement is that fan-out is explicit and does not create ambiguous duplicate
-Rule identities.
+A Rule with no fan-out SHALL still use the same Rule-result shape as a Rule
+with fan-out: exactly one policy-facing Rule Result containing a non-empty
+`instances` collection. The common single-invocation case therefore has one
+instance rather than a separate direct-result representation.
+
+This avoids two equivalent canonical serializations for the same semantics.
+Consumers can always find invocation/check/target-specific results in
+`instances`, while the Rule Result's top-level `outcome` remains the
+deterministic aggregate policy outcome.
 
 The aggregate Rule outcome SHALL be deterministically derived from the
 instance/check outcomes according to the selected Rule assessment method's
