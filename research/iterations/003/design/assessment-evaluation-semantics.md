@@ -193,6 +193,18 @@ Results SHALL distinguish:
 
 Evidence retention limits SHALL NOT be used as evaluation limits unless the result remains semantically correct.
 
+### 10.1 Dependency cycles and resource limits
+
+Static dependency cycles are invalid Assessment content, not ordinary runtime truth outcomes.
+
+- A compiler/validator SHALL reject statically detectable cycles involving Variables, Objects, Sets, Filters, States, Tests, or Assessment-result dependencies before target evaluation.
+- Cycle diagnostics SHOULD identify the dependency path sufficiently for an author to correct the content.
+- An implementation SHALL NOT resolve a cycle by arbitrary ordering, fixed-point guessing, recursion truncation, or by returning `false`.
+
+Runtime resource exhaustion is different from a semantic cycle. Limits on recursion depth, memory, item count, wall-clock time, or implementation-specific resources MAY stop execution, but such a stop SHALL be reported as an execution/resource error or explicitly incomplete evaluation according to the applicable result contract. It SHALL NOT be reported as a semantic `false` merely because evaluation could not finish.
+
+Evidence caps remain separate: once truth is already established, retained evidence MAY be truncated without changing the Assessment result.
+
 ## 11. Conversion versus native authoring
 
 Lossless migration SHALL preserve effective legacy semantics and source provenance, including whether values were source-explicit or inherited/defaulted.
@@ -220,7 +232,6 @@ These remain open and SHALL NOT be silently guessed:
 
 - exact non-Boolean filter-State outcome propagation for all cases;
 - per-capability comparison/collection edge behavior not fully stated by generic OVAL schemas;
-- complete runtime behavior for resource-limit/cycle failures;
 - differential execution against an independent OVAL evaluator/reference scanner;
 - precise early-termination proofs for every Test/quantifier combination.
 
