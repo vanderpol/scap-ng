@@ -156,5 +156,15 @@ class ProjectionTests(unittest.TestCase):
             )
 
 
+    def test_checked_in_projection_matches_exact_jsonl(self):
+        fixture=ROOT/"research/iterations/003/results/issue21"
+        scan=json.loads((fixture/"scan-result.json").read_text())
+        benchmark=json.loads((fixture/"benchmark-result.json").read_text())
+        events=project_scan(scan, {"benchmark-result.json": benchmark})
+        actual="\n".join(jsonl_lines(events))+"\n"
+        expected=(fixture/"expected.jsonl").read_text()
+        self.assertEqual(expected, actual)
+
+
 if __name__=="__main__":
     unittest.main()
