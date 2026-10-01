@@ -59,6 +59,14 @@ jobs:
           python tools/test_current_authoring_contract.py
           python tools/test_full_review_contract.py
           python tools/test_tailoring_example.py
+      - name: Generate reviewed capability schema slice
+        run: |
+          mkdir -p work/generated-capability-schemas
+          python tools/generate_capability_schema.py \
+            --mapping schema/v0.1.0/capability-mappings/unix.file.json \
+            --output work/generated-capability-schemas/unix.file.schema.json
+          python -m json.tool work/generated-capability-schemas/unix.file.schema.json > /dev/null
+
       - name: Repository normalization and content compiler
         run: |
           python tools/test_scap_ng_repo_normalizer.py
