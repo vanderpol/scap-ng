@@ -151,6 +151,15 @@ class ProjectionTests(unittest.TestCase):
         self.assertEqual("automated", event["check_selector"])
         self.assertEqual({"example_parameter": 42}, event["parameters"])
         self.assertEqual("applicable", event["applicability"]["outcome"])
+        rule["observed_state"]=[{
+            "item_ref":"item-1",
+            "state_slot":"mode",
+            "datatype":"string",
+            "value":"0666",
+            "status":"exists",
+        }]
+        event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
+        self.assertEqual("0666", event["observed_state"][0]["value"])
 
     def test_non_boolean_rule_outcomes_are_preserved(self):
         for outcome in ("error", "unknown", "not_evaluated", "not_applicable"):
