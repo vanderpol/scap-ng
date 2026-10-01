@@ -7,6 +7,7 @@ from oval_result_truth_tables import (
     aggregate_check, aggregate_operator, aggregate_existence,
     evaluate_collected_object_test, evaluate_missing_collected_object_record,
     aggregate_many_to_many, aggregate_state, aggregate_item_states,
+    resolve_variable_reference,
 )
 
 
@@ -213,6 +214,25 @@ class CollectedObjectControlFlow(unittest.TestCase):
     def test_invalid_flag_rejected(self):
         with self.assertRaises(ValueError):
             evaluate_collected_object_test("mystery", existence="at_least_one_exists")
+
+
+class VariableReferenceSemantics(unittest.TestCase):
+    def test_zero_values_is_analysis_error(self):
+        self.assertEqual(
+            resolve_variable_reference([]),
+            {"status": ERROR, "values": []},
+        )
+
+    def test_values_are_preserved(self):
+        self.assertEqual(
+            resolve_variable_reference(["a", "b"]),
+            {"status": TRUE, "values": ["a", "b"]},
+        )
+
+    def test_empty_variable_is_not_object_absence(self):
+        result = resolve_variable_reference([])
+        self.assertNotEqual(result["status"], FALSE)
+        self.assertEqual(result["status"], ERROR)
 
 
 class StateEntityAggregationOrder(unittest.TestCase):
