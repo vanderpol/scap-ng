@@ -176,6 +176,26 @@ class ProjectionTests(unittest.TestCase):
                 self.assertEqual(outcome, event["outcome"])
                 self.assertEqual(outcome, event["instances"][0]["outcome"])
 
+
+    def test_bounded_evidence_and_early_stop_are_preserved(self):
+        scan=scan_doc()
+        benchmark=benchmark_doc()
+        rule=benchmark["benchmark_result"]["rule_results"][0]
+        rule["evidence_summary"]={
+            "observed_failures":20,
+            "actual_failures":"unknown",
+            "maximum":20,
+            "returned":2,
+            "truncated_population":True,
+            "stop_reason":"evidence_maximum_reached",
+        }
+        event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
+        summary=event["evidence_summary"]
+        self.assertEqual(20, summary["observed_failures"])
+        self.assertEqual("unknown", summary["actual_failures"])
+        self.assertTrue(summary["truncated_population"])
+        self.assertEqual("evidence_maximum_reached", summary["stop_reason"])
+
     def test_missing_benchmark_result_is_rejected(self):
         with self.assertRaises(KeyError):
             project_scan(scan_doc(), {})
