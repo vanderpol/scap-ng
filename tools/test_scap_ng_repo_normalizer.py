@@ -82,7 +82,8 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertEqual(len(shared),1)
             shared_assessment=yaml.safe_load(shared[0].read_text())["assessment"]
             self.assertEqual(shared_assessment["version"],1)
-            provenance=shared_assessment["reuse_provenance"]
+            self.assertNotIn("reuse_provenance",shared_assessment)
+            provenance=report["exact_groups"][0]["members"]
             self.assertEqual(len(provenance),2)
             self.assertEqual(
                 {row["source_assessment"]["id"] for row in provenance},
