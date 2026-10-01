@@ -336,6 +336,34 @@ An extension SHALL NOT:
 - override Platform/applicability processing;
 - silently change Rule selection.
 
+
+## Legacy checking-content resolution
+
+SCAP-NG native Rule/Assessment bindings SHALL resolve to explicit Assessment
+content; runtime scanners SHALL NOT repeat XCCDF's remote/fallback content
+discovery procedure.
+
+During XCCDF migration/compilation, multiple `check-content-ref` elements are
+ordered alternatives. The compiler SHALL attempt them in source order and use
+the first location whose required content can be successfully resolved. Embedded
+`check-content` is a fallback only when no referenced alternative resolves.
+
+The compiler SHALL preserve provenance sufficient to identify:
+
+- every source alternative considered;
+- source order;
+- which alternative was selected;
+- whether embedded content was used as fallback;
+- the checking-system identity and selected check name, when present.
+
+Unreachable alternatives MAY be omitted from executable scanner-facing content
+after compilation, but their migration provenance SHOULD remain available for
+audit/reconstruction.
+
+A native package SHALL contain or integrity-bind the selected executable
+Assessment content. It SHALL NOT depend on mutable ordered network fallback at
+scan time merely to reproduce legacy XCCDF mechanics.
+
 ## 14. SCAP 1.4 relationship
 
 The SCAP-NG Benchmark is the direct policy descendant of the XCCDF Benchmark,
