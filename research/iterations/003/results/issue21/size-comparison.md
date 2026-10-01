@@ -37,33 +37,35 @@ once, and fixed-format overhead dominates a one-Rule sample.
 
 ## Matched detailed comparison
 
-A second fixture, `matched-scap14-detailed.arf.xml`, adds detailed OVAL Results
-and System Characteristics to the same XCCDF Rule result. It represents the same
-logical failed observation as the NG detailed result: UID 0 and UNIX permission
-bits equivalent to mode `0666`, with the Test/Definition outcome false.
+The detailed fixture, `matched-scap14-detailed.arf.xml`, now includes:
+
+- the XCCDF Rule result;
+- OVAL Definition/Test results;
+- OVAL System Characteristics with the observed UNIX permissions equivalent to
+  mode `0666`;
+- the source OVAL Definition/Test/Object/State expressing the required root-owned
+  permissions equivalent to mode `0644`.
+
+This makes the detailed fixture self-contained for the same observed-versus-
+required root-cause question exposed by the NG Rule + Assessment results.
 
 | Detailed representation | Bytes |
 | --- | ---: |
-| SCAP 1.4 ARF + XCCDF + OVAL Results/System Characteristics | 6,196 |
+| Self-contained SCAP 1.4 ARF + XCCDF + OVAL source/Results/System Characteristics | 9,316 |
 | SCAP-NG canonical scan + Benchmark + detailed Assessment members | 6,227 |
 
-For this deliberately tiny one-Rule detailed-observation case, the normalized NG package is
-31 bytes (about **0.5%**) larger than the current ARF fixture.
+For this deliberately tiny one-Rule self-contained detailed case, the normalized
+NG package is 3,089 bytes, or about **33.2%**, smaller than the matched ARF.
 
-However, this is **not yet a fully information-equivalent comparison**. The ARF
-fixture sets OVAL `include_source_definitions=false`; it carries the evaluated
-Definition/Test results and System Characteristics observation, but not the
-source OVAL Object/State that expresses the expected configuration. The NG Rule
-result carries `expected_state` directly. A fully self-contained ARF comparison
-therefore needs the source OVAL Definitions (or another equivalent representation
-of the expected state) before interpreting the raw-size ratio as a like-for-like
-root-cause report.
+The ratio is a controlled fixture result, not a general compression claim.
+Fixed overhead, Rule count, evidence volume, repeated context, projection choice,
+and serialization details can materially change it. The minimal XCCDF-only
+comparison remains important: the self-contained NG JSONL event is larger there
+because it deliberately repeats context for SIEM indexing.
 
-This is a fixture result, not a general compression claim. Fixed overhead,
-number of Rules, amount of evidence, repeated context, projection choice, and
-serialization details can all materially change the ratio. The earlier minimal
-XCCDF-only comparison remains important: NG JSONL is larger there because each
-SIEM event is intentionally self-contained.
+Strict ARF and nested OVAL XSD validation is part of the regression suite. The
+9,316-byte number should be treated as provisional until the current validation
+run containing the source OVAL Definitions is green.
 
 Compression should be measured separately from raw size because both XML and
 JSON compress heavily and production transport/storage may use compression.
