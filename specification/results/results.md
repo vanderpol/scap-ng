@@ -286,10 +286,16 @@ contact record when the referenced Benchmark Result is part of the same
 canonical result package. It SHALL nevertheless retain enough local information
 to identify which value affected that Assessment execution.
 
-A Rule Result SHOULD normally rely on its `assessment_result_ref` to reach the
-consumed Organizational Input bindings. A Rule Result MAY additionally expose
-compact Organizational Input references when doing so materially improves
-downstream use, but it SHOULD NOT duplicate the full provenance record.
+A Rule Result that was evaluated using Organizational Input SHALL expose the
+effective organization-defined value(s) directly in that Rule Result so a human
+or downstream consumer can see what expected policy state the Rule was evaluated
+against without opening the detailed Assessment Result.
+
+Each exposed Rule-level value SHALL include a stable reference to the canonical
+Benchmark-result Organizational Input assertion. The Rule Result SHOULD include
+a concise provenance summary such as organization, authority/authorization
+reference, and effective period when useful, but it SHOULD NOT duplicate the
+entire canonical provenance/contact record.
 
 An exporter that emits standalone per-Rule or per-Assessment events MAY
 denormalize the referenced Organizational Input value and provenance into each
