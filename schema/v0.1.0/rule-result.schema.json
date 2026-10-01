@@ -42,11 +42,49 @@
       "description": "Deterministic aggregate policy outcome derived from all Rule result instances."
     },
     "assessment": {
-      "type": [
-        "object",
-        "null"
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "digest": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mode": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "automated",
+                "manual",
+                null
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
       ],
-      "description": "Effective selected Assessment method/binding metadata for this Rule; per-invocation details live in instances and referenced Assessment Results."
+      "description": "Effective selected Assessment identity/version for this Rule; per-invocation details live in instances and referenced Assessment Results."
     },
     "message": {
       "type": [
