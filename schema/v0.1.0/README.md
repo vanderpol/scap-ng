@@ -145,6 +145,13 @@ policy/result layer and is not a seventh Assessment truth value. Likewise,
 non-compliance Assessment classes describe the meaning of technical truth; they
 do not silently dictate policy-facing pass/fail inversion.
 
+Typed result values distinguish scalar, multi-valued, and record observations.
+Record values use named typed fields and may retain repeated field values.
+OVAL-compatible Variable Results explicitly reject record datatype; record
+structures remain on collected Item/entity data, matching the inherited OVAL
+constraint while supporting record-producing capabilities such as WMI57 and
+cmdlet-style collection.
+
 The full pinned NIWC Current native corpus census remains the primary evidence
 used to classify fields as required, optional, conditional, extensible, or
 migration-only before schemas become normative.
