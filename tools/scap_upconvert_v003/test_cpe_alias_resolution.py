@@ -11,6 +11,11 @@ from scap_upconvert_v003 import convert_full_review as full
 
 
 class CpeAliasResolutionTests(unittest.TestCase):
+    def test_distinct_cpe_names_have_distinct_native_condition_ids(self):
+        first=full.cpe_applicability_id("cpe:/o:microsoft:windows_server_2012")
+        second=full.cpe_applicability_id("cpe:/o:microsoft:windows_server_2012:r2")
+        self.assertNotEqual(first,second)
+
     def test_formatted_cpe_alias_maps_to_same_dictionary_item(self):
         legacy="cpe:/o:apple:macos:15.0"
         formatted="cpe:2.3:o:apple:macos:15.0:*:*:*:*:*:*:*"
