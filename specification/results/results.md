@@ -449,8 +449,40 @@ counts, but core SCAP-NG SHALL NOT require publisher-specific severity labels.
 A result exporter MAY project the normalized package into denormalized event
 formats such as JSONL.
 
-A SIEM projection MAY emit one scan-summary event followed by one independent
-event per Rule result.
+A SIEM projection SHOULD emit one scan-summary event followed by one independent
+event per Rule result. Each Rule event SHOULD be independently useful after
+indexing and SHOULD therefore repeat the minimum run, target, Benchmark, Profile,
+and Rule context needed for ordinary search and dashboard use.
+
+At minimum, a standalone Rule event SHOULD expose:
+
+- event type and result-schema version;
+- run identity and relevant timestamps;
+- scanner identity/version;
+- stable target reference plus useful target identifiers/hostname;
+- Benchmark identity/version and executed package digest when available;
+- effective Profile and Tailoring identity when applicable;
+- Rule identity, title, severity, outcome, and deterministic message;
+- structured reason and expected state when applicable;
+- selected Assessment identity and Rule-result instance(s);
+- references to detailed Assessment Result/evidence rather than embedding the
+  complete detailed execution graph;
+- source signed-result/manifest identity or verification status when the
+  projection derives from a signed canonical result.
+
+A scan-summary event SHOULD expose the run identity, target set, Benchmark
+result references, aggregate counters, and source signature/verification status
+needed to correlate the following Rule events.
+
+For a fixed canonical input and projection version, JSONL generation SHOULD be
+deterministic. Event ordering SHOULD follow canonical Benchmark-result ordering
+and Rule-result ordering unless an explicitly identified projection profile
+defines another deterministic order.
+
+A projection SHALL NOT change Assessment truth, Rule outcome, evidence
+completeness, or provenance. It SHALL NOT become a second canonical result
+source. When a Rule event references a detailed Assessment Result, that
+reference SHALL continue to identify the authoritative detailed result.
 
 Consumer-specific denormalization SHALL NOT dictate the canonical result model.
 
