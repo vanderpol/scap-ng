@@ -204,7 +204,13 @@ def main(argv=None):
         original_path=temp/'original-applicability.xml'; ET.ElementTree(app_oval).write(original_path,encoding='utf-8')
         predicates,dictionary=platform_sources(args.input)
         split_platform_definitions={}
+        split_inventory={}
         if args.split_root:
+            split_manifest_path=args.split_root/'manifest.json'
+            if split_manifest_path.exists():
+                split_manifest=json.loads(split_manifest_path.read_text(encoding='utf-8'))
+                split_inventory={row.get('cpe_name'):row for row in split_manifest.get('cpe_inventory',[])
+                                 if row.get('cpe_name') and row.get('status')=='split_valid'}
             provenance_path=args.split_root/'applicability'/'provenance.json'
             if provenance_path.exists():
                 provenance_doc=json.loads(provenance_path.read_text(encoding='utf-8'))
@@ -234,7 +240,16 @@ def main(argv=None):
                 app_id='platform.'+source.semantic_id(title,'platform')
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
-            unsupported=source.unsupported_definition_features(app_oval,did)
+            definition_oval=app_oval
+            definition_original_path=original_path
+            inventory_row=split_inventory.get(ref)
+            if inventory_row:
+                did=inventory_row.get('definition_id') or did
+                inventory_path=args.split_root/inventory_row['path']
+                definition_oval=ET.parse(inventory_path).getroot()
+                definition_original_path=temp/('inventory-'+source.safe_id(ref)+'.xml')
+                ET.ElementTree(definition_oval).write(definition_original_path,encoding='utf-8')
+            unsupported=source.unsupported_definition_features(definition_oval,did)
             if unsupported:
                 deprecated_only=all(x.get('feature')=='deprecated_oval_test' for x in unsupported)
                 if deprecated_only:
@@ -254,11 +269,11 @@ def main(argv=None):
                     })
                     continue
                 raise ValueError('Applicability source blocked: '+str(unsupported))
-            provenance={};native,error=source.lower_definition(app_oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
+            provenance={};native,error=source.lower_definition(definition_oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
             if error: raise ValueError('Applicability: '+str(error))
             tree,new_id=build(native);schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
             reverse=temp/'reverse.xml';tree.write(reverse,encoding='utf-8')
-            parity=compare(original_path,reverse,did,new_id,root_only=True)
+            parity=compare(definition_original_path,reverse,did,new_id,root_only=True)
             if not parity['equal']: raise ValueError('Applicability round-trip mismatch: '+app_id)
             # Compare the source definition before applying the separate source-platform negation.
             if negate: native['assessment']['evaluate']={'not':native['assessment']['evaluate']}
