@@ -188,6 +188,7 @@ class ProjectionTests(unittest.TestCase):
         fixture=ROOT/"research/iterations/003/results/issue21"
         paths=[
             fixture/"matched-scap14.arf.xml",
+            fixture/"matched-scap14-detailed.arf.xml",
             fixture/"scan-result.json",
             fixture/"benchmark-result.json",
             fixture/"expected.jsonl",
@@ -196,6 +197,64 @@ class ProjectionTests(unittest.TestCase):
         for path in paths:
             with self.subTest(path=path.name):
                 self.assertGreater(path.stat().st_size, 0)
+
+    def test_matched_detailed_scap14_arf_and_oval_are_schema_valid(self):
+        fixture=ROOT/"research/iterations/003/results/issue21"
+        schema_dir=ROOT/"third_party/scap-1.4-schemas"
+        arf_path=fixture/"matched-scap14-detailed.arf.xml"
+        doc=etree.parse(str(arf_path))
+
+        arf_schema=etree.XMLSchema(etree.parse(str(schema_dir/"asset-reporting-format_1.1.0.xsd")))
+        arf_schema.assertValid(doc)
+
+        oval_schema_dir=schema_dir/"oval_5.12.3"
+        wrapper=f"""<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-results-5"
+                     schemaLocation="oval-results-schema.xsd"/>
+          <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"
+                     schemaLocation="unix-system-characteristics-schema.xsd"/>
+        </xs:schema>"""
+        wrapper_doc=etree.fromstring(
+            wrapper.encode("utf-8"),
+            base_url=(oval_schema_dir/"issue21-validation-wrapper.xsd").as_uri(),
+        )
+        oval_schema=etree.XMLSchema(etree.ElementTree(wrapper_doc))
+        oval_nodes=doc.xpath(
+            "//oval-res:oval_results",
+            namespaces={"oval-res":"http://oval.mitre.org/XMLSchema/oval-results-5"},
+        )
+        self.assertEqual(1, len(oval_nodes))
+        oval_schema.assertValid(etree.ElementTree(oval_nodes[0]))
+
+        ns={
+            "oval-res":"http://oval.mitre.org/XMLSchema/oval-results-5",
+            "oval-sc":"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5",
+            "unix-sc":"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix",
+        }
+        self.assertEqual(
+            "false",
+            oval_nodes[0].xpath("string(.//oval-res:test/@result)", namespaces=ns),
+        )
+        self.assertEqual(
+            "complete",
+            oval_nodes[0].xpath("string(.//oval-sc:object/@flag)", namespaces=ns),
+        )
+        self.assertEqual(
+            "0",
+            oval_nodes[0].xpath("string(.//unix-sc:file_item/unix-sc:user_id)", namespaces=ns),
+        )
+        expected_permissions={
+            "uread":"true","uwrite":"true","uexec":"false",
+            "gread":"true","gwrite":"true","gexec":"false",
+            "oread":"true","owrite":"true","oexec":"false",
+        }
+        for name, expected in expected_permissions.items():
+            with self.subTest(permission=name):
+                actual=oval_nodes[0].xpath(
+                    f"string(.//unix-sc:file_item/unix-sc:{name})",
+                    namespaces=ns,
+                )
+                self.assertEqual(expected, actual)
 
 
     def test_issue21_rule_message_matches_detailed_observation(self):
