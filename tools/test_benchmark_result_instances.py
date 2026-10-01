@@ -180,6 +180,12 @@ class AssessmentResultComponentTests(unittest.TestCase):
         validate(json.loads(path.read_text()), ASSESSMENT_SCHEMA)
 
 
+    def test_issue21_canonical_result_fixtures_validate(self):
+        fixture=ROOT/"research/iterations/003/results/issue21"
+        validate(json.loads((fixture/"scan-result.json").read_text()), SCAN_SCHEMA)
+        validate(json.loads((fixture/"benchmark-result.json").read_text()), SCHEMA)
+
+
 class ResultSchemaRegistryTests(unittest.TestCase):
     def test_all_result_schemas_are_valid_draft_2020_12(self):
         for name, schema in sorted(LOCAL_SCHEMAS.items()):
