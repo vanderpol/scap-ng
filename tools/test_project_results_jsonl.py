@@ -82,7 +82,7 @@ def benchmark_doc():
                 "title": "Example requirement",
                 "severity": "high",
                 "outcome": "fail",
-                "assessment": {"id": "assessment-1"},
+                "assessment": {"id": "assessment-1", "version": 1, "mode": "automated"},
                 "message": "Observed mode 0666; expected 0644.",
                 "reason": {"code": "value_mismatch"},
                 "expected_state": [{
