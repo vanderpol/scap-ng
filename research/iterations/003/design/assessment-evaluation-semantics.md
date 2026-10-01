@@ -213,7 +213,15 @@ Native SCAP-NG source SHOULD make behavior-affecting settings explicit where doi
 
 Migration provenance SHALL remain outside executable native content except for stable source-identification metadata required by the adopted format.
 
-## 12. Conformance evidence
+## 12. Conformance and differential evidence
+
+The evidence hierarchy for evaluator semantics is:
+
+1. **Normative authority:** pinned OVAL 5.12.3 schemas, Schematron, and published language documentation.
+2. **Primary legacy differential reference for core OVAL behavior:** MITRE's OVAL Definition Interpreter (`ovaldi`). The accessible GitHub repository `OVALInterpreter/ovaldi` is an unofficial Git conversion of the historical SourceForge/Subversion code; its own documentation identifies the MITRE interpreter as an open-source reference implementation of the OVAL Language. Because the implementation predates OVAL 5.12.x, it is evidence for stable/core semantics, not authority for later-version additions.
+3. **Secondary differential implementation evidence:** OpenSCAP. Results MAY be compared to expose implementation disagreements, but OpenSCAP SHALL NOT by itself settle an ambiguous OVAL semantic rule. A disagreement between OpenSCAP and the normative language or the MITRE reference lineage must be investigated rather than normalized into native NG behavior.
+
+Differential execution is supporting evidence, not a replacement for normative text. When legacy evaluators disagree, SCAP-NG SHALL preserve the ambiguity until stronger source evidence or an explicit standards decision resolves it.
 
 Current focused executable evidence:
 
