@@ -94,6 +94,7 @@ def project_scan(
                 "reason": rule.get("reason"),
                 "assessment": rule.get("assessment"),
                 "expected_state": rule.get("expected_state", []),
+                "observed_state": rule.get("observed_state", []),
                 "instances": rule.get("instances", []),
                 "evidence_refs": rule.get("evidence_refs", []),
                 "organizational_inputs": rule.get("organizational_inputs", []),
