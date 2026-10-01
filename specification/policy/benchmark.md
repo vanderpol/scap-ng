@@ -533,6 +533,33 @@ The Benchmark processing model SHALL NOT assume that every Rule is a
 `compliance` Assessment merely because compliance is a primary SCAP-NG use
 case.
 
+Assessment class defines the semantic meaning of Assessment truth; Rule policy
+defines whether that truth satisfies the Rule.
+
+For a `compliance` Assessment used as the normal compliance determination,
+`true` maps to Rule pass and `false` maps to Rule fail.
+
+When a `vulnerability`, `patch`, `inventory`, or `miscellaneous`
+Assessment directly backs a Rule whose policy outcome is pass/fail, the Rule's
+Assessment binding SHALL explicitly declare the policy interpretation of the
+Assessment result unless that interpretation is standardized unambiguously for
+that Rule use case.
+
+For example, an inventory Assessment whose `true` result means "product is
+installed" cannot be assumed to imply either policy pass or policy fail merely
+from `class: inventory`. Likewise, `vulnerability: true` means the
+vulnerability condition is present; whether that is being used as a failure
+condition, a finding/reporting Rule, or an applicability/input condition belongs
+to the consuming policy context.
+
+A scanner SHALL NOT contain hidden class-name inversions such as
+"vulnerability true always means Rule fail" or "patch true always means Rule
+pass" unless a future standards profile explicitly defines that mapping.
+
+The exact authoring property used to express Rule satisfaction remains a schema
+decision. The semantic requirement is that the mapping be explicit,
+deterministic, validated at compile time, and visible in results/provenance.
+
 Rule outcome interpretation SHALL use the selected Assessment Method's declared
 class as defined in `../assessment/assessment-method.md`.
 
