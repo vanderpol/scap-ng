@@ -149,6 +149,44 @@ Every newly encountered source construct that requires a new semantic mapping
 SHOULD be added to the migration/conformance regression corpus after support is
 implemented.
 
+### XCCDF check-content reference fallback
+
+XCCDF 1.2 defines multiple `check-content-ref` elements as **alternative
+locations in source order**, not multiple checks to execute. Migration SHALL
+preserve that resolution semantics during compilation:
+
+1. attempt `check-content-ref` alternatives in XML document order;
+2. select the first reference whose content can be resolved successfully;
+3. use embedded `check-content` only when none of the references resolve;
+4. report a conversion blocker if no reference resolves and no usable embedded
+   content exists.
+
+The converter SHALL NOT execute or combine multiple successfully resolvable
+alternatives. Their purpose is retrieval fallback.
+
+This legacy retrieval mechanism SHOULD be normalized away before scanner
+runtime. A compiled SCAP-NG package SHALL contain the selected, resolved
+Assessment/check content (or the native representation derived from it) and
+SHALL NOT require runtime network/location fallback across legacy
+`check-content-ref` alternatives.
+
+Migration evidence SHOULD preserve:
+
+- every source alternative in original order;
+- each `href` and optional `name`;
+- resolution success/failure;
+- which alternative was selected, or whether embedded `check-content` was
+  used;
+- a digest/identity for the selected source content.
+
+For reproducibility, converters SHOULD resolve references from a closed,
+pinned input set such as a SCAP data stream/package. Mutable network retrieval
+SHOULD NOT silently participate in a reproducible migration build; if external
+retrieval is explicitly allowed, the retrieved artifact SHOULD be captured and
+pinned by digest in migration evidence.
+
+This fallback behavior is a migration/build concern, not a native SCAP-NG
+authoring or execution feature.
 
 ## 12. CPE inventory migration
 
