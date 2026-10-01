@@ -219,6 +219,34 @@ organizational role, authentication/identity source, response source
 A later reviewer/approver SHALL be represented as a separate provenance event
 and SHALL NOT replace the identity or timestamp of the original evaluator.
 
+## Organizational Input result provenance
+
+Results SHALL make every effective Organizational Input value that affected
+evaluation reconstructable without requiring the original Input Set to remain
+externally available forever.
+
+For each consumed organization-resolved Parameter, results SHOULD record:
+
+- Parameter identity;
+- effective typed value, or a protected/redacted representation when required;
+- value source (`organizational_input`, interactive, API/integration, or other
+  standardized source);
+- Organizational Input Set identity/version when a persisted set was used;
+- supplier/source-system provenance;
+- supplied timestamp;
+- authorization status and available authorization reference;
+- whether the value was redacted in the result.
+
+Result provenance SHALL distinguish publisher-resolved Parameter values from
+organization-resolved values. Supplying Organizational Input SHALL NOT make the
+run appear Tailored.
+
+If a required value is missing, the affected Assessment SHALL report
+`not_evaluated` or the final standardized equivalent with structured reason
+`missing_organizational_input` and the unresolved Parameter identity. It SHALL
+NOT report an ordinary compliance failure or not-applicable result merely
+because policy data was absent.
+
 ## 13. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
