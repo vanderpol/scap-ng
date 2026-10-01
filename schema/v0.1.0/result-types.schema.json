@@ -61,7 +61,7 @@
       "additionalProperties": false
     },
     "typed_value": {
-      "description": "A result value with explicit datatype. Record/multi-value refinement remains capability/schema work.",
+      "description": "A typed scalar or record result value. Multi-valued entities/Variables are represented by arrays of typed_value rather than by an implicit multi-value scalar.",
       "type": "object",
       "required": [
         "datatype"
@@ -83,6 +83,43 @@
           "default": false
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "datatype": {
+                "const": "record"
+              }
+            },
+            "required": [
+              "datatype"
+            ]
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "object",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/typed_value"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/typed_value"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ],
       "additionalProperties": true
     },
     "bounded_evidence": {
