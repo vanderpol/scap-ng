@@ -144,13 +144,18 @@ defines an explicit deterministic precedence rule.
 The current pre-alpha model prefers rejecting ambiguity over relying on source
 order.
 
-## 8. Tailoring Parameters
+## 8. Parameters are outside native Tailoring
 
-Tailoring MAY override a publisher-resolved Parameter only when that Parameter
-is declared tailorable.
+A native Tailoring artifact SHALL NOT override Parameter values.
 
-Supplying a value for a Parameter intentionally left unresolved for the
-organization is Organizational Input, not Tailoring.
+A concrete Parameter value resolved by the Benchmark publisher or a publisher
+Profile is part of that publisher policy. An organization that intentionally
+uses a different expected value is defining a different policy and SHALL use a
+distinct organization-authored Benchmark/policy identity rather than hiding the
+change inside Tailoring.
+
+Supplying a value for a Parameter intentionally left unresolved by the publisher
+is Organizational Input, not Tailoring.
 
 Tailoring and Organizational Input SHALL remain distinguishable in source and
 results.
@@ -195,9 +200,10 @@ Tailoring inheritance SHALL be acyclic.
 
 Layers SHALL be applied from parent to child.
 
-A child Tailoring MAY override the parent's Rule-selection or tailorable
-Parameter decisions because both layers are explicitly local policy, but the
-final effective state SHALL be deterministic.
+A child Tailoring MAY override the parent's Rule-selection or published
+Assessment-selection decisions when those surfaces are permitted by this
+specification, but it SHALL NOT override Parameter values. The final effective
+state SHALL be deterministic.
 
 Tooling SHOULD flatten Tailoring inheritance before scanner execution.
 
@@ -265,7 +271,11 @@ SCAP-NG Tailoring is the policy descendant of XCCDF Tailoring, but it uses a
 smaller mutation surface.
 
 Legacy XCCDF Tailoring constructs SHOULD be normalized to the effective
-SCAP-NG Rule-selection and Parameter changes when this can be done losslessly.
+SCAP-NG Rule-selection and supported selection changes when this can be done
+losslessly. Legacy XCCDF Tailoring that changes a concrete Value SHALL NOT be
+mapped to a native Tailoring Parameter override; migration SHALL instead produce
+or require a distinct organization-authored policy/Benchmark representation, or
+report that the conversion cannot yet be represented losslessly.
 
 A legacy Tailoring construct that changes policy in a way the native SCAP-NG
 model does not support SHALL be reported for review rather than silently
@@ -292,9 +302,6 @@ Illustrative source:
       disabled_rules:
         - WN11-EXAMPLE-001
 
-      parameters:
-        password_minimum_length: 16
-
 A Tailoring artifact SHOULD NOT serialize a full copy of the Benchmark or
 Profile.
 
@@ -308,10 +315,9 @@ A processor SHALL resolve effective policy in this order:
 4. resolve publisher Parameter values;
 5. apply Tailoring parent layers, if any;
 6. apply the requested Tailoring layer;
-7. resolve resulting effective Rule selection;
-8. resolve resulting effective tailorable Parameter values;
-9. validate required Organizational Input separately;
-10. freeze the effective policy for the Assessment Request.
+7. resolve resulting effective Rule and Assessment-selection state;
+8. validate required Organizational Input separately;
+9. freeze the effective policy for the Assessment Request.
 
 After policy is frozen, subsequent evaluation SHALL NOT mutate that effective
 policy.
@@ -325,8 +331,7 @@ A Tailoring artifact SHALL fail validation when:
 - the referenced Profile does not exist;
 - a referenced Rule is not a Benchmark member;
 - a Rule is both enabled and disabled in the same layer;
-- a Parameter does not exist;
-- a Parameter is not tailorable;
+- Tailoring attempts to provide or override a Parameter value;
 - Tailoring attempts to change an Assessment Method or applicability mapping;
 - Tailoring inheritance is cyclic;
 - Group operations are ambiguous;
@@ -344,7 +349,7 @@ A rebase tool MAY create a candidate Tailoring for the new Benchmark.
 A rebase operation SHOULD classify each previous local decision as:
 
 - unchanged and still valid;
-- automatically mapped to a stable Rule/Parameter identity;
+- automatically mapped to a stable Rule or Assessment-selection identity;
 - affected by publisher policy change;
 - removed because the referenced object no longer exists;
 - requiring human review.
@@ -384,8 +389,8 @@ At minimum, a complete run result SHOULD identify:
 - publisher Profile identity;
 - Tailoring identity/version;
 - effective selected/disabled Rule state;
-- effective tailored Parameter values or their protected references;
-- which values came from Organizational Input rather than Tailoring.
+- effective publisher Parameter values or their protected references;
+- which values came from Organizational Input.
 
 Sensitive Parameter values MAY require redaction according to the future
 results-security profile.
@@ -416,7 +421,7 @@ SHOULD add worked source examples covering at least:
 - Tailoring a publisher Profile;
 - disabling a publisher-selected Rule;
 - re-enabling a Benchmark Rule disabled by a publisher Profile;
-- overriding a tailorable publisher Parameter;
+- demonstrating that an attempted publisher Parameter override is rejected;
 - supplying Organizational Input without creating Tailoring;
 - rebasing Tailoring to a newer Benchmark version;
 - result provenance showing publisher policy versus local modifications.
