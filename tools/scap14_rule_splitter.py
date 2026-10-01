@@ -93,10 +93,12 @@ def embedded_components(datastream_root):
     refs = {}
     for e in datastream_root.iter():
         n = local(e.tag)
-        if n == "component":
+        if n in ("component", "extended-component"):
             cid = e.get("id")
             children = [x for x in e if isinstance(x.tag, str)]
             if cid and children:
+                if cid in components and etree.tostring(components[cid]) != etree.tostring(children[0]):
+                    raise ValueError(f"conflicting embedded component id: {cid}")
                 components[cid] = children[0]
         elif n == "component-ref":
             rid = e.get("id")
