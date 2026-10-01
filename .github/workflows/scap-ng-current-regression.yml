@@ -67,6 +67,12 @@ jobs:
             --output work/generated-capability-schemas/unix.file.schema.json
           python -m json.tool work/generated-capability-schemas/unix.file.schema.json > /dev/null
 
+      - name: Upload generated capability schema slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-capability-schema-${{ matrix.os }}
+          path: work/generated-capability-schemas/unix.file.schema.json
+
       - name: Repository normalization and content compiler
         run: |
           python tools/test_scap_ng_repo_normalizer.py
