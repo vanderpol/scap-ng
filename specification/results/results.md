@@ -209,6 +209,7 @@ This SHOULD include, as applicable:
 - outcome;
 - concise deterministic message;
 - structured failure reason;
+- decisive `observed_state` for machine-readable observed-versus-required comparison when applicable;
 - bounded evidence;
 - Assessment mode;
 - effective check selector and Assessment Method identity;
@@ -218,6 +219,25 @@ This SHOULD include, as applicable:
 The full Rule discussion, remediation, Manual Assessment procedure, and
 Assessment implementation SHOULD NOT automatically be copied into every Rule
 result.
+
+### Decisive observed-state visibility
+
+A failed or otherwise diagnostically meaningful automated Rule Result SHOULD
+expose a bounded `observed_state` collection containing the smallest concrete
+observations needed for ordinary human/SIEM understanding of the outcome.
+
+Each observed-state entry SHOULD identify, as applicable, the collected Item
+reference, State identity, State slot/entity, datatype, observed value or
+protected/redacted representation, and collection/entity status.
+
+`observed_state` is a compact projection of authoritative detailed Assessment
+evidence. It SHALL NOT become a second independent evidence truth. The referenced
+Assessment Result remains authoritative for the complete Test/Object/Item/State/
+Entity evaluation graph.
+
+A missing required item SHALL NOT be represented by fabricating an observed
+Item. In that case the structured reason and expected state describe the
+absence, while `observed_state` may be empty.
 
 ## Expected-state visibility
 
@@ -463,7 +483,7 @@ At minimum, a standalone Rule event SHOULD expose:
 - Benchmark identity/version and executed package digest when available;
 - effective Profile and Tailoring identity when applicable;
 - Rule identity, title, severity, outcome, and deterministic message;
-- structured reason and expected state when applicable;
+- structured reason, expected state, and decisive observed state when applicable;
 - selected Assessment identity and Rule-result instance(s);
 - references to detailed Assessment Result/evidence rather than embedding the
   complete detailed execution graph;
