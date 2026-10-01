@@ -146,11 +146,22 @@ def verify_cms_signature(manifest_bytes: bytes, signature: bytes, cert_pem: byte
             )
 
 
+def _lexical_abs(path: Path) -> Path:
+    return Path(os.path.abspath(os.path.normpath(str(path))))
+
+
+def _relative_member_path(path: Path, root: Path) -> str:
+    rel = os.path.relpath(str(_lexical_abs(path)), str(_lexical_abs(root)))
+    if rel == os.pardir or rel.startswith(os.pardir + os.sep):
+        raise ValueError(f"{path}: path escapes corpus root {root}")
+    return Path(rel).as_posix()
+
+
 def resolve_assessment(source_root: Path, rule_path: Path, ref: str) -> tuple[Path, dict]:
-    target = (rule_path.parent / ref).resolve()
-    source_root = source_root.resolve()
+    target = _lexical_abs(rule_path.parent / ref)
+    source_root = _lexical_abs(source_root)
     try:
-        target.relative_to(source_root)
+        _relative_member_path(target, source_root)
     except ValueError as exc:
         raise ValueError(f"{rule_path}: Assessment reference escapes corpus root: {ref}") from exc
     if not target.is_file():
@@ -184,7 +195,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         object_index[object_id] = {
             "type": kind,
             "path": member,
-            "source": source_path.relative_to(source_root).as_posix(),
+            "source": _relative_member_path(source_path, source_root),
             "sha256": hashlib.sha256(data).hexdigest(),
             "size": len(data),
         }
@@ -348,7 +359,7 @@ def main() -> int:
     ap.add_argument("--scap-ng-revision")
     args = ap.parse_args()
 
-    source_root = args.corpus_root.resolve()
+    source_root = _lexical_abs(args.corpus_root)
     benchmark_dirs = sorted(
         p.parent
         for p in source_root.rglob("benchmark.yaml")
