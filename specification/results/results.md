@@ -142,6 +142,82 @@ For organization-defined expected values, the same expected-state entry format
 SHALL be used. Organizational Input therefore changes the `source` and adds a
 provenance reference; it does not introduce a separate hidden result surface.
 
+
+## Rule result instances and fan-out
+
+A Benchmark Result SHALL retain one policy-facing Rule Result record for each
+effectively selected Rule. A Rule Result MAY contain one or more **result
+instances** when the Rule's selected assessment method is intentionally
+evaluated separately for multiple target instances or multiple independently
+reported checks.
+
+The Rule Result's top-level `outcome` is the aggregate policy outcome for the
+Rule. Each result instance retains its own outcome and detailed Assessment
+Result reference.
+
+Illustrative shape:
+
+    rule_result:
+      rule_id: example-rule
+      outcome: fail
+      instances:
+        - id: account:root
+          kind: target_instance
+          outcome: pass
+          assessment_result_ref: assessment-result-1
+        - id: account:example
+          kind: target_instance
+          outcome: fail
+          assessment_result_ref: assessment-result-2
+
+Result-instance identity SHALL be stable within the Benchmark Result and SHALL
+preserve enough context to distinguish why multiple executions/results exist.
+An instance MAY identify:
+
+- a target/component instance;
+- an independently reported check;
+- both, when both dimensions are present.
+
+A Rule with no fan-out SHOULD still expose the common Rule-result contract
+without requiring consumers to reconstruct a legacy XCCDF multiple-result
+model. Whether the final schema represents the ordinary execution as a single
+entry in `instances` or retains direct common-case fields alongside an empty
+`instances` collection remains a serialization decision; the semantic
+requirement is that fan-out is explicit and does not create ambiguous duplicate
+Rule identities.
+
+The aggregate Rule outcome SHALL be deterministically derived from the
+instance/check outcomes according to the selected Rule assessment method's
+declared aggregation semantics. Aggregation SHALL NOT silently discard
+`error`, `unknown`, `not_evaluated`, or `not_applicable`.
+
+### XCCDF `multi-check` migration
+
+For a nameless XCCDF `check-content-ref`:
+
+- when `multi-check=false` (the default), the executed checks are combined
+  into one Rule result using the source XCCDF aggregation semantics;
+- when `multi-check=true`, each executed check SHALL remain separately
+  identifiable in the migrated Rule Result's result instances.
+
+The converter SHALL preserve which underlying check produced each instance and
+the source aggregation behavior.
+
+### XCCDF Rule `multiple` migration
+
+For XCCDF Rule `multiple=true`, distinct target/component instances that were
+reported separately SHALL remain separately identifiable as Rule result
+instances.
+
+`multiple` and `multi-check` are independent dimensions. If both apply, a
+result instance SHALL preserve both the target-instance identity and the
+executed-check identity needed to reconstruct the source result semantics.
+
+For legacy `multiple=false` or `multi-check=false` behavior that combines
+several component outcomes into one Rule outcome, migration SHALL preserve the
+source aggregation semantics rather than treating the first or last result as
+authoritative.
+
 ## 6. Deterministic message
 
 Every Rule result SHOULD contain a concise deterministic human-readable
