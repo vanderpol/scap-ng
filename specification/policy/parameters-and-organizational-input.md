@@ -253,6 +253,46 @@ technical binding remains in the selected Assessment's expected-State/input
 contract. Compilation SHALL verify that the Rule-level declaration and the
 selected Assessment binding agree.
 
+For each Organizational Input required by an Assessment choice, the Rule-level
+discoverability record SHALL identify every consumer location using the tuple:
+
+    Assessment choice -> Test ID -> State ID -> State slot/entity
+
+State ID alone is insufficient because one State may be reused by more than one
+Test, and one State may contain more than one organization-resolved field. Test
+ID plus State ID plus slot therefore provides an unambiguous execution-facing
+address while the named Organizational Input identity provides reuse across
+consumer locations.
+
+One named Organizational Input MAY feed multiple Test/State/slot locations.
+Likewise, one Test MAY depend on multiple different Organizational Inputs.
+Processors SHALL NOT assume a one-input-per-Test or one-input-per-State model.
+
+Illustrative Rule-level discovery metadata:
+
+    organizational_input_requirements:
+      automated:
+        - input: approved_time_sources
+          required: true
+          uses:
+            - test: test-chrony-sources
+              state: state-approved-source
+              state_slot: hostname
+            - test: test-ntpd-sources
+              state: state-approved-ntp-source
+              state_slot: hostname
+        - input: approved_max_offset
+          required: true
+          uses:
+            - test: test-time-offset
+              state: state-offset-limit
+              state_slot: offset
+
+This Rule-level structure is an index/summary, not an independent source of
+execution semantics. The Assessment State declarations remain authoritative,
+and compilation SHALL reject disagreement between the Rule summary and the
+Assessment graph.
+
 A scanner that advertises Organizational Input support SHALL validate supplied
 values against the applicable declared contract before using them. A scanner
 SHALL NOT claim support and then bypass type/cardinality/schema validation.
