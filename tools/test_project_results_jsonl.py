@@ -149,6 +149,8 @@ class ProjectionTests(unittest.TestCase):
         event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
         self.assertEqual(1.5, event["weight"])
         self.assertEqual("automated", event["check_selector"])
+        self.assertEqual(1, event["assessment"]["version"])
+        self.assertEqual("automated", event["assessment"]["mode"])
         self.assertEqual({"example_parameter": 42}, event["parameters"])
         self.assertEqual("applicable", event["applicability"]["outcome"])
         rule["observed_state"]=[{
