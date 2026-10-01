@@ -160,5 +160,25 @@ class AssessmentResultComponentTests(unittest.TestCase):
         validate(json.loads(path.read_text()), SCAN_SCHEMA)
 
 
+    def test_record_typed_variable_is_rejected(self):
+        doc=base_assessment_result()
+        doc["assessment_result"]["variables"].append({
+            "id":"var-record",
+            "datatype":"record",
+            "status":"complete",
+            "cardinality":"one",
+            "values":[{
+                "datatype":"record",
+                "value":{"name":{"datatype":"string","value":"example"}}
+            }],
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            validate(doc, ASSESSMENT_SCHEMA)
+
+    def test_record_item_fixture_validates(self):
+        path=ROOT/"research/iterations/003/results/issue40/record-item.result.json"
+        validate(json.loads(path.read_text()), ASSESSMENT_SCHEMA)
+
+
 if __name__=="__main__":
     unittest.main()
