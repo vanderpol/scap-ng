@@ -207,6 +207,19 @@ def evaluate_missing_collected_object_record():
     return UNKNOWN
 
 
+def resolve_variable_reference(values):
+    """Normalize an OVAL variable reference result for downstream evaluation.
+
+    OVAL 5.12.3 VariableType documentation requires an analysis error when a
+    variable returns no value. This applies before Object/State-specific use;
+    an empty variable SHALL NOT be reinterpreted as an empty Object collection.
+    """
+    values = list(values)
+    if not values:
+        return {"status": ERROR, "values": []}
+    return {"status": TRUE, "values": values}
+
+
 def aggregate_many_to_many(*, var_check, entity_check, comparison_rows):
     """Aggregate one State entity's many-to-many value comparisons.
 
