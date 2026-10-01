@@ -103,6 +103,70 @@ Comments and evidence SHALL NOT silently alter the selected compliance outcome.
 Publisher content MAY impose additional evidence or comment requirements when
 such requirements are explicitly authored.
 
+## Manual result provenance
+
+A completed Manual Assessment Result SHALL record sufficient provenance to
+identify who supplied the normalized manual outcome and when that outcome was
+recorded.
+
+At minimum, a completed manual result SHALL include:
+
+- an evaluator/respondent identity;
+- a completion timestamp;
+- the Manual Assessment identity/version;
+- the Assessment execution identity or Assessment Request context;
+- the selected normalized outcome.
+
+The evaluator identity SHALL use one or more stable typed identifiers available
+to the implementation, such as an authenticated account identifier, directory
+identity, certificate subject, organization-managed user identifier, or other
+portable identity value. A display name MAY accompany the stable identity but
+SHALL NOT be the only identity when a stronger identifier is available.
+
+A manual result SHOULD also support, when available:
+
+- organization/role of the evaluator;
+- authentication/identity source;
+- start time and completion time;
+- reviewer comments distinct from factual observations;
+- evidence/evidence references supplied by the evaluator;
+- whether the response was entered directly, imported from another authorized
+  system, or supplied by an authorized delegate;
+- provenance for the source system or import when the result was not entered
+  directly.
+
+If a second person verifies, approves, or adjudicates the manual result, that
+review action SHALL be represented separately from the original evaluator. The
+original evaluator identity and completion time SHALL NOT be overwritten by a
+later reviewer or approver.
+
+Illustrative result metadata:
+
+    manual_response:
+      outcome: fail
+      completed_at: 2026-10-01T14:32:18-04:00
+      evaluator:
+        id:
+          scheme: directory
+          value: jdoe@example.mil
+        display_name: Jane Doe
+        role: System Administrator
+      response_source: direct
+
+      review:
+        reviewed_at: 2026-10-01T15:10:04-04:00
+        reviewer:
+          id:
+            scheme: directory
+            value: reviewer@example.mil
+          display_name: Alex Reviewer
+
+Exact identity schemes and the final result serialization remain subject to the
+result schema, but the provenance requirements above are normative.
+
+Manual result provenance describes who made or reviewed the observation. It is
+distinct from Tailoring authorization and Organizational Input provenance.
+
 ## 7. Optional richer interaction
 
 SCAP-NG MAY support richer Manual Assessment interaction metadata in addition
