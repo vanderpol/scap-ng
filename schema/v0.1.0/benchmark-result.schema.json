@@ -298,8 +298,8 @@
               "outcome",
               "assessment",
               "message",
-              "assessment_result_ref",
-              "expected_state"
+              "expected_state",
+              "instances"
             ],
             "properties": {
               "rule_id": {
@@ -327,13 +327,15 @@
                   "unknown",
                   "not_evaluated",
                   "not_applicable"
-                ]
+                ],
+                "description": "Deterministic aggregate policy outcome derived from all Rule result instances."
               },
               "assessment": {
                 "type": [
                   "object",
                   "null"
-                ]
+                ],
+                "description": "Effective selected Assessment method/binding metadata for this Rule; per-invocation details live in instances and referenced Assessment Results."
               },
               "message": {
                 "type": [
@@ -389,12 +391,6 @@
                     },
                     "additionalProperties": true
                   }
-                ]
-              },
-              "assessment_result_ref": {
-                "type": [
-                  "string",
-                  "null"
                 ]
               },
               "evidence_refs": {
@@ -549,6 +545,80 @@
                         "object",
                         "null"
                       ]
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "instances": {
+                "type": "array",
+                "minItems": 1,
+                "description": "Explicit result instances contributing to this policy-facing Rule Result. Present even for the common single-invocation case.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "outcome",
+                    "assessment_result_ref"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "outcome": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail",
+                        "error",
+                        "unknown",
+                        "not_evaluated",
+                        "not_applicable"
+                      ]
+                    },
+                    "assessment_result_ref": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "assessment_invocation_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "target_instance": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "check_instance": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "reason": {
+                      "type": [
+                        "string",
+                        "object",
+                        "null"
+                      ]
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   },
                   "additionalProperties": true
