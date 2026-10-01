@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import yaml
 
-OLD_KEYS={'collect','object_title','object_values','state_capability'}
+OLD_KEYS={'collect','object_title','object_values'}
 ASSESSMENT_SECTION_ORDER=('collections','variables','tests','evaluate')
 
 def violations(document):
@@ -35,6 +35,9 @@ def violations(document):
         errors.append('assessment: presentation order must be collections, variables, tests, evaluate (omit absent sections)')
     if 'deprecated' in a: errors.append('assessment.deprecated: forbidden native attribute')
     if 'checks' in a: errors.append('assessment.checks: use Tests')
+    for name,payload in a.get('collections',{}).items():
+        if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
+            errors.append(f'assessment.collections.{name}: Collection must declare capability')
     for name in a.get('tests',{}):
         if not name.startswith('test-'): errors.append(f'assessment.tests.{name}: missing test- prefix')
     visit(document,'document')
