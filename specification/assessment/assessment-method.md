@@ -79,7 +79,7 @@ Assessment source SHOULD present metadata first, followed by `objects`, `variabl
 This recommendation supports consistent reading and review.
 
 Mapping key order SHALL NOT affect Assessment semantics or reference resolution.
-An implementation SHALL permit references to named Collections and Variables
+An implementation SHALL permit references to named Objects and Variables
 regardless of whether their definitions appear before or after the reference.
 An otherwise valid Assessment SHALL NOT be rejected solely for differing from
 the recommended presentation order. Sequence order SHALL retain its defined
@@ -493,9 +493,9 @@ Assessment semantics.
 **Status: compatibility requirement; schema-wide and execution conformance
 coverage is still open.**
 
-Each supported native Collection Capability SHALL define a typed, versioned
+Each supported native Object capability SHALL define a typed, versioned
 behavior contract: its allowed settings, allowed values, effective defaults,
-validity conditions, collection/existence/error effects and supported
+validity conditions, Object collection/existence/error effects and supported
 combinations. SCAP-NG SHALL NOT make authors rely on undocumented
 collector-specific defaults.
 
@@ -506,7 +506,7 @@ optional `behaviors` element SHALL NOT automatically be assumed equivalent to
 an empty element or a partially specified element without verifying the source
 language's omission semantics.
 
-Native Collection authoring SHOULD expose applicable effective behaviors with
+Native Object authoring SHOULD expose applicable effective behaviors with
 concrete values. Conversion provenance SHALL distinguish values explicitly
 authored in OVAL from values inferred through a documented default. If a
 behavior is unsupported or its effective semantics cannot be established,
