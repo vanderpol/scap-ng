@@ -28,6 +28,14 @@ name and identifier of the OVAL successor are OVAL Board decisions. The name
 `OVAL 6` SHALL NOT be reused for this work because that designation was used
 by a prior OVAL 6 effort.
 
+Until the Board ratifies the final standards identity, project prototypes and
+conformance fixtures use the explicitly provisional implementation identifier
+`scap-ng.pre-alpha.assessment` with version `0.1.0`. This identifier is an
+implementation/testing handle only. It SHALL NOT be presented as the final name
+or identifier of the OVAL successor, and it SHALL be replaced consistently in
+Benchmarks, automated Assessments, schemas, fixtures, and conformance tests when
+the Board-defined identity is adopted.
+
 Conceptually:
 
     assessment:
