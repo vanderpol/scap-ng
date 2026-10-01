@@ -476,6 +476,77 @@ Such a selector change SHOULD include a human-readable justification and, where
 available, an authorization/change reference so the result can explain why the
 non-default Assessment was selected.
 
+
+## Legacy XCCDF inheritance and cluster normalization
+
+SCAP-NG native Benchmark/Rule/Profile source SHALL NOT require XCCDF Item
+`extends` or `cluster-id` processing at scan time.
+
+During migration, XCCDF inheritance SHALL be resolved before native policy
+execution artifacts are produced. The converter SHALL preserve both:
+
+- the **effective value** of every inherited property that affects execution,
+  selection, scoring, assessment choice, applicability, or presentation; and
+- provenance identifying whether the effective value was authored locally,
+  inherited, or produced by an explicit override.
+
+Inheritance resolution SHALL be acyclic. Missing parents, type-mismatched
+parents, inheritance cycles, or ambiguous effective values SHALL fail migration
+rather than producing partially resolved native policy.
+
+For XCCDF 1.2 content, deprecated Group `extends` SHALL NOT be treated as a
+supported native inheritance mechanism. A converter MAY preserve source
+provenance for such content but SHALL only emit a native result when its
+effective semantics are unambiguous and supported.
+
+### Abstract items and Profiles
+
+XCCDF `abstract=true` identifies source content intended only for inheritance.
+An abstract source Rule/Profile SHALL NOT become an independently selectable
+native executable Rule/Profile merely because it exists in the source.
+
+If a non-abstract descendant inherits from an abstract source item, the
+descendant's native representation SHALL contain the effective inherited
+semantics needed for execution. The abstract ancestor MAY be omitted from
+scanner-facing native content after provenance has been preserved.
+
+### Hidden items
+
+XCCDF `hidden=true` is presentation metadata. A hidden Rule or Group may still
+participate in assessment and selection.
+
+Migration SHALL NOT interpret `hidden` as disabled, unselected,
+not-applicable, or informational. A native representation MAY preserve a
+presentation hint such as `presentation.hidden`, but that hint SHALL NOT alter
+Rule truth, selection, applicability, or scoring.
+
+### Cluster identifiers
+
+XCCDF `cluster-id` is a profile-authoring indirection that permits one Profile
+operation to target multiple Rules/Groups.
+
+Migration SHALL resolve every Profile selection/refinement that references a
+cluster to the exact member set for the bound Benchmark version. The resulting
+native Profile SHOULD express explicit stable Rule/Group decisions rather than
+requiring runtime cluster lookup.
+
+Cluster expansion SHALL preserve:
+
+- the exact Benchmark version against which membership was resolved;
+- every member affected by the source operation;
+- source operation order where later operations override earlier decisions;
+- provenance linking each expanded native decision to the source cluster and
+  Profile operation.
+
+A source cluster that resolves to no valid target, resolves ambiguously, or
+changes meaning because of unresolved inheritance SHALL be a migration
+diagnostic/blocker rather than being silently ignored.
+
+The source `cluster-id` MAY remain in migration provenance or authoring
+comments. It is not required as a native scanner-facing construct once all
+dependent Profile semantics have been expanded deterministically.
+
+
 <!-- spec-nav:start -->
 
 ---
