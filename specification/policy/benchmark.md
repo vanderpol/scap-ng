@@ -190,6 +190,49 @@ The value is an explicit source reference. No filename such as
 A Benchmark SHALL NOT rely on scanner-specific knowledge to resolve an
 applicability identifier.
 
+
+## Rule selection prerequisites and conflicts
+
+Rule/Group selection prerequisites SHALL preserve Boolean grouping explicitly.
+
+For native Rule source, `requires` is an ordered collection of requirement
+clauses. All clauses must be satisfied. Within one clause, any one referenced
+item is sufficient.
+
+Illustrative form:
+
+    requires:
+      - any_of:
+          - rule-a
+          - rule-b
+      - any_of:
+          - group-c
+
+is equivalent to:
+
+    (rule-a OR rule-b) AND group-c
+
+A scalar string MAY be used as shorthand for a one-member `any_of` clause
+during the pre-alpha authoring period.
+
+A producer SHALL NOT flatten multiple requirement clauses into one list because
+that changes the selection semantics.
+
+### XCCDF migration
+
+Each XCCDF `requires` element maps to one native requirement clause. The
+space-separated IDs within that source element map to the clause's `any_of`
+members. Multiple XCCDF `requires` elements remain separate clauses and are
+ANDed together.
+
+XCCDF `conflicts` references remain independent constraints requiring the
+referenced item to be unselected.
+
+Migration SHALL preserve the XCCDF processing-order rule: requires/conflicts
+are evaluated at their defined point in selection processing and SHALL NOT be
+re-evaluated later merely because subsequent processing changed another item's
+selection state.
+
 ## 7. Profiles
 
 Publisher-defined Profiles belong to the Benchmark policy publication.
