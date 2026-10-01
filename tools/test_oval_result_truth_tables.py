@@ -9,6 +9,7 @@ from oval_result_truth_tables import (
     aggregate_many_to_many, aggregate_state, aggregate_item_states,
     resolve_variable_reference, evaluate_variable_entity_reference,
     combine_set_flags, SET_FLAGS,
+    decisive_partial_check, decisive_partial_existence,
 )
 
 
@@ -215,6 +216,38 @@ class CollectedObjectControlFlow(unittest.TestCase):
     def test_invalid_flag_rejected(self):
         with self.assertRaises(ValueError):
             evaluate_collected_object_test("mystery", existence="at_least_one_exists")
+
+
+class EarlyTerminationSemantics(unittest.TestCase):
+    def test_check_quantifiers_only_stop_on_irreversible_outcomes(self):
+        self.assertEqual(decisive_partial_check("all", [TRUE, FALSE]), FALSE)
+        self.assertIsNone(decisive_partial_check("all", [TRUE, TRUE]))
+
+        self.assertEqual(decisive_partial_check("at least one", [FALSE, TRUE]), TRUE)
+        self.assertIsNone(decisive_partial_check("at least one", [FALSE, FALSE]))
+
+        self.assertEqual(decisive_partial_check("only one", [TRUE, TRUE]), FALSE)
+        self.assertIsNone(decisive_partial_check("only one", [TRUE]))
+
+        self.assertEqual(decisive_partial_check("none satisfy", [FALSE, TRUE]), FALSE)
+        self.assertIsNone(decisive_partial_check("none satisfy", [FALSE, FALSE]))
+
+    def test_existence_quantifiers_only_stop_on_irreversible_outcomes(self):
+        self.assertEqual(decisive_partial_existence("at_least_one_exists", exists=1), TRUE)
+        self.assertIsNone(decisive_partial_existence("at_least_one_exists", exists=0))
+
+        self.assertEqual(decisive_partial_existence("none_exist", exists=1), FALSE)
+        self.assertIsNone(decisive_partial_existence("none_exist", exists=0))
+
+        self.assertEqual(decisive_partial_existence("only_one_exists", exists=2), FALSE)
+        self.assertIsNone(decisive_partial_existence("only_one_exists", exists=1))
+
+        self.assertIsNone(decisive_partial_existence("all_exist", exists=1))
+        self.assertIsNone(decisive_partial_existence("any_exist", exists=1))
+
+    def test_error_like_observations_do_not_create_new_shortcuts(self):
+        self.assertIsNone(decisive_partial_check("all", [TRUE, ERROR]))
+        self.assertIsNone(decisive_partial_check("at least one", [FALSE, UNKNOWN]))
 
 
 class SetFlagPropagation(unittest.TestCase):
