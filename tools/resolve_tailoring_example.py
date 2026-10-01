@@ -24,8 +24,12 @@ def load(path, kind):
 def validate_value(parameter, value):
     kind=parameter['type']; constraints=parameter.get('constraints') or {}
     types={'integer':int,'boolean':bool,'string':str,'list':list,'record':dict}
-    if kind not in types or type(value) is not types[kind]: raise ValueError('Parameter type mismatch: '+parameter['id'])
-    if kind=='integer' and not constraints.get('minimum',value)<=value<=constraints.get('maximum',value):
+    if kind=='number':
+        if type(value) not in (int,float):
+            raise ValueError('Parameter type mismatch: '+parameter['id'])
+    elif kind not in types or type(value) is not types[kind]:
+        raise ValueError('Parameter type mismatch: '+parameter['id'])
+    if kind in ('integer','number') and not constraints.get('minimum',value)<=value<=constraints.get('maximum',value):
         raise ValueError('Parameter out of range: '+parameter['id'])
     if kind=='string' and len(value)>constraints.get('max_length',len(value)): raise ValueError('Parameter too long')
     if kind=='list':
