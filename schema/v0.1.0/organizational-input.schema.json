@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/organizational-input.schema.json",
+  "title": "SCAP-NG Organizational Input Set v0.1.0 draft",
+  "description": "External organization-supplied policy data for Parameters intentionally left unresolved by a Benchmark publisher.",
+  "type": "object",
+  "required": [
+    "organizational_input"
+  ],
+  "properties": {
+    "organizational_input": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "purpose",
+        "benchmark",
+        "values",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "benchmark": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "intended_scope": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Descriptive intended scope only. It does not cause implicit selection or application.",
+          "properties": {
+            "organization": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ]
+            },
+            "organizational_unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "system_or_environment": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "values": {
+          "type": "object",
+          "description": "Parameter ID to supplied typed value. Parameter type/cardinality/constraints are authoritative in the Benchmark.",
+          "minProperties": 1,
+          "additionalProperties": true
+        },
+        "value_provenance": {
+          "type": "object",
+          "description": "Optional per-Parameter provenance when values have different authorities or sources.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "effective_from": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "organization",
+            "supplied_by",
+            "supplied_at",
+            "authorization_status"
+          ],
+          "properties": {
+            "organization": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ]
+            },
+            "supplied_by": {
+              "type": [
+                "string",
+                "object"
+              ],
+              "description": "Person, service, or authoritative system that supplied the Input Set."
+            },
+            "supplied_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "source_system": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ]
+            },
+            "authorized_by": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ]
+            },
+            "authorized_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "authorization_reference": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "authorization_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "contact": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
