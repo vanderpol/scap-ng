@@ -456,7 +456,7 @@ def main(argv=None):
                    'platform':{'id':args.platform_id,'title':args.platform_title,
                                'applicability':{'operator':'any','conditions':[app_ids[n.get('idref').lstrip('#')] for n in xr.findall('x:platform',source.NS) if app_ids.get(n.get('idref').lstrip('#'))]}},
                    'applicability_catalog':'applicability.yaml','scoring':source.benchmark_scoring(xr),
-                   'parameters':[],'default_selection':next(iter(baseline.values())),
+                   'parameters':parameters,'default_selection':next(iter(baseline.values())),
                    'groups':groups,'profiles':profiles,'rules':[r['id'] for r in rs]}
         review.write_yaml(args.output/'benchmark.yaml',{'benchmark':benchmark})
         review.write_yaml(args.output/'applicability.yaml',{'applicability':{'id':args.benchmark_id+'.applicability','conditions':registry}})
