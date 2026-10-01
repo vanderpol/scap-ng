@@ -142,7 +142,44 @@
           "type": "string"
         },
         "inputs": {
-          "type": "array"
+          "type": "object",
+          "description": "Named typed input contracts declared by the Assessment. Policy-layer bindings are supplied by the referring Rule/Assessment selection, not hard-coded here.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "datatype",
+              "cardinality",
+              "required"
+            ],
+            "properties": {
+              "datatype": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cardinality": {
+                "type": "string",
+                "enum": [
+                  "one",
+                  "zero_or_one",
+                  "one_or_more",
+                  "zero_or_more"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "constraints": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": true
+          }
         },
         "evidence": {
           "type": "array"
@@ -163,9 +200,7 @@
           },
           "then": {
             "required": [
-              "procedure",
-              "inputs",
-              "evidence"
+              "procedure"
             ]
           }
         },
