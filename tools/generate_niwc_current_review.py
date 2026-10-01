@@ -46,10 +46,16 @@ def source_identity(path: Path):
                 path.stem,
             )
             source_id = benchmark.get("id") or path.stem
+            # Native identities must not inherit XCCDF serialization names.
+            # Derive a stable clean identity from the published artifact name,
+            # while retaining the original XCCDF Benchmark ID in provenance.
+            artifact_base = re.sub(r"^U_", "", path.stem)
+            artifact_base = re.sub(r"_V\\d+R\\d+.*$", "", artifact_base)
+            native_base = safe(artifact_base)
             return {
                 "source_benchmark_id": source_id,
-                "benchmark_id": "niwc." + safe(source_id),
-                "platform_id": "source." + safe(source_id),
+                "benchmark_id": "niwc." + native_base,
+                "platform_id": "product." + native_base,
                 "platform_title": title,
                 "title": title,
             }
