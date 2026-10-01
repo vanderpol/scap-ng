@@ -203,6 +203,85 @@ a standardized class.
 Research implementations MAY experiment with the concept only when clearly
 marked as non-conformant/experimental.
 
+
+## Assessment-result dependencies
+
+An automated Assessment MAY statically declare another Assessment as a
+dependency and consume that dependent Assessment's final result within its
+`evaluate` expression.
+
+This is a first-class Assessment composition mechanism. It is distinct from:
+
+- sharing or importing collected Items;
+- reusing an Object collection execution;
+- policy-layer Rule applicability;
+- conditional `if/then/else` syntax.
+
+A dependent Assessment result SHALL be usable as an ordinary logical leaf in
+the consuming Assessment's evaluation tree. A consumer SHALL NOT be required
+to duplicate the dependency's Tests, Objects, States, Variables, or collection
+logic.
+
+Illustrative source form:
+
+    assessment:
+      dependencies:
+        server_role:
+          assessment: ../applicability/server-role.assessment.yaml
+          expected_id: example.server-role
+          expected_version: 1
+          purpose: applicability
+
+      evaluate:
+        all:
+          - assessment: server_role
+          - test: local-setting-correct
+
+The exact final `evaluate` serialization remains subject to schema
+stabilization. The semantic contract is normative:
+
+1. Every dependency SHALL be statically declared in signed/validated source.
+2. Source references SHALL resolve deterministically during compilation.
+3. The compiled package SHALL bind the dependency to immutable Assessment
+   identity/version/content.
+4. A dependency graph SHALL be acyclic. Cycles SHALL fail validation rather
+   than being resolved by runtime recursion limits.
+5. The dependent Assessment's complete result domain SHALL be preserved.
+   `error`, `unknown`, `not_evaluated`, and `not_applicable` SHALL NOT
+   be silently coerced to Boolean false.
+6. If a dependency invocation with the same target and effective bindings is
+   already available in the execution graph, a processor SHOULD reuse that
+   result rather than execute it again.
+7. Result reuse SHALL NOT erase provenance. The consuming Assessment Result
+   SHALL identify the dependency execution/result it consumed.
+8. An Assessment-result dependency SHALL NOT implicitly import the dependent
+   Assessment's Items into the consumer. Item/collection reuse is a separate
+   mechanism with separate provenance and completeness rules.
+
+### OVAL `extend_definition` migration
+
+OVAL 5.12.3 `extend_definition` maps to an Assessment-result dependency plus a
+leaf reference in the native `evaluate` tree.
+
+Migration SHALL preserve:
+
+- the referenced Definition identity;
+- the position of the reference within the criteria tree;
+- surrounding criteria operators and nesting;
+- `negate` semantics;
+- the full result-domain behavior of the referenced Definition;
+- source provenance.
+
+Migration SHALL NOT inline the referenced Definition merely to avoid an
+Assessment dependency when doing so would duplicate semantics, lose reusable
+identity, change evaluation/result provenance, or obscure the original graph.
+
+OVAL `applicability_check` on an `extend_definition`, `criterion`, or
+`criteria` node is a separate applicability semantic marker and SHALL NOT be
+discarded merely because the referenced Definition has been represented as an
+Assessment dependency. Its exact native migration is defined with the
+applicability model.
+
 ## 5. Automated semantics
 
 Automated Assessments SHALL make behavior-affecting cardinality, existence, and
