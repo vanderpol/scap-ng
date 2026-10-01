@@ -205,6 +205,35 @@ Objects and States SHOULD be independently named in native Assessment source.
 Stable local identities support reuse, filters, result-to-source traceability,
 semantic comparison, and generated capability schemas.
 
+Objects and States MAY instead be embedded directly within a Test when they
+are private to that Test and are not referenced elsewhere.
+
+For embedded/private nodes, containment defines scope and identity. An embedded
+Object or State SHALL NOT require an authored ID solely to support execution or
+result reporting. A node that must be referenced outside its containing Test
+SHALL be promoted to a named Object or State.
+
+This yields the following authoring principle:
+
+> **Containment implies private scope; IDs imply referenceable scope.**
+
+A conforming normalizer MAY inline a named Object or State when it can prove
+that the node is used only by one Test and is not independently referenced by a
+Variable, set, filter, other Test, or other dependency. Such normalization
+SHALL preserve evaluation semantics and migration provenance.
+
+Likewise, a conforming normalizer MAY promote equivalent private inline nodes
+to named reusable nodes when reuse is established. The normalizer SHALL NOT
+infer reuse solely from similar human-readable titles.
+
+Migration evidence SHALL preserve the source identity of an inlined legacy
+node, including its source OVAL Object or State identity where available, even
+when that identity is no longer exposed as a native authored ID.
+
+Assessment Results MAY identify private inline nodes by deterministic structural
+identity derived from the containing Test; an authored node ID SHALL NOT be
+required merely for result traceability.
+
 Filters are part of Object semantics. The Item population participating in a
 Test is the effective population after Object selection, set operations, and
 filters. A scanner MAY implement filtering during collection/query planning and
