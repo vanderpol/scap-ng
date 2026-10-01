@@ -1,0 +1,80 @@
+name: Inventory XCCDF valid conversion gaps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/inventory_xccdf_valid_gaps.py
+      - .github/workflows/inventory-xccdf-valid-gaps.yml
+
+permissions:
+  contents: write
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inventory pinned Current source
+        run: |
+          python scap-ng/tools/inventory_xccdf_valid_gaps.py             niwc/Current             --output evidence/xccdf-valid-gap-inventory.json
+      - name: Summarize for review
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc=json.loads(Path("evidence/xccdf-valid-gap-inventory.json").read_text())
+          lines=[
+              "# XCCDF valid conversion-gap inventory",
+              "",
+              f"Pinned NIWC revision: {__import__('os').environ['NIWC_REVISION']}",
+              "",
+              "This report inspects original SCAP 1.4 ZIPs directly. No generated NG content is used.",
+              "",
+              "## Summary",
+          ]
+          for key,value in doc["summary"].items():
+              lines.append(f"- {key}: **{value}**")
+          lines += ["","## Packages with XCCDF Value or direct CPE"]
+          for row in doc["packages"]:
+              lines.append(
+                  f"- {row['artifact']}: Values={row['value_count']}, "
+                  f"Profile value actions={row['profile_value_action_count']}, "
+                  f"direct CPE={len(row['direct_cpe_platforms'])}"
+              )
+          Path("evidence/README.md").write_text("\n".join(lines)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xccdf-valid-gap-inventory
+          path: evidence
+          if-no-files-found: error
+      - name: Publish compact evidence
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          dst="research/iterations/003/evidence/xccdf-valid-gap-inventory"
+          rm -rf "$dst"
+          mkdir -p "$dst"
+          cp ../evidence/* "$dst"/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$dst"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Publish XCCDF valid-gap inventory"
+          git pull --rebase origin main
+          git push
