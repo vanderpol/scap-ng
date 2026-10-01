@@ -1,4 +1,4 @@
-"""Current Collection/Test grammar must preserve distinct OVAL quantifiers."""
+"""Current OVAL-aligned Test/Object/State grammar must preserve distinct OVAL quantifiers."""
 import sys
 from pathlib import Path
 import tempfile
@@ -10,11 +10,13 @@ from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from check_current_authoring_contract import violations
+from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 
 class CurrentQuantifiers(unittest.TestCase):
     def roundtrip(self, root):
         native, error = lower_definition(root, "oval:example:def:1", "current-quantifiers", collection_graph=True)
         self.assertIsNone(error)
+        native = align_assessment_vocabulary(native)
         self.assertEqual(violations(native), [])
         regenerated, rid = build(native)
         with tempfile.TemporaryDirectory() as tmp:
