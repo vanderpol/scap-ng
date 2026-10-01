@@ -80,7 +80,7 @@ Each entry captures (a) discovery, (b) required normative direction or candidate
 
 **Discovery:** many failures are 'item exists when prohibited' or 'required item absent'. Source `check_existence`, `check`, `var_check`, `entity_check` have different scopes and defaults. Existence-only Tests can lack a State entirely.
 
-**Specification:** each scope SHALL be explicit with well-defined defaults and truth tables, including none_exist and at_least_one_exists. Structured failure reasons SHOULD distinguish unexpected existence, missing expected items, mismatched values and collection errors. Evidence cap/early stop MAY limit records but SHALL NOT alter truth conditions.
+**Specification:** each scope SHALL be explicit with well-defined defaults and truth tables, including none_exist and at_least_one_exists. Structured failure reasons SHOULD distinguish unexpected existence, missing expected items, mismatched values and collection errors. Evidence cap/early stop MAY limit records but SHALL NOT alter truth conditions. Collected-object lookup SHALL bind the full legacy identity tuple required by OVAL System Characteristics (`object id`, `version`, and `variable_instance`, defaulting the legacy instance to 1 when omitted). A missing matching collected-object record maps to `unknown`; duplicate exact identities are invalid input and SHALL NOT be resolved by arbitrary ordering.
 
 **Proof:** zero/one/many results with States absent/present, each quantifier, unknown/error, early-stop effects.
 
