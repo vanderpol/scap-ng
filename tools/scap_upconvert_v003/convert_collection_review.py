@@ -21,6 +21,7 @@ from scap_upconvert_v003.build_rhel9_review_slice import (
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare, OD
 from check_current_authoring_contract import violations
+from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 import yaml
 
 def source_benchmark(package):
@@ -199,18 +200,23 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None):
                 })
                 continue
             failed=True; result['assessments'].append({'status':'blocked','error':error}); continue
-        errors=violations(native)
-        if errors: raise ValueError('Current vocabulary guard: '+str(errors))
+        # Round-trip the semantic intermediate before presentation vocabulary
+        # alignment so legacy parity evidence remains independent of the native
+        # naming decision.
         tree,new_id=build(native); schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
         regenerated=Path(temp_root)/(rid+'-'+aid.replace('.','-')+'.xml'); tree.write(regenerated,encoding='utf-8')
         parity=compare(original_path,regenerated,did,new_id,root_only=True)
         if not parity['equal']:
             failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
+        native=align_assessment_vocabulary(native)
+        errors=violations(native)
+        if errors: raise ValueError('Current vocabulary guard: '+str(errors))
         ref='assessments/automated/'+aid+'.assessment.yaml'
         write_yaml(output/ref,native); done[did]=ref; result['selectors'][selector]=ref
         result['assessments'].append({'status':'representation_comparator_equal','path':ref,
             'source_graph_bindings':provenance,'tests':len(native['assessment']['tests']),
-            'collections':len(native['assessment']['collections']),
+            'objects':len(native['assessment']['objects']),
+            'states':len(native['assessment'].get('states',{})),
             'variables':len(native['assessment'].get('variables',{})),'reverse_omni_schema_valid':True})
     if deprecated_selector_fallbacks:
         manual_ref=result['selectors'].get('manual') or (next(iter(manual_done.values())) if manual_done else None)
@@ -331,21 +337,23 @@ def main(argv=None):
                         })
                         continue
                     failed=True;result['assessments'].append({'status':'blocked','error':error});continue
-                errors=violations(native)
-                if errors:raise ValueError('Current vocabulary guard: '+str(errors))
                 tree,new_id=build(native)
                 schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
                 regenerated=Path(tmp)/(rid+'.xml');tree.write(regenerated,encoding='utf-8')
                 parity=compare(original_path,regenerated,did,new_id,root_only=True)
                 if not parity['equal']:
                     failed=True;result['assessments'].append({'status':'blocked','parity':parity});continue
+                native=align_assessment_vocabulary(native)
+                errors=violations(native)
+                if errors:raise ValueError('Current vocabulary guard: '+str(errors))
                 ref='assessments/automated/'+aid+'.assessment.yaml'
                 write_yaml(args.output/ref,native)
                 done[did]=ref;result['selectors'][selector]=ref
                 result['assessments'].append({'status':'representation_comparator_equal',
                     'path':ref,'source_graph_bindings':provenance,
                     'tests':len(native['assessment']['tests']),
-                    'collections':len(native['assessment']['collections']),
+                    'objects':len(native['assessment']['objects']),
+                    'states':len(native['assessment'].get('states',{})),
                     'variables':len(native['assessment'].get('variables',{})),
                     'reverse_omni_schema_valid':True})
             if deprecated_selector_fallbacks:
