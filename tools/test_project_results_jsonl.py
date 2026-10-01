@@ -274,6 +274,8 @@ class ProjectionTests(unittest.TestCase):
                      schemaLocation="oval-results-schema.xsd"/>
           <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"
                      schemaLocation="unix-system-characteristics-schema.xsd"/>
+          <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+                     schemaLocation="unix-definitions-schema.xsd"/>
         </xs:schema>"""
         wrapper_doc=etree.fromstring(
             wrapper.encode("utf-8"),
@@ -291,6 +293,7 @@ class ProjectionTests(unittest.TestCase):
             "oval-res":"http://oval.mitre.org/XMLSchema/oval-results-5",
             "oval-sc":"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5",
             "unix-sc":"http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix",
+            "unix-def":"http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
         }
         self.assertEqual(
             "false",
@@ -316,6 +319,26 @@ class ProjectionTests(unittest.TestCase):
                     namespaces=ns,
                 )
                 self.assertEqual(expected, actual)
+
+        required_permissions={
+            "uread":"true","uwrite":"true","uexec":"false",
+            "gread":"true","gwrite":"false","gexec":"false",
+            "oread":"true","owrite":"false","oexec":"false",
+        }
+        for name, expected in required_permissions.items():
+            with self.subTest(required_permission=name):
+                actual=oval_nodes[0].xpath(
+                    f"string(.//unix-def:file_state/unix-def:{name})",
+                    namespaces=ns,
+                )
+                self.assertEqual(expected, actual)
+        self.assertEqual(
+            "0",
+            oval_nodes[0].xpath(
+                "string(.//unix-def:file_state/unix-def:user_id)",
+                namespaces=ns,
+            ),
+        )
 
 
     def test_issue21_rule_message_matches_detailed_observation(self):
