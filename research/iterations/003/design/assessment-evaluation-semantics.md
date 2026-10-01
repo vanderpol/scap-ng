@@ -234,7 +234,19 @@ Current focused executable evidence:
 
 Representation round-trip evidence is necessary but does not prove target-runtime equivalence.
 
-## 13. Unresolved items
+## 13. Sensitive-value redaction versus OVAL `mask`
+
+A pinned corpus census on 2026-10-01 scanned 212 source files across NIWC Current and SCAP Self-Assertion, including XML inside package ZIPs, and found **zero source-explicit OVAL `mask` attributes**. XSD-inherited `mask=false` was intentionally excluded from the census.
+
+SCAP-NG therefore SHALL NOT expose a generic OVAL-compatible `mask` property on every native Object/State entity merely because the legacy base type carried that attribute.
+
+Where a capability can collect sensitive values, SCAP-NG SHOULD provide an explicit **sensitive-result/evidence redaction** mechanism tied to disclosure of collected evidence rather than to generic comparison syntax. Such a mechanism SHALL NOT alter collection, comparison, or Assessment truth semantics.
+
+Migration tooling SHALL preserve source provenance if explicit legacy `mask` usage is encountered outside the pinned corpus and SHALL diagnose unsupported semantics rather than silently dropping it.
+
+Evidence: GitHub Actions run 36931308817, source-explicit mask census; 212 files scanned, 0 explicit occurrences, 0 scan failures.
+
+## 14. Unresolved items
 
 These remain open and SHALL NOT be silently guessed:
 
