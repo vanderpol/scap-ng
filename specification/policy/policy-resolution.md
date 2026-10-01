@@ -13,7 +13,7 @@ An Assessment Request identifies:
 - an exact compiled Benchmark package;
 - optionally, one publisher Profile;
 - optionally, one Tailoring artifact compatible with that Benchmark/Profile;
-- required Organizational Input values or references.
+- required Organizational Input values or references, each explicitly bound to the request.
 
 A scanner SHALL NOT choose a Profile or Tailoring artifact implicitly based on
 filename, directory, target identity, or local implementation convention.
@@ -27,16 +27,44 @@ A processor SHALL conceptually resolve policy in this order:
 3. resolve the selected publisher Profile and its ancestors;
 4. apply Profile Rule deselections and publisher Parameter bindings;
 5. resolve and apply Tailoring layers;
-6. bind Organizational Input and other authorized run-time policy data;
-7. freeze the effective Rule-selection and Parameter state for the run;
-8. evaluate the Benchmark Platform expression;
-9. for each effectively selected Rule, evaluate its Rule applicability
+6. resolve explicitly bound Organizational Input Sets and other authorized run-time policy data;
+7. validate every supplied value against the bound Benchmark Parameter declaration;
+8. freeze the effective Rule-selection, Assessment-selection, Parameter, and Organizational Input state for the run;
+9. evaluate the Benchmark Platform expression;
+10. for each effectively selected Rule, evaluate its Rule applicability
    expression;
-10. execute the applicable Rule's selected Assessment Method(s);
-11. emit results that identify the resolved policy state used.
+11. execute the applicable Rule's selected Assessment Method(s);
+12. emit results that identify the resolved policy state used.
 
 An implementation MAY optimize this processing order internally, but such
 optimization SHALL NOT change observable semantics.
+
+## Explicit Organizational Input binding
+
+An Organizational Input Set SHALL be applied only when it is explicitly bound
+by the Assessment Request or by an external orchestration system that produces
+an equivalent explicit request.
+
+A scanner SHALL NOT infer or select an Organizational Input Set from:
+
+- target hostname or address;
+- target inventory;
+- organization or intended-scope metadata;
+- filenames or directory layout;
+- ambient environment variables;
+- local scanner convention.
+
+Intended-scope metadata MAY assist operators and orchestration systems, but it
+does not itself bind policy data to a run.
+
+A bound Input Set SHALL identify the exact Benchmark identity/version for which
+its values were authored. A mismatch SHALL fail policy resolution.
+
+When a required organization-resolved Parameter is still unresolved after all
+explicitly bound inputs have been processed, dependent Assessments SHALL be
+reported `not_evaluated` (or the final standardized equivalent) with a
+structured `missing_organizational_input` reason rather than pass, fail, or
+not-applicable.
 
 ## 3. Selection before applicability
 
