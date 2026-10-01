@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from lxml import etree
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 
@@ -164,6 +166,36 @@ class ProjectionTests(unittest.TestCase):
         actual="\n".join(jsonl_lines(events))+"\n"
         expected=(fixture/"expected.jsonl").read_text()
         self.assertEqual(expected, actual)
+
+
+    def test_matched_scap14_arf_is_schema_valid(self):
+        fixture=ROOT/"research/iterations/003/results/issue21"
+        schema_path=ROOT/"third_party/scap-1.4-schemas/asset-reporting-format_1.1.0.xsd"
+        schema=etree.XMLSchema(etree.parse(str(schema_path)))
+        doc=etree.parse(str(fixture/"matched-scap14.arf.xml"))
+        schema.assertValid(doc)
+
+        ns={
+            "arf":"http://scap.nist.gov/schema/asset-reporting-format/1.1",
+            "xccdf":"http://checklists.nist.gov/xccdf/1.2",
+        }
+        rules=doc.xpath("//xccdf:rule-result", namespaces=ns)
+        self.assertEqual(1, len(rules))
+        self.assertEqual("rule-file-mode", rules[0].get("idref"))
+        self.assertEqual("fail", rules[0].find("xccdf:result", ns).text)
+
+    def test_size_comparison_inputs_exist(self):
+        fixture=ROOT/"research/iterations/003/results/issue21"
+        paths=[
+            fixture/"matched-scap14.arf.xml",
+            fixture/"scan-result.json",
+            fixture/"benchmark-result.json",
+            fixture/"expected.jsonl",
+            ROOT/"research/iterations/003/results/issue40/rhel9-file-mode-fail.result.json",
+        ]
+        for path in paths:
+            with self.subTest(path=path.name):
+                self.assertGreater(path.stat().st_size, 0)
 
 
 if __name__=="__main__":
