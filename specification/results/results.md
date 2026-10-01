@@ -206,13 +206,16 @@ This SHOULD include, as applicable:
 - important publisher identifiers;
 - title;
 - severity;
+- effective scoring weight when defined;
 - outcome;
 - concise deterministic message;
 - structured failure reason;
 - decisive `observed_state` for machine-readable observed-versus-required comparison when applicable;
 - bounded evidence;
 - Assessment mode;
-- effective check selector and Assessment Method identity;
+- effective check selector and Assessment Method identity/version;
+- effective Parameters materially relevant to the Rule;
+- applicability disposition and supporting applicability-result references when applicable;
 - `expected_state`, always present;
 - Tailoring and Organizational Input provenance where relevant.
 
@@ -482,9 +485,10 @@ At minimum, a standalone Rule event SHOULD expose:
 - stable target reference plus useful target identifiers/hostname;
 - Benchmark identity/version and executed package digest when available;
 - effective Profile and Tailoring identity when applicable;
-- Rule identity, title, severity, outcome, and deterministic message;
+- Rule identity, title, severity, effective weight, outcome, and deterministic message;
 - structured reason, expected state, and decisive observed state when applicable;
-- selected Assessment identity and Rule-result instance(s);
+- effective check selector, relevant Parameters, and applicability disposition;
+- selected Assessment identity/version and Rule-result instance(s);
 - references to detailed Assessment Result/evidence rather than embedding the
   complete detailed execution graph;
 - source signed-result/manifest identity or verification status when the
