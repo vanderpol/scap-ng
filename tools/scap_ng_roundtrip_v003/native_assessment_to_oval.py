@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 
+from scap_upconvert_v003.assessment_oval_vocabulary import legacy_intermediate_vocabulary
+
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 OC = "http://oval.mitre.org/XMLSchema/oval-common-5"
 XSI = "http://www.w3.org/2001/XMLSchema-instance"
@@ -588,6 +590,9 @@ class Builder:
         return ET.ElementTree(self.root), did
 
 def build(document):
+    # The emitter still uses the established semantic intermediate internally.
+    # Convert authoritative OVAL-aligned authored source only at this boundary.
+    document = legacy_intermediate_vocabulary(document)
     builder = Builder(document)
     return builder.build()
 
