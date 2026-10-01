@@ -1,26 +1,53 @@
-# Parameters, Tailoring Values, and Organizational Input
+# Parameters and Organizational Input
 
 **Status:** pre-alpha normative draft
 
 ## 1. Parameter
 
-A Parameter represents typed policy data.
+A Parameter represents typed policy data that exists independently of any one Assessment execution.
+
+SCAP-NG does **not** retain XCCDF `Value` as a native construct. Valid XCCDF
+`Value` content is migrated into Parameters and policy/input bindings.
 
 A Parameter SHALL define:
 
 - stable semantic identity;
 - data type;
 - human-readable description;
-- whether the value is publisher-defined or organization-defined;
+- whether resolution is publisher-defined or organization-defined;
 - publisher value/default when one exists;
+- cardinality;
 - validation constraints needed to determine whether a supplied value is
   valid.
 
 SCAP-NG SHALL NOT restrict Parameters to a single text string.
 
-The type system SHOULD support scalar and structured values needed by real
-policy, including strings, booleans, numbers, versions, paths as data values,
-collections, and structured records.
+The type system SHOULD support the typed values and cardinalities legitimately
+needed as Assessment inputs, including strings, booleans, numbers, versions,
+paths as data values, lists/sets, and structured records. Parameter typing
+SHOULD align with the Assessment input type system rather than creating a
+separate XCCDF-compatible type island.
+
+## Parameter versus Assessment Variable
+
+A Parameter and an Assessment Variable are different concepts.
+
+A **Parameter** is policy-layer data resolved before Assessment execution. Its
+effective value may come from the Benchmark publisher, a publisher Profile,
+Tailoring, Organizational Input, an API, or interactive input according to the
+rules below.
+
+An **Assessment Variable** is part of the Assessment's executable/dataflow graph
+and may derive values from literals, other Variables, Objects/Items, functions,
+or explicitly bound external inputs.
+
+An Assessment SHALL consume a Parameter only through an explicit typed input
+binding. Binding a Parameter to an Assessment Variable or other declared input
+SHALL NOT make the Parameter part of the executable Assessment graph.
+
+Policy resolution SHALL freeze effective Parameter values before ordinary
+Assessment execution. Assessment execution SHALL NOT mutate the effective
+policy Parameter value.
 
 ## 2. Tailoring versus Organizational Input
 
@@ -36,6 +63,21 @@ tailored.
 
 A user SHALL NOT be required to create a Tailoring artifact merely to provide
 required Organizational Input.
+
+## Publisher Profile Parameter refinement
+
+A publisher Profile MAY resolve a publisher-defined Parameter differently from
+the Benchmark baseline, including selecting a different publisher value and,
+when required by migrated semantics, a different publisher-defined validation
+constraint set.
+
+Only publisher-controlled Benchmark/Profile layers MAY alter Parameter
+constraints. Tailoring and Organizational Input SHALL provide values within the
+effective constraints and SHALL NOT redefine datatype, cardinality, bounds,
+patterns, allowed values, or other validation semantics.
+
+This rule provides the native target for legacy XCCDF `refine-value` semantics
+without retaining XCCDF selector machinery as a native language feature.
 
 ## 3. Assessment input binding
 
@@ -77,6 +119,35 @@ bind any Tailoring and Organizational Input needed for that run.
 
 Organizational Input MAY be embedded in the request or referenced from a
 separately managed input set.
+
+## XCCDF Value migration
+
+Valid XCCDF 1.2 `Value` semantics SHALL be migrated without requiring a native
+XCCDF-style Value object.
+
+The migration mapping is:
+
+- XCCDF `Value` -> SCAP-NG Parameter;
+- unselected/base XCCDF value -> Benchmark Parameter value/default;
+- XCCDF datatype and constraints -> Parameter datatype/cardinality/constraints;
+- `prohibitChanges=true` -> non-tailorable Parameter;
+- `check-export` -> explicit typed Assessment input binding;
+- Profile `set-value` / `set-complex-value` -> publisher Profile Parameter
+  value binding;
+- Profile `refine-value` -> resolved publisher Profile Parameter value and
+  effective constraint set;
+- Tailoring value changes -> Tailoring Parameter override when permitted.
+
+Legacy selector names and source IDs MAY be retained in migration provenance,
+but native execution SHALL depend on the resolved Parameter semantics rather
+than XCCDF selector tags.
+
+When an XCCDF cluster operation targets multiple Values, migration tooling SHALL
+resolve and expand the operation deterministically to the affected native
+Parameters while retaining provenance of the source cluster operation.
+
+A legacy construct that cannot be represented without loss SHALL fail migration
+explicitly rather than silently coercing the value.
 
 ## 7. Value provenance
 
