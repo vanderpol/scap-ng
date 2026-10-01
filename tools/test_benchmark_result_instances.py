@@ -57,7 +57,7 @@ def base_result():
             "rule_results": [{
                 "rule_id": "rule-1",
                 "outcome": "pass",
-                "assessment": {"id": "assessment-1"},
+                "assessment": {"id": "assessment-1", "version": 1, "mode": "automated"},
                 "message": "compliant",
                 "expected_state": [],
                 "instances": [{
