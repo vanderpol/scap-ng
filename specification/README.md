@@ -139,3 +139,45 @@ rationale.
 
 Publisher-specific vocabulary SHALL NOT be promoted into generic SCAP-NG
 terminology merely because it is common in one content ecosystem.
+
+
+## Native feature admission and simplification principle
+
+SCAP-NG SHALL NOT preserve a legacy SCAP/XCCDF/OVAL construct merely because
+the construct exists in an earlier specification or because a hypothetical
+future use can be imagined.
+
+A construct SHOULD become part of the native SCAP-NG model only when at least
+one of the following is true:
+
+- it preserves a demonstrated semantic requirement that cannot be represented
+  clearly by an existing native construct;
+- it is exercised by real content or realistic implementation/conformance use;
+- it is necessary for interoperability, portability, auditability, or
+  deterministic evaluation;
+- it materially improves authoring or implementation without creating
+  competing ways to express the same semantics.
+
+Legacy constructs that exist primarily for XML serialization, inheritance
+machinery, packaging indirection, historical compatibility, or speculative
+extensibility SHOULD be normalized away during migration when their effective
+meaning can be preserved directly.
+
+A converter MAY need to understand a legacy construct completely in order to
+migrate it losslessly. That requirement does **not** imply that the construct
+must survive as a native SCAP-NG feature.
+
+When deciding the disposition of a legacy feature, the project SHOULD classify
+it explicitly as one of:
+
+1. **retain** — the concept remains useful and substantially unchanged;
+2. **replace** — preserve the semantics using a simpler or more coherent native
+   construct;
+3. **normalize away** — resolve the legacy mechanism during migration and emit
+   only its effective meaning;
+4. **drop** — omit a genuinely obsolete, deprecated, harmful, or unjustified
+   feature, with the divergence documented.
+
+New native features SHOULD be justified by concrete content, implementation, or
+standards requirements rather than hypothetical use cases alone.
+
