@@ -10,14 +10,14 @@ one-Rule failed scan population.
 | Representation | Bytes | Scope |
 | --- | ---: | --- |
 | Minimal schema-valid SCAP 1.4 ARF/XCCDF result | 1,223 | Run/target/Rule policy result only; no detailed OVAL Results/System Characteristics payload. |
-| SCAP-NG JSONL projection | 2,138 | Self-contained scan-summary event plus self-contained Rule event. |
+| SCAP-NG JSONL projection | 2,281 | Self-contained scan-summary event plus self-contained Rule event. |
 | SCAP-NG canonical scan index | 1,064 | Normalized run/target/result references. |
-| SCAP-NG canonical Benchmark result | 2,584 | Benchmark/Rule result and policy-facing context. |
+| SCAP-NG canonical Benchmark result | 2,818 | Benchmark/Rule result and policy-facing context. |
 | SCAP-NG detailed Assessment result | 2,345 | Detailed Test/Object/Item/State evidence for the failed Rule. |
-| SCAP-NG canonical package members above, total | 5,993 | Detailed logical result for the same Rule. |
+| SCAP-NG canonical package members above, total | 6,227 | Detailed logical result for the same Rule. |
 
-For this deliberately tiny one-Rule sample, the JSONL projection is 915 bytes
-(about 74.8%) larger than the minimal XCCDF-only ARF. The detailed NG members are
+For this deliberately tiny one-Rule sample, the JSONL projection is 1,058 bytes
+(about 86.5%) larger than the minimal XCCDF-only ARF. The detailed NG members are
 larger still because they contain detailed evidence that the minimal ARF fixture
 does not.
 
@@ -45,10 +45,19 @@ bits equivalent to mode `0666`, with the Test/Definition outcome false.
 | Detailed representation | Bytes |
 | --- | ---: |
 | SCAP 1.4 ARF + XCCDF + OVAL Results/System Characteristics | 6,196 |
-| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 5,993 |
+| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 6,227 |
 
-For this deliberately tiny one-Rule detailed case, the normalized NG package is
-203 bytes, or about **3.3%**, smaller than the matched detailed ARF.
+For this deliberately tiny one-Rule detailed-observation case, the normalized NG package is
+31 bytes (about **0.5%**) larger than the current ARF fixture.
+
+However, this is **not yet a fully information-equivalent comparison**. The ARF
+fixture sets OVAL `include_source_definitions=false`; it carries the evaluated
+Definition/Test results and System Characteristics observation, but not the
+source OVAL Object/State that expresses the expected configuration. The NG Rule
+result carries `expected_state` directly. A fully self-contained ARF comparison
+therefore needs the source OVAL Definitions (or another equivalent representation
+of the expected state) before interpreting the raw-size ratio as a like-for-like
+root-cause report.
 
 This is a fixture result, not a general compression claim. Fixed overhead,
 number of Rules, amount of evidence, repeated context, projection choice, and
