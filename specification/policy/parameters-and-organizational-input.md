@@ -32,10 +32,10 @@ separate XCCDF-compatible type island.
 
 A Parameter and an Assessment Variable are different concepts.
 
-A **Parameter** is policy-layer data resolved before Assessment execution. Its
-effective value may come from the Benchmark publisher, a publisher Profile,
-Tailoring, Organizational Input, an API, or interactive input according to the
-rules below.
+A **Parameter** is policy-layer data resolved before Assessment execution. Its effective value may come from the Benchmark publisher, a publisher Profile,
+or—only when intentionally unresolved by the publisher—from Organizational
+Input, an API, or interactive input according to the rules below. Native
+Tailoring SHALL NOT override Parameter values.
 
 An **Assessment Variable** is part of the Assessment's executable/dataflow graph
 and may derive values from literals, other Variables, Objects/Items, functions,
@@ -53,7 +53,9 @@ policy Parameter value.
 
 SCAP-NG SHALL distinguish Tailoring from Organizational Input.
 
-**Tailoring** changes an already-resolved publisher policy decision.
+**Tailoring** changes only the native policy surfaces explicitly permitted by
+the Tailoring specification, such as Rule selection and published Assessment
+selection. It SHALL NOT replace an already-resolved publisher Parameter value.
 
 **Organizational Input** supplies expected policy state intentionally left
 unresolved by the publisher.
@@ -72,12 +74,35 @@ when required by migrated semantics, a different publisher-defined validation
 constraint set.
 
 Only publisher-controlled Benchmark/Profile layers MAY alter Parameter
-constraints. Tailoring and Organizational Input SHALL provide values within the
-effective constraints and SHALL NOT redefine datatype, cardinality, bounds,
-patterns, allowed values, or other validation semantics.
+constraints. Organizational Input SHALL provide values within the effective
+constraints and SHALL NOT redefine datatype, cardinality, bounds, patterns,
+allowed values, or other validation semantics. Tailoring SHALL NOT provide or
+override Parameter values.
 
 This rule provides the native target for legacy XCCDF `refine-value` semantics
 without retaining XCCDF selector machinery as a native language feature.
+
+## Publisher requirement versus organization-authored policy
+
+When a Benchmark publisher defines a concrete Parameter value as part of the
+requirement, that value is part of the publisher's policy. A native Tailoring
+artifact SHALL NOT substitute a different expected value while continuing to
+present the result as evaluation against the publisher's policy.
+
+If an organization intentionally adopts a different requirement, it SHALL
+publish or otherwise identify a distinct organization-authored policy/Benchmark
+(or a future standardized derived-policy artifact) with its own provenance and
+identity. Evaluation against that local policy is not a tailored evaluation of
+the unchanged publisher requirement.
+
+This preserves a simple audit rule: a result claiming evaluation against a
+publisher Benchmark/Profile uses that publisher's resolved Parameter values.
+Differences in expected values are visible as differences in policy identity,
+not hidden inside Tailoring.
+
+This rule does not apply when the publisher deliberately leaves the expected
+value unresolved for the organization. In that case, Organizational Input
+supplies the missing value without creating a different policy requirement.
 
 ## 3. Assessment input binding
 
@@ -88,9 +113,8 @@ Parameter values SHALL be usable only as policy/expected-state data.
 
 ## 4. Policy-data isolation
 
-Values supplied through a Benchmark, Profile, Tailoring artifact,
-Organizational Input set, interactive entry, API, or external input file SHALL
-NOT:
+Values supplied through a Benchmark, Profile, Organizational Input set,
+interactive entry, API, or external input file SHALL NOT:
 
 - select or replace an Assessment Method;
 - alter collection targets or collection behavior;
@@ -130,13 +154,13 @@ The migration mapping is:
 - XCCDF `Value` -> SCAP-NG Parameter;
 - unselected/base XCCDF value -> Benchmark Parameter value/default;
 - XCCDF datatype and constraints -> Parameter datatype/cardinality/constraints;
-- `prohibitChanges=true` -> non-tailorable Parameter;
+- `prohibitChanges` -> migration provenance describing whether legacy XCCDF permitted value mutation; native SCAP-NG does not use this flag to permit Tailoring Parameter overrides;
 - `check-export` -> explicit typed Assessment input binding;
 - Profile `set-value` / `set-complex-value` -> publisher Profile Parameter
   value binding;
 - Profile `refine-value` -> resolved publisher Profile Parameter value and
   effective constraint set;
-- Tailoring value changes -> Tailoring Parameter override when permitted.
+- legacy Tailoring value changes -> a distinct organization-authored policy/Benchmark (or an explicitly defined future derived-policy artifact), not a native Tailoring Parameter override.
 
 Legacy selector names and source IDs MAY be retained in migration provenance,
 but native execution SHALL depend on the resolved Parameter semantics rather
@@ -156,7 +180,7 @@ distinguish at least:
 
 - publisher Benchmark value;
 - publisher Profile value;
-- Tailoring override;
+- organization-authored policy value, when evaluating a separately published local Benchmark;
 - persistent Organizational Input;
 - interactive run-time input;
 - API/integration supplied input;
