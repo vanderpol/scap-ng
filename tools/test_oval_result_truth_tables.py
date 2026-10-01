@@ -7,9 +7,10 @@ from oval_result_truth_tables import (
     aggregate_check, aggregate_operator, aggregate_existence,
     evaluate_collected_object_test, evaluate_missing_collected_object_record,
     aggregate_many_to_many, aggregate_state, aggregate_item_states,
-    resolve_variable_reference, evaluate_variable_entity_reference,
-    combine_set_flags, SET_FLAGS,
+    resolve_variable_reference, apply_variable_reference_context,
+    evaluate_variable_entity_reference, combine_set_flags, SET_FLAGS,
     decisive_partial_check, decisive_partial_existence,
+    NO_VALUES, apply_filter_state_result,
 )
 
 
