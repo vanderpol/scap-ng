@@ -436,6 +436,49 @@ A scanner SHALL NOT assume that Assessment `true` universally means Rule
 layers.
 
 
+
+## Assessment invocation and effective input identity
+
+One Assessment Result represents exactly one Assessment invocation against one
+target and one effective input/binding set.
+
+If the same Assessment is evaluated more than once with different effective
+input values, each evaluation SHALL have a distinct `execution_id` and a
+distinct Assessment Result. Implementations SHALL NOT collapse such executions
+merely because the Assessment logical identity/version is identical.
+
+An automated Assessment Result SHOULD expose the effective named input bindings
+that materially affected that invocation. Each binding SHOULD identify:
+
+- the Assessment input name;
+- the effective typed value or protected/redacted representation;
+- the source of the value;
+- a source/provenance reference when applicable.
+
+A processor MAY additionally provide a deterministic binding-set identifier or
+digest to simplify reuse and correlation. Such an identifier SHALL be derived
+from the complete effective binding semantics needed to distinguish executions
+and SHALL NOT substitute for the actual provenance required by the result
+model.
+
+### OVAL `variable_instance` migration
+
+OVAL Results `variable_instance` differentiates repeated evaluations of a
+Definition, Test, or extended Definition when different variable values are
+supplied. Its default is instance `1`.
+
+SCAP-NG/standalone Assessment migration SHALL map semantically distinct OVAL
+variable instances to distinct Assessment invocations/results when the
+different bindings can affect evaluation. The source `variable_instance`
+number MAY be retained as migration provenance, but it SHALL NOT become the
+native semantic identity of an Assessment.
+
+Within one migrated invocation, Test/Assessment dependency references SHALL
+resolve to the result instance associated with the same effective source
+variable-binding context. A converter or result importer SHALL NOT join a Test
+from one variable instance to Items, Variables, or an extended Definition
+result from another instance.
+
 ## 15. Assessment Result file cardinality
 
 A canonical SCAP-NG result package SHALL produce one Assessment Result artifact
