@@ -147,5 +147,12 @@ class AssessmentResultComponentTests(unittest.TestCase):
         validate(doc, ASSESSMENT_SCHEMA)
 
 
+    def test_issue40_worked_result_fixtures_validate(self):
+        fixture_dir=ROOT/"research/iterations/003/results/issue40"
+        for path in sorted(fixture_dir.glob("*.result.json")):
+            with self.subTest(path=path.name):
+                validate(json.loads(path.read_text()), ASSESSMENT_SCHEMA)
+
+
 if __name__=="__main__":
     unittest.main()
