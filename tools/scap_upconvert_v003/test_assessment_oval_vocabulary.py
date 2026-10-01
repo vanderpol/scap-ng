@@ -84,6 +84,92 @@ class VocabularyAlignmentTests(unittest.TestCase):
             result["tests"]["test-two"]["states"],
         )
 
+    def test_effective_mask_false_is_omitted_from_native_authoring(self):
+        source = {
+            "assessment": {
+                "id": "a", "version": 1, "assessment_title": None,
+                "mode": "automated", "class": "compliance", "purpose": "assessment",
+                "collections": {
+                    "config-collection": {
+                        "collection_title": None,
+                        "capability": "unix.file",
+                        "select": {
+                            "filepath": {
+                                "value": "/etc/passwd",
+                                "operation": "equals",
+                                "datatype": "string",
+                                "mask": False,
+                            }
+                        },
+                    }
+                },
+                "tests": {
+                    "test-config": {
+                        "test_title": None,
+                        "capability": "unix.file",
+                        "collection": "config-collection",
+                        "assertion": {
+                            "existence": "at_least_one_exists",
+                            "item_quantifier": "all",
+                            "state_title": None,
+                            "state_capability": "unix.file",
+                            "state": {
+                                "field": "user_id",
+                                "value": "0",
+                                "operation": "equals",
+                                "datatype": "int",
+                                "mask": False,
+                            },
+                        },
+                    }
+                },
+                "evaluate": {"test": "test-config"},
+            }
+        }
+        result = align_assessment_vocabulary(source)["assessment"]
+        self.assertNotIn(
+            "mask",
+            result["objects"]["config-object"]["select"]["filepath"],
+        )
+        state_ref=result["tests"]["test-config"]["states"][0]
+        self.assertNotIn("mask", result["states"][state_ref]["state"])
+
+    def test_mask_true_fails_closed_until_redaction_mapping_exists(self):
+        source = {
+            "assessment": {
+                "id": "a", "version": 1, "assessment_title": None,
+                "mode": "automated", "class": "compliance", "purpose": "assessment",
+                "collections": {
+                    "secret-collection": {
+                        "collection_title": None,
+                        "capability": "unix.file",
+                        "select": {
+                            "filepath": {
+                                "value": "/etc/shadow",
+                                "operation": "equals",
+                                "datatype": "string",
+                                "mask": True,
+                            }
+                        },
+                    }
+                },
+                "tests": {
+                    "test-secret": {
+                        "test_title": None,
+                        "capability": "unix.file",
+                        "collection": "secret-collection",
+                        "assertion": {
+                            "existence": "at_least_one_exists",
+                            "item_quantifier": "all",
+                        },
+                    }
+                },
+                "evaluate": {"test": "test-secret"},
+            }
+        }
+        with self.assertRaisesRegex(ValueError, "redaction mapping"):
+            align_assessment_vocabulary(source)
+
     def test_alignment_round_trips_through_legacy_bridge(self):
         source = {
             "assessment": {
