@@ -30,6 +30,35 @@ def _fingerprint(value) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def _normalize_generic_mask(value):
+    """Remove effective mask=false from executable native entity payloads.
+
+    Source/default explicitness remains migration evidence in the semantic IR.
+    mask=true requires the pending narrow sensitive-result redaction mapping and
+    therefore fails closed instead of reintroducing OVAL's generic mask surface.
+    """
+    if isinstance(value, list):
+        return [_normalize_generic_mask(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+
+    out={}
+    for key,item in value.items():
+        if key=="mask":
+            normalized = item
+            if isinstance(item, str):
+                normalized=item.strip().lower()
+            if normalized in (False, 0, "false", "0"):
+                continue
+            if normalized in (True, 1, "true", "1"):
+                raise ValueError(
+                    "OVAL mask=true requires sensitive-result redaction mapping"
+                )
+            raise ValueError(f"unsupported OVAL mask value: {item!r}")
+        out[key]=_normalize_generic_mask(item)
+    return out
+
+
 def _replace_object_refs(value):
     """Rename intermediate Collection references to native Object references."""
     if isinstance(value, list):
@@ -186,8 +215,8 @@ def align_assessment_vocabulary(document: dict) -> dict:
 
     objects = promote_filters(objects)
 
-    assessment["objects"] = objects
-    assessment["states"] = states
+    assessment["objects"] = _normalize_generic_mask(objects)
+    assessment["states"] = _normalize_generic_mask(states)
 
     # Canonical presentation order is metadata, Objects, Variables, States,
     # Tests, evaluate. Mapping order is presentation-only.
