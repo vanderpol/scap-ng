@@ -588,7 +588,15 @@ def native_rule_identity(rule):
 def check_kind(check):
     selector = (check.get("selector") or "").strip().lower()
     system = (check.get("system") or "").lower()
-    if selector == "manual" or "ocil" in system or text(check.find("x:check-content", NS)):
+    # Selector/system semantics take precedence over presentation text.  In
+    # particular, an OVAL Check that references an OVAL Definition remains an
+    # automated Check even when the publisher also carries inline explanatory
+    # or fallback text in check-content.
+    if selector == "manual" or "ocil" in system:
+        return "manual"
+    if check.find("x:check-content-ref", NS) is not None:
+        return "automated"
+    if text(check.find("x:check-content", NS)):
         return "manual"
     return "automated"
 
