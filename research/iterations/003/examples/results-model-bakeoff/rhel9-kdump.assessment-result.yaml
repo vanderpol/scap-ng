@@ -1,0 +1,157 @@
+assessment_result:
+  result_schema_version: 0.1.0-draft
+  execution_id: example-rhel9-kdump-1
+
+  assessment:
+    source_oval_definition_id: oval:mil.disa.stig.defs:def:230310
+    version: 2
+    assessment_title: The operating system must disable kernel dumps unless needed.
+
+  class: compliance
+  purpose: assessment
+  mode: automated
+  outcome: false
+
+  completeness:
+    logical: true
+    population: true
+    evidence: true
+
+  evaluate_result:
+    operator: all
+    outcome: false
+    children:
+      - test: test-load-state
+        outcome: false
+      - test: test-unit-file-state
+        outcome: false
+      - test: test-active-state
+        outcome: false
+
+  tests:
+    - id: test-load-state
+      source_oval_test_id: oval:mil.disa.stig.linux:tst:23031000
+      test_title: kdump.service LoadState is masked if it exists.
+      capability: linux.systemdunitproperty
+      outcome: false
+      existence: any_exist
+      check: all
+      object_ref: object-load-state
+      state_refs: [state-masked]
+      item_refs: [item-1]
+      decisive_explanation:
+        reason: value_mismatch
+        actual: loaded
+        expected: masked
+        message: kdump.service LoadState is "loaded"; expected "masked".
+
+    - id: test-unit-file-state
+      source_oval_test_id: oval:mil.disa.stig.linux:tst:23031001
+      test_title: kdump.service UnitFileState is masked if it exists.
+      capability: linux.systemdunitproperty
+      outcome: false
+      existence: any_exist
+      check: all
+      object_ref: object-unit-file-state
+      state_refs: [state-masked]
+      item_refs: [item-2]
+      decisive_explanation:
+        reason: value_mismatch
+        actual: enabled
+        expected: masked
+        message: kdump.service UnitFileState is "enabled"; expected "masked".
+
+    - id: test-active-state
+      source_oval_test_id: oval:mil.disa.stig.linux:tst:23031002
+      test_title: kdump.service ActiveState is inactive if it exists.
+      capability: linux.systemdunitproperty
+      outcome: false
+      existence: any_exist
+      check: all
+      object_ref: object-active-state
+      state_refs: [state-inactive]
+      item_refs: [item-3]
+      decisive_explanation:
+        reason: value_mismatch
+        actual: active
+        expected: inactive
+        message: kdump.service ActiveState is "active"; expected "inactive".
+
+  objects:
+    - id: object-load-state
+      source_oval_object_id: oval:mil.disa.stig.linux:obj:23031000
+      capability: linux.systemdunitproperty
+      collection_status: complete
+      select:
+        unit: kdump.service
+        property: LoadState
+      item_refs: [item-1]
+
+    - id: object-unit-file-state
+      source_oval_object_id: oval:mil.disa.stig.linux:obj:23031001
+      capability: linux.systemdunitproperty
+      collection_status: complete
+      select:
+        unit: kdump.service
+        property: UnitFileState
+      item_refs: [item-2]
+
+    - id: object-active-state
+      source_oval_object_id: oval:mil.disa.stig.linux:obj:23031002
+      capability: linux.systemdunitproperty
+      collection_status: complete
+      select:
+        unit: kdump.service
+        property: ActiveState
+      item_refs: [item-3]
+
+  states:
+    - id: state-masked
+      source_oval_state_id: oval:mil.disa.stig.linux:ste:20000005
+      capability: linux.systemdunitproperty
+      expected:
+        value:
+          operation: equals
+          value: masked
+
+    - id: state-inactive
+      source_oval_state_id: oval:mil.disa.stig.linux:ste:20000007
+      capability: linux.systemdunitproperty
+      expected:
+        value:
+          operation: equals
+          value: inactive
+
+  items:
+    - id: item-1
+      source_item_id: "29"
+      capability: linux.systemdunitproperty
+      status: exists
+      imported: false
+      fields:
+        unit: kdump.service
+        property: LoadState
+        value: loaded
+
+    - id: item-2
+      source_item_id: "30"
+      capability: linux.systemdunitproperty
+      status: exists
+      imported: false
+      fields:
+        unit: kdump.service
+        property: UnitFileState
+        value: enabled
+
+    - id: item-3
+      source_item_id: "31"
+      capability: linux.systemdunitproperty
+      status: exists
+      imported: false
+      fields:
+        unit: kdump.service
+        property: ActiveState
+        value: active
+
+  variables: []
+  diagnostics: []
