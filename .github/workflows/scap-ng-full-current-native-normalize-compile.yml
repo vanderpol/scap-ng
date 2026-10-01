@@ -139,9 +139,16 @@ jobs:
               if '"generated_fresh": true' not in p.read_text(): raise SystemExit(f"Fresh-generation provenance missing: {p}")
           print(f"fresh_generation_records={len(summaries)}")
           PY
+      - name: Census fresh native corpus for schema stabilization
+        run: |
+          python scap-ng/tools/native_schema_census.py work/fresh-current \
+            --output work/evidence/native-schema-census.json
       - name: Normalize exact duplicates and report near overlaps
         run: |
-          python scap-ng/tools/scap_ng_repo_normalizer.py work/fresh-current             --output-root work/normalized-current --report work/evidence/normalizer-report.json --top-near 500
+          python scap-ng/tools/scap_ng_repo_normalizer.py work/fresh-current \
+            --output-root work/normalized-current \
+            --report work/evidence/normalizer-report.json \
+            --top-near 500
       - name: Compile unnormalized corpus baseline
         run: |
           python scap-ng/tools/scap_ng_content_compiler.py work/fresh-current             --output-dir work/packages-before --metrics work/evidence/compiler-before.json             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
