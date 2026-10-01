@@ -143,29 +143,42 @@ def collect_corpus(root: Path) -> tuple[list[dict], dict[Path, list[dict]]]:
     return benchmarks, uses
 
 
-def rewrite_rules(output_root: Path, input_root: Path, replacements: dict[Path, Path]) -> int:
-    rewritten = 0
+
+def report_consumer(consumer: dict, source: Path) -> dict:
+    return {
+        "benchmark": consumer.get("benchmark"),
+        "benchmark_id": consumer.get("benchmark_id"),
+        "rule_id": consumer.get("rule_id"),
+        "title": consumer.get("title"),
+        "selector": consumer.get("selector"),
+        "rule_path": consumer["rule_path"].relative_to(source).as_posix(),
+    }
+
+def rewrite_rules(
+    output_root: Path,
+    input_root: Path,
+    replacements: dict[Path, Path],
+    uses: dict[Path, list[dict]],
+) -> int:
+    rewritten_paths=set()
     for original_target, shared_target in replacements.items():
-        # Find every Rule in the copied tree that referenced this source path.
-        # Rule paths are mirrored from input_root to output_root.
-        for rule_path in input_root.rglob("rules/*.yaml"):
-            refs = rule_refs(rule_path)
-            matching = [selector for selector, target in refs if target == original_target]
-            if not matching:
-                continue
+        by_rule: dict[Path, list[str]] = defaultdict(list)
+        for consumer in uses.get(original_target, []):
+            by_rule[consumer["rule_path"]].append(consumer["selector"])
+        for rule_path, selectors in by_rule.items():
             out_rule = output_root / rule_path.relative_to(input_root)
             doc = load_yaml(out_rule)
             choices = (doc.get("rule") or {}).get("assessment_choices") or {}
             rel = Path(os.path.relpath(shared_target, out_rule.parent)).as_posix()
             changed = False
-            for selector in matching:
+            for selector in selectors:
                 if selector in choices and choices[selector].get("assessment") != rel:
                     choices[selector]["assessment"] = rel
                     changed = True
             if changed:
                 dump_yaml(out_rule, doc)
-                rewritten += 1
-    return rewritten
+                rewritten_paths.add(out_rule)
+    return len(rewritten_paths)
 
 
 
@@ -334,7 +347,10 @@ def main() -> int:
             members.append(
                 {
                     "source": str(row["path"].relative_to(source)),
-                    "consumers": row["consumers"],
+                    "consumers": [
+                        report_consumer(consumer, source)
+                        for consumer in row["consumers"]
+                    ],
                 }
             )
             duplicate_instances_avoided += 1
@@ -348,7 +364,7 @@ def main() -> int:
             }
         )
 
-    rewritten_rule_files = rewrite_rules(output, source, replacements)
+    rewritten_rule_files = rewrite_rules(output, source, replacements, uses)
 
     # Remove promoted local duplicates after references in the copied tree point
     # to the shared canonical Assessment.
