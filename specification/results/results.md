@@ -247,6 +247,58 @@ If a required value is missing, the affected Assessment SHALL report
 NOT report an ordinary compliance failure or not-applicable result merely
 because policy data was absent.
 
+## Organizational Input provenance propagation
+
+Organizational Input provenance SHALL be normalized at the run/Benchmark-result
+level and referenced by lower-level results rather than copied in full into
+every Assessment or Rule result.
+
+The canonical propagation model is:
+
+    Organizational Input source
+        -> frozen effective policy snapshot
+        -> Benchmark Result organizational-input registry
+        -> Assessment Result consumed-input binding(s)
+        -> Rule Result references Assessment Result
+        -> optional SIEM/export denormalization
+
+The Benchmark Result SHALL preserve the authoritative run-time snapshot of each
+effective Organizational Input assertion used by the run, including its typed
+value (or protected representation), organization, supplier, authority basis,
+authorization information, scope, effective period, source system, and other
+required provenance.
+
+Each such effective assertion SHALL have a stable result-local identity, for
+example `organizational_input_ref`, that is immutable within the result
+package.
+
+An Assessment Result that consumes Organizational Input SHALL identify each
+consumed input slot and SHALL record:
+
+- the Assessment input/State slot identity;
+- the effective value used, or a protected/redacted representation;
+- the corresponding Benchmark-result Organizational Input provenance reference;
+- whether the completed State/value was materialized successfully;
+- any validation/redaction status needed to interpret the binding.
+
+The Assessment Result SHALL NOT need to duplicate the complete authority and
+contact record when the referenced Benchmark Result is part of the same
+canonical result package. It SHALL nevertheless retain enough local information
+to identify which value affected that Assessment execution.
+
+A Rule Result SHOULD normally rely on its `assessment_result_ref` to reach the
+consumed Organizational Input bindings. A Rule Result MAY additionally expose
+compact Organizational Input references when doing so materially improves
+downstream use, but it SHOULD NOT duplicate the full provenance record.
+
+An exporter that emits standalone per-Rule or per-Assessment events MAY
+denormalize the referenced Organizational Input value and provenance into each
+event. Such denormalization SHALL preserve the canonical identities and SHALL
+NOT create a second independent provenance truth.
+
+This model permits compact canonical storage while allowing SIEM/Splunk/Elastic
+events to be independently useful.
+
 ## 13. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
