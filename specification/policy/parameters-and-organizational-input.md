@@ -147,6 +147,20 @@ A persistent Input Set MAY be reused across multiple Assessment Requests, but
 each use SHALL result from an explicit binding or from an external orchestration
 system that constructs an explicit Assessment Request.
 
+An Assessment Request MAY explicitly bind more than one Organizational Input
+Set when policy data is maintained by different organizational authorities.
+After validation, each effective Parameter SHALL have at most one supplied
+value. If two bound Input Sets (or an Input Set and an explicitly supplied
+runtime value) provide the same Parameter, policy resolution SHALL fail as
+ambiguous unless a future specification defines an explicit merge operation for
+that Parameter type. Source order SHALL NOT establish precedence.
+
+If an Input Set declares `effective_from` or `expires_at`, the processor SHALL
+evaluate that validity window against the frozen run start time. A value outside
+its declared validity window is unavailable policy data; it SHALL NOT be used
+for Assessment execution and SHALL NOT itself produce an ordinary compliance
+failure.
+
 ### Value resolution and validation
 
 For every supplied value, the processor SHALL resolve the Parameter declaration
