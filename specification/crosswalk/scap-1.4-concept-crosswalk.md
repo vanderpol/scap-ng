@@ -12,7 +12,7 @@ concepts and records deliberate divergences.
 | Group | XCCDF Group | retained for meaningful organization; one-Rule wrappers discouraged |
 | Profile | XCCDF Profile | retained; native Rule selection is subtractive delta only |
 | Tailoring | XCCDF Tailoring | retained as external policy modification; exact Rule-selection powers still under design |
-| Parameter | XCCDF Value | expanded to typed policy data with cleaner binding semantics |
+| Parameter | XCCDF Value | native XCCDF `Value` is not retained; valid legacy Value semantics migrate into typed policy Parameters and explicit Assessment input bindings |
 | Organizational Input | interactive XCCDF Value + check-export + OVAL external variable | separated from Tailoring; restricted to expected-state data |
 | Assessment Method | XCCDF check + OVAL/OCIL implementation | unified semantic successor |
 | Manual Assessment | XCCDF Check Text / OCIL manual interaction | Check Text alone is sufficient; default result contract replaces need for questionnaire scaffolding |
@@ -30,6 +30,24 @@ concepts and records deliberate divergences.
 | Publisher extension | XCCDF metadata / foreign namespaces | formal constrained extension surface |
 | Historical provenance comments/report | source IDs embedded through component structure | preserved outside scanner semantics where possible |
 | SIEM projection | custom post-processing of ARF/XCCDF results | explicit projection from canonical results; denormalization is consumer-specific |
+
+## XCCDF Value compatibility note
+
+SCAP-NG does not retain XCCDF `Value` as a native construct. Its enduring
+semantics are split into clearer native concepts:
+
+- publisher policy data -> Parameter;
+- intentionally unresolved site-specific expected data -> Organizational Input;
+- XCCDF `check-export` -> explicit typed Assessment input binding;
+- OVAL external Variable -> Assessment Variable/input;
+- publisher Profile value refinement -> publisher Profile Parameter resolution.
+
+A native Tailoring artifact does not override publisher-resolved Parameter
+values. If an organization adopts a different concrete requirement, that is a
+different organization-authored policy/Benchmark, not a hidden Tailoring value
+change. Legacy XCCDF Tailoring value mutations therefore require migration into
+a distinct local policy representation or an explicit conversion blocker until
+such representation is available.
 
 ## CPE inventory compatibility note
 
