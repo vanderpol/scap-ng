@@ -44,7 +44,25 @@
         },
         "scanner": {
           "type": "object",
-          "description": "Scanner identity/version and implementation provenance."
+          "description": "Scanner identity/version and implementation provenance.",
+          "required": [
+            "capabilities"
+          ],
+          "properties": {
+            "capabilities": {
+              "type": "object",
+              "required": [
+                "organizational_input"
+              ],
+              "properties": {
+                "organizational_input": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
         },
         "target": {
           "type": "object",
@@ -324,10 +342,53 @@
                 ]
               },
               "reason": {
-                "type": [
-                  "string",
-                  "object",
-                  "null"
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "code"
+                    ],
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "enum": [
+                          "unexpected_existence",
+                          "required_item_missing",
+                          "required_match_missing",
+                          "value_mismatch",
+                          "cardinality_mismatch",
+                          "unsupported_organizational_input",
+                          "missing_organizational_input",
+                          "invalid_organizational_input"
+                        ]
+                      },
+                      "input": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "state_slot": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "message": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "additionalProperties": true
+                  }
                 ]
               },
               "assessment_result_ref": {
@@ -494,7 +555,44 @@
                 }
               }
             },
-            "additionalProperties": true
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "outcome": {
+                      "const": "not_evaluated"
+                    },
+                    "reason": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "unsupported_organizational_input",
+                            "missing_organizational_input",
+                            "invalid_organizational_input"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "outcome",
+                    "reason"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "expected_state": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            ]
           }
         }
       },
