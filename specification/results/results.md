@@ -99,18 +99,38 @@ For legacy XCCDF 1.2 `role`:
   `not_evaluated` (or the final schema's equivalent technical non-execution
   outcome), a stable reason such as `policy_unchecked`, and scoring excluded.
 
-Legacy `role` therefore SHALL NOT become an Assessment attribute that forces
-Assessment truth. It is Rule policy/result disposition.
+Legacy `role` therefore SHALL NOT survive as a native XCCDF-style
+Assessment attribute that forces Assessment truth. Its effective source
+semantics are mapped into explicit Rule policy/result disposition during
+migration.
 
-An Assessment whose intrinsic purpose is to collect descriptive information
-rather than determine a compliance assertion SHOULD express that purpose
-through its Assessment class/result payload. That is distinct from XCCDF
-`role=unscored`, which can wrap an otherwise ordinary compliance check.
+Organizational Input replaces only the subset of historical `unscored` usage
+whose real limitation was an organization-specific expected policy value. When
+supplying that input makes compliance objectively determinable, the migrated
+Rule SHOULD use an ordinary compliance Assessment with an explicit
+Organizational Input binding and preserve the resulting technical pass/fail
+outcome.
 
 Missing or invalid required Organizational Input SHALL follow the
 Organizational Input evaluation contract (for example `not_evaluated` with a
 specific input reason); it SHALL NOT be converted to `informational` merely
 because older content used `unscored` as a workaround.
+
+Organizational Input does **not** replace every historical use of `role`.
+Content that is genuinely intended to be reporting-only even when all required
+policy inputs are available still needs an explicit Rule reporting/scoring
+disposition (or a future standardized informational Assessment class, if that
+candidate is adopted). Likewise, legacy `unchecked` remains a policy decision
+not to execute the Assessment and maps to an explicit non-execution result.
+
+The preferred native direction is therefore to eliminate the overloaded
+single `role` switch and represent its distinct concerns separately:
+
+- Assessment technical truth;
+- Organizational Input dependencies;
+- Rule scoring eligibility;
+- Rule reporting disposition;
+- explicit policy-driven non-execution.
 
 ## 4. Target identity
 
@@ -128,7 +148,7 @@ Results SHOULD support one or more typed target identifiers, such as:
 Hostname and relevant addresses SHOULD remain available as descriptive
 correlation data.
 
-## 4. Target product inventory
+## 5. Target product inventory
 
 A complete scan result SHOULD support target product inventory independently
 from per-Rule compliance results.
@@ -175,7 +195,7 @@ supporting observed evidence.
 Product inventory is descriptive target data. It SHALL NOT be interpreted as a
 Rule result, compliance finding, or implicit applicability decision.
 
-## 5. Rule result self-description
+## 6. Rule result self-description
 
 A Rule result SHOULD contain enough Rule context for common downstream use
 without requiring the consumer to possess the original Benchmark.
@@ -342,7 +362,7 @@ to explain why two invocations differ. A result consumer SHALL be able to
 distinguish separate executions without relying on array position, first/last
 ordering, or reconstructed legacy XML identity.
 
-## 6. Deterministic message
+## 7. Deterministic message
 
 Every Rule result SHOULD contain a concise deterministic human-readable
 message suitable for logs, APIs, Splunk, Elastic, dashboards, and review tools.
@@ -358,7 +378,7 @@ scanner-specific prose.
 Heuristic or AI-generated analysis SHALL NOT replace the authoritative
 message.
 
-## 7. Failure reason
+## 8. Failure reason
 
 Failed results SHOULD provide a machine-readable reason.
 
@@ -378,7 +398,7 @@ For an expected-presence condition, observing zero required matching items
 SHOULD produce `required_item_missing` unless the more specific
 `required_match_missing` accurately describes the case.
 
-## 8. Concrete evidence
+## 9. Concrete evidence
 
 When failure is established by a concrete violating item, at least one concrete
 failing example SHALL be retained unless collection/evaluation failed before
@@ -389,7 +409,7 @@ Evidence SHOULD identify what failed and why.
 A missing required item or condition SHALL be represented as a missing
 requirement, not as a fabricated collected object.
 
-## 9. Evidence limits and short circuiting
+## 10. Evidence limits and short circuiting
 
 Evidence-retention limits SHALL NOT be compliance thresholds.
 
@@ -406,7 +426,7 @@ Results SHOULD distinguish:
 If the full population was not evaluated, a total population failure count
 SHALL be reported as unknown rather than inferred from observed failures.
 
-## 10. Summary
+## 11. Summary
 
 A result package SHOULD provide precomputed aggregate counters so common
 consumers are not required to scan every Rule result merely to construct a
@@ -422,7 +442,7 @@ Useful aggregates include:
 Publisher-specific projections MAY add aliases such as DISA CAT I/II/III
 counts, but core SCAP-NG SHALL NOT require publisher-specific severity labels.
 
-## 11. SIEM projection
+## 12. SIEM projection
 
 A result exporter MAY project the normalized package into denormalized event
 formats such as JSONL.
@@ -432,7 +452,7 @@ event per Rule result.
 
 Consumer-specific denormalization SHALL NOT dictate the canonical result model.
 
-## 12. Manual results
+## 13. Manual results
 
 Manual Assessment default behavior and completed outcome semantics are defined
 in `../assessment/manual-assessment.md`.
@@ -566,7 +586,7 @@ that `organizational_input_ref` resolves, Rule declarations agree with the
 selected Assessment contract, and supplied values conform to capability-specific
 State schemas.
 
-## 13. Decisive outcome explanation
+## 14. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
 decisive outcome explanation: the smallest evaluated expression subtree, or set
@@ -594,7 +614,7 @@ compliance failures.
 The final exact explanation serialization remains under design.
 
 
-## 14. Assessment class and result interpretation
+## 15. Assessment class and result interpretation
 
 Results SHALL retain the effective Assessment class when it is needed to
 interpret Boolean truth correctly.
@@ -679,7 +699,7 @@ variable-binding context. A converter or result importer SHALL NOT join a Test
 from one variable instance to Items, Variables, or an extended Definition
 result from another instance.
 
-## 15. Assessment Result file cardinality
+## 16. Assessment Result file cardinality
 
 A canonical SCAP-NG result package SHALL produce one Assessment Result artifact
 for each Assessment invocation that contributes to the run.
@@ -704,7 +724,7 @@ the final imported-Item rules.
 Benchmark/Rule results SHOULD reference the corresponding Assessment Result
 execution identity rather than embedding the complete detailed execution graph.
 
-## 16. Failure counts and evidence maximums
+## 17. Failure counts and evidence maximums
 
 Assessment Result and Benchmark/Rule Result reporting SHOULD use the same
 terminology for bounded failure evidence.
