@@ -11,10 +11,12 @@ for every feature we may add later.
 
 - Benchmark -> Rule -> selected Assessment is authoritative.
 - There is no separate Policy document.
-- Assessment source currently uses `collections`, `variables`, `tests`, and
+- Assessment source uses `objects`, `variables`, `states`, `tests`, and
   `evaluate` as the core automated structure.
-- Test, collection/object, State/predicate, and Variable semantics remain
-  independently meaningful and require semantic compatibility validation.
+- Test, Object, State, and Variable semantics remain independently meaningful
+  and require semantic compatibility validation.
+- `Collection` is reserved for the runtime act of evaluating an Object and
+  producing Items; it is not the authored Object node name.
 - Applicability Assessments are ordinary Assessments invoked for applicability.
 - Migration, conversion, quarantine, parity, and normalizer evidence are
   excluded from native content schemas.
@@ -27,6 +29,9 @@ The current executable schemas cover:
 2. Rule
 3. Assessment
 4. Applicability catalog
+5. Tailoring (strawman)
+6. Benchmark Result (strawman)
+7. Assessment Result (first-draft strawman)
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
@@ -85,23 +90,30 @@ These features SHALL NOT be added to v0.1.0 merely to reserve speculative
 syntax. See
 [`specification/assessment/draft-future-assessment-features.md`](../../specification/assessment/draft-future-assessment-features.md).
 
-## OVAL terminology review
+## OVAL terminology alignment
 
-The project is reconsidering whether the authored term `Collection` should
-return to the established OVAL term `Object` while reserving
-`collection execution` for runtime acquisition. Because this terminology
-decision is not yet ratified, v0.1.0 preserves the current `collections`
-serialization. A later schema revision may rename it deliberately with an
-explicit migration rule.
+The current working decision is to use the established OVAL terms **Test**,
+**Object**, **State**, **Variable**, and **Item** when SCAP-NG retains the same
+substantive concept. The authored `Collection` term has therefore been retired
+in favor of `Object`; collection describes runtime execution of an Object.
 
-The working terminology principle is: when SCAP-NG retains an OVAL construct
-with substantially the same semantics, retain the established OVAL term unless
-there is a clear benefit that outweighs the compatibility cost.
+Intentional native terminology improvements remain:
+
+- OVAL Definition -> Assessment;
+- OVAL criteria/criterion -> `evaluate`;
+- OVAL generic comments -> typed `assessment_title`, `test_title`,
+  `object_title`, `state_title`, and `variable_title`.
+
+Tests retain OVAL `check_existence`, `check`, and `state_operator` when
+those semantics are preserved. Deep capability schemas SHALL be generated
+against this aligned vocabulary rather than the earlier
+Collection/assertion/item-quantifier prototype.
 
 ## Planned next schemas
 
-Tailoring, organizational input, package manifest, and results schemas will be
-added after the core authoring graph and result model stabilize.
+Organizational input and package-manifest schemas remain to be added. Initial
+Tailoring, Benchmark Result, and Assessment Result schemas now exist and will
+continue to evolve with the result-model work.
 
 The full pinned NIWC Current native corpus census remains the primary evidence
 used to classify fields as required, optional, conditional, extensible, or
