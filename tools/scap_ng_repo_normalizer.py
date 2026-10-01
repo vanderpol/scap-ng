@@ -273,12 +273,13 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[di
         ).ratio()
         if title_ratio < 0.58 and jaccard < 0.50:
             continue
-        discussion_ratio=SequenceMatcher(
-            None,
-            " ".join(_tokens(left["discussion"]))[:2500],
-            " ".join(_tokens(right["discussion"]))[:2500],
-            autojunk=False,
-        ).ratio()
+        left_disc=set(_tokens(left["discussion"]))
+        right_disc=set(_tokens(right["discussion"]))
+        disc_union=left_disc|right_disc
+        discussion_ratio=(
+            len(left_disc&right_disc)/len(disc_union)
+            if disc_union else 0.0
+        )
         score=0.55*title_ratio+0.30*jaccard+0.15*discussion_ratio
         if score < 0.62:
             continue
@@ -292,7 +293,7 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[di
             "similarity_score":round(score,4),
             "title_similarity":round(title_ratio,4),
             "title_token_jaccard":round(jaccard,4),
-            "discussion_similarity":round(discussion_ratio,4),
+            "discussion_token_jaccard":round(discussion_ratio,4),
             "shared_title_trigrams":shared_trigrams,
             "shared_identifiers":shared_ids,
             "left":{k:left[k] for k in ("benchmark","benchmark_id","rule_id","title")},
