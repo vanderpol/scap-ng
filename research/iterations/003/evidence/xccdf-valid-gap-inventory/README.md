@@ -5,6 +5,7 @@ Pinned NIWC revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
 This report inspects original SCAP 1.4 ZIPs directly. No generated NG content is used.
 
 ## Summary
+- check_exports: **798**
 - packages_scanned: **65**
 - packages_with_direct_cpe: **65**
 - packages_with_values: **7**
