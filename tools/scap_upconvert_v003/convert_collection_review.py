@@ -79,11 +79,47 @@ def manual_procedure(rec, c):
     if not procedure: raise ValueError(rec['id']+': manual source has no verified inline procedure')
     return binding, procedure
 
+
+SOURCE_DEFECT_ERROR_PREFIXES = (
+    "invalid_oval_record_datatype",
+    "test_collection_capability_mismatch:",
+    "test_state_capability_mismatch:",
+    "Filter capability mismatch:",
+)
+
+
+def source_defect_reason(error):
+    """Return a stable source-defect class for positively identified bad OVAL.
+
+    Unknown conversion errors deliberately return None and remain hard blockers.
+    """
+    if not isinstance(error, str):
+        return None
+    if error == "invalid_oval_record_datatype":
+        return "invalid_oval_record_datatype"
+    if error.startswith("test_collection_capability_mismatch:"):
+        return "test_collection_capability_mismatch"
+    if error.startswith("test_state_capability_mismatch:"):
+        return "test_state_capability_mismatch"
+    if error.startswith("Filter capability mismatch:"):
+        return "filter_collection_capability_mismatch"
+    return None
+
+
+def source_defect_fallback(selector, did, error):
+    return {
+        "selector": selector,
+        "source_definition": did,
+        "classification": "source_content_defect",
+        "reason": source_defect_reason(error),
+        "error": error,
+    }
+
 def convert_rule(rec, original, output, schema, temp_root):
     from lxml import etree
     rid=rec['id']
     result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
-    done={}; manual_done={}; deprecated_selector_fallbacks=[]
+    done={}; manual_done={}; deprecated_selector_fallbacks=[]; source_defect_selector_fallbacks=[]
     has_manual=any(check_kind(check)=='manual' for check in rec['checks'])
     original_path=Path(temp_root)/(rid+'-source.xml')
     ET.ElementTree(original).write(original_path,encoding='utf-8')
@@ -121,6 +157,18 @@ def convert_rule(rec, original, output, schema, temp_root):
             failed=True; result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported}); continue
         native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
         if error:
+            defect=source_defect_reason(error)
+            if defect and has_manual:
+                fallback=source_defect_fallback(selector,did,error)
+                source_defect_selector_fallbacks.append(fallback)
+                result['assessments'].append({
+                    'status':'skipped_source_defect_manual_fallback',
+                    'source_definition':did,
+                    'classification':'source_content_defect',
+                    'reason':defect,
+                    'error':error,
+                })
+                continue
             failed=True; result['assessments'].append({'status':'blocked','error':error}); continue
         errors=violations(native)
         if errors: raise ValueError('Current vocabulary guard: '+str(errors))
@@ -144,6 +192,17 @@ def convert_rule(rec, original, output, schema, temp_root):
                 if fallback['selector']=='default': result['selectors']['default']=manual_ref
             result['manual_fallbacks']=deprecated_selector_fallbacks
             result['manual_fallback_assessment']=manual_ref
+    if source_defect_selector_fallbacks:
+        manual_ref=result['selectors'].get('manual') or (next(iter(manual_done.values())) if manual_done else None)
+        if manual_ref is None:
+            failed=True
+            result.setdefault('errors',[]).append('source-invalid automated Assessment has no usable manual fallback')
+        else:
+            for fallback in source_defect_selector_fallbacks:
+                if fallback['selector']=='default':
+                    result['selectors']['default']=manual_ref
+            result.setdefault('source_defect_fallbacks',[]).extend(source_defect_selector_fallbacks)
+            result['source_defect_manual_fallback_assessment']=manual_ref
     return result, failed
 
 def main(argv=None):
@@ -185,6 +244,7 @@ def main(argv=None):
             done={}
             manual_done={}
             deprecated_selector_fallbacks=[]
+            source_defect_selector_fallbacks=[]
             has_manual=any(check_kind(check)=='manual' for check in rec['checks'])
             for c in rec['checks']:
                 selector=(c.get('selector') or '').strip() or 'default'
@@ -229,6 +289,18 @@ def main(argv=None):
                     failed=True;result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported});continue
                 native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
                 if error:
+                    defect=source_defect_reason(error)
+                    if defect and has_manual:
+                        fallback=source_defect_fallback(selector,did,error)
+                        source_defect_selector_fallbacks.append(fallback)
+                        result['assessments'].append({
+                            'status':'skipped_source_defect_manual_fallback',
+                            'source_definition':did,
+                            'classification':'source_content_defect',
+                            'reason':defect,
+                            'error':error,
+                        })
+                        continue
                     failed=True;result['assessments'].append({'status':'blocked','error':error});continue
                 errors=violations(native)
                 if errors:raise ValueError('Current vocabulary guard: '+str(errors))
@@ -260,6 +332,19 @@ def main(argv=None):
                             result['selectors']['default']=manual_ref
                     result['manual_fallbacks']=deprecated_selector_fallbacks
                     result['manual_fallback_assessment']=manual_ref
+            if source_defect_selector_fallbacks:
+                manual_ref=result['selectors'].get('manual')
+                if manual_ref is None and manual_done:
+                    manual_ref=next(iter(manual_done.values()))
+                if manual_ref is None:
+                    failed=True
+                    result.setdefault('errors',[]).append('source-invalid automated Assessment has no usable manual fallback')
+                else:
+                    for fallback in source_defect_selector_fallbacks:
+                        if fallback['selector']=='default':
+                            result['selectors']['default']=manual_ref
+                    result.setdefault('source_defect_fallbacks',[]).extend(source_defect_selector_fallbacks)
+                    result['source_defect_manual_fallback_assessment']=manual_ref
             evidence['rules'].append(result)
     evidence['status']='blocked' if failed else 'prototype_dataflow_and_roundtrip_checks_passed'
     (args.output/'evidence.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
