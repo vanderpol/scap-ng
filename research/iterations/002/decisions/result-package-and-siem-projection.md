@@ -247,3 +247,108 @@ The following remain open pending additional operational result review:
 - whether summary aggregates are mandatory or SHOULD-level requirements;
 - how much Benchmark/profile metadata belongs in every standalone individual
   .result artifact versus only in a complete .results package.
+
+
+## Signed result package
+
+SCAP-NG SHOULD make cryptographic signing of scan results a normal, simple
+implementation path rather than an optional XML-signature feature that is
+rarely exercised.
+
+The preferred design reuses the same manifest-and-signature model as signed
+Benchmark packages:
+
+1. serialize the canonical Benchmark Result and each referenced detailed
+   Assessment Result using the required canonical representation;
+2. compute a SHA-256 digest for every normative result member;
+3. record those members and digests in one result manifest;
+4. sign the canonical result manifest once;
+5. verify the manifest signature and every listed member digest before trusting
+   the result package.
+
+Conceptual package:
+
+    META-INF/
+      result-manifest.json
+      signature.cose
+
+    benchmark-result.json
+    assessment-results/
+      <execution-id>.json
+      ...
+
+The signature covers the complete logical result set without depending on ZIP
+compression bytes, file ordering, timestamps in an archive container, or
+incidental transport representation.
+
+### Simplicity and common implementation
+
+Content packages and result packages SHOULD use the same signature envelope,
+algorithm registry, trust-store model, certificate/key identification rules,
+and verification API wherever practical.
+
+A vendor SHOULD NOT need to implement XML Digital Signature, a separate result
+signature scheme, and a package signature scheme merely to support SCAP-NG.
+
+The initial project direction is one detached/sidecar signature over a canonical
+manifest rather than embedded signatures scattered through result objects.
+
+### What is signed
+
+The result manifest SHALL integrity-bind, directly or by member digest, at
+minimum:
+
+- the Benchmark Result;
+- every detailed Assessment Result referenced by the Benchmark Result;
+- the exact Benchmark/package identity and digest used for execution;
+- the result schema/specification versions needed to interpret the package.
+
+The manifest SHOULD also carry stable run identity and creation/completion
+timestamps so the signed object can be correlated without parsing every member.
+
+### Signer identity and verification
+
+A signed result SHOULD make the following visible to consumers:
+
+- signing key or certificate identity;
+- signature algorithm;
+- signature creation time when provided by the signing mechanism;
+- trust-chain or trust-anchor information needed by the deployment model;
+- verification status produced by a verifier;
+- the exact result-manifest digest that was verified.
+
+Signer identity is distinct from scanner/product identity. A deployment MAY use
+the same credential for both, but the data model SHALL NOT assume that the
+software vendor is the party signing an operational scan result.
+
+### Tamper evidence
+
+Any modification to a signed Benchmark Result, Rule Result, Assessment Result,
+or other normative member SHALL cause digest/signature verification to fail.
+
+A consumer SHALL NOT present a modified result as still signed merely because
+the original signature file remains present.
+
+Non-normative transport/projection artifacts such as a generated SIEM JSONL
+export MAY be unsigned derivatives. When produced from a signed canonical
+result, they SHOULD carry a reference to the source signed-result package and
+its verified manifest digest.
+
+### Optional signing versus verifiability
+
+The format SHOULD permit unsigned result packages for low-assurance/testing
+workflows, but every conforming implementation SHOULD be able to verify signed
+result packages.
+
+High-assurance conformance profiles MAY require scanners to sign results.
+
+This keeps the base format easy to implement while giving DoD/enterprise
+deployments a straightforward path to require provenance and tamper evidence.
+
+### Open cryptographic profile question
+
+The existing package prototype uses a `signature.cose` placeholder. The final
+cryptographic profile should select one small, widely implementable signature
+format and algorithm set for both content and result packages rather than
+supporting multiple interchangeable signature frameworks.
+
