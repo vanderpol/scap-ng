@@ -1,0 +1,140 @@
+assessment_result:
+  result_schema_version: 0.1.0-draft
+  execution_id: example-windows2025-impersonate-client-1
+
+  assessment:
+    source_oval_definition_id: oval:mil.disa.stig.defs:def:220975
+    version: 5
+    assessment_title: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service, Local Service, and Network Service.
+
+  class: compliance
+  purpose: assessment
+  mode: automated
+  outcome: false
+
+  evaluation:
+    logical_complete: true
+    population_complete: true
+    evidence_complete: true
+    stop_reason: complete
+    evaluated_items: 5
+
+  summary:
+    observed_failures: 1
+    actual_failures: 1
+
+  evidence:
+    failures:
+      maximum: 50
+      returned: 1
+      truncated_population: false
+
+  evaluate_result:
+    test: test-impersonate-client
+    outcome: false
+
+  tests:
+    - id: test-impersonate-client
+      source_oval_test_id: oval:mil.disa.stig.win:tst:22097501
+      test_title: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE
+      capability: windows.userright
+      outcome: false
+      existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      object_ref: object-impersonate-client
+      state_refs:
+        - state-empty
+        - state-administrators
+        - state-local-service
+        - state-network-service
+        - state-service
+      item_refs: [item-1, item-2, item-3, item-4, item-5]
+      decisive_explanation:
+        reason: value_mismatch
+        failing_item_refs: [item-3]
+        message: One unauthorized trustee has the SE_IMPERSONATE_NAME user right.
+
+  objects:
+    - id: object-impersonate-client
+      source_oval_object_id: oval:mil.disa.stig.win:obj:25349801
+      capability: windows.userright
+      collection_status: complete
+      select:
+        userright: SE_IMPERSONATE_NAME
+      item_refs: [item-1, item-2, item-3, item-4, item-5]
+
+  states:
+    - id: state-empty
+      source_oval_state_id: oval:mil.disa.stig.win:ste:20000029
+      expected: {}
+    - id: state-administrators
+      source_oval_state_id: oval:mil.disa.stig.win:ste:20000030
+      expected:
+        trustee_name: Administrators
+    - id: state-local-service
+      source_oval_state_id: oval:mil.disa.stig.win:ste:20000036
+      expected:
+        trustee_name: LOCAL SERVICE
+    - id: state-network-service
+      source_oval_state_id: oval:mil.disa.stig.win:ste:20000037
+      expected:
+        trustee_name: NETWORK SERVICE
+    - id: state-service
+      source_oval_state_id: oval:mil.disa.stig.win:ste:20000038
+      expected:
+        trustee_name: SERVICE
+
+  items:
+    - id: item-1
+      source_item_id: "141"
+      capability: windows.userright
+      status: exists
+      fields:
+        userright: SE_IMPERSONATE_NAME
+        trustee_name: SERVICE
+        trustee_sid: S-1-5-6
+      test_result: true
+
+    - id: item-2
+      source_item_id: "142"
+      capability: windows.userright
+      status: exists
+      fields:
+        userright: SE_IMPERSONATE_NAME
+        trustee_name: Administrators
+        trustee_sid: S-1-5-32-544
+      test_result: true
+
+    - id: item-3
+      source_item_id: "143"
+      capability: windows.userright
+      status: exists
+      fields:
+        userright: SE_IMPERSONATE_NAME
+        trustee_name: SPRINGFIELD\Domain Admins
+        trustee_sid: S-1-5-21-4025666716-58298144-3826533331-512
+      test_result: false
+
+    - id: item-4
+      source_item_id: "144"
+      capability: windows.userright
+      status: exists
+      fields:
+        userright: SE_IMPERSONATE_NAME
+        trustee_name: NETWORK SERVICE
+        trustee_sid: S-1-5-20
+      test_result: true
+
+    - id: item-5
+      source_item_id: "145"
+      capability: windows.userright
+      status: exists
+      fields:
+        userright: SE_IMPERSONATE_NAME
+        trustee_name: LOCAL SERVICE
+        trustee_sid: S-1-5-19
+      test_result: true
+
+  variables: []
+  diagnostics: []
