@@ -334,6 +334,95 @@
         },
         "additionalProperties": true
       }
+    },
+    "weight": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Effective Rule weight used by the selected scoring model, when defined."
+    },
+    "check_selector": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Effective named Assessment/check selector chosen for this Rule."
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Effective publisher/Profile/Tailoring Parameters materially relevant to this Rule result."
+    },
+    "applicability": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Aggregate Rule applicability plus the named applicability Assessment results that produced it.",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "applicable",
+            "not_applicable",
+            "unknown",
+            "error",
+            "not_evaluated"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "outcome"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "applicable",
+                  "not_applicable",
+                  "unknown",
+                  "error",
+                  "not_evaluated"
+                ]
+              },
+              "assessment_result_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "assessment_invocation_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "required": [
+        "outcome",
+        "conditions"
+      ],
+      "additionalProperties": true
     }
   },
   "additionalProperties": true,
