@@ -35,19 +35,26 @@ once, and fixed-format overhead dominates a one-Rule sample.
 - A minimal policy-result ARF is not an apples-to-apples substitute for detailed
   OVAL Results/System Characteristics.
 
-## Remaining apples-to-apples comparison
+## Matched detailed comparison
 
-The meaningful detailed comparison is:
+A second fixture, `matched-scap14-detailed.arf.xml`, adds detailed OVAL Results
+and System Characteristics to the same XCCDF Rule result. It represents the same
+logical failed observation as the NG detailed result: UID 0 and UNIX permission
+bits equivalent to mode `0666`, with the Test/Definition outcome false.
 
-- ARF containing XCCDF Rule results **plus** matched detailed OVAL Results and
-  System Characteristics; versus
-- the canonical SCAP-NG scan + Benchmark + Assessment result package for the
-  same observations.
+| Detailed representation | Bytes |
+| --- | ---: |
+| SCAP 1.4 ARF + XCCDF + OVAL Results/System Characteristics | 6,025 |
+| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 5,547 |
 
-That detailed SCAP 1.4 fixture should be schema-valid and contain the same
-observed mode value, expected value, Test outcome, and collected Item represented
-by the NG Assessment result. Until that fixture exists, no claim that NG
-detailed results are smaller than ARF is justified.
+For this deliberately tiny one-Rule detailed case, the normalized NG package is
+478 bytes, or about **7.9%**, smaller than the matched detailed ARF.
+
+This is a fixture result, not a general compression claim. Fixed overhead,
+number of Rules, amount of evidence, repeated context, projection choice, and
+serialization details can all materially change the ratio. The earlier minimal
+XCCDF-only comparison remains important: NG JSONL is larger there because each
+SIEM event is intentionally self-contained.
 
 Compression should be measured separately from raw size because both XML and
 JSON compress heavily and production transport/storage may use compression.
