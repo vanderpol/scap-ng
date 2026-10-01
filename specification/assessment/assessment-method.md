@@ -352,6 +352,56 @@ This intrinsic applicability mechanism is required independently of SCAP-NG so
 that a standalone converted OVAL Definition retains its result semantics even
 when it is executed without a Benchmark or Rule wrapper.
 
+
+## Composed Assessments and XCCDF complex-check migration
+
+An automated Assessment MAY be a **composed Assessment** whose evaluation is
+defined partly or entirely by the results of statically declared dependent
+Assessments.
+
+This permits a Rule to retain the simple relationship:
+
+    Rule -> selected Assessment
+
+even when legacy policy used a Boolean composition of several independent
+checking-system checks.
+
+A composed Assessment MAY have no local Objects, States, or Tests when its
+result is derived entirely from dependent Assessment results. Its
+`dependencies` and `evaluate` expression remain sufficient executable
+content.
+
+### XCCDF `complex-check`
+
+An XCCDF `complex-check` SHOULD migrate to a composed Assessment when its
+children represent independently executable checks.
+
+The converter SHALL preserve:
+
+- recursive AND/OR grouping;
+- child ordering for provenance even when the logical operator is commutative;
+- `negate` at every complex-check node;
+- each child check's checking-system identity and resolved content;
+- the source XCCDF multi-valued result-combination semantics.
+
+Each executable child check SHOULD become or resolve to an independently
+identified Assessment dependency. The composed Assessment's `evaluate`
+expression combines those dependency results.
+
+A converter SHALL NOT flatten nested complex-check groups when flattening could
+change negation, result-domain propagation, provenance, or source traceability.
+
+### XCCDF simple-check negation
+
+XCCDF check-level `negate=true` SHALL be represented in the composed/native
+evaluation expression surrounding the referenced Assessment result. Negation
+changes the consuming expression's interpretation of the child result; it SHALL
+NOT mutate the child Assessment's independently executable truth.
+
+This distinction permits the same Assessment to be reused by both negated and
+non-negated consumers without creating semantically duplicated Assessment
+files.
+
 ## 5. Automated semantics
 
 Automated Assessments SHALL make behavior-affecting cardinality, existence, and
