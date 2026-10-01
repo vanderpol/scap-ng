@@ -223,9 +223,19 @@ def generate(mapping, repo_root):
             "description": docs(field),
         }
 
-    all_state_datatypes = sorted({
-        dtype for row in state_meta.values() for dtype in row["datatypes"]
-    })
+    state_field_branches = [
+        {
+            "properties": {
+                "field": {"const": name},
+                "datatype": {
+                    "type": "string",
+                    "enum": sorted(set(meta["datatypes"])),
+                },
+            },
+            "required": ["field"],
+        }
+        for name, meta in sorted(state_meta.items())
+    ]
 
     controls = mapping["native"]["test_result_controls"]
     capability = mapping["capability"]
@@ -325,13 +335,20 @@ def generate(mapping, repo_root):
                             },
                             **{
                                 key: value
-                                for key, value in generic_entity_schema(all_state_datatypes)["properties"].items()
+                                for key, value in generic_entity_schema(["string"])["properties"].items()
+                                if key != "datatype"
                             },
+                            "datatype": {"type": "string"},
                         },
                         "additionalProperties": False,
-                        "anyOf": [
-                            {"required": ["value"]},
-                            {"required": ["variable"]},
+                        "allOf": [
+                            {"oneOf": state_field_branches},
+                            {
+                                "anyOf": [
+                                    {"required": ["value"]},
+                                    {"required": ["variable"]},
+                                ]
+                            },
                         ],
                     },
                 },
