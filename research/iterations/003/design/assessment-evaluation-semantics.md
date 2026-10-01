@@ -170,8 +170,12 @@ An incomplete collection generally yields `unknown` unless already-observed evid
 Examples of conclusive evidence include:
 
 - an observed Item when `check_existence=none_exist` -> false;
+- an observed Item when `check_existence=at_least_one_exists` -> true;
+- an observed Item when `check_existence=any_exist` -> true, because later error/not-collected observations cannot overturn that OVAL truth-table outcome;
 - more than one observed Item when `check_existence=only_one_exists` -> false;
 - a decisive State/`check` result where additional Items cannot change the truth result according to the applicable truth table.
+
+The current conformance fixtures explicitly test that every implemented early-termination shortcut is **irreversible** under additional observations. A scanner SHALL NOT add a shortcut merely because it is common or efficient; the final semantic result must be invariant for every permitted unseen continuation.
 
 This semantic rule is separate from evidence truncation. A scanner MAY cap retained evidence, but a cap SHALL NOT alter assessment truth.
 
