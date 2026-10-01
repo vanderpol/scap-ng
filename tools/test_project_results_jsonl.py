@@ -135,6 +135,38 @@ class ProjectionTests(unittest.TestCase):
         for line in first:
             json.loads(line)
 
+
+    def test_compact_rule_context_is_projected(self):
+        scan=scan_doc()
+        benchmark=benchmark_doc()
+        rule=benchmark["benchmark_result"]["rule_results"][0]
+        rule.update({
+            "weight": 1.5,
+            "check_selector": "automated",
+            "parameters": {"example_parameter": 42},
+            "applicability": {"outcome": "applicable", "conditions": []},
+        })
+        event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
+        self.assertEqual(1.5, event["weight"])
+        self.assertEqual("automated", event["check_selector"])
+        self.assertEqual({"example_parameter": 42}, event["parameters"])
+        self.assertEqual("applicable", event["applicability"]["outcome"])
+
+    def test_non_boolean_rule_outcomes_are_preserved(self):
+        for outcome in ("error", "unknown", "not_evaluated", "not_applicable"):
+            with self.subTest(outcome=outcome):
+                scan=scan_doc()
+                benchmark=benchmark_doc()
+                rule=benchmark["benchmark_result"]["rule_results"][0]
+                rule["outcome"]=outcome
+                rule["instances"][0]["outcome"]=outcome
+                event=project_scan(
+                    scan,
+                    {"benchmark-results/example.json": benchmark},
+                )[1]
+                self.assertEqual(outcome, event["outcome"])
+                self.assertEqual(outcome, event["instances"][0]["outcome"])
+
     def test_missing_benchmark_result_is_rejected(self):
         with self.assertRaises(KeyError):
             project_scan(scan_doc(), {})
