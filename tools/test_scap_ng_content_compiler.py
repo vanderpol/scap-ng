@@ -49,6 +49,51 @@ class ContentCompilerTests(unittest.TestCase):
             self.assertTrue(out.exists())
             self.assertFalse(metrics["signed"])
 
+    def test_mapped_applicability_conditions_preserve_ids_and_resolve_assessments(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"corpus"
+            b=root/"example"
+            dump(b/"benchmark.yaml",{
+                "benchmark":{
+                    "id":"example",
+                    "version":{"value":"1"},
+                    "rules":["R1"],
+                    "profiles":[],
+                    "applicability_catalog":"applicability.yaml",
+                }
+            })
+            dump(b/"assessments"/"automated"/"R1.automated.assessment.yaml",{
+                "assessment":{"id":"R1.automated","mode":"automated","collections":{},"tests":{},"evaluate":None}
+            })
+            dump(b/"assessments"/"applicability"/"platform.assessment.yaml",{
+                "assessment":{"id":"platform.assessment","mode":"automated","purpose":"applicability",
+                              "collections":{},"tests":{},"evaluate":None}
+            })
+            dump(b/"rules"/"R1.rule.yaml",{
+                "rule":{
+                    "id":"R1",
+                    "assessment_choices":{"automated":{"assessment":"../assessments/automated/R1.automated.assessment.yaml"}},
+                    "default_assessment_choice":"automated",
+                }
+            })
+            dump(b/"applicability.yaml",{
+                "applicability":{
+                    "id":"example.applicability",
+                    "conditions":{
+                        "platform.example":{
+                            "assessment":"assessments/applicability/platform.assessment.yaml"
+                        }
+                    },
+                }
+            })
+            benchmark,members,index=compile_benchmark(root,b)
+            self.assertIn("platform.assessment",index)
+            app=json.loads(members["objects/applicability.json"])
+            self.assertEqual(
+                app["applicability"]["conditions"]["platform.example"]["assessment"],
+                "platform.assessment",
+            )
+
 
 if __name__=="__main__":
     unittest.main()
