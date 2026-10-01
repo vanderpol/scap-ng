@@ -4,10 +4,23 @@ from pathlib import Path
 import unittest
 
 import jsonschema
+from jsonschema import RefResolver
 
 
 ROOT=Path(__file__).resolve().parents[1]
-SCHEMA=json.loads((ROOT/"schema/v0.1.0/benchmark-result.schema.json").read_text())
+SCHEMA_DIR=ROOT/"schema/v0.1.0"
+SCHEMA=json.loads((SCHEMA_DIR/"benchmark-result.schema.json").read_text())
+LOCAL_SCHEMAS={}
+for path in SCHEMA_DIR.glob("*.schema.json"):
+    doc=json.loads(path.read_text())
+    LOCAL_SCHEMAS[path.name]=doc
+    if doc.get("$id"):
+        LOCAL_SCHEMAS[doc["$id"]]=doc
+RESOLVER=RefResolver.from_schema(SCHEMA, store=LOCAL_SCHEMAS)
+
+
+def validate(doc):
+    jsonschema.Draft202012Validator(SCHEMA, resolver=RESOLVER).validate(doc)
 
 
 def base_result():
@@ -57,7 +70,7 @@ def base_result():
 
 class BenchmarkResultInstanceTests(unittest.TestCase):
     def test_single_invocation_uses_one_instance(self):
-        jsonschema.validate(base_result(), SCHEMA)
+        validate(base_result())
 
     def test_fanout_uses_multiple_instances_under_one_rule(self):
         doc=base_result()
@@ -70,13 +83,13 @@ class BenchmarkResultInstanceTests(unittest.TestCase):
             "assessment_invocation_id":"invocation-2",
             "target_instance":"account:example",
         })
-        jsonschema.validate(doc, SCHEMA)
+        validate(doc)
 
     def test_empty_instances_is_invalid(self):
         doc=base_result()
         doc["benchmark_result"]["rule_results"][0]["instances"]=[]
         with self.assertRaises(jsonschema.ValidationError):
-            jsonschema.validate(doc, SCHEMA)
+            validate(doc)
 
     def test_old_top_level_assessment_result_ref_does_not_replace_instances(self):
         doc=base_result()
@@ -84,7 +97,7 @@ class BenchmarkResultInstanceTests(unittest.TestCase):
         rr.pop("instances")
         rr["assessment_result_ref"]="legacy-direct-ref"
         with self.assertRaises(jsonschema.ValidationError):
-            jsonschema.validate(doc, SCHEMA)
+            validate(doc)
 
 
 if __name__=="__main__":
