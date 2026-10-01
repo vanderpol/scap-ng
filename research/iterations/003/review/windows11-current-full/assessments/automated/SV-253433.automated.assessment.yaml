@@ -8,6 +8,7 @@ assessment:
   collections:
     built-in-guest-sid-collection:
       collection_title: Built-in Guest SID
+      capability: windows.sid_sid
       select:
         trustee_sid:
           operation: pattern match
@@ -16,6 +17,7 @@ assessment:
           value: ^S-1-5-[0-9-]+-501$
     built-in-guest-account-collection:
       collection_title: Built-in Guest account
+      capability: windows.user_sid55
       select:
         user_sid:
           operation: equals
@@ -33,8 +35,6 @@ assessment:
         values:
           collection: built-in-guest-sid-collection
           field: trustee_sid
-      collection_capabilities:
-        built-in-guest-sid-collection: windows.sid_sid
   tests:
     test-built-in-guest-account-disabled:
       test_title: The built-in guest account is disabled.
@@ -44,6 +44,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: null
+        state_capability: windows.user_sid55
         state:
           field: enabled
           value: '0'

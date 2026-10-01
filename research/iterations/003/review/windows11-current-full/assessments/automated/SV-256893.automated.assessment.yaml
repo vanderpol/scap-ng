@@ -8,6 +8,7 @@ assessment:
   collections:
     windows-wmi57-collection:
       collection_title: null
+      capability: windows.wmi57
       select:
         namespace:
           operation: equals
@@ -21,6 +22,7 @@ assessment:
           value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
     editionid-collection:
       collection_title: EditionID
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -39,6 +41,7 @@ assessment:
           value: EditionId
     windows-registry-collection:
       collection_title: null
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -57,6 +60,7 @@ assessment:
           value: NotifyDisableIEOptions
     64-bit-displayname-registry-value-collection:
       collection_title: 64-bit DisplayName registry value
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -78,6 +82,7 @@ assessment:
         recurse_direction: down
     64-bit-displayname-equals-microsoft-edge-collection:
       collection_title: 64-bit DisplayName equals Microsoft Edge
+      capability: windows.registry
       set:
         operator: union
         members:
@@ -93,8 +98,10 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: registry value equals Microsoft Edge
+          capability: windows.registry
     32-bit-displayname-registry-value-collection:
       collection_title: 32-bit DisplayName registry value
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -116,6 +123,7 @@ assessment:
         recurse_direction: down
     32-bit-displayname-equals-microsoft-edge-collection:
       collection_title: 32-bit DisplayName equals Microsoft Edge
+      capability: windows.registry
       set:
         operator: union
         members:
@@ -131,6 +139,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: registry value equals Microsoft Edge
+          capability: windows.registry
   tests:
     test-internet-explorer-11-optional-feature-disabled-or-not-installed:
       test_title: Internet Explorer 11 optional feature disabled or not installed
@@ -140,6 +149,7 @@ assessment:
         existence: any_exist
         item_quantifier: all
         state_title: null
+        state_capability: windows.wmi57
         state:
           field: result
           value:
@@ -163,6 +173,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: EditionID = EnterpriseS (reg_sz)
+        state_capability: windows.registry
         state:
           all:
           - field: type
@@ -189,6 +200,7 @@ assessment:
         state_operator: OR
         states:
         - state_title: null
+          capability: windows.registry
           state:
             all:
             - field: type
@@ -206,6 +218,7 @@ assessment:
               entity_check: all
               entity_existence: at_least_one_exists
         - state_title: null
+          capability: windows.registry
           state:
             all:
             - field: type
@@ -223,6 +236,7 @@ assessment:
               entity_check: all
               entity_existence: at_least_one_exists
         - state_title: null
+          capability: windows.registry
           state:
             all:
             - field: type

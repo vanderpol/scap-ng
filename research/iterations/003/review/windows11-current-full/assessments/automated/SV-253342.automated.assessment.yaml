@@ -9,6 +9,7 @@ assessment:
   collections:
     path-system-evtx-collection:
       collection_title: path System.evtx
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -27,6 +28,7 @@ assessment:
           value: file
     system-event-log-strict-filepath-as-listed-collection:
       collection_title: The System event log. Strict filepath, as listed.
+      capability: windows.fileeffectiverights53
       select:
         filepath:
           operation: case insensitive equals
@@ -42,6 +44,7 @@ assessment:
           value: .*
     permissions-system-event-log-minus-those-allowed-strict-filepath-as-collection:
       collection_title: Permissions of System event log, minus those allowed. Strict filepath, as listed.
+      capability: windows.fileeffectiverights53
       set:
         operator: union
         members:
@@ -57,6 +60,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: Event Log process account. Deterministically built with respect to service name.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -67,6 +71,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: SYSTEM account.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -77,6 +82,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: Administrators account.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -87,6 +93,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: LOCAL SERVICE account, the owner.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -97,8 +104,10 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+          capability: windows.fileeffectiverights53
     system-root-directory-collection:
       collection_title: System Root Directory
+      capability: windows.registry
       select:
         hive:
           operation: equals
@@ -117,6 +126,7 @@ assessment:
           value: SystemRoot
     system-event-log-built-filepath-collection:
       collection_title: The System event log. Built filepath.
+      capability: windows.fileeffectiverights53
       select:
         filepath:
           operation: case insensitive equals
@@ -132,6 +142,7 @@ assessment:
           value: .*
     permissions-system-event-log-minus-those-allowed-built-filepath-collection:
       collection_title: Permissions of System event log, minus those allowed. Built filepath.
+      capability: windows.fileeffectiverights53
       set:
         operator: union
         members:
@@ -147,6 +158,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: Event Log process account. Deterministically built with respect to service name.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -157,6 +169,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: SYSTEM account.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -167,6 +180,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: Administrators account.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -177,6 +191,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: LOCAL SERVICE account, the owner.
+          capability: windows.fileeffectiverights53
         - action: exclude
           match:
             field: trustee_sid
@@ -187,6 +202,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+          capability: windows.fileeffectiverights53
   variables:
     strict-path-system-evtx-variable:
       title: Strict path to System.evtx.
@@ -214,8 +230,6 @@ assessment:
                 collection: path-system-evtx-collection
                 field: value
             pattern: ^%.*%(.*)$
-      collection_capabilities:
-        system-root-directory-collection: windows.registry
   tests:
     test-system-event-log-have-at-least-default-permissions-strict-path:
       test_title: The System event log must have at least default permissions. Strict Path
@@ -233,6 +247,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: '%SystemRoot% environment variable.'
+        state_capability: windows.registry
         state:
           field: value
           value: ^(?i)%SystemRoot%.*$
