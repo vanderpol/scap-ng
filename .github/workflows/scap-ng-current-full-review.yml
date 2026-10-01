@@ -19,15 +19,15 @@ on:
       - .github/workflows/scap-ng-current-full-review.yml
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: rhel9-current-full-review-main
+  cancel-in-progress: true
 
 jobs:
   full-package:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,5 +52,24 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rhel9-current-full-${{ matrix.os }}
+          name: rhel9-current-full-review
           path: work/rhel9-current-full
+          if-no-files-found: error
+      - name: Publish review tree to main
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          dst="research/iterations/003/review/rhel9-current-full"
+          rm -rf "$dst"
+          mkdir -p "$(dirname "$dst")"
+          cp -R ../work/rhel9-current-full "$dst"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$dst"
+          if git diff --cached --quiet; then
+            echo "RHEL 9 current review already matches."
+            exit 0
+          fi
+          git commit -m "Publish current RHEL 9 full review benchmark"
+          git pull --rebase origin main
+          git push
