@@ -17,12 +17,12 @@ No iteration-001/002 or pre-existing generated SCAP-NG tree was used as input.
 
 ## Manual-review candidates
 - Near-duplicate Assessment groups: **99**
-- Near-duplicate Rule candidates reported: **35062**
+- Near-duplicate Rule candidates reported: **45794**
 
 ## Compiler experiment
-- Unsigned bundles before: **65** / 21768470 bytes
-- Unsigned bundles after: **65** / 22320575 bytes
-- Aggregate standalone-bundle change: **-552105 bytes (-2.54%)**
+- Unsigned bundles before: **65** / 21768447 bytes
+- Unsigned bundles after: **65** / 22320571 bytes
+- Aggregate standalone-bundle change: **-552124 bytes (-2.54%)**
 - Self-signed CMS experimental bundles: **65**
 - Signature trust: self-signed-experimental-no-publisher-trust
 
