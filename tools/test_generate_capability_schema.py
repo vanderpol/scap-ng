@@ -82,6 +82,25 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
+    def test_directory_selection_preserves_nil_semantics(self):
+        self.validate_def("object", {
+            "object_title": "directory itself",
+            "capability": "unix.file",
+            "select": {
+                "path": {
+                    "value": "/etc",
+                    "operation": "equals",
+                    "datatype": "string",
+                },
+                "filename": {
+                    "value": "",
+                    "operation": "equals",
+                    "datatype": "string",
+                    "nil": True,
+                },
+            },
+        })
+
     def test_filepath_and_path_filename_are_mutually_exclusive(self):
         bad = {
             "object_title": None,
