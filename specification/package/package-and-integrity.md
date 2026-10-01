@@ -146,6 +146,31 @@ manifest or equivalent complete logical package representation.
 The final signature format, trust model, countersigning model, and certificate
 requirements remain under design.
 
+
+### Result-package signing relationship
+
+Benchmark content-package signing and Benchmark Result-package signing use the
+same architectural pattern: an immutable manifest integrity-binds package
+members and a signature authenticates that manifest.
+
+The two signatures serve different purposes and SHALL remain distinct:
+
+- a **Benchmark package signature** authenticates the policy/Assessment content
+  that was distributed for execution;
+- a **Benchmark Result package signature** authenticates the completed result
+  artifact produced for a particular run/target.
+
+A Benchmark Result SHOULD reference the immutable identity/digest of the
+Benchmark package that was executed. A signed result therefore provides a
+cryptographic chain from the completed result to the exact signed/identified
+content package without embedding the entire source Benchmark in the result.
+
+Implementations SHOULD reuse the same signature envelope, key-identification,
+algorithm, and trust-validation machinery for both package types where
+practical. SCAP-NG SHOULD NOT define two unrelated cryptographic frameworks for
+content and results.
+
+
 ## 7. Historical authoring comments
 
 Comments used for migration provenance or author guidance are non-semantic.
