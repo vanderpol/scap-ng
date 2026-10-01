@@ -21,19 +21,21 @@ from typing import Any
 
 import yaml
 
-NONSEMANTIC_ASSESSMENT_KEYS = {
+ROOT_NONSEMANTIC_ASSESSMENT_KEYS = {
     "id",
     "version",
     "assessment_title",
+    "provenance",
+    "migration_provenance",
+    "reuse_provenance",
+}
+RECURSIVE_NONSEMANTIC_KEYS = {
     "source_id",
     "source_definition_id",
     "source_test_id",
     "source_object_id",
     "source_state_id",
     "source_variable_id",
-    "provenance",
-    "migration_provenance",
-    "reuse_provenance",
 }
 
 
@@ -60,11 +62,19 @@ def dump_yaml(path: Path, value: dict) -> None:
     )
 
 
-def normalize_value(value: Any, *, abstract_literals: bool = False, parent: str | None = None) -> Any:
+def normalize_value(
+    value: Any,
+    *,
+    abstract_literals: bool = False,
+    parent: str | None = None,
+    depth: int = 0,
+) -> Any:
     if isinstance(value, dict):
         out = {}
         for key, child in value.items():
-            if key in NONSEMANTIC_ASSESSMENT_KEYS:
+            if key in RECURSIVE_NONSEMANTIC_KEYS:
+                continue
+            if depth == 0 and key in ROOT_NONSEMANTIC_ASSESSMENT_KEYS:
                 continue
             if abstract_literals and key == "value":
                 # Keep surrounding datatype/operation/cardinality semantics while
@@ -72,12 +82,20 @@ def normalize_value(value: Any, *, abstract_literals: bool = False, parent: str 
                 out[key] = None if child is None else "<PARAM>"
             else:
                 out[key] = normalize_value(
-                    child, abstract_literals=abstract_literals, parent=key
+                    child,
+                    abstract_literals=abstract_literals,
+                    parent=key,
+                    depth=depth + 1,
                 )
         return out
     if isinstance(value, list):
         return [
-            normalize_value(x, abstract_literals=abstract_literals, parent=parent)
+            normalize_value(
+                x,
+                abstract_literals=abstract_literals,
+                parent=parent,
+                depth=depth + 1,
+            )
             for x in value
         ]
     return value
