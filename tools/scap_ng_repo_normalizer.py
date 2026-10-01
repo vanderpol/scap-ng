@@ -360,20 +360,29 @@ def main() -> int:
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
         assessment["id"] = shared_id
-        assessment["reuse_provenance"] = [
-            {
+        # This is a new canonical Assessment identity, not a continuation of
+        # whichever source file sorts first.
+        assessment["version"] = 1
+        reuse_provenance = []
+        for row in group:
+            source_assessment = (load_yaml(row["path"]).get("assessment") or {})
+            reuse_provenance.append({
                 "source": str(row["path"].relative_to(source)),
+                "source_assessment": {
+                    "id": source_assessment.get("id"),
+                    "version": source_assessment.get("version"),
+                    "title": source_assessment.get("assessment_title"),
+                },
                 "consumers": [
                     {
-                        "benchmark": c["benchmark"],
-                        "rule_id": c["rule_id"],
-                        "selector": c["selector"],
+                        "benchmark": consumer["benchmark"],
+                        "rule_id": consumer["rule_id"],
+                        "selector": consumer["selector"],
                     }
-                    for c in row["consumers"]
+                    for consumer in row["consumers"]
                 ],
-            }
-            for row in group
-        ]
+            })
+        assessment["reuse_provenance"] = reuse_provenance
         dump_yaml(shared_path, {"assessment": assessment})
 
         members = []
@@ -382,6 +391,11 @@ def main() -> int:
             members.append(
                 {
                     "source": str(row["path"].relative_to(source)),
+                    "source_assessment": {
+                        "id": (load_yaml(row["path"]).get("assessment") or {}).get("id"),
+                        "version": (load_yaml(row["path"]).get("assessment") or {}).get("version"),
+                        "title": (load_yaml(row["path"]).get("assessment") or {}).get("assessment_title"),
+                    },
                     "consumers": [
                         report_consumer(consumer, source)
                         for consumer in row["consumers"]
