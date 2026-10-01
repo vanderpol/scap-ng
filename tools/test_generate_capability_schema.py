@@ -144,6 +144,43 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 },
             })
 
+    def test_state_datatype_is_field_specific(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("state", {
+                "state_title": None,
+                "capability": "unix.file",
+                "state": {
+                    "field": "suid",
+                    "value": 1,
+                    "operation": "equals",
+                    "datatype": "int",
+                },
+            })
+
+        self.validate_def("state", {
+            "state_title": None,
+            "capability": "unix.file",
+            "state": {
+                "field": "suid",
+                "value": True,
+                "operation": "equals",
+                "datatype": "boolean",
+            },
+        })
+
+    def test_user_id_rejects_boolean_datatype(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("state", {
+                "state_title": None,
+                "capability": "unix.file",
+                "state": {
+                    "field": "user_id",
+                    "value": True,
+                    "operation": "equals",
+                    "datatype": "boolean",
+                },
+            })
+
     def test_semantic_validator_rules_are_not_lost(self):
         rules = {
             row["id"]: row
