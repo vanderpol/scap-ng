@@ -46,6 +46,24 @@ def restriction_values(node):
     return values
 
 
+def deprecated_restriction_values(node):
+    rows = []
+    for child in node.iter():
+        if child.tag != XSD + "enumeration" or child.get("value") is None:
+            continue
+        deprecated = [
+            n for n in child.iter()
+            if local(n.tag) == "deprecated_info"
+        ]
+        if deprecated:
+            rows.append({
+                "value": child.get("value"),
+                "evidence": " ".join(docs(n) or " ".join("".join(n.itertext()).split())
+                                     for n in deprecated).strip(),
+            })
+    return rows
+
+
 def source_datatypes(element):
     typed = element.get("type") or ""
     suffix_map = {
@@ -105,6 +123,9 @@ def behavior_contract(root, type_name):
         if values:
             schema["type"] = "string"
             schema["enum"] = values
+            deprecated_values = deprecated_restriction_values(attr)
+            if deprecated_values:
+                schema["x-oval-deprecated-enum-values"] = deprecated_values
         else:
             # FileBehaviors max_depth is the current integer case.
             has_integer = any(
