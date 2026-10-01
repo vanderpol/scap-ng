@@ -99,16 +99,18 @@ A Variable result SHALL preserve at least:
 - evaluation status;
 - provenance sufficient to identify the source/binding.
 
-### 5.1 Zero values
+### 5.1 Zero values and reference context
 
-Pinned OVAL 5.12.3 VariableType documentation states that a Variable returning no value produces an analysis error.
+Pinned OVAL 5.12.3 generic VariableType documentation states that a Variable returning no value is an analysis-error condition. More specific entity `var_ref` documentation refines that behavior at the reference site, so native evaluation SHALL preserve **zero values as a distinct intermediate status** until reference context is known.
 
-Therefore:
+For OVAL-derived entity references:
 
-- `[]` is an error condition for OVAL-derived compatibility semantics;
-- an implementation SHALL NOT reinterpret zero values as an empty Object population;
-- `var_check` or `entity_check` SHALL NOT turn an unresolved/error Variable into a successful predicate;
-- conversion tooling SHALL NOT synthesize a replacement value merely to avoid the error.
+- an Object entity `var_ref` that resolves to zero values causes the referenced Object to be considered **not to exist**;
+- a State entity `var_ref` that resolves to zero values produces an **error** for State evaluation;
+- `var_check` or `entity_check` SHALL NOT convert the zero-value/error condition into a successful State predicate;
+- migration and conversion tooling SHALL NOT synthesize a replacement value merely to avoid zero cardinality.
+
+This context-specific rule takes precedence over treating zero cardinality as one universal result. Native implementations SHOULD represent zero cardinality distinctly during Variable resolution so Object and State consumers cannot accidentally collapse the two behaviors.
 
 ### 5.2 Empty string is not zero values
 
