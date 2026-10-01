@@ -31,7 +31,11 @@ def audit(package, output):
             selector=(check.get('selector') or '').strip() or 'default'
             if selector in expected: issues.append(rid+': duplicate source selector')
             expected[selector]=check
-        fallbacks={row['selector']:row for row in bindings[rid].get('manual_fallbacks',[])}
+        fallback_rows=(
+            bindings[rid].get('manual_fallbacks',[])
+            + bindings[rid].get('source_defect_fallbacks',[])
+        )
+        fallbacks={row['selector']:row for row in fallback_rows}
         expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
         if set(choices)!=expected_native: issues.append(rid+': selector set differs')
         if 'default' not in expected or native['default_assessment_choice']!='default':
@@ -41,7 +45,7 @@ def audit(package, output):
                                 if a.get('path') and a.get('source_graph_bindings')}
         for selector,check in expected.items():
             if selector in fallbacks and selector!='default':
-                if selector in choices: issues.append(rid+': deprecated automated selector was not skipped: '+selector)
+                if selector in choices: issues.append(rid+': excluded automated selector was not skipped: '+selector)
                 continue
             ref=choices[selector]['assessment']; target=(output/'rules'/ref).resolve()
             if not target.is_relative_to(output.resolve()): raise ValueError('Package escape')
@@ -50,7 +54,8 @@ def audit(package, output):
             expected_mode='manual' if manual or selector in fallbacks else 'automated'
             if method['mode']!=expected_mode: issues.append(rid+': mode differs for '+selector)
             if selector in fallbacks:
-                # Intentional NG migration rule: deprecated automated OVAL is
+                # Intentional NG migration exception: a deprecated or
+                # positively classified source-invalid automated OVAL path is
                 # not converted. The source default may point to the verified
                 # source manual Assessment instead.
                 continue
