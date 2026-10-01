@@ -82,6 +82,13 @@ def project_scan(
                 "rule_id": rule["rule_id"],
                 "title": rule.get("title"),
                 "severity": rule.get("severity"),
+                "weight": rule.get("weight"),
+                "check_selector": rule.get(
+                    "check_selector",
+                    effective_policy.get("check_selectors", {}).get(rule["rule_id"]),
+                ),
+                "parameters": rule.get("parameters", effective_policy.get("parameters", {})),
+                "applicability": rule.get("applicability"),
                 "outcome": rule["outcome"],
                 "message": rule.get("message"),
                 "reason": rule.get("reason"),
