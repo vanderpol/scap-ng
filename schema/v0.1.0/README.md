@@ -35,6 +35,8 @@ The current executable schemas cover:
 8. Organizational Input
 9. Reusable result types
 10. Reusable collected Item results
+11. Detailed Test results
+12. Object collection results
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
@@ -129,6 +131,8 @@ Package-manifest and deeper reusable result-component schemas remain to be
 added. Tailoring, Organizational Input, Benchmark Result, Assessment Result,
 reusable result-type, and collected-Item schemas now exist and will continue to
 evolve with the result-model work.
+
+The detailed Test result schema preserves existence evaluation separately from per-State/per-Item aggregation and the final Test outcome. The Object collection result schema preserves the six OVAL-derived collection flags (`error`, `complete`, `incomplete`, `does_not_exist`, `not_collected`, and `not_applicable`) rather than reducing collection to a Boolean.
 
 The reusable result-type schema intentionally keeps the technical outcome domain
 to six states: `true`, `false`, `error`, `unknown`, `not_evaluated`, and
