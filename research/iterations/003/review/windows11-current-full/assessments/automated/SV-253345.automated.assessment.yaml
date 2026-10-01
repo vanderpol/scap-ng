@@ -5,39 +5,43 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-auditeventpolicysubcategories-collection:
-      collection_title: null
+  objects:
+    windows-auditeventpolicysubcategories-object:
       capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-log-on-is-set-to-success:
+      state_title: '''Log On'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_logon_logoff_events
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-log-on-is-set-to-success-and-failure:
+      state_title: '''Log On'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_logon_logoff_events
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-audit-logon-set-failure-succss-failure:
       test_title: '''Audit Logon'' is set to ''Failure'' and ''Succss and Failure'
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: '''Log On'' is set to ''Success'''
-          capability: windows.auditeventpolicysubcategories
-          state:
-            field: other_logon_logoff_events
-            value: AUDIT_SUCCESS
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: '''Log On'' is set to ''Success'' and ''Failure'''
-          capability: windows.auditeventpolicysubcategories
-          state:
-            field: other_logon_logoff_events
-            value: AUDIT_SUCCESS_FAILURE
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-log-on-is-set-to-success
+      - state-log-on-is-set-to-success-and-failure
   evaluate:
     test: test-audit-logon-set-failure-succss-failure

@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    bitlocker-status-collection:
-      collection_title: BitLocker status
+  objects:
+    bitlocker-status-object:
       capability: windows.wmi57
       select:
         namespace:
@@ -21,30 +20,34 @@ assessment:
           datatype: string
           mask: false
           value: SELECT protectionstatus FROM win32_encryptablevolume
+      object_title: BitLocker status
+  states:
+    state-bitlocker-status-is-protected:
+      state_title: BitLocker status is Protected
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: protectionstatus
+            value: '1'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-bitlocker-enabled-on-all-fixed-drives:
       test_title: BitLocker must be enabled on all fixed drives.
       capability: windows.wmi57
-      collection: bitlocker-status-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: BitLocker status is Protected
-        state_capability: windows.wmi57
-        state:
-          field: result
-          value:
-            record:
-            - name: protectionstatus
-              value: '1'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: bitlocker-status-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-bitlocker-status-is-protected
   evaluate:
     test: test-bitlocker-enabled-on-all-fixed-drives

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-registry-collection:
-      collection_title: null
+  objects:
+    windows-registry-object:
       capability: windows.registry
       select:
         hive:
@@ -25,8 +24,8 @@ assessment:
           datatype: string
           mask: false
           value: DODownloadMode
-    windows-wmi57-collection:
-      collection_title: null
+      object_title: null
+    windows-wmi57-object:
       capability: windows.wmi57
       select:
         namespace:
@@ -39,8 +38,8 @@ assessment:
           datatype: string
           mask: false
           value: SELECT DomainRole FROM win32_computersystem
-    downloadmode-set-through-settings-app-collection:
-      collection_title: DownloadMode set through the Settings App
+      object_title: null
+    downloadmode-set-through-settings-app-object:
       capability: windows.registry
       select:
         hive:
@@ -58,194 +57,173 @@ assessment:
           datatype: string
           mask: false
           value: DODownloadMode
+      object_title: DownloadMode set through the Settings App
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-2:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-3:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-equals-99:
+      state_title: Reg_Dword type and value equals 99
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '99'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-equals-100:
+      state_title: Reg_Dword type and value equals 100
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '100'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-standalone-workstation:
+      state_title: Standalone Workstation
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '0'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-standalone-server:
+      state_title: Standalone Server
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '2'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-downloadmode-set-enabled-http-only-lan-group-simple-or-bypass:
       test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
       capability: windows.registry
-      collection: windows-registry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '0'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '1'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '2'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: Reg_Dword type and value equals 99
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '99'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: Reg_Dword type and value equals 100
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '100'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-registry
+      - state-windows-registry-2
+      - state-windows-registry-3
+      - state-reg-dword-type-and-value-equals-99
+      - state-reg-dword-type-and-value-equals-100
     test-system-windows-standalone-workstation-or-server:
       test_title: The system is a Windows Standalone Workstation or Server
       capability: windows.wmi57
-      collection: windows-wmi57-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: Standalone Workstation
-          capability: windows.wmi57
-          state:
-            field: result
-            value:
-              record:
-              - name: domainrole
-                value: '0'
-                operation: equals
-                datatype: string
-                mask: false
-                entity_check: all
-            operation: equals
-            datatype: record
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: Standalone Server
-          capability: windows.wmi57
-          state:
-            field: result
-            value:
-              record:
-              - name: domainrole
-                value: '2'
-                operation: equals
-                datatype: string
-                mask: false
-                entity_check: all
-            operation: equals
-            datatype: record
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: windows-wmi57-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-standalone-workstation
+      - state-standalone-server
     test-downloadmode-set-enabled-http-only-or-lan-selected:
       test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
       capability: windows.registry
-      collection: downloadmode-set-through-settings-app-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '0'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_dword
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '1'
-              operation: equals
-              datatype: int
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
+      object: downloadmode-set-through-settings-app-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-registry
+      - state-windows-registry-2
   evaluate:
     any:
     - test: test-downloadmode-set-enabled-http-only-lan-group-simple-or-bypass

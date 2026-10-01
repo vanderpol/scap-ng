@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-registry-collection:
-      collection_title: null
+  objects:
+    windows-registry-object:
       capability: windows.registry
       select:
         hive:
@@ -25,52 +24,57 @@ assessment:
           datatype: string
           mask: false
           value: SCRemoveOption
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-2:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-interactive-logon-smart-card-removal-behavior-set-lock-workstation-or:
       test_title: '''Interactive logon: Smart card removal behavior'' is set to ''Lock Workstation'' or ''Force
         Logoff'''
       capability: windows.registry
-      collection: windows-registry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_sz
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '1'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.registry
-          state:
-            all:
-            - field: type
-              value: reg_sz
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
-            - field: value
-              value: '2'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-              entity_existence: at_least_one_exists
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-registry
+      - state-windows-registry-2
   evaluate:
     test: test-interactive-logon-smart-card-removal-behavior-set-lock-workstation-or

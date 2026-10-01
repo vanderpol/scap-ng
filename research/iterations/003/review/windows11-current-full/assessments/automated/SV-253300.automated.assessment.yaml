@@ -5,12 +5,11 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-passwordpolicy-collection:
-      collection_title: null
+  objects:
+    windows-passwordpolicy-object:
       capability: windows.passwordpolicy
-    windows-registry-collection:
-      collection_title: null
+      object_title: null
+    windows-registry-object:
       capability: windows.registry
       select:
         hive:
@@ -28,49 +27,55 @@ assessment:
           datatype: string
           mask: false
           value: DevicePasswordHistory
-  tests:
-    test-enforce-password-history-set-24-passwords-or-more:
-      test_title: '''Enforce password history'' is set to ''24'' passwords or more'
+      object_title: null
+  states:
+    state-password-history-length-is-greater-than-or-equal-to-vari:
+      state_title: Password History Length is greater than or equal to variable
       capability: windows.passwordpolicy
-      collection: windows-passwordpolicy-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Password History Length is greater than or equal to variable
-        state_capability: windows.passwordpolicy
-        state:
-          field: password_hist_len
+      state:
+        field: password_hist_len
+        value: '24'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
           value: '24'
           operation: greater than or equal
           datatype: int
           mask: false
           entity_check: all
           entity_existence: at_least_one_exists
+  tests:
+    test-enforce-password-history-set-24-passwords-or-more:
+      test_title: '''Enforce password history'' is set to ''24'' passwords or more'
+      capability: windows.passwordpolicy
+      object: windows-passwordpolicy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-password-history-length-is-greater-than-or-equal-to-vari
     test-enforce-password-history-set-24-passwords-or-more-through-intune:
       test_title: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
       capability: windows.registry
-      collection: windows-registry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '24'
-            operation: greater than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     any:
     - test: test-enforce-password-history-set-24-passwords-or-more

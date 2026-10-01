@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    search-p12-files-collection:
-      collection_title: Search for .p12 files
+  objects:
+    search-p12-files-object:
       capability: windows.file
       select:
         path:
@@ -22,32 +21,14 @@ assessment:
           value: \.[Pp]12$
       filters:
       - action: exclude
-        match:
-          field: filepath
-          value: '[Aa]dobe.+Preflight\.p12$'
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: Preflight.p12 Adobe file should not report failure
-        capability: windows.file
+        state: state-preflight-p12-adobe-file-should-not-report-failure
       - action: exclude
-        match:
-          field: filepath
-          value: '[Ee]wallet\.p12$'
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: ewallet.p12 Oracle Wallet Manager should not report failure
-        capability: windows.file
+        state: state-ewallet-p12-oracle-wallet-manager-should-not-report-fail
       behaviors:
         max_depth: '-1'
         recurse_direction: down
-    search-pfx-files-collection:
-      collection_title: Search for .pfx files
+      object_title: Search for .p12 files
+    search-pfx-files-object:
       capability: windows.file
       select:
         path:
@@ -63,23 +44,43 @@ assessment:
       behaviors:
         max_depth: '-1'
         recurse_direction: down
+      object_title: Search for .pfx files
+  states:
+    state-preflight-p12-adobe-file-should-not-report-failure:
+      state_title: Preflight.p12 Adobe file should not report failure
+      capability: windows.file
+      state:
+        field: filepath
+        value: '[Aa]dobe.+Preflight\.p12$'
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ewallet-p12-oracle-wallet-manager-should-not-report-fail:
+      state_title: ewallet.p12 Oracle Wallet Manager should not report failure
+      capability: windows.file
+      state:
+        field: filepath
+        value: '[Ee]wallet\.p12$'
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-software-certificate-installation-files-removed-p12-files:
       test_title: Software certificate installation files must be removed. .p12 files
       capability: windows.file
-      collection: search-p12-files-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: search-p12-files-object
+      check_existence: none_exist
+      check: all
     test-software-certificate-installation-files-removed-pfx-files:
       test_title: Software certificate installation files must be removed. .pfx files
       capability: windows.file
-      collection: search-pfx-files-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: search-pfx-files-object
+      check_existence: none_exist
+      check: all
   evaluate:
     all:
     - test: test-software-certificate-installation-files-removed-p12-files

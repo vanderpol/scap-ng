@@ -5,45 +5,50 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-auditeventpolicysubcategories-collection:
-      collection_title: null
+  objects:
+    windows-auditeventpolicysubcategories-object:
       capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-plug-and-play-events-is-set-to-success:
+      state_title: '''Plug and Play Events'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: pnp_activity
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-plug-and-play-events-is-set-to-success-and-failure:
+      state_title: '''Plug and Play Events'' is set to ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: pnp_activity
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-audit-detailed-tracking-pnp-activity-success-only:
       test_title: Audit - Detailed Tracking - PNP Activity - Success Only
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''Plug and Play Events'' is set to ''Success'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: pnp_activity
-          value: AUDIT_SUCCESS
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-plug-and-play-events-is-set-to-success
     test-audit-detailed-tracking-pnp-activity-success-failure:
       test_title: Audit - Detailed Tracking - PNP Activity - Success and Failure
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''Plug and Play Events'' is set to ''Success and Failure'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: pnp_activity
-          value: AUDIT_SUCCESS_FAILURE
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-plug-and-play-events-is-set-to-success-and-failure
   evaluate:
     any:
     - test: test-audit-detailed-tracking-pnp-activity-success-only

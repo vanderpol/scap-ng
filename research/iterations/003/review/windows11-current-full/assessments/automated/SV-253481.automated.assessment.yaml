@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-userright-collection:
-      collection_title: null
+  objects:
+    windows-userright-object:
       capability: windows.userright
       select:
         userright:
@@ -16,23 +15,27 @@ assessment:
           datatype: string
           mask: false
           value: SE_TCB_NAME
+      object_title: null
+  states:
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-act-as-part-operating-system-none:
       test_title: Act as part of the operating system - None
       capability: windows.userright
-      collection: windows-userright-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.userright
-        state:
-          field: trustee_name
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-userright
   evaluate:
     test: test-act-as-part-operating-system-none

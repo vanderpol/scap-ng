@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    gather-antivirusproduct-from-securitycenter2-collection:
-      collection_title: Gather AntivirusProduct from SecurityCenter2
+  objects:
+    gather-antivirusproduct-from-securitycenter2-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -67,30 +66,34 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
+      object_title: Gather AntivirusProduct from SecurityCenter2
+  states:
+    state-an-antivirus-program-must-be-installed-and-running:
+      state_title: An antivirus program must be installed and running
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: productstate
+            value: '4096'
+            operation: bitwise and
+            datatype: int
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
   tests:
     test-windows-use-antivirus-program:
       test_title: Windows must use an antivirus program
       capability: windows.cmdlet
-      collection: gather-antivirusproduct-from-securitycenter2-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: An antivirus program must be installed and running
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: productstate
-              value: '4096'
-              operation: bitwise and
-              datatype: int
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: gather-antivirusproduct-from-securitycenter2-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-an-antivirus-program-must-be-installed-and-running
   evaluate:
     test: test-windows-use-antivirus-program

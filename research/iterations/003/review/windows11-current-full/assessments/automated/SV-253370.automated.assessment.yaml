@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    deviceguard-securityservicesrunning-collection:
-      collection_title: DeviceGuard securityservicesrunning
+  objects:
+    deviceguard-securityservicesrunning-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -67,30 +66,34 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
+      object_title: DeviceGuard securityservicesrunning
+  states:
+    state-securityservicesrunning-contains-1-in-array-element:
+      state_title: securityservicesrunning contains 1 in array element
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: securityservicesrunning
+            value: '1'
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-credential-guard-running-on-windows-11-domain-joined-systems:
       test_title: Credential Guard must be running on Windows 11 domain-joined systems.
       capability: windows.cmdlet
-      collection: deviceguard-securityservicesrunning-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: only one
-        state_title: securityservicesrunning contains 1 in array element
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: securityservicesrunning
-              value: '1'
-              operation: pattern match
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: deviceguard-securityservicesrunning-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-securityservicesrunning-contains-1-in-array-element
   evaluate:
     test: test-credential-guard-running-on-windows-11-domain-joined-systems

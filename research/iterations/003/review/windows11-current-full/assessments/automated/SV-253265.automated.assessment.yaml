@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    all-local-disk-file-systems-not-using-ntfs-collection:
-      collection_title: All 'Local Disk' File systems not using NTFS
+  objects:
+    all-local-disk-file-systems-not-using-ntfs-object:
       capability: windows.wmi57
       select:
         namespace:
@@ -20,14 +19,14 @@ assessment:
           datatype: string
           mask: false
           value: SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!="NTFS"
+      object_title: All 'Local Disk' File systems not using NTFS
+  states: {}
   tests:
     test-local-volumes-use-ntfs:
       test_title: Local volumes use NTFS
       capability: windows.wmi57
-      collection: all-local-disk-file-systems-not-using-ntfs-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: all-local-disk-file-systems-not-using-ntfs-object
+      check_existence: none_exist
+      check: all
   evaluate:
     test: test-local-volumes-use-ntfs

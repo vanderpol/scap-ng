@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    gather-firewallproduct-from-securitycenter2-collection:
-      collection_title: Gather FirewallProduct from SecurityCenter2
+  objects:
+    gather-firewallproduct-from-securitycenter2-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -67,8 +66,8 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
-    gather-firewallproduct-from-netsecurity-collection:
-      collection_title: Gather FirewallProduct from NetSecurity
+      object_title: Gather FirewallProduct from SecurityCenter2
+    gather-firewallproduct-from-netsecurity-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -122,55 +121,61 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
+      object_title: Gather FirewallProduct from NetSecurity
+  states:
+    state-product-state-must-be-397568-enabled:
+      state_title: Product State must be 397568 (enabled)
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: productstate
+            value: '266240'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-enabled-must-be-true:
+      state_title: Enabled must be 'True')
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: enabled
+            value: 'True'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-verify-3rd-party-firewall-installed-enabled-via-security-center:
       test_title: Verify a 3rd party firewall is installed and enabled via Security Center.
       capability: windows.cmdlet
-      collection: gather-firewallproduct-from-securitycenter2-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: Product State must be 397568 (enabled)
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: productstate
-              value: '266240'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: gather-firewallproduct-from-securitycenter2-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-product-state-must-be-397568-enabled
     test-verify-windows-defender-firewall-enabled:
       test_title: Verify Windows defender firewall is enabled.
       capability: windows.cmdlet
-      collection: gather-firewallproduct-from-netsecurity-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: Enabled must be 'True')
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: enabled
-              value: 'True'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: gather-firewallproduct-from-netsecurity-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-enabled-must-be-true
   evaluate:
     any:
     - test: test-verify-3rd-party-firewall-installed-enabled-via-security-center

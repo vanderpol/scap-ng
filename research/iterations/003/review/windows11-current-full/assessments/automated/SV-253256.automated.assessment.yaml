@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    secure-boot-state-setting-collection:
-      collection_title: Secure Boot State Setting
+  objects:
+    secure-boot-state-setting-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -56,31 +55,35 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
+      object_title: Secure Boot State Setting
+  states:
+    state-bios-firmware-type-must-be-equal-to-uefi:
+      state_title: BIOS Firmware Type must be equal to UEFI
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: biosfirmwaretype
+            value: UEFI
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-unified-extensible-firmware-interface-uefi-firmware-exist-configured-run-in:
       test_title: Unified Extensible Firmware Interface (UEFI) firmware must exist and be configured to run in UEFI
         mode, not Legacy BIOS.
       capability: windows.cmdlet
-      collection: secure-boot-state-setting-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: BIOS Firmware Type must be equal to UEFI
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: biosfirmwaretype
-              value: UEFI
-              operation: case insensitive equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: secure-boot-state-setting-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-bios-firmware-type-must-be-equal-to-uefi
   evaluate:
     test: test-unified-extensible-firmware-interface-uefi-firmware-exist-configured-run-in

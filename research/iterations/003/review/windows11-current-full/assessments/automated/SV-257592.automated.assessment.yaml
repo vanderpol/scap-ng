@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    ensure-no-portproxies-configured-collection:
-      collection_title: Ensure no portproxies are configured.
+  objects:
+    ensure-no-portproxies-configured-object:
       capability: windows.registry
       select:
         hive:
@@ -25,8 +24,8 @@ assessment:
           datatype: string
           mask: false
           value: .*
-    check-registry-existence-v4tov4-tcp-collection:
-      collection_title: Check registry for existence of v4tov4\tcp
+      object_title: Ensure no portproxies are configured.
+    check-registry-existence-v4tov4-tcp-object:
       capability: windows.registry
       select:
         hive:
@@ -45,23 +44,21 @@ assessment:
           mask: false
           nil: true
           value: ''
+      object_title: Check registry for existence of v4tov4\tcp
+  states: {}
   tests:
     test-windows-11-not-have-portproxy-enabled-or-in-use:
       test_title: Windows 11 must not have portproxy enabled or in use.
       capability: windows.registry
-      collection: ensure-no-portproxies-configured-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: only one
-        state: null
+      object: ensure-no-portproxies-configured-object
+      check_existence: none_exist
+      check: only one
     test-windows-11-not-have-portproxy-enabled-or-in-use-2:
       test_title: Windows 11 must not have portproxy enabled or in use.
       capability: windows.registry
-      collection: check-registry-existence-v4tov4-tcp-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: only one
-        state: null
+      object: check-registry-existence-v4tov4-tcp-object
+      check_existence: none_exist
+      check: only one
   evaluate:
     all:
     - test: test-windows-11-not-have-portproxy-enabled-or-in-use

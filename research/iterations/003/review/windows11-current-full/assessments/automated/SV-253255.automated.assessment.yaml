@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    check-tpm-values-collection:
-      collection_title: Check for TPM values
+  objects:
+    check-tpm-values-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -55,8 +54,8 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
-    check-tpm-specific-version-collection:
-      collection_title: Check for TPM Specific Version
+      object_title: Check for TPM values
+    check-tpm-specific-version-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -116,67 +115,73 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
+      object_title: Check for TPM Specific Version
+  states:
+    state-tpm-values-must-be-equal-to-true:
+      state_title: TPM values must be equal to True
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: tpmpresent
+            value: 'True'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+          - name: tpmready
+            value: 'True'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+          - name: tpmenabled
+            value: 'True'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-specific-version-must-be-2-0:
+      state_title: Specific Version must be 2.0
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: specversion
+            value: 2\.0
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-windows-have-tpm-ready-use:
       test_title: Windows must have TPM and must be ready to use
       capability: windows.cmdlet
-      collection: check-tpm-values-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: TPM values must be equal to True
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: tpmpresent
-              value: 'True'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-            - name: tpmready
-              value: 'True'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-            - name: tpmenabled
-              value: 'True'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: check-tpm-values-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-tpm-values-must-be-equal-to-true
     test-windows-tpm-specific-version-should-version-2-0:
       test_title: Windows TPM Specific Version should be version 2.0
       capability: windows.cmdlet
-      collection: check-tpm-specific-version-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: Specific Version must be 2.0
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: specversion
-              value: 2\.0
-              operation: pattern match
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: check-tpm-specific-version-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-specific-version-must-be-2-0
   evaluate:
     all:
     - test: test-windows-have-tpm-ready-use

@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-userright-collection:
-      collection_title: null
+  objects:
+    windows-userright-object:
       capability: windows.userright
       select:
         userright:
@@ -16,41 +15,47 @@ assessment:
           datatype: string
           mask: false
           value: SE_DENY_SERVICE_LOGON_NAME
+      object_title: null
+  states:
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ^(?i)(.+\\)?Domain Admins$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-2:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ^(?i)(.+\\)?Enterprise Admins$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-deny-log-on-as-service-domain-admins:
       test_title: Deny log on as a service - Domain Admins
       capability: windows.userright
-      collection: windows-userright-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: windows.userright
-        state:
-          field: trustee_name
-          value: ^(?i)(.+\\)?Domain Admins$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-windows-userright
     test-deny-log-on-as-service-enterprise-admins:
       test_title: Deny log on as a service - Enterprise Admins
       capability: windows.userright
-      collection: windows-userright-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: windows.userright
-        state:
-          field: trustee_name
-          value: ^(?i)(.+\\)?Enterprise Admins$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-windows-userright-2
   evaluate:
     all:
     - test: test-deny-log-on-as-service-domain-admins

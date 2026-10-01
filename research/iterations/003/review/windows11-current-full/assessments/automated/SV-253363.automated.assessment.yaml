@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    ssl-ecccurves-setting-collection:
-      collection_title: SSL - EccCurves Setting
+  objects:
+    ssl-ecccurves-setting-object:
       capability: windows.registry
       select:
         hive:
@@ -25,8 +24,8 @@ assessment:
           datatype: string
           mask: false
           value: EccCurves
-    independent-variable-collection:
-      collection_title: null
+      object_title: SSL - EccCurves Setting
+    independent-variable-object:
       capability: independent.variable
       select:
         var_ref:
@@ -35,6 +34,7 @@ assessment:
           mask: false
           value:
             variable: merged-multi-string-ssl-ecccurves-setting-variable
+      object_title: null
   variables:
     merged-multi-string-ssl-ecccurves-setting-variable:
       title: Merged Multi-String SSL - EccCurves Setting
@@ -44,28 +44,31 @@ assessment:
         merge:
           values:
             values:
-              collection: ssl-ecccurves-setting-collection
+              object: ssl-ecccurves-setting-object
               field: value
           delimiter: ''
           sort: document
           order: ascending
+  states:
+    state-independent-variable:
+      state_title: null
+      capability: independent.variable
+      state:
+        field: value
+        value: ^NistP384\s*NistP256$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-prioritize-ecc-curves-longer-key-lengths-first-nistp384-requirement:
       test_title: Prioritize ECC Curves with longer key lengths first. NistP384 Requirement
       capability: independent.variable
-      collection: independent-variable-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: only one
-        state_title: null
-        state_capability: independent.variable
-        state:
-          field: value
-          value: ^NistP384\s*NistP256$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: independent-variable-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-independent-variable
   evaluate:
     test: test-prioritize-ecc-curves-longer-key-lengths-first-nistp384-requirement

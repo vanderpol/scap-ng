@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: inventory
   purpose: applicability
-  collections:
-    run-command-get-pnpdevice-class-bluetooth-status-ok-class-collection:
-      collection_title: 'Run command: (Get-PnpDevice -class bluetooth -status OK).class'
+  objects:
+    run-command-get-pnpdevice-class-bluetooth-status-ok-class-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -22,24 +21,26 @@ assessment:
           value: (Get-PnpDevice -class bluetooth -status OK).class
       filters:
       - action: include
-        match:
-          field: stdout_line
-          value: Bluetooth
-          operation: case insensitive equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: Check if Get-PnpDevice command returned any items with class 'Bluetooth'
-        capability: independent.shellcommand
+        state: state-check-if-get-pnpdevice-command-returned-any-items-with-c
+      object_title: 'Run command: (Get-PnpDevice -class bluetooth -status OK).class'
+  states:
+    state-check-if-get-pnpdevice-command-returned-any-items-with-c:
+      state_title: Check if Get-PnpDevice command returned any items with class 'Bluetooth'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: Bluetooth
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-report-true-if-bluetooth-installed:
       test_title: Report true if bluetooth installed
       capability: independent.shellcommand
-      collection: run-command-get-pnpdevice-class-bluetooth-status-ok-class-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: run-command-get-pnpdevice-class-bluetooth-status-ok-class-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     test: test-report-true-if-bluetooth-installed

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    group-policy-registry-entry-allowgamedvr-collection:
-      collection_title: Group Policy registry entry for AllowGameDVR
+  objects:
+    group-policy-registry-entry-allowgamedvr-object:
       capability: windows.registry
       select:
         hive:
@@ -25,8 +24,8 @@ assessment:
           datatype: string
           mask: false
           value: AllowGameDVR
-    intune-registry-entry-allowgamedvr-collection:
-      collection_title: Intune registry entry for AllowGameDVR
+      object_title: Group Policy registry entry for AllowGameDVR
+    intune-registry-entry-allowgamedvr-object:
       capability: windows.registry
       select:
         hive:
@@ -44,39 +43,43 @@ assessment:
           datatype: string
           mask: false
           value: AllowGameDVR
-    registry-entries-allowgamedvr-collection:
-      collection_title: Registry entries for AllowGameDVR
+      object_title: Intune registry entry for AllowGameDVR
+    registry-entries-allowgamedvr-object:
       capability: windows.registry
       set:
         operator: union
         members:
-        - collection: group-policy-registry-entry-allowgamedvr-collection
-        - collection: intune-registry-entry-allowgamedvr-collection
+        - object: group-policy-registry-entry-allowgamedvr-object
+        - object: intune-registry-entry-allowgamedvr-object
+      object_title: Registry entries for AllowGameDVR
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-allowgamedvr-disabled:
       test_title: AllowGameDVR is disabled
       capability: windows.registry
-      collection: registry-entries-allowgamedvr-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: registry-entries-allowgamedvr-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     test: test-allowgamedvr-disabled

@@ -6,45 +6,50 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-auditeventpolicysubcategories-collection:
-      collection_title: null
+  objects:
+    windows-auditeventpolicysubcategories-object:
       capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-other-object-access-events-is-set-to-success:
+      state_title: '''Other Object Access Events'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_object_access_events
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-other-object-access-events-is-set-to-success-and-failure:
+      state_title: '''Other Object Access Events'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_object_access_events
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-audit-other-object-access-events-set-success:
       test_title: '''Audit Other Object Access Events'' is set to ''Success'''
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''Other Object Access Events'' is set to ''Success'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: other_object_access_events
-          value: AUDIT_SUCCESS
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-other-object-access-events-is-set-to-success
     test-audit-other-object-access-events-set-success-failure:
       test_title: '''Audit Other Object Access Events'' is set to ''Success'' and ''Failure'''
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''Other Object Access Events'' is set to ''Success'' and ''Failure'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: other_object_access_events
-          value: AUDIT_SUCCESS_FAILURE
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-other-object-access-events-is-set-to-success-and-failure
   evaluate:
     any:
     - test: test-audit-other-object-access-events-set-success

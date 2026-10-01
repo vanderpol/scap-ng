@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    verify-bluetooth-radio-turned-off-collection:
-      collection_title: Verify the Bluetooth radio is turned off
+  objects:
+    verify-bluetooth-radio-turned-off-object:
       capability: windows.registry
       select:
         hive:
@@ -25,23 +24,27 @@ assessment:
           datatype: string
           mask: false
           value: AllowBluetooth
+      object_title: Verify the Bluetooth radio is turned off
+  states:
+    state-value-equal-to-0:
+      state_title: Value Equal To 0
+      capability: windows.registry
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-bluetooth-radio-turned-off:
       test_title: Bluetooth radio must be turned off.
       capability: windows.registry
-      collection: verify-bluetooth-radio-turned-off-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: only one
-        state_title: Value Equal To 0
-        state_capability: windows.registry
-        state:
-          field: value
-          value: '0'
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: verify-bluetooth-radio-turned-off-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-value-equal-to-0
   evaluate:
     test: test-bluetooth-radio-turned-off

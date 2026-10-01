@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    run-powershell-command-determine-if-secure-boot-enabled-collection:
-      collection_title: Run a PowerShell command to determine if secure boot is enabled
+  objects:
+    run-powershell-command-determine-if-secure-boot-enabled-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -25,23 +24,27 @@ assessment:
           datatype: string
           mask: false
           value: ''
+      object_title: Run a PowerShell command to determine if secure boot is enabled
+  states:
+    state-verify-true-is-returned-to-stdout:
+      state_title: Verify True is returned to stdout
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'True'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-run-powershell-command-determine-if-secure-boot-enabled:
       test_title: Run a PowerShell command to determine if Secure Boot must be enabled.
       capability: independent.shellcommand
-      collection: run-powershell-command-determine-if-secure-boot-enabled-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Verify True is returned to stdout
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: 'True'
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: run-powershell-command-determine-if-secure-boot-enabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-true-is-returned-to-stdout
   evaluate:
     test: test-run-powershell-command-determine-if-secure-boot-enabled

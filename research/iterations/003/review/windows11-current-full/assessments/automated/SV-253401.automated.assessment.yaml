@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    group-policy-registry-entry-minimumpinlength-collection:
-      collection_title: Group Policy registry entry for MinimumPINLength
+  objects:
+    group-policy-registry-entry-minimumpinlength-object:
       capability: windows.registry
       select:
         hive:
@@ -26,8 +25,8 @@ assessment:
           datatype: string
           mask: false
           value: MinimumPINLength
-    registry-object-tenant-id-account-currently-in-use-collection:
-      collection_title: Registry object for the Tenant ID of the account currently in use
+      object_title: Group Policy registry entry for MinimumPINLength
+    registry-object-tenant-id-account-currently-in-use-object:
       capability: windows.registry
       select:
         hive:
@@ -46,8 +45,8 @@ assessment:
           mask: false
           nil: true
           value: ''
-    intune-registry-entry-minimumpinlength-collection:
-      collection_title: Intune registry entry for MinimumPINLength
+      object_title: Registry object for the Tenant ID of the account currently in use
+    intune-registry-entry-minimumpinlength-object:
       capability: windows.registry
       select:
         hive:
@@ -67,14 +66,15 @@ assessment:
           datatype: string
           mask: false
           value: MinimumPINLength
-    registry-entries-minimumpinlength-collection:
-      collection_title: Registry entries for MinimumPINLength
+      object_title: Intune registry entry for MinimumPINLength
+    registry-entries-minimumpinlength-object:
       capability: windows.registry
       set:
         operator: union
         members:
-        - collection: group-policy-registry-entry-minimumpinlength-collection
-        - collection: intune-registry-entry-minimumpinlength-collection
+        - object: group-policy-registry-entry-minimumpinlength-object
+        - object: intune-registry-entry-minimumpinlength-object
+      object_title: Registry entries for MinimumPINLength
   variables:
     guid-current-tenant-variable:
       title: GUID of current Tenant
@@ -88,37 +88,40 @@ assessment:
         - regex_capture:
             value:
               values:
-                collection: registry-object-tenant-id-account-currently-in-use-collection
+                object: registry-object-tenant-id-account-currently-in-use-object
                 field: key
             pattern: (?i)\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
         - literal:
             value: \device\policies\PINComplexity
             datatype: string
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '6'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-minimum-pin-length-6-or-greater:
       test_title: Minimum PIN length is 6 or greater
       capability: windows.registry
-      collection: registry-entries-minimumpinlength-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '6'
-            operation: greater than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: registry-entries-minimumpinlength-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     test: test-minimum-pin-length-6-or-greater

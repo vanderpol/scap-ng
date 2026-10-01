@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-wmi57-collection:
-      collection_title: null
+  objects:
+    windows-wmi57-object:
       capability: windows.wmi57
       select:
         namespace:
@@ -20,30 +19,34 @@ assessment:
           datatype: string
           mask: false
           value: SELECT installstate FROM win32_optionalfeature WHERE name = 'TFTP'
+      object_title: null
+  states:
+    state-windows-wmi57:
+      state_title: null
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-tftp-client-not-installed-on-system:
       test_title: The TFTP Client is not installed on the system
       capability: windows.wmi57
-      collection: windows-wmi57-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.wmi57
-        state:
-          field: result
-          value:
-            record:
-            - name: installstate
-              value: '2'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-wmi57-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-windows-wmi57
   evaluate:
     test: test-tftp-client-not-installed-on-system

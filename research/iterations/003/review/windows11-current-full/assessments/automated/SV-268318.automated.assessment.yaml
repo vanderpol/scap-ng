@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    computer-gpo-s-applied-collection:
-      collection_title: Computer GPO's applied
+  objects:
+    computer-gpo-s-applied-object:
       capability: windows.cmdlet
       select:
         module_name:
@@ -68,8 +67,8 @@ assessment:
               datatype: string
               mask: false
               entity_check: all
-    mdm-managing-device-collection:
-      collection_title: MDM is managing the device
+      object_title: Computer GPO's applied
+    mdm-managing-device-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -87,49 +86,55 @@ assessment:
           datatype: string
           mask: false
           value: IntuneManagementExtension
+      object_title: MDM is managing the device
+  states:
+    state-at-least-one-enabled-must-be-true:
+      state_title: At least one enabled must be True
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: enabled
+            value: 'True'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-stdout-line-must-contain-the-output-running:
+      state_title: stdout_line must contain the output running
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: Running
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-test-ensure-that-at-least-one-gpo-applied-enabled:
       test_title: Test to ensure that at least one GPO applied is enabled
       capability: windows.cmdlet
-      collection: computer-gpo-s-applied-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: At least one enabled must be True
-        state_capability: windows.cmdlet
-        state:
-          field: value
-          value:
-            record:
-            - name: enabled
-              value: 'True'
-              operation: equals
-              datatype: string
-              mask: false
-              entity_check: all
-          operation: equals
-          datatype: record
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: computer-gpo-s-applied-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-at-least-one-enabled-must-be-true
     test-run-powershell-command-determine-if-mobile-device-management-mdm-product:
       test_title: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to
         enforce STIG compliance
       capability: independent.shellcommand
-      collection: mdm-managing-device-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: stdout_line must contain the output running
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: Running
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: mdm-managing-device-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-stdout-line-must-contain-the-output-running
   evaluate:
     any:
     - test: test-test-ensure-that-at-least-one-gpo-applied-enabled

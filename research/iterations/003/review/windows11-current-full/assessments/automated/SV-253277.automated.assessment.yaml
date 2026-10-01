@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    simple-tcp-ip-services-collection:
-      collection_title: Simple TCP/IP Services
+  objects:
+    simple-tcp-ip-services-object:
       capability: windows.wmi57
       select:
         namespace:
@@ -20,14 +19,14 @@ assessment:
           datatype: string
           mask: false
           value: SELECT startmode FROM Win32_Service WHERE name='simptcp'
+      object_title: Simple TCP/IP Services
+  states: {}
   tests:
     test-check-make-sure-simple-tcp-ip-services-server-feature-not:
       test_title: Check to make sure the Simple TCP/IP Services server feature is not present.
       capability: windows.wmi57
-      collection: simple-tcp-ip-services-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: at least one
-        state: null
+      object: simple-tcp-ip-services-object
+      check_existence: none_exist
+      check: at least one
   evaluate:
     test: test-check-make-sure-simple-tcp-ip-services-server-feature-not

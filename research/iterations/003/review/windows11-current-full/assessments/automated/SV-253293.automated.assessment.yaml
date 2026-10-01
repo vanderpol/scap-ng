@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-collection:
-      collection_title: Retrieve AcceptIncomingRequests from BluetoothAuthenticationAgent
+  objects:
+    retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-object:
       capability: windows.ntuser
       select:
         key:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: AcceptIncomingRequests
+      object_title: Retrieve AcceptIncomingRequests from BluetoothAuthenticationAgent
+  states:
+    state-value-equal-to-1:
+      state_title: Value equal to 1
+      capability: windows.ntuser
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-system-notify-user-when-bluetooth-device-attempts-connect:
       test_title: The system must notify the user when a Bluetooth device attempts to connect.
       capability: windows.ntuser
-      collection: retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: Value equal to 1
-        state_capability: windows.ntuser
-        state:
-          field: value
-          value: '1'
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-value-equal-to-1
   evaluate:
     test: test-system-notify-user-when-bluetooth-device-attempts-connect

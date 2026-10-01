@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    everyoneincludesanonymous-configured-collection:
-      collection_title: everyoneincludesanonymous must be configured
+  objects:
+    everyoneincludesanonymous-configured-object:
       capability: windows.registry
       select:
         hive:
@@ -25,8 +24,8 @@ assessment:
           datatype: string
           mask: false
           value: everyoneincludesanonymous
-    run-icacls-command-against-system-drive-root-directory-collection:
-      collection_title: Run Icacls command against system drive root directory
+      object_title: everyoneincludesanonymous must be configured
+    run-icacls-command-against-system-drive-root-directory-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -44,8 +43,8 @@ assessment:
           datatype: string
           mask: false
           value: ':'
-    run-icacls-command-against-windows-install-directory-collection:
-      collection_title: Run Icacls command against Windows install directory
+      object_title: Run Icacls command against system drive root directory
+    run-icacls-command-against-windows-install-directory-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -63,8 +62,8 @@ assessment:
           datatype: string
           mask: false
           value: ':'
-    run-icacls-command-against-program-files-directory-collection:
-      collection_title: Run Icacls command against Program Files directory
+      object_title: Run Icacls command against Windows install directory
+    run-icacls-command-against-program-files-directory-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -82,8 +81,8 @@ assessment:
           datatype: string
           mask: false
           value: ':'
-    run-icacls-command-against-program-files-x86-directory-collection:
-      collection_title: Run Icacls command against Program Files (x86) directory
+      object_title: Run Icacls command against Program Files directory
+    run-icacls-command-against-program-files-x86-directory-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -102,6 +101,7 @@ assessment:
           datatype: string
           mask: false
           value: ':'
+      object_title: Run Icacls command against Program Files (x86) directory
   variables:
     required-permissions-variable:
       title: Required Permissions
@@ -135,160 +135,115 @@ assessment:
         - (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
         - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(RX\)
         - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
-  tests:
-    test-network-access-let-everyone-permissions-apply-anonymous-users-set-disabled:
-      test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+  states:
+    state-value-must-be-equal-to-0:
+      state_title: Value must be equal to 0
       capability: windows.registry
-      collection: everyoneincludesanonymous-configured-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: only one
-        state_title: Value must be equal to 0
-        state_capability: windows.registry
-        state:
-          field: value
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-permissions-must-equal-expected-output:
+      state_title: Permissions must equal expected output
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
           value: '0'
           operation: equals
           datatype: int
           mask: false
           entity_check: all
           entity_existence: at_least_one_exists
+        - field: stdout_line
+          value:
+            variable: required-permissions-variable
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: at least one
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stderr_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+    state-permissions-must-equal-expected-output-2:
+      state_title: Permissions must equal expected output
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value:
+            variable: required-permissions-variable-2
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: at least one
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stderr_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  tests:
+    test-network-access-let-everyone-permissions-apply-anonymous-users-set-disabled:
+      test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+      capability: windows.registry
+      object: everyoneincludesanonymous-configured-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-value-must-be-equal-to-0
     test-system-drive-root-directory-permissions-conform-minimum-requirements:
       test_title: System drive root directory permissions must conform to minimum requirements.
       capability: independent.shellcommand
-      collection: run-icacls-command-against-system-drive-root-directory-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Permissions must equal expected output
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value:
-              variable: required-permissions-variable
-            operation: pattern match
-            datatype: string
-            mask: false
-            variable_check: at least one
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stderr_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: run-icacls-command-against-system-drive-root-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-permissions-must-equal-expected-output
     test-windows-installation-directory-permissions-conform-minimum-requirements:
       test_title: Windows installation directory permissions must conform to minimum requirements.
       capability: independent.shellcommand
-      collection: run-icacls-command-against-windows-install-directory-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Permissions must equal expected output
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value:
-              variable: required-permissions-variable-2
-            operation: pattern match
-            datatype: string
-            mask: false
-            variable_check: at least one
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stderr_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: run-icacls-command-against-windows-install-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-permissions-must-equal-expected-output-2
     test-program-files-directory-permissions-conform-minimum-requirements:
       test_title: Program Files directory permissions must conform to minimum requirements.
       capability: independent.shellcommand
-      collection: run-icacls-command-against-program-files-directory-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Permissions must equal expected output
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value:
-              variable: required-permissions-variable-2
-            operation: pattern match
-            datatype: string
-            mask: false
-            variable_check: at least one
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stderr_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: run-icacls-command-against-program-files-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-permissions-must-equal-expected-output-2
     test-program-files-x86-directory-permissions-conform-minimum-requirements:
       test_title: Program Files (x86) directory permissions must conform to minimum requirements.
       capability: independent.shellcommand
-      collection: run-icacls-command-against-program-files-x86-directory-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Permissions must equal expected output
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value:
-              variable: required-permissions-variable-2
-            operation: pattern match
-            datatype: string
-            mask: false
-            variable_check: at least one
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stderr_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: run-icacls-command-against-program-files-x86-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-permissions-must-equal-expected-output-2
   evaluate:
     all:
     - test: test-network-access-let-everyone-permissions-apply-anonymous-users-set-disabled

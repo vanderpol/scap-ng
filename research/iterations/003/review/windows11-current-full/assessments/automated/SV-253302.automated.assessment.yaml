@@ -5,27 +5,30 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-passwordpolicy-collection:
-      collection_title: null
+  objects:
+    windows-passwordpolicy-object:
       capability: windows.passwordpolicy
+      object_title: null
+  states:
+    state-windows-passwordpolicy:
+      state_title: null
+      capability: windows.passwordpolicy
+      state:
+        field: min_passwd_age
+        value: '86400'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-minimum-password-age-set-at-least-1-day:
       test_title: '''Minimum Password Age'' is set to at least ''1'' day'
       capability: windows.passwordpolicy
-      collection: windows-passwordpolicy-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.passwordpolicy
-        state:
-          field: min_passwd_age
-          value: '86400'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-passwordpolicy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-passwordpolicy
   evaluate:
     test: test-minimum-password-age-set-at-least-1-day

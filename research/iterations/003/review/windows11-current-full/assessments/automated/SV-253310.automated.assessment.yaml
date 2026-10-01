@@ -6,45 +6,50 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-auditeventpolicysubcategories-collection:
-      collection_title: null
+  objects:
+    windows-auditeventpolicysubcategories-object:
       capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-user-account-management-is-set-to-success:
+      state_title: '''User Account Management'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: user_account_management
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-user-account-management-is-set-to-success-and-failure:
+      state_title: '''User Account Management'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: user_account_management
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-audit-user-account-management-set-success:
       test_title: '''Audit User Account Management'' is set to ''Success'''
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''User Account Management'' is set to ''Success'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: user_account_management
-          value: AUDIT_SUCCESS
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-user-account-management-is-set-to-success
     test-audit-user-account-management-set-success-failure:
       test_title: '''Audit User Account Management'' is set to ''Success'' and ''Failure'''
       capability: windows.auditeventpolicysubcategories
-      collection: windows-auditeventpolicysubcategories-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: '''User Account Management'' is set to ''Success'' and ''Failure'''
-        state_capability: windows.auditeventpolicysubcategories
-        state:
-          field: user_account_management
-          value: AUDIT_SUCCESS_FAILURE
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-user-account-management-is-set-to-success-and-failure
   evaluate:
     any:
     - test: test-audit-user-account-management-set-success

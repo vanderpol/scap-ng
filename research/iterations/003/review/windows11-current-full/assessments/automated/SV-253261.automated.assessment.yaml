@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    check-bitlocker-minimumpin-collection:
-      collection_title: Check for BitLocker MinimumPIN
+  objects:
+    check-bitlocker-minimumpin-object:
       capability: windows.registry
       select:
         hive:
@@ -26,31 +25,35 @@ assessment:
           datatype: string
           mask: false
           value: MinimumPIN
+      object_title: Check for BitLocker MinimumPIN
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '6'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-bitlocker-6-digits-or-more:
       test_title: BitLocker must be 6 digits or more.
       capability: windows.registry
-      collection: check-bitlocker-minimumpin-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '6'
-            operation: greater than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: check-bitlocker-minimumpin-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     test: test-bitlocker-6-digits-or-more

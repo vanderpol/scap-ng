@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    gpo-registry-entry-fips-compliant-algorithms-collection:
-      collection_title: GPO registry entry for FIPS-compliant algorithms
+  objects:
+    gpo-registry-entry-fips-compliant-algorithms-object:
       capability: windows.registry
       select:
         hive:
@@ -26,8 +25,8 @@ assessment:
           datatype: string
           mask: false
           value: Enabled
-    intune-registry-entry-fips-compliant-algorithms-collection:
-      collection_title: Intune registry entry for FIPS-compliant algorithms
+      object_title: GPO registry entry for FIPS-compliant algorithms
+    intune-registry-entry-fips-compliant-algorithms-object:
       capability: windows.registry
       select:
         hive:
@@ -45,39 +44,43 @@ assessment:
           datatype: string
           mask: false
           value: AllowFipsAlgorithmPolicy_ProviderSet
-    registry-entries-fips-compliant-algorithms-collection:
-      collection_title: Registry entries for FIPS-compliant algorithms
+      object_title: Intune registry entry for FIPS-compliant algorithms
+    registry-entries-fips-compliant-algorithms-object:
       capability: windows.registry
       set:
         operator: union
         members:
-        - collection: gpo-registry-entry-fips-compliant-algorithms-collection
-        - collection: intune-registry-entry-fips-compliant-algorithms-collection
+        - object: gpo-registry-entry-fips-compliant-algorithms-object
+        - object: intune-registry-entry-fips-compliant-algorithms-object
+      object_title: Registry entries for FIPS-compliant algorithms
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-fips-compliant-algorithms-enabled:
       test_title: FIPS-compliant algorithms are enabled
       capability: windows.registry
-      collection: registry-entries-fips-compliant-algorithms-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '1'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: registry-entries-fips-compliant-algorithms-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     test: test-fips-compliant-algorithms-enabled

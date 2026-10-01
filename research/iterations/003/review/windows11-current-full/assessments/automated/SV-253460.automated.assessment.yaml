@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-registry-collection:
-      collection_title: null
+  objects:
+    windows-registry-object:
       capability: windows.registry
       select:
         hive:
@@ -26,32 +25,36 @@ assessment:
           datatype: string
           mask: false
           value: SupportedEncryptionTypes
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-2147483640-for-aes128-hm:
+      state_title: Reg_Dword type and value equals 2147483640 for AES128_HMAC_SHA1, AES256_HMAC_SHA1, and Future_Encryption_Types
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2147483640'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-network-security-configure-encryption-types-allowed-kerberos-set-enabled-aes128:
       test_title: '''Network Security: Configure encryption types allowed for Kerberos'' is set to ''Enabled'' with
         ''AES128_HMAC_SHA1'', ''AES256_HMAC_SHA1'', ''Future encryption types'''
       capability: windows.registry
-      collection: windows-registry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Reg_Dword type and value equals 2147483640 for AES128_HMAC_SHA1, AES256_HMAC_SHA1, and Future_Encryption_Types
-        state_capability: windows.registry
-        state:
-          all:
-          - field: type
-            value: reg_dword
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: value
-            value: '2147483640'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-2147483640-for-aes128-hm
   evaluate:
     test: test-network-security-configure-encryption-types-allowed-kerberos-set-enabled-aes128

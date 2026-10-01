@@ -5,12 +5,11 @@ assessment:
   mode: automated
   class: inventory
   purpose: applicability
-  collections:
-    os-family-collection:
-      collection_title: OS family
+  objects:
+    os-family-object:
       capability: independent.family
-    productname-registry-entry-collection:
-      collection_title: ProductName registry entry
+      object_title: OS family
+    productname-registry-entry-object:
       capability: windows.registry
       select:
         hive:
@@ -28,8 +27,8 @@ assessment:
           datatype: string
           mask: false
           value: ProductName
-    currentbuildnumber-registry-entry-collection:
-      collection_title: CurrentBuildNumber registry entry
+      object_title: ProductName registry entry
+    currentbuildnumber-registry-entry-object:
       capability: windows.registry
       select:
         hive:
@@ -47,58 +46,66 @@ assessment:
           datatype: string
           mask: false
           value: CurrentBuildNumber
+      object_title: CurrentBuildNumber registry entry
+  states:
+    state-microsoft-windows-family:
+      state_title: Microsoft Windows family
+      capability: independent.family
+      state:
+        field: family
+        value: windows
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-10-or-windows-11:
+      state_title: Windows 10 or Windows 11
+      capability: windows.registry
+      state:
+        field: value
+        value: ^[Ww][Ii][Nn][Dd][Oo][Ww][Ss] 1[01].*$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        field: value
+        value: '22000'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-installed-operating-system-belongs-microsoft-windows-family:
       test_title: The installed operating system belongs to the Microsoft Windows family
       capability: independent.family
-      collection: os-family-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Microsoft Windows family
-        state_capability: independent.family
-        state:
-          field: family
-          value: windows
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: os-family-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-microsoft-windows-family
     test-installed-operating-system-windows-10-or-11:
       test_title: The installed operating system is Windows 10 or 11
       capability: windows.registry
-      collection: productname-registry-entry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Windows 10 or Windows 11
-        state_capability: windows.registry
-        state:
-          field: value
-          value: ^[Ww][Ii][Nn][Dd][Oo][Ww][Ss] 1[01].*$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: productname-registry-entry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-10-or-windows-11
     test-current-build-number-22000-or-greater:
       test_title: The current build number is 22000 or greater.
       capability: windows.registry
-      collection: currentbuildnumber-registry-entry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: windows.registry
-        state:
-          field: value
-          value: '22000'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: currentbuildnumber-registry-entry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
   evaluate:
     all:
     - test: test-installed-operating-system-belongs-microsoft-windows-family

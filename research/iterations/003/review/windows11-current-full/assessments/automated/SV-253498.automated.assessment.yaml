@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    windows-userright-collection:
-      collection_title: null
+  objects:
+    windows-userright-object:
       capability: windows.userright
       select:
         userright:
@@ -16,76 +15,89 @@ assessment:
           datatype: string
           mask: false
           value: SE_IMPERSONATE_NAME
+      object_title: null
+  states:
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-2:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: Administrators
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-3:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: LOCAL SERVICE
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-4:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: NETWORK SERVICE
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-5:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: SERVICE
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-6:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: RESTRICTED SERVICES\PrintSpoolerService
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-impersonate-client-after-authentication-administrators-local-service-network-service-service:
       test_title: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
         RESTRICTED SERVICES\PrintSpoolerService
       capability: windows.userright
-      collection: windows-userright-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: Administrators
-            operation: case insensitive equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: LOCAL SERVICE
-            operation: case insensitive equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: NETWORK SERVICE
-            operation: case insensitive equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: SERVICE
-            operation: case insensitive equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: windows.userright
-          state:
-            field: trustee_name
-            value: RESTRICTED SERVICES\PrintSpoolerService
-            operation: case insensitive equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-userright
+      - state-windows-userright-2
+      - state-windows-userright-3
+      - state-windows-userright-4
+      - state-windows-userright-5
+      - state-windows-userright-6
   evaluate:
     test: test-impersonate-client-after-authentication-administrators-local-service-network-service-service
