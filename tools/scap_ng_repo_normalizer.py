@@ -200,6 +200,40 @@ def rewrite_rules(
 
 
 
+
+def semantic_differences(left: Any, right: Any, path: str = "$", limit: int = 20) -> list[dict]:
+    """Return bounded, human-reviewable semantic differences."""
+    out=[]
+    def walk(a,b,p):
+        if len(out)>=limit:
+            return
+        if type(a) is not type(b):
+            out.append({"path":p,"left":a,"right":b,"kind":"type_or_value"})
+            return
+        if isinstance(a,dict):
+            for key in sorted(set(a)|set(b)):
+                child=f"{p}.{key}"
+                if key not in a:
+                    out.append({"path":child,"left":None,"right":b[key],"kind":"right_only"})
+                elif key not in b:
+                    out.append({"path":child,"left":a[key],"right":None,"kind":"left_only"})
+                else:
+                    walk(a[key],b[key],child)
+                if len(out)>=limit:
+                    return
+        elif isinstance(a,list):
+            if len(a)!=len(b):
+                out.append({"path":p+".length","left":len(a),"right":len(b),"kind":"length"})
+            for i,(av,bv) in enumerate(zip(a,b)):
+                walk(av,bv,f"{p}[{i}]")
+                if len(out)>=limit:
+                    return
+        elif a!=b:
+            out.append({"path":p,"left":a,"right":b,"kind":"value"})
+    walk(left,right,path)
+    return out
+
+
 def _tokens(value: str | None) -> list[str]:
     if not value:
         return []
@@ -281,26 +315,63 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int | None = None) ->
             if disc_union else 0.0
         )
         score=0.55*title_ratio+0.30*jaccard+0.15*discussion_ratio
-        if score < 0.62:
-            continue
         left_ids={(x.get("scheme"),x.get("value")) for x in left["identifiers"] if isinstance(x,dict)}
         right_ids={(x.get("scheme"),x.get("value")) for x in right["identifiers"] if isinstance(x,dict)}
         shared_ids=sorted(
             [{"scheme":s,"value":v} for s,v in left_ids & right_ids],
             key=lambda x:(x["scheme"] or "",x["value"] or ""),
         )
+
+        # A review queue should be evidence-rich, not a dump of generic STIG
+        # wording.  Shared identifiers are strong evidence.  Without them,
+        # require very strong title overlap plus meaningful policy-text support.
+        strong_text=(
+            (title_ratio >= 0.86 and jaccard >= 0.65)
+            or (score >= 0.82 and discussion_ratio >= 0.45)
+        )
+        if not shared_ids and not strong_text:
+            continue
+
+        confidence=(
+            "high"
+            if shared_ids or (title_ratio >= 0.94 and jaccard >= 0.80)
+            else "medium"
+        )
+        reasons=[]
+        if shared_ids:
+            reasons.append("shared_identifier")
+        if title_ratio >= 0.94:
+            reasons.append("near_identical_title")
+        elif title_ratio >= 0.86:
+            reasons.append("strong_title_similarity")
+        if discussion_ratio >= 0.65:
+            reasons.append("strong_discussion_similarity")
+        elif discussion_ratio >= 0.45:
+            reasons.append("supporting_discussion_similarity")
+
+        distinctive_stop={
+            "the","a","an","and","or","to","of","for","in","on","with",
+            "must","shall","should","be","is","are","configured","configuration",
+            "system","systems","server","application","ensure","only"
+        }
+        left_only=sorted((lt-rt)-distinctive_stop)
+        right_only=sorted((rt-lt)-distinctive_stop)
         out.append({
             "similarity_score":round(score,4),
+            "confidence":confidence,
+            "review_reasons":reasons,
             "title_similarity":round(title_ratio,4),
             "title_token_jaccard":round(jaccard,4),
             "discussion_token_jaccard":round(discussion_ratio,4),
             "shared_title_trigrams":shared_trigrams,
             "shared_identifiers":shared_ids,
+            "distinctive_title_tokens_left_only":left_only[:12],
+            "distinctive_title_tokens_right_only":right_only[:12],
             "left":{k:left[k] for k in ("benchmark","benchmark_id","rule_id","title")},
             "right":{k:right[k] for k in ("benchmark","benchmark_id","rule_id","title")},
             "classification":"manual_overlap_review_only",
         })
-    out.sort(key=lambda x:(-x["similarity_score"],x["left"]["benchmark"],x["left"]["rule_id"] or ""))
+    out.sort(key=lambda x:(0 if x["confidence"]=="high" else 1,-x["similarity_score"],x["left"]["benchmark"],x["left"]["rule_id"] or ""))
     return out if not limit else out[:limit]
 
 def main() -> int:
@@ -429,6 +500,26 @@ def main() -> int:
                 for c in row["consumers"]
             }
         )
+        variants={}
+        for row in group:
+            variants.setdefault(row["exact"], row)
+        ordered_variants=sorted(variants.items(), key=lambda item:item[0])
+        baseline_fp,baseline_row=ordered_variants[0]
+        baseline_doc=normalize_value(
+            copy.deepcopy((load_yaml(baseline_row["path"]).get("assessment") or {}))
+        )
+        variant_differences=[]
+        for variant_fp,variant_row in ordered_variants[1:]:
+            variant_doc=normalize_value(
+                copy.deepcopy((load_yaml(variant_row["path"]).get("assessment") or {}))
+            )
+            variant_differences.append({
+                "baseline_exact_fingerprint":baseline_fp,
+                "variant_exact_fingerprint":variant_fp,
+                "baseline_source":str(baseline_row["path"].relative_to(source)),
+                "variant_source":str(variant_row["path"].relative_to(source)),
+                "differences":semantic_differences(baseline_doc,variant_doc,limit=20),
+            })
         near_groups.append(
             {
                 "shape_fingerprint": shape,
@@ -436,6 +527,7 @@ def main() -> int:
                 "exact_variants": len(exacts),
                 "benchmark_count": benchmark_count,
                 "members": consumers,
+                "variant_differences": variant_differences,
             }
         )
     near_groups.sort(
