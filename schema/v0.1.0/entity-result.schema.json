@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/entity-result.schema.json",
+  "title": "SCAP-NG State Entity Result v0.1.0 strawman",
+  "description": "Result of evaluating one State entity/predicate against corresponding Item entity data and optional Variable values.",
+  "type": "object",
+  "required": [
+    "entity",
+    "outcome"
+  ],
+  "properties": {
+    "entity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "$ref": "result-types.schema.json#/$defs/technical_outcome"
+    },
+    "operation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "entity_check": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "var_check": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "variable_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "item_values": {
+      "type": "array",
+      "items": {
+        "$ref": "result-types.schema.json#/$defs/typed_value"
+      }
+    },
+    "variable_values": {
+      "type": "array",
+      "items": {
+        "$ref": "result-types.schema.json#/$defs/typed_value"
+      }
+    },
+    "comparison_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "outcome"
+        ],
+        "properties": {
+          "outcome": {
+            "$ref": "result-types.schema.json#/$defs/technical_outcome"
+          },
+          "item_value": {
+            "$ref": "result-types.schema.json#/$defs/typed_value"
+          },
+          "expected_value": {
+            "$ref": "result-types.schema.json#/$defs/typed_value"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "reason": {
+      "type": [
+        "object",
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
