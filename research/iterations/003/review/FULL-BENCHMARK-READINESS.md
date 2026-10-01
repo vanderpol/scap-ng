@@ -70,17 +70,43 @@ Review can proceed with *documented* nonblocking warnings; no blanket
 
 ## Snapshot: Windows 11
 
-- The green workflow `convert-windows11-scap14-to-ng.yml` is
-  **iteration-001** evidence (257 Rules, source-pinned NIWC content);
-  it is not the iteration-003 clean-native benchmark.
-- No Windows 11 sibling to `rhel9-full/` existed under
-  `research/iterations/003/source/split-rule-assessment/` at this
-  checkpoint.
-- Next: build Windows 11 with the current v003 source design and the same
-  provenance/diagnostic package structure and reviewer checks as RHEL 9.
-  Carry over the pinned published source, not the old generated source.
-- A Windows 11 handoff notification must wait for that full v003 conversion,
-  its source accounting, and its current validation evidence.
+- Current reviewer source path:
+  `research/iterations/003/review/windows11-current-full/`
+- Source is pinned to NIWC revision
+  `8c8e5dff860af6b1290ee9273a282db24278f8d5` and Windows 11 V2R10
+  archive SHA256
+  `e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d`.
+- Current full-review workflow run
+  [36794192423](https://github.com/vanderpol/scap-ng/actions/runs/36794192423)
+  completed successfully and published commit
+  `fa144b75c`.
+- The review contains **257 Rules** and **767 native YAML files**.
+  Native validation reports relative-reference resolution, native cleanliness,
+  presentation ordering and Group membership all passed.
+- Component-resolved source splitting accounted for **246 Rules with OVAL**
+  and **11 source-manual/no-OVAL Rules**, with zero unresolved references,
+  zero ambiguous OVAL Definition references and zero schema-invalid Rule
+  closures.
+- Rule source audit compares all **257 source/native Rules** with
+  `issues: []`.
+- Profile selection audit compares all **11 Profiles** with
+  `mismatch_count: 0` for every Profile and `issues: []`.
+- Supported automated Assessments carry reverse omni-schema validation and
+  semantic representation-comparator evidence.
+- One source Rule, `SV-253476`, uses deprecated OVAL
+  `windows.user_test`. Per project policy, its `default` and
+  `automated` source selectors are not converted to automated NG content.
+  The published source manual Assessment is used as the native default/manual
+  choice instead.
+- The same deprecated Test type occurs in the Rule's
+  `local_enabled_administrators` applicability source. That automated
+  applicability Assessment is intentionally omitted and the source manual
+  procedure owns the applicability decision. Both exceptions are explicit in
+  `evidence.json`; no round-trip-equivalence claim is made for those skipped
+  deprecated paths.
+- This is a candidate for owner **source/design review**. Target-runtime
+  evaluator equivalence remains a separate conformance gate and is not implied
+  by successful source conversion/round-trip evidence.
 
 ## Notification decision
 
