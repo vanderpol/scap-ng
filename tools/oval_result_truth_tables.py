@@ -141,7 +141,11 @@ def decisive_partial_existence(mode, *, exists=0):
         return FALSE if exists >= 1 else None
     if mode == "only_one_exists":
         return FALSE if exists >= 2 else None
-    if mode in {"all_exist", "any_exist"}:
+    if mode == "any_exist":
+        # Once one existing item has been observed, future error/not-collected
+        # observations cannot overturn OVAL's any_exist=true outcome.
+        return TRUE if exists >= 1 else None
+    if mode == "all_exist":
         return None
     raise ValueError(f"unsupported ExistenceEnumeration: {mode}")
 
