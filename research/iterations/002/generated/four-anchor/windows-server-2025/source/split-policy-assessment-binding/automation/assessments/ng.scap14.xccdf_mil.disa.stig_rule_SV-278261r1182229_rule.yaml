@@ -16,12 +16,48 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: userright
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SE_RESTORE_NAME
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -30,20 +66,26 @@ assessment:
       entities:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
-      state_title: null
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: null
   evaluate:
     tests:
@@ -62,29 +104,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000030
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253505:
-        source_definition_id: oval:mil.disa.stig.defs:def:253505
-        class: compliance
-        version: '4'
-        criteria:
-          children:
-          - comment: Restore files and directories - Administrators
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25350501
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Restore files and directories" user right must only be assigned to the Administrators group.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278261:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278261
         class: compliance
@@ -118,6 +137,29 @@ assessment:
             text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
               \n  Accounts with the \"Restore files and directories\" user right can circumvent file and directory permissions\
               \ and could allow access to sensitive data. It could also be used to overwrite more current data."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253505:
+        source_definition_id: oval:mil.disa.stig.defs:def:253505
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: Restore files and directories - Administrators
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25350501
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Restore files and directories" user right must only be assigned to the Administrators group.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -284,6 +326,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278261r1182229_rule
-    semantic_ir_sha256: 7a34fb79f4d3220edadbef87c60c27f6221646820e0e0c458a1543aa7dd5aa53
+    semantic_ir_sha256: fe58a73da13bc268af55f7c93905eadeec4a6ba831e6d339cc3b5eed9a6d4412
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 19ac98dc497f40667028ef1cf599c300f85f5adaad41a84c2aa1da4b0907aa50
+  semantic_fingerprint_sha256: 6be034bd0315a79d89c57965c16b7e949fd8a22474897d5e8f566643b9dc9277

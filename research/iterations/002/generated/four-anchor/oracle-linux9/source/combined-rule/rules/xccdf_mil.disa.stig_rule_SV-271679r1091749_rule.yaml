@@ -377,12 +377,32 @@ rule:
         version: '1'
         object_title: Check that the automount setting is locked from nonprivileged user modification
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/dconf/db/local.d/locks
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -390,6 +410,16 @@ rule:
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -397,6 +427,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -409,12 +449,32 @@ rule:
         version: '3'
         object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/dconf/profile/user
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -422,6 +482,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -430,18 +500,6 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25801700:
-          source_test_id: oval:mil.disa.stig.ind:tst:25801700
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25801700
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:25801701:
           source_test_id: oval:mil.disa.stig.ind:tst:25801701
           source_type: textfilecontent54_test
@@ -454,35 +512,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:25801701
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:25801700:
+          source_test_id: oval:mil.disa.stig.ind:tst:25801700
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25801700
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258017:
-          source_definition_id: oval:mil.disa.stig.defs:def:258017
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25801700
-            - comment: Check that the automount setting is locked from nonprivileged user modification
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25801701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent a user from overriding the disabling of the graphical user interface
-                autorun function.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271679:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271679
           class: compliance
@@ -516,6 +558,34 @@ rule:
               text: "Techniques used to address this include protocols using nonces (e.g., numbers generated for a specific\
                 \ one-time use) or challenges (e.g., TLS, WS_Security). Additional techniques include time-synchronous or\
                 \ challenge-response one-time authenticators.\n\n\tSatisfies: SRG-OS-000114-GPOS-00059, SRG-OS-000378-GPOS-00163"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258017:
+          source_definition_id: oval:mil.disa.stig.defs:def:258017
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25801700
+            - comment: Check that the automount setting is locked from nonprivileged user modification
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25801701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent a user from overriding the disabling of the graphical user interface
+                autorun function.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -648,9 +718,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271679r1091749_rule
-      semantic_ir_sha256: 51405e4f3e650bc768ac95b381b3c6f08930a10dba7bfb1c240c4e1026e275ed
+      semantic_ir_sha256: 3724642c46f04d3d37a36d68cf0ba614a4e23ebef0ee8a5ee1c6ff4b3b35545d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 97609fc8b6779667a4503b4b1d59eca44267b7acff7938d412bb4c8944d86c75
+    semantic_fingerprint_sha256: 7b136de12fadd3cbcdba6cc580c20cf2bbd1a4669fb248eab10ec275344feda8
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271679r1091749_rule

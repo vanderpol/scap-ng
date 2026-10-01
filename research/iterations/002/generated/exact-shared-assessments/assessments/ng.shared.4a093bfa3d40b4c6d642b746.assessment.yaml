@@ -1,0 +1,253 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271662
+  collect:
+    oval:mil.disa.stig.ind:obj:23051702:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+      - attributes:
+          datatype: int
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23051702
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.linux:obj:23051700:
+      capability: scapng.collect.linux.partition
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/log/audit
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23051700
+      source_type: partition_object
+      version: '1'
+  derive: {}
+  description: OL 9 must mount /var/log/audit with the nosuid option.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230518:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23051800
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /var/log/audit with the nosuid option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230518
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271662:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230518
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002066 - OL 9 must mount /var/log/audit with the nosuid option.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "nosuid" mount option causes the system to not execute "setuid" and "setgid" files with owner privileges.
+              This option must be used for mounting any file system not containing approved "setuid" and "setguid" files.
+              Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized
+              administrative access.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271662
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23051800:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051702
+        predicates:
+        - oval:mil.disa.stig.ind:ste:2303001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23051800
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: /var/log/audit is configured in /etc/fstab with the nosuid option.
+      oval:mil.disa.stig.linux:tst:23051800:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:23051700
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000002
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23051800
+        source_type: partition_test
+        state_operator: AND
+        test_title: /var/log/audit is mounted with the nosuid option.
+  id: ng.shared.4a093bfa3d40b4c6d642b746
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:2303001:
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:2303001
+      source_type: textfilecontent54_state
+      state_title: null
+    oval:mil.disa.stig.linux:ste:20000002:
+      entities:
+      - attributes:
+          entity_check: at least one
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: at least one
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nosuid
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000002
+      source_type: partition_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 4a093bfa3d40b4c6d642b746c5e51b0c0ab5b3b9fb0ac4e2b5555cea2d641adc
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271662r1091698_rule
+    title: OL 9 must mount /var/log/audit with the nosuid option.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257875r958804_rule
+    title: RHEL 9 must mount /var/log/audit with the nosuid option.

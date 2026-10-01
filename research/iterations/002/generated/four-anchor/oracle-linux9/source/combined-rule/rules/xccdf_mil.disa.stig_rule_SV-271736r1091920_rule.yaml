@@ -335,37 +335,6 @@ rule:
     description: OL 9 must disable the ability of systemd to spawn an interactive boot process.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25779300:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25779300
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: BLS options
-        query:
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /boot/loader/entries
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^.*\.conf$
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^options\s+(.*)$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25779301:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25779301
@@ -374,12 +343,32 @@ rule:
         version: '1'
         object_title: /etc/default/grub GRUB_CMDLINE_LINUX
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/default/grub
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -387,6 +376,87 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:25779300:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25779300
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: BLS options
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /boot/loader/entries
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^options\s+(.*)$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -401,6 +471,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -621,9 +707,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271736r1091920_rule
-      semantic_ir_sha256: 2c61c3d1a2d11609f049f7e5f4b634b63937d9f9c6ba1e181535b10de408c395
+      semantic_ir_sha256: a991f2d830460ef7e34f122d45c4c9efe98f21c8df705b75e982a89f0bba2d5c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d6e2a4352aa2ce33370483f53c26c4e9d922d4f1cc0d52992b1bf9ad1d7c73c9
+    semantic_fingerprint_sha256: bb19ec761613dd3bf59629802ec73b8b5304eda8ea6ca49a37fcef1f4c57ed80
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271736r1091920_rule

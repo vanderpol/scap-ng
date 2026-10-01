@@ -351,12 +351,32 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -364,6 +384,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -376,12 +406,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -403,6 +465,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253453:
+          source_definition_id: oval:mil.disa.stig.defs:def:253453
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25345300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Anonymous enumeration of SAM accounts must not be allowed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253453:
           source_definition_id: oval:mil.disa.stig.windows11:def:253453
           class: compliance
@@ -434,29 +519,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Anonymous enumeration of SAM accounts allows anonymous log on users (null session connections) to list
                 all accounts names, thus providing a list of potential points to attack the system.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253453:
-          source_definition_id: oval:mil.disa.stig.defs:def:253453
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25345300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Anonymous enumeration of SAM accounts must not be allowed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -588,9 +650,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253453r991589_rule
-      semantic_ir_sha256: 07d21ceff7fef8e732ac47eb5b39d87c7283788ec93b14de0177ee50a9036bfb
+      semantic_ir_sha256: 75cb1cd2593bcb24a565c7b7f8ab0a01f4d3e2d82c3f873de27629104c92fcbc
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e4997c46e12dbff6e21d3d1d60d703a484b90b2ce7b14f43e49f44e9f7d30f3d
+    semantic_fingerprint_sha256: 1677954e0af5244bde51f44ec2c1932b0f94ba2f6b727b5af868e5d24525c35f
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253453r991589_rule

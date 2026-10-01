@@ -402,25 +402,22 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_DENY_BATCH_LOGON_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000041:
-        source_state_id: oval:mil.disa.stig.win:ste:20000041
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Enterprise Admins$
-        state_title: null
       oval:mil.disa.stig.win:ste:20000040:
         source_state_id: oval:mil.disa.stig.win:ste:20000040
         source_type: userright_state
@@ -429,10 +426,55 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ^(?i)(.+\\)?Domain Admins$
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000041:
+        source_state_id: oval:mil.disa.stig.win:ste:20000041
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Enterprise Admins$
         state_title: null
     evaluate:
       tests:
@@ -671,9 +713,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253492r1137691_rule
-      semantic_ir_sha256: c14d06a47f80e83ec12ee84c70f31660f4e8e8f8132f43176785b855f44812d5
+      semantic_ir_sha256: 641ec6c90e576b61a844c16e8a83f4f9838deefc3258b31b1962482157a976d3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: be7c7cf773da2c345fe37812246d9f896b6662f4ef3b356f25494db7550a5b68
+    semantic_fingerprint_sha256: 94b26b788ec4d643f60ff01142639c27901393e8c3b4f16c942bd47f8b604e62
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253492r1137691_rule

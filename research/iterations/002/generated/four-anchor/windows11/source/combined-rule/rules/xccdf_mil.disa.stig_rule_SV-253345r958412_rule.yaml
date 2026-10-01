@@ -354,19 +354,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25334500:
-        source_state_id: oval:mil.disa.stig.win:ste:25334500
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: other_logon_logoff_events
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS
-        state_title: '''Log On'' is set to ''Success'''
       oval:mil.disa.stig.win:ste:25334501:
         source_state_id: oval:mil.disa.stig.win:ste:25334501
         source_type: auditeventpolicysubcategories_state
@@ -375,11 +362,56 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: other_logon_logoff_events
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         state_title: '''Log On'' is set to ''Success'' and ''Failure'''
+      oval:mil.disa.stig.win:ste:25334500:
+        source_state_id: oval:mil.disa.stig.win:ste:25334500
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: other_logon_logoff_events
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS
+        state_title: '''Log On'' is set to ''Success'''
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25334500:
@@ -587,9 +619,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253345r958412_rule
-      semantic_ir_sha256: f9e747f0814d2e080eced9afa5d3c9316267d0565834a69af1f67eab9be6b6f0
+      semantic_ir_sha256: 28c41223a107ddc378bf750c58b99b72acfb61301c3d4842f67a2d52e7d0458e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 1f7640100bb9b8a542c977dedb878c0e0089207156bd456e0647bc8a23c2f021
+    semantic_fingerprint_sha256: 6960098b7b6c7cd775e8f87b6fb314a907e4c6f370c5c9b2d4b351c2983a71ae
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253345r958412_rule

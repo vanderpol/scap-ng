@@ -15,17 +15,47 @@ assessment:
       version: '1'
       object_title: Return the renamed guest account information
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: $( if((Get-CimInstance Win32_OperatingSystem).ProductType -eq 2){ Get-ADUser -Filter * -Properties SID | Where-Object
           {$_.SID -match "^S-1-5-[0-9-]+-501$"} | Select-Object Name,Enabled -First 1 | Format-List } else { Get-Localuser
           | Where-Object {$_.SID -match '^S-1-5-[0-9-]+-501$'} } ) | Format-List
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .+
@@ -40,6 +70,22 @@ assessment:
       - attributes:
           entity_check: none satisfy
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: none satisfy
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -222,6 +268,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278195r1181291_rule
-    semantic_ir_sha256: c271bef37628a11f3aff17627e4252e6a955ea78a13ae231696625926f13cb45
+    semantic_ir_sha256: 702cb0eb4f2057082afe483ddfc0796e7afc6d351895ba942d40e31f194bd44b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 6c85ce00ec451117fa2a7b77e0cff6c3a11f1d4801003c8d0254b052868e3fba
+  semantic_fingerprint_sha256: 22ef6e218abaedc87ed02dc376cf88662ffca76cf3a4eb27782a642ba0d31796

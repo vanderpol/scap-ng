@@ -355,15 +355,45 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SYSTEM\CurrentControlSet\Control\Session Manager
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ProtectionMode
@@ -375,12 +405,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -403,29 +465,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253467:
-          source_definition_id: oval:mil.disa.stig.defs:def:253467
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25346700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The default permissions of global system objects must be increased.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253467:
           source_definition_id: oval:mil.disa.stig.windows11:def:253467
           class: compliance
@@ -459,6 +498,29 @@ rule:
                 semaphores. Each type of object is created with a default DACL that specifies who can access the objects with
                 what permissions. If this policy is enabled, the default DACL is stronger, allowing non-admin users to read
                 shared objects, but not modify shared objects that they did not create.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253467:
+          source_definition_id: oval:mil.disa.stig.defs:def:253467
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25346700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The default permissions of global system objects must be increased.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -590,9 +652,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253467r991589_rule
-      semantic_ir_sha256: 7515012a6f38464097f59077a00581a6ed62c4f24cc6183501d077b98696542f
+      semantic_ir_sha256: 5f4f3435a7ea7e6554d0c29b7bb456837e265bac656c286f63b820bf1799824f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ba82e486eb677d6651783b33a32ed4a9981acc2ef59bb28f8632aa4bf2f38c43
+    semantic_fingerprint_sha256: 4873a2f0234df34874c9238458abdc2f3243c6fa7e2d7db1cdb33dc822bef301
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253467r991589_rule

@@ -1,0 +1,208 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278118
+  collect:
+    oval:mil.disa.stig.win:obj:25340800:
+      capability: scapng.collect.windows.registry
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Software\Policies\Microsoft\Internet Explorer\Feeds
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AllowBasicAuthInClear
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25340800
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 must disable Basic authentication for RSS feeds over HTTP.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253408:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verifies 'Turn on Basic feed authentication over HTTP' is set to 'Not Configured' or 'Disabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25340800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Basic authentication for RSS feeds over HTTP must not be used.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253408
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278118:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253408
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000400 - Windows Server 2025 must disable Basic authentication for RSS feeds over HTTP.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Basic authentication uses plain-text passwords that could be used to compromise a system. Disabling Basic
+              authentication will reduce this potential.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278118
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25340800:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.win:obj:25340800
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25340800
+        source_type: registry_test
+        state_operator: AND
+        test_title: '''Turn on Basic feed authentication over HTTP'' is set to ''Not Configured'' or ''Disabled'''
+  id: ng.shared.96b4d6b5624ba6b28f57b2d3
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000000:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000000
+      source_type: registry_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 96b4d6b5624ba6b28f57b2d3bd2eb7b6767735e5635d83db85fb6a98de51b0b4
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278118r1182067_rule
+    title: Windows Server 2025 must disable Basic authentication for RSS feeds over HTTP.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253408r958478_rule
+    title: Basic authentication for RSS feeds over HTTP must not be used.

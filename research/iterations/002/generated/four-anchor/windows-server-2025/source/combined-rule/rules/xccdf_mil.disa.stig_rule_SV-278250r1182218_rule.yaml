@@ -468,12 +468,48 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_DEBUG_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -482,20 +518,26 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
     evaluate:
       tests:
@@ -514,29 +556,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253490:
-          source_definition_id: oval:mil.disa.stig.defs:def:253490
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Debug Programs - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Debug programs" user right must only be assigned to the Administrators group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278250:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278250
           class: compliance
@@ -571,6 +590,29 @@ rule:
                 \n  Accounts with the \"Debug programs\" user right can attach a debugger to any process or to the kernel,\
                 \ providing complete access to sensitive and critical operating system components. This right is given to\
                 \ Administrators in the default configuration."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253490:
+          source_definition_id: oval:mil.disa.stig.defs:def:253490
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Debug Programs - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Debug programs" user right must only be assigned to the Administrators group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -739,9 +781,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278250r1182218_rule
-      semantic_ir_sha256: fa7f1d3c859cc06d1993cf6ccc35876d93270e479eb8ab51651f814856851e11
+      semantic_ir_sha256: a9e2c73b9ae13f1ff94c4ec6819b5addfbec1139609012ca72101e80e6b18d3d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 44a521d429e9f55b268591de388cf7dd368a2d87c44142a3015f79a7bd8a8a03
+    semantic_fingerprint_sha256: 13977ba47287603c0e003cca88fc3b40cad5326f49bf957721790a58049a404e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278250r1182218_rule

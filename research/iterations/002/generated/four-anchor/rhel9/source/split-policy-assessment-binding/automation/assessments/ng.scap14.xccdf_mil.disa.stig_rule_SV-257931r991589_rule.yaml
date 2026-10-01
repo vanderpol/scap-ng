@@ -16,16 +16,46 @@ assessment:
       object_title: Verify all local files and directories on RHEL 8 have a valid owner.  Limit results to the first 100 failures
         found.
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: bash
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser -print | head -n 100
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -40,12 +70,44 @@ assessment:
       entities:
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: exit_status
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '0'
       - attributes:
           check_existence: none_exist
+        effective_attributes:
+          check_existence:
+            origin: explicit
+            value: none_exist
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -213,6 +275,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257931r991589_rule
-    semantic_ir_sha256: 19de7ade7352681f1461958c93390fae28b1aebbbaba7098f46db6db4210f866
+    semantic_ir_sha256: 2c273646c648f2f9985f820a0c72d55c56e0918dc3e4a7d6923c3c667b734e5a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ae17576ae26d8b0ae70568e321b9ced42136168350044153723ff1096fbe2fff
+  semantic_fingerprint_sha256: f3dcfff2489fbbe59bf52815f5f0cd242e79d0943d1592d3065ff8e43e54777a

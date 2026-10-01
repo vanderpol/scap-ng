@@ -429,11 +429,31 @@ rule:
         version: '13'
         object_title: Verify execshield is enabled in grub.
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: grubby --info=ALL | grep args | grep -E '([^[:alnum:]])(noexec)([^[:alnum:]])'
@@ -445,11 +465,31 @@ rule:
         version: '13'
         object_title: Check flags in /proc/cpuinfo.
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: grep ^flags /proc/cpuinfo | grep -Ev '([^[:alnum:]])(nx)([^[:alnum:]]|$)'
@@ -463,25 +503,28 @@ rule:
         entities:
         - attributes:
             check_existence: none_exist
+          effective_attributes:
+            check_existence:
+              origin: explicit
+              value: none_exist
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         state_title: Confirm no output produced by command.
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702
-          source_type: shellcommand_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Verify execshield is enabled in grub.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781702
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701
           source_type: shellcommand_test
@@ -492,6 +535,19 @@ rule:
           state_operator: AND
           collections:
           - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702
+          source_type: shellcommand_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Verify execshield is enabled in grub.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781702
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701
           source_other: []
@@ -669,9 +725,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
-      semantic_ir_sha256: e9ac2eab2a7c5862fd89feb9f051c362934f8df82039d036df16878a5df1645b
+      semantic_ir_sha256: d57623a9ff9c7b1955f2b5079299952b06c744ddfc4511ef786da902b64d1657
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: f526ee10c91a018d0e4593f0026151c8e409e4592c1237c220ec70d410a220f7
+    semantic_fingerprint_sha256: e671df9dad7e2b07a787ac8a2aa85546368df4026a7a19ddd4bd3e3b6e3e161d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257817r1069383_rule

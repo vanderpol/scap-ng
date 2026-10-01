@@ -642,11 +642,31 @@ rule:
         version: '18'
         object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: powershell
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
@@ -661,11 +681,31 @@ rule:
         version: '18'
         object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: powershell
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
@@ -680,11 +720,31 @@ rule:
         version: '18'
         object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: powershell
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
@@ -693,6 +753,37 @@ rule:
             PropagationFlags: $($_.PropagationFlags)" }'
     derive: {}
     predicates:
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
+        source_type: shellcommand_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: stdout_line
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
+            ContainerInherit, PropagationFlags: None$|^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions,
+            Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$'
+        state_title: 'System Full, Administrators ReadPermission and ChangePermissions '
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102
         source_type: shellcommand_state
@@ -701,6 +792,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -711,23 +818,21 @@ rule:
             Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$'
         state_title: 'System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681:
           Read'
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
-        source_type: shellcommand_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: stdout_line
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
-            ContainerInherit, PropagationFlags: None$|^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions,
-            Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$'
-        state_title: 'System Full, Administrators ReadPermission and ChangePermissions '
     evaluate:
       tests:
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102
+          source_type: shellcommand_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Default permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102
+          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103
           source_type: shellcommand_test
@@ -753,19 +858,6 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
-          source_other: []
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102
-          source_type: shellcommand_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Default permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:253431:
@@ -1003,9 +1095,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253431r958726_rule
-      semantic_ir_sha256: 16ecdb4d85bdb4190db6fb83b71ba7d43a340f09fa30eff5c41d4a667dd2ec6f
+      semantic_ir_sha256: 9021fa0711b49eaf5e4c93a8b51b334e7b6f6da1ed690f034821d0ae4f52a1ea
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 9eb99f60d747b8743671fdab1842d8c265991d1b381726e1a035e86f5316d322
+    semantic_fingerprint_sha256: 2cd14b22136ad982e10a3c1633e6014c1d33cbc1b6b9c0050c19fa3d64eea3ee
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253431r958726_rule

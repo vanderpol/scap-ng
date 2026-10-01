@@ -403,12 +403,32 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/audit.rules
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -416,6 +436,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -437,6 +467,29 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230430:
+          source_definition_id: oval:mil.disa.stig.defs:def:230430
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit invocations of /usr/sbin/setfiles
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23043000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of setfiles in the operating system must generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271558:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271558
           class: compliance
@@ -478,29 +531,6 @@ rule:
                 \ hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\
                 \n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,\
                 \ SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000463-GPOS-00207, SRG-OS-000465-GPOS-00209"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230430:
-          source_definition_id: oval:mil.disa.stig.defs:def:230430
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit invocations of /usr/sbin/setfiles
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23043000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of setfiles in the operating system must generate an audit record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -628,9 +658,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271558r1092536_rule
-      semantic_ir_sha256: a4901fabcd181ebcd348d8e5c0e78f7fca6c310e04d6bc819d9189d3bab93c9c
+      semantic_ir_sha256: 83cd96589bd2007121d9525f5262cf8b6c9fe504d3792609a0f84daf40a9c0df
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ca7a14c6080024479cf994922d8311f2481312f6f027f0cef91d588999fcc4b8
+    semantic_fingerprint_sha256: 6d9e2557b268f53800365691af62b065ea46fb434af93a6cd7d1334612894625
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271558r1092536_rule

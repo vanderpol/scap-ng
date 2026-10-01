@@ -402,12 +402,32 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/audit.rules
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -415,6 +435,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -436,6 +466,29 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230437:
+          source_definition_id: oval:mil.disa.stig.defs:def:230437
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit invocations of /usr/bin/newgrp
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23043700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the newgrp command in the operating system must generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271543:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271543
           class: compliance
@@ -477,29 +530,6 @@ rule:
                 \ hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\
                 \n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,\
                 \ SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230437:
-          source_definition_id: oval:mil.disa.stig.defs:def:230437
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit invocations of /usr/bin/newgrp
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23043700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the newgrp command in the operating system must generate an audit record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -626,9 +656,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271543r1092506_rule
-      semantic_ir_sha256: 382b0552f29bd213c4306138a6b61e3650601987f837b1587bbab3a1c2fd1f68
+      semantic_ir_sha256: d6355c3af7407576eaaccad70385f7bc02e9108a1d59f205978874856a013c6e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: bfd8a2950542f26fabf0c740b773c3f3157a9218353a614323f5152a734ccc9b
+    semantic_fingerprint_sha256: 207887bf0b33a7412b8ce8f5dcf3c9d953f5d41ae8fe0460bdb083b7ae88e502
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271543r1092506_rule

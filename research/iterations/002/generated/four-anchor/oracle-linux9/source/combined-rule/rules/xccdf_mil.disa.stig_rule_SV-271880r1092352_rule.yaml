@@ -375,7 +375,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: net.ipv6.conf.all.forwarding
@@ -390,6 +400,22 @@ rule:
         - attributes:
             datatype: int
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -411,6 +437,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000009
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:271880:
+          source_definition_id: oval:mil.disa.stig.defs:def:271880
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: net.ipv6.conf.all.forwarding setting in kernel is 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23054000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must not enable IPv6 packet forwarding unless the system is a router.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271880:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271880
           class: compliance
@@ -442,29 +491,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: IP forwarding permits the kernel to forward packets from one network interface to another. The ability
                 to forward packets between two networks is only appropriate for systems acting as routers.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:271880:
-          source_definition_id: oval:mil.disa.stig.defs:def:271880
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: net.ipv6.conf.all.forwarding setting in kernel is 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23054000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must not enable IPv6 packet forwarding unless the system is a router.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -600,9 +626,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271880r1092352_rule
-      semantic_ir_sha256: 623334c6a43e26de0fac868622bbb3ed5b8348a0d639b7e2d6f36c71f8fe66ca
+      semantic_ir_sha256: a40185c51178ad284d29fdbbaf5597d9281407e25ba4cb387bffecb95c63e098
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 50394127a87ff00348ebfafae93b5bcb6d562bcec7e643afcec244fcfc19c79a
+    semantic_fingerprint_sha256: a25a2336622c9db461011cee72fe4a5e42b068d74dd88faebed7bacbb6abfe44
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271880r1092352_rule

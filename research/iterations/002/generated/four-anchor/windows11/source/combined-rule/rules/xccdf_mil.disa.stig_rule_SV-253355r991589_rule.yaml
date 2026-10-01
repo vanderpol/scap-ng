@@ -359,15 +359,45 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: EnableICMPRedirect
@@ -379,12 +409,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -406,6 +468,30 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253355:
+          source_definition_id: oval:mil.disa.stig.defs:def:253355
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25335500
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding
+                Open Shortest Path First (OSPF) generated routes.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253355:
           source_definition_id: oval:mil.disa.stig.windows11:def:253355
           class: compliance
@@ -438,30 +524,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Allowing ICMP redirect of routes can lead to traffic not being routed properly.  When disabled, this forces
                 ICMP to be routed via shortest path first.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253355:
-          source_definition_id: oval:mil.disa.stig.defs:def:253355
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25335500
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding
-                Open Shortest Path First (OSPF) generated routes.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -594,9 +656,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253355r991589_rule
-      semantic_ir_sha256: 37c62b0e4d91ecaebffabf4e31a86039d4b0c96a3ac640a4f66cd3f8d7deba16
+      semantic_ir_sha256: acfe4945f9e67d68798cc6cd78963d29ef6264b8c3631f3c359749ece8dfd951
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e22da29d682324a46074ea11d33f486dd1f7959359592aa66863acc55dd44895
+    semantic_fingerprint_sha256: d371f3945dc03acf67e7c2f31857dc823e92ab596054d054aa4d7d5d66d75c98
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253355r991589_rule

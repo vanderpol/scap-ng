@@ -366,7 +366,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: net.ipv4.icmp_echo_ignore_broadcasts
@@ -381,6 +391,22 @@ rule:
         - attributes:
             datatype: int
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -402,6 +428,30 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000010
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:271873:
+          source_definition_id: oval:mil.disa.stig.defs:def:271873
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: net.ipv4.icmp_echo_ignore_broadcasts is set to 1 in kernel
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23053700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast
+                address.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271873:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271873
           class: compliance
@@ -435,30 +485,6 @@ rule:
               text: "Responding to broadcast (ICMP) echoes facilitates network mapping and provides a vector for amplification\
                 \ attacks.\n\n\tIgnoring ICMP echo requests (pings) sent to broadcast or multicast addresses makes the system\
                 \ slightly more difficult to enumerate on the network."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:271873:
-          source_definition_id: oval:mil.disa.stig.defs:def:271873
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: net.ipv4.icmp_echo_ignore_broadcasts is set to 1 in kernel
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23053700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast
-                address.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -590,9 +616,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271873r1092331_rule
-      semantic_ir_sha256: b5084fc61deab82f9f63450379368610f9a7b4931bd311f430eac49205cce117
+      semantic_ir_sha256: 9a77504c145736d2ab61cc50718cf15af5ae3377cc621a5f16e1264506cde2c1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5d5b45b78e112493193bf3d38f63edd19c1f0596202df9368b431b2f8b15e798
+    semantic_fingerprint_sha256: 87722fffdfcc63a0bdfba7af09aedf1214e802ef9a766e2058d1b986f842df03
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271873r1092331_rule

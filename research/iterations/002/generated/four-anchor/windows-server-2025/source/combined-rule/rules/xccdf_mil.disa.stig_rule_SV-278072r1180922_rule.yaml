@@ -353,20 +353,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25432500:
-        source_state_id: oval:mil.disa.stig.win:ste:25432500
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: ipsec_driver
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS
-        state_title: Audit - IPSec Driver - Success only
       oval:mil.disa.stig.win:ste:25432501:
         source_state_id: oval:mil.disa.stig.win:ste:25432501
         source_type: auditeventpolicysubcategories_state
@@ -376,11 +362,57 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: ipsec_driver
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         state_title: Audit - IPSec Driver - Success and Failure
+      oval:mil.disa.stig.win:ste:25432500:
+        source_state_id: oval:mil.disa.stig.win:ste:25432500
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: ipsec_driver
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS
+        state_title: Audit - IPSec Driver - Success only
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25432500:
@@ -582,9 +614,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278072r1180922_rule
-      semantic_ir_sha256: 5c00ca58fe4161bf93b83f57045a043d6a94076a4d3daedcb1567552db00ebf8
+      semantic_ir_sha256: f8229616e11a0fd5cac9f37011722a17fed1a76de106b3e6e07171a544799f34
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 7aa02c4b218096658fb0b08c7bfa27be2a959e50c6a81ce29effdac18149d216
+    semantic_fingerprint_sha256: dc4c03c304c93f88507b28a821febeaca5edacbff9b8e6665e5cd7b8a43e4664
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278072r1180922_rule

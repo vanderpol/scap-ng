@@ -344,42 +344,6 @@ rule:
     description: OL 9 must mount /var/log with the nodev option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23051401:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:23051401
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.ind:var:23051400
-      oval:mil.disa.stig.ind:obj:23051402:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23051402
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/fstab
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
-        - attributes:
-            datatype: int
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.linux:obj:23051400:
         capability: scapng.collect.linux.partition
         source_object_id: oval:mil.disa.stig.linux:obj:23051400
@@ -388,10 +352,96 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /var/log
+      oval:mil.disa.stig.ind:obj:23051402:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23051402
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/fstab
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        - attributes:
+            datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23051401:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:23051401
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.ind:var:23051400
     derive:
       oval:mil.disa.stig.ind:var:23051400:
         source_variable_id: oval:mil.disa.stig.ind:var:23051400
@@ -455,19 +505,6 @@ rule:
           variable_id: oval:mil.disa.stig.ind:var:23051400
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.linux:ste:20000001:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000001
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nodev
-        state_title: null
       oval:mil.disa.stig.ind:ste:23051400:
         source_state_id: oval:mil.disa.stig.ind:ste:23051400
         source_type: variable_state
@@ -476,13 +513,70 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: nodev
         state_title: null
+      oval:mil.disa.stig.linux:ste:20000001:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000001
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: nodev
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:23051402:
+          source_test_id: oval:mil.disa.stig.ind:tst:23051402
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /var/log is configured in /etc/fstab
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23051402
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.linux:tst:23051400:
           source_test_id: oval:mil.disa.stig.linux:tst:23051400
           source_type: partition_test
@@ -508,18 +602,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:23051401
           predicates:
           - oval:mil.disa.stig.ind:ste:23051400
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23051402:
-          source_test_id: oval:mil.disa.stig.ind:tst:23051402
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /var/log is configured in /etc/fstab
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23051402
-          predicates: []
           source_other: []
       definitions:
         oval:mil.disa.stig.ol9os:def:271657:
@@ -715,9 +797,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271657r1091683_rule
-      semantic_ir_sha256: 5fe4fa736f102d99997277d74e06c421ffb54d2e6edaf2f2573a5563f19b6ff2
+      semantic_ir_sha256: d455232e21f25ffa433749c184a9cf0468490fdeb01a5bd671cb811204538f92
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b462ae3fdf2f2928676dd31d10830e513d34a9eead65867d07194ce72aa09cbc
+    semantic_fingerprint_sha256: 9f607237f4ad54d9572c14ee586dee107c357304ffde6d2be88cbc60c6b0ed00
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271657r1091683_rule

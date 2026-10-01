@@ -7,22 +7,74 @@ assessment:
   description: RHEL 9 must enable certificate based smart card authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25812200:
+    oval:mil.disa.stig.ind:obj:25812201:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812200
+      source_object_id: oval:mil.disa.stig.ind:obj:25812201
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      object_title: 'sssd.conf: pam_cert_auth'
+      object_title: '/etc/sssd/conf.d: pam_cert_auth'
       query:
       - attributes:
-          datatype: string
+          recurse_direction: down
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
-        name: filepath
+        name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/sssd.conf
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/conf.d
+      - attributes:
+          datatype: string
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .+
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -30,6 +82,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -55,34 +117,42 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:25812201:
+    oval:mil.disa.stig.ind:obj:25812200:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812201
+      source_object_id: oval:mil.disa.stig.ind:obj:25812200
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      object_title: '/etc/sssd/conf.d: pam_cert_auth'
+      object_title: 'sssd.conf: pam_cert_auth'
       query:
       - attributes:
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/conf.d
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .+
+        value: /etc/sssd/sssd.conf
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -90,6 +160,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -105,6 +185,22 @@ assessment:
       - attributes:
           datatype: string
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -308,6 +404,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258122r1045246_rule
-    semantic_ir_sha256: 7279094c3f866af97de3a65f3be5d68da6c4bcb2d2d1c29f30e602b7682e59a4
+    semantic_ir_sha256: f02a5b3ee1aec86da62dfed25100bbbfbd8b1554dccd9f5c70d669ccba403958
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 405a92aac8ef0499648737397ec724d9601c2f99bd3378f253ba47122c9382a5
+  semantic_fingerprint_sha256: 9080f7a0ac1f699e2b0503b0b962313c9015ead547bca52922810a103ea8bf33

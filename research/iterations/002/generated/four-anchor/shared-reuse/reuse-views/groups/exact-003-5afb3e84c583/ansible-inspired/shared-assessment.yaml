@@ -1,0 +1,267 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.shared.5afb3e84c583314c13e3e744
+  version: 1
+  description: Windows Server 2025 account lockout duration must be configured to 15 minutes or greater.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows Server 2025 account lockout duration must be configured to 15 minutes or greater.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:20000001
+    collect:
+      capability: scapng.collect.windows.lockoutpolicy
+      object_title: null
+      query: []
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000001
+      source_type: lockoutpolicy_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:20000001
+  predicates:
+    oval:mil.disa.stig.win:ste:25329700:
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: less than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: explicit
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than or equal
+        kind: element
+        name: lockout_duration
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25329700
+      source_type: lockoutpolicy_state
+      state_title: Lockout Duration equals -1
+    oval:mil.disa.stig.win:ste:25329701:
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: lockout_duration
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '4294967295'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25329701
+      source_type: lockoutpolicy_state
+      state_title: Lockout Duration equals 4294967295
+    oval:mil.disa.stig.win:ste:25329702:
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: explicit
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: lockout_duration
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '900'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25329702
+      source_type: lockoutpolicy_state
+      state_title: Lockout Duration greater than or equals 900
+    oval:mil.disa.stig.win:ste:25329801:
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than
+        kind: element
+        name: lockout_threshold
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25329801
+      source_type: lockoutpolicy_state
+      state_title: Lockout Threshold is greater than 0
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253297:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verifies 'Account lockout threshold' is not set to '0'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25329801
+          - children:
+            - comment: Verifies 'Account lockout duration' is set to '0'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25329700
+            - comment: Verifies 'Account lockout duration' is set to '15 minutes' or greater
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25329701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows account lockout duration must be configured to 15 minutes or greater.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253297
+        version: '2'
+      oval:mil.disa.stig.windows2025:def:278033:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253297
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-AC-000010 - Windows Server 2025 account lockout duration must be configured to 15 minutes or greater.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: When enabled, the account lockout feature prevents brute-force password attacks on the system. This parameter
+              specifies the period of time that an account will remain locked after the specified number of failed logon attempts.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278033
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25329700:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000001
+        predicates:
+        - oval:mil.disa.stig.win:ste:25329700
+        - oval:mil.disa.stig.win:ste:25329701
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25329700
+        source_type: lockoutpolicy_test
+        state_operator: OR
+        test_title: '''Account lockout duration'' is set to ''0'''
+      oval:mil.disa.stig.win:tst:25329701:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000001
+        predicates:
+        - oval:mil.disa.stig.win:ste:25329702
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25329701
+        source_type: lockoutpolicy_test
+        state_operator: AND
+        test_title: '''Account lockout duration'' is set to ''15 minutes'' or greater'
+      oval:mil.disa.stig.win:tst:25329801:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000001
+        predicates:
+        - oval:mil.disa.stig.win:ste:25329801
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25329801
+        source_type: lockoutpolicy_test
+        state_operator: AND
+        test_title: '''Account lockout threshold'' is not set to ''0'''
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows2025:def:278033
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence

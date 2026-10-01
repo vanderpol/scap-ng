@@ -352,12 +352,32 @@ rule:
         version: '1'
         object_title: /etc/login.defs:ENCRYPT_METHOD
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/login.defs
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -365,6 +385,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -380,6 +410,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -401,6 +447,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:23023100
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230231:
+          source_definition_id: oval:mil.disa.stig.defs:def:230231
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/login.defs:ENCRYPT_METHOD >= SHA512
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23023100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must encrypt all stored passwords with a FIPS 140-2 approved cryptographic hashing
+                algorithm.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271623:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271623
           class: compliance
@@ -437,30 +507,6 @@ rule:
                 This setting ensures user and group account administration utilities are configured to store only encrypted\
                 \ representations of passwords. Additionally, the \"crypt_style\" configuration option ensures the use of\
                 \ a strong hashing algorithm that makes password cracking attacks more difficult."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230231:
-          source_definition_id: oval:mil.disa.stig.defs:def:230231
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/login.defs:ENCRYPT_METHOD >= SHA512
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23023100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must encrypt all stored passwords with a FIPS 140-2 approved cryptographic hashing
-                algorithm.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -588,9 +634,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271623r1091581_rule
-      semantic_ir_sha256: ef0ec0edf668adc60155cbe5bfeb9a8a69661fe29d125e6b82b74f17a16622ff
+      semantic_ir_sha256: bb3846dc8ed4ca99698391e81e8cd136c8d7e02f42fc43bd32d71bfed6e31d86
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 864408c094ec71b4811758a04431c0d618fa3b2e49edeab478852a17096cab7c
+    semantic_fingerprint_sha256: f5ced3094f78042b99f9ea9b85c14b8107990c702cedbd049db2bfde173f8108
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271623r1091581_rule

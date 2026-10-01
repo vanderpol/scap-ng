@@ -355,6 +355,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -362,6 +372,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -369,6 +389,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -381,12 +411,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -409,6 +471,30 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253450:
+          source_definition_id: oval:mil.disa.stig.defs:def:253450
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Microsoft Network Client: Send unencrypted password to connect to third-party SMB servers''
+                is set to ''Disabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25345000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Unencrypted passwords must not be sent to third-party SMB Servers.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253450:
           source_definition_id: oval:mil.disa.stig.windows11:def:253450
           class: compliance
@@ -442,30 +528,6 @@ rule:
                 plain text passwords across the network, when authenticating to an SMB server, reduces the overall security
                 of the environment. Check with the vendor of the SMB server to see if there is a way to support encrypted
                 password authentication.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253450:
-          source_definition_id: oval:mil.disa.stig.defs:def:253450
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Microsoft Network Client: Send unencrypted password to connect to third-party SMB servers''
-                is set to ''Disabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25345000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Unencrypted passwords must not be sent to third-party SMB Servers.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -597,9 +659,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253450r987796_rule
-      semantic_ir_sha256: a3b498c7e512cc2db84ea77a96008a67241f1539ca7bfbec6fee8218aa30b818
+      semantic_ir_sha256: 8052f61e832b9cdb5939f9ed29c141cee4e933a935b1add7588cd14940706543
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: dd41b6d0d5fdafc62ea44380cf715a8832f6da944f27cf0669e7dd74323e11cb
+    semantic_fingerprint_sha256: 2e8c7a1f7fe31b77502b0e068fcb354e98ae9d06045f9f692cc2e82163c56f4b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253450r987796_rule

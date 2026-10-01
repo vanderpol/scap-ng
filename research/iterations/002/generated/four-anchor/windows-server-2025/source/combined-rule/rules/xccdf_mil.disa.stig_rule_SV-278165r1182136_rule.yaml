@@ -507,12 +507,51 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_NETWORK_LOGON_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000031:
+        source_state_id: oval:mil.disa.stig.win:ste:20000031
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Authenticated Users
+        state_title: null
       oval:mil.disa.stig.win:ste:25441802:
         source_state_id: oval:mil.disa.stig.win:ste:25441802
         source_type: userright_state
@@ -521,10 +560,52 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Enterprise Domain Controllers
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
@@ -534,33 +615,26 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000031:
-        source_state_id: oval:mil.disa.stig.win:ste:20000031
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Authenticated Users
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
     evaluate:
       tests:
@@ -581,30 +655,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25441802
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:254418:
-          source_definition_id: oval:mil.disa.stig.defs:def:254418
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Access this computer from the network - Administrators, Authenticated Users, Enterprise Domain Controllers
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25441801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: "Windows Access this computer from the network user right must only be assigned to the Administrators,\
-                \ Authenticated Users, and \nEnterprise Domain Controllers groups on domain controllers."
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278165:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278165
           class: compliance
@@ -639,6 +689,30 @@ rule:
               text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
                 \n  Accounts with the \"Access this computer from the network\" right may access resources on the system,\
                 \ and this right must be limited to those requiring it."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:254418:
+          source_definition_id: oval:mil.disa.stig.defs:def:254418
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Access this computer from the network - Administrators, Authenticated Users, Enterprise Domain Controllers
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25441801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: "Windows Access this computer from the network user right must only be assigned to the Administrators,\
+                \ Authenticated Users, and \nEnterprise Domain Controllers groups on domain controllers."
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -818,9 +892,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278165r1182136_rule
-      semantic_ir_sha256: 38fca29f942d6215a5e2cc31d67cc37662d4fce6b477d080997bf3007e063f0d
+      semantic_ir_sha256: bf16cee8277e2216d18944ffd1632d3046fff623d265119029fff524213d20e1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d69f0d72bbe9906c25df69034adad6b7d3ead4435d72526919794d147aa8b323
+    semantic_fingerprint_sha256: edaa74e282ddcda5050fffc6003be64c2231d5ee7a8fa2a568fe46495c9fd1c7
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278165r1182136_rule

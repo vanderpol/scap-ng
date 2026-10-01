@@ -1,0 +1,140 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278020
+  collect:
+    oval:mil.disa.stig.win:obj:25327700:
+      capability: scapng.collect.windows.wmi57
+      object_title: Simple TCP/IP Services
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT startmode FROM Win32_Service WHERE name='simptcp'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25327700
+      source_type: wmi57_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 must not have Simple TCP/IP Services installed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253277:
+        class: compliance
+        criteria:
+          children:
+          - comment: Check to make sure the Simple TCP/IP Services server feature is not present.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25327700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Simple TCP/IP Services must not be installed on the system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253277
+        version: '2'
+      oval:mil.disa.stig.windows2025:def:278020:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253277
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-00-000350 - Windows Server 2025 must not have Simple TCP/IP Services installed.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Unnecessary services increase the attack surface of a system. Some of these services may not support required
+              levels of authentication or encryption or may provide unauthorized access to the system.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278020
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25327700:
+        check: at least one
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.win:obj:25327700
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25327700
+        source_type: wmi57_test
+        state_operator: AND
+        test_title: Check to make sure the Simple TCP/IP Services server feature is not present.
+  id: ng.shared.aac8d08e476430824683fcd4
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: aac8d08e476430824683fcd4593ab0ac34ad5a534cf84951868fc1ed1b37aaee
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278020r1180766_rule
+    title: Windows Server 2025 must not have Simple TCP/IP Services installed.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253277r958478_rule
+    title: Simple TCP/IP Services must not be installed on the system.

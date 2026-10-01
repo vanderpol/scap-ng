@@ -1,0 +1,246 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271578
+  collect:
+    oval:mil.disa.stig.ind:obj:23039400:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/auditd.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)^\s*name_format\s*=\s*(\w+)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23039400
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must label all offloaded audit logs before sending them to the central log server.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230394:
+        class: compliance
+        criteria:
+          children:
+          - comment: '/etc/audit/auditd.conf: name_format = hostname, fqd or numeric'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23039400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must label all off-loaded audit logs before sending them to the central log server.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230394
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271578:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230394
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000755 - OL 9 must label all offloaded audit logs before sending them to the central log server.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Enriched logging is needed to determine who, what, and when events occur on a system. Without this, determining\
+              \ root cause of an event will be much more difficult.\n\n\tWhen audit logs are not labeled before they are sent\
+              \ to a central log server, the audit data will not be able to be analyzed and tied back to the correct system.\n\
+              \n\tSatisfies: SRG-OS-000039-GPOS-00017, SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271578
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23039400:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23039400
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23039400
+        - oval:mil.disa.stig.ind:ste:23039401
+        - oval:mil.disa.stig.ind:ste:23039402
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23039400
+        source_type: textfilecontent54_test
+        state_operator: OR
+        test_title: '/etc/audit/auditd.conf: name_format = hostname, fqd or numeric'
+  id: ng.shared.d8921d75c6792439cd78c23a
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:23039400:
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)^hostname$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23039400
+      source_type: textfilecontent54_state
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23039401:
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)^fqd$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23039401
+      source_type: textfilecontent54_state
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23039402:
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)^numeric$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23039402
+      source_type: textfilecontent54_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: d8921d75c6792439cd78c23a3a8a0355e0a2a8a5a28fe27cfdfdb48b49bf8d2f
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271578r1092572_rule
+    title: OL 9 must label all offloaded audit logs before sending them to the central log server.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258161r958416_rule
+    title: RHEL 9 must label all offloaded audit logs before sending them to the central log server.

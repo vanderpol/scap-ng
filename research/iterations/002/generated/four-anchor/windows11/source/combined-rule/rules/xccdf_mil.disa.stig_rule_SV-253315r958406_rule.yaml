@@ -370,20 +370,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25331500:
-        source_state_id: oval:mil.disa.stig.win:ste:25331500
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: logoff
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS
-        state_title: Audit - Logoff - Success only
       oval:mil.disa.stig.win:ste:25331501:
         source_state_id: oval:mil.disa.stig.win:ste:25331501
         source_type: auditeventpolicysubcategories_state
@@ -393,26 +379,59 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: logoff
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         state_title: Audit - Logoff - Success and Failure
+      oval:mil.disa.stig.win:ste:25331500:
+        source_state_id: oval:mil.disa.stig.win:ste:25331500
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: logoff
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS
+        state_title: Audit - Logoff - Success only
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25331500:
-          source_test_id: oval:mil.disa.stig.win:tst:25331500
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Audit - Logoff - Success only
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331500
-          source_other: []
         oval:mil.disa.stig.win:tst:25331501:
           source_test_id: oval:mil.disa.stig.win:tst:25331501
           source_type: auditeventpolicysubcategories_test
@@ -425,6 +444,19 @@ rule:
           - oval:mil.disa.stig.win:obj:20000000
           predicates:
           - oval:mil.disa.stig.win:ste:25331501
+          source_other: []
+        oval:mil.disa.stig.win:tst:25331500:
+          source_test_id: oval:mil.disa.stig.win:tst:25331500
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Audit - Logoff - Success only
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331500
           source_other: []
       definitions:
         oval:mil.disa.stig.windows11:def:253315:
@@ -626,9 +658,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253315r958406_rule
-      semantic_ir_sha256: f9101b319ec64fbe2890d0a7673e2c7f2449a88304e0fde47833e777559dc0d9
+      semantic_ir_sha256: f5629a3604ca695d97bd95649fe811f06e85788d4968b976fee6f70de6f87e56
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e9897541ad75c28225eb96f1fc2da99b954188758caaec1cb2311e9e181e4992
+    semantic_fingerprint_sha256: ee555f4522bd74be0e411342571dab06a6256ebe329c22f1523c5d719491427a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253315r958406_rule

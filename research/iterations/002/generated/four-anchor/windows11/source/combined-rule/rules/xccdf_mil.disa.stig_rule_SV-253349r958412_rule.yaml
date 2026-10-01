@@ -354,19 +354,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25334901:
-        source_state_id: oval:mil.disa.stig.win:ste:25334901
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: mpssvc_rule_level_policy_change
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_FAILURE
-        state_title: '''MPSSVC Rule-Level Policy Change'' is set to ''Failure'''
       oval:mil.disa.stig.win:ste:25334900:
         source_state_id: oval:mil.disa.stig.win:ste:25334900
         source_type: auditeventpolicysubcategories_state
@@ -375,11 +362,56 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: mpssvc_rule_level_policy_change
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         state_title: '''MPSSVC Rule-Level Policy Change'' is set to ''Success'' and ''Failure'''
+      oval:mil.disa.stig.win:ste:25334901:
+        source_state_id: oval:mil.disa.stig.win:ste:25334901
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mpssvc_rule_level_policy_change
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_FAILURE
+        state_title: '''MPSSVC Rule-Level Policy Change'' is set to ''Failure'''
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25334900:
@@ -397,29 +429,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25334901
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253349:
-          source_definition_id: oval:mil.disa.stig.defs:def:253349
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - MPSSVC Rule-Level Policy Change
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25334900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must be configured to audit MPSSVC Rule-Level Policy Change Failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253349:
           source_definition_id: oval:mil.disa.stig.windows11:def:253349
           class: compliance
@@ -458,6 +467,29 @@ rule:
 
                 Audit MPSSVC Rule-Level Policy Change determines whether the operating system generates audit events when
                 changes are made to policy rules for the Microsoft Protection Service (MPSSVC.exe).'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253349:
+          source_definition_id: oval:mil.disa.stig.defs:def:253349
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - MPSSVC Rule-Level Policy Change
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25334900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must be configured to audit MPSSVC Rule-Level Policy Change Failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -587,9 +619,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253349r958412_rule
-      semantic_ir_sha256: f0c5a10e71e84dc1cbd8b2b2b1694e657dace88df56fae75cc771c2c65a3693f
+      semantic_ir_sha256: 335b447eb81ea1d621368d5db10f1f1b449a10cad4499f70e26859a6871fcfa1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 480f8de064aa253a70efb2538af32a4fa1731ab86fac5bf7f67952a532d41219
+    semantic_fingerprint_sha256: 5518490f7718369644c5c8e2d5836cb6156cdf93cb1818d7d1cf3d2463f09ae8
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253349r958412_rule

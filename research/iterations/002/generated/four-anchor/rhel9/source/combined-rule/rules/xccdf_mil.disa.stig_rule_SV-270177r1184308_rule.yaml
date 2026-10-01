@@ -403,12 +403,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/crypto-policies/back-ends/openssh.config
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -416,25 +436,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:25798901:
-        source_state_id: oval:mil.disa.stig.ind:ste:25798901
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '"aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"'
-        state_title: null
       oval:mil.disa.stig.ind:ste:25798900:
         source_state_id: oval:mil.disa.stig.ind:ste:25798900
         source_type: textfilecontent54_state
@@ -443,10 +460,55 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr
+        state_title: null
+      oval:mil.disa.stig.ind:ste:25798901:
+        source_state_id: oval:mil.disa.stig.ind:ste:25798901
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '"aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"'
         state_title: null
     evaluate:
       tests:
@@ -655,9 +717,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-270177r1184308_rule
-      semantic_ir_sha256: 8757b77ad1ace19baf88689883ac59ab12fbf4e497da86607a2a18e1e8b5f6fb
+      semantic_ir_sha256: 7dca23d19c868d86d8ba96ffa6ed93b93097afc14922bec9a8770285fcd70b1f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 88cdbd182d2eb7ca3125c8533080c3d94b1792b3a49c06cb613fee9220337b5f
+    semantic_fingerprint_sha256: a55c71846c574ecdc69ce41722f3fd2611e945248018b375cd60da154f454f91
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-270177r1184308_rule

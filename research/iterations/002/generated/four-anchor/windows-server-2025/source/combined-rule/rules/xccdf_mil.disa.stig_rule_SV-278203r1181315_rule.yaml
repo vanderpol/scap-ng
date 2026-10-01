@@ -320,18 +320,48 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -344,12 +374,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -371,6 +433,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253441:
+          source_definition_id: oval:mil.disa.stig.defs:def:253441
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Domain member: Disable machine account password changes'' is set to ''Disabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25344100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The computer account password must not be prevented from being reset.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278203:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278203
           class: compliance
@@ -403,29 +488,6 @@ rule:
               text: Computer account passwords are changed automatically on a regular basis. Disabling automatic password
                 changes can make the system more vulnerable to malicious access. Frequent password changes can be a significant
                 safeguard for the system. A new password for the computer account will be generated every 30 days.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253441:
-          source_definition_id: oval:mil.disa.stig.defs:def:253441
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Domain member: Disable machine account password changes'' is set to ''Disabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25344100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The computer account password must not be prevented from being reset.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -546,9 +608,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278203r1181315_rule
-      semantic_ir_sha256: 73978d26b93a6eb40b7e6acb95325c81738174d2fd2c214f1b554cc4e898f8b5
+      semantic_ir_sha256: 2035af8f73c19ea97743c96a761c5ff94bf968f473f13352a57d2e3ecedc5fce
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: c80661513a7d44a88d9c896bafcf3bb232480647032e27b195f0008f803882b0
+    semantic_fingerprint_sha256: 314ea1b295052ab6b8a08b7bcc2ae88bedc0981ca31a057e313b60144a8f1b0a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278203r1181315_rule

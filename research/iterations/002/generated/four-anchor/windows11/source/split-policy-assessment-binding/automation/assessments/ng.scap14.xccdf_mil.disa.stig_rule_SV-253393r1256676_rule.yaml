@@ -17,18 +17,48 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: HKEY_LOCAL_MACHINE
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SOFTWARE\Policies\Microsoft\Windows\DataCollection
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -41,12 +71,44 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -58,12 +120,44 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -87,6 +181,30 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253393:
+        source_definition_id: oval:mil.disa.stig.defs:def:253393
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Verifies 'Allow Diagnostic Data' is set to 'Diagnostic Data Off (Not recommended)' or 'Send Required
+              Diagnostic Data' selected in 'Options:'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25339300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Telemetry must not be configured to Full.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253393:
         source_definition_id: oval:mil.disa.stig.windows11:def:253393
         class: compliance
@@ -123,30 +241,6 @@ assessment:
               and usage data and may be required to support some Microsoft services. "Enhanced" includes additional information
               on how Windows and apps are used and advanced reliability data. Windows Analytics can use a "limited enhanced"
               level to provide information such as health data for devices.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253393:
-        source_definition_id: oval:mil.disa.stig.defs:def:253393
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Verifies 'Allow Diagnostic Data' is set to 'Diagnostic Data Off (Not recommended)' or 'Send Required
-              Diagnostic Data' selected in 'Options:'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25339300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows Telemetry must not be configured to Full.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -267,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253393r1256676_rule
-    semantic_ir_sha256: a0afe9d33b91aec6f836c5475c1fea5240db86abce34af92776ded9b1138d758
+    semantic_ir_sha256: 42b36f4f83376c27064fbb1bc72b9adeeb14f46b1e2f4cad63e523c9d19f9718
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: aa6b079f3d18201c4a1fafc545e622b60ffdfdcf4d712e1bbceec547b87f3c91
+  semantic_fingerprint_sha256: ac899cab087fbddf0241c6990ea5704ebbb8969476412c040285358e41d7386c

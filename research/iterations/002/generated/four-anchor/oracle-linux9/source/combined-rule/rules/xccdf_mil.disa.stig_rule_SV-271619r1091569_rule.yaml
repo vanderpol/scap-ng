@@ -337,12 +337,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/security/pwquality.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -350,6 +370,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -364,21 +394,61 @@ rule:
         query:
         - attributes:
             recurse_direction: down
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/security/pwquality.conf.d
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \.conf$
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -386,6 +456,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -413,20 +493,6 @@ rule:
           operator_explicit: true
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23036100:
-        source_state_id: oval:mil.disa.stig.ind:ste:23036100
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: less than or equal
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '3'
-        state_title: null
       oval:mil.disa.stig.ind:ste:20000015:
         source_state_id: oval:mil.disa.stig.ind:ste:20000015
         source_type: textfilecontent54_state
@@ -436,10 +502,56 @@ rule:
         - attributes:
             datatype: int
             operation: greater than
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
+        state_title: null
+      oval:mil.disa.stig.ind:ste:23036100:
+        source_state_id: oval:mil.disa.stig.ind:ste:23036100
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: less than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than or equal
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '3'
         state_title: null
     evaluate:
       tests:
@@ -458,30 +570,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000015
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230361:
-          source_definition_id: oval:mil.disa.stig.defs:def:230361
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23036100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must require the maximum number of repeating characters be limited to three when
-                passwords are changed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271619:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271619
           class: compliance
@@ -517,6 +605,30 @@ rule:
                 \ at guessing and brute-force attacks.\n\n\tPassword complexity is one factor of several that determines how\
                 \ long it takes to crack a password. The more complex a password, the greater the number of possible combinations\
                 \ that need to be tested before the password is compromised."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230361:
+          source_definition_id: oval:mil.disa.stig.defs:def:230361
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23036100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must require the maximum number of repeating characters be limited to three when
+                passwords are changed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -640,9 +752,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271619r1091569_rule
-      semantic_ir_sha256: d735da090d564b77b3cda8a06c2f50b01e99fd077a0ea94d26b43575da85a00f
+      semantic_ir_sha256: 6d7fe78299f6bbccf8551b08bd28f5a35860850badf9041f1669bf1b58b8e8c1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: dfa6bfa4bb5d2074eaa5d4565885ef85487e4813f8e17b711d6f75f0043cfec4
+    semantic_fingerprint_sha256: 844174ffb82e3b09b9a5b4efc2791d6a374e0cb438ed158b1dd7ded47e4ab876
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271619r1091569_rule

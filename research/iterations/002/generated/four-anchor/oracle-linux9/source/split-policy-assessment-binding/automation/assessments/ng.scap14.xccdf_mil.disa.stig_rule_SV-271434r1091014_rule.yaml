@@ -7,32 +7,6 @@ assessment:
   description: OL 9 must use a separate file system for /tmp.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23029500:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23029500
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/fstab
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[^# \t]+\s+/tmp\s+
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.linux:obj:23029500:
       capability: scapng.collect.linux.partition
       source_object_id: oval:mil.disa.stig.linux:obj:23029500
@@ -41,10 +15,76 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: /tmp
+    oval:mil.disa.stig.ind:obj:23029500:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029500
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          datatype: string
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[^# \t]+\s+/tmp\s+
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
@@ -251,6 +291,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271434r1091014_rule
-    semantic_ir_sha256: 9300811470a1b47db7dffed5ce662ebf4f3b13db14c62dc6d9b1dcfade723e5b
+    semantic_ir_sha256: 06fe6f25862e04413bdc104190360f8151e5c46d3b4fccf87d4d700cf93b38e3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: a372aa3671c284d4a9208c6f5ff6ee765644f256719b33a1ac84737577d838b2
+  semantic_fingerprint_sha256: ee3e9b00741832b25791d5b61ee5a1c2e8a469ef92607f0b0d48e7f3de5d03a3

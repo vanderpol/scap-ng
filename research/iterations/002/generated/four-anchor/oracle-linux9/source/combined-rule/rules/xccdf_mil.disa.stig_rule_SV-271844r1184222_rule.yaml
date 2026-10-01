@@ -325,16 +325,46 @@ rule:
         version: '5'
         object_title: Retrieve array of users from passwd file with UID >=1000 and 'nologin'.
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: 'ls -d $(awk -F: ''($3>=1000)&&($7 !~ /nologin/){print $6}'' /etc/passwd)'
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -349,6 +379,22 @@ rule:
         - attributes:
             check_existence: none_exist
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: explicit
+              value: none_exist
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: stderr_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -520,9 +566,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271844r1184222_rule
-      semantic_ir_sha256: 208a2a5a3e96544cc982fa946319c8f69c558d5c6af23c047aae86319b059350
+      semantic_ir_sha256: f2108818e3995acbbfa2e2c7e70a0ed731489228e0e02a5b84822eae522358ee
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d93e83ea412c8222b8c69d2b5dc6874853e6c829b84301606024d177b1b70d9e
+    semantic_fingerprint_sha256: 160508883a389c7cc7308ce087c7bcf4bde0e928d444d148d81e29bd502bfc45
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271844r1184222_rule

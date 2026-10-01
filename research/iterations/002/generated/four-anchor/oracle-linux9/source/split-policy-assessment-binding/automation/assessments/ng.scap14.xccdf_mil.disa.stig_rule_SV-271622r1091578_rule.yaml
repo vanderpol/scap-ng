@@ -8,31 +8,6 @@ assessment:
     encrypted representations of passwords.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:20441701:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:20441701
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '3'
-      object_title: /etc/libuser.conf defaults section with crypt_style
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/libuser.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*crypt_style\s*=\s*(\S+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:20441700:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:20441700
@@ -41,12 +16,32 @@ assessment:
       version: '4'
       object_title: /etc/libuser.conf defaults section with crypt_style
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/libuser.conf
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -54,25 +49,77 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:20441701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:20441701
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '3'
+      object_title: /etc/libuser.conf defaults section with crypt_style
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/libuser.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*crypt_style\s*=\s*(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:20441701:
-      source_state_id: oval:mil.disa.stig.ind:ste:20441701
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: sha512
-      state_title: sha512
     oval:mil.disa.stig.ind:ste:20441700:
       source_state_id: oval:mil.disa.stig.ind:ste:20441700
       source_type: textfilecontent54_state
@@ -82,26 +129,58 @@ assessment:
       - attributes:
           datatype: string
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
       state_title: defaults/crypt_style
+    oval:mil.disa.stig.ind:ste:20441701:
+      source_state_id: oval:mil.disa.stig.ind:ste:20441701
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: sha512
+      state_title: sha512
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:20441700:
-        source_test_id: oval:mil.disa.stig.ind:tst:20441700
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: libuser.conf, defaults/crypt_style exists
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:20441700
-        predicates:
-        - oval:mil.disa.stig.ind:ste:20441700
-        source_other: []
       oval:mil.disa.stig.ind:tst:20441701:
         source_test_id: oval:mil.disa.stig.ind:tst:20441701
         source_type: textfilecontent54_test
@@ -114,6 +193,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:20441701
         predicates:
         - oval:mil.disa.stig.ind:ste:20441701
+        source_other: []
+      oval:mil.disa.stig.ind:tst:20441700:
+        source_test_id: oval:mil.disa.stig.ind:tst:20441700
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: libuser.conf, defaults/crypt_style exists
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:20441700
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20441700
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:204417:
@@ -303,6 +395,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271622r1091578_rule
-    semantic_ir_sha256: 9b076b52bb9bf020184a4f050e742825d7b0670fa5b9aa2c2f03b3173538add5
+    semantic_ir_sha256: 1dc42a67fd6699ecb155c451194c926fc0a2eb635f5860ce20ee37cf4a2d12ab
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: e7c481b45b9d9f7686fc566fdb20dd9903e56aeebfba7eb6414bbaa8d9a094c0
+  semantic_fingerprint_sha256: c33dcffd8bc61d9aeca73e31187bb8465b0d39b4252e8e9b7bb4d9e2e9b93806

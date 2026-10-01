@@ -26,6 +26,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: ipsec_driver
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -40,6 +56,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: ipsec_driver
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -47,19 +79,6 @@ assessment:
       state_title: Audit - IPSec Driver - Success and Failure
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25333000:
-        source_test_id: oval:mil.disa.stig.win:tst:25333000
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Audit - IPSec Driver - Failure only
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25333000
-        source_other: []
       oval:mil.disa.stig.win:tst:25333001:
         source_test_id: oval:mil.disa.stig.win:tst:25333001
         source_type: auditeventpolicysubcategories_test
@@ -73,7 +92,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25333001
         source_other: []
+      oval:mil.disa.stig.win:tst:25333000:
+        source_test_id: oval:mil.disa.stig.win:tst:25333000
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Audit - IPSec Driver - Failure only
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333000
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253330:
+        source_definition_id: oval:mil.disa.stig.defs:def:253330
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - IPSec Driver - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333000
+          - comment: Audit - IPSec Driver - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333001
+          comment: Audit - IPSec Driver - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit System - IPsec Driver failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253330:
         source_definition_id: oval:mil.disa.stig.windows11:def:253330
         class: compliance
@@ -110,33 +169,6 @@ assessment:
 
 
               IPsec Driver records events related to the IPsec Driver such as dropped packets.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253330:
-        source_definition_id: oval:mil.disa.stig.defs:def:253330
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - IPSec Driver - Failure only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333000
-          - comment: Audit - IPSec Driver - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333001
-          comment: Audit - IPSec Driver - Failure
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit System - IPsec Driver failures.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -271,6 +303,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253330r991586_rule
-    semantic_ir_sha256: ef969568b7b6debdf70e8e93ac3faf1481067515eccdb744e18ad0f01a57b0ac
+    semantic_ir_sha256: 22d2d2a167ea7a7bf9398fbe1fc61c3bcbde06c56c3ecab8c84d8131c95c7465
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ab37a9fc9d40c022ccca6b53df9fe7402984e26564755561350baf1421ac5204
+  semantic_fingerprint_sha256: cd8047f82988e9570f994d47bb23d14ddb118dbb6fb143fa9ddb15e3b9216f47

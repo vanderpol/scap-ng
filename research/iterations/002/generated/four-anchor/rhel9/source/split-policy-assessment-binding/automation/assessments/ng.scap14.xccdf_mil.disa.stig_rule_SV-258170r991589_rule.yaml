@@ -15,12 +15,32 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/audit/auditd.conf
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -28,6 +48,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -43,6 +73,22 @@ assessment:
       - attributes:
           datatype: string
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -64,6 +110,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000022
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258170:
+        source_definition_id: oval:mil.disa.stig.defs:def:258170
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: '/etc/audit/auditd.conf: write_logs = yes'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25817000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must write audit records to disk.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258170:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258170
         class: compliance
@@ -95,29 +164,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Audit data should be synchronously written to disk to ensure log integrity. This setting assures that all
               audit event data is written disk.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258170:
-        source_definition_id: oval:mil.disa.stig.defs:def:258170
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: '/etc/audit/auditd.conf: write_logs = yes'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25817000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must write audit records to disk.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -238,6 +284,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258170r991589_rule
-    semantic_ir_sha256: 6d3dcf84dacaecef86338201f6da80df6f8430321b8153fc6deba36de5be2e60
+    semantic_ir_sha256: cf8470ac850d4d1250336f636154a54d087fe9baeae85c52ed01d870cd6bdb14
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 48776f4624a7d68e1874fa4600d4d804aaa6f9a6f3581eda87d45eb9cc0be95b
+  semantic_fingerprint_sha256: 538c248e1aae54d2e3e289fe09a36e78580687ca077e7206ce46aa8a095738a5

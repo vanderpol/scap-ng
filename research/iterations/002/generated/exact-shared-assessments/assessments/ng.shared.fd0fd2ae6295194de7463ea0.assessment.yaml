@@ -1,0 +1,249 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271681
+  collect:
+    oval:mil.disa.stig.ind:obj:24453900:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/db/local.d/locks
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^/org/gnome/desktop/screensaver/lock-enabled$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:24453900
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25801700:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*system-db\s*:\s*local\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25801700
+      source_type: textfilecontent54_object
+      version: '3'
+  derive: {}
+  description: OL 9 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:244539:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25801700
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:24453900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the screensaver lock-enabled setting for the graphical
+              user interface.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:244539
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271681:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:244539
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002123 - OL 9 must prevent a user from overriding the screensaver lock-enabled setting for the graphical
+              user interface.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "A session time-out lock is a temporary action taken when a user stops work and moves away from the immediate\
+              \ physical vicinity of the information system but does not log out because of the temporary nature of the absence.\
+              \ Rather than relying on the user to manually lock their operating system session prior to vacating the vicinity,\
+              \ operating systems need to be able to identify when a user's session has idled and take action to initiate\
+              \ the session lock.\n\n\tThe session lock is implemented at the point where session activity can be determined\
+              \ and/or controlled.\n\n\tImplementing session settings will have little value if a user is able to manipulate\
+              \ these settings from the defaults prescribed in the other requirements of this implementation guide.\n\n\t\
+              Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271681
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:24453900:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:24453900
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:24453900
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: /org/gnome/desktop/screensaver/lock-enabled in /etc/dconf/db/local.d/locks/*
+      oval:mil.disa.stig.ind:tst:25801700:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25801700
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25801700
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+  id: ng.shared.fd0fd2ae6295194de7463ea0
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: fd0fd2ae6295194de7463ea0055dd8c85bf31e1e834a5349496f8cc5098c7d30
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271681r1091755_rule
+    title: OL 9 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258022r1045097_rule
+    title: RHEL 9 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface.

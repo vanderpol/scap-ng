@@ -347,6 +347,22 @@ rule:
         entities:
         - attributes:
             datatype: boolean
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: boolean
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: anonymous_name_lookup
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -368,6 +384,29 @@ rule:
           - oval:mil.disa.stig.win:ste:25345200
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253452:
+          source_definition_id: oval:mil.disa.stig.defs:def:253452
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '''Network access: Allow anonymous SID/Name translation'' is set to ''Disabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25345200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Anonymous SID/Name translation must not be allowed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253452:
           source_definition_id: oval:mil.disa.stig.windows11:def:253452
           class: compliance
@@ -399,29 +438,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Allowing anonymous SID/Name translation can provide sensitive information for accessing a system. Only
                 authorized users must be able to perform such translations.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253452:
-          source_definition_id: oval:mil.disa.stig.defs:def:253452
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '''Network access: Allow anonymous SID/Name translation'' is set to ''Disabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25345200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Anonymous SID/Name translation must not be allowed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -550,9 +566,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253452r991589_rule
-      semantic_ir_sha256: 86daa092709e6c8f221de89f95c805fc9c1c845a6265ed166aa6889f844dd87e
+      semantic_ir_sha256: 5bc96444a85164e4ff455fdbce0bc48b62d41d4e19e6805b37679e269d2797d4
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: fda1422ac0f240bf48c79e45f3fcc3d3aa282f064aa23c3356273152c0628be4
+    semantic_fingerprint_sha256: 0455616fddf1906c1b2aa355aefea736fca15c12f6b8944ddcdd900326bf5a88
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253452r991589_rule

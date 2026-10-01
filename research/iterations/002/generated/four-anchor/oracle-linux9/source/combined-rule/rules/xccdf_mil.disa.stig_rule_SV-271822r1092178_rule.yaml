@@ -346,7 +346,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /var/log/messages
@@ -360,6 +370,22 @@ rule:
         entities:
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -381,29 +407,6 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230246:
-          source_definition_id: oval:mil.disa.stig.defs:def:230246
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /var/log/messages file is owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23024600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system /var/log/messages file must be owned by root.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271822:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271822
           class: compliance
@@ -440,6 +443,29 @@ rule:
                 \ error messages must be carefully considered by the organization and development team. The extent to which\
                 \ the information system is able to identify and handle error conditions is guided by organizational policy\
                 \ and operational requirements."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230246:
+          source_definition_id: oval:mil.disa.stig.defs:def:230246
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /var/log/messages file is owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23024600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system /var/log/messages file must be owned by root.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -566,9 +592,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271822r1092178_rule
-      semantic_ir_sha256: a90237bb0a327714a9181110e4cf174c01eca8b62b2cfb8646971d1a2dc43618
+      semantic_ir_sha256: 73fc7b1b36df0b96bfb26c0061851046d523e54ce822ecd728a812734532638b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 2d79ec1b995eeef4e1ab32f95ab733c367f55e58c6f05ae759b3bc722af29052
+    semantic_fingerprint_sha256: 775e7f4699bb4a2a1f8135d45aa9fa38c57cdfe58202d0f02398de24ecc1efbf
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271822r1092178_rule

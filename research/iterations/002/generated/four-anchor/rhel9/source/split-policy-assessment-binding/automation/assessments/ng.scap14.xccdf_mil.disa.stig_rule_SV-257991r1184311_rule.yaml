@@ -16,12 +16,32 @@ assessment:
       version: '2'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/crypto-policies/back-ends/opensshserver.config
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -29,6 +49,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -41,7 +71,23 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
@@ -52,7 +98,23 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
@@ -74,30 +136,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25799101
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:257991:
-        source_definition_id: oval:mil.disa.stig.defs:def:257991
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25799100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
-              FIPS 140-3 validated cryptographic hash algorithms.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257991:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257991
         class: compliance
@@ -144,6 +182,30 @@ assessment:
               RHEL 9 incorporates system-wide crypto policies by default. The SSH configuration file has no effect on the
               ciphers, MACs, or algorithms unless specifically defined in the /etc/sysconfig/sshd file. The employed algorithms
               can be viewed in the /etc/crypto-policies/back-ends/opensshserver.config file.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:257991:
+        source_definition_id: oval:mil.disa.stig.defs:def:257991
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25799100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
+              FIPS 140-3 validated cryptographic hash algorithms.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -278,6 +340,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257991r1184311_rule
-    semantic_ir_sha256: 1d5d8d70ae59ffb6f46f28b75e9e996ffecb7f27b1d5614f69c507cfb95dbd78
+    semantic_ir_sha256: ddfce99c274a576da461c9a670eb430a974977bfbab4f521fd92a9fbbc4c7773
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: cd38d883455acff0d63c12506dd827968ddf2dc9e0fbc4af138b75087bf14371
+  semantic_fingerprint_sha256: b6e863e50c6914f8c42aec8a103e8edf1f00b44463284045d31309179c41476e

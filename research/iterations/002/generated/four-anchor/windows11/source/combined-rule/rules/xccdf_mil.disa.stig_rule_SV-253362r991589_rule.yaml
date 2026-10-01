@@ -404,32 +404,6 @@ rule:
       and \\*\NETLOGON shares.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25336201:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25336201
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: Hardened Path Config for \\*\NETLOGON
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: \\*\NETLOGON
       oval:mil.disa.stig.win:obj:25336200:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25336200
@@ -440,68 +414,183 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: \\*\SYSVOL
-    derive: {}
-    predicates:
-      oval:mil.disa.stig.win:ste:25336201:
-        source_state_id: oval:mil.disa.stig.win:ste:25336201
-        source_type: registry_state
+      oval:mil.disa.stig.win:obj:25336201:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25336201
+        source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
+        version: '1'
+        object_title: Hardened Path Config for \\*\NETLOGON
+        query:
         - attributes:
             datatype: string
-            entity_check: none satisfy
-            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
-          name: value
+          name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
-        state_title: No RequireMutualAuthentication!=1
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+        - attributes:
+            datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: \\*\NETLOGON
+    derive: {}
+    predicates:
       oval:mil.disa.stig.win:ste:25336202:
         source_state_id: oval:mil.disa.stig.win:ste:25336202
         source_type: registry_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_sz
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: (^| *, *)RequireIntegrity=1( *, *|$)
         state_title: RequireIntegrity=1
-      oval:mil.disa.stig.win:ste:25336203:
-        source_state_id: oval:mil.disa.stig.win:ste:25336203
+      oval:mil.disa.stig.win:ste:25336201:
+        source_state_id: oval:mil.disa.stig.win:ste:25336201
         source_type: registry_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_sz
@@ -509,6 +598,73 @@ rule:
             datatype: string
             entity_check: none satisfy
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: explicit
+              value: none satisfy
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
+        state_title: No RequireMutualAuthentication!=1
+      oval:mil.disa.stig.win:ste:25336203:
+        source_state_id: oval:mil.disa.stig.win:ste:25336203
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+            entity_check: none satisfy
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: explicit
+              value: none satisfy
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -520,13 +676,45 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_sz
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -774,9 +962,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253362r991589_rule
-      semantic_ir_sha256: 53f942fa577776f447147aa53c3999f609ed4bc8218808e26060eea2ed3b94ac
+      semantic_ir_sha256: 8537280c69f96f37652b05a893f889863a96d1fe2967332e5f7ed29283c66c02
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: a19cdf18683f707cfe17c4e26499f470d29127786ed0055d174a9754892a444a
+    semantic_fingerprint_sha256: 95bb41fedbba93e8b2a5c77798903c0fb0a069cdde5852d243003035844cd205
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253362r991589_rule

@@ -444,6 +444,16 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: namespace
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -451,6 +461,16 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -465,6 +485,16 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: namespace
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -472,6 +502,16 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -496,25 +536,28 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '2'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25328500:
-          source_test_id: oval:mil.disa.stig.win:tst:25328500
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Windows PowerShell 2.0 optional feature is disabled
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25328500
-          predicates:
-          - oval:mil.disa.stig.win:ste:25328500
-          source_other: []
         oval:mil.disa.stig.win:tst:25328501:
           source_test_id: oval:mil.disa.stig.win:tst:25328501
           source_type: wmi57_test
@@ -528,7 +571,49 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25328500
           source_other: []
+        oval:mil.disa.stig.win:tst:25328500:
+          source_test_id: oval:mil.disa.stig.win:tst:25328500
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Windows PowerShell 2.0 optional feature is disabled
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25328500
+          predicates:
+          - oval:mil.disa.stig.win:ste:25328500
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253285:
+          source_definition_id: oval:mil.disa.stig.defs:def:253285
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState
+                2
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25328500
+            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
+                2
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25328501
+            comment: Determine if Windows PowerShell 2.0 feature is disabled
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The Windows PowerShell 2.0 feature must be disabled on the system.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253285:
           source_definition_id: oval:mil.disa.stig.windows11:def:253285
           class: compliance
@@ -561,35 +646,6 @@ rule:
               text: Windows PowerShell 5.0 added advanced logging features, which can provide additional detail when malware
                 has been run on a system. Disabling the Windows PowerShell 2.0 mitigates against a downgrade attack that evades
                 the Windows PowerShell 5.0 script block logging feature.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253285:
-          source_definition_id: oval:mil.disa.stig.defs:def:253285
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState
-                2
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25328500
-            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
-                2
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25328501
-            comment: Determine if Windows PowerShell 2.0 feature is disabled
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The Windows PowerShell 2.0 feature must be disabled on the system.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -743,9 +799,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
-      semantic_ir_sha256: 9051b9f9a2b4268478287911ecd3df4493036a89284562df588e9507cb2a6cb1
+      semantic_ir_sha256: 21d3a058ba4b563c95625d467e1b7b93eb8769b3c1700f3c131267a695177915
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 18aa441f6688dd33d05e411c26885777a57bfb7ce567725b6602316288cf10fb
+    semantic_fingerprint_sha256: 95202e961bdac796a470bc1bb60644023f0e5319e67af87d1cf24407e009242c
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule

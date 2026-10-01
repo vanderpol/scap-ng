@@ -28,33 +28,6 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23499001:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23499001
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/systemd/system.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23499002:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23499002
@@ -65,18 +38,48 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/systemd/system.conf.d
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^.+\.conf$
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -84,6 +87,73 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23499001:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23499001
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/systemd/system.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -99,6 +169,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -120,6 +206,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000014
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:234990:
+        source_definition_id: oval:mil.disa.stig.defs:def:234990
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23499000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The systemd Ctrl-Alt-Delete burst key sequence in the operating system must be disabled.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257784:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257784
         class: compliance
@@ -156,29 +265,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000324-GPOS-00125, SRG-OS-000480-GPOS-00227'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:234990:
-        source_definition_id: oval:mil.disa.stig.defs:def:234990
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23499000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The systemd Ctrl-Alt-Delete burst key sequence in the operating system must be disabled.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -306,6 +392,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257784r1208766_rule
-    semantic_ir_sha256: 7289733700d917604413735dc392795014530e0be713b6148e0b0579757114dc
+    semantic_ir_sha256: 071eb21ea4d8f87e0fa840e914b39afabf3fd51637db0f6b53af85af56509848
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 2eb6e89b915b86cbe14936dc0c0ce6cc8118d858405d0b188e1eec7f62b39266
+  semantic_fingerprint_sha256: 404fbb4028a60b76c535a435f96b28d1dc3a7e4c86e50beb3b8adcb6f79c1433

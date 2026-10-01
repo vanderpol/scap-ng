@@ -343,18 +343,6 @@ rule:
     description: OL 9 must mount /var/log/audit with the nosuid option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23051700:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23051700
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /var/log/audit
       oval:mil.disa.stig.ind:obj:23051702:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23051702
@@ -363,22 +351,74 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23051700:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23051700
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /var/log/audit
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:20000002:
@@ -389,6 +429,22 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -402,6 +458,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -626,9 +698,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271662r1091698_rule
-      semantic_ir_sha256: b259dbb6b9f552f73f8418bb8b0cb6fb4d49897d3ce2cb4338750e371d9ae865
+      semantic_ir_sha256: 89eba72de88c5aa6b234ed6e5e586a66f91ef545327a9d61534925dffbe6e6f6
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 66d0ffbe460dc41676c5af4a06ef67364a1940a2cc48658bdecd29701026c32b
+    semantic_fingerprint_sha256: 4e730325d78d7adf4e36a7980b362b448871256da2b3ac023e1f8ba24d3b90e3
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271662r1091698_rule

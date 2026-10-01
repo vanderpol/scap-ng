@@ -7,6 +7,28 @@ assessment:
   description: The Windows Server 2025 "Create symbolic links" user right must only be assigned to the Administrators group.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.win:obj:25348900:
+      capability: scapng.collect.windows.userright
+      source_object_id: oval:mil.disa.stig.win:obj:25348900
+      source_type: userright_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_CREATE_SYMBOLIC_LINK_NAME
     oval:mil.disa.stig.win:obj:20000014:
       capability: scapng.collect.windows.wmi57
       source_object_id: oval:mil.disa.stig.win:obj:20000014
@@ -17,6 +39,16 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: namespace
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -24,47 +56,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: wql
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SELECT ID FROM Win32_ServerFeature
-    oval:mil.disa.stig.win:obj:25348900:
-      capability: scapng.collect.windows.userright
-      source_object_id: oval:mil.disa.stig.win:obj:25348900
-      source_type: userright_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      object_title: null
-      query:
-      - kind: element
-        name: userright
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SE_CREATE_SYMBOLIC_LINK_NAME
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000030:
-      source_state_id: oval:mil.disa.stig.win:ste:20000030
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-        kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Administrators
-      state_title: null
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      state_title: null
     oval:mil.disa.stig.win:ste:25449900:
       source_state_id: oval:mil.disa.stig.win:ste:25449900
       source_type: userright_state
@@ -73,27 +80,84 @@ assessment:
       entities:
       - attributes:
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
       state_title: null
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000030:
+      source_state_id: oval:mil.disa.stig.win:ste:20000030
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Administrators
+      state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25348901:
-        source_test_id: oval:mil.disa.stig.win:tst:25348901
-        source_type: userright_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Create symbolic links - Administrators
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: OR
-        collections:
-        - oval:mil.disa.stig.win:obj:25348900
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000029
-        - oval:mil.disa.stig.win:ste:20000030
-        source_other: []
       oval:mil.disa.stig.win:tst:25449903:
         source_test_id: oval:mil.disa.stig.win:tst:25449903
         source_type: userright_test
@@ -120,6 +184,20 @@ assessment:
         collections:
         - oval:mil.disa.stig.win:obj:20000014
         predicates: []
+        source_other: []
+      oval:mil.disa.stig.win:tst:25348901:
+        source_test_id: oval:mil.disa.stig.win:tst:25348901
+        source_type: userright_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Create symbolic links - Administrators
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: OR
+        collections:
+        - oval:mil.disa.stig.win:obj:25348900
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000029
+        - oval:mil.disa.stig.win:ste:20000030
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:254499:
@@ -346,6 +424,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278249r1182217_rule
-    semantic_ir_sha256: d180f8cc052d2cd7996bf4cb414427239951e3f71cc96e3c8e06fc7018170667
+    semantic_ir_sha256: 69ac5f3507d38d85d6da6cb21f2c2cde6b68990c973980db2c855a126bac4706
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: dc5889d8bfee1ba8b7db3b2e72b0fa35779fcb3cdc6c3f37c844144580e4de04
+  semantic_fingerprint_sha256: 2f2cb61bef58faee51bbd18cafb1dff11a2fbdf83a7125bfb3f253a305e5e4e3

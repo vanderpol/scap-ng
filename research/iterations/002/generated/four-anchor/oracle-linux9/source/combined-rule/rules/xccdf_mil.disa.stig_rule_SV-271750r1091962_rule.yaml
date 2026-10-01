@@ -355,26 +355,88 @@ rule:
     description: OL 9 must automatically exit interactive command shell user sessions after 15 minutes of inactivity.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:27175001:
+      oval:mil.disa.stig.ind:obj:27175002:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27175001
+        source_object_id: oval:mil.disa.stig.ind:obj:27175002
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
         object_title: null
         query:
-        - kind: element
-          name: filepath
+        - attributes:
+            max_depth: '-1'
+            recurse_direction: down
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/profile
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/profile.d
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.+\.sh$
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^[^#]*\s*TMOUT=(\d+)\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -400,38 +462,56 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.ind:obj:27175002:
+      oval:mil.disa.stig.ind:obj:27175001:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27175002
+        source_object_id: oval:mil.disa.stig.ind:obj:27175001
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
         object_title: null
         query:
-        - attributes:
-            max_depth: '-1'
-            recurse_direction: down
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
-          name: behaviors
+          name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/profile.d
+          value: /etc/profile
         - attributes:
             operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^.+\.sh$
-        - attributes:
-            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^[^#]*\s*TMOUT=(\d+)\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -447,6 +527,22 @@ rule:
         - attributes:
             datatype: int
             operation: less than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than or equal
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -654,9 +750,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271750r1091962_rule
-      semantic_ir_sha256: c6b213c85871b027471671af3e9d89a23da8a5d623203ce513eebf8c7297ef50
+      semantic_ir_sha256: b957115792d1746597c311bed5e5c2c7cd131b1b63727527a80b3f427e03ff17
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 830bfb9d86a942933241cd847963cb22bd51792a46a1d80ed149b11dbe2ca2c5
+    semantic_fingerprint_sha256: 669f05635e4168eb1fa316fd2ffb92a8dd282966375379a783cbdfa396537f96
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271750r1091962_rule

@@ -394,16 +394,46 @@ rule:
         query:
         - attributes:
             ignore_case: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/auditd.conf
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -411,6 +441,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -425,11 +465,34 @@ rule:
         query:
         - attributes:
             var_ref: oval:mil.disa.stig.defs:var:23029400
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: documented_implicit
+              value: all
           kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         - attributes:
             nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -484,6 +547,22 @@ rule:
         entities:
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -505,6 +584,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230399:
+          source_definition_id: oval:mil.disa.stig.defs:def:230399
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: audit log directories are owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23039900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit log directory must be owned by root to prevent unauthorized read access.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258166:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258166
           class: compliance
@@ -539,29 +641,6 @@ rule:
 
 
                 Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029, SRG-OS-000206-GPOS-00084'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230399:
-          source_definition_id: oval:mil.disa.stig.defs:def:230399
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: audit log directories are owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23039900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system audit log directory must be owned by root to prevent unauthorized read access.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -686,9 +765,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
-      semantic_ir_sha256: e41134e0f3156e41134e18b02b95c6d5bc249c44442d853fd0163c33a229662d
+      semantic_ir_sha256: a8eacdef8a452d37023aeb82faf9e38c53a78d48b9622ea2d0e1f75c26265952
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b27aeb43668ffa597b2252f8c62954cd84cfe289da046a6cf9782922aa0764c3
+    semantic_fingerprint_sha256: c0b8d8570e3dcc4fd2d7cdaebc28dae929ab64607dde9a470b5598a0b30f9ad4
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule

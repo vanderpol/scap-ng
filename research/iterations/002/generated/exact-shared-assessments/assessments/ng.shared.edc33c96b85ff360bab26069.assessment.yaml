@@ -1,0 +1,192 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271454
+  collect:
+    oval:mil.disa.stig.ind:obj:25823000:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: /proc/sys/crypto/fips_enabled
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /proc/sys/crypto/fips_enabled
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(\d+)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25823000
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must enable FIPS mode.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:271454:
+        class: compliance
+        criteria:
+          children:
+          - comment: /proc/sys/crypto/fips_enabled is set to 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25823000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must enable FIPS mode.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:271454
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271454:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:271454
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000070 - OL 9 must enable FIPS mode.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Use of weak or untested encryption algorithms undermines the purposes of using encryption to protect data.\
+              \ The operating system must implement cryptographic modules adhering to the higher standards approved by the\
+              \ federal government since this provides assurance they have been tested and validated. This includes NIST FIPS-validated\
+              \ cryptography for the following: Provisioning digital signatures, generating cryptographic hashes, and to protect\
+              \ data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives,\
+              \ policies, regulations, and standards.\n\n\tSatisfies: SRG-OS-000033-GPOS-00014, SRG-OS-000125-GPOS-00065,\
+              \ SRG-OS-000396-GPOS-00176, SRG-OS-000423-GPOS-00187, SRG-OS-000478-GPOS-00223"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271454
+        version: '2'
+    tests:
+      oval:mil.disa.stig.ind:tst:25823000:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:25823000
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25823000
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: fips_enabled == 1
+  id: ng.shared.edc33c96b85ff360bab26069
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:20000003:
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:20000003
+      source_type: textfilecontent54_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: edc33c96b85ff360bab26069a6f7b34c411f9818a644e73c0bb27fff718deb4b
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271454r1092458_rule
+    title: OL 9 must enable FIPS mode.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258230r1184334_rule
+    title: RHEL 9 must enable FIPS mode.

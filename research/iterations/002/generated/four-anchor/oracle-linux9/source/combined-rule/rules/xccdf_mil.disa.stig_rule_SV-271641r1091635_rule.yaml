@@ -348,12 +348,32 @@ rule:
         version: '2'
         object_title: /etc/fstab, uncommented, nfs, capturing options
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -361,6 +381,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -376,6 +406,22 @@ rule:
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -584,9 +630,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271641r1091635_rule
-      semantic_ir_sha256: 97f2b3b73306f91ade427a35833196e07f27f33108c283b9995c2fa90bf30216
+      semantic_ir_sha256: 4b1bef2ae1ec87ae7e659dc73bea03c55580bc1886498b0da8a3b81e1efab93c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 1d71cb7a034500abe3eb6f11b607293c565a345086220351ea8bc8a9dbf53f1a
+    semantic_fingerprint_sha256: 6e07c748b7e2a9375942360530e5c7024677128c75dcb22661c282d6547a4844
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271641r1091635_rule

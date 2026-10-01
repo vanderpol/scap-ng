@@ -370,16 +370,46 @@ rule:
         object_title: Verify all local files and directories on RHEL 8 have a valid group.  Limit results to the first 100
           failures found.
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup -print | head -n 100
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -394,6 +424,22 @@ rule:
         entities:
         - attributes:
             check_existence: none_exist
+          effective_attributes:
+            check_existence:
+              origin: explicit
+              value: none_exist
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -561,9 +607,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257930r991589_rule
-      semantic_ir_sha256: c2cdbc62a5e7ca57a0aff63d311695e873ba2df96cdd24458863dfb3a4ef8f0b
+      semantic_ir_sha256: 0b8be7578993d65c60b75b0db252dd09c2623cecee51f0d8b018ed9ea3bc4aa0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5bd2fd1231e54c0248ca3f8fd2df4a10fba6eefc539492bbd0552f16253b54bf
+    semantic_fingerprint_sha256: 0618777e806611dc30aca1a402b67b3cd0f5b3f44e66ac7fdf7c555dad150b13
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257930r991589_rule

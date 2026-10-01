@@ -356,41 +356,78 @@ rule:
             recurse: directories
             recurse_direction: down
             recurse_file_system: local
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /
         - attributes:
             nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:navy.navwar.niwcatlantic.scc.linux:ste:27178502
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:navy.navwar.niwcatlantic.scc.linux:ste:27178501
     derive: {}
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:27178502:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27178502
-        source_type: file_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - attributes:
-            datatype: boolean
-          kind: element
-          name: owrite
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: '0'
-        state_title: Used as filter to exclude owrite of '0'.
       oval:navy.navwar.niwcatlantic.scc.linux:ste:27178501:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27178501
         source_type: file_state
@@ -400,11 +437,56 @@ rule:
         - attributes:
             datatype: int
             operation: less than
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
         state_title: Filter out files with UID less than 1000
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:27178502:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27178502
+        source_type: file_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            datatype: boolean
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: boolean
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: owrite
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: '0'
+        state_title: Used as filter to exclude owrite of '0'.
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.linux:tst:27178501:
@@ -569,9 +651,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271785r1155290_rule
-      semantic_ir_sha256: 755a8c89cb9a01cf8a407b14a3fcb776087d48d80399485ad49ec57f83e3a5ef
+      semantic_ir_sha256: 4901a248815d424b4ba8e8a21b83bb6353bf4b791fb121e56ebdb7980ed2424e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 216d34b1a6859a13e7fc6ad10659d438cae8e8d6877ffc935190c6dab9989648
+    semantic_fingerprint_sha256: b7de7f3bb9e6ff8c4d4716372d1095e4e452f2c84db199635e0a82b3db70cdcd
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271785r1155290_rule

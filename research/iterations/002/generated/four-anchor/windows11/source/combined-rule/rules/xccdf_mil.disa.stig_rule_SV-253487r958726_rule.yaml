@@ -388,34 +388,76 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_CREATE_GLOBAL_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000037:
-        source_state_id: oval:mil.disa.stig.win:ste:20000037
+      oval:mil.disa.stig.win:ste:20000030:
+        source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NETWORK SERVICE
+          value: Administrators
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
       oval:mil.disa.stig.win:ste:20000036:
         source_state_id: oval:mil.disa.stig.win:ste:20000036
@@ -425,10 +467,55 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: LOCAL SERVICE
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000037:
+        source_state_id: oval:mil.disa.stig.win:ste:20000037
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NETWORK SERVICE
         state_title: null
       oval:mil.disa.stig.win:ste:20000038:
         source_state_id: oval:mil.disa.stig.win:ste:20000038
@@ -438,23 +525,26 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SERVICE
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000030:
-        source_state_id: oval:mil.disa.stig.win:ste:20000030
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Administrators
         state_title: null
     evaluate:
       tests:
@@ -476,30 +566,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000038
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253487:
-          source_definition_id: oval:mil.disa.stig.defs:def:253487
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Create global objects - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25348701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Create global objects" user right must only be assigned to Administrators, Service, Local Service,
-                and Network Service.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253487:
           source_definition_id: oval:mil.disa.stig.windows11:def:253487
           class: compliance
@@ -535,6 +601,30 @@ rule:
 
                 Accounts with the "Create global objects" user right can create objects that are available to all sessions,
                 which could affect processes in other users'' sessions.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253487:
+          source_definition_id: oval:mil.disa.stig.defs:def:253487
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Create global objects - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25348701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Create global objects" user right must only be assigned to Administrators, Service, Local Service,
+                and Network Service.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -674,9 +764,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253487r958726_rule
-      semantic_ir_sha256: a8b931e3e602bbca28118c2f167a5c2988d6ac808e4d3d513c099cde0e9189ba
+      semantic_ir_sha256: bd1924012866c219d469cb3e2763159164d300b40e7ecd242aa235260397a212
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 950385407553a14bf40a1b7cb1bf002e5e5ce47f056cb501bf5aed1b817c3e7f
+    semantic_fingerprint_sha256: 6c54be472aeea13b06d5176ba20ddde6a2e6c41a20b02ffa494f498b7aace971
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253487r958726_rule

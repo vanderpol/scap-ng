@@ -370,12 +370,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/auditd.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -383,6 +403,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -397,6 +427,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -418,6 +464,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:23039001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258159:
+          source_definition_id: oval:mil.disa.stig.defs:def:258159
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/audit/auditd.conf: admin_space_left_action = SINGLE'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25815900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must take action when allocated audit record storage volume reaches 95 percent of
+                the repository maximum audit record storage capacity.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271603:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271603
           class: compliance
@@ -450,30 +520,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: If action is not taken when storage volume reaches 95 percent utilization, the auditing system may fail
                 when the storage volume reaches capacity.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258159:
-          source_definition_id: oval:mil.disa.stig.defs:def:258159
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '/etc/audit/auditd.conf: admin_space_left_action = SINGLE'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25815900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must take action when allocated audit record storage volume reaches 95 percent of
-                the repository maximum audit record storage capacity.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -610,9 +656,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271603r1092592_rule
-      semantic_ir_sha256: 482d60de4c6f570e4e2941ebe066dcd2cb6813922624cd278009e578aed3e06b
+      semantic_ir_sha256: 4f7b8451c35f63c05c98ca59a56ca8647cea96b1b591f4484ddbfa92e39a7246
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8dc96c168196c8ea17767c0e9354a6cdbbcfe743e65dc847b5ad92700fe4128e
+    semantic_fingerprint_sha256: e82bcda8c2a56b7dbbe53cb574afda9d84bfaaf47a6e1a7c374387d32f7075b1
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271603r1092592_rule

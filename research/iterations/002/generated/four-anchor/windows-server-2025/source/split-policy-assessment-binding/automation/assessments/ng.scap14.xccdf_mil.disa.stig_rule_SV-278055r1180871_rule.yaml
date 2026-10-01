@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25331301:
-      source_state_id: oval:mil.disa.stig.win:ste:25331301
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: account_lockout
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      state_title: '''Account Lockout'' is set to ''Success'' and ''Failure'''
     oval:mil.disa.stig.win:ste:25430800:
       source_state_id: oval:mil.disa.stig.win:ste:25430800
       source_type: auditeventpolicysubcategories_state
@@ -38,26 +25,58 @@ assessment:
       entities:
       - attributes:
           datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: account_lockout
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       state_title: '''Account Lockout'' is set to ''Success'''
+    oval:mil.disa.stig.win:ste:25331301:
+      source_state_id: oval:mil.disa.stig.win:ste:25331301
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: account_lockout
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: '''Account Lockout'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25430800:
-        source_test_id: oval:mil.disa.stig.win:tst:25430800
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: '''Audit Account Lockout'' is set to ''Success'''
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25430800
-        source_other: []
       oval:mil.disa.stig.windows:tst:25331301:
         source_test_id: oval:mil.disa.stig.windows:tst:25331301
         source_type: auditeventpolicysubcategories_test
@@ -70,6 +89,19 @@ assessment:
         - oval:mil.disa.stig.win:obj:20000000
         predicates:
         - oval:mil.disa.stig.win:ste:25331301
+        source_other: []
+      oval:mil.disa.stig.win:tst:25430800:
+        source_test_id: oval:mil.disa.stig.win:tst:25430800
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Audit Account Lockout'' is set to ''Success'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25430800
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:254308:
@@ -260,6 +292,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278055r1180871_rule
-    semantic_ir_sha256: 3ce8a2a156bbf285de432ecadc4cf957c234dfcbe2ff23abde25c7fa02c7a0d7
+    semantic_ir_sha256: 53a51b0898c49a77ffe091ac134f6c0adff9c3ddcfe3febb0ada3cf49ecece88
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: f8a8df4376eaba25b027db0f4412f0b00aa6cc6eb3b6789994ce092cbf39eddf
+  semantic_fingerprint_sha256: 3d9c6f261d8b3ffaac7e38785f34674d4d2e6ea63313f7a93146c8b0b2845226

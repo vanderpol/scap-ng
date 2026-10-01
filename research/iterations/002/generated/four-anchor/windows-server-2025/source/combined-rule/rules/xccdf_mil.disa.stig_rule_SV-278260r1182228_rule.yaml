@@ -409,7 +409,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_PROF_SINGLE_PROCESS_NAME
@@ -423,6 +433,22 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -434,7 +460,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
@@ -455,29 +497,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253504:
-          source_definition_id: oval:mil.disa.stig.defs:def:253504
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Profile single process - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25350401
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Profile single process" user right must only be assigned to the Administrators group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278260:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278260
           class: compliance
@@ -511,6 +530,29 @@ rule:
               text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
                 \n  Accounts with the \"Profile single process\" user right can monitor nonsystem processes performance. An\
                 \ attacker could use this to identify processes to attack."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253504:
+          source_definition_id: oval:mil.disa.stig.defs:def:253504
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Profile single process - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25350401
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Profile single process" user right must only be assigned to the Administrators group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -661,9 +703,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278260r1182228_rule
-      semantic_ir_sha256: ea6681014b2b064cc723a63ed1571d62a84edacfcde102527e2ebbef2a63ade0
+      semantic_ir_sha256: 62bb8e6ad79550fef3a6afdefd23fa74547387594c305576a0d9fdb951a76b22
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5e1c45ec1fd1e82de3668456ed8a09c92fedf8f22ef13d6095fd44f8e0ec2644
+    semantic_fingerprint_sha256: 2454df43a2b58db1e144154bf1fe5f0289c1b26dd92046e1ccca3a0514f22b39
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278260r1182228_rule

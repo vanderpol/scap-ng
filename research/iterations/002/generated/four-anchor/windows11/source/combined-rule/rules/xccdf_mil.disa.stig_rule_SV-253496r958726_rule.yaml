@@ -352,7 +352,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_ENABLE_DELEGATION_NAME
@@ -364,7 +374,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
@@ -384,30 +410,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000029
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253496:
-          source_definition_id: oval:mil.disa.stig.defs:def:253496
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Enable computer and user accounts to be trusted for delegation - None
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349601
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Enable computer and user accounts to be trusted for delegation" user right must not be assigned to
-                any groups or accounts.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253496:
           source_definition_id: oval:mil.disa.stig.windows11:def:253496
           class: compliance
@@ -443,6 +445,30 @@ rule:
 
                 The "Enable computer and user accounts to be trusted for delegation" user right allows the "Trusted for Delegation"
                 setting to be changed. This could potentially allow unauthorized users to impersonate other users.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253496:
+          source_definition_id: oval:mil.disa.stig.defs:def:253496
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Enable computer and user accounts to be trusted for delegation - None
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349601
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Enable computer and user accounts to be trusted for delegation" user right must not be assigned to
+                any groups or accounts.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -573,9 +599,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253496r958726_rule
-      semantic_ir_sha256: ec1a184994527977fc74030ebeadf417a407f6f577cd2c2acb5fa3e911eea436
+      semantic_ir_sha256: 61fbd487e5c9eb15ea19358c8b68a59dd6b20b99c4849bb81f44b0788dfc0486
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 1090f37c78f14e75f55d4f88898194800d74a99dc7c5e19ac469af8e87a3514d
+    semantic_fingerprint_sha256: a400daebb44e7d0a027eb3f0d7f81317aa4042975b0e73c5e015124bcc3e0a19
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253496r958726_rule

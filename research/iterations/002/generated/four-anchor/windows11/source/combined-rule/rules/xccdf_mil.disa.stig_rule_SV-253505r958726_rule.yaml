@@ -359,22 +359,22 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_RESTORE_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -383,10 +383,52 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
     evaluate:
       tests:
@@ -405,29 +447,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253505:
-          source_definition_id: oval:mil.disa.stig.defs:def:253505
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Restore files and directories - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25350501
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Restore files and directories" user right must only be assigned to the Administrators group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253505:
           source_definition_id: oval:mil.disa.stig.windows11:def:253505
           class: compliance
@@ -463,6 +482,29 @@ rule:
 
                 Accounts with the "Restore files and directories" user right can circumvent file and directory permissions
                 and could allow access to sensitive data. It could also be used to over-write more current data.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253505:
+          source_definition_id: oval:mil.disa.stig.defs:def:253505
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Restore files and directories - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25350501
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Restore files and directories" user right must only be assigned to the Administrators group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -595,9 +637,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253505r958726_rule
-      semantic_ir_sha256: 39eb3c3dba0e0a56af67540f2b857f4dd42ab9c5302961790c1deb718d176727
+      semantic_ir_sha256: d85bf6bce7e003f399237feca36c8883f8e0ebcd3b2a94e0bee2c239df79d205
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: c6d25f3b34a3716fbdfcd63757b4bcd7d9efef16ed54cc051ca3f9b840a53ead
+    semantic_fingerprint_sha256: 44c6987c01a34019b39e00c204b2eb97e2dc991b99fdc270801107db872b1c66
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253505r958726_rule

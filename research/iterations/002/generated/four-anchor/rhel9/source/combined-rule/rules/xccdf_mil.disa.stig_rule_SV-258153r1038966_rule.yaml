@@ -415,12 +415,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/auditd.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -428,6 +448,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -442,23 +472,26 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?i)^syslog$
-        state_title: null
-      oval:mil.disa.stig.ind:ste:23039002:
-        source_state_id: oval:mil.disa.stig.ind:ste:23039002
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?i)^halt$
         state_title: null
       oval:mil.disa.stig.ind:ste:23039001:
         source_state_id: oval:mil.disa.stig.ind:ste:23039001
@@ -468,10 +501,55 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?i)^single$
+        state_title: null
+      oval:mil.disa.stig.ind:ste:23039002:
+        source_state_id: oval:mil.disa.stig.ind:ste:23039002
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)^halt$
         state_title: null
     evaluate:
       tests:
@@ -491,6 +569,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:23039002
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230390:
+          source_definition_id: oval:mil.disa.stig.defs:def:230390
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23039000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system System must take appropriate action when an audit processing failure occurs.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258153:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258153
           class: compliance
@@ -525,29 +626,6 @@ rule:
                 it takes action to mitigate the failure. Audit processing failures include software/hardware errors; failures
                 in the audit capturing mechanisms; and audit storage capacity being reached or exceeded. Responses to audit
                 failure depend upon the nature of the failure mode.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230390:
-          source_definition_id: oval:mil.disa.stig.defs:def:230390
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23039000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system System must take appropriate action when an audit processing failure occurs.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -683,9 +761,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258153r1038966_rule
-      semantic_ir_sha256: 06ee7f41a742753c2005ec81627afe8624f05250440d4029220f96ff303305ec
+      semantic_ir_sha256: c6d31dc8cb7997dc3880e03e50b1c82084ea9a7b3ed7ff62561e65e4bb0e7641
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 665ba40f89060cc88416e3cbed9c01da73aa57a29ac9e85ee1e435a6bb10f04c
+    semantic_fingerprint_sha256: d72d0109620106aeb67cda607804666ba8d85d937620619b3af563f98f7d9ecf
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258153r1038966_rule

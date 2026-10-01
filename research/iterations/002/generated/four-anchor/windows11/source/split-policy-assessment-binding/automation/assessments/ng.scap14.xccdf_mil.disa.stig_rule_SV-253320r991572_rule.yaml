@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25331901:
-      source_state_id: oval:mil.disa.stig.win:ste:25331901
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: file_share
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      state_title: '''File Share'' is set to ''Success'' and ''Failure'''
     oval:mil.disa.stig.win:ste:25332000:
       source_state_id: oval:mil.disa.stig.win:ste:25332000
       source_type: auditeventpolicysubcategories_state
@@ -38,11 +25,56 @@ assessment:
       entities:
       - attributes:
           datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: file_share
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       state_title: '''File Share'' is set to ''Success'''
+    oval:mil.disa.stig.win:ste:25331901:
+      source_state_id: oval:mil.disa.stig.win:ste:25331901
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: file_share
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: '''File Share'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25332000:
@@ -60,6 +92,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25331901
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253320:
+        source_definition_id: oval:mil.disa.stig.defs:def:253320
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Audit - File Share - Success only or Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows must be configured to audit Object Access - File Share successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253320:
         source_definition_id: oval:mil.disa.stig.windows11:def:253320
         class: compliance
@@ -97,29 +152,6 @@ assessment:
 
               Auditing file shares records events related to connection to shares on a system including system shares such
               as C$.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253320:
-        source_definition_id: oval:mil.disa.stig.defs:def:253320
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Audit - File Share - Success only or Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows must be configured to audit Object Access - File Share successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -259,6 +291,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253320r991572_rule
-    semantic_ir_sha256: a10a86ed99d3844bd9573f65ec2af65ae7076d1ea649455e4705e68b3014c672
+    semantic_ir_sha256: 4b629736c7d4c4a7ab3d357e77589823852dd6004aa5f39093b606c378032bfb
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 510183cfde9c0b35bfb626d0ce774e89cf7176bb660adaa35690e74bc0f9cc7b
+  semantic_fingerprint_sha256: de325787fa7f0f46286c93361a0bb3f03ed07aebd27097ec317c16bdef2a52db

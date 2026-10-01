@@ -372,12 +372,32 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /proc/sys/crypto/fips_enabled
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -385,6 +405,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -400,6 +430,22 @@ rule:
         - attributes:
             datatype: int
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -421,29 +467,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000003
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:271454:
-          source_definition_id: oval:mil.disa.stig.defs:def:271454
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /proc/sys/crypto/fips_enabled is set to 1
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25823000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must enable FIPS mode.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271454:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271454
           class: compliance
@@ -480,6 +503,29 @@ rule:
                 \ hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws,\
                 \ Executive Orders, directives, policies, regulations, and standards.\n\n\tSatisfies: SRG-OS-000033-GPOS-00014,\
                 \ SRG-OS-000125-GPOS-00065, SRG-OS-000396-GPOS-00176, SRG-OS-000423-GPOS-00187, SRG-OS-000478-GPOS-00223"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:271454:
+          source_definition_id: oval:mil.disa.stig.defs:def:271454
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /proc/sys/crypto/fips_enabled is set to 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25823000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enable FIPS mode.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -605,9 +651,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271454r1092458_rule
-      semantic_ir_sha256: 347393a52b23abee5118aba617173c2f25a4be3443569fa116cd87859869aa83
+      semantic_ir_sha256: daf5c380576963eeb285c1ecafeda717ef8806c217daf769b1134abaa66b596d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 18f0e3749534862e6bc502d32890f5db9cf4738739d1442f2f693c1a296f66a8
+    semantic_fingerprint_sha256: 6c84d3e16b0416aef3cffc61e52fe493ac47fa4018eb5cf064640347ae00bf60
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271454r1092458_rule

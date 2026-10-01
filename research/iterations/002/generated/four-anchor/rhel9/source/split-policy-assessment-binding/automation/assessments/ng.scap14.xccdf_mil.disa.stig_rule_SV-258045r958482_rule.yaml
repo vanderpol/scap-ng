@@ -7,6 +7,28 @@ assessment:
   description: RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25804501:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:25804501
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: count of passwd entries
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:25804500
     oval:mil.disa.stig.unix:obj:25804500:
       capability: scapng.collect.unix.password
       source_object_id: oval:mil.disa.stig.unix:obj:25804500
@@ -17,88 +39,37 @@ assessment:
       query:
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: username
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: .*
       - attributes:
           action: include
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:25804500
-    oval:mil.disa.stig.ind:obj:25804501:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:25804501
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: count of passwd entries
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.defs:var:25804500
   derive:
-    oval:mil.disa.stig.defs:var:25804500:
-      source_variable_id: oval:mil.disa.stig.defs:var:25804500
-      source_type: local_variable
-      datatype: int
-      variable_title: count of passwd entries
-      semantic_ast:
-        datatype: int
-        expression:
-          args:
-          - item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            op: object_component
-            record_field: null
-          attributes: {}
-          op: count
-        id: oval:mil.disa.stig.defs:var:25804500
-        type: local_variable
-      resolution:
-        blocked_by:
-          item_field: user_id
-          object_ref: oval:mil.disa.stig.unix:obj:25804500
-          operation: object_component
-          reason: object_component_requires_collection:password_object
-          record_field: null
-          status: dynamic_object_dependency
-        datatype: int
-        operation: count
-        reason: count_child_not_static:object_component_requires_collection:password_object
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        blocked_by:
-          item_field: user_id
-          object_ref: oval:mil.disa.stig.unix:obj:25804500
-          operation: object_component
-          reason: object_component_requires_collection:password_object
-          record_field: null
-          status: dynamic_object_dependency
-        datatype: int
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.unix:obj:25804500
-          operations:
-          - count
-          - object_component
-          variables: []
-        expression:
-          args:
-          - item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            op: object_component
-            record_field: null
-          attributes: {}
-          op: count
-        mode: target_dependent
-        reason: count_child_not_static:object_component_requires_collection:password_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.defs:var:25804500
-        variable_type: local_variable
     oval:mil.disa.stig.defs:var:25804501:
       source_variable_id: oval:mil.disa.stig.defs:var:25804501
       source_type: local_variable
@@ -173,6 +144,65 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:25804501
         variable_type: local_variable
+    oval:mil.disa.stig.defs:var:25804500:
+      source_variable_id: oval:mil.disa.stig.defs:var:25804500
+      source_type: local_variable
+      datatype: int
+      variable_title: count of passwd entries
+      semantic_ast:
+        datatype: int
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        id: oval:mil.disa.stig.defs:var:25804500
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        operation: count
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:25804500
+          operations:
+          - count
+          - object_component
+          variables: []
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        mode: target_dependent
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25804500
+        variable_type: local_variable
   predicates:
     oval:mil.disa.stig.unix:ste:25804500:
       source_state_id: oval:mil.disa.stig.unix:ste:25804500
@@ -183,6 +213,22 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -197,6 +243,25 @@ assessment:
       - attributes:
           datatype: int
           var_ref: oval:mil.disa.stig.defs:var:25804501
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: documented_implicit
+            value: all
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -394,6 +459,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
-    semantic_ir_sha256: 6e824864a8b9676d0e12463dc620a02ca6f89bef84e0004136dc1dd1b86fc9fe
+    semantic_ir_sha256: 4abf49050e5e73d81bc50f7cf3b95cdd53a864e868362975b1fb5ca1db39ce6a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 25ed103fa9a67bfc35d287065a261d1e1bf5276d8ef538655d16326b0b092bf6
+  semantic_fingerprint_sha256: 13e59ce7dde5cc57d7c87d073ab858a1c1f460219afed660706b3d8ceb455b3d

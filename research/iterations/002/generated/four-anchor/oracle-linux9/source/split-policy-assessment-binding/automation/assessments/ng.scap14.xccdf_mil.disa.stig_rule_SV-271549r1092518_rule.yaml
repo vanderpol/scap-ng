@@ -15,12 +15,32 @@ assessment:
       version: '2'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/audit/audit.rules
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -28,6 +48,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -49,6 +79,29 @@ assessment:
         predicates: []
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230434:
+        source_definition_id: oval:mil.disa.stig.defs:def:230434
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit invocations of /usr/libexec/openssh/ssh-keysign
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23043400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Successful/unsuccessful uses of the ssh-keysign in the operating system must generate an audit record.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271549:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271549
         class: compliance
@@ -89,29 +142,6 @@ assessment:
               \ absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The performance\
               \ can be helped, however, by combining system calls into one rule whenever possible.\n\n\tSatisfies: SRG-OS-000037-GPOS-00015,\
               \ SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215"
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230434:
-        source_definition_id: oval:mil.disa.stig.defs:def:230434
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit invocations of /usr/libexec/openssh/ssh-keysign
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23043400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Successful/unsuccessful uses of the ssh-keysign in the operating system must generate an audit record.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -239,6 +269,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271549r1092518_rule
-    semantic_ir_sha256: 98cb9e094190e12fcb0831c682ba27466fa94909e0f5e2016de3f658c7878abb
+    semantic_ir_sha256: f21e0a2d13e592b2fc1f35264556a09b112bb588a2040f854f201ddd73aca52d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: df522d3c9545c396c6ce63c4305bb4e31e4b8f977838eab0ab8efd086efd7807
+  semantic_fingerprint_sha256: 27a1c2c7aa283f41156185d8e1374c960bc29ec3558018f90beda8f6ab037b0a

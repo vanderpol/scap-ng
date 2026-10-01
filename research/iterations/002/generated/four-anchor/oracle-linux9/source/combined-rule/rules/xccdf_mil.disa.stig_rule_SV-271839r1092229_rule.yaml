@@ -352,6 +352,16 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -359,6 +369,16 @@ rule:
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -366,26 +386,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23033300:
-        source_state_id: oval:mil.disa.stig.ind:ste:23033300
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: less than or equal
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '3'
-        state_title: null
       oval:mil.disa.stig.ind:ste:20000015:
         source_state_id: oval:mil.disa.stig.ind:ste:20000015
         source_type: textfilecontent54_state
@@ -395,10 +411,56 @@ rule:
         - attributes:
             datatype: int
             operation: greater than
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
+        state_title: null
+      oval:mil.disa.stig.ind:ste:23033300:
+        source_state_id: oval:mil.disa.stig.ind:ste:23033300
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: less than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than or equal
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '3'
         state_title: null
     evaluate:
       tests:
@@ -417,29 +479,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000015
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230333:
-          source_definition_id: oval:mil.disa.stig.defs:def:230333
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: deny is set to 3 or less but not 0 in /etc/security/faillock.conf
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23033300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must automatically lock an account when three unsuccessful logon attempts occur.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271839:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271839
           class: compliance
@@ -472,6 +511,29 @@ rule:
               text: "By limiting the number of failed logon attempts, the risk of unauthorized system access via user password\
                 \ guessing, otherwise known as brute-force attacks, is reduced. Limits are imposed by locking the account.\n\
                 \n\tSatisfies: SRG-OS-000329-GPOS-00128, SRG-OS-000021-GPOS-00005"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230333:
+          source_definition_id: oval:mil.disa.stig.defs:def:230333
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: deny is set to 3 or less but not 0 in /etc/security/faillock.conf
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23033300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must automatically lock an account when three unsuccessful logon attempts occur.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -598,9 +660,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271839r1092229_rule
-      semantic_ir_sha256: 1aad2d8be4ab1e60a2e0df8f4dcdc47446909c168d8a1a9399cfa904921a84f9
+      semantic_ir_sha256: d178f3affdc42ce4a0d7389c5095e29a305f2372bd30828c1e75f711f9957ceb
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 273847725ac02a623d226af815a1569201b9b457705e17b00050c5d18f4995c1
+    semantic_fingerprint_sha256: 36014380f97f62b44be0ec80bd279e16289eab2116fb1edcc97d474e5a348f3a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271839r1092229_rule

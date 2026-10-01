@@ -1,0 +1,208 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278094
+  collect:
+    oval:mil.disa.stig.win:obj:25337600:
+      capability: scapng.collect.windows.registry
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows NT\Printers
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: DisableHTTPPrinting
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25337600
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 printing over HTTP must be turned off.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253376:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verifies 'Turn off printing over HTTP' is set to 'Enabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25337600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Printing over HTTP must be prevented.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253376
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278094:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253376
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000160 - Windows Server 2025 printing over HTTP must be turned off.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Some features may communicate with the vendor, sending system information or downloading data or components\
+              \ for the feature. Turning off this capability will prevent potentially sensitive information from being sent\
+              \ outside the enterprise and will prevent uncontrolled updates to the system.\n\n  This setting prevents the\
+              \ client computer from printing over HTTP, which allows the computer to print to printers on the intranet as\
+              \ well as the internet."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278094
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25337600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25337600
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25337600
+        source_type: registry_test
+        state_operator: AND
+        test_title: '''Turn off printing over HTTP'' is set to ''Enabled'''
+  id: ng.shared.20347795a3409c2dce772124
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000001:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000001
+      source_type: registry_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 20347795a3409c2dce772124874e2ee6fa7b1a12b307e60854d0b41f75dc59fb
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278094r1180988_rule
+    title: Windows Server 2025 printing over HTTP must be turned off.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253376r958478_rule
+    title: Printing over HTTP must be prevented.

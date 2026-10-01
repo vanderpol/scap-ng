@@ -360,18 +360,48 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -384,12 +414,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -412,6 +474,30 @@ rule:
           - oval:mil.disa.stig.win:ste:25346000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253460:
+          source_definition_id: oval:mil.disa.stig.defs:def:253460
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Network Security: Configure encryption types allowed for Kerberos'' is set to ''Enabled''
+                with ''AES128_HMAC_SHA1'', ''AES256_HMAC_SHA1'', ''Future encryption types'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25346000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Kerberos encryption types must be configured to prevent the use of DES and RC4 encryption suites.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253460:
           source_definition_id: oval:mil.disa.stig.windows11:def:253460
           class: compliance
@@ -444,30 +530,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Certain encryption types are no longer considered secure. This setting configures a minimum encryption
                 type for Kerberos, preventing the use of the DES and RC4 encryption suites.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253460:
-          source_definition_id: oval:mil.disa.stig.defs:def:253460
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Network Security: Configure encryption types allowed for Kerberos'' is set to ''Enabled''
-                with ''AES128_HMAC_SHA1'', ''AES256_HMAC_SHA1'', ''Future encryption types'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25346000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Kerberos encryption types must be configured to prevent the use of DES and RC4 encryption suites.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -599,9 +661,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253460r971535_rule
-      semantic_ir_sha256: c354bc112b77073a9214686546d5d9e4610d38dd1a0ca2b17299e5481139ca79
+      semantic_ir_sha256: 995dc976259b83a60af1990261647efefd3117bb48015105c5190f4dddcbd22a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8ef104cc1fba23ced9d3b04c591b82501cbb88add71f0f64a700c5a9b1bd3e5a
+    semantic_fingerprint_sha256: 8d04dbf0f6cc2d3036622d252e99fa7da0ffd90b02c4ddf83f7c84662803cac1
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253460r971535_rule

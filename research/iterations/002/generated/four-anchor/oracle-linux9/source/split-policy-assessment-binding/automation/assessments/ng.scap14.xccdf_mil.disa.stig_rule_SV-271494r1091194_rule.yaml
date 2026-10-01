@@ -15,11 +15,31 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: unit
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: sssd.service
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: UnitFileState
@@ -31,37 +51,89 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: unit
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: sssd.service
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: ActiveState
   derive: {}
   predicates:
-    oval:mil.disa.stig.linux:ste:20000003:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000003
-      source_type: systemdunitproperty_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: active
-      state_title: null
     oval:mil.disa.stig.linux:ste:20000006:
       source_state_id: oval:mil.disa.stig.linux:ste:20000006
       source_type: systemdunitproperty_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: enabled
+      state_title: null
+    oval:mil.disa.stig.linux:ste:20000003:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000003
+      source_type: systemdunitproperty_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: active
       state_title: null
   evaluate:
     tests:
@@ -92,33 +164,6 @@ assessment:
         - oval:mil.disa.stig.linux:ste:20000003
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:271494:
-        source_definition_id: oval:mil.disa.stig.defs:def:271494
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: sssd.service is active
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:27149400
-          - comment: sssd.service is enabled
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:27149401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must use the SSSD package for multifactor authentication services.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271494:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271494
         class: compliance
@@ -164,6 +209,33 @@ assessment:
               \ \n\t \n\tThe DOD common access card (CAC) with DOD-approved PKI is an example of multifactor authentication.\n\
               \n\tSatisfies: SRG-OS-000705-GPOS-00150, SRG-OS-000105-GPOS-00052, SRG-OS-000106-GPOS-00053, SRG-OS-000107-GPOS-00054,\
               \ SRG-OS-000108-GPOS-00055, SRG-OS-000375-GPOS-00161"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:271494:
+        source_definition_id: oval:mil.disa.stig.defs:def:271494
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: sssd.service is active
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:27149400
+          - comment: sssd.service is enabled
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:27149401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must use the SSSD package for multifactor authentication services.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -284,6 +356,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271494r1091194_rule
-    semantic_ir_sha256: 1d4b4c08cd948413babc556e0ca299f1556058fc226e358775350c80de2c2ea2
+    semantic_ir_sha256: dd7d5338c8ffa8b7fba2999b33d46c7909e9d2b4de7f7c593bcc61a67bd03b6d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ce6c23a3c87a8aff8673853275c7991327cb0ccfa679ca45c1c82de0991dc923
+  semantic_fingerprint_sha256: 7a81da2ca989a86f830b84072db612d41504a9358c300468aab2eecfa2c1146b

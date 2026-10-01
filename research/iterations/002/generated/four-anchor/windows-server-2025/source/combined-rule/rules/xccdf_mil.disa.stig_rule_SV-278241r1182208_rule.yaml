@@ -393,7 +393,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_TRUSTED_CREDMAN_ACCESS_NAME
@@ -405,7 +415,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
@@ -425,6 +451,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000029
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253479:
+          source_definition_id: oval:mil.disa.stig.defs:def:253479
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Access Credential Manager as a trusted caller - None
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347901
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Access Credential Manager as a trusted caller" user right must not be assigned to any groups or accounts.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278241:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278241
           class: compliance
@@ -458,29 +507,6 @@ rule:
               text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
                 \n  Accounts with the \"Access Credential Manager as a trusted caller\" user right may be able to retrieve\
                 \ the credentials of other accounts from Credential Manager."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253479:
-          source_definition_id: oval:mil.disa.stig.defs:def:253479
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Access Credential Manager as a trusted caller - None
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347901
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Access Credential Manager as a trusted caller" user right must not be assigned to any groups or accounts.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -625,9 +651,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278241r1182208_rule
-      semantic_ir_sha256: 96fa6377a47e55f9b256cf1323d5317c6f8a39d506b346302d676244a8141828
+      semantic_ir_sha256: 17dfbdc065f6a2a87047f302e76f36027b9d5acce324ac220240c63b6a3c6d8e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 4a275f6d0fd0f9f53eb425aab4a237aae6c287a28e73d299653ee61a85d2f7a9
+    semantic_fingerprint_sha256: 1920eb183cdb023f430a2b0ddd503a25b6b51e5f4dbef8ebcbbd801f4c7309ac
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278241r1182208_rule

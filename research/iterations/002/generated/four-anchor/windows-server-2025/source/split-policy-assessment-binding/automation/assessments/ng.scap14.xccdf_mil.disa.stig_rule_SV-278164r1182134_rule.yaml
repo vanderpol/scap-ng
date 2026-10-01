@@ -17,18 +17,48 @@ assessment:
       query:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: HKEY_LOCAL_MACHINE
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -41,12 +71,44 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -68,6 +130,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000000
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:254417:
+        source_definition_id: oval:mil.disa.stig.defs:def:254417
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25441700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows domain controllers must be configured to allow reset of machine account passwords.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278164:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278164
         class: compliance
@@ -101,29 +186,6 @@ assessment:
             text: Enabling this setting on all domain controllers in a domain prevents domain members from changing their
               computer account passwords. If these passwords are weak or compromised, the inability to change them may leave
               these computers vulnerable.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:254417:
-        source_definition_id: oval:mil.disa.stig.defs:def:254417
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25441700
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows domain controllers must be configured to allow reset of machine account passwords.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -246,6 +308,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278164r1182134_rule
-    semantic_ir_sha256: 13b776277a43f3acd59664036ed91bd0184a07029b0cc3ccdab69e24ab578e21
+    semantic_ir_sha256: 529b1ea7db92656d14a393143b76403db7d0904ab6ca88d20da13dbbe52020b4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 6fd342d6d6960a3c6a007dec385aac7668868d938440d06d26edc052c5300bf8
+  semantic_fingerprint_sha256: e50bb07824cee90975f24823370be8d3113adaf9f205a3e0d06e4ac467a34a0f

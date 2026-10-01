@@ -1,0 +1,171 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271470
+  collect:
+    oval:mil.disa.stig.linux:obj:25793600:
+      capability: scapng.collect.linux.systemdunitproperty
+      object_title: firewalld.service ActiveState
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: firewalld.service
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ActiveState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:25793600
+      source_type: systemdunitproperty_object
+      version: '1'
+  derive: {}
+  description: OL 9 must be configured so that the firewalld service is active.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257936:
+        class: compliance
+        criteria:
+          children:
+          - comment: The firewall daemon is active
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25793600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A firewall must be active on the operating system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257936
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271470:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257936
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000221 - OL 9 must be configured so that the firewalld service is active.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Firewalld provides an easy and effective way to block/limit remote access to the system via ports, services,\
+              \ and protocols.\n\n\tRemote access services, such as those providing remote access to network devices and information\
+              \ systems, which lack automated control capabilities, increase risk and make remote user access management difficult\
+              \ at best.\n\n\tRemote access is access to DOD nonpublic information systems by an authorized user (or an information\
+              \ system) communicating through an external, nonorganization-controlled network. Remote access methods include,\
+              \ for example, dial-up, broadband, and wireless.\n\n\tOL 9 functionality (e.g., RDP) must be capable of taking\
+              \ enforcement action if the audit reveals unauthorized activity. Automated control of remote access sessions\
+              \ allows organizations to ensure ongoing compliance with remote access policies by enforcing connection rules\
+              \ of remote access applications on a variety of information system components (e.g., servers, workstations,\
+              \ notebook computers, smartphones, and tablets).\n\n\tSatisfies: SRG-OS-000096-GPOS-00050, SRG-OS-000297-GPOS-00115"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271470
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:25793600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:25793600
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:25793600
+        source_type: systemdunitproperty_test
+        state_operator: AND
+        test_title: Check if firewalld is in 'active' state
+  id: ng.shared.69f72f2d8a52e5ba9057e06f
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000003:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: active
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000003
+      source_type: systemdunitproperty_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 69f72f2d8a52e5ba9057e06fc8245085b4cd0eabe5c05ec2387a91e28072b8bf
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271470r1092618_rule
+    title: OL 9 must be configured so that the firewalld service is active.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257936r1044995_rule
+    title: The firewalld service on RHEL 9 must be active.

@@ -353,18 +353,48 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: System\CurrentControlSet\Services\LanmanWorkstation\Parameters
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -377,12 +407,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -404,29 +466,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253449:
-          source_definition_id: oval:mil.disa.stig.defs:def:253449
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25344900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The Windows SMB client must be configured to always perform SMB packet signing.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253449:
           source_definition_id: oval:mil.disa.stig.windows11:def:253449
           class: compliance
@@ -459,6 +498,29 @@ rule:
               text: The server message block (SMB) protocol provides the basis for many network operations. Digitally signed
                 SMB packets aid in preventing man-in-the-middle attacks. If this policy is enabled, the SMB client will only
                 communicate with an SMB server that performs SMB packet signing.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253449:
+          source_definition_id: oval:mil.disa.stig.defs:def:253449
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25344900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The Windows SMB client must be configured to always perform SMB packet signing.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -590,9 +652,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253449r958908_rule
-      semantic_ir_sha256: c952d8f598688729e3e3d8e878e6c82c9a8b72e63a77b78cbfab0541b765af84
+      semantic_ir_sha256: 3f03c35027617d06781e7e27da61cd107b489d2ed5e0e8a26c0bfb4eba3a6848
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 48ff6946efe43aecef94ac027e6123d95c821f4481586e5073bba8b37f693f53
+    semantic_fingerprint_sha256: 8ded053a19777bb588f2c3b24073b7ac567e0081e6ce82de1cc9edbb604085ce
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253449r958908_rule

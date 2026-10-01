@@ -15,12 +15,32 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/profile
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -28,6 +48,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -43,6 +73,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -64,29 +110,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000025
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258075:
-        source_definition_id: oval:mil.disa.stig.defs:def:258075
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/profile:umask == 077
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25807500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must define default permissions for the system default profile.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271695:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271695
         class: compliance
@@ -120,6 +143,29 @@ assessment:
               to mode 600 or less permissive. Although umask can be represented as a four-digit number, the first digit representing
               special access modes is typically ignored or required to be "0". This requirement applies to the globally configured
               system defaults and the local interactive user defaults for each account on the system.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258075:
+        source_definition_id: oval:mil.disa.stig.defs:def:258075
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/profile:umask == 077
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25807500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must define default permissions for the system default profile.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -242,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271695r1091797_rule
-    semantic_ir_sha256: c5def24ed19917054524265fef338fffe633a74d383f0bd1b84036759ad33e94
+    semantic_ir_sha256: b8de034d1bbfcbbb9d95bfa7292a147794b5cef8ce2d4bdd1d0e36e0d934012e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: daad01e661dde63fc50dcd72dc0830ace62313233e577c20e2ad3292b39e0032
+  semantic_fingerprint_sha256: 922b264790d54d9cee2b8fd9f69bf318fbf7cf7b4713f246e168a2ae629e8402

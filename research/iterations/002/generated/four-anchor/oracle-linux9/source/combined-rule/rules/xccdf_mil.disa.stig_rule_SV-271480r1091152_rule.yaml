@@ -346,11 +346,31 @@ rule:
         version: '5'
         object_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
@@ -364,6 +384,22 @@ rule:
         entities:
         - attributes:
             check_existence: none_exist
+          effective_attributes:
+            check_existence:
+              origin: explicit
+              value: none_exist
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -528,9 +564,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271480r1091152_rule
-      semantic_ir_sha256: 4584c3d4f240968d7766ab3df3dcf62fe46d65bffa8b6063131be3627d6fc4d8
+      semantic_ir_sha256: 30bb33510c31c6741f3f227cf6c6b9022e04ca847f0da890d4fdc8c2445d49db
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 4b81a36d8acb22f1e3983cf8bebb4049a3fc05eebda49486b95c54814127d9fa
+    semantic_fingerprint_sha256: 5f1bf74f6bbd84b2a8d1b0a21661e44b884902d239ae34153cdbb3ad191d66a2
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271480r1091152_rule

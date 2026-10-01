@@ -17,6 +17,16 @@ assessment:
       query:
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: trustee_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -89,6 +99,36 @@ assessment:
         variable_id: oval:mil.disa.stig.win:var:25343501
         variable_type: local_variable
   predicates:
+    oval:mil.disa.stig.win:ste:25343500:
+      source_state_id: oval:mil.disa.stig.win:ste:25343500
+      source_type: sid_sid_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: case insensitive not equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive not equal
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Administrator
+      state_title: Not Administrator
     oval:mil.disa.stig.win:ste:25343501:
       source_state_id: oval:mil.disa.stig.win:ste:25343501
       source_type: sid_sid_state
@@ -99,24 +139,29 @@ assessment:
           datatype: string
           operation: case insensitive not equal
           var_ref: oval:mil.disa.stig.win:var:25343501
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive not equal
+          var_check:
+            origin: documented_implicit
+            value: all
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: Not localdomain\Administrator
-    oval:mil.disa.stig.win:ste:25343500:
-      source_state_id: oval:mil.disa.stig.win:ste:25343500
-      source_type: sid_sid_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: case insensitive not equal
-        kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Administrator
-      state_title: Not Administrator
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25343500:
@@ -134,6 +179,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25343501
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253435:
+        source_definition_id: oval:mil.disa.stig.defs:def:253435
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25343500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The built-in administrator account must be renamed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253435:
         source_definition_id: oval:mil.disa.stig.windows11:def:253435
         class: compliance
@@ -165,29 +233,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: The built-in administrator account is a well-known account subject to attack. Renaming this account to an
               unidentified name improves the protection of this account and the system.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253435:
-        source_definition_id: oval:mil.disa.stig.defs:def:253435
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25343500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The built-in administrator account must be renamed.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -315,6 +360,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253435r991589_rule
-    semantic_ir_sha256: a969772565d2edaeba51914eaa900847b53836862fc8481c087ee91ccb274115
+    semantic_ir_sha256: 3d716f3279d345f3ef27b35740a56be52379fdd395174e6c5b03230fe7d91639
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 768770d0eeff3813ece8e1238779f9292926569f1b97dfe9c534b472d089268c
+  semantic_fingerprint_sha256: dfd89cd3773bfa31c81bbaec71104995abcc508ae452ded2db5be05b43e6f55a

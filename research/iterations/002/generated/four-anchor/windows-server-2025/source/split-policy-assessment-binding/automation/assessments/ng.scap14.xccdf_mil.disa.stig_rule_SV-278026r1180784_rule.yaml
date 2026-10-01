@@ -17,6 +17,16 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: namespace
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -24,6 +34,16 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: wql
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -48,6 +68,22 @@ assessment:
           name: field
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: '411'
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: record
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -68,6 +104,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25427800
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:254278:
+        source_definition_id: oval:mil.disa.stig.defs:def:254278
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_ServerFeature is installed
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25427800
+          comment: Determine if Windows PowerShell 2.0 feature is disabled
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Windows PowerShell 2.0 feature must be disabled on the system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278026:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278026
         class: compliance
@@ -100,29 +159,6 @@ assessment:
             text: Windows PowerShell 5.x added advanced logging features that can provide additional detail when malware has
               been run on a system. Disabling the Windows PowerShell 2.0 mitigates against a downgrade attack that evades
               the Windows PowerShell 5.x script block logging feature.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:254278:
-        source_definition_id: oval:mil.disa.stig.defs:def:254278
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_ServerFeature is installed
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25427800
-          comment: Determine if Windows PowerShell 2.0 feature is disabled
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The Windows PowerShell 2.0 feature must be disabled on the system.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -249,6 +285,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278026r1180784_rule
-    semantic_ir_sha256: d1d6318f7e5cf4cea8c928ab25f8641b84bc31904a16cbf8c9aef8b34ba8e4ca
+    semantic_ir_sha256: 5753b542903ab24bafef6dbb6b0509e781aab26eac8737ff301b40c1372cce8a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 4d1bb43226e5724d1acde12b49f7c7e64afc253e874ebc1905bcdbbad541769b
+  semantic_fingerprint_sha256: d88d53071dee8961f7a717a97e41031b57fc071636d3be4d4a2051581baca73a

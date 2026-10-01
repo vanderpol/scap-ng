@@ -328,18 +328,48 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: System\CurrentControlSet\Services\Tcpip\Parameters
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -352,12 +382,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -380,6 +442,30 @@ rule:
           - oval:mil.disa.stig.win:ste:20000002
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253354:
+          source_definition_id: oval:mil.disa.stig.defs:def:253354
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''MSS: (DisableIPSourceRouting) IP source routing protection level (protects against packet
+                spoofing)'' is set to ''Highest protection, source routing is completely disabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25335400
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to prevent IP source routing.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278083:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278083
           class: compliance
@@ -411,30 +497,6 @@ rule:
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Configuring the system to disable IP source routing protects against spoofing.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253354:
-          source_definition_id: oval:mil.disa.stig.defs:def:253354
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''MSS: (DisableIPSourceRouting) IP source routing protection level (protects against packet
-                spoofing)'' is set to ''Highest protection, source routing is completely disabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25335400
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to prevent IP source routing.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -556,9 +618,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278083r1180955_rule
-      semantic_ir_sha256: d7fed72acbc742d8a23820a61199b0f4fae1b1c88c6cd867c140aa59b23b6e12
+      semantic_ir_sha256: 533e5c5ac96d32a81fd5bc10e54c6ede77b4a6bbc17c2275860f4e6ea42e7023
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 3c1c574dfa54d2d5260f7e631e9b4f93d4ee9dc9e5ec55225731b49cce624458
+    semantic_fingerprint_sha256: afd074b50dd5c97cf20ad9a2b58279514c09190c19ac531554e5f737fe8b20e0
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278083r1180955_rule

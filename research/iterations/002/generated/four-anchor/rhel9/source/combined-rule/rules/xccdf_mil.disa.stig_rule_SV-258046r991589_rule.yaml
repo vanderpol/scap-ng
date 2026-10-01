@@ -428,6 +428,30 @@ rule:
     description: RHEL 9 system accounts must not have an interactive login shell.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:25804600:
+        capability: scapng.collect.unix.password
+        source_object_id: oval:mil.disa.stig.unix:obj:25804600
+        source_type: password_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        object_title: null
+        query:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: username
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: .+
       oval:mil.disa.stig.unix:obj:25804601:
         capability: scapng.collect.unix.password
         source_object_id: oval:mil.disa.stig.unix:obj:25804601
@@ -455,35 +479,37 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.unix:obj:25804600:
-        capability: scapng.collect.unix.password
-        source_object_id: oval:mil.disa.stig.unix:obj:25804600
-        source_type: password_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        object_title: null
-        query:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: username
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: .+
     derive: {}
     predicates:
-      oval:mil.disa.stig.unix:ste:25804602:
-        source_state_id: oval:mil.disa.stig.unix:ste:25804602
+      oval:mil.disa.stig.unix:ste:25804600:
+        source_state_id: oval:mil.disa.stig.unix:ste:25804600
         source_type: password_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         operator: AND
         entities:
         - attributes:
-            datatype: int
-            operation: equals
+            datatype: string
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
-          name: user_id
+          name: login_shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: '0'
+          value: /sbin/nologin|/usr/sbin/nologin
         state_title: null
       oval:mil.disa.stig.unix:ste:25804601:
         source_state_id: oval:mil.disa.stig.unix:ste:25804601
@@ -494,24 +520,56 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
         state_title: null
-      oval:mil.disa.stig.unix:ste:25804600:
-        source_state_id: oval:mil.disa.stig.unix:ste:25804600
+      oval:mil.disa.stig.unix:ste:25804602:
+        source_state_id: oval:mil.disa.stig.unix:ste:25804602
         source_type: password_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         operator: AND
         entities:
         - attributes:
-            datatype: string
-            operation: pattern match
+            datatype: int
+            operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
-          name: login_shell
+          name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /sbin/nologin|/usr/sbin/nologin
+          value: '0'
         state_title: null
     evaluate:
       tests:
@@ -724,9 +782,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258046r991589_rule
-      semantic_ir_sha256: fc77d0e59b6b959e334d4e80ee9abd6fd69832a01d6163079fb68c8414432612
+      semantic_ir_sha256: 2b51afe46464bef18282735a7a0652a92c404f9d5d2d385b35b9dc8a3cea20ef
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: cda988929efa9b1d163822aac8a400229dc785395a6cd8f1094038da6aa64c62
+    semantic_fingerprint_sha256: 119eea45668453aef2e37da5a6e3153035bab22f8ca10e49a8853fd4586ab6bf
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258046r991589_rule

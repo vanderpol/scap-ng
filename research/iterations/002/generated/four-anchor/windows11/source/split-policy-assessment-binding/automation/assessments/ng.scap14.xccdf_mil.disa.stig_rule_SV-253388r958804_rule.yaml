@@ -17,18 +17,48 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: HKEY_LOCAL_MACHINE
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -41,13 +71,45 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -69,29 +131,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:25338800
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253388:
-        source_definition_id: oval:mil.disa.stig.defs:def:253388
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Turn off AutoPlay' is set to 'Enabled:All Drives'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25338800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Autoplay must be disabled for all drives.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253388:
         source_definition_id: oval:mil.disa.stig.windows11:def:253388
         class: compliance
@@ -125,6 +164,29 @@ assessment:
               as soon as media is inserted in the drive. As a result, the setup file of programs or music on audio media may
               start. By default, autoplay is disabled on removable drives, such as the floppy disk drive (but not the CD-ROM
               drive) and on network drives. If this policy is enabled, autoplay can be disabled on all drives.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253388:
+        source_definition_id: oval:mil.disa.stig.defs:def:253388
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Turn off AutoPlay' is set to 'Enabled:All Drives'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25338800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Autoplay must be disabled for all drives.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -262,6 +324,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253388r958804_rule
-    semantic_ir_sha256: c87857c6e0fa2191d0dad2f933186a2afaa47692d425778727fd88bf557d88ed
+    semantic_ir_sha256: 7333c6988a479747433a9d1bb70581e7be2f59b8859d6206513a27470cebda74
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: d4e8dc63f50120e36dc2cf632e65b4ee082a5a71fc926e874c28ac5214b6e5c7
+  semantic_fingerprint_sha256: 9c076e461808a440b038d77de58e76e7920a20f64deab400f45632a9791cc4c2

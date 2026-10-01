@@ -15,22 +15,22 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: userright
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SE_INTERACTIVE_LOGON_NAME
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      state_title: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -39,10 +39,52 @@ assessment:
       entities:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: null
     oval:mil.disa.stig.win:ste:20000039:
       source_state_id: oval:mil.disa.stig.win:ste:20000039
@@ -52,6 +94,22 @@ assessment:
       entities:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -75,6 +133,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000039
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253482:
+        source_definition_id: oval:mil.disa.stig.defs:def:253482
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: Allow log on locally - Administrators, Users
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25348201
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Allow log on locally" user right must only be assigned to the Administrators and Users groups.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253482:
         source_definition_id: oval:mil.disa.stig.windows11:def:253482
         class: compliance
@@ -109,29 +190,6 @@ assessment:
 
 
               Accounts with the "Allow log on locally" user right can log on interactively to a system.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253482:
-        source_definition_id: oval:mil.disa.stig.defs:def:253482
-        class: compliance
-        version: '4'
-        criteria:
-          children:
-          - comment: Allow log on locally - Administrators, Users
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25348201
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Allow log on locally" user right must only be assigned to the Administrators and Users groups.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -267,6 +325,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253482r1137691_rule
-    semantic_ir_sha256: af4d2e683d2795e4b7856a0b394dfc8a5309853fac72970f6051892b44c4e81b
+    semantic_ir_sha256: dc2ce2a18f78725dce0910a2a0338c50c3d29f345ab1ff25be0d6da6629ad7b4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b4ecc155b3091c87a168791191edf8df1efe989101c2c1a2603fc0e945c270cb
+  semantic_fingerprint_sha256: d909658e37c7e91e78b67db51fd4ca30174ce2d1bfd0df2793f8264c76ed40af

@@ -337,33 +337,20 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /etc/ssh/sshd_config
-      oval:mil.disa.stig.unix:obj:25799901:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:25799901
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        object_title: null
-        query:
-        - attributes:
-            recurse: directories
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/ssh/sshd_config.d
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.unix:obj:25799902:
         capability: scapng.collect.unix.file
         source_object_id: oval:mil.disa.stig.unix:obj:25799902
@@ -375,19 +362,102 @@ rule:
         - attributes:
             recurse: directories
             recurse_direction: down
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /etc/ssh/sshd_config.d
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: .*
+      oval:mil.disa.stig.unix:obj:25799901:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:25799901
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        object_title: null
+        query:
+        - attributes:
+            recurse: directories
+            recurse_direction: down
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/ssh/sshd_config.d
+        - attributes:
+            nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive: {}
     predicates:
       oval:mil.disa.stig.unix:ste:20000005:
@@ -398,6 +468,22 @@ rule:
         entities:
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -405,19 +491,6 @@ rule:
         state_title: owned by root
     evaluate:
       tests:
-        oval:mil.disa.stig.unix:tst:25799802:
-          source_test_id: oval:mil.disa.stig.unix:tst:25799802
-          source_type: file_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          test_title: The /etc/ssh/sshd_config.d files are owned by root.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.unix:obj:25799902
-          predicates:
-          - oval:mil.disa.stig.unix:ste:20000005
-          source_other: []
         oval:mil.disa.stig.unix:tst:25799800:
           source_test_id: oval:mil.disa.stig.unix:tst:25799800
           source_type: file_test
@@ -441,6 +514,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.unix:obj:25799901
+          predicates:
+          - oval:mil.disa.stig.unix:ste:20000005
+          source_other: []
+        oval:mil.disa.stig.unix:tst:25799802:
+          source_test_id: oval:mil.disa.stig.unix:tst:25799802
+          source_type: file_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          test_title: The /etc/ssh/sshd_config.d files are owned by root.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.unix:obj:25799902
           predicates:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
@@ -634,9 +720,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271777r1092043_rule
-      semantic_ir_sha256: 603af6239044f4fa6650d4e846020a96b12bfe2f8b540ee23fc82b796e5cc2ce
+      semantic_ir_sha256: 7a495d3b3705a93a5202f7b4f73617b948ef50fd75a491860c887107604d1bd0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 33ebb5f01f37c1a237329bf667e2e09483cd513a45dfa84850ee2c0a0a43d32c
+    semantic_fingerprint_sha256: 6bbc77cbce5eb7344690f54f7a2c534cfd817315b3f28c11a59084ac86424820
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271777r1092043_rule

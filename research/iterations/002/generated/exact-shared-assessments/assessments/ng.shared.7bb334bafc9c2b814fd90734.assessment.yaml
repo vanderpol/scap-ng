@@ -1,0 +1,224 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401:
+      capability: scapng.collect.independent.shellcommand
+      object_title: Gather gsettings get org.gnome.desktop.session idle-delay
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: gsettings get org.gnome.desktop.session idle-delay
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: uint32\s+(\d+)
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401
+      source_type: shellcommand_object
+      version: '5'
+  derive: {}
+  description: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271674:
+        class: compliance
+        criteria:
+          children:
+          - comment: Gnome idle-delay must not be set to 0 or greater than 600
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401
+        source_type: shellcommand_test
+        state_operator: AND
+        test_title: Gnome idle-delay must not be set to 0 or greater than 600
+  id: ng.shared.7bb334bafc9c2b814fd90734
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401:
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: not equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: not equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401
+      source_type: shellcommand_state
+      state_title: idle-delay must not be equal to zero
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402:
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '600'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
+      source_type: shellcommand_state
+      state_title: idle-delay must be less than or equal to 600
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 7bb334bafc9c2b814fd90734d39f1c288415269a7785347d779dccea28c82147
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+    title: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258023r1155656_rule
+    title: RHEL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.

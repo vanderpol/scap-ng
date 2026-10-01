@@ -7,31 +7,6 @@ assessment:
   description: RHEL 9 must elevate the SELinux context when an administrator calls the sudo command.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:27249600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:27249600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sudoers
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^(.*\bsysadm_r\b.*)$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:27249601:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:27249601
@@ -44,21 +19,61 @@ assessment:
           ignore_case: 'true'
           max_depth: '-1'
           recurse_direction: down
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/sudoers.d
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .*
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -66,6 +81,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -91,6 +116,61 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
+    oval:mil.disa.stig.ind:obj:27249600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:27249600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(.*\bsysadm_r\b.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:27249600:
@@ -101,6 +181,22 @@ assessment:
       entities:
       - attributes:
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -122,29 +218,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:27249600
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:272496:
-        source_definition_id: oval:mil.disa.stig.defs:def:272496
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: elevate the SELinux context when an administrator calls the sudo command
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:27249600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must elevate the SELinux context when an administrator calls the sudo command.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:272496:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:272496
         class: compliance
@@ -194,6 +267,29 @@ assessment:
               cryptographic key management activities. Nonprivileged users are individuals who do not possess appropriate
               authorizations. Circumventing intrusion detection and prevention mechanisms or malicious code protection mechanisms
               are examples of privileged functions that require protection from nonprivileged users.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:272496:
+        source_definition_id: oval:mil.disa.stig.defs:def:272496
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: elevate the SELinux context when an administrator calls the sudo command
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:27249600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must elevate the SELinux context when an administrator calls the sudo command.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -326,6 +422,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-272496r1155582_rule
-    semantic_ir_sha256: c24a394683614a7947299cbf6d2e56b352f06724e0dba692b6e898cd094424ce
+    semantic_ir_sha256: 6bd7676f43a2374e9d4f473b7dcf5f4c94c527682151e90cdb43a3d6a9578602
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ca926b193ce878df68e9b4c314d897d4972601d90f20961e251ccb73a3aa3ff7
+  semantic_fingerprint_sha256: 4b54e4449aa8204a299453ee3f5141fd59d4150d7289de1983cc5eb98df41e37

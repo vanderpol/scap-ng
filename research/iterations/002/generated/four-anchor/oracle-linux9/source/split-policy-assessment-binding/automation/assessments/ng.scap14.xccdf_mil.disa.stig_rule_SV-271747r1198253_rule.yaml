@@ -15,7 +15,17 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: kernel.kptr_restrict
@@ -30,6 +40,22 @@ assessment:
       - attributes:
           datatype: int
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -51,29 +77,6 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000010
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:257800:
-        source_definition_id: oval:mil.disa.stig.defs:def:257800
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: kernel.kptr_restrict is set to 1
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:25780000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must restrict exposed kernel pointer addresses access.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271747:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271747
         class: compliance
@@ -108,6 +111,29 @@ assessment:
               \ of this structure, the kernel can be compromised. This option disallows any program without the CAP_SYSLOG\
               \ capability to get the addresses of kernel pointers by replacing them with \"0\".\n\n\tSatisfies: SRG-OS-000132-GPOS-00067,\
               \ SRG-OS-000433-GPOS-00192"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:257800:
+        source_definition_id: oval:mil.disa.stig.defs:def:257800
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: kernel.kptr_restrict is set to 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25780000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must restrict exposed kernel pointer addresses access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -226,6 +252,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271747r1198253_rule
-    semantic_ir_sha256: a65ff467f4bb8ecc34fcf114d0e8495d3362bf354190ff26d9677648d6cf5856
+    semantic_ir_sha256: f675b67cd63a7145dbf4ab4a1cb279ef4339aa25285c18b98ec956e326905a4c
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 4c73e6092df134c7bab78f5a4add75d62dcc56db31b0fe538678abeab30f10f6
+  semantic_fingerprint_sha256: 6f34535717eef306950429b265eeaedc218fdd7deb12582520387d8fbca455b3

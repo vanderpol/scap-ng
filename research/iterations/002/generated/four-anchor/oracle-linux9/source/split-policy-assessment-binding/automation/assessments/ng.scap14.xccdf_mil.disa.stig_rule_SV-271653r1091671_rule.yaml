@@ -7,18 +7,6 @@ assessment:
   description: OL 9 must mount /tmp with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23051101:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:23051101
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.linux:var:23051100
     oval:mil.disa.stig.linux:obj:23051100:
       capability: scapng.collect.linux.partition
       source_object_id: oval:mil.disa.stig.linux:obj:23051100
@@ -27,10 +15,42 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: /tmp
+    oval:mil.disa.stig.ind:obj:23051101:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:23051101
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.linux:var:23051100
     oval:mil.disa.stig.ind:obj:23051102:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051102
@@ -39,18 +59,48 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/fstab
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
       - attributes:
           datatype: int
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -118,19 +168,6 @@ assessment:
         variable_id: oval:mil.disa.stig.linux:var:23051100
         variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.ind:ste:23051100:
-      source_state_id: oval:mil.disa.stig.ind:ste:23051100
-      source_type: variable_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: nodev
-      state_title: null
     oval:mil.disa.stig.linux:ste:20000001:
       source_state_id: oval:mil.disa.stig.linux:ste:20000001
       source_type: partition_state
@@ -139,13 +176,70 @@ assessment:
       entities:
       - attributes:
           entity_check: at least one
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: at least one
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: mount_options
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: nodev
       state_title: null
+    oval:mil.disa.stig.ind:ste:23051100:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051100
+      source_type: variable_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: at least one
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: nodev
+      state_title: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:23051102:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051102
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /tmp is configured in /etc/fstab
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051102
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:23051101:
         source_test_id: oval:mil.disa.stig.ind:tst:23051101
         source_type: variable_test
@@ -171,18 +265,6 @@ assessment:
         - oval:mil.disa.stig.linux:obj:23051100
         predicates:
         - oval:mil.disa.stig.linux:ste:20000001
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23051102:
-        source_test_id: oval:mil.disa.stig.ind:tst:23051102
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: /tmp is configured in /etc/fstab
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23051102
-        predicates: []
         source_other: []
     definitions:
       oval:mil.disa.stig.ol9os:def:271653:
@@ -378,6 +460,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271653r1091671_rule
-    semantic_ir_sha256: 8e214f5a3fac13671a485bb66290e0115f271a0ecfc23b65f0aa9438f5d750f6
+    semantic_ir_sha256: da33c5248f81f73354c1cf76fd7385d6efe48d05e087bbc06b5d3c87fdef577e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: cf262ffaf993d4c2ca76e07a44247cc2a3b7156e1229c4e6c770924906259229
+  semantic_fingerprint_sha256: 78da3f1877f1c5d400704729f26e1bf355ff6de2567afc304e58849eb07cccd4

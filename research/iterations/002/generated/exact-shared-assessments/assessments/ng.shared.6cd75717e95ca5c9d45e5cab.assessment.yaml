@@ -1,0 +1,123 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271508
+  collect:
+    oval:mil.disa.stig.linux:obj:23047700:
+      capability: scapng.collect.linux.rpminfo
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: rsyslog
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23047700
+      source_type: rpminfo_object
+      version: '1'
+  derive: {}
+  description: OL 9 must have the rsyslog package installed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230477:
+        class: compliance
+        criteria:
+          children:
+          - comment: The rsyslog package is installed.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23047700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must have the packages required for offloading audit logs installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230477
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271508:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230477
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000350 - OL 9 must have the rsyslog package installed.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "rsyslogd is a system utility providing support for message logging. Support for both internet and Unix\
+              \ domain sockets enables this utility to support both local and remote logging. Couple this utility with \"\
+              gnutls\" (which is a secure communications library implementing the SSL, TLS, and DTLS protocols), to create\
+              \ a method to securely encrypt and offload auditing.\n\n\tSatisfies: SRG-OS-000479-GPOS-00224, SRG-OS-000051-GPOS-00024"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271508
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:23047700:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23047700
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23047700
+        source_type: rpminfo_test
+        state_operator: AND
+        test_title: The rsyslog package is installed.
+  id: ng.shared.6cd75717e95ca5c9d45e5cab
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 6cd75717e95ca5c9d45e5cabef7656e89a2e2a2e638bf4fa0528826fd9486dec
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271508r1091236_rule
+    title: OL 9 must have the rsyslog package installed.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258140r1106460_rule
+    title: RHEL 9 must have the rsyslog package installed.

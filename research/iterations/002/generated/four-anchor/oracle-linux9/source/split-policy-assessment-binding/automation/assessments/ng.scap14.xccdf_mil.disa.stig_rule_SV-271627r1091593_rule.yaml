@@ -15,12 +15,32 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/login.defs
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -28,6 +48,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -40,12 +70,32 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/login.defs
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -53,6 +103,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -68,6 +128,22 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -75,6 +151,19 @@ assessment:
       state_title: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:23023300:
+        source_test_id: oval:mil.disa.stig.ind:tst:23023300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS, if set, is set to 100000 or greater'
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23023300
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23023300
+        source_other: []
       oval:mil.disa.stig.ind:tst:23023303:
         source_test_id: oval:mil.disa.stig.ind:tst:23023303
         source_type: textfilecontent54_test
@@ -100,19 +189,6 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23023300
         source_other: []
-      oval:mil.disa.stig.ind:tst:23023300:
-        source_test_id: oval:mil.disa.stig.ind:tst:23023300
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS, if set, is set to 100000 or greater'
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23023300
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23023300
-        source_other: []
       oval:mil.disa.stig.ind:tst:23023302:
         source_test_id: oval:mil.disa.stig.ind:tst:23023302
         source_type: textfilecontent54_test
@@ -126,42 +202,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.ol9os:def:271627:
-        source_definition_id: oval:mil.disa.stig.ol9os:def:271627
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:230233
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: OL09-00-001075 - OL 9 shadow password suite must be configured to use a sufficient number of hashing rounds.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Oracle Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: "Passwords need to be protected at all times, and encryption is the standard method for protecting passwords.\
-              \ If passwords are not encrypted, they can be plainly read (i.e., clear text) and easily compromised. Passwords\
-              \ that are encrypted with a weak algorithm are no more protected than if they are kept in plain text.\n\n\t\
-              Using more hashing rounds makes password cracking attacks more difficult.\n\n\tSatisfies: SRG-OS-000073-GPOS-00041,\
-              \ SRG-OS-000120-GPOS-00061"
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:230233:
         source_definition_id: oval:mil.disa.stig.defs:def:230233
         class: compliance
@@ -200,6 +240,42 @@ assessment:
             text: The operating system shadow password suite must be configured to use a sufficient number of hashing rounds.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.ol9os:def:271627:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271627
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230233
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-001075 - OL 9 shadow password suite must be configured to use a sufficient number of hashing rounds.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Passwords need to be protected at all times, and encryption is the standard method for protecting passwords.\
+              \ If passwords are not encrypted, they can be plainly read (i.e., clear text) and easily compromised. Passwords\
+              \ that are encrypted with a weak algorithm are no more protected than if they are kept in plain text.\n\n\t\
+              Using more hashing rounds makes password cracking attacks more difficult.\n\n\tSatisfies: SRG-OS-000073-GPOS-00041,\
+              \ SRG-OS-000120-GPOS-00061"
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -324,6 +400,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271627r1091593_rule
-    semantic_ir_sha256: 4bc0707985b614454d229743e53dca8166600de78a576b953f8e21f293a52232
+    semantic_ir_sha256: 30e4092adc3abaaba11b76fa9e617c100b1ea9403011c6779427b13df8b49f88
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 1bdfb07443565541ba470ccc7854f91c2114c0a3eafa2f53de990408c98cd1f1
+  semantic_fingerprint_sha256: d0159538192e466d1f74efedaf1188f87b15dadcd61794c3e0e879392648b79d

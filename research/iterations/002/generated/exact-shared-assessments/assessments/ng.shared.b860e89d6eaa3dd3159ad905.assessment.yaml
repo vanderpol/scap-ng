@@ -1,0 +1,209 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278107
+  collect:
+    oval:mil.disa.stig.win:obj:25333900:
+      capability: scapng.collect.windows.registry
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows\EventLog\System
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: MaxSize
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25333900
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 System event log size must be configured to 32768 KB or greater.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253339:
+        class: compliance
+        criteria:
+          children:
+          - comment: The System event log size is configured to 32768 KB or greater
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The System event log size must be configured to 32768 KB or greater.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253339
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278107:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253339
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000290 - Windows Server 2025 System event log size must be configured to 32768 KB or greater.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Inadequate log size will cause the log to fill up quickly. This may prevent audit events from being recorded
+              properly and require frequent attention by administrative personnel.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278107
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25333900:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25333900
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333700
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25333900
+        source_type: registry_test
+        state_operator: AND
+        test_title: The System event log size is configured to 32768 KB or greater
+  id: ng.shared.b860e89d6eaa3dd3159ad905
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:25333700:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '32768'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25333700
+      source_type: registry_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: b860e89d6eaa3dd3159ad905cac6d8a22f2422a90907260e79b4d1016026353d
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278107r1181816_rule
+    title: Windows Server 2025 System event log size must be configured to 32768 KB or greater.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253339r958752_rule
+    title: The System event log size must be configured to 32768 KB or greater.

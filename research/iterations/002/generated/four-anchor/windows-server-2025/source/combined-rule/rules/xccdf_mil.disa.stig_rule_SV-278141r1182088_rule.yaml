@@ -686,14 +686,44 @@ rule:
         query:
         - attributes:
             error_if_stderr_exists: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: powershell
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: Import-Module GroupPolicy; Import-Module ActiveDirectory; if (-not (Get-PSDrive -Name AD -ErrorAction SilentlyContinue))
@@ -709,7 +739,17 @@ rule:
             | Format-Table -AutoSize | Out-String -Width 4096 } else { [PSCustomObject]@{ GPO = 'Domain Controllers OU'; Status
             = 'PASS'; Reason = 'Delegation securely restricted to authorized administrative groups on Domain Controllers OU.'
             } | Format-Table -AutoSize | Out-String -Width 4096 }
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: .+
@@ -724,6 +764,22 @@ rule:
         - attributes:
             entity_check: none satisfy
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: none satisfy
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -989,9 +1045,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278141r1182088_rule
-      semantic_ir_sha256: 3668cddaf79274dedc76c5f909b2c5cc4e18ad61d98873024ef7438d82cc183e
+      semantic_ir_sha256: db6f9e30caba90d4ae55574d1044a59059036c703828cbbb17c3a8960d1706ef
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d83a0c153971dc0a0f96a244549d0ab0e4c8d161f0cec26b34a9be7ab03f1e30
+    semantic_fingerprint_sha256: 3c5ef9a54e8bfbf9b3e75646a0cda8947457cd6489f72afaa59026c5becf5cb3
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278141r1182088_rule

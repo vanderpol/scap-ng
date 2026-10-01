@@ -435,12 +435,32 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/audit.rules
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -448,6 +468,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -469,6 +499,29 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230432:
+          source_definition_id: oval:mil.disa.stig.defs:def:230432
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit invocations of /usr/sbin/setsebool
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23043200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of setsebool in the operating system must generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258186:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258186
           class: compliance
@@ -520,29 +573,6 @@ rule:
 
                 Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,
                 SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000463-GPOS-00207, SRG-OS-000465-GPOS-00209'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230432:
-          source_definition_id: oval:mil.disa.stig.defs:def:230432
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit invocations of /usr/sbin/setsebool
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23043200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of setsebool in the operating system must generate an audit record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -670,9 +700,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258186r1045343_rule
-      semantic_ir_sha256: a2786655c95fa9fa8d64ccd11d8b698271fdb0a1e19ee076e4d814a4deddbe0e
+      semantic_ir_sha256: 74187d50954cc75058c1d1d0b3e3c6cb04c52f9ed96395ecbe8aeead2f98067c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e1dbef8dd3caf771085a821d8b736398c42585c97248140b6cb40118fd671b50
+    semantic_fingerprint_sha256: 2eb5365f93af167b281e7b35779cadf89046b1c725157b299186dac10b98a442
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258186r1045343_rule

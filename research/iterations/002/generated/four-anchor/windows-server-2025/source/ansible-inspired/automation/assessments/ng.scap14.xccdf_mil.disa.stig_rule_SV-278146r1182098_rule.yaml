@@ -18,14 +18,44 @@ assessment:
       query:
       - attributes:
           error_if_stderr_exists: 'true'
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: $( try { $obj=Get-ADObject -Filter "objectClass -eq 'nTDSService'" -Properties dsHeuristics -SearchBase "CN=Services,$((Get-ADRootDSE).configurationNamingContext)"
@@ -35,7 +65,17 @@ assessment:
           -ge 7){$h[6]}else{'N/A'}; [PSCustomObject]@{ Status=$stat; Detail=("dsHeuristics value is [{0}]. Seventh char is
           '{1}' ({2})." -f $h,$c,$msg) } } } catch { [PSCustomObject]@{ Status='ERROR'; Detail="Directory Service object could
           not be located or read." } } ) | Out-String -Width 4096
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .+
@@ -49,18 +89,48 @@ assessment:
       capability: scapng.collect.independent.shellcommand
       object_title: Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: 'if (([adsi]"LDAP://$((Get-ADDomain).DistinguishedName)").PSBase.ObjectSecurity.GetAccessRules($true, $true,
           [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq ''S-1-5-7'' -and $_.AccessControlType
           -eq ''Allow'' }) { Write-Host "FAIL: ANONYMOUS LOGON is configured with ALLOW permissions." } else { Write-Host
           "PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions." }'
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .+
@@ -75,6 +145,22 @@ assessment:
       - attributes:
           entity_check: none satisfy
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: none satisfy
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -281,8 +367,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278146
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: f84a46bbdc220f4c853fb6bb96971190304478620041fffa0224806e3ab89af7
+    semantic_ir_sha256: be862e912c9ab19e4ab7827323576014567048edba6a10817583c7ec7d2fabbf
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278146r1182098_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 75c96a7edb5e2744445a37b73910a900f0fd08cf0f0a072d050e909640963c07
+  semantic_fingerprint_sha256: d5441818c9e4063ad979c4de55a4b465776bd50c5c2c13a46c19cff5cbe0c599

@@ -380,6 +380,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: special_logon
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -394,6 +410,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: special_logon
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -401,19 +433,6 @@ rule:
         state_title: Audit - Special Logon - Success only
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25331800:
-          source_test_id: oval:mil.disa.stig.win:tst:25331800
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Audit - Special Logon - Success only
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331800
-          source_other: []
         oval:mil.disa.stig.win:tst:25331801:
           source_test_id: oval:mil.disa.stig.win:tst:25331801
           source_type: auditeventpolicysubcategories_test
@@ -427,7 +446,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25331801
           source_other: []
+        oval:mil.disa.stig.win:tst:25331800:
+          source_test_id: oval:mil.disa.stig.win:tst:25331800
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Audit - Special Logon - Success only
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331800
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253318:
+          source_definition_id: oval:mil.disa.stig.defs:def:253318
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Special Logon - Success only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25331800
+            - comment: Audit - Special Logon - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25331801
+            comment: Audit - Special Logon - Success
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit Logon/Logoff - Special Logon successes.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253318:
           source_definition_id: oval:mil.disa.stig.windows11:def:253318
           class: compliance
@@ -465,33 +524,6 @@ rule:
 
 
                 Special Logon records special logons which have administrative privileges and can be used to elevate processes.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253318:
-          source_definition_id: oval:mil.disa.stig.defs:def:253318
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Special Logon - Success only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25331800
-            - comment: Audit - Special Logon - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25331801
-            comment: Audit - Special Logon - Success
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit Logon/Logoff - Special Logon successes.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -627,9 +659,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253318r991578_rule
-      semantic_ir_sha256: ce6532696f910e52623bfafa3b760f904cc0029f3c07873b1dc9dcf587d343fa
+      semantic_ir_sha256: ee8491baf66d095209ea43b61014e7af66ccecb5bb2926c769f05c42e3bfef56
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: c2cc6d474955eb6bc00186d3781ec768f582b7b4138d6b58a59e4d88bb044eac
+    semantic_fingerprint_sha256: dae6012cf1547ee036b65b6af682470eda399414be96f0f57b6d19d153e580eb
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253318r991578_rule

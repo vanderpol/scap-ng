@@ -355,18 +355,48 @@ rule:
         query:
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation
         - attributes:
             datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -379,12 +409,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -406,6 +468,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253368:
+          source_definition_id: oval:mil.disa.stig.defs:def:253368
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Remote host allows delegation of non-exportable credentials' is set to 'Enabled'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25336800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must be configured to enable Remote host allows delegation of non-exportable credentials.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278089:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278089
           class: compliance
@@ -440,29 +525,6 @@ rule:
                 exposes them to theft on the remote host. Restricted Admin mode or Remote Credential Guard allow delegation
                 of nonexportable credentials providing additional protection of the credentials. Enabling this configures
                 the host to support Restricted Admin mode or Remote Credential Guard.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253368:
-          source_definition_id: oval:mil.disa.stig.defs:def:253368
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Remote host allows delegation of non-exportable credentials' is set to 'Enabled'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25336800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must be configured to enable Remote host allows delegation of non-exportable credentials.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -594,9 +656,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278089r1180973_rule
-      semantic_ir_sha256: d5ed3b0e5b471695e2ede2aca5392eea4f4b758095feb07ff6efa1fb8af44f1a
+      semantic_ir_sha256: aaa4b10cc5180776a1b30d9abbafc37dbf1b85903a4fb834d6629f57d830962e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 86430888ec96a13793311c272d19359c6bd9e4104d0c525399347cccaa3d8871
+    semantic_fingerprint_sha256: 2fce2628df731477b821cc2b4e3f118188ff1f1662cb4cd82906977b281f5c05
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278089r1180973_rule

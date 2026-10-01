@@ -17,20 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25332701:
-      source_state_id: oval:mil.disa.stig.win:ste:25332701
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: authorization_policy_change
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      state_title: Audit - Audit Policy Change - Success and Failure
     oval:mil.disa.stig.win:ste:25332700:
       source_state_id: oval:mil.disa.stig.win:ste:25332700
       source_type: auditeventpolicysubcategories_state
@@ -40,26 +26,59 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: authorization_policy_change
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       state_title: Audit - Audit Policy Change - Success only
+    oval:mil.disa.stig.win:ste:25332701:
+      source_state_id: oval:mil.disa.stig.win:ste:25332701
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: authorization_policy_change
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: Audit - Audit Policy Change - Success and Failure
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25332701:
-        source_test_id: oval:mil.disa.stig.win:tst:25332701
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Audit - Audit Policy Change - Success and Failure
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25332701
-        source_other: []
       oval:mil.disa.stig.win:tst:25332700:
         source_test_id: oval:mil.disa.stig.win:tst:25332700
         source_type: auditeventpolicysubcategories_test
@@ -73,34 +92,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25332700
         source_other: []
+      oval:mil.disa.stig.win:tst:25332701:
+        source_test_id: oval:mil.disa.stig.win:tst:25332701
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Audit - Audit Policy Change - Success and Failure
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25332701
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253327:
-        source_definition_id: oval:mil.disa.stig.defs:def:253327
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Audit Policy Change - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332700
-          - comment: Audit - Audit Policy Change - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332701
-          comment: Audit - Audit Policy Change - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Policy Change - Authorization Policy Change successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253327:
         source_definition_id: oval:mil.disa.stig.windows11:def:253327
         class: compliance
@@ -137,6 +142,33 @@ assessment:
 
 
               Authorization Policy Change records events related to changes in user rights, such as create a token object.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253327:
+        source_definition_id: oval:mil.disa.stig.defs:def:253327
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Audit Policy Change - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332700
+          - comment: Audit - Audit Policy Change - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332701
+          comment: Audit - Audit Policy Change - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Policy Change - Authorization Policy Change successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -262,6 +294,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253327r991572_rule
-    semantic_ir_sha256: 614a3e4672db48c5d73ed78a8c756498b8283e8166dd09d974dd704c9f0ad86c
+    semantic_ir_sha256: ef0592bec9af4dd50cc73d6f8712701b626729058d9b4891c266de92a285055f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: c11084d506cad8369bc90fc776c4440d1482f0b0543afe644a8f6aeb64158370
+  semantic_fingerprint_sha256: 3fdcc95108e5005ccec1caf827adcb8792e8286735e79426ce0a6f816aa17ade

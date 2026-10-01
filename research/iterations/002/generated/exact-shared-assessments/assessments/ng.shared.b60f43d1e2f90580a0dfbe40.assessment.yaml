@@ -1,0 +1,162 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271509
+  collect:
+    oval:mil.disa.stig.linux:obj:25814200:
+      capability: scapng.collect.linux.systemdunitproperty
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: rsyslog.service
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ActiveState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:25814200
+      source_type: systemdunitproperty_object
+      version: '2'
+  derive: {}
+  description: OL 9 must be configured so that the rsyslog service is active.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258142:
+        class: compliance
+        criteria:
+          children:
+          - comment: rsyslog is active
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25814200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The rsyslog service must be running in the operating system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258142
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271509:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258142
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000351 - OL 9 must be configured so that the rsyslog service is active.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The rsyslog service must be running to provide logging services, which are essential to system administration.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271509
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:25814200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:25814200
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:25814200
+        source_type: systemdunitproperty_test
+        state_operator: AND
+        test_title: rsyslog.service is active
+  id: ng.shared.b60f43d1e2f90580a0dfbe40
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000003:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: active
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000003
+      source_type: systemdunitproperty_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: b60f43d1e2f90580a0dfbe40e04848dd1c7403c5ee45ce3cccaa4ad7a3899c0a
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271509r1091239_rule
+    title: OL 9 must be configured so that the rsyslog service is active.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258142r991589_rule
+    title: The rsyslog service on RHEL 9 must be active.

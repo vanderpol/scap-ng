@@ -399,42 +399,52 @@ rule:
         version: '5'
         object_title: Gather gsettings get org.gnome.desktop.session idle-delay
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: bash
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: gsettings get org.gnome.desktop.session idle-delay
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: uint32\s+(\d+)
     derive: {}
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
-        source_type: shellcommand_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-          kind: element
-          name: exit_status
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '0'
-        - attributes:
-            datatype: int
-            operation: less than or equal
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '600'
-        state_title: idle-delay must be less than or equal to 600
       oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401
         source_type: shellcommand_state
@@ -443,6 +453,22 @@ rule:
         entities:
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: exit_status
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -450,11 +476,79 @@ rule:
         - attributes:
             datatype: int
             operation: not equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: not equal
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
         state_title: idle-delay must not be equal to zero
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
+        source_type: shellcommand_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: exit_status
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '0'
+        - attributes:
+            datatype: int
+            operation: less than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than or equal
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '600'
+        state_title: idle-delay must be less than or equal to 600
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401:
@@ -626,9 +720,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
-      semantic_ir_sha256: 435b2b4d0705807c28a5b54b7e07a4dacdb62f7c23bab9e33cfaec921e152204
+      semantic_ir_sha256: 0a7464623206076a2bc9f57c6971fe272d513f2faf53e0a9a8138cc60465e04c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 17c006bcc3d0188f9c73a01612f8cfb54ccab4f608495c089edf3f9336041ada
+    semantic_fingerprint_sha256: 3730a8c99b452077a49abe05003b5d8bf4203ccc8a53b6c72519fc1285693a3a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271674r1208729_rule

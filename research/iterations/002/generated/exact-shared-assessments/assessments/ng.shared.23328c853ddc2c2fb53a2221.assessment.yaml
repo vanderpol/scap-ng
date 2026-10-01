@@ -1,0 +1,213 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278225
+  collect:
+    oval:mil.disa.stig.win:obj:25346200:
+      capability: scapng.collect.windows.registry
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Control\Lsa
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: LmCompatibilityLevel
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25346200
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 LAN Manager authentication level must be configured to send NTLMv2 response only and to
+    refuse LM and NTLM.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253462:
+        class: compliance
+        criteria:
+          children:
+          - comment: 'Verifies ''Network security: LAN Manager authentication level'' is set to ''Send NTLMv2 response only.
+              Refuse LM & NTLM'' (Level 5)'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25346200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The LanMan authentication level must be set to send NTLMv2 response only, and to refuse LM and NTLM.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253462
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278225:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253462
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-SO-000310 - Windows Server 2025 LAN Manager authentication level must be configured to send NTLMv2
+              response only and to refuse LM and NTLM.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Kerberos v5 authentication protocol is the default for authentication of users who are logging on to
+              domain accounts. NTLM, which is less secure, is retained in later Windows versions for compatibility with clients
+              and servers that are running earlier versions of Windows or applications that still use it. It is also used
+              to authenticate logons to stand-alone or nondomain-joined computers that are running later versions.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278225
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25346200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25346200
+        predicates:
+        - oval:mil.disa.stig.win:ste:25346200
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25346200
+        source_type: registry_test
+        state_operator: AND
+        test_title: '''Network security: LAN Manager authentication level'' is set to ''Send NTLMv2 response only. Refuse
+          LM & NTLM'' (Level 5)'
+  id: ng.shared.23328c853ddc2c2fb53a2221
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:25346200:
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '5'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25346200
+      source_type: registry_state
+      state_title: Reg_Dword type and value equals 5
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 23328c853ddc2c2fb53a22218ecbe354e8fc3a884caaf92b17098f00d214a64f
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278225r1182320_rule
+    title: Windows Server 2025 LAN Manager authentication level must be configured to send NTLMv2 response only and to refuse
+      LM and NTLM.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253462r991589_rule
+    title: The LanMan authentication level must be set to send NTLMv2 response only, and to refuse LM and NTLM.

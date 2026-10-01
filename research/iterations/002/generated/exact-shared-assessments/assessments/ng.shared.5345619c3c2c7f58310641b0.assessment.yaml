@@ -1,0 +1,173 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271673
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27167301:
+      capability: scapng.collect.independent.shellcommand
+      object_title: Retrieve the gnome screensaver lock-delay setting.
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: gsettings get org.gnome.desktop.screensaver lock-delay
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: uint32\s(\d+)$
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27167301
+      source_type: shellcommand_object
+      version: '5'
+  derive: {}
+  description: OL 9 must initiate a session lock for graphical user interfaces when the screensaver is activated.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271673:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verify the OS initiates a session lock for graphical user interfaces when the screensaver is activated.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167301
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must initiate a session lock for graphical user interfaces when the screensaver is activated.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A session lock is a temporary action taken when a user stops work and moves away from the immediate physical
+              vicinity of the information system but does not want to logout because of the temporary nature of the absence.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271673
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27167301:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27167301
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27167301
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167301
+        source_type: shellcommand_test
+        state_operator: AND
+        test_title: Verify the OS initiates a session lock for graphical user interfaces when the screensaver is activated.
+  id: ng.shared.5345619c3c2c7f58310641b0
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27167301:
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '5'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167301
+      source_type: shellcommand_state
+      state_title: Confirm value is set to 5 or greater.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 5345619c3c2c7f58310641b0d5116fc6789646d968efc15260bfb32d307ce4b5
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271673r1091731_rule
+    title: OL 9 must initiate a session lock for graphical user interfaces when the screensaver is activated.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258025r958402_rule
+    title: RHEL 9 must initiate a session lock for graphical user interfaces when the screensaver is activated.

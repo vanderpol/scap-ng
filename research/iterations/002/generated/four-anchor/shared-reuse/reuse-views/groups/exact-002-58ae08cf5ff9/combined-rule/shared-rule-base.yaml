@@ -1,0 +1,174 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+shared_rule_base:
+  id: ng.shared.58ae08cf5ff9883a0f943193
+  assessment:
+    assert:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271511
+    collect:
+      oval:mil.disa.stig.linux:obj:23028501:
+        capability: scapng.collect.linux.systemdunitproperty
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: rngd.service
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: ActiveState
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_object_id: oval:mil.disa.stig.linux:obj:23028501
+        source_type: systemdunitproperty_object
+        version: '2'
+    derive: {}
+    description: OL 9 must enable the hardware random number generator entropy gatherer service.
+    evaluate:
+      definitions:
+        oval:mil.disa.stig.defs:def:257782:
+          class: compliance
+          criteria:
+            children:
+            - comment: rngd.service is active
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23028501
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enable the hardware random number generator entropy gatherer service.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          source_definition_id: oval:mil.disa.stig.defs:def:257782
+          version: '1'
+        oval:mil.disa.stig.ol9os:def:271511:
+          class: compliance
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:257782
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-000360 - OL 9 must enable the hardware random number generator entropy gatherer service.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: "The most important characteristic of a random number generator is its randomness, namely its ability\
+                \ to deliver random numbers that are impossible to predict. Entropy in computer security is associated with\
+                \ the unpredictability of a source of randomness. The random source with high entropy tends to achieve a uniform\
+                \ distribution of random values. Random number generators are one of the most important building blocks of\
+                \ cryptosystems.\n\n\tThe rngd service feeds random data from hardware device to kernel random device. Quality\
+                \ (nonpredictable) random number generation is important for several security functions (i.e., ciphers)."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271511
+          version: '1'
+      tests:
+        oval:mil.disa.stig.linux:tst:23028501:
+          check: all
+          check_existence: at_least_one_exists
+          collections:
+          - oval:mil.disa.stig.linux:obj:23028501
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000003
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          source_other: []
+          source_test_id: oval:mil.disa.stig.linux:tst:23028501
+          source_type: systemdunitproperty_test
+          state_operator: AND
+          test_title: rngd.service is active
+    id: ng.shared.58ae08cf5ff9883a0f943193
+    migration:
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+      source: SCAP 1.4 / OVAL 5.12.3
+      status: legacy_compatible
+      reuse_scope: cross-benchmark-exact-semantic-equivalence
+    predicates:
+      oval:mil.disa.stig.linux:ste:20000003:
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: active
+        operator: AND
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_state_id: oval:mil.disa.stig.linux:ste:20000003
+        source_type: systemdunitproperty_state
+        state_title: null
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    version: 1
+    exact_reuse_fingerprint_sha256: 58ae08cf5ff9883a0f943193fd6213d43cf5d8b41c2e08e784837538b51f8697
+    reuse_provenance:
+    - benchmark: oracle-linux9
+      rule_id: xccdf_mil.disa.stig_rule_SV-271511r1091245_rule
+      title: OL 9 must enable the hardware random number generator entropy gatherer service.
+      exact_fingerprint: 58ae08cf5ff9883a0f943193fd6213d43cf5d8b41c2e08e784837538b51f8697
+    - benchmark: rhel9
+      rule_id: xccdf_mil.disa.stig_rule_SV-257782r991589_rule
+      title: RHEL 9 must enable the hardware random number generator entropy gatherer service.
+      exact_fingerprint: 58ae08cf5ff9883a0f943193fd6213d43cf5d8b41c2e08e784837538b51f8697
+  reuse_evidence: equivalent_oval_semantics
+  overlay_contract: Policy identity/content may vary per overlay; assessment semantics are immutable.

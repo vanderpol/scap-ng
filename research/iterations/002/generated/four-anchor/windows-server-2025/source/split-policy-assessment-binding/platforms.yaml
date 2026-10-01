@@ -333,14 +333,6 @@ inventory_assessments:
     description: Product inventory for cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:10000000:
-        capability: scapng.collect.independent.family
-        source_object_id: oval:mil.disa.stig.ind:obj:10000000
-        source_type: family_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: OS family
-        query: []
       oval:mil.disa.stig.win:obj:10000000:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:10000000
@@ -349,18 +341,56 @@ inventory_assessments:
         version: '1'
         object_title: ProductName registry entry
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: HKEY_LOCAL_MACHINE
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ProductName
+      oval:mil.disa.stig.ind:obj:10000000:
+        capability: scapng.collect.independent.family
+        source_object_id: oval:mil.disa.stig.ind:obj:10000000
+        source_type: family_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: OS family
+        query: []
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:10000007:
@@ -371,6 +401,22 @@ inventory_assessments:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -382,7 +428,23 @@ inventory_assessments:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: family
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: windows
@@ -481,9 +543,9 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
-      semantic_ir_sha256: 629333f061c1dff26f0fb4c012839e9312e0883a752655db313222ffacefb1c7
+      semantic_ir_sha256: da127f8fabf83721991e3251a9355e1cddd66a4ce031d601ffb5a00c9b08dc47
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 60972b2476318312d5b7f4f5718777a82e7c9cdbcd65233cc57bfc9bb1d7e878
+    semantic_fingerprint_sha256: ce255dcd937de87152124b563299f8d53ac957107eda1a787975151795ba5643
     purpose: platform_inventory
     inventory_output:
       emit_when: platform_true

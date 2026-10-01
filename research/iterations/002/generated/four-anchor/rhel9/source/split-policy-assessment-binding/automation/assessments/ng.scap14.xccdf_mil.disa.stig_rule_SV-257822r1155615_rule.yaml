@@ -15,18 +15,48 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/yum.repos.d
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \.repo$
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -34,26 +64,22 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23026401:
-      source_state_id: oval:mil.disa.stig.ind:ste:23026401
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
-      state_title: null
     oval:mil.disa.stig.ind:ste:23026400:
       source_state_id: oval:mil.disa.stig.ind:ste:23026400
       source_type: textfilecontent54_state
@@ -63,26 +89,59 @@ assessment:
       - attributes:
           datatype: string
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: text
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
       state_title: null
+    oval:mil.disa.stig.ind:ste:23026401:
+      source_state_id: oval:mil.disa.stig.ind:ste:23026401
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
+      state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23026400:
-        source_test_id: oval:mil.disa.stig.ind:tst:23026400
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23026400
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23026400
-        source_other: []
       oval:mil.disa.stig.ind:tst:23026401:
         source_test_id: oval:mil.disa.stig.ind:tst:23026401
         source_type: textfilecontent54_test
@@ -95,6 +154,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23026400
         predicates:
         - oval:mil.disa.stig.ind:ste:23026401
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23026400:
+        source_test_id: oval:mil.disa.stig.ind:tst:23026400
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23026400
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23026400
         source_other: []
     definitions:
       oval:mil.disa.stig.rhel9os:def:257822:
@@ -299,6 +371,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257822r1155615_rule
-    semantic_ir_sha256: a062b475133dddf2d0a90ebde745f6b0eb826575e9f99b8c6aa3d57f57504b95
+    semantic_ir_sha256: 85517ed4fbba12ef0c7723db5cfeda1ab73dfa6c7ff8a784f9e27d3e83d8b217
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 648b0d7a295388b268ad81dde2aa8329045f9e9593edcc92332755dc2a369e68
+  semantic_fingerprint_sha256: 5598d29492bcd987e1fe7a8e1b39f75c40d92a3be9799e3b3c6ebeb94ae42b41

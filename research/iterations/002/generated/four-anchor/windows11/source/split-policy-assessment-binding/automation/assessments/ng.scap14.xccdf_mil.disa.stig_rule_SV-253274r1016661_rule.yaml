@@ -7,26 +7,56 @@ assessment:
   description: Permissions for system files and directories must conform to minimum requirements.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '18'
-      object_title: Run Icacls command against system drive root directory
+      object_title: everyoneincludesanonymous must be configured
       query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: icacls($env:SystemDrive + '\')
-      - kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ':'
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Control\Lsa
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: everyoneincludesanonymous
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404
@@ -35,15 +65,45 @@ assessment:
       version: '18'
       object_title: Run Icacls command against Program Files directory
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name ProgramFilesDir).ProgramFilesDir
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ':'
@@ -55,38 +115,98 @@ assessment:
       version: '18'
       object_title: Run Icacls command against Windows install directory
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: icacls($env:windir)
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ':'
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '18'
-      object_title: everyoneincludesanonymous must be configured
+      object_title: Run Icacls command against system drive root directory
       query:
-      - kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SYSTEM\CurrentControlSet\Control\Lsa
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: everyoneincludesanonymous
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: icacls($env:SystemDrive + '\')
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ':'
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405
@@ -95,20 +215,100 @@ assessment:
       version: '18'
       object_title: Run Icacls command against Program Files (x86) directory
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir
           (x86)'
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ':'
   derive:
+    oval:navy.navwar.niwcatlantic.scc.windows:var:25327402:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
+      source_type: constant_variable
+      datatype: string
+      variable_title: Required Permissions
+      semantic_ast:
+        datatype: string
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
+        type: constant_variable
+        values:
+        - datatype: string
+          value: (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
+        - datatype: string
+          value: (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
+        - datatype: string
+          value: (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
+        - datatype: string
+          value: (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
+        - datatype: string
+          value: (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
+        - datatype: string
+          value: (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
+        - datatype: string
+          value: (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
+        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
+        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
+        - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
+        - (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
+        - (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
+        variable_type: constant_variable
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
+        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
+        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
+        - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
+        - (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
+        - (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
+        variable_type: constant_variable
     oval:navy.navwar.niwcatlantic.scc.windows:var:25327403:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327403
       source_type: constant_variable
@@ -183,107 +383,7 @@ assessment:
         - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
         variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327403
         variable_type: constant_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:25327402:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
-      source_type: constant_variable
-      datatype: string
-      variable_title: Required Permissions
-      semantic_ast:
-        datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
-        type: constant_variable
-        values:
-        - datatype: string
-          value: (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
-        - datatype: string
-          value: (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
-        - datatype: string
-          value: (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
-        - datatype: string
-          value: (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
-        - datatype: string
-          value: (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
-        - datatype: string
-          value: (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
-        - datatype: string
-          value: (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
-      resolution:
-        datatype: string
-        status: exact_static
-        values:
-        - (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
-        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
-        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
-        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
-        - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
-        - (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
-        - (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
-        variable_type: constant_variable
-      evaluation_plan:
-        datatype: string
-        mode: static
-        resolution_status: exact_static
-        values:
-        - (?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)
-        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)
-        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)
-        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)
-        - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(M\)
-        - (?i)NT AUTHORITY\\Authenticated Users:\(AD\)
-        - (?i)Mandatory Label\\High Mandatory Level:\(OI\)\(NP\)\(IO\)\(NW\)
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
-        variable_type: constant_variable
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-        kind: element
-        name: exit_status
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      - attributes:
-          operation: pattern match
-          var_check: at least one
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:25327403
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          check_existence: none_exist
-        kind: element
-        name: stderr_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      state_title: Permissions must equal expected output
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-        kind: element
-        name: exit_status
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      - attributes:
-          operation: pattern match
-          var_check: at least one
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          check_existence: none_exist
-        kind: element
-        name: stderr_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      state_title: Permissions must equal expected output
     oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401
       source_type: registry_state
@@ -293,13 +393,194 @@ assessment:
       - attributes:
           datatype: int
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '0'
       state_title: Value must be equal to 0
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:25327402
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+          var_check:
+            origin: explicit
+            value: at least one
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          check_existence: none_exist
+        effective_attributes:
+          check_existence:
+            origin: explicit
+            value: none_exist
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: stderr_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      state_title: Permissions must equal expected output
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:25327403
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+          var_check:
+            origin: explicit
+            value: at least one
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          check_existence: none_exist
+        effective_attributes:
+          check_existence:
+            origin: explicit
+            value: none_exist
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: stderr_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      state_title: Permissions must equal expected output
   evaluate:
     tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: System drive root directory permissions must conform to minimum requirements.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402
+        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403
         source_type: shellcommand_test
@@ -310,6 +591,19 @@ assessment:
         state_operator: AND
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327403
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: Program Files (x86) directory permissions must conform to minimum requirements.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
         source_other: []
@@ -336,32 +630,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: System drive root directory permissions must conform to minimum requirements.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Program Files (x86) directory permissions must conform to minimum requirements.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403
         source_other: []
@@ -591,6 +859,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253274r1016661_rule
-    semantic_ir_sha256: 55cb6753fd4021733f8e2b02fbef197d93f8abd0b3ad3e4ee44a5a5660164cfe
+    semantic_ir_sha256: d2b542c063293ac9bd4bc470a6aa9ed94fdde1ab3802e66ceef9e1627d57d168
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 3dda30e910c5d040754e47ed7fa811aaea3087b5acc60f24355fc2085aaabe04
+  semantic_fingerprint_sha256: 309e416e7acf0e26e4ab9e707f3981c7f9e5c6188a7020c3ec07262c998684fd

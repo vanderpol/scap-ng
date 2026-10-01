@@ -360,22 +360,22 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_TAKE_OWNERSHIP_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -384,10 +384,52 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
     evaluate:
       tests:
@@ -406,6 +448,30 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253506:
+          source_definition_id: oval:mil.disa.stig.defs:def:253506
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Take ownership of files or other objects - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25350601
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Take ownership of files or other objects" user right must only be assigned to the Administrators
+                group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253506:
           source_definition_id: oval:mil.disa.stig.windows11:def:253506
           class: compliance
@@ -441,30 +507,6 @@ rule:
 
                 Accounts with the "Take ownership of files or other objects" user right can take ownership of objects and
                 make changes.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253506:
-          source_definition_id: oval:mil.disa.stig.defs:def:253506
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Take ownership of files or other objects - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25350601
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Take ownership of files or other objects" user right must only be assigned to the Administrators
-                group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -597,9 +639,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253506r958726_rule
-      semantic_ir_sha256: c6bb69c79c12c8168e2c88d0ef9fe72ce7a2483912a2a684e412e173e4a1bf23
+      semantic_ir_sha256: b84295873a257339117371cc4a3a4222dac609bb8902a32b051c9fbbf0520787
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6b7b8941cc981d9bb2874dd83456afeb2fa8117e96a9aee48d5fca1a60378672
+    semantic_fingerprint_sha256: 63bb94efc84f1ceca71f6361483b9233a983aa8588c0905753857f241a89a7ad
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253506r958726_rule

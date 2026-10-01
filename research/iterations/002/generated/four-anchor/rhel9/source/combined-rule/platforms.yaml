@@ -606,18 +606,6 @@ inventory_assessments:
     description: Product inventory for cpe:/o:redhat:enterprise_linux:9.0
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:110000004:
-        capability: scapng.collect.linux.rpminfo
-        source_object_id: oval:mil.disa.stig.linux:obj:110000004
-        source_type: rpminfo_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '13'
-        object_title: null
-        query:
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: redhat-release
       oval:mil.disa.stig.linux:obj:110000003:
         capability: scapng.collect.linux.rpminfo
         source_object_id: oval:mil.disa.stig.linux:obj:110000003
@@ -626,10 +614,42 @@ inventory_assessments:
         version: '13'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: oraclelinux-release
+      oval:mil.disa.stig.linux:obj:110000004:
+        capability: scapng.collect.linux.rpminfo
+        source_object_id: oval:mil.disa.stig.linux:obj:110000004
+        source_type: rpminfo_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '13'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: redhat-release
       oval:mil.disa.stig.linux:obj:110000002:
         capability: scapng.collect.linux.rpminfo
         source_object_id: oval:mil.disa.stig.linux:obj:110000002
@@ -638,7 +658,17 @@ inventory_assessments:
         version: '13'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: toss-release
@@ -652,6 +682,22 @@ inventory_assessments:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: version
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -672,18 +718,6 @@ inventory_assessments:
           predicates:
           - oval:mil.disa.stig.linux:ste:110000004
           source_other: []
-        oval:mil.disa.stig.linux:tst:110000009:
-          source_test_id: oval:mil.disa.stig.linux:tst:110000009
-          source_type: rpminfo_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: The TOSS Package is not Installed
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:110000002
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.linux:tst:110000010:
           source_test_id: oval:mil.disa.stig.linux:tst:110000010
           source_type: rpminfo_test
@@ -694,6 +728,18 @@ inventory_assessments:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.linux:obj:110000003
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.linux:tst:110000009:
+          source_test_id: oval:mil.disa.stig.linux:tst:110000009
+          source_type: rpminfo_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: The TOSS Package is not Installed
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:110000002
           predicates: []
           source_other: []
       definitions:
@@ -766,9 +812,9 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:redhat:enterprise_linux:9.0
-      semantic_ir_sha256: eefe8ad069b0d6f8bb5f4e5bb4ca2b9bc05e3d794d4fe0b3bb1e169ca46f60e8
+      semantic_ir_sha256: ee38ec76475b083dc36311c923e9767a012f49d129d09e3b17f4594c9576e36c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ab670b471cbf81f31cba188601a76994d3a4f6e27c8556ba2403c9ffb6ee9765
+    semantic_fingerprint_sha256: db3b464777fa87655992113c9aeda2a0f0ecc5dfc427bd665764c1602a22bfb4
     purpose: platform_inventory
     inventory_output:
       emit_when: platform_true
@@ -806,12 +852,32 @@ inventory_assessments:
         version: '13'
         object_title: gather the CPE_NAME attribute
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/os-release
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -819,6 +885,16 @@ inventory_assessments:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -833,6 +909,22 @@ inventory_assessments:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -915,9 +1007,9 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:rocky:rocky:9
-      semantic_ir_sha256: 7e1293a47496ca2a7a838891fe0d976861d1f6de5b6c25da272ed3b5c99eed18
+      semantic_ir_sha256: 972474f5448f64908982aa1f1249752442adafc53ccbac12ae1a0257d9d93134
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5d36118f30022a4fd09c70e0166fe7a53681c59429637b4436d907ced33dfaf9
+    semantic_fingerprint_sha256: c26edcfd2bec93159e4dbecaee31f390ba6131e5ed7343ddfeff01dbed998174
     purpose: platform_inventory
     inventory_output:
       emit_when: platform_true
@@ -955,12 +1047,32 @@ inventory_assessments:
         version: '13'
         object_title: gather the CPE_NAME attribute
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/os-release
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -968,6 +1080,16 @@ inventory_assessments:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -982,6 +1104,22 @@ inventory_assessments:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -1064,9 +1202,9 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:almalinux:almalinux:9
-      semantic_ir_sha256: 944793b417481ac45de058f9d6c68fa76028975adb3ae498c34cd8aaeabef946
+      semantic_ir_sha256: d9dc3297949dfbe1804423935a25eb27f12c1ee33634e50063d69948099cb455
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b638fcc3ee0889656e95b831061f0480e7d93df66a2e7787c0fd0359c34576bd
+    semantic_fingerprint_sha256: 8a4ee0a3ddba2db12720e8e633e723ff2ec4151d11541283f0833119a13a0628
     purpose: platform_inventory
     inventory_output:
       emit_when: platform_true

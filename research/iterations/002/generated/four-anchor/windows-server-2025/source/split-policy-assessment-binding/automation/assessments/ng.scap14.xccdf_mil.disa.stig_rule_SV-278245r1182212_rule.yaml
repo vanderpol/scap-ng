@@ -15,12 +15,48 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: userright
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SE_CREATE_PAGEFILE_NAME
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -29,20 +65,26 @@ assessment:
       entities:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
-      state_title: null
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: null
   evaluate:
     tests:
@@ -265,6 +307,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278245r1182212_rule
-    semantic_ir_sha256: 1787e032984b518aa5a347f32a1d5f3fe432bb82861b767dbab7646978ba0bec
+    semantic_ir_sha256: 596da488e0c3915bc8067c41152982466234ad6fada65b09eb568a1fc0ce91fd
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ef9cd07e0f6dd3287cdbc02c8927ee2f4dbe8854d15d11c74c9a755bf5a6920b
+  semantic_fingerprint_sha256: f377dfffc0f89a98715e2a8c54471a77e7a0d737f649d95143a3e55ed3446d3b

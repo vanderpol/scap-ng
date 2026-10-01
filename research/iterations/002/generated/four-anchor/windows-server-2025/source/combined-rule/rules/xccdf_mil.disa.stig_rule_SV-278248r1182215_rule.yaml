@@ -386,7 +386,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_CREATE_PERMANENT_NAME
@@ -398,7 +408,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
@@ -418,29 +444,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000029
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253488:
-          source_definition_id: oval:mil.disa.stig.defs:def:253488
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Create permanent shared objects - None
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25348801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Create permanent shared objects" user right must not be assigned to any groups or accounts.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278248:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278248
           class: compliance
@@ -474,6 +477,29 @@ rule:
               text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
                 \n  Accounts with the \"Create permanent shared objects\" user right could expose sensitive data by creating\
                 \ shared objects."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253488:
+          source_definition_id: oval:mil.disa.stig.defs:def:253488
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Create permanent shared objects - None
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25348801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Create permanent shared objects" user right must not be assigned to any groups or accounts.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -616,9 +642,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278248r1182215_rule
-      semantic_ir_sha256: b91543de06560b7f59febd6c0fa3818877d073cf28e3af4a492055964ca51b54
+      semantic_ir_sha256: f0b22957ff8e82ceb4e05509f9bd16206a483d401d6b5579aacf12d797c1baae
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e0a53e5b6fe50938a4e1a4df8e89ee54635bf199f2ac97af8fbe05aa52ae18c7
+    semantic_fingerprint_sha256: 247c45f39d28bde7b994ebc1a08e07ef0b234acbc9bb1a08d0ae491cb6a308fa
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278248r1182215_rule

@@ -16,12 +16,32 @@ assessment:
       version: '1'
       object_title: /etc/dnf/dnf.conf gpgcheck
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/dnf/dnf.conf
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -29,6 +49,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -44,6 +74,22 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -65,6 +111,30 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25782000
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257820:
+        source_definition_id: oval:mil.disa.stig.defs:def:257820
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/dnf/dnf.conf gpgcheck=1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25782000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must check the GPG signature of software packages originating from external software
+              repositories before installation.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271524:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271524
         class: compliance
@@ -101,30 +171,6 @@ assessment:
               \ by the organization.\n\n\tVerifying the authenticity of software prior to installation validates the integrity\
               \ of the software package received from a vendor. This verifies the software has not been tampered with and\
               \ that it has been provided by a trusted vendor."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257820:
-        source_definition_id: oval:mil.disa.stig.defs:def:257820
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/dnf/dnf.conf gpgcheck=1
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25782000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must check the GPG signature of software packages originating from external software
-              repositories before installation.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -258,6 +304,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271524r1091284_rule
-    semantic_ir_sha256: 156add14341d40ff20782ee9f982d59d2e598593c168369dc03e8b5c07daa539
+    semantic_ir_sha256: ac23d24b93b132251ced743c5d3e5fbc079a2329038f5e0c08a6ec29e8603244
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: dc95d899499499ae055ac12d45ebeeedef003af717d40ceb402f36da42cc3c3b
+  semantic_fingerprint_sha256: bce532f6b09d6716e5fe50b9156a3ab81a156c98843ba80f1c19b18f348dae7d

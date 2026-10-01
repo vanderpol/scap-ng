@@ -7,24 +7,6 @@ assessment:
   description: OL 9 cron configuration files directory must be owned by root.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.unix:obj:25792600:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:25792600
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      object_title: /etc/cron* files
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: ^cron.*$
     oval:mil.disa.stig.unix:obj:25792601:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:25792601
@@ -35,15 +17,73 @@ assessment:
       query:
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: ^/etc/cron.*$
       - attributes:
           nil: 'true'
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+    oval:mil.disa.stig.unix:obj:25792600:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:25792600
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      object_title: /etc/cron* files
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: ^cron.*$
   derive: {}
   predicates:
     oval:mil.disa.stig.unix:ste:20000005:
@@ -54,6 +94,22 @@ assessment:
       entities:
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -61,19 +117,6 @@ assessment:
       state_title: owned by root
   evaluate:
     tests:
-      oval:mil.disa.stig.unix:tst:25792600:
-        source_test_id: oval:mil.disa.stig.unix:tst:25792600
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        test_title: /etc/cron* files owned by root
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:25792600
-        predicates:
-        - oval:mil.disa.stig.unix:ste:20000005
-        source_other: []
       oval:mil.disa.stig.unix:tst:25792601:
         source_test_id: oval:mil.disa.stig.unix:tst:25792601
         source_type: file_test
@@ -87,34 +130,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.unix:ste:20000005
         source_other: []
+      oval:mil.disa.stig.unix:tst:25792600:
+        source_test_id: oval:mil.disa.stig.unix:tst:25792600
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        test_title: /etc/cron* files owned by root
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:25792600
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000005
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:257926:
-        source_definition_id: oval:mil.disa.stig.defs:def:257926
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/cron* files owned by root
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:25792600
-          - comment: /etc/cron* directories owned by root
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:25792601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system cron configuration files directory must be owned by root.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271829:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271829
         class: compliance
@@ -147,6 +176,33 @@ assessment:
             text: Service configuration files enable or disable features of their respective services that if configured incorrectly
               can lead to insecure and vulnerable configurations; therefore, service configuration files must be owned by
               the correct group to prevent unauthorized changes.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:257926:
+        source_definition_id: oval:mil.disa.stig.defs:def:257926
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/cron* files owned by root
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25792600
+          - comment: /etc/cron* directories owned by root
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25792601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system cron configuration files directory must be owned by root.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -285,6 +341,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271829r1092199_rule
-    semantic_ir_sha256: 7d7e2dc721c04661335fa57a72cb9b5190581e38c49de9f21004a7ad5c159b15
+    semantic_ir_sha256: f88144857d9bce1673ff6bcebfb891af4f807c9a33c68c7898ca6770802892fa
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 10a805d1f7fe0780474d51346614ac03e740d0b46583da0119693d6cd8e053d4
+  semantic_fingerprint_sha256: 659cb38fd379b811f985c673cef1c1c8fc02e316b149227b20082751365a9c58

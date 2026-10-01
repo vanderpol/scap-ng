@@ -400,38 +400,36 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: namespace
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: root\rsop\computer
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxTicketAge'
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25438801:
-        source_state_id: oval:mil.disa.stig.win:ste:25438801
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              datatype: int
-              name: setting
-              operation: greater than
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '0'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
       oval:mil.disa.stig.win:ste:25438800:
         source_state_id: oval:mil.disa.stig.win:ste:25438800
         source_type: wmi57_state
@@ -450,6 +448,60 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '10'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: null
+      oval:mil.disa.stig.win:ste:25438801:
+        source_state_id: oval:mil.disa.stig.win:ste:25438801
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              datatype: int
+              name: setting
+              operation: greater than
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '0'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -673,9 +725,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278135r1182075_rule
-      semantic_ir_sha256: 4c4c22db496b57108b0f30da6c535eb9d30c4bb93b1f1c5756c13411a43c4f76
+      semantic_ir_sha256: 2fd2edb34a61b99d89bdd181b4b8725809590bf6bb6b306a585c233971193bc9
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: cc2d503ad73e6db5dc2ab7417b8f7dfa8ed70e9ed9ad658932e24a04fd1501ab
+    semantic_fingerprint_sha256: 93846a33d631454fbd4d740c2650cc3c85d5440adb85afee4ac5158344e9650d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278135r1182075_rule

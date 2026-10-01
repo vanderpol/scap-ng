@@ -1,0 +1,131 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271519
+  collect:
+    oval:mil.disa.stig.linux:obj:23041100:
+      capability: scapng.collect.linux.rpminfo
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: audit
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23041100
+      source_type: rpminfo_object
+      version: '1'
+  derive: {}
+  description: OL 9 must have the audit package installed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230411:
+        class: compliance
+        criteria:
+          children:
+          - comment: package audit is installed
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23041100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit package must be installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230411
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271519:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230411
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000440 - OL 9 must have the audit package installed.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Without establishing what type of events occurred, the source of events, where events occurred, and the\
+              \ outcome of events, it would be difficult to establish, correlate, and investigate the events leading up to\
+              \ an outage or attack.\n\n\tAudit record content that may be necessary to satisfy this requirement includes,\
+              \ for example, time stamps, source and destination addresses, user/process identifiers, event descriptions,\
+              \ success/fail indications, filenames involved, and access control or flow control rules invoked.\n\n\tAssociating\
+              \ event types with detected events in audit logs provides a means of investigating an attack, recognizing resource\
+              \ utilization or capacity thresholds, or identifying an improperly configured OL 9 system.\n\n\tSatisfies: SRG-OS-000062-GPOS-00031,\
+              \ SRG-OS-000037-GPOS-00015, SRG-OS-000038-GPOS-00016, SRG-OS-000039-GPOS-00017, SRG-OS-000040-GPOS-00018, SRG-OS-000041-GPOS-00019,\
+              \ SRG-OS-000042-GPOS-00021, SRG-OS-000051-GPOS-00024, SRG-OS-000054-GPOS-00025, SRG-OS-000122-GPOS-00063, SRG-OS-000254-GPOS-00095,\
+              \ SRG-OS-000255-GPOS-00096, SRG-OS-000337-GPOS-00129, SRG-OS-000348-GPOS-00136, SRG-OS-000349-GPOS-00137, SRG-OS-000350-GPOS-00138,\
+              \ SRG-OS-000351-GPOS-00139, SRG-OS-000352-GPOS-00140, SRG-OS-000353-GPOS-00141, SRG-OS-000354-GPOS-00142, SRG-OS-000358-GPOS-00145,\
+              \ SRG-OS-000365-GPOS-00152, SRG-OS-000392-GPOS-00172, SRG-OS-000475-GPOS-00220, SRG-OS-000055-GPOS-00026"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271519
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:23041100:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23041100
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23041100
+        source_type: rpminfo_test
+        state_operator: AND
+        test_title: package audit is installed
+  id: ng.shared.7bb07eded5b8e69c41ac3a62
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 7bb07eded5b8e69c41ac3a62c417d3d4a8e275a0439d1432ceaf1e3d4486dd10
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271519r1091269_rule
+    title: OL 9 must have the audit package installed.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258151r1045298_rule
+    title: RHEL 9 audit package must be installed.

@@ -352,6 +352,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -359,6 +369,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -366,6 +386,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -378,12 +408,44 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -405,6 +467,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253383:
+          source_definition_id: oval:mil.disa.stig.defs:def:253383
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Restrict Unauthenticated RPC clients' is set to 'Enabled' and 'Authenticated'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25338300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Unauthenticated RPC clients must be restricted from connecting to the RPC server.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253383:
           source_definition_id: oval:mil.disa.stig.windows11:def:253383
           class: compliance
@@ -436,29 +521,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Configuring RPC to restrict unauthenticated RPC clients from connecting to the RPC server will prevent
                 anonymous connections.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253383:
-          source_definition_id: oval:mil.disa.stig.defs:def:253383
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Restrict Unauthenticated RPC clients' is set to 'Enabled' and 'Authenticated'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25338300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Unauthenticated RPC clients must be restricted from connecting to the RPC server.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -590,9 +652,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253383r971545_rule
-      semantic_ir_sha256: af81dfc6f3696cf2cc5fc1f9fddb2abbe67124a204a18a0eede6b5f8dde13383
+      semantic_ir_sha256: 2a54f679904c710e91cf8298c21ac5129f8437e4b33e8806e75aebb9f1f5c501
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: bda15eeed7860e91c1340f6bab0f819701f823de876016cd6a0bcd361a979dd8
+    semantic_fingerprint_sha256: 78559f990e205c814b849ad8c41690ba55f1c3fa60e7d7d4c3d344b926d8715e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253383r971545_rule

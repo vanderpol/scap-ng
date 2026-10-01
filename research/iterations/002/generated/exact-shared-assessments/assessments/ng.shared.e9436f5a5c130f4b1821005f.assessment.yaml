@@ -1,0 +1,151 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271794
+  collect:
+    oval:mil.disa.stig.unix:obj:25789900:
+      capability: scapng.collect.unix.file
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/group
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:25789900
+      source_type: file_object
+      version: '1'
+  derive: {}
+  description: OL 9 /etc/group file must be group-owned by root.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257899:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/group file is owned by root
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25789900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system /etc/group file must be group-owned by root.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257899
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271794:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257899
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002532 - OL 9 /etc/group file must be group-owned by root.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "/etc/group" file contains information regarding groups that are configured on the system. Protection
+              of this file is important for system security.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271794
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:25789900:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.unix:obj:25789900
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000006
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:25789900
+        source_type: file_test
+        state_operator: AND
+        test_title: /etc/group file is owned by root
+  id: ng.shared.e9436f5a5c130f4b1821005f
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000006:
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: group_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000006
+      source_type: file_state
+      state_title: group-owned by root
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: e9436f5a5c130f4b1821005f28184c208116c831034caa68b9d0a66b78b2e150
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271794r1092094_rule
+    title: OL 9 /etc/group file must be group-owned by root.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257899r991589_rule
+    title: RHEL 9 /etc/group file must be group-owned by root.

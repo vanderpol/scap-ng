@@ -446,12 +446,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/audit.rules
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -459,6 +479,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -480,6 +510,30 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230409:
+          source_definition_id: oval:mil.disa.stig.defs:def:230409
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit modifications to /etc/sudoers
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23040900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must generate audit records for all account creations, modifications, disabling,
+                and termination events that affect /etc/sudoers.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271527:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271527
           class: compliance
@@ -517,30 +571,6 @@ rule:
                 \ SRG-OS-000304-GPOS-00121, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000470-GPOS-00214,\
                 \ SRG-OS-000471-GPOS-00215, SRG-OS-000239-GPOS-00089, SRG-OS-000240-GPOS-00090, SRG-OS-000241-GPOS-00091,\
                 \ SRG-OS-000303-GPOS-00120, SRG-OS-000466-GPOS-00210, SRG-OS-000476-GPOS-00221"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230409:
-          source_definition_id: oval:mil.disa.stig.defs:def:230409
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit modifications to /etc/sudoers
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23040900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must generate audit records for all account creations, modifications, disabling,
-                and termination events that affect /etc/sudoers.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -672,9 +702,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271527r1092474_rule
-      semantic_ir_sha256: 67b14b17d59ad9a872297d0ff77fccad6fc548792ae87bb9a4ce5e8189833d40
+      semantic_ir_sha256: 2742e19b6da7f05ab1593b4c760c59c86c9b86cf21761bb46da32630169aaad4
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 93f75ac8bc5367f7d6e4806142dd650a911e82c6d1eb8964ed3f84443c65ae81
+    semantic_fingerprint_sha256: 9cf6685045011b705d3a6453fdc905b0fdffaf942f9a0d937d7b652855fc9dc7
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271527r1092474_rule

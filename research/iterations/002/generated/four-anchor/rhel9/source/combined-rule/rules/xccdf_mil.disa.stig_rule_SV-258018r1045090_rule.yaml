@@ -375,12 +375,32 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/gdm/custom.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -388,6 +408,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -400,7 +430,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: 'false'
@@ -421,29 +467,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230329:
-          source_definition_id: oval:mil.disa.stig.defs:def:230329
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: AutomaticLoginEnable is set to false
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23032900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Unattended or automatic logon via the operating system graphical user interface must not be allowed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258018:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258018
           class: compliance
@@ -474,6 +497,29 @@ rule:
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Failure to restrict system access to authenticated users negatively impacts operating system security.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230329:
+          source_definition_id: oval:mil.disa.stig.defs:def:230329
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: AutomaticLoginEnable is set to false
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23032900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Unattended or automatic logon via the operating system graphical user interface must not be allowed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -611,9 +657,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258018r1045090_rule
-      semantic_ir_sha256: e4df8659d665260522bddb8d2fae8e426449c073abf4c0a78b8ef599825de650
+      semantic_ir_sha256: cbbf81c146152859b3d15a7dc0f72cc5a139d1b62245b1bf9978d7dc25fc9bd2
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: cda36f24fcfc0b5cdfd397d4248831d0f5d725e2049b117bfe0609f36c06d7c3
+    semantic_fingerprint_sha256: 42ddc8b75d539cb0f3e40176f02ff63d0075964682f50a6322a908f100a53a48
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258018r1045090_rule

@@ -15,12 +15,32 @@ assessment:
       version: '3'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/systemd/logind.conf
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -28,6 +48,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -42,6 +72,22 @@ assessment:
       entities:
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -63,6 +109,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25725800
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257258:
+        source_definition_id: oval:mil.disa.stig.defs:def:257258
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: The system terminates idle user sessions.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25725800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must terminate idle user sessions.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258077:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258077
         class: compliance
@@ -95,29 +164,6 @@ assessment:
             text: Terminating an idle session within a short time period reduces the window of opportunity for unauthorized
               personnel to take control of a management session enabled on the console or console port that has been left
               unattended.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257258:
-        source_definition_id: oval:mil.disa.stig.defs:def:257258
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: The system terminates idle user sessions.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25725800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must terminate idle user sessions.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -247,6 +293,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258077r1155659_rule
-    semantic_ir_sha256: 29ca2211adc239c5bb5938feabcda1d875390e557c7c00157221723f8afbd3ad
+    semantic_ir_sha256: b52fc97ba3007d70976c15b6cf9f3721304ddf407d6f466c23d36a50aa813be5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 54304bbf392f9474cc9675c641b75da87fdfd05e8dfd3b44eecf496e278a8643
+  semantic_fingerprint_sha256: 21ea44620a9750b5e896d94f7b1a3989b5711d1e53cdd63e539881575aad9e45

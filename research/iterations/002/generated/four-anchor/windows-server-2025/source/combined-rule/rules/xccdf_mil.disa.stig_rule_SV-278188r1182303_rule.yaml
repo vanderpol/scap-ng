@@ -567,22 +567,6 @@ rule:
       unauthenticated access on all systems.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:10000100:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:mil.disa.stig.win:obj:10000100
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT DomainRole FROM win32_computersystem
       oval:mil.disa.stig.win:obj:25349500:
         capability: scapng.collect.windows.userright
         source_object_id: oval:mil.disa.stig.win:obj:25349500
@@ -591,10 +575,56 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: userright
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+      oval:mil.disa.stig.win:obj:10000100:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:mil.disa.stig.win:obj:10000100
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT DomainRole FROM win32_computersystem
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:20000033:
@@ -605,89 +635,26 @@ rule:
         entities:
         - attributes:
             operation: case insensitive equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Guests
-        state_title: null
-      oval:mil.disa.stig.win:ste:10000200:
-        source_state_id: oval:mil.disa.stig.win:ste:10000200
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: domainrole
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '1'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: Domain Member Workstation
-      oval:mil.disa.stig.win:ste:10000300:
-        source_state_id: oval:mil.disa.stig.win:ste:10000300
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: domainrole
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '2'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: Standalone Server
-      oval:mil.disa.stig.win:ste:20000040:
-        source_state_id: oval:mil.disa.stig.win:ste:20000040
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Domain Admins$
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000034:
-        source_state_id: oval:mil.disa.stig.win:ste:20000034
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(NT Authority\\)?Local account$
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000041:
-        source_state_id: oval:mil.disa.stig.win:ste:20000041
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Enterprise Admins$
         state_title: null
       oval:mil.disa.stig.win:ste:10000100:
         source_state_id: oval:mil.disa.stig.win:ste:10000100
@@ -705,10 +672,62 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '0'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Standalone Workstation
+      oval:mil.disa.stig.win:ste:10000300:
+        source_state_id: oval:mil.disa.stig.win:ste:10000300
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: domainrole
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '2'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Standalone Server
       oval:mil.disa.stig.win:ste:10000400:
         source_state_id: oval:mil.disa.stig.win:ste:10000400
         source_type: wmi57_state
@@ -725,10 +744,149 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '3'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Domain Member Server
+      oval:mil.disa.stig.win:ste:10000200:
+        source_state_id: oval:mil.disa.stig.win:ste:10000200
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: domainrole
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Domain Member Workstation
+      oval:mil.disa.stig.win:ste:20000040:
+        source_state_id: oval:mil.disa.stig.win:ste:20000040
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Domain Admins$
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000041:
+        source_state_id: oval:mil.disa.stig.win:ste:20000041
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Enterprise Admins$
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000034:
+        source_state_id: oval:mil.disa.stig.win:ste:20000034
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(NT Authority\\)?Local account$
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:10002200:
@@ -744,33 +902,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:10000100
           - oval:mil.disa.stig.win:ste:10000300
-          source_other: []
-        oval:mil.disa.stig.win:tst:25349509:
-          source_test_id: oval:mil.disa.stig.win:tst:25349509
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Deny log on through Remote Desktop Services - Domain Admins
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349500
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000040
-          source_other: []
-        oval:mil.disa.stig.win:tst:10002300:
-          source_test_id: oval:mil.disa.stig.win:tst:10002300
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: The system is a non-DC domain-joined Windows server or workstation
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: OR
-          collections:
-          - oval:mil.disa.stig.win:obj:10000100
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000200
-          - oval:mil.disa.stig.win:ste:10000400
           source_other: []
         oval:mil.disa.stig.win:tst:25349507:
           source_test_id: oval:mil.disa.stig.win:tst:25349507
@@ -798,6 +929,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000034
           source_other: []
+        oval:mil.disa.stig.win:tst:10002300:
+          source_test_id: oval:mil.disa.stig.win:tst:10002300
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: The system is a non-DC domain-joined Windows server or workstation
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: OR
+          collections:
+          - oval:mil.disa.stig.win:obj:10000100
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000200
+          - oval:mil.disa.stig.win:ste:10000400
+          source_other: []
         oval:mil.disa.stig.win:tst:25349510:
           source_test_id: oval:mil.disa.stig.win:tst:25349510
           source_type: userright_test
@@ -810,6 +955,19 @@ rule:
           - oval:mil.disa.stig.win:obj:25349500
           predicates:
           - oval:mil.disa.stig.win:ste:20000041
+          source_other: []
+        oval:mil.disa.stig.win:tst:25349509:
+          source_test_id: oval:mil.disa.stig.win:tst:25349509
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Deny log on through Remote Desktop Services - Domain Admins
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349500
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000040
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:254439:
@@ -1095,9 +1253,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278188r1182303_rule
-      semantic_ir_sha256: 0c66c97e1c61c0bb3e051dce64c722b62b82d4b1b7c681a99377b2999e6646b3
+      semantic_ir_sha256: 84f77952d17c3740579b85f636feec7ee92ed3a873e5a67c23a515d720b68c06
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 74af0f9f43de4e75f6f930733fddb1dde8bbc37bc0f7244424d8553513b4930f
+    semantic_fingerprint_sha256: 89818c96cec91a44a5d7a44fd689a0ee5d8d82dd3c9af37b1edef65d27686552
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278188r1182303_rule

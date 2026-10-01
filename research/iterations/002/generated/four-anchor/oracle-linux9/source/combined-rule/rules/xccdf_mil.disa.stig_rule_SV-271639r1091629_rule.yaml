@@ -355,11 +355,31 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: unit
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: autofs.service
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: ActiveState
@@ -371,7 +391,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: inactive
@@ -392,6 +428,29 @@ rule:
           - oval:mil.disa.stig.linux:ste:20000007
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230502:
+          source_definition_id: oval:mil.disa.stig.defs:def:230502
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The autofs.service is inactive if it exists.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23050200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system file system automounter must be disabled unless required.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271639:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271639
           class: compliance
@@ -424,29 +483,6 @@ rule:
               text: "An authentication process resists replay attacks if it is impractical to achieve a successful authentication\
                 \ by recording and replaying a previous authentication message.\n\n\tSatisfies: SRG-OS-000114-GPOS-00059,\
                 \ SRG-OS-000378-GPOS-00163"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230502:
-          source_definition_id: oval:mil.disa.stig.defs:def:230502
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The autofs.service is inactive if it exists.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23050200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system file system automounter must be disabled unless required.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -574,9 +610,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271639r1091629_rule
-      semantic_ir_sha256: bda9cc63000d6548223bbc2a9e6fc9be796340eef58093c3639d4ddff03ca6a2
+      semantic_ir_sha256: 45572254026f2f36e120d88e16446c9015e3d900215fc32bbe0e39aae16837e3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 24b148947bc1e22787a0af69261030feccbd888299847bd4ff93c32ac1ca77e3
+    semantic_fingerprint_sha256: 76206bdd9b79388d3c80f97fbab86cf45b3294fe0dc9b5e019820cafaa7871b2
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271639r1091629_rule

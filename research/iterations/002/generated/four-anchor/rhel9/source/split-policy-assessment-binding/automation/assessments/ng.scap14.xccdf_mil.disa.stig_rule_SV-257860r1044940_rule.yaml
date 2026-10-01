@@ -15,7 +15,17 @@ assessment:
       version: '1'
       object_title: /boot
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: /boot
@@ -29,6 +39,22 @@ assessment:
       entities:
       - attributes:
           entity_check: at least one
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: at least one
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: mount_options
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -50,6 +76,29 @@ assessment:
         - oval:mil.disa.stig.linux:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257860:
+        source_definition_id: oval:mil.disa.stig.defs:def:257860
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: /boot has nodev option
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25786000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /boot with the nodev option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257860:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257860
         class: compliance
@@ -81,29 +130,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: The only legitimate location for device files is the "/dev" directory located on the root partition. The
               only exception to this is chroot jails.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257860:
-        source_definition_id: oval:mil.disa.stig.defs:def:257860
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: /boot has nodev option
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:25786000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /boot with the nodev option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -231,6 +257,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257860r1044940_rule
-    semantic_ir_sha256: 0c64b889a51440b1e9df774b36d0a1d0dce5f5ced0524785d75a84e3da2f9ec2
+    semantic_ir_sha256: 0ce50310111ce912be48a2cecefc03ec4cbfffe8e7ff9e6e7bf1d58a3c45a876
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 7f7fb92d0ff0af19174156094abc86f513465f50ddcdd09baabc436c315e34d4
+  semantic_fingerprint_sha256: 7cc74710f6747bfdca4b3aa273639b659de9d63e1566b6bc6bd77fa3097b8713

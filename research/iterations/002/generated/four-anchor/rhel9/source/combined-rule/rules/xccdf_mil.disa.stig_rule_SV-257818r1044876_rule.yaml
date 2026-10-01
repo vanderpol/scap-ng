@@ -376,6 +376,42 @@ rule:
     description: The kdump service on RHEL 9 must be disabled.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23031001:
+        capability: scapng.collect.linux.systemdunitproperty
+        source_object_id: oval:mil.disa.stig.linux:obj:23031001
+        source_type: systemdunitproperty_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: kdump.service
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: UnitFileState
       oval:mil.disa.stig.linux:obj:23031002:
         capability: scapng.collect.linux.systemdunitproperty
         source_object_id: oval:mil.disa.stig.linux:obj:23031002
@@ -384,11 +420,31 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: unit
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: kdump.service
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: ActiveState
@@ -400,53 +456,89 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: unit
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: kdump.service
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: LoadState
-      oval:mil.disa.stig.linux:obj:23031001:
-        capability: scapng.collect.linux.systemdunitproperty
-        source_object_id: oval:mil.disa.stig.linux:obj:23031001
-        source_type: systemdunitproperty_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: unit
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: kdump.service
-        - kind: element
-          name: property
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: UnitFileState
     derive: {}
     predicates:
-      oval:mil.disa.stig.linux:ste:20000007:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000007
-        source_type: systemdunitproperty_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: inactive
-        state_title: null
       oval:mil.disa.stig.linux:ste:20000005:
         source_state_id: oval:mil.disa.stig.linux:ste:20000005
         source_type: systemdunitproperty_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: masked
+        state_title: null
+      oval:mil.disa.stig.linux:ste:20000007:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000007
+        source_type: systemdunitproperty_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: inactive
         state_title: null
     evaluate:
       tests:
@@ -463,19 +555,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.linux:ste:20000005
           source_other: []
-        oval:mil.disa.stig.linux:tst:23031001:
-          source_test_id: oval:mil.disa.stig.linux:tst:23031001
-          source_type: systemdunitproperty_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: kdump.service UnitFileState is masked if it exists.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23031001
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000005
-          source_other: []
         oval:mil.disa.stig.linux:tst:23031002:
           source_test_id: oval:mil.disa.stig.linux:tst:23031002
           source_type: systemdunitproperty_test
@@ -488,6 +567,19 @@ rule:
           - oval:mil.disa.stig.linux:obj:23031002
           predicates:
           - oval:mil.disa.stig.linux:ste:20000007
+          source_other: []
+        oval:mil.disa.stig.linux:tst:23031001:
+          source_test_id: oval:mil.disa.stig.linux:tst:23031001
+          source_type: systemdunitproperty_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: kdump.service UnitFileState is masked if it exists.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23031001
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000005
           source_other: []
       definitions:
         oval:mil.disa.stig.rhel9os:def:257818:
@@ -679,9 +771,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257818r1044876_rule
-      semantic_ir_sha256: 3d87bc5f4157d17e0dd364da309a1615e3222f020b9271221033a2cad2beb83c
+      semantic_ir_sha256: 0c70d0712612c5bb6d23e96536fa7e0b254456a08378aea1ccb008b97283f794
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5648d27450dec9f0c869d39214fea55206b856188790af36575c801c1452e474
+    semantic_fingerprint_sha256: b991adc4d96789925fbf772b1069bd169f3c98e4a6db196714c8b631335e38d1
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257818r1044876_rule

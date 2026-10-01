@@ -370,6 +370,28 @@ rule:
     description: RHEL 9 must mount /tmp with the nodev option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23051101:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:23051101
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.linux:var:23051100
       oval:mil.disa.stig.linux:obj:23051100:
         capability: scapng.collect.linux.partition
         source_object_id: oval:mil.disa.stig.linux:obj:23051100
@@ -378,7 +400,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /tmp
@@ -390,34 +422,52 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23051101:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:23051101
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.linux:var:23051100
     derive:
       oval:mil.disa.stig.linux:var:23051100:
         source_variable_id: oval:mil.disa.stig.linux:var:23051100
@@ -481,19 +531,6 @@ rule:
           variable_id: oval:mil.disa.stig.linux:var:23051100
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.linux:ste:20000001:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000001
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nodev
-        state_title: null
       oval:mil.disa.stig.ind:ste:23051100:
         source_state_id: oval:mil.disa.stig.ind:ste:23051100
         source_type: variable_state
@@ -502,9 +539,54 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: nodev
+        state_title: null
+      oval:mil.disa.stig.linux:ste:20000001:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000001
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nodev
         state_title: null
     evaluate:
@@ -548,6 +630,37 @@ rule:
           - oval:mil.disa.stig.ind:ste:23051100
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230511:
+          source_definition_id: oval:mil.disa.stig.defs:def:230511
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23051100
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051101
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051102
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /tmp with the nodev option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257866:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257866
           class: compliance
@@ -584,37 +697,6 @@ rule:
 
                 The only legitimate location for device files is the "/dev" directory located on the root partition, with
                 the exception of chroot jails if implemented.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230511:
-          source_definition_id: oval:mil.disa.stig.defs:def:230511
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23051100
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051101
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051102
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /tmp with the nodev option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -742,9 +824,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257866r958804_rule
-      semantic_ir_sha256: 4478915a3eac31476af54a00b1ceaa4cd9caadb19fb106ed8cc6bcd992cdf584
+      semantic_ir_sha256: 174aa13bfa62600be0c4b3dda2537bfb9297d223ba682f7f9c8b45014f39b63a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6a34ede172a71842aa6d5b7175f1c078697aa2f0923a9b09c2b9d83dfa7bcbda
+    semantic_fingerprint_sha256: dee93038a647462155b01da9cab15f04e35dd88d71642e743943233f408f4b66
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257866r958804_rule

@@ -1,0 +1,154 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271522
+  collect:
+    oval:mil.disa.stig.ind:obj:23028100:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dnf/dnf.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*clean_requirements_on_remove[ \t]*=[ \t]*(?:True|1|yes)[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23028100
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must remove all software components after updated versions have been installed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230281:
+        class: compliance
+        criteria:
+          children:
+          - comment: '/etc/dnf/dnf.conf: clean_requirements_on_remove is set to True, 1 or yes'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23028100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: YUM must remove all software components after updated versions have been installed on the operating system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230281
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271522:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230281
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000495 - OL 9 must remove all software components after updated versions have been installed.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Previous versions of software components that are not removed from the information system after updates
+              have been installed may be exploited by some adversaries.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271522
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23028100:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23028100
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23028100
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: '/etc/dnf/dnf.conf: clean_requirements_on_remove is set to True, 1 or yes'
+  id: ng.shared.6225ab5d9707e8c03023ed7c
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 6225ab5d9707e8c03023ed7cd22c89da486308ffd80a2d82baf74af713108b74
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271522r1091278_rule
+    title: OL 9 must remove all software components after updated versions have been installed.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257824r1044886_rule
+    title: RHEL 9 must remove all software components after updated versions have been installed.

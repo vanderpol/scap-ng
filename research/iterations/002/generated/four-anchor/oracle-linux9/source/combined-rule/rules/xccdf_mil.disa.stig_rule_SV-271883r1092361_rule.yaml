@@ -382,7 +382,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: net.ipv6.conf.default.accept_source_route
@@ -397,6 +407,22 @@ rule:
         - attributes:
             datatype: int
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -418,6 +444,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000009
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:248882:
+          source_definition_id: oval:mil.disa.stig.defs:def:248882
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: net.ipv6.conf.default.accept_source_route setting in kernel is 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:24888202
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must not forward IPv6 source-routed packets by default.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271883:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271883
           class: compliance
@@ -452,29 +501,6 @@ rule:
                 \ requirement applies only to the forwarding of source-routed traffic, such as when forwarding is enabled\
                 \ and the system is functioning as a router.\n\n\tAccepting source-routed packets in the IPv6 protocol has\
                 \ few legitimate uses. It must be disabled unless it is absolutely required."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:248882:
-          source_definition_id: oval:mil.disa.stig.defs:def:248882
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: net.ipv6.conf.default.accept_source_route setting in kernel is 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:24888202
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must not forward IPv6 source-routed packets by default.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -609,9 +635,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271883r1092361_rule
-      semantic_ir_sha256: 0bb1a422ea840ac5a2397f5def7dc986ddae8490f9a37d08411a9260f483bf52
+      semantic_ir_sha256: 4ef72e43236231bb05238e3a42c443db4d5eea0aec3f3cd05b6a1eaa7478e105
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: a0e7454ae86f6e021c79311aa22f69a4c8225f4d12c721de4b82f2d6760fb561
+    semantic_fingerprint_sha256: a3b3f08b20d63573928aa564cac3927a94949f910a174fc74c7c85b4bb41c649
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271883r1092361_rule

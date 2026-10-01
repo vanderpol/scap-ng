@@ -15,16 +15,46 @@ assessment:
       version: '13'
       object_title: Verify the permissions of the /etc/ssh/sshd_config file
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: bash
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: rpm --verify openssh-server | awk '! ($2 == "c" && $1 ~ /^.\..\.\.\.\..\./) {print $0}'
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -39,6 +69,22 @@ assessment:
       entities:
       - attributes:
           check_existence: none_exist
+        effective_attributes:
+          check_existence:
+            origin: explicit
+            value: none_exist
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -204,6 +250,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257999r1155686_rule
-    semantic_ir_sha256: 1efa9879fdf3e661916561b0767255a6d369b6584fe712d47d0bcfe00b45498e
+    semantic_ir_sha256: a0b7df2c52d3f42e342cc6030e34ecafcd6c1a211e000bb03896039ef4fe77ec
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 3f97893c4c58dc17892a5bd959fc79df63f89266e8fbf5684e3afa21204dcec4
+  semantic_fingerprint_sha256: 214f77d4ea3a5c384c3a08c2bcecfa30de976097349fddfd6b9a7e5cc5590dcb

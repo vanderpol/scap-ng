@@ -18,6 +18,16 @@ assessment:
       - attributes:
           datatype: string
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -25,6 +35,16 @@ assessment:
       - attributes:
           datatype: string
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -32,6 +52,16 @@ assessment:
       - attributes:
           datatype: string
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -44,12 +74,44 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -71,6 +133,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000000
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253379:
+        source_definition_id: oval:mil.disa.stig.defs:def:253379
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Enumerate local users on domain-joined computers' is set to 'Disabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25337900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Local users on domain-joined computers must not be enumerated.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278179:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278179
         class: compliance
@@ -102,29 +187,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: The username is one part of logon credentials that could be used to gain access to a system. Preventing
               the enumeration of users limits this information to authorized personnel.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253379:
-        source_definition_id: oval:mil.disa.stig.defs:def:253379
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Enumerate local users on domain-joined computers' is set to 'Disabled'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25337900
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Local users on domain-joined computers must not be enumerated.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -261,6 +323,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278179r1182284_rule
-    semantic_ir_sha256: d99091c30073fd6ca417c5e5125647bf5a54281ac69ae76a197631db009efc04
+    semantic_ir_sha256: 0563d54f1174ef78ec5a040f7cd0ed8d4286be263d2dbbec5c181f1466d88ef8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 49a70c65658f385e7f7d616be66543ffa8c7c39ca38b4aad71827a236cbb64d7
+  semantic_fingerprint_sha256: 604b330b1b2d8823accc76ea08709ffb282718e9d70ab4fa1ffdda33fce3bd7f

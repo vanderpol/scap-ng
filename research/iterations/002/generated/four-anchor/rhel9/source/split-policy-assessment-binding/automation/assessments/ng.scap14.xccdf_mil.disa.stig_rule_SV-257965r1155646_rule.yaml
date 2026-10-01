@@ -15,7 +15,17 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: net.ipv4.conf.default.rp_filter
@@ -30,6 +40,22 @@ assessment:
       - attributes:
           datatype: int
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -51,6 +77,29 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000010
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:271871:
+        source_definition_id: oval:mil.disa.stig.defs:def:271871
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: net.ipv4.conf.default.rp_filter setting in kernel is set to 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:20461100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must use a reverse-path filter for IPv4 network traffic, when possible, by default.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257965:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257965
         class: compliance
@@ -83,29 +132,6 @@ assessment:
             text: Enabling reverse path filtering drops packets with source addresses that should not have been able to be
               received on the interface on which they were received. It must not be used on systems that are routers for complicated
               networks, but is helpful for end hosts and routers serving small networks.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:271871:
-        source_definition_id: oval:mil.disa.stig.defs:def:271871
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: net.ipv4.conf.default.rp_filter setting in kernel is set to 1
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:20461100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must use a reverse-path filter for IPv4 network traffic, when possible, by default.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -235,6 +261,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257965r1155646_rule
-    semantic_ir_sha256: a0be6a84890e1655f815577d81cbc6adf742bbe451b3475de45d314c2eb6afc9
+    semantic_ir_sha256: c3335a173bf69dbaa676dd708aea070aaf6e183b12f38a59116170b8206ef071
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: f4b025ad8b111b4da4d02a899d8b9d0ad8684403a45815afaeb50b9e995039c4
+  semantic_fingerprint_sha256: 5b629d152a3408a936208cb5090fb3bcd70e68ae264310682938055c4b4cbe56

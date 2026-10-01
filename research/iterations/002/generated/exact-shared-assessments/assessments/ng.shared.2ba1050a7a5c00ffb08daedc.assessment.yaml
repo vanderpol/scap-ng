@@ -1,0 +1,253 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271583
+  collect:
+    oval:mil.disa.stig.ind:obj:23039701:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/auditd.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*log_file\s*=\s*(\S+)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23039701
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.unix:obj:23039700:
+      capability: scapng.collect.unix.file
+      object_title: Audit log file location
+      query:
+      - attributes:
+          var_ref: oval:mil.disa.stig.defs:var:23039700
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: documented_implicit
+            value: all
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23039700
+      source_type: file_object
+      version: '2'
+  derive:
+    oval:mil.disa.stig.defs:var:23039700:
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23039701
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23039701
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23039700
+        variable_type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23039701
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23039701
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23039700
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:23039700
+      variable_title: audit data directory from /etc/audit/auditd.conf
+  description: OL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized read access.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230398:
+        class: compliance
+        criteria:
+          children:
+          - comment: audit logs are group-owned by root
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23039800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit logs must be group-owned by root to prevent unauthorized read access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230398
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271583:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230398
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000785 - OL 9 audit logs must be group-owned by root or by a restricted logging group to prevent
+              unauthorized read access.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Unauthorized disclosure of audit records can reveal system and configuration data to attackers, thus compromising\
+              \ its confidentiality.\n\n\tSatisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029,\
+              \ SRG-OS-000206-GPOS-00084"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271583
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:23039800:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.unix:obj:23039700
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000006
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23039800
+        source_type: file_test
+        state_operator: AND
+        test_title: audit logs are group-owned by root
+  id: ng.shared.2ba1050a7a5c00ffb08daedc
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000006:
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: group_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000006
+      source_type: file_state
+      state_title: group-owned by root
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 2ba1050a7a5c00ffb08daedc37a126ddc3991bf38f1fd58ff97e43f39fee67aa
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+    title: OL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized read access.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258165r958434_rule
+    title: RHEL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized read access.

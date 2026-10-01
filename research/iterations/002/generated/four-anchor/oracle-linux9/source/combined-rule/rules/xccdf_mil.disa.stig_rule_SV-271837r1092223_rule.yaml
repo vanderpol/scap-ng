@@ -372,15 +372,45 @@ rule:
             ignore_case: 'false'
             multiline: 'true'
             singleline: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/pam.d/system-auth
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -388,6 +418,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -402,11 +442,56 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: text
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
         state_title: Check that auth required pam_faillock.so authfail line exists.
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: text
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
+        state_title: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
       oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701
         source_type: textfilecontent54_state
@@ -415,6 +500,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: text
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -428,24 +529,27 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: text
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*account\s+required\s+pam_faillock.so\b
         state_title: Check that account required pam_faillock.so line exists.
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: text
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
-        state_title: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.linux:tst:27183701:
@@ -622,9 +726,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
-      semantic_ir_sha256: 5670c90a58b2dda8c2e1d31ad505bd94b95acc817e90ab76161d4eecd7e82ac3
+      semantic_ir_sha256: 195f78b78bcf075921440c52dd30c374fc8c1f47f51e3615e29fa6d8eb7d1cb6
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 9912c2dd10d8c232a808816f4834ba2139053a27a19db671362376cf293d3b7d
+    semantic_fingerprint_sha256: 468821c66861f0d9be2fc619e492eabbb6ce7801d8eb4ae5878a374f4bcee034
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule

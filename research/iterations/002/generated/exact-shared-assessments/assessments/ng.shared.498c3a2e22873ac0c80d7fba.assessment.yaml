@@ -1,0 +1,296 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271709
+  collect:
+    oval:mil.disa.stig.ind:obj:27170900:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:27170900
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:27170901:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .+
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:27170901
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:27170902:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: all sshd_config and sshd_config.d/* files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:27170900
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:27170901
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:27170902
+      source_type: textfilecontent54_object
+      version: '2'
+  derive: {}
+  description: OL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming
+    unresponsive.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:271709:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:27170900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured so that all network connections associated with SSH traffic are
+              terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated
+              mission requirements.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:271709
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271709:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:271709
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002346 - OL 9 must be configured so that all network connections associated with SSH traffic terminate
+              after becoming unresponsive.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Terminating an unresponsive SSH session within a short time period reduces the window of opportunity for\
+              \ unauthorized personnel to take control of a management session enabled on the console or console port that\
+              \ has been left unattended. In addition, quickly terminating an idle SSH session will also free up resources\
+              \ committed by the managed network element.\n\n\tTerminating network connections associated with communications\
+              \ sessions includes, for example, deallocating associated TCP/IP address/port pairs at the operating system\
+              \ level and deallocating networking assignments at the application level if multiple application sessions are\
+              \ using a single operating system-level network connection. This does not mean the operating system terminates\
+              \ all sessions or network access; it only ends the unresponsive session and releases the resources associated\
+              \ with that session.\n\n\tOL 9 uses /etc/ssh/sshd_config for configurations of OpenSSH. Within the sshd_config,\
+              \ the product of the values of \"ClientAliveInterval\" and \"ClientAliveCountMax\" are used to establish the\
+              \ inactivity threshold. The \"ClientAliveInterval\" is a timeout interval in seconds, after which if no data\
+              \ has been received from the client, SSHD will send a message through the encrypted channel to request a response\
+              \ from the client. The \"ClientAliveCountMax\" is the number of client alive messages that may be sent without\
+              \ SSHD receiving any messages back from the client. If this threshold is met, sshd will disconnect the client.\
+              \ For more information on these settings and others, refer to the sshd_config man pages.\n\n\tSatisfies: SRG-OS-000163-GPOS-00072,\
+              \ SRG-OS-000279-GPOS-00109"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271709
+        version: '2'
+    tests:
+      oval:mil.disa.stig.ind:tst:27170900:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:27170902
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:27170900
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+  id: ng.shared.498c3a2e22873ac0c80d7fba
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:20000003:
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:20000003
+      source_type: textfilecontent54_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 498c3a2e22873ac0c80d7fba0377d2b7d52b8cd22208b54af6d7ddbf42fa2873
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271709r1091839_rule
+    title: OL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming unresponsive.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+    title: RHEL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming
+      unresponsive.

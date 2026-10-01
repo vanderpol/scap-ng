@@ -353,17 +353,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25432000:
-        source_state_id: oval:mil.disa.stig.win:ste:25432000
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: audit_policy_change
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_FAILURE
-        state_title: null
       oval:mil.disa.stig.win:ste:25332501:
         source_state_id: oval:mil.disa.stig.win:ste:25332501
         source_type: auditeventpolicysubcategories_state
@@ -372,11 +361,54 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: audit_policy_change
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         state_title: '''Audit Policy Change'' is set to ''Success'' and ''Failure'''
+      oval:mil.disa.stig.win:ste:25432000:
+        source_state_id: oval:mil.disa.stig.win:ste:25432000
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: audit_policy_change
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_FAILURE
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25432000:
@@ -578,9 +610,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278067r1180907_rule
-      semantic_ir_sha256: c23d347969e0079832f87efb31d6a6b80d7f9dc39f6fba1b2b280faded9e08e3
+      semantic_ir_sha256: 47e7bd4a53e10d2ba1e5b1f53d51f5af0742e23e5a7fab1d36e2781206b85201
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b071b33e35779ff4080b87a37e802b19920721340d210bbaa72fd196b193fd0f
+    semantic_fingerprint_sha256: dd3c0038c047d0056756f34ae985fb7d50a7cbe3ce4d22fc985fb7138751015f
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278067r1180907_rule

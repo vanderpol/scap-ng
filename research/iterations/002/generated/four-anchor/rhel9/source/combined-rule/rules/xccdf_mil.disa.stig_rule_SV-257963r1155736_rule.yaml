@@ -429,7 +429,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: net.ipv4.conf.default.accept_redirects
@@ -444,6 +454,22 @@ rule:
         - attributes:
             datatype: int
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -465,6 +491,30 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000009
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:271869:
+          source_definition_id: oval:mil.disa.stig.defs:def:271869
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: net.ipv4.conf.default.accept_redirects setting in kernel is 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:24455000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from
+                being accepted.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257963:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257963
           class: compliance
@@ -501,30 +551,6 @@ rule:
 
 
                 This feature of the IPv4 protocol has few legitimate uses. It must be disabled unless absolutely required.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:271869:
-          source_definition_id: oval:mil.disa.stig.defs:def:271869
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: net.ipv4.conf.default.accept_redirects setting in kernel is 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:24455000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from
-                being accepted.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -654,9 +680,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257963r1155736_rule
-      semantic_ir_sha256: b23c20543b5d4530c12c522391fe2925d0cb72c1ee0f13a2c74bbff11652f5d6
+      semantic_ir_sha256: d3f07991b5d8582caf26ea25125115ad5bdd8f5942efaf6e7319be9f04c3dced
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5be29bdf23ba30e8ed8e6941c824623278e2e70c4a502fd8f9b1c09b7911781d
+    semantic_fingerprint_sha256: 20b7de136e58c12e2e83e7ace759f04dba5e22aa260ed943ecd0cab97475d327
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257963r1155736_rule

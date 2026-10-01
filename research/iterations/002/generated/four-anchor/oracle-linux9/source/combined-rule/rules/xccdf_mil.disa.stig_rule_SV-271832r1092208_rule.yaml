@@ -324,18 +324,6 @@ rule:
     description: OL 9 duplicate User IDs (UIDs) must not exist for interactive users.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25804501:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:25804501
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: count of passwd entries
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.defs:var:25804500
       oval:mil.disa.stig.unix:obj:25804500:
         capability: scapng.collect.unix.password
         source_object_id: oval:mil.disa.stig.unix:obj:25804500
@@ -346,16 +334,58 @@ rule:
         query:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: username
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: .*
         - attributes:
             action: include
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.unix:ste:25804500
+      oval:mil.disa.stig.ind:obj:25804501:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:25804501
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: count of passwd entries
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.defs:var:25804500
     derive:
       oval:mil.disa.stig.defs:var:25804501:
         source_variable_id: oval:mil.disa.stig.defs:var:25804501
@@ -500,6 +530,25 @@ rule:
         - attributes:
             datatype: int
             var_ref: oval:mil.disa.stig.defs:var:25804501
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: documented_implicit
+              value: all
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -513,6 +562,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -534,6 +599,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:25804500
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258045:
+          source_definition_id: oval:mil.disa.stig.defs:def:258045
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: GIDs are unique
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25804500
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system duplicate User IDs (UIDs) must not exist for interactive users.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271832:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271832
           class: compliance
@@ -566,29 +654,6 @@ rule:
               text: "To ensure accountability and prevent unauthenticated access, interactive users must be identified and\
                 \ authenticated to prevent potential misuse and compromise of the system.\n\n\tSatisfies: SRG-OS-000104-GPOS-00051,\
                 \ SRG-OS-000121-GPOS-00062, SRG-OS-000042-GPOS-00020"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258045:
-          source_definition_id: oval:mil.disa.stig.defs:def:258045
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: GIDs are unique
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25804500
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system duplicate User IDs (UIDs) must not exist for interactive users.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -709,9 +774,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271832r1092208_rule
-      semantic_ir_sha256: 4d9dc1bf0105295eae9f5a2d8a4545a2b49e8a46d57fa279951c466e8d1d3abe
+      semantic_ir_sha256: 4e30dc81f6ebaaf312140c43dbeae3c1e060fb06a434b5c299f9f4e2b995467c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: f872a6fac379930dc3de1201d171b472af3708ffacdcd4c49c2717942d849836
+    semantic_fingerprint_sha256: c3eab2cde4d5db8f9d5355540f2cb1cae09669c56c1a95f1e45b046f03da1466
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271832r1092208_rule

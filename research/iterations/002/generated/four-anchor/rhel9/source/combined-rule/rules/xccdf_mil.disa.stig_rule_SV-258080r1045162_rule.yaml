@@ -425,31 +425,6 @@ rule:
     description: RHEL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25808000:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25808000
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: /etc/security/faillock.conf dir
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/security/faillock.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*dir\s*=\s*(.*)\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.linux:obj:25808000:
         capability: scapng.collect.linux.selinuxsecuritycontext
         source_object_id: oval:mil.disa.stig.linux:obj:25808000
@@ -460,14 +435,92 @@ rule:
         query:
         - attributes:
             var_ref: oval:mil.disa.stig.defs:var:25808000
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: documented_implicit
+              value: all
           kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         - attributes:
             nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      oval:mil.disa.stig.ind:obj:25808000:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25808000
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: /etc/security/faillock.conf dir
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/security/faillock.conf
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*dir\s*=\s*(.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive:
       oval:mil.disa.stig.defs:var:25808000:
         source_variable_id: oval:mil.disa.stig.defs:var:25808000
@@ -517,7 +570,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: faillog_t
@@ -753,9 +822,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258080r1045162_rule
-      semantic_ir_sha256: e0bdcdc1c1e750f687e495dcfb16f5b8a952acb46985a4693e057913db53ed41
+      semantic_ir_sha256: 7e70e34d6d02c4a72133e0168f55335ab007aa3af0e1a3ba4695efee2e13a034
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8e3271233c4f0609f61108ba73dbf4a6578a4d9165d5eb1395882d86d8564a08
+    semantic_fingerprint_sha256: a0b671ef5c0dfe3a82f6bfb8ffdbed229a25af643abc4fcca8443e2ede4c4e4a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258080r1045162_rule

@@ -346,18 +346,6 @@ rule:
     description: OL 9 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:24453000:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:24453000
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /boot/efi
       oval:mil.disa.stig.ind:obj:24453001:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:24453001
@@ -366,22 +354,74 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*[^#\s]+\s+/boot/efi\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:24453000:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:24453000
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /boot/efi
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:2445301:
@@ -392,6 +432,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -405,6 +461,22 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -412,19 +484,6 @@ rule:
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:24453000:
-          source_test_id: oval:mil.disa.stig.linux:tst:24453000
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: If /boot/efi is mounted, it is mounted with the nosuid option
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:24453000
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000002
-          source_other: []
         oval:mil.disa.stig.ind:tst:24453001:
           source_test_id: oval:mil.disa.stig.ind:tst:24453001
           source_type: textfilecontent54_test
@@ -438,7 +497,48 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:2445301
           source_other: []
+        oval:mil.disa.stig.linux:tst:24453000:
+          source_test_id: oval:mil.disa.stig.linux:tst:24453000
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: If /boot/efi is mounted, it is mounted with the nosuid option
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:24453000
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000002
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:244530:
+          source_definition_id: oval:mil.disa.stig.defs:def:244530
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /boot/efi is mounted an configured with the nosuid option.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:24453000
+            - comment: If /boot/efi is configured in /etc/fstab it is with the nosuid option.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:24453001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent files with the setuid and setgid bit set from being executed on the
+                /boot/efi directory.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271649:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271649
           class: compliance
@@ -473,34 +573,6 @@ rule:
                 This option must be used for mounting any file system not containing approved "setuid" and "setguid" files.
                 Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized
                 administrative access.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:244530:
-          source_definition_id: oval:mil.disa.stig.defs:def:244530
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /boot/efi is mounted an configured with the nosuid option.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:24453000
-            - comment: If /boot/efi is configured in /etc/fstab it is with the nosuid option.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:24453001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent files with the setuid and setgid bit set from being executed on the
-                /boot/efi directory.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -631,9 +703,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271649r1208728_rule
-      semantic_ir_sha256: aa460b764bb1f7af0c38b064c6e3b05d5b12eb2d85b8d4274da7a11818e21177
+      semantic_ir_sha256: 9930634c2504eed8579345193b54c80f56a1118e3dd72409cd0718d1c45433b1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ab793d9ed8250ae58f28a2a10bbb6119065c4b544e26ebc7bf445dd71a3643d4
+    semantic_fingerprint_sha256: 306c3067e6d79be6ed0bc363459c014065b687210ff54de6a6d37b32c90d241a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271649r1208728_rule

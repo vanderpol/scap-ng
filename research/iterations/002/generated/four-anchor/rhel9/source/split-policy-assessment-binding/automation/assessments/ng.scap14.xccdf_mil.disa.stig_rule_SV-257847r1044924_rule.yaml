@@ -17,16 +17,46 @@ assessment:
       query:
       - attributes:
           ignore_case: 'true'
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/audit/auditd.conf
       - attributes:
           datatype: string
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -34,6 +64,76 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23029401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          datatype: string
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23029401
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+          var_check:
+            origin: explicit
+            value: at least one
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -50,36 +150,22 @@ assessment:
           datatype: string
           var_check: at least one
           var_ref: oval:mil.disa.stig.defs:var:23029400
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: explicit
+            value: at least one
         kind: element
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-    oval:mil.disa.stig.ind:obj:23029401:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23029401
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/fstab
-      - attributes:
-          datatype: string
-          operation: pattern match
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.defs:var:23029401
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
   derive:
     oval:mil.disa.stig.defs:var:23029400:
       source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -197,18 +283,6 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23029400:
-        source_test_id: oval:mil.disa.stig.linux:tst:23029400
-        source_type: partition_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        test_title: There is a separate file system for audit data directory.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23029400
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23029401:
         source_test_id: oval:mil.disa.stig.ind:tst:23029401
         source_type: textfilecontent54_test
@@ -219,6 +293,18 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:23029401
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:23029400:
+        source_test_id: oval:mil.disa.stig.linux:tst:23029400
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        test_title: There is a separate file system for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029400
         predicates: []
         source_other: []
     definitions:
@@ -405,6 +491,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257847r1044924_rule
-    semantic_ir_sha256: ce24984cd1521f612ea150ebbd9a82e73c5f4a6c3dbbd132083ef2540650cb47
+    semantic_ir_sha256: eea98c74407a2c8a6d296b06a22605cba979e19efa1e637cba3fd8a269160f8f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 9c690237ad50e3449a04d2e4d6dd64334a620d3920d0e96b97a73fe8adeadb9f
+  semantic_fingerprint_sha256: a075fc0169ac924b78043b13178bd13843dbb74975526ca5b715083258722942

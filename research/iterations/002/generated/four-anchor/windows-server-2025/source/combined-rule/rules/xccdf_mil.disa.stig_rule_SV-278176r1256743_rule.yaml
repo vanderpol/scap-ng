@@ -364,15 +364,45 @@ rule:
         object_title: Run $user = Get-ADUser krbtgt -properties passwordlastset; ([datetime]::Now - $user.PasswordLastSet).Days
           command via PowerShell
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: powershell
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: $user = Get-ADUser krbtgt -properties passwordlastset; ([datetime]::Now - $user.PasswordLastSet).Days
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
     derive: {}
@@ -385,6 +415,22 @@ rule:
         entities:
         - attributes:
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: command
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -392,6 +438,22 @@ rule:
         - attributes:
             datatype: int
             operation: less than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than or equal
           kind: element
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -562,9 +624,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278176r1256743_rule
-      semantic_ir_sha256: 45de9b631defad152a690dd09b32d64c9fd831ad2db13617e20b388928c47875
+      semantic_ir_sha256: e7832a378193f762e333e9fff32ab04fd4c40edf9a7ed0e0e7f998d57ecf1f07
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ad2115395f24f19f4c553f2ad91f296314c7e75696c8e25c1ab840ebbd230ec7
+    semantic_fingerprint_sha256: ee23b7a2da07b8ea5c0a68b7cd9ec2cec4d03ef775c25c048a1cd2c42a0a1d46
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278176r1256743_rule

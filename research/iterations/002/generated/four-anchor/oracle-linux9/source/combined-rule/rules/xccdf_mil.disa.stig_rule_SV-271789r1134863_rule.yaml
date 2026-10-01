@@ -343,28 +343,81 @@ rule:
         query:
         - attributes:
             recurse_direction: down
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         - attributes:
             var_check: only one
             var_ref: oval:mil.disa.stig.defs:var:20000018
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: explicit
+              value: only one
           kind: element
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: (\.so\S*)$
         - attributes:
             action: include
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.unix:ste:20000015
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.unix:ste:20000006
@@ -408,17 +461,6 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:20000018
           variable_type: constant_variable
     predicates:
-      oval:mil.disa.stig.unix:ste:20000015:
-        source_state_id: oval:mil.disa.stig.unix:ste:20000015
-        source_type: file_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: regular
-        state_title: null
       oval:mil.disa.stig.unix:ste:20000006:
         source_state_id: oval:mil.disa.stig.unix:ste:20000006
         source_type: file_state
@@ -427,11 +469,54 @@ rule:
         entities:
         - attributes:
             datatype: int
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: group_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '0'
         state_title: group-owned by root
+      oval:mil.disa.stig.unix:ste:20000015:
+        source_state_id: oval:mil.disa.stig.unix:ste:20000015
+        source_type: file_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: regular
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:23026200:
@@ -447,6 +532,29 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230262:
+          source_definition_id: oval:mil.disa.stig.defs:def:230262
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: All system-wide library files must be group-owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23026200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system library files must be group-owned by root or a system account.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271789:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271789
           class: compliance
@@ -481,29 +589,6 @@ rule:
                 \n\tThis requirement applies to OL 9 with software libraries that are accessible and configurable, as in the\
                 \ case of interpreted languages. Software libraries also include privileged programs that execute with escalated\
                 \ privileges."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230262:
-          source_definition_id: oval:mil.disa.stig.defs:def:230262
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: All system-wide library files must be group-owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23026200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system library files must be group-owned by root or a system account.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -629,9 +714,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
-      semantic_ir_sha256: 4616623b3cc569c1a0dffe8baf2aace1745cfc364e0c4fa8cccaceec1115611d
+      semantic_ir_sha256: 3ea808044c7c4144294ea13937d44381865322a02b156875d6f8cb86c0fddeaf
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 13eb84157b883bdb088946d12498f1998cd057026f39a7217e26f669cb855061
+    semantic_fingerprint_sha256: 0ee30dcc277b89f4e3b8c12854e266e78968bec71b28509fd14832d1149a826e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule

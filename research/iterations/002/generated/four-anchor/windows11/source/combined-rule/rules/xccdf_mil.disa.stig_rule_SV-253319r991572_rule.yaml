@@ -377,19 +377,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25331901:
-        source_state_id: oval:mil.disa.stig.win:ste:25331901
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: file_share
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        state_title: '''File Share'' is set to ''Success'' and ''Failure'''
       oval:mil.disa.stig.win:ste:25331900:
         source_state_id: oval:mil.disa.stig.win:ste:25331900
         source_type: auditeventpolicysubcategories_state
@@ -398,26 +385,58 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: file_share
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_FAILURE
         state_title: '''File Share'' is set to ''Failure'''
+      oval:mil.disa.stig.win:ste:25331901:
+        source_state_id: oval:mil.disa.stig.win:ste:25331901
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: file_share
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
+        state_title: '''File Share'' is set to ''Success'' and ''Failure'''
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25331900:
-          source_test_id: oval:mil.disa.stig.win:tst:25331900
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: '''Audit File Share'' is set to ''Failure'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331900
-          source_other: []
         oval:mil.disa.stig.win:tst:25331901:
           source_test_id: oval:mil.disa.stig.win:tst:25331901
           source_type: auditeventpolicysubcategories_test
@@ -430,6 +449,19 @@ rule:
           - oval:mil.disa.stig.win:obj:20000000
           predicates:
           - oval:mil.disa.stig.win:ste:25331901
+          source_other: []
+        oval:mil.disa.stig.win:tst:25331900:
+          source_test_id: oval:mil.disa.stig.win:tst:25331900
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: '''Audit File Share'' is set to ''Failure'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331900
           source_other: []
       definitions:
         oval:mil.disa.stig.windows11:def:253319:
@@ -635,9 +667,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253319r991572_rule
-      semantic_ir_sha256: 5fd0fa7e75ac9cb836d1b01f3e211a530b81cc05cc713b250050f5c2df7c6f95
+      semantic_ir_sha256: e3903b952bc4922e235fecf54c4a5d56e6e3501e69f59d5d00b44e922496854d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 154edb5cd75b52f1e5a3009f2dfcf55107cd06712aeb0b8295b4b7e4a8472ff1
+    semantic_fingerprint_sha256: 2e7395e460150efefaed0dd1b41c9e2d91e4bccc0c44cfc2a78842d751ce68dc
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253319r991572_rule

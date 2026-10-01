@@ -371,22 +371,6 @@ rule:
     description: OL 9 must disable acquiring, saving, and processing core dumps.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23031201:
-        capability: scapng.collect.linux.systemdunitproperty
-        source_object_id: oval:mil.disa.stig.linux:obj:23031201
-        source_type: systemdunitproperty_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: systemd-coredump.socket UnitFileState
-        query:
-        - kind: element
-          name: unit
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: systemd-coredump.socket
-        - kind: element
-          name: property
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: UnitFileState
       oval:mil.disa.stig.linux:obj:23031200:
         capability: scapng.collect.linux.systemdunitproperty
         source_object_id: oval:mil.disa.stig.linux:obj:23031200
@@ -395,14 +379,70 @@ rule:
         version: '1'
         object_title: systemd-coredump.socket LoadState
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: unit
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: systemd-coredump.socket
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: LoadState
+      oval:mil.disa.stig.linux:obj:23031201:
+        capability: scapng.collect.linux.systemdunitproperty
+        source_object_id: oval:mil.disa.stig.linux:obj:23031201
+        source_type: systemdunitproperty_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: systemd-coredump.socket UnitFileState
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: systemd-coredump.socket
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: UnitFileState
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:20000005:
@@ -411,26 +451,29 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: masked
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23031200:
-          source_test_id: oval:mil.disa.stig.linux:tst:23031200
-          source_type: systemdunitproperty_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: systemd-coredump.socket LoadState is masked if exists
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23031200
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000005
-          source_other: []
         oval:mil.disa.stig.linux:tst:23031201:
           source_test_id: oval:mil.disa.stig.linux:tst:23031201
           source_type: systemdunitproperty_test
@@ -441,6 +484,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.linux:obj:23031201
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000005
+          source_other: []
+        oval:mil.disa.stig.linux:tst:23031200:
+          source_test_id: oval:mil.disa.stig.linux:tst:23031200
+          source_type: systemdunitproperty_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: systemd-coredump.socket LoadState is masked if exists
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23031200
           predicates:
           - oval:mil.disa.stig.linux:ste:20000005
           source_other: []
@@ -640,9 +696,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271732r1155329_rule
-      semantic_ir_sha256: cd433b42f6d0cf0f976744caf7ffae6a3f40ab85eedbb9c932b6e1b3d12e319d
+      semantic_ir_sha256: 6906cb28a0cdf4371a838de9fa7507b187518b6ab5382284ea8ff3613bf9952c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d5e7ed6c932ae50f91ebcf587c667d3595f0fb5946f8dd1a4ef249e2f4e16851
+    semantic_fingerprint_sha256: f293d6bb3711b55ed107486e7d22ded8b1217ef8891a8606f97e8cc767bfd96e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271732r1155329_rule

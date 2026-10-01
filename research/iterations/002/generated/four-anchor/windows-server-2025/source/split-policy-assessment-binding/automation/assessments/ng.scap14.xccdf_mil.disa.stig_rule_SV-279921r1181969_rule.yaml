@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:27894601:
-      source_state_id: oval:mil.disa.stig.win:ste:27894601
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: registry
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      state_title: '''Registry'' is set to ''Success'' and ''Failure'''
     oval:mil.disa.stig.win:ste:27894700:
       source_state_id: oval:mil.disa.stig.win:ste:27894700
       source_type: auditeventpolicysubcategories_state
@@ -38,11 +25,56 @@ assessment:
       entities:
       - attributes:
           datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: registry
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       state_title: '''Registry'' is set to ''Success'''
+    oval:mil.disa.stig.win:ste:27894601:
+      source_state_id: oval:mil.disa.stig.win:ste:27894601
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: registry
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: '''Registry'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:27894601:
@@ -72,33 +104,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:27894700
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:278947:
-        source_definition_id: oval:mil.disa.stig.defs:def:278947
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Registry - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:27894700
-          - comment: Audit - Registry - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:27894601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must be configured to audit registry successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:279921:
         source_definition_id: oval:mil.disa.stig.windows2025:def:279921
         class: compliance
@@ -133,6 +138,33 @@ assessment:
               provide a trail of evidence in case the system or network is compromised. Collecting this data is essential
               for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
               Credential validation records events related to validation tests on credentials for a user account logon.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:278947:
+        source_definition_id: oval:mil.disa.stig.defs:def:278947
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Registry - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894700
+          - comment: Audit - Registry - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured to audit registry successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -253,6 +285,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-279921r1181969_rule
-    semantic_ir_sha256: 83ee91e2ea81a0c9b35fcdd0c1294dcb5bb72220bca6aa72e2c1065c4113b197
+    semantic_ir_sha256: 2d45acaf5627c52e435866247bf59d6fdded3dcfd1ce967775960dc6d335f9c5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: c6dbcf57fc4507b38f173fe91519328f0614038c90356979354c727de7d49714
+  semantic_fingerprint_sha256: 2370afc38a1641fb6195f36978d4fd10febc63e224538673a74053e78c2ffbcd

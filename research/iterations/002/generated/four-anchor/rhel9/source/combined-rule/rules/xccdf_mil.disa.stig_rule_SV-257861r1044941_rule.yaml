@@ -380,7 +380,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /boot
@@ -392,18 +402,48 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*[^#\s]+\s+/boot\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -418,6 +458,22 @@ rule:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -431,6 +487,22 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -465,34 +537,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:2303001
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230300:
-          source_definition_id: oval:mil.disa.stig.defs:def:230300
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: /boot is mounted an configured with the nosuid option.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23030000
-            - comment: If /boot is configured in /etc/fstab it is with the nosuid option.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23030001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent files with the setuid and setgid bit set from being executed on the
-                /boot directory.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257861:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257861
           class: compliance
@@ -530,6 +574,34 @@ rule:
 
 
                 Satisfies: SRG-OS-000368-GPOS-00154, SRG-OS-000480-GPOS-00227'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230300:
+          source_definition_id: oval:mil.disa.stig.defs:def:230300
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: /boot is mounted an configured with the nosuid option.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23030000
+            - comment: If /boot is configured in /etc/fstab it is with the nosuid option.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23030001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent files with the setuid and setgid bit set from being executed on the
+                /boot directory.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -657,9 +729,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
-      semantic_ir_sha256: b81f2e84097ff02d09e154ac2043037330f7b54b8588ec43882d47da0a0a5a39
+      semantic_ir_sha256: edb494709929e4b5fbdac80c19d6d0143aba8b8fd93d39f596f003fa91aa5b7e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 4fd13d54f9043822f7bd2a508c4d248373b7916ee3144b7e1d3a41e0847d23b5
+    semantic_fingerprint_sha256: 0a74b5e3991cfd14f5cf6b35972f47bcaf67e28259b3d15de0fcec381f1d8df3
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule

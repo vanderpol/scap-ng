@@ -403,84 +403,6 @@ rule:
     description: Windows Server 2025 passwords must be configured to expire.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501:
-        capability: scapng.collect.windows.cmdlet
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501
-        source_type: cmdlet_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any
-          are found)
-        query:
-        - kind: element
-          name: module_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: CimCmdlets
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: module_id
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: version
-            nil: 'true'
-          kind: element
-          name: module_version
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - kind: element
-          name: verb
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Get
-        - kind: element
-          name: noun
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: CimInstance
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: class
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: Win32_Useraccount
-          - attributes:
-              name: filter
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: PasswordExpires=False and LocalAccount=True and Disabled=False
-          kind: element
-          name: parameters
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: first
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '100'
-          kind: element
-          name: select
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: null
-        query:
-        - kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT DomainRole FROM win32_computersystem
       oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503:
         capability: scapng.collect.windows.cmdlet
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
@@ -490,26 +412,76 @@ rule:
         object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any
           are found)
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: module_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ActiveDirectory
         - attributes:
             nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: module_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         - attributes:
             datatype: version
             nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: version
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: module_version
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: verb
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Get
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: noun
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ADUser
@@ -528,6 +500,16 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: Enabled -eq $true -and PasswordNeverExpires -eq $true
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: record
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: parameters
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -540,9 +522,187 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '100'
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: record
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: select
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501:
+        capability: scapng.collect.windows.cmdlet
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501
+        source_type: cmdlet_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any
+          are found)
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: module_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: CimCmdlets
+        - attributes:
+            nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: module_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: version
+            nil: 'true'
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: version
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: module_version
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: verb
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Get
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: noun
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: CimInstance
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: class
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: Win32_Useraccount
+          - attributes:
+              name: filter
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: PasswordExpires=False and LocalAccount=True and Disabled=False
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: record
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: parameters
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: first
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '100'
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: record
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: select
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT DomainRole FROM win32_computersystem
     derive: {}
     predicates:
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27800502:
@@ -561,30 +721,26 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '3'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Domain Member Server
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: domainrole
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '4'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: Backup Domain Controller
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501
         source_type: wmi57_state
@@ -601,6 +757,22 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '2'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -621,25 +793,76 @@ rule:
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             value: '5'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Primary Domain Controller
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: domainrole
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '4'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Backup Domain Controller
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504
-          source_type: wmi57_test
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503
+          source_type: cmdlet_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: The system is a Windows Domain Controller
+          test_title: Windows Domain Controller - Active Directory User Account Passwords for Enabled Users must be configured
+            to expire.
           check: all
-          check_existence: at_least_one_exists
-          state_operator: OR
+          check_existence: none_exist
+          state_operator: AND
           collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800505
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
+          predicates: []
           source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27800502:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800502
@@ -655,18 +878,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800502
           source_other: []
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503
-          source_type: cmdlet_test
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504
+          source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Windows Domain Controller - Active Directory User Account Passwords for Enabled Users must be configured
-            to expire.
+          test_title: The system is a Windows Domain Controller
           check: all
-          check_existence: none_exist
-          state_operator: AND
+          check_existence: at_least_one_exists
+          state_operator: OR
           collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
-          predicates: []
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800505
           source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27800501:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800501
@@ -877,9 +1101,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278005r1182259_rule
-      semantic_ir_sha256: 7fc428106478eac9d61526d0e2014d4d1797ac9f686d89a03be95b8866d252d7
+      semantic_ir_sha256: 7074610e8121cdeb0ff06d82142e3ad809456c6c09f3c86fda940163ce0fd897
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: a77222f0e82dbb0e9b0cd074322fda22437b3f8388253a28021046d9f108108c
+    semantic_fingerprint_sha256: e0cebfed0e6b887c3a1c6dd9fd8a85b48bb62cda5ab61c6ed27e15c8be786d23
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278005r1182259_rule

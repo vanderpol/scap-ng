@@ -352,7 +352,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /tmp
@@ -364,13 +374,33 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -378,6 +408,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -386,18 +426,6 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23029500:
-          source_test_id: oval:mil.disa.stig.ind:tst:23029500
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: There is a separate file system configured for /tmp.
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23029500
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.linux:tst:23029500:
           source_test_id: oval:mil.disa.stig.linux:tst:23029500
           source_type: partition_test
@@ -408,6 +436,18 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.linux:obj:23029500
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23029500:
+          source_test_id: oval:mil.disa.stig.ind:tst:23029500
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: There is a separate file system configured for /tmp.
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23029500
           predicates: []
           source_other: []
       definitions:
@@ -589,9 +629,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257844r1044918_rule
-      semantic_ir_sha256: e3899ffe553a9aaa2ae572b1636211eaa7bd788dd510a7ad3b86be0d1f4237a8
+      semantic_ir_sha256: 4aa7a593ef90751a8d290078ced9b9817eab54bd2cd0c943704634a3021ef41c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5795fbf54e698ff3a23547bc65ad9fad2c2de638f07dfef682f678c9a1642a7a
+    semantic_fingerprint_sha256: ecf2a69a3d28e2739bd35c2f028343c44c6dda790bfd4d0e4efb090e3c76aca7
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257844r1044918_rule

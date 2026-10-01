@@ -1,0 +1,152 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271451
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27145101:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: Retrieve any configuration lines containing root, admin, or administrator.
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/grub2.cfg
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\n*[\s#]*set\s+superusers="(root|admin|administrator)"
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27145101
+      source_type: textfilecontent54_object
+      version: '5'
+  derive: {}
+  description: OL 9 must require a unique superuser's name upon booting into single-user and maintenance modes.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271451:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verify the boot loader superuser account has been set.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27145101
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must require a unique superuser's name upon booting into single-user and maintenance modes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Having a nondefault grub superuser username makes password-guessing attacks less effective.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271451
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27145101:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27145101
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27145101
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27145101
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: Verify the boot loader password is not set to root, admin, or adminstrator.
+  id: ng.shared.49e090f7ced29102ae60bc9b
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27145101:
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(root|admin|administrator)$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27145101
+      source_type: textfilecontent54_state
+      state_title: Include filter to capture non-compliant configuration lines containing root, admin, or administrator.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 49e090f7ced29102ae60bc9befe2916ee664c65107c7882b7aef8210db6cab0c
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271451r1137691_rule
+    title: OL 9 must require a unique superuser's name upon booting into single-user and maintenance modes.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257789r1137691_rule
+    title: RHEL 9 must require a unique superusers name upon booting into single-user and maintenance modes.

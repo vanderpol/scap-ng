@@ -26,6 +26,16 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -33,6 +43,16 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -40,6 +60,16 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -55,6 +85,22 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: password_hist_len
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -66,13 +112,45 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -80,19 +158,6 @@ assessment:
       state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25330000:
-        source_test_id: oval:mil.disa.stig.win:tst:25330000
-        source_type: passwordpolicy_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: '''Enforce password history'' is set to ''24'' passwords or more'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000002
-        predicates:
-        - oval:mil.disa.stig.win:ste:25330000
-        source_other: []
       oval:mil.disa.stig.win:tst:25330001:
         source_test_id: oval:mil.disa.stig.win:tst:25330001
         source_type: registry_test
@@ -106,34 +171,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25330001
         source_other: []
+      oval:mil.disa.stig.win:tst:25330000:
+        source_test_id: oval:mil.disa.stig.win:tst:25330000
+        source_type: passwordpolicy_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Enforce password history'' is set to ''24'' passwords or more'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000002
+        predicates:
+        - oval:mil.disa.stig.win:ste:25330000
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:25330000:
-        source_definition_id: oval:mil.disa.stig.defs:def:25330000
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330000
-          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330001
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The password history must be configured to 24 passwords remembered.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253300:
         source_definition_id: oval:mil.disa.stig.windows11:def:253300
         class: compliance
@@ -167,6 +218,33 @@ assessment:
               without being required to change a password to a unique password on a regularly scheduled basis. This enables
               users to effectively negate the purpose of mandating periodic password changes. The default value is 24 for
               Windows domain systems. DoW has decided this is the appropriate value for all Windows systems.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25330000:
+        source_definition_id: oval:mil.disa.stig.defs:def:25330000
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330000
+          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The password history must be configured to 24 passwords remembered.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -308,6 +386,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
-    semantic_ir_sha256: 0a4007cbe3deb1de0e2354a6923b0baf5736e8e2fb11f7162beec573d58a9b6e
+    semantic_ir_sha256: 20dc8f5a42cfc31f91fcc83dc35f7c919fb70a1e323d8c40a8ab7247f6e7f8eb
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 35f56ff5f4ebc28f9b408ac237f2527f9944725bd472c6077f7e226504eb366b
+  semantic_fingerprint_sha256: e47ef39c0b48b39007dee904324c31f92416153c6bc7d2741761921485bd07b9

@@ -331,6 +331,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: process_creation
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -345,6 +361,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: process_creation
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -352,19 +384,6 @@ rule:
         state_title: Audit - Process Creation - Failure only
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25331201:
-          source_test_id: oval:mil.disa.stig.win:tst:25331201
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Audit - Process Creation - Success and Failure
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331201
-          source_other: []
         oval:mil.disa.stig.win:tst:25777000:
           source_test_id: oval:mil.disa.stig.win:tst:25777000
           source_type: auditeventpolicysubcategories_test
@@ -378,7 +397,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25777000
           source_other: []
+        oval:mil.disa.stig.win:tst:25331201:
+          source_test_id: oval:mil.disa.stig.win:tst:25331201
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Audit - Process Creation - Success and Failure
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331201
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257770:
+          source_definition_id: oval:mil.disa.stig.defs:def:257770
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Process Creation - Failure only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25777000
+            - comment: Audit - Process Creation - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25331201
+            comment: Audit - Process Creation - Failure
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit Detailed Tracking - Process Creation failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:257770:
           source_definition_id: oval:mil.disa.stig.windows11:def:257770
           class: compliance
@@ -413,33 +472,6 @@ rule:
 
 
                 These audit events can help with understanding how a computer is being used and tracking user activity.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257770:
-          source_definition_id: oval:mil.disa.stig.defs:def:257770
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Process Creation - Failure only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25777000
-            - comment: Audit - Process Creation - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25331201
-            comment: Audit - Process Creation - Failure
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit Detailed Tracking - Process Creation failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -560,9 +592,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257770r958412_rule
-      semantic_ir_sha256: afeeefd669b2d70d1952e41bfd632721a28ff3a05f7b4e07e91bc767211374e3
+      semantic_ir_sha256: 2a73d4bf30b422100e80452746c9024aa27c1ae03a532a3bfdea024e09702957
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 2b059a397ca1a092036d9ae906a1f8c16e319217f362f5c9ee7d48d7130e9659
+    semantic_fingerprint_sha256: 759fc74dc95bf468b439e46d5ec87512c49a6c65a3ca0ed824b8252a051fc597
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257770r958412_rule

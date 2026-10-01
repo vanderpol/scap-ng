@@ -7,29 +7,88 @@ assessment:
   description: OL 9 SSH daemon must prevent remote hosts from connecting to the proxy display.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23055601:
+    oval:mil.disa.stig.ind:obj:23055602:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23055601
+      source_object_id: oval:mil.disa.stig.ind:obj:23055602
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '4'
-      object_title: sshd_config X11UseLocalhost
+      object_title: null
       query:
       - attributes:
-          datatype: string
+          max_depth: '-1'
+          recurse_direction: down
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
-        name: filepath
+        name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
       - attributes:
           datatype: int
-          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -55,38 +114,59 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23055602:
+    oval:mil.disa.stig.ind:obj:23055601:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23055602
+      source_object_id: oval:mil.disa.stig.ind:obj:23055601
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '4'
-      object_title: null
+      object_title: sshd_config X11UseLocalhost
       query:
       - attributes:
-          max_depth: '-1'
-          recurse_direction: down
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
-        name: behaviors
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d
+        value: /etc/ssh/sshd_config
       - attributes:
           operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.+\.conf$
-      - attributes:
-          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
       - attributes:
           datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -102,6 +182,22 @@ assessment:
       - attributes:
           datatype: string
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -308,6 +404,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
-    semantic_ir_sha256: 3d64686a146b40983d6f5536a277553aa006074810454029071b57fa42e89ca7
+    semantic_ir_sha256: bb6e39b8e09ca858e091cb8539cad399808379f87dc2cfc9bfe36603c1801427
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 73753731cc1f764bd96164021d711482bf20e5fde5e6d04917d6e645c2eb7d15
+  semantic_fingerprint_sha256: 92ad4a1ba1cb0311194d752b70bd812dbcc88407b9c62c788cbbe0f52a56055a

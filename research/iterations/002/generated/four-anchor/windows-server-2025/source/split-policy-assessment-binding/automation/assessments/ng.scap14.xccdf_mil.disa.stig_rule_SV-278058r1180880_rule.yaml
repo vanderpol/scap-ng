@@ -17,20 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25331500:
-      source_state_id: oval:mil.disa.stig.win:ste:25331500
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: logoff
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      state_title: Audit - Logoff - Success only
     oval:mil.disa.stig.win:ste:25331501:
       source_state_id: oval:mil.disa.stig.win:ste:25331501
       source_type: auditeventpolicysubcategories_state
@@ -40,26 +26,59 @@ assessment:
       - attributes:
           datatype: string
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: logoff
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       state_title: Audit - Logoff - Success and Failure
+    oval:mil.disa.stig.win:ste:25331500:
+      source_state_id: oval:mil.disa.stig.win:ste:25331500
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: logoff
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      state_title: Audit - Logoff - Success only
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25331501:
-        source_test_id: oval:mil.disa.stig.win:tst:25331501
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Audit - Logoff - Success and Failure
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25331501
-        source_other: []
       oval:mil.disa.stig.win:tst:25331500:
         source_test_id: oval:mil.disa.stig.win:tst:25331500
         source_type: auditeventpolicysubcategories_test
@@ -73,34 +92,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25331500
         source_other: []
+      oval:mil.disa.stig.win:tst:25331501:
+        source_test_id: oval:mil.disa.stig.win:tst:25331501
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Audit - Logoff - Success and Failure
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25331501
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253315:
-        source_definition_id: oval:mil.disa.stig.defs:def:253315
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Logoff - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331500
-          - comment: Audit - Logoff - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331501
-          comment: Audit - Logoff - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Logon/Logoff - Logoff successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278058:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278058
         class: compliance
@@ -136,6 +141,33 @@ assessment:
               \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
               \ behavior.\n\n  Logoff records user logoffs. If this is an interactive logoff, it is recorded on the local\
               \ system. If it is to a network share, it is recorded on the system accessed."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253315:
+        source_definition_id: oval:mil.disa.stig.defs:def:253315
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Logoff - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331500
+          - comment: Audit - Logoff - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331501
+          comment: Audit - Logoff - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Logon/Logoff - Logoff successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -262,6 +294,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278058r1180880_rule
-    semantic_ir_sha256: b4e60ca2b7aa0a36c12c1c83be504ea627b9b0ca5374afa064fb046198eb3ad6
+    semantic_ir_sha256: 342140e244a06924f861af765c2f2c1070c67b6b912b75b5690c2b637483cb81
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 160a333a8400ec875a4aeaad3334f53be3abeb8292ab71f24e9d9c713ab1e9db
+  semantic_fingerprint_sha256: 4702df0cf94865c5bd66858ca3519efee60daaa9210b5ad38baf0a6431e556f3

@@ -406,12 +406,32 @@ rule:
         version: '2'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/auditd.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -419,26 +439,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23048300:
-        source_state_id: oval:mil.disa.stig.ind:ste:23048300
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '25'
-        state_title: null
       oval:mil.disa.stig.ind:ste:23048301:
         source_state_id: oval:mil.disa.stig.ind:ste:23048301
         source_type: textfilecontent54_state
@@ -448,26 +464,59 @@ rule:
         - attributes:
             datatype: int
             operation: less than
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: less than
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '100'
         state_title: null
+      oval:mil.disa.stig.ind:ste:23048300:
+        source_state_id: oval:mil.disa.stig.ind:ste:23048300
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '25'
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23048301:
-          source_test_id: oval:mil.disa.stig.ind:tst:23048301
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: '/etc/audit/auditd.conf: space_left less than 100%'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23048300
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23048301
-          source_other: []
         oval:mil.disa.stig.ind:tst:23048300:
           source_test_id: oval:mil.disa.stig.ind:tst:23048300
           source_type: textfilecontent54_test
@@ -480,6 +529,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:23048300
           predicates:
           - oval:mil.disa.stig.ind:ste:23048300
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23048301:
+          source_test_id: oval:mil.disa.stig.ind:tst:23048301
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: '/etc/audit/auditd.conf: space_left less than 100%'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23048300
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23048301
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230483:
@@ -677,9 +739,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258156r1106364_rule
-      semantic_ir_sha256: 085d488db88f4f945924268c9192fc6122cd8e0450129c21ec2b13e8a4b17074
+      semantic_ir_sha256: 5bb65ac485e88f24ced5b8d0c5e2fc70fd18017f7f35c5986c2f8f7d20fa3533
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b9473fb2f4c0d7bc08d209eeecb08c474fc5bc03dfe350b98331f6624c739c84
+    semantic_fingerprint_sha256: 882426c2d34c39f5dc98d510af86fa56a08eb0ecc586b33d45ed6192186d3061
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258156r1106364_rule

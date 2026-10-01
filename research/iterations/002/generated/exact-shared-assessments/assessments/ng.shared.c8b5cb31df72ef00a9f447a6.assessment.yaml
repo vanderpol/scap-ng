@@ -1,0 +1,224 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271754
+  collect:
+    oval:mil.disa.stig.ind:obj:23033500:
+      capability: scapng.collect.independent.textfilecontent54
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/faillock.conf
+      - attributes:
+          datatype: string
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*fail_interval\s*=\s*([\d]+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23033500
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time
+    period.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230335:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/security/faillock.conf:fail_interval <=900 and !=0
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23033500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must automatically lock an account when three unsuccessful logon attempts occur during
+              a 15-minute time period.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230335
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271754:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230335
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002416 - OL 9 must automatically lock an account when three unsuccessful logon attempts occur during
+              a 15-minute time period.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "By limiting the number of failed logon attempts the risk of unauthorized system access via user password\
+              \ guessing, otherwise known as brute-forcing, is reduced. Limits are imposed by locking the account.\n\n\tSatisfies:\
+              \ SRG-OS-000329-GPOS-00128, SRG-OS-000021-GPOS-00005"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271754
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23033500:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23033500
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23033500
+        - oval:mil.disa.stig.ind:ste:20000024
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23033500
+        source_type: textfilecontent54_test
+        state_operator: AND
+        test_title: /etc/security/faillock.conf:fail_interval <=900 and !=0
+  id: ng.shared.c8b5cb31df72ef00a9f447a6
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:20000024:
+      entities:
+      - attributes:
+          datatype: int
+          operation: not equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: not equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:20000024
+      source_type: textfilecontent54_state
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23033500:
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '900'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23033500
+      source_type: textfilecontent54_state
+      state_title: null
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: c8b5cb31df72ef00a9f447a61fcea55fbd84a4d38042c3493bda11f72a38e594
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271754r1184208_rule
+    title: OL 9 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258056r1045143_rule
+    title: RHEL 9 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time
+      period.

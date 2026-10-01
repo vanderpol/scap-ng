@@ -16,12 +16,48 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: userright
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SE_SYSTEM_ENVIRONMENT_NAME
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -30,20 +66,26 @@ assessment:
       entities:
       - attributes:
           operation: case insensitive equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
-      state_title: null
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: null
   evaluate:
     tests:
@@ -62,6 +104,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000030
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253502:
+        source_definition_id: oval:mil.disa.stig.defs:def:253502
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: Modify firmware environment values - Administrators
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25350201
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Modify firmware environment values" user right must only be assigned to the Administrators group.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278258:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278258
         class: compliance
@@ -95,29 +160,6 @@ assessment:
             text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
               \n  Accounts with the \"Modify firmware environment values\" user right can change hardware configuration environment\
               \ variables. This could result in hardware failures or a denial of service."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253502:
-        source_definition_id: oval:mil.disa.stig.defs:def:253502
-        class: compliance
-        version: '4'
-        criteria:
-          children:
-          - comment: Modify firmware environment values - Administrators
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25350201
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Modify firmware environment values" user right must only be assigned to the Administrators group.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -268,6 +310,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
-    semantic_ir_sha256: 3ca6389800afe1d512e4c2c481aa0ea0ed89cea1cbc199dadada9f07ec441301
+    semantic_ir_sha256: 4d57a77f5f2e12f93d550f47a9b20375a84892e77bf3a1fc249c6b19945598be
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: cb7784e567d6dfbab94e89012c76eee58a9b1a641597fd7366b09c78a26e1295
+  semantic_fingerprint_sha256: fe8188a1f958aae33d1dec5be476ea98ae6f55f8683c0a34e4ea68039745e6b3

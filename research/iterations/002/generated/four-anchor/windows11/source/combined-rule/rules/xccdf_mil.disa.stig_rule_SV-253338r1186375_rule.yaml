@@ -410,6 +410,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: hive
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -417,6 +427,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -424,6 +444,16 @@ rule:
         - attributes:
             datatype: string
             operation: case insensitive equals
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: case insensitive equals
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -436,13 +466,45 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: reg_dword
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -464,30 +526,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25333800
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253338:
-          source_definition_id: oval:mil.disa.stig.defs:def:253338
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The Security event log size is configured to 5120000 KB or greater
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25333800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The security event log size must be configured to a value that holds at least one week's worth of audit
-                records.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253338:
           source_definition_id: oval:mil.disa.stig.windows11:def:253338
           class: compliance
@@ -521,6 +559,30 @@ rule:
               text: nadequate log size will cause the log to fill up quickly. This may prevent audit events from being recorded
                 properly and require frequent attention by administrative personnel. System administrators (SAs) must monitor
                 the volume of security event audit records and increase the registry value for the log size as needed.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253338:
+          source_definition_id: oval:mil.disa.stig.defs:def:253338
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The Security event log size is configured to 5120000 KB or greater
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25333800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The security event log size must be configured to a value that holds at least one week's worth of audit
+                records.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -669,9 +731,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
-      semantic_ir_sha256: 87e23e509c67fb5148f19c52c9fd87ffe8612ac4e7cf1e5ac55a13554458eedd
+      semantic_ir_sha256: 8b93199652a1c6af107117886428484e3b8a9082de07ab478bb64a97d13a3044
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6ed5386b8c27de6ee1fef71b83daaacf9603000fe61f38a47d055baec08fd1d3
+    semantic_fingerprint_sha256: 547f37d128be562146c4806fcf9919dbf9b7a9701a5ead6b9b7fa6f683708477
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule

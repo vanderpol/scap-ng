@@ -17,12 +17,32 @@ assessment:
       query:
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: HKEY_LOCAL_MACHINE
       - attributes:
           datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -30,6 +50,16 @@ assessment:
       - attributes:
           datatype: string
           operation: case insensitive equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: case insensitive equals
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -42,13 +72,45 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - kind: element
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: reg_dword
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -70,6 +132,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25326100
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253261:
+        source_definition_id: oval:mil.disa.stig.defs:def:253261
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: BitLocker must be 6 digits or more.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25326100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows systems must use a BitLocker PIN with a minimum length of six digits for pre-boot authentication.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253261:
         source_definition_id: oval:mil.disa.stig.windows11:def:253261
         class: compliance
@@ -105,29 +190,6 @@ assessment:
               system controls. Encrypting the data ensures that confidentiality is protected even when the operating system
               is not running. Pre-boot authentication prevents unauthorized users from accessing encrypted drives. Increasing
               the pin length requires a greater number of guesses for an attacker.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253261:
-        source_definition_id: oval:mil.disa.stig.defs:def:253261
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: BitLocker must be 6 digits or more.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25326100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows systems must use a BitLocker PIN with a minimum length of six digits for pre-boot authentication.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -261,6 +323,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253261r1210284_rule
-    semantic_ir_sha256: b5c8a879563cd9057cd3d8deca01c27b5f5e536fa3c223e2647942c806fd46fe
+    semantic_ir_sha256: 1051270757f1a6666c78e52c01ed8ff86ed61ee49c187f084f21d3ee756fc9b4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: fe10114cc32be51816b397344b78f9767ff6472d5da6eb4a8e8e08473abb12b1
+  semantic_fingerprint_sha256: 80b753569c9590c2e7bbdd6498b742dec6b15bf02f15680eba0aa5c106d3cdb9

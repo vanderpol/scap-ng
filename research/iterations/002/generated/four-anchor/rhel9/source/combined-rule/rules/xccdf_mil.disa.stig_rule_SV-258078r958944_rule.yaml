@@ -444,56 +444,6 @@ rule:
     description: RHEL 9 must use a Linux Security Module configured to enforce limits on system services.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23024001:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23024001
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        object_title: /etc/selinux/config:SELINUX value
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/selinux/config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^SELINUX=(.*)\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:23024000:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23024000
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        object_title: /sys/fs/selinux/enforce value
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /sys/fs/selinux/enforce
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^(\d+)$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.linux:obj:23024000:
         capability: scapng.collect.linux.partition
         source_object_id: oval:mil.disa.stig.linux:obj:23024000
@@ -502,10 +452,130 @@ rule:
         version: '1'
         object_title: /sys/fs/selinux
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /sys/fs/selinux
+      oval:mil.disa.stig.ind:obj:23024000:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23024000
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: /sys/fs/selinux/enforce value
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /sys/fs/selinux/enforce
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^(\d+)$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23024001:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23024001
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: /etc/selinux/config:SELINUX value
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/selinux/config
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^SELINUX=(.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:23024000:
@@ -514,7 +584,23 @@ rule:
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         operator: AND
         entities:
-        - kind: element
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: fs_type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: selinuxfs
@@ -527,6 +613,22 @@ rule:
         entities:
         - attributes:
             datatype: string
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -541,6 +643,22 @@ rule:
         - attributes:
             datatype: int
             operation: not equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: not equal
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -548,18 +666,18 @@ rule:
         state_title: /sys/fs/selinux/enforce != 0
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23024000:
-          source_test_id: oval:mil.disa.stig.linux:tst:23024000
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: selinux is active
+        oval:mil.disa.stig.ind:tst:23024001:
+          source_test_id: oval:mil.disa.stig.ind:tst:23024001
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/selinux/config:SELINUX=enforcing
           check: all
-          check_existence: at_least_one_exists
+          check_existence: only_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.linux:obj:23024000
+          - oval:mil.disa.stig.ind:obj:23024001
           predicates:
-          - oval:mil.disa.stig.linux:ste:23024000
+          - oval:mil.disa.stig.ind:ste:23024001
           source_other: []
         oval:mil.disa.stig.ind:tst:23024000:
           source_test_id: oval:mil.disa.stig.ind:tst:23024000
@@ -574,18 +692,18 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23024000
           source_other: []
-        oval:mil.disa.stig.ind:tst:23024001:
-          source_test_id: oval:mil.disa.stig.ind:tst:23024001
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /etc/selinux/config:SELINUX=enforcing
+        oval:mil.disa.stig.linux:tst:23024000:
+          source_test_id: oval:mil.disa.stig.linux:tst:23024000
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: selinux is active
           check: all
-          check_existence: only_one_exists
+          check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23024001
+          - oval:mil.disa.stig.linux:obj:23024000
           predicates:
-          - oval:mil.disa.stig.ind:ste:23024001
+          - oval:mil.disa.stig.linux:ste:23024000
           source_other: []
       definitions:
         oval:mil.disa.stig.rhel9os:def:258078:
@@ -806,9 +924,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258078r958944_rule
-      semantic_ir_sha256: 3bbb37c63a06effbb7cecd96c04c5ea2acc9aa9daa4165cc5bd93cebebf5e5d3
+      semantic_ir_sha256: bfd0e7acc709ff51df6dae867449a4cddff16867bbb9037ac875570c4c904eab
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: bfb864cc8d3f4ae986ad7a7efefdaf8b4233c3fcc83423a1eaddf11c69325d9d
+    semantic_fingerprint_sha256: 2cb83519ef7aa335409a4406636ae801ecba80fa8d366f6b83df2070a06d9df1
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258078r958944_rule

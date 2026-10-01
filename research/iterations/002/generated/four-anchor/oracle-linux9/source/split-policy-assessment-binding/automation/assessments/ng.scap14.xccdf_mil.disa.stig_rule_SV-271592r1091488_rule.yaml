@@ -16,18 +16,48 @@ assessment:
       version: '2'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /boot/loader/entries
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^.*\.conf$
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -35,6 +65,16 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -50,6 +90,22 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -71,30 +127,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:23046900
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:271592:
-        source_definition_id: oval:mil.disa.stig.defs:def:271592
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Boot Loader Specification options audit_backlog_limit set to 8192 or greater.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23046900
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must allocate an audit_backlog_limit of sufficient size to capture processes that start
-              prior to the audit daemon.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271592:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271592
         class: compliance
@@ -133,6 +165,30 @@ assessment:
               \ filter).\n\n\tAllocating an audit_backlog_limit of sufficient size is critical in maintaining a stable boot\
               \ process. With an insufficient limit allocated, the system is susceptible to boot failures and crashes.\n\n\
               \tSatisfies: SRG-OS-000254-GPOS-00095, SRG-OS-000341-GPOS-00132"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:271592:
+        source_definition_id: oval:mil.disa.stig.defs:def:271592
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Boot Loader Specification options audit_backlog_limit set to 8192 or greater.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23046900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must allocate an audit_backlog_limit of sufficient size to capture processes that start
+              prior to the audit daemon.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -254,6 +310,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271592r1091488_rule
-    semantic_ir_sha256: 8504fa098f747e2bf52de8ba855ff4b7620770818c1fbd690ac434aac0f1747f
+    semantic_ir_sha256: 0402486d1896cd34b7b9302503c5293e0842954c08923b1f4fa5d10c24cc02d5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 66cca30c2430a9edb5fd8fe86fe1a1f44f55932836f93bc181e89e65bd848741
+  semantic_fingerprint_sha256: a2374a43910912994e2527085fdc9bdb9c821210c9de4dfb172afc0b4a55361c

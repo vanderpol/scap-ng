@@ -364,31 +364,6 @@ rule:
     description: OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23031602:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031602
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        object_title: /etc/resolv.conf nameserver entries
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/resolv.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^nameserver\s+(.*)$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23031601:
         capability: scapng.collect.independent.variable
         source_object_id: oval:mil.disa.stig.ind:obj:23031601
@@ -397,7 +372,17 @@ rule:
         version: '1'
         object_title: count of unique name servers
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: var_ref
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: oval:mil.disa.stig.ind:var:23031600
@@ -409,12 +394,32 @@ rule:
         version: '2'
         object_title: /etc/nsswitch.conf hosts entry
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/nsswitch.conf
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -422,6 +427,71 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23031602:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23031602
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: /etc/resolv.conf nameserver entries
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/resolv.conf
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^nameserver\s+(.*)$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -502,19 +572,6 @@ rule:
           variable_id: oval:mil.disa.stig.ind:var:23031600
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.ind:ste:23031600:
-        source_state_id: oval:mil.disa.stig.ind:ste:23031600
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (^|\s)dns(\s|$)
-        state_title: hosts entry contains dns
       oval:mil.disa.stig.ind:ste:23031601:
         source_state_id: oval:mil.disa.stig.ind:ste:23031601
         source_type: variable_state
@@ -524,26 +581,58 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '2'
         state_title: /etc/resolv.conf is configured with at least two name servers
+      oval:mil.disa.stig.ind:ste:23031600:
+        source_state_id: oval:mil.disa.stig.ind:ste:23031600
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (^|\s)dns(\s|$)
+        state_title: hosts entry contains dns
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23031600:
-          source_test_id: oval:mil.disa.stig.ind:tst:23031600
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: The system is using DNS
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23031600
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23031600
-          source_other: []
         oval:mil.disa.stig.ind:tst:23031601:
           source_test_id: oval:mil.disa.stig.ind:tst:23031601
           source_type: variable_test
@@ -568,6 +657,19 @@ rule:
           collections:
           - oval:mil.disa.stig.ind:obj:23031602
           predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23031600:
+          source_test_id: oval:mil.disa.stig.ind:tst:23031600
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: The system is using DNS
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23031600
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23031600
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230316:
@@ -771,9 +873,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
-      semantic_ir_sha256: ed2a2954e183a15fe66fb9839f4fac64f026ce369084d450450c46bc536db9ad
+      semantic_ir_sha256: 7192b3d5e069fcab84c622d5da646628429fd1dbfd18847ddb1eeccd7e967650
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 44fa684549f1c9342434fa899099c75e0e503f976ddd417f4ad9614f8b6479d7
+    semantic_fingerprint_sha256: 4beae365607a317ec9e62d54abf2c78419371e31369c14716b81e0a11d5fe249
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271861r1092295_rule

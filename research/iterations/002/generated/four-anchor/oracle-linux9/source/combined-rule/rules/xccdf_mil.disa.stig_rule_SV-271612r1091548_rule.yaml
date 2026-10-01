@@ -345,12 +345,32 @@ rule:
         version: '1'
         object_title: in /etc/pam.d/system-auth check for pam_pwquality.so retry equals value
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/pam.d/system-auth
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -358,6 +378,16 @@ rule:
             \t]+))retry=([0-9]+)(?:\s|$)
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -373,6 +403,22 @@ rule:
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -577,9 +623,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
-      semantic_ir_sha256: 0a69be8f65eb9ef6fe830bc14e0e546e8cfef2fb49550592fd2f2a3d5d8588e7
+      semantic_ir_sha256: 0e38f7d6b3289d0047dac28866fb1bdedf2296bf06ad68510234de644c809673
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6c2c9558422cfa5a4b9264426654ef7c694a20be2016877cf2701342bd532f60
+    semantic_fingerprint_sha256: d975cebb92620220d2ffca22611cf51625f0b6690f658db73169d698ca1c3074
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule

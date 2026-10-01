@@ -347,7 +347,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: /var/log
@@ -359,7 +369,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: var_ref
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: oval:mil.disa.stig.defs:var:23051600
@@ -371,18 +391,48 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/fstab
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
         - attributes:
             datatype: int
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -450,19 +500,6 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:23051600
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.linux:ste:23051600:
-        source_state_id: oval:mil.disa.stig.linux:ste:23051600
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: noexec
-        state_title: null
       oval:mil.disa.stig.ind:ste:23051600:
         source_state_id: oval:mil.disa.stig.ind:ste:23051600
         source_type: variable_state
@@ -471,25 +508,70 @@ rule:
         entities:
         - attributes:
             entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: noexec
         state_title: null
+      oval:mil.disa.stig.linux:ste:23051600:
+        source_state_id: oval:mil.disa.stig.linux:ste:23051600
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: noexec
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23051600:
-          source_test_id: oval:mil.disa.stig.ind:tst:23051600
-          source_type: variable_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /var/log is configured with the noexec option in /etc/fstab
+        oval:mil.disa.stig.linux:tst:23051600:
+          source_test_id: oval:mil.disa.stig.linux:tst:23051600
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: /var/log is mounted with the noexec option
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23051600
+          - oval:mil.disa.stig.linux:obj:23051600
           predicates:
-          - oval:mil.disa.stig.ind:ste:23051600
+          - oval:mil.disa.stig.linux:ste:23051600
           source_other: []
         oval:mil.disa.stig.ind:tst:23051601:
           source_test_id: oval:mil.disa.stig.ind:tst:23051601
@@ -503,18 +585,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:23051601
           predicates: []
           source_other: []
-        oval:mil.disa.stig.linux:tst:23051600:
-          source_test_id: oval:mil.disa.stig.linux:tst:23051600
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: /var/log is mounted with the noexec option
+        oval:mil.disa.stig.ind:tst:23051600:
+          source_test_id: oval:mil.disa.stig.ind:tst:23051600
+          source_type: variable_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /var/log is configured with the noexec option in /etc/fstab
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.linux:obj:23051600
+          - oval:mil.disa.stig.ind:obj:23051600
           predicates:
-          - oval:mil.disa.stig.linux:ste:23051600
+          - oval:mil.disa.stig.ind:ste:23051600
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230516:
@@ -710,9 +792,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271658r1091686_rule
-      semantic_ir_sha256: ba0f2f26d06327540e1fa739fc49b97fdf29871d21204f9a7e7d09fca6153643
+      semantic_ir_sha256: d742f7358dce5cc134cc16265144c850d21b92d6a527a6e3ef8c4fc419829b62
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: cb4966188747ea219332ec325a5557f879fd418a87c42a2d2c469089ffb0c218
+    semantic_fingerprint_sha256: 9d824408e61ea7adabd75a6213793ffd63346d99c080c97b0c27493b009b07c4
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271658r1091686_rule

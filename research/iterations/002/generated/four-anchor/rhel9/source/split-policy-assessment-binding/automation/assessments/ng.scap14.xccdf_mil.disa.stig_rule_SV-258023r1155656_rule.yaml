@@ -15,42 +15,52 @@ assessment:
       version: '13'
       object_title: Gather gsettings get org.gnome.desktop.session idle-delay
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: bash
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: gsettings get org.gnome.desktop.session idle-delay
       - attributes:
           operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: uint32\s+(\d+)
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-        kind: element
-        name: exit_status
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      - attributes:
-          datatype: int
-          operation: less than or equal
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '600'
-      state_title: idle-delay must be less than or equal to 600
     oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301
       source_type: shellcommand_state
@@ -59,6 +69,22 @@ assessment:
       entities:
       - attributes:
           datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: exit_status
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -66,11 +92,79 @@ assessment:
       - attributes:
           datatype: int
           operation: not equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: not equal
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '0'
       state_title: idle-delay must not be equal to zero
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '600'
+      state_title: idle-delay must be less than or equal to 600
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.linux:tst:25802301:
@@ -243,6 +337,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258023r1155656_rule
-    semantic_ir_sha256: 70d5aa58f2ca754e6f3bde7816ad88da9ca0c64ef7fbec9d0f7f79eebc55273a
+    semantic_ir_sha256: 6e25c2d15561231595bf9eae76edc96ec76452a18e3eccb919333df698c31376
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 2a9421de22c6e7f6a28eabd6b28e2bbf76ee3db3b60317568de17438778e4a65
+  semantic_fingerprint_sha256: 129046e07d36a0020098ec3944676ce7f08041d8a1bdfa36094a3d97ec37ced4

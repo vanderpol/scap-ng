@@ -1,0 +1,336 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271772
+  collect:
+    oval:mil.disa.stig.unix:obj:23028600:
+      capability: scapng.collect.unix.file
+      object_title: null
+      query:
+      - attributes:
+          max_depth: '-1'
+          recurse_direction: down
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/ssh
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: ^.*\.pub$
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23028600
+      source_type: file_object
+      version: '1'
+  derive: {}
+  description: OL 9 SSH public host key files must have mode 0644 or less permissive.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230286:
+        class: compliance
+        criteria:
+          children:
+          - comment: The SSH daemon public host key files have mode 0644 or less permissive
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23028600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSH public host key files must have mode 0644 or less permissive.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230286
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271772:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230286
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002503 - OL 9 SSH public host key files must have mode 0644 or less permissive.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If a public host key file is modified by an unauthorized user, the SSH service may be compromised.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271772
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:23028600:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:23028600
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23028600
+        source_type: file_test
+        state_operator: AND
+        test_title: The SSH daemon public host key files have mode 0644 or less permissive
+  id: ng.shared.65fae54f5a433f7eb313d5e9
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000001:
+      entities:
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: suid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: sgid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: uexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: gwrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: gexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: boolean
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: oexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000001
+      source_type: file_state
+      state_title: File permissions is 644 or more restrictive
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 65fae54f5a433f7eb313d5e9d0ca45bcc094aba24e25eb0e53888bd450a3f64a
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271772r1092028_rule
+    title: OL 9 SSH public host key files must have mode 0644 or less permissive.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258001r991589_rule
+    title: RHEL 9 SSH public host key files must have mode 0644 or less permissive.

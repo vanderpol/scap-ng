@@ -368,12 +368,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/login.defs
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -381,6 +401,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -396,6 +426,22 @@ rule:
         - attributes:
             datatype: string
             operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -417,6 +463,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:23038300
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230383:
+          source_definition_id: oval:mil.disa.stig.defs:def:230383
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/login.defs:UMASK == 077
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must define default permissions for all authenticated users in such a way that the
+                user can only read and modify their own files.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271696:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271696
           class: compliance
@@ -449,30 +519,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Setting the most restrictive default permissions ensures that when new accounts are created, they do not
                 have unnecessary access.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230383:
-          source_definition_id: oval:mil.disa.stig.defs:def:230383
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/login.defs:UMASK == 077
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must define default permissions for all authenticated users in such a way that the
-                user can only read and modify their own files.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -608,9 +654,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271696r1091800_rule
-      semantic_ir_sha256: b041289a6704b41b2772b8d62c622de80a5023300a8591c1814acf93ba59b196
+      semantic_ir_sha256: a38c5fdbf7f7bdcb573ced2250fd1ad76741165b6e93b707d29f2adbe061bdb9
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 7aaef0063a092d400b48a46ea9415d6927bf7a8adbb22d0ce49dff635f9d6f76
+    semantic_fingerprint_sha256: db96a501fbe323c1dc102fe0017ade0a957237ce88acefdbc271aefee119e883
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271696r1091800_rule

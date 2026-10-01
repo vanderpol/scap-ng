@@ -7,31 +7,6 @@ assessment:
   description: RHEL 9 groups must have unique Group ID (GID).
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25806100:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25806100
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: /etc/group GIDs
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/group
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '^[^:]*:[^:]*:([^:]+):'
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25806101:
       capability: scapng.collect.independent.variable
       source_object_id: oval:mil.disa.stig.ind:obj:25806101
@@ -40,10 +15,75 @@ assessment:
       version: '1'
       object_title: count of group entries
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: var_ref
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: oval:mil.disa.stig.defs:var:25806100
+    oval:mil.disa.stig.ind:obj:25806100:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25806100
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: /etc/group GIDs
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/group
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^[^:]*:[^:]*:([^:]+):'
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive:
     oval:mil.disa.stig.defs:var:25806101:
       source_variable_id: oval:mil.disa.stig.defs:var:25806101
@@ -188,6 +228,25 @@ assessment:
       - attributes:
           datatype: int
           var_ref: oval:mil.disa.stig.defs:var:25806101
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: documented_implicit
+            value: all
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -208,6 +267,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25806100
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258061:
+        source_definition_id: oval:mil.disa.stig.defs:def:258061
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: GIDs are unique
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25806100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system groups must have unique Group ID (GID).
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258061:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258061
         class: compliance
@@ -239,29 +321,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: To ensure accountability and prevent unauthenticated access, groups must be identified uniquely to prevent
               potential misuse and compromise of the system.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258061:
-        source_definition_id: oval:mil.disa.stig.defs:def:258061
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: GIDs are unique
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25806100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system groups must have unique Group ID (GID).
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -380,6 +439,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258061r958482_rule
-    semantic_ir_sha256: 18c65f950c85d6c045dcc0377e3649bbdadf51c612ddbfedb5487567bc78e1e5
+    semantic_ir_sha256: fe0ede3fd30301a01109db0c31d74bb4e8244cdd1f9ae93e2d0416b98d9d6e95
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b9516f16a19d5a8cf088a2a389a8c64bfddc022b7db66d7996179bc538da4f8a
+  semantic_fingerprint_sha256: 05fb2abcc5d891161ef10ece58deba3617f4f921bfd714233e835dc1b3390c2c

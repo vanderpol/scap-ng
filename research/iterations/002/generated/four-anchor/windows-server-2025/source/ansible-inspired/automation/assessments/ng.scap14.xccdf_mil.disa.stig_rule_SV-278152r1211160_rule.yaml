@@ -16,14 +16,44 @@ assessment:
       query:
       - attributes:
           error_if_stderr_exists: 'true'
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: powershell
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '$p=''AD:\CN=AdminSDHolder,CN=System,''+(Get-ADDomain).DistinguishedName;$a=(Get-Acl $p -Audit).Audit;$f=[bool]($a|Where-Object{$_.IdentityReference
@@ -36,7 +66,17 @@ assessment:
           -f $p.Replace(''AD:\'',''''),($r -join '' / '')}else{''Target_Object={0} | IdentityReference=Everyone (S-1-1-0)
           | Status=PASS | Details=All mandatory Failure and Success audit policies are correctly configured per the STIG.''
           -f $p.Replace(''AD:\'','''')}'
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .+
@@ -51,6 +91,22 @@ assessment:
       - attributes:
           entity_check: none satisfy
           operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: none satisfy
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -294,8 +350,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278152
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 412ab69208c0783652b1aeb1fa4c59ae3a01253aa5523f422b10c77323269153
+    semantic_ir_sha256: 8da60f44910dec905d3cc0f57648a2a88dea0027973b9c147ef375a5f16da5bc
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278152r1211160_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: cd9ed23b1886785c12112fa5aa7e84f57d7cb912abcd235a85d9f32e57c753a1
+  semantic_fingerprint_sha256: 6810649ee86cccee923a48e1eb4157e652ad463aa75335e02a426f16ce62b2a0

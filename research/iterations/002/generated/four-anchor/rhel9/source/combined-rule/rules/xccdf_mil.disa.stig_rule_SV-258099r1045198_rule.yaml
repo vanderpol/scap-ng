@@ -407,12 +407,32 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/pam.d/password-auth
         - attributes:
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -420,6 +440,16 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -435,6 +465,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -456,29 +502,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:25810000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258099:
-          source_definition_id: oval:mil.disa.stig.defs:def:258099
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The pam_unix module is included in password-auth and configured for 100000 or more rounds.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25809900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system password-auth must be configured to use a sufficient number of hashing rounds.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258099:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258099
           class: compliance
@@ -517,6 +540,29 @@ rule:
 
 
                 Satisfies: SRG-OS-000073-GPOS-00041, SRG-OS-000120-GPOS-00061'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258099:
+          source_definition_id: oval:mil.disa.stig.defs:def:258099
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The pam_unix module is included in password-auth and configured for 100000 or more rounds.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25809900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system password-auth must be configured to use a sufficient number of hashing rounds.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -644,9 +690,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258099r1045198_rule
-      semantic_ir_sha256: 4f1612fb5e3cbc12fabdcf1aa8df1c2b6a4b75ebe1f336109dc5b3692c96e6ff
+      semantic_ir_sha256: 3f54867bd95301e148c0d790ea8bf1d97ade398454c021dbe1118ec2ebabf92f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: bfcd0a3a92b0408a642f03789cfb01ca28716d7e1038604202bce1a8b574e36f
+    semantic_fingerprint_sha256: 4113a2cf2faafd6b8f9b916f8cf993384cfb06bfbaa0e6efa8513e221f34c52a
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258099r1045198_rule

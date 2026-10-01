@@ -373,7 +373,17 @@ rule:
         version: '1'
         object_title: null
         query:
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: var_ref
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: oval:mil.disa.stig.defs:var:25815500
@@ -389,6 +399,19 @@ rule:
             datatype: string
             var_check: at least one
             var_ref: oval:mil.disa.stig.defs:var:23029400
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: explicit
+              value: at least one
           kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -402,16 +425,46 @@ rule:
         query:
         - attributes:
             ignore_case: 'true'
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/audit/auditd.conf
         - attributes:
             datatype: string
             operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -419,52 +472,21 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
     derive:
-      oval:mil.disa.stig.defs:var:23029400:
-        source_variable_id: oval:mil.disa.stig.defs:var:23029400
-        source_type: local_variable
-        datatype: string
-        variable_title: audit data directory from /etc/audit/auditd.conf
-        semantic_ast:
-          datatype: string
-          expression:
-            item_field: subexpression
-            object_ref: oval:mil.disa.stig.ind:obj:23029402
-            op: object_component
-            record_field: null
-          id: oval:mil.disa.stig.defs:var:23029400
-          type: local_variable
-        resolution:
-          datatype: string
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23029402
-          operation: object_component
-          reason: object_component_requires_collection:textfilecontent54_object
-          record_field: null
-          status: dynamic_object_dependency
-          variable_type: local_variable
-        evaluation_plan:
-          datatype: string
-          dependencies:
-            objects:
-            - oval:mil.disa.stig.ind:obj:23029402
-            operations:
-            - object_component
-            variables: []
-          expression:
-            item_field: subexpression
-            object_ref: oval:mil.disa.stig.ind:obj:23029402
-            op: object_component
-            record_field: null
-          mode: target_dependent
-          reason: object_component_requires_collection:textfilecontent54_object
-          resolution_status: dynamic_object_dependency
-          variable_id: oval:mil.disa.stig.defs:var:23029400
-          variable_type: local_variable
       oval:mil.disa.stig.defs:var:25815500:
         source_variable_id: oval:mil.disa.stig.defs:var:25815500
         source_type: local_variable
@@ -534,6 +556,47 @@ rule:
           resolution_status: dynamic_object_dependency
           variable_id: oval:mil.disa.stig.defs:var:25815500
           variable_type: local_variable
+      oval:mil.disa.stig.defs:var:23029400:
+        source_variable_id: oval:mil.disa.stig.defs:var:23029400
+        source_type: local_variable
+        datatype: string
+        variable_title: audit data directory from /etc/audit/auditd.conf
+        semantic_ast:
+          datatype: string
+          expression:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23029402
+            op: object_component
+            record_field: null
+          id: oval:mil.disa.stig.defs:var:23029400
+          type: local_variable
+        resolution:
+          datatype: string
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+          variable_type: local_variable
+        evaluation_plan:
+          datatype: string
+          dependencies:
+            objects:
+            - oval:mil.disa.stig.ind:obj:23029402
+            operations:
+            - object_component
+            variables: []
+          expression:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23029402
+            op: object_component
+            record_field: null
+          mode: target_dependent
+          reason: object_component_requires_collection:textfilecontent54_object
+          resolution_status: dynamic_object_dependency
+          variable_id: oval:mil.disa.stig.defs:var:23029400
+          variable_type: local_variable
     predicates:
       oval:mil.disa.stig.ind:ste:25815500:
         source_state_id: oval:mil.disa.stig.ind:ste:25815500
@@ -544,6 +607,22 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -577,34 +656,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:25815500
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258155:
-          source_definition_id: oval:mil.disa.stig.defs:def:258155
-          class: compliance
-          version: '3'
-          criteria:
-            children:
-            - comment: Audit file system exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23029400
-            - comment: Audit file system total space >= 10GiB
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25815500
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
-                when audit records are not immediately sent to a central audit record storage facility.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271596:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271596
           class: compliance
@@ -638,6 +689,34 @@ rule:
               text: "To ensure OL 9 systems have a sufficient storage capacity in which to write the audit logs, OL 9 needs\
                 \ to be able to allocate audit record storage capacity.\n\n\tThe task of allocating audit record storage capacity\
                 \ is usually performed during initial installation of OL 9.\n\n\tSatisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000342-GPOS-00133"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258155:
+          source_definition_id: oval:mil.disa.stig.defs:def:258155
+          class: compliance
+          version: '3'
+          criteria:
+            children:
+            - comment: Audit file system exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23029400
+            - comment: Audit file system total space >= 10GiB
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25815500
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
+                when audit records are not immediately sent to a central audit record storage facility.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -769,9 +848,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271596r1091500_rule
-      semantic_ir_sha256: a46a1b115251f37c90b58d9791c9a196577bb44853220cfc5d363f4791ad56e0
+      semantic_ir_sha256: 662a24d82f1e5746bdccb332e0354d007ced159c73a3f06493232a4a032bf066
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: a1ccf45c7a27bf0e38c895a2076ae75bb0a70b2f7485b3161b7a08fb1fb8b40e
+    semantic_fingerprint_sha256: be1450e708de3b2cae12b2641f9b0d763ab83da8c40203a8b212f8310a38bd4c
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271596r1091500_rule

@@ -15,7 +15,17 @@ assessment:
       version: '1'
       object_title: null
       query:
-      - kind: element
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: kernel.unprivileged_bpf_disabled
@@ -30,6 +40,22 @@ assessment:
       - attributes:
           datatype: int
           operation: equals
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -51,6 +77,29 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000010
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:271748:
+        source_definition_id: oval:mil.disa.stig.defs:def:271748
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: kernel.unprivileged_bpf_disabled setting in kernel is '1'.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23054500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable access to network bpf system call from nonprivileged processes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257810:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257810
         class: compliance
@@ -85,29 +134,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000132-GPOS-00067, SRG-OS-000480-GPOS-00227'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:271748:
-        source_definition_id: oval:mil.disa.stig.defs:def:271748
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: kernel.unprivileged_bpf_disabled setting in kernel is '1'.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23054500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must disable access to network bpf system call from nonprivileged processes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -238,6 +264,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257810r1198253_rule
-    semantic_ir_sha256: f44c75dc27c0532b942c7ac55a776f839f6c0f15541fb5695742b5a4d3ced1cf
+    semantic_ir_sha256: 874fc42f5cb1da0ace8b5e7c68e165c7437d0501f78700a7a8975f82cdd2b622
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 7bea1c38f4292c44bab8b5f0d6c8518ed7174c3c3764449235c64ad74753cff3
+  semantic_fingerprint_sha256: fe826d11697a7c968ec98a318390fb3498a675c5a05c5444e9be4babccbbf282
