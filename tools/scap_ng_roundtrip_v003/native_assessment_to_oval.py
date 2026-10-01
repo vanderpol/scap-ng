@@ -221,7 +221,7 @@ class Builder:
         for item in set_expr.get("filters", []):
             self.emit_filter(node, capability, item)
 
-    def emit_object(self, collection, *, private_identity=None, inherited_capability=None):
+    def emit_object(self, collection, *, private_identity=None):
         if isinstance(collection, str):
             name = collection
             if name not in self.assessment.get("collections", {}):
@@ -231,9 +231,6 @@ class Builder:
             identity = ["named_collection", name]
         else:
             identity = private_identity if private_identity is not None else collection
-            if inherited_capability is not None:
-                collection = dict(collection)
-                collection['capability'] = inherited_capability
         oid = self.ids.get("obj", identity)
         if oid in self.active_objects:
             raise ValueError("Collection dependency cycle")
@@ -293,9 +290,10 @@ class Builder:
                     raise ValueError("Embedded Collection is outside Variable scope")
                 native_id, entry = self.variable_context[-1]
                 self.private_collection_number += 1
-                object_id = self.emit_object(collection,
+                object_id = self.emit_object(
+                    collection,
                     private_identity=["private", native_id, self.private_collection_number],
-                    inherited_capability=entry.get("capability"))
+                )
             else:
                 object_id = self.emit_object(collection)
             attrs = {
