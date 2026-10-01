@@ -244,28 +244,40 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[di
         for shingle in shingles:
             inverted[shingle].append(idx)
 
-    candidates=set()
+    # Count shared title trigrams first.  This avoids running expensive fuzzy
+    # comparisons over the combinatorial set produced by generic STIG wording.
+    pair_hits: dict[tuple[int,int], int] = defaultdict(int)
     for ids in inverted.values():
-        # Avoid pathological generic shingles while retaining useful overlap.
-        if len(ids)>200:
+        # Very common shingles ("must be configured", etc.) are poor blockers.
+        if len(ids)>80:
             continue
         for pos,left in enumerate(ids):
             for right in ids[pos+1:]:
                 if rules[left]["benchmark"]==rules[right]["benchmark"]:
                     continue
-                candidates.add((min(left,right),max(left,right)))
+                pair=(min(left,right),max(left,right))
+                pair_hits[pair]+=1
 
     out=[]
-    for left_idx,right_idx in candidates:
+    for (left_idx,right_idx), shared_trigrams in pair_hits.items():
         left,right=rules[left_idx],rules[right_idx]
         lt=set(left["tokens"]); rt=set(right["tokens"])
         union=lt|rt
         jaccard=(len(lt&rt)/len(union)) if union else 0.0
-        title_ratio=SequenceMatcher(None,left["normalized_title"],right["normalized_title"]).ratio()
+        # Require meaningful cheap token overlap before SequenceMatcher.
+        # One shared trigram alone is intentionally insufficient for long titles.
+        if jaccard < 0.40 and shared_trigrams < 2:
+            continue
+        title_ratio=SequenceMatcher(
+            None,left["normalized_title"],right["normalized_title"],autojunk=False
+        ).ratio()
+        if title_ratio < 0.58 and jaccard < 0.50:
+            continue
         discussion_ratio=SequenceMatcher(
             None,
-            " ".join(_tokens(left["discussion"]))[:4000],
-            " ".join(_tokens(right["discussion"]))[:4000],
+            " ".join(_tokens(left["discussion"]))[:2500],
+            " ".join(_tokens(right["discussion"]))[:2500],
+            autojunk=False,
         ).ratio()
         score=0.55*title_ratio+0.30*jaccard+0.15*discussion_ratio
         if score < 0.62:
@@ -281,6 +293,7 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[di
             "title_similarity":round(title_ratio,4),
             "title_token_jaccard":round(jaccard,4),
             "discussion_similarity":round(discussion_ratio,4),
+            "shared_title_trigrams":shared_trigrams,
             "shared_identifiers":shared_ids,
             "left":{k:left[k] for k in ("benchmark","benchmark_id","rule_id","title")},
             "right":{k:right[k] for k in ("benchmark","benchmark_id","rule_id","title")},
