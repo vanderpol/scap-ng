@@ -170,6 +170,44 @@ algorithm, and trust-validation machinery for both package types where
 practical. SCAP-NG SHOULD NOT define two unrelated cryptographic frameworks for
 content and results.
 
+### Migration of legacy XML signatures
+
+SCAP 1.4 source content may contain XML Digital Signature elements on OVAL,
+XCCDF, or related source nodes. Those signatures authenticate the **legacy XML
+representation**, not the semantically converted SCAP-NG representation.
+
+A converter that supports signature-aware migration SHALL verify a legacy XML
+signature against the original, unmodified source bytes/node set **before**
+normalization or conversion. Verification results SHOULD record, in migration
+evidence as available:
+
+- source artifact identity and cryptographic digest;
+- signed source node/document identity;
+- verification status;
+- signer/key or certificate identity;
+- signature and digest algorithms;
+- trust-chain status separately from cryptographic signature validity;
+- verification time and verifier implementation/version.
+
+A valid legacy XML signature SHALL NOT be copied into native SCAP-NG executable
+content as though it authenticates the converted object. Conversion changes the
+representation and may change object boundaries, so the original signature no
+longer covers the resulting package members.
+
+The compiled SCAP-NG package SHALL establish its own integrity and, when signed,
+its own package signature over the canonical NG package manifest or equivalent
+complete logical representation. Migration evidence MAY link that new package
+identity to the verified legacy source digest/signature result.
+
+If a source signature is present but cryptographic verification fails, a
+signature-aware converter SHALL fail closed or quarantine the affected source;
+it SHALL NOT silently convert the content while claiming authenticated legacy
+provenance. Lack of a legacy signature is not itself a migration failure unless
+a deployment policy requires signed source.
+
+Legacy source-signature verification, SCAP-NG content-package signing, and
+SCAP-NG result-package signing are therefore three distinct trust events. A
+successful event at one layer SHALL NOT be treated as proof of another.
 
 ## 7. Historical authoring comments
 
