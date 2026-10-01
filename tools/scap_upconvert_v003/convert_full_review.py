@@ -503,6 +503,9 @@ def main(argv=None):
         if unsupported: raise ValueError('Unsupported Benchmark metadata: '+str(unsupported))
         front,_=source.normalize_front_matter(xr);rear,_=source.normalize_rear_matter(xr)
         groups,grouping=source.build_groups(rs);version=xr.find('x:version',source.NS)
+        # Keep Benchmark discovery metadata aligned with each automated Assessment.
+        # The identifier is explicitly provisional until the OVAL Board adopts
+        # the successor specification identity.
         benchmark={'id':args.benchmark_id,'ng_schema_version':None,'use_case':'compliance',
                    'assessment_specifications':[{'id':WORKING_ASSESSMENT_SPECIFICATION_ID,'version':WORKING_ASSESSMENT_SPECIFICATION_VERSION}],
                    'title':source.localized_texts(xr,'title'),'description':source.localized_texts(xr,'description'),
