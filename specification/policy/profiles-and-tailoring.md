@@ -465,6 +465,17 @@ instead of an automated check.
 The effective policy recorded for a run SHALL include any non-default check
 selection needed to reconstruct which Assessment Method was executed.
 
+A common intended use is an operational safety exception. For example, if a
+published automated Assessment is known to cause unacceptable denial-of-service
+or availability risk in a particular environment, a Tailoring artifact MAY
+select a publisher-provided manual Assessment alternative for that Rule. The
+requirement itself remains unchanged; only the published Assessment selection
+used to evaluate it changes.
+
+Such a selector change SHOULD include a human-readable justification and, where
+available, an authorization/change reference so the result can explain why the
+non-default Assessment was selected.
+
 <!-- spec-nav:start -->
 
 ---
