@@ -17,10 +17,12 @@ for path in SCHEMA_DIR.glob("*.schema.json"):
     if doc.get("$id"):
         LOCAL_SCHEMAS[doc["$id"]]=doc
 RESOLVER=RefResolver.from_schema(SCHEMA, store=LOCAL_SCHEMAS)
+ASSESSMENT_SCHEMA=LOCAL_SCHEMAS["assessment-result.schema.json"]
 
 
-def validate(doc):
-    jsonschema.Draft202012Validator(SCHEMA, resolver=RESOLVER).validate(doc)
+def validate(doc, schema=SCHEMA):
+    resolver=RefResolver.from_schema(schema, store=LOCAL_SCHEMAS)
+    jsonschema.Draft202012Validator(schema, resolver=resolver).validate(doc)
 
 
 def base_result():
@@ -98,6 +100,51 @@ class BenchmarkResultInstanceTests(unittest.TestCase):
         rr["assessment_result_ref"]="legacy-direct-ref"
         with self.assertRaises(jsonschema.ValidationError):
             validate(doc)
+
+
+def base_assessment_result():
+    return {
+        "assessment_result": {
+            "result_schema_version": "0.1.0",
+            "execution_id": "invocation-1",
+            "assessment": {"id": "assessment-1", "version": 1},
+            "purpose": "assessment",
+            "class": "compliance",
+            "outcome": "true",
+            "logical_complete": True,
+            "population_complete": True,
+            "evidence_complete": True,
+            "tests": [],
+            "objects": [],
+            "items": [],
+            "variables": [],
+            "diagnostics": [],
+        }
+    }
+
+
+class AssessmentResultComponentTests(unittest.TestCase):
+    def test_reusable_refs_resolve_offline(self):
+        validate(base_assessment_result(), ASSESSMENT_SCHEMA)
+
+    def test_informational_is_not_technical_truth(self):
+        doc=base_assessment_result()
+        doc["assessment_result"]["outcome"]="informational"
+        with self.assertRaises(jsonschema.ValidationError):
+            validate(doc, ASSESSMENT_SCHEMA)
+
+    def test_collected_item_uses_reusable_schema(self):
+        doc=base_assessment_result()
+        doc["assessment_result"]["items"].append({
+            "id":"item-1",
+            "capability":"unix.file",
+            "status":"exists",
+            "fields":{
+                "path":{"datatype":"string","value":"/etc/example"}
+            },
+            "provenance":{"object_ref":"object-1"},
+        })
+        validate(doc, ASSESSMENT_SCHEMA)
 
 
 if __name__=="__main__":
