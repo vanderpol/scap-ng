@@ -21,6 +21,19 @@ This ledger exists so that:
 
 A disposition marked **Board decision pending** is not a finalized removal.
 
+## Compatibility preservation rule
+
+A SCAP 1.4 capability or semantic that is exercised by current real-world
+content or by the SCAP 1.4 validation/conformance corpus SHALL be preserved in
+SCAP-NG unless there is a compelling, explicitly documented reason to remove or
+replace it.
+
+Rarity, implementation inconvenience, or apparent lack of popularity are not by
+themselves sufficient reasons for removal. When a used capability is normalized,
+replaced, blocked, deferred, or dropped, this ledger SHALL identify the concrete
+evidence, migration behavior, rationale, and restoration criteria.
+
+
 ## Disposition vocabulary
 
 - **retain** — native NG keeps the construct or equivalent semantic primitive.
