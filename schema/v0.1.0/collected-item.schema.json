@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/collected-item.schema.json",
+  "title": "SCAP-NG collected Item v0.1.0 strawman",
+  "description": "Reusable runtime Item shape. Capability-specific schemas may further constrain fields and statuses.",
+  "type": "object",
+  "required": [
+    "id",
+    "capability",
+    "status",
+    "fields",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "imported": {
+      "type": "boolean",
+      "default": false
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "result-types.schema.json#/$defs/typed_value"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "result-types.schema.json#/$defs/typed_value"
+            }
+          }
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}
