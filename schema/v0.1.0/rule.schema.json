@@ -80,8 +80,32 @@
         },
         "requires": {
           "type": "array",
+          "description": "Selection prerequisites. Each array entry is one requirement clause; clauses are ANDed. A clause's any_of members are ORed. A single string is shorthand for a one-member clause.",
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "any_of"
+                ],
+                "properties": {
+                  "any_of": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
           }
         },
         "conflicts": {
