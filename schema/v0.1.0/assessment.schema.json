@@ -2,39 +2,192 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.1.0/assessment.schema.json",
   "title": "SCAP-NG Assessment v0.1.0",
+  "description": "Pre-alpha structural schema using OVAL-aligned semantic node names. Capability-specific Object/State/Test/Variable schemas are generated separately.",
   "type": "object",
-  "required": ["assessment"],
+  "required": [
+    "assessment"
+  ],
   "properties": {
     "assessment": {
       "type": "object",
-      "required": ["id","version","assessment_title","mode","class","purpose"],
+      "required": [
+        "id",
+        "version",
+        "assessment_title",
+        "mode",
+        "class",
+        "purpose"
+      ],
       "properties": {
-        "id": {"type":"string","minLength":1},
-        "version": {"type":"integer","minimum":1},
-        "assessment_title": {"type":["string","null"]},
-        "mode": {"type":"string","enum":["manual","automated"]},
-        "class": {
-          "type":"string",
-          "enum":["compliance","vulnerability","patch","inventory","miscellaneous"]
+        "id": {
+          "type": "string",
+          "minLength": 1
         },
-        "purpose": {"type":"string","enum":["assessment","applicability"]},
-        "collections": {"type":"object"},
-        "variables": {"type":"object"},
-        "tests": {"type":"object"},
-        "evaluate": {"type":"object"},
-        "procedure": {"type":"string"},
-        "inputs": {"type":"array"},
-        "evidence": {"type":"array"}
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "assessment_title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "automated"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "compliance",
+            "vulnerability",
+            "patch",
+            "inventory",
+            "miscellaneous"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "assessment",
+            "applicability"
+          ]
+        },
+        "objects": {
+          "type": "object",
+          "description": "Named authored Objects. An Object defines the effective observation population; collection is the runtime act of evaluating it.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "description": "Named Variables.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "states": {
+          "type": "object",
+          "description": "Named authored States/predicates.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "tests": {
+          "type": "object",
+          "description": "Named Tests. A Test references an Object and zero or more States and retains check_existence/check/state_operator semantics.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "test_title",
+              "capability"
+            ],
+            "properties": {
+              "test_title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "capability": {
+                "type": "string",
+                "minLength": 1
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1
+              },
+              "check_existence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "check": {
+                "type": "string",
+                "minLength": 1
+              },
+              "state_operator": {
+                "type": "string",
+                "enum": [
+                  "AND",
+                  "OR"
+                ]
+              },
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "result": {
+                "type": "string",
+                "enum": [
+                  "unknown"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "evaluate": {
+          "type": "object"
+        },
+        "procedure": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array"
+        },
+        "evidence": {
+          "type": "array"
+        }
       },
       "additionalProperties": false,
       "allOf": [
         {
-          "if": {"properties":{"mode":{"const":"manual"}},"required":["mode"]},
-          "then": {"required":["procedure","inputs","evidence"]}
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "manual"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "procedure",
+              "inputs",
+              "evidence"
+            ]
+          }
         },
         {
-          "if": {"properties":{"mode":{"const":"automated"}},"required":["mode"]},
-          "then": {"required":["collections","tests","evaluate"]}
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "automated"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "objects",
+              "states",
+              "tests",
+              "evaluate"
+            ]
+          }
         }
       ]
     }
