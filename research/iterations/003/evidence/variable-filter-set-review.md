@@ -134,3 +134,23 @@ passes ten targets but fails NGINX on definition
 `ad8b4c12`; this mismatch is separate from bundled-input indexing and must not
 be silently repaired or exempted to make CI green. [Windows expansion](https://github.com/vanderpol/scap-ng/actions/runs/36762966817)
 also passed. The full NIWC census remained queued at this evidence checkpoint.
+
+
+## 2026-10-01 current evaluator-contract follow-up
+
+The migration/round-trip evidence above is now complemented by current-design
+runtime truth-table contracts in `tools/oval_result_truth_tables.py`.
+
+- Set collected-object flag propagation for UNION, INTERSECTION, and COMPLEMENT
+  is promoted into the current conformance helper and exercised across the full
+  flag table.
+- Variable zero-cardinality is preserved until reference context is known;
+  Object and State references apply their distinct OVAL semantics.
+- Boolean filter-State outcomes have explicit include/exclude behavior.
+- Non-Boolean filter-State outcomes (`error`, `unknown`, `not evaluated`,
+  `not applicable`) are deliberately rejected as unresolved rather than
+  coerced to booleans. Their exact collection-status propagation remains an
+  open item in #11 pending authoritative evidence.
+
+This preserves a strict boundary between proven migration fidelity and
+still-unresolved evaluator behavior.
