@@ -503,9 +503,32 @@ def main() -> int:
         (cid, root) for cid, root in components.items()
         if component_kind(root) == "xccdf"
     ]
-    oval_components = [
-        OvalComponent(cid, root) for cid, root in components.items()
+
+    # Some published ZIPs carry applicability/inventory OVAL as standalone XML
+    # members referenced by the XCCDF/CPE dictionary rather than as embedded
+    # datastream components.  They are still authoritative package members and
+    # must participate in source graph resolution.  Avoid double-indexing an
+    # identical OVAL document when the ZIP also embeds the same component.
+    embedded_oval = [
+        (cid, root) for cid, root in components.items()
         if component_kind(root) == "oval"
+    ]
+    seen_oval_documents = {
+        sha256(etree.tostring(root, encoding="UTF-8"))
+        for _, root in embedded_oval
+    }
+    standalone_oval = []
+    for member_name, _, root in parse_xml_candidates(args.source_zip):
+        if component_kind(root) != "oval":
+            continue
+        digest = sha256(etree.tostring(root, encoding="UTF-8"))
+        if digest in seen_oval_documents:
+            continue
+        seen_oval_documents.add(digest)
+        standalone_oval.append((f"zip-member:{member_name}", root))
+
+    oval_components = [
+        OvalComponent(cid, root) for cid, root in embedded_oval + standalone_oval
     ]
     if not benchmarks:
         raise ValueError("no embedded XCCDF Benchmark component found")
