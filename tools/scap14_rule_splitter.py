@@ -127,16 +127,26 @@ def oval_source_roots(zip_path: Path, components):
         sha256(etree.tostring(root, encoding="UTF-8"))
         for _, root in embedded
     }
-    standalone = []
+    discovered = []
     for member_name, _, root in parse_xml_candidates(zip_path):
-        if component_kind(root) != "oval":
-            continue
-        digest = sha256(etree.tostring(root, encoding="UTF-8"))
-        if digest in seen:
-            continue
-        seen.add(digest)
-        standalone.append((f"zip-member:{member_name}", root))
-    return embedded + standalone
+        # A package may carry OVAL as a standalone XML document or nested
+        # inside a datastream/component structure not represented by the
+        # simplified embedded-component index. Index every unique
+        # oval_definitions root from authoritative package XML.
+        candidates = (
+            [root]
+            if component_kind(root) == "oval"
+            else [node for node in root.iter() if component_kind(node) == "oval"]
+        )
+        for ordinal, oval_root in enumerate(candidates, 1):
+            digest = sha256(etree.tostring(oval_root, encoding="UTF-8"))
+            if digest in seen:
+                continue
+            seen.add(digest)
+            discovered.append(
+                (f"zip-member:{member_name}#oval-{ordinal}", oval_root)
+            )
+    return embedded + discovered
 
 
 class OvalComponent:
