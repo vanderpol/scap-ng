@@ -63,9 +63,10 @@ and serialization details can materially change it. The minimal XCCDF-only
 comparison remains important: the self-contained NG JSONL event is larger there
 because it deliberately repeats context for SIEM indexing.
 
-Strict ARF and nested OVAL XSD validation is part of the regression suite. The
-9,316-byte number should be treated as provisional until the current validation
-run containing the source OVAL Definitions is green.
+Strict ARF and nested OVAL XSD validation is part of the regression suite.
+Current-design regression run 36942343930 passed on both Ubuntu and Windows with
+the self-contained source OVAL Definitions included, so the 9,316-byte ARF
+fixture and the comparison inputs are schema-validated at this checkpoint.
 
 Compression should be measured separately from raw size because both XML and
 JSON compress heavily and production transport/storage may use compression.
