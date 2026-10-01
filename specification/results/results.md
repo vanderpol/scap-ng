@@ -23,35 +23,46 @@ run and Rule-specific results for each evaluated Rule.
 The canonical result package need not use the same denormalized representation
 used by SIEM exports.
 
-### Canonical results versus OVAL result directives
+### Candidate simplification: canonical results versus OVAL result directives
 
-SCAP-NG intentionally does not reproduce OVAL Results `directives` as a
-content/result-language mechanism that can omit whole outcome classes or switch
-individual Definition results between `thin` and `full` structures.
+**Board decision pending.** OVAL Results currently permits per-result/per-class
+`reported` controls, `thin` versus `full` result content, and
+`include_source_definitions`.
 
-The canonical SCAP-NG result package SHALL use one stable, self-describing
-logical contract for all outcomes. A result SHALL NOT disappear from the
-canonical package merely because it is pass/false, not applicable, unknown, or
-another outcome selected for suppression by an OVAL-style directive.
+The current SCAP-NG design preference is to simplify this to one stable,
+self-describing canonical logical result contract and treat reduced-detail or
+filtered views as explicit projections/exports. Under that candidate design, a
+canonical result would not disappear merely because it is pass/false, not
+applicable, unknown, or another outcome selected for suppression by a legacy
+directive.
 
-Implementations MAY generate explicit **projections** or exports that reduce
-detail, filter outcome classes, omit embedded source content, or denormalize
-records for transport/consumer needs. Such a projection:
+A projection/export could then reduce detail, filter outcome classes, omit
+embedded source content, or denormalize records for transport/consumer needs.
+If this approach is adopted, such a projection should:
 
-- SHALL be identified as a projection rather than the canonical signed result;
-- SHALL NOT change the underlying technical outcome;
-- SHOULD identify the canonical result/package from which it was derived;
-- SHALL apply deterministic, documented selection/redaction rules;
-- SHALL NOT be required in order to interpret the canonical result package.
+- be identified as a projection rather than the canonical signed result;
+- not change the underlying technical outcome;
+- identify the canonical result/package from which it was derived;
+- apply deterministic, documented selection/redaction rules;
+- not be required in order to interpret the canonical result package.
 
-Migration of an OVAL Results document MAY preserve its source directives as
-legacy/result provenance describing why that legacy document contains or omits
-particular data. Those directives SHALL NOT become execution semantics for a
-native SCAP-NG Assessment.
+Migration of an OVAL Results document should preserve its source directives as
+legacy/result provenance describing why that source document contains or omits
+particular data.
 
-This is an intentional simplification: OVAL `reported`, per-class directives,
-`thin`/`full` content switches, and `include_source_definitions` are
-serialization/report-shaping controls, not Assessment truth semantics.
+This simplification is **not yet normative**. The OVAL Board should explicitly
+decide whether SCAP-NG/next-generation OVAL retains, revises, or drops:
+
+- per-result/per-class `reported` suppression;
+- `thin` versus `full` result content;
+- `include_source_definitions` as a result-shaping control.
+
+The argument for dropping them is reduced scanner/result-consumer complexity:
+one canonical result model plus ordinary projections can provide the same
+transport/reporting flexibility without making the core result schema vary by
+directive. The argument for retaining them is compatibility with established
+OVAL result-generation workflows and the ability to reduce result size at the
+source. Both positions should be reviewed before schema freeze.
 
 ## 3. Technical outcome versus reporting/scoring disposition
 
