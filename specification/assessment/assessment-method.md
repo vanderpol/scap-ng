@@ -168,6 +168,8 @@ including OVAL `check_existence`, or SHALL fail explicitly.
 
 Assessment collection SHALL be expressed using defined capabilities.
 
+Each named or embedded Collection SHALL carry its own capability because a Collection is an independently meaningful acquisition node and MAY be referenced by more than one Test or Variable. A Test capability SHALL NOT substitute for, relocate, or implicitly define the capability of a referenced Collection. Test, Collection, and State/predicate capability identities SHALL be validated for compatibility without erasing their independent declarations.
+
 A capability identifies a portable collection/evaluation interface rather than
 a Benchmark-specific Rule.
 
