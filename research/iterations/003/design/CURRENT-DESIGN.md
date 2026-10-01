@@ -65,6 +65,15 @@ Owner direction, 2026-09-30: Tailoring SHALL have an obvious human-readable `pur
 
 `source/split-rule-assessment/rhel9-full` is historical generated baseline data, not current native syntax. `source/split-policy-assessment/rhel9-full` is a superseded architecture experiment. Neither tree is an automatic source of current authoring decisions.
 
+## Assessment evaluator semantics checkpoint — 2026-10-01
+
+The durable runtime semantic contract is now maintained in
+[assessment-evaluation-semantics.md](assessment-evaluation-semantics.md).
+Confirmed OVAL-derived behavior belongs there, with focused conformance tests;
+JSON Schema is a structural projection and SHALL NOT be the sole source for
+runtime/evaluation semantics. Ambiguous legacy behavior remains explicitly
+unresolved rather than being guessed into the native model.
+
 ## Required working procedure
 
 1. Read this record and repository instructions. Resolve conflicts in favor of the latest explicit owner instruction, update this record, and mark older prose superseded before generating examples.
