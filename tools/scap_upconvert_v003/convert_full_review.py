@@ -343,7 +343,10 @@ def main(argv=None):
                 node=dictionary[ref];checks=[n for n in node if source.local(n.tag)=='check']
                 if len(checks)!=1: raise ValueError('Unsupported dictionary binding')
                 did=source.text(checks[0]);title=source.text(next((n for n in node if source.local(n.tag)=='title'),None))
-                app_id='platform.'+source.semantic_id(title,'platform')
+                # CPE names are the stable source identity. Human titles are
+                # presentation metadata and are not unique (for example the
+                # Windows Server 2012 / 2012 R2 dictionary entries).
+                app_id='platform.'+source.semantic_id(ref,'platform')
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
             definition_oval=app_oval
