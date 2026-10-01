@@ -131,8 +131,15 @@ jobs:
           failures=[r for r in report["results"] if not r.get("equal")]
           deprecated=[]
           extensions=[]
+          source_defects=[]
           bad=[]
           extension_details=set()
+          source_defect_prefixes=(
+              "invalid_oval_record_datatype",
+              "test_collection_capability_mismatch:",
+              "test_state_capability_mismatch:",
+              "Filter capability mismatch:",
+          )
           for row in failures:
               features=row.get("unsupported_features") or []
               names={x.get("feature") for x in features}
@@ -143,6 +150,8 @@ jobs:
                   for feature in features:
                       if feature.get("detail"):
                           extension_details.add(feature["detail"])
+              elif isinstance(row.get("error"),str) and row["error"].startswith(source_defect_prefixes):
+                  source_defects.append(row)
               else:
                   bad.append(row)
           print(json.dumps({
@@ -151,6 +160,7 @@ jobs:
               "deprecated_blockers": len(deprecated),
               "publisher_extension_blockers": len(extensions),
               "publisher_extension_elements": sorted(extension_details),
+              "source_content_defects": len(source_defects),
               "unexpected_failures": len(bad),
               "max_dependency_depth": report.get("max_dependency_depth",0),
           },indent=2))
