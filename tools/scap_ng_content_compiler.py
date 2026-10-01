@@ -205,19 +205,39 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
     if applicability_path.exists():
         applicability_doc = load_yaml(applicability_path)
         app_root = applicability_doc.get("applicability") or {}
-        conditions = []
-        for row in app_root.get("conditions", []) or []:
-            if not isinstance(row, dict) or not isinstance(row.get("assessment"), str):
-                conditions.append(row)
-                continue
-            target, assessment_doc = resolve_assessment(
-                source_root, applicability_path, row["assessment"]
-            )
-            aid = assessment_doc["assessment"]["id"]
-            assessment_docs[aid] = (target, assessment_doc)
-            updated = json.loads(json.dumps(row))
-            updated["assessment"] = aid
-            conditions.append(updated)
+        source_conditions = app_root.get("conditions") or {}
+        if isinstance(source_conditions, dict):
+            conditions = {}
+            for condition_id, row in source_conditions.items():
+                if not isinstance(row, dict):
+                    conditions[condition_id] = row
+                    continue
+                updated = json.loads(json.dumps(row))
+                ref = updated.get("assessment")
+                if isinstance(ref, str):
+                    target, assessment_doc = resolve_assessment(
+                        source_root, applicability_path, ref
+                    )
+                    aid = assessment_doc["assessment"]["id"]
+                    assessment_docs[aid] = (target, assessment_doc)
+                    updated["assessment"] = aid
+                conditions[condition_id] = updated
+        elif isinstance(source_conditions, list):
+            conditions = []
+            for row in source_conditions:
+                if not isinstance(row, dict) or not isinstance(row.get("assessment"), str):
+                    conditions.append(row)
+                    continue
+                target, assessment_doc = resolve_assessment(
+                    source_root, applicability_path, row["assessment"]
+                )
+                aid = assessment_doc["assessment"]["id"]
+                assessment_docs[aid] = (target, assessment_doc)
+                updated = json.loads(json.dumps(row))
+                updated["assessment"] = aid
+                conditions.append(updated)
+        else:
+            raise ValueError(f"{applicability_path}: conditions must be mapping or list")
         compiled_applicability = {
             "applicability": {
                 **{k: v for k, v in app_root.items() if k != "conditions"},
