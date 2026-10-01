@@ -42,7 +42,7 @@ Each entry captures (a) discovery, (b) required normative direction or candidate
 
 **Specification:** value-producing nodes SHALL carry datatype, cardinality, value set, evaluation status and provenance. Define zero-values, error, unknown and not-collected distinctly. Sentinel values such as an intentionally supplied empty string are real values, not substitutes for zero cardinality; conversion tooling SHALL NOT invent such sentinels. An author or capability MAY intentionally define a sentinel only when its meaning and safety are explicit in that assessment contract. The semantic model SHALL describe ordered/unordered combinations, Cartesian products, variable quantification and datatype validation where applicable. An input constrained to modify expected state SHALL NOT be able to change command text, selected collectors or execution privileges.
 
-**Proof:** multi-value constants, zero-value variable analysis-error fixtures at Object and State reference sites, many-to-many quantifier truth tables, Cartesian-product function tests, record_field extraction, errors propagating across dependencies.
+**Proof:** multi-value constants, zero-value variable analysis-error fixtures at Object and State reference sites, explicit propagation of variable error/unknown status before `var_check`/`entity_check` aggregation, many-to-many quantifier truth tables, Cartesian-product function tests, record_field extraction, errors propagating across dependencies.
 
 ### 4. External variable value constraints were genuinely missing
 
