@@ -156,6 +156,12 @@ def inspect(path):
                 "formatted_names":formatted,
                 "checks":checks,
             })
+    oval_definition_ids={
+        node.get("id")
+        for _,xml_root in roots
+        for node in xml_root.iter()
+        if local(node.tag)=="definition" and node.get("id")
+    }
     direct_resolution=[]
     for ref in direct_cpe:
         matches=[
@@ -165,6 +171,14 @@ def inspect(path):
         direct_resolution.append({
             "idref":ref,
             "matches":matches,
+            "check_resolution":[
+                {
+                    "definition":check,
+                    "definition_present":check in oval_definition_ids,
+                }
+                for row in matches
+                for check in row["checks"]
+            ],
         })
     return {
         "artifact":path.name,
