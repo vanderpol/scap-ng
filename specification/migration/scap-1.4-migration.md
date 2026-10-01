@@ -226,6 +226,64 @@ Native Benchmark/Profile/Tailoring content need not retain `cluster-id`.
 Complete migration evidence SHOULD retain the source cluster-to-member
 crosswalk so reviewers can reconstruct why explicit NG operations were emitted.
 
+### XCCDF item/Profile inheritance, abstract templates, and hidden presentation
+
+XCCDF 1.2 requires inheritance to be resolved during Loading before Benchmark
+traversal. Stage-1 SCAP-NG migration SHALL likewise flatten supported
+`extends` relationships into effective content before emitting native objects.
+Native Benchmark/Rule/Assessment/Parameter execution SHALL NOT require a
+runtime XCCDF inheritance engine.
+
+For supported Rule, Value, and Profile inheritance, the converter SHALL apply
+the XCCDF 1.2 property processing models rather than a generic object merge:
+
+- **None:** `abstract`, `cluster-id`, `extends`, `id`, `signature`,
+  `status`, and `dc-status` are not inherited.
+- **Prepend:** `source` and `choices`.
+- **Append:** `requires`, `conflicts`, `ident`, `fix`, `value`,
+  `complex-value`, `default`, `complex-default`, `lower-bound`,
+  `upper-bound`, `match`, `select`, `refine-value`, `refine-rule`,
+  `set-value`, `set-complex-value`, and `profile-note`.
+- **Replace:** `hidden`, `prohibitChanges`, `selected`, `version`,
+  `weight`, `operator`, `interfaceHint`, `check`, `complex-check`,
+  `role`, `severity`, `type`, `interactive`, `multiple`, `note-tag`,
+  and `impact-metric`. XCCDF's distinct-system/distinct-selector rule for
+  `check` remains part of effective-property identity.
+- **Override:** `title`, `description`, `platform`, `question`,
+  `rationale`, `warning`, `reference`, and `fixtext`; explicit
+  `override=true` replaces the corresponding inherited property, otherwise
+  the property appends. Locale-distinct values remain distinct where XCCDF
+  defines `xml:lang` identity.
+
+The converter SHALL recursively resolve the extended object first, SHALL reject
+missing or wrong-type `extends` targets, and SHALL reject inheritance cycles.
+After resolution, the emitted native object SHALL contain its complete effective
+semantics and SHALL NOT retain `extends` merely as an execution dependency.
+Migration evidence SHOULD preserve the inheritance chain and the origin of each
+effective property.
+
+An XCCDF item or Profile with effective `abstract=true` is a template and is
+removed after inheritance resolution. It SHALL NOT become an independently
+executable/selectable native SCAP-NG object. Its contributed effective
+properties remain present in concrete descendants, with source provenance.
+
+XCCDF `hidden` affects generated-document presentation only; the XCCDF
+specification explicitly permits hidden items to participate in assessment.
+SCAP-NG therefore SHALL NOT give `hidden` execution semantics. Stage-1
+migration MAY retain source `hidden` state in migration/presentation metadata,
+but scanners SHALL NOT use it to select, skip, score, or otherwise alter
+Assessment truth. A future document-generation profile MAY define native
+presentation metadata independently of scanner execution.
+
+**Deprecated XCCDF Group extension is an explicit migration blocker by default.**
+XCCDF 1.2 requires fresh unique identifiers for descendant Group/Rule/Value
+objects created through Group extension but states that no standardized ID
+generation procedure exists and warns that vendor behavior is therefore
+non-interoperable. A Stage-1 converter SHALL NOT invent random or
+implementation-specific native identities and claim lossless equivalence. Such
+content SHALL be quarantined for source cleanup or handled only by a separately
+declared compatibility procedure that records its identity mapping completely.
+
 ## 12. CPE inventory migration
 
 SCAP 1.4 OVAL inventory definitions that map to CPE identifiers SHALL preserve
