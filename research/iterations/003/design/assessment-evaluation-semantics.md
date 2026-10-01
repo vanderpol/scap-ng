@@ -146,9 +146,11 @@ A filter references a State and is applied to an Object's Items before the enclo
 - Multiple filters are applied to the candidate population before set combination.
 - Conflicting filters may legitimately produce an empty population.
 
-A runtime evaluator SHALL NOT coerce `error`, `unknown`, or other non-Boolean State outcomes using host-language truthiness.
+A runtime evaluator SHALL NOT coerce `error`, `unknown`, `not evaluated`, or `not applicable` State outcomes using host-language truthiness.
 
-**Open semantic item:** exact collection-status behavior for every non-Boolean filter-State outcome is not yet promoted to normative SCAP-NG text. Until supported by authoritative source and independent execution evidence, implementations/converters SHALL surface the condition rather than guess.
+SCAP-NG explicitly resolves the legacy ambiguity as follows: a non-Boolean filter-State result SHALL produce a collection/evaluation **error** for the enclosing Object path. It SHALL NOT be interpreted as either an include or exclude decision.
+
+This is an intentional native clarification rather than a claim that OVAL 5.12.3 generic schema prose defines every propagation step. Historical MITRE ovaldi behavior is used as sanity-check evidence: its core filter implementation rejects any State result other than true/false, and the Object collector converts the resulting exception to a collected-Object error. Because ovaldi predates 5.12.x, it supports the reasonableness and continuity of this rule but is not its normative authority.
 
 ## 8. Collection status and Object-set propagation
 
@@ -250,7 +252,6 @@ Evidence: GitHub Actions run 36931308817, source-explicit mask census; 212 files
 
 These remain open and SHALL NOT be silently guessed:
 
-- exact non-Boolean filter-State outcome propagation for all cases;
 - per-capability comparison/collection edge behavior not fully stated by generic OVAL schemas;
 - differential execution against an independent OVAL evaluator/reference scanner;
 - precise early-termination proofs for every Test/quantifier combination.
