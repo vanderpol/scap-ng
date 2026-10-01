@@ -115,7 +115,7 @@ def source_defect_fallback(selector, did, error):
         "error": error,
     }
 
-def convert_rule(rec, original, output, schema, temp_root):
+def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None):
     from lxml import etree
     rid=rec['id']
     result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
@@ -155,7 +155,30 @@ def convert_rule(rec, original, output, schema, temp_root):
                                               'source_definition':did,'unsupported':unsupported})
                 continue
             failed=True; result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported}); continue
-        native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
+        external_bindings={}
+        for export in c.findall('x:check-export',NS):
+            source_variable=export.get('export-name')
+            source_value=export.get('value-id')
+            if not source_variable or not source_value:
+                failed=True
+                result['assessments'].append({'status':'blocked','error':'invalid_xccdf_check_export'})
+                external_bindings=None
+                break
+            if parameter_ids is None or source_value not in parameter_ids:
+                failed=True
+                result['assessments'].append({
+                    'status':'blocked',
+                    'error':'unresolved_xccdf_value_binding:'+source_value,
+                })
+                external_bindings=None
+                break
+            external_bindings[source_variable]=parameter_ids[source_value]
+        if external_bindings is None:
+            continue
+        native,error=lower_definition(
+            original,did,aid,collection_graph=True,provenance=provenance,
+            external_bindings=external_bindings,
+        )
         if error:
             defect=source_defect_reason(error)
             if defect and has_manual:
