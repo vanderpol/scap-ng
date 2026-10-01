@@ -210,7 +210,7 @@ def _normalized_title(value: str | None) -> str:
     return " ".join(_tokens(value))
 
 
-def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[dict]:
+def near_rule_candidates(benchmarks: list[dict], *, limit: int | None = None) -> list[dict]:
     """Find cross-benchmark Rule text candidates for manual overlap review.
 
     This is advisory only.  It intentionally does not claim policy equivalence.
@@ -301,14 +301,17 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[di
             "classification":"manual_overlap_review_only",
         })
     out.sort(key=lambda x:(-x["similarity_score"],x["left"]["benchmark"],x["left"]["rule_id"] or ""))
-    return out[:limit]
+    return out if not limit else out[:limit]
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus_root", type=Path)
     ap.add_argument("--output-root", type=Path, required=True)
     ap.add_argument("--report", type=Path, required=True)
-    ap.add_argument("--top-near", type=int, default=250)
+    ap.add_argument("--top-near", type=int, default=250,
+                    help="Maximum near-duplicate Assessment groups retained")
+    ap.add_argument("--max-rule-candidates", type=int, default=0,
+                    help="Maximum similar-Rule candidates; 0 retains all")
     args = ap.parse_args()
 
     source = args.corpus_root.resolve()
@@ -446,7 +449,10 @@ def main() -> int:
             x["shape_fingerprint"],
         )
     )
-    rule_candidates = near_rule_candidates(benchmarks, limit=args.top_near)
+    rule_candidates = near_rule_candidates(
+        benchmarks,
+        limit=(args.max_rule_candidates or None),
+    )
 
     before_assessment_instances = len(rows)
     after_assessment_definitions = before_assessment_instances - duplicate_instances_avoided
