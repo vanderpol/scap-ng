@@ -185,7 +185,17 @@ def main(argv=None):
                         ET.SubElement(original,'{'+review.OD+'}'+name)
                 result,failed_rule=review.convert_rule(rec,original,args.output,schema,temp)
                 evidence['rules'].append(result); blocked=blocked or failed_rule
-            evidence['status']='blocked' if blocked else 'prototype_dataflow_and_roundtrip_checks_passed'
+            quarantined=sum(
+                len(row.get('source_defect_fallbacks',[]))
+                for row in evidence['rules']
+            )
+            evidence['source_defect_quarantine_count']=quarantined
+            evidence['status']=(
+                'blocked' if blocked
+                else 'converted_with_source_defect_quarantine'
+                if quarantined
+                else 'prototype_dataflow_and_roundtrip_checks_passed'
+            )
             write_json(args.output/'evidence.json',evidence)
             if blocked: raise ValueError('Assessment conversion blocked; see evidence.json')
         else:
