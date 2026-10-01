@@ -220,6 +220,33 @@ def resolve_variable_reference(values):
     return {"status": TRUE, "values": values}
 
 
+def evaluate_variable_entity_reference(
+    *,
+    variable_status,
+    var_check,
+    entity_check,
+    comparison_rows=None,
+):
+    """Propagate variable resolution status into State/Object entity evaluation.
+
+    A zero-value variable has already normalized to ERROR via
+    resolve_variable_reference(). Non-success variable status is propagated
+    before any var_check/entity_check aggregation; quantifiers cannot turn an
+    unresolved/error variable into a successful predicate.
+    """
+    if variable_status != TRUE:
+        if variable_status not in RESULTS:
+            raise ValueError(f"unsupported variable status: {variable_status}")
+        return variable_status
+    if comparison_rows is None:
+        raise ValueError("resolved variable requires comparison_rows")
+    return aggregate_many_to_many(
+        var_check=var_check,
+        entity_check=entity_check,
+        comparison_rows=comparison_rows,
+    )
+
+
 def aggregate_many_to_many(*, var_check, entity_check, comparison_rows):
     """Aggregate one State entity's many-to-many value comparisons.
 
