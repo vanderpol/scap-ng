@@ -229,6 +229,12 @@ class VariableReferenceSemantics(unittest.TestCase):
             {"status": TRUE, "values": ["a", "b"]},
         )
 
+    def test_empty_string_is_a_real_value(self):
+        self.assertEqual(
+            resolve_variable_reference([""]),
+            {"status": TRUE, "values": [""]},
+        )
+
     def test_empty_variable_is_not_object_absence(self):
         result = resolve_variable_reference([])
         self.assertNotEqual(result["status"], FALSE)
