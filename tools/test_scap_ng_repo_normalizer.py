@@ -78,6 +78,14 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertEqual(report["summary"]["exact_duplicate_groups"],1)
             self.assertEqual(report["summary"]["duplicate_assessment_definitions_avoided"],1)
             self.assertGreaterEqual(report["summary"]["near_duplicate_review_groups"],1)
+            near=report["near_duplicate_review_groups"][0]
+            self.assertTrue(near["variant_differences"])
+            diff_paths={
+                item["path"]
+                for variant in near["variant_differences"]
+                for item in variant["differences"]
+            }
+            self.assertIn("$.collections.files.select.path.value",diff_paths)
             shared=list((output/"shared"/"assessments").glob("*.yaml"))
             self.assertEqual(len(shared),1)
             shared_assessment=yaml.safe_load(shared[0].read_text())["assessment"]
@@ -93,6 +101,25 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertIn("shared/assessments",rule["assessment_choices"]["automated"]["assessment"])
             # The literal-different third Assessment is advisory only, not removed.
             self.assertTrue((output/"c"/"assessments"/"automated"/"R3.automated.assessment.yaml").exists())
+
+
+    def test_rule_overlap_queue_requires_strong_evidence(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            self.benchmark(root,"a","R1","/etc/ssh/sshd_config")
+            self.benchmark(root,"b","R2","/etc/ssh/sshd_config")
+            self.benchmark(root,"c","R3","/etc/unrelated")
+            benches,_=normalizer.collect_corpus(root)
+            candidates=normalizer.near_rule_candidates(benches)
+            self.assertTrue(candidates)
+            top=candidates[0]
+            self.assertIn(top["confidence"],{"high","medium"})
+            self.assertTrue(top["review_reasons"])
+            # Generic STIG phrasing alone should not create an overlap candidate.
+            self.assertFalse(any(
+                {row["left"]["rule_id"],row["right"]["rule_id"]}=={"R1","R3"}
+                for row in candidates
+            ))
 
 
 if __name__=="__main__":
