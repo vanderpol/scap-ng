@@ -14,11 +14,12 @@ reproduce OVAL XML nesting or element names.
 | Test `check` | Test Result `check` + per-Item outcomes | Preserve per-Item aggregation semantics. |
 | Test `state_operator` | Test Result `state_operator` | Preserve multi-State aggregation level separately. |
 | State result | Test Result `per_item_results[].state_results[]` | Preserve per-State result before Test aggregation. |
-| State entity result / `entity_check` | State-result `entity_results` | Entity-level details remain available; exact capability-specific schema is still being refined. |
-| `var_check` | State/entity result details + Variable Result | Variable aggregation remains a separate semantic level and SHALL NOT be flattened into Test truth. |
+| State entity result / `entity_check` | Entity Result `entity_check` + State Result `entity_results` | Preserve entity-level aggregation separately from State and Test aggregation. |
+| `var_check` | Entity Result `var_check` + Variable Result | Variable aggregation remains a separate semantic level and SHALL NOT be flattened into Test truth. |
 | collected_object flag | Collection Result `status` | Preserve `error`, `complete`, `incomplete`, `does_not_exist`, `not_collected`, and `not_applicable`. |
 | collected_object item refs | Collection Result `item_refs` | Preserve Object-to-Item relationship. |
 | system_characteristics Item | Collected Item Result | Preserve capability identity, Item status, fields, and provenance. |
+| system_info / host identity | Scan/Benchmark target identity and inventory | Preserve host/product identity at the run/target layer instead of duplicating it in every Assessment result. |
 | Item entity datatype/value/status | Collected Item `fields` typed values | Preserve datatype/value/status and explicit redaction. |
 | OVAL `mask` | Result/evidence redaction metadata | Generic comparison-level mask is not a native authoring primitive; sensitive-result handling is explicit and separately governed by the legacy disposition ledger. |
 | Definition/Test `variable_instance` | Assessment invocation identity | Distinct effective bindings become distinct invocations; source integer may remain provenance only. |
@@ -42,6 +43,24 @@ For an Object-backed Test the preserved evaluation layers are:
 
 SCAP-NG result consumers SHALL NOT infer that a later layer replaces or erases
 the earlier diagnostic layer.
+
+## Evidence and completeness
+
+SCAP-NG separates logical completeness, population completeness, and retained
+evidence completeness. Bounded evidence records observed failures, the actual
+failure population when known, the configured evidence maximum, returned
+evidence count, truncation state, and stop reason. An evidence maximum is not a
+compliance threshold and SHALL NOT alter Assessment truth.
+
+Worked bounded-evidence examples are maintained under
+`research/iterations/003/results/issue40/`.
+
+## Informational Rule disposition
+
+XCCDF Rule role remains a policy/result concern. `informational` is therefore
+not added to the six-state Assessment/Test technical outcome domain. A Rule may
+be reporting-only or excluded from scoring while the underlying Assessment
+truth remains available.
 
 ## Compatibility guardrail
 
