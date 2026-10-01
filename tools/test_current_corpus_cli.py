@@ -1,4 +1,4 @@
-"""Exercise the actual corpus CLI so broad regression cannot silently use old syntax."""
+"""Exercise the actual corpus CLI so broad regression requires OVAL-aligned authored syntax."""
 import json
 from pathlib import Path
 import subprocess
@@ -32,14 +32,14 @@ class CorpusCLI(unittest.TestCase):
         report, native = self.run_layout()
         self.assertEqual(report["native_layout"], "current")
         self.assertEqual(report["semantic_equal"], 1)
-        self.assertIn("collections", native)
+        self.assertIn("objects", native)
         self.assertIn("tests", native)
         self.assertNotIn("checks", native)
-        self.assertEqual(len(native["collections"]), 2)
-        ref = next(iter(native["variables"].values()))["expression"]["values"]["collection"]
-        self.assertIn(ref, [node["collection"] for node in native["tests"].values()])
-        sections = [key for key in native if key in ("collections", "variables", "tests", "evaluate")]
-        self.assertEqual(sections, ["collections", "variables", "tests", "evaluate"])
+        self.assertEqual(len(native["objects"]), 2)
+        ref = next(iter(native["variables"].values()))["expression"]["values"]["object"]
+        self.assertIn(ref, [node["object"] for node in native["tests"].values()])
+        sections = [key for key in native if key in ("objects", "variables", "states", "tests", "evaluate")]
+        self.assertEqual(sections, ["objects", "variables", "states", "tests", "evaluate"])
 
     def test_historical_baseline_requires_explicit_switch(self):
         report, native = self.run_layout("historical")
