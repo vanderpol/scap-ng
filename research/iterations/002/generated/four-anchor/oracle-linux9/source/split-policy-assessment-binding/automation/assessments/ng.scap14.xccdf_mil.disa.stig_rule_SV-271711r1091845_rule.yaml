@@ -7,6 +7,61 @@ assessment:
   description: OL 9 SSH daemon must not allow rhosts authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25800501:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25800501
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Pull value of /etc/ssh/sshd_config:IgnoreRhosts
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)IgnoreRhosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25800502:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25800502
@@ -45,61 +100,6 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^.*$
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)IgnoreRhosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:25800501:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25800501
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: Pull value of /etc/ssh/sshd_config:IgnoreRhosts
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -202,29 +202,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000016
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258005:
-        source_definition_id: oval:mil.disa.stig.defs:def:258005
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*:IgnoreRhosts == yes
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25800500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system SSH daemon must not allow rhosts authentication.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271711:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271711
         class: compliance
@@ -255,6 +232,29 @@ assessment:
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: SSH trust relationships mean a compromise on one host can allow an attacker to move trivially to other hosts.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258005:
+        source_definition_id: oval:mil.disa.stig.defs:def:258005
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*:IgnoreRhosts == yes
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25800500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSH daemon must not allow rhosts authentication.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -383,6 +383,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271711r1091845_rule
-    semantic_ir_sha256: 4cad06414925856c961059ae77f3887ce83799342a22f5a5972ac8d67f7c586b
+    semantic_ir_sha256: b77ad2f2d2f93bc6e975d53f597114909476fcae5987146bbd98c0e4e4a0942e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: dc0773c86d43d9b52e18188e13b19c2cf2753cb48318ac535dd20f77c611fec4

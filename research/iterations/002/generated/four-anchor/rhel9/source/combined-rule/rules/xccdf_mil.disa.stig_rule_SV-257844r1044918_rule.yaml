@@ -344,28 +344,6 @@ rule:
     description: RHEL 9 must use a separate file system for /tmp.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23029500:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23029500
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /tmp
       oval:mil.disa.stig.ind:obj:23029500:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029500
@@ -422,22 +400,32 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23029500:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23029500
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /tmp
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23029500:
-          source_test_id: oval:mil.disa.stig.linux:tst:23029500
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: There is a separate file system for /tmp.
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23029500
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23029500:
           source_test_id: oval:mil.disa.stig.ind:tst:23029500
           source_type: textfilecontent54_test
@@ -448,6 +436,18 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23029500
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.linux:tst:23029500:
+          source_test_id: oval:mil.disa.stig.linux:tst:23029500
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: There is a separate file system for /tmp.
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23029500
           predicates: []
           source_other: []
       definitions:
@@ -629,7 +629,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257844r1044918_rule
-      semantic_ir_sha256: 4aa7a593ef90751a8d290078ced9b9817eab54bd2cd0c943704634a3021ef41c
+      semantic_ir_sha256: a21f0dbdbce6442ab8811c3a8548d79fcde9e88ec380c8c3b469463751a19ca1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ecf2a69a3d28e2739bd35c2f028343c44c6dda790bfd4d0e4efb090e3c76aca7
   assessments:

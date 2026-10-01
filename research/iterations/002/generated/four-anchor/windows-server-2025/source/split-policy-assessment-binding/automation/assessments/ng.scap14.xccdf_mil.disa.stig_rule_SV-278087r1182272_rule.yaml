@@ -8,62 +8,6 @@ assessment:
     and integrity for at least the \\*\SYSVOL and \\*\NETLOGON shares.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25336200:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25336200
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      object_title: Hardened Path Config for \\*\SYSVOL
-      query:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: \\*\SYSVOL
     oval:mil.disa.stig.win:obj:25336201:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25336201
@@ -120,8 +64,115 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: \\*\NETLOGON
+    oval:mil.disa.stig.win:obj:25336200:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25336200
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: Hardened Path Config for \\*\SYSVOL
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: \\*\SYSVOL
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:25336203:
+      source_state_id: oval:mil.disa.stig.win:ste:25336203
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+          entity_check: none satisfy
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: explicit
+            value: none satisfy
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
+      state_title: No RequireIntegrity!=1
     oval:mil.disa.stig.win:ste:25336201:
       source_state_id: oval:mil.disa.stig.win:ste:25336201
       source_type: registry_state
@@ -223,57 +274,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
       state_title: RequireMutualAuthentication=1
-    oval:mil.disa.stig.win:ste:25336203:
-      source_state_id: oval:mil.disa.stig.win:ste:25336203
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: xsd_default
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_sz
-      - attributes:
-          datatype: string
-          entity_check: none satisfy
-          operation: pattern match
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: string
-          entity_check:
-            origin: explicit
-            value: none satisfy
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
-      state_title: No RequireIntegrity!=1
     oval:mil.disa.stig.win:ste:25336202:
       source_state_id: oval:mil.disa.stig.win:ste:25336202
       source_type: registry_state
@@ -326,22 +326,6 @@ assessment:
       state_title: RequireIntegrity=1
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25336200:
-        source_test_id: oval:mil.disa.stig.win:tst:25336200
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Mutual Authentication and Integrity for \\*\SYSVOL
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25336200
-        predicates:
-        - oval:mil.disa.stig.win:ste:25336200
-        - oval:mil.disa.stig.win:ste:25336201
-        - oval:mil.disa.stig.win:ste:25336202
-        - oval:mil.disa.stig.win:ste:25336203
-        source_other: []
       oval:mil.disa.stig.win:tst:25336201:
         source_test_id: oval:mil.disa.stig.win:tst:25336201
         source_type: registry_test
@@ -358,35 +342,23 @@ assessment:
         - oval:mil.disa.stig.win:ste:25336202
         - oval:mil.disa.stig.win:ste:25336203
         source_other: []
+      oval:mil.disa.stig.win:tst:25336200:
+        source_test_id: oval:mil.disa.stig.win:tst:25336200
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Mutual Authentication and Integrity for \\*\SYSVOL
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25336200
+        predicates:
+        - oval:mil.disa.stig.win:ste:25336200
+        - oval:mil.disa.stig.win:ste:25336201
+        - oval:mil.disa.stig.win:ste:25336202
+        - oval:mil.disa.stig.win:ste:25336203
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253362:
-        source_definition_id: oval:mil.disa.stig.defs:def:253362
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Mutual Authentication and Integrity for \\*\SYSVOL
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25336200
-          - comment: Mutual Authentication and Integrity for \\*\NETLOGON
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25336201
-          comment: has correct UNC path hardening
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL
-              and \\*\NETLOGON shares.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278087:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278087
         class: compliance
@@ -419,6 +391,34 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Additional security requirements are applied to UNC paths specified in hardened UNC paths before allowing
               access to them. This aids in preventing tampering with or spoofing of connections to these paths.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253362:
+        source_definition_id: oval:mil.disa.stig.defs:def:253362
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Mutual Authentication and Integrity for \\*\SYSVOL
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25336200
+          - comment: Mutual Authentication and Integrity for \\*\NETLOGON
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25336201
+          comment: has correct UNC path hardening
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL
+              and \\*\NETLOGON shares.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -566,6 +566,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278087r1182272_rule
-    semantic_ir_sha256: 6d4810ef69786ff343a7a7ff505b29f74037128a21e90211cb00eb27eae87a4e
+    semantic_ir_sha256: 38d27b2d226cd81ef4b125c5423a51f48fa431f3f180d3d3618808b94aafd4f8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: f2b212dbe9f6dd9b2fa89b2b5e51699f1c7c812c37d8d7462a46bb8ed504f644

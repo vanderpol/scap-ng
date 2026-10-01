@@ -387,6 +387,37 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '4294967295'
         state_title: Lockout Duration equals 4294967295
+      oval:mil.disa.stig.win:ste:25329702:
+        source_state_id: oval:mil.disa.stig.win:ste:25329702
+        source_type: lockoutpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            entity_check: all
+            operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: explicit
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: lockout_duration
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '900'
+        state_title: Lockout Duration greater than or equals 900
       oval:mil.disa.stig.win:ste:25329801:
         source_state_id: oval:mil.disa.stig.win:ste:25329801
         source_type: lockoutpolicy_state
@@ -448,37 +479,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
         state_title: Lockout Duration equals -1
-      oval:mil.disa.stig.win:ste:25329702:
-        source_state_id: oval:mil.disa.stig.win:ste:25329702
-        source_type: lockoutpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            entity_check: all
-            operation: greater than or equal
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: int
-            entity_check:
-              origin: explicit
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: lockout_duration
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '900'
-        state_title: Lockout Duration greater than or equals 900
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25329700:
@@ -522,6 +522,40 @@ rule:
           - oval:mil.disa.stig.win:ste:25329801
           source_other: []
       definitions:
+        oval:mil.disa.stig.windows11:def:253297:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253297
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:253297
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-AC-000005 - Windows 11 account lockout duration must be configured to 15 minutes or greater.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The account lockout feature, when enabled, prevents brute-force password attacks on the system. This parameter
+                specifies the amount of time that an account will remain locked after the specified number of failed logon
+                attempts.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:253297:
           source_definition_id: oval:mil.disa.stig.defs:def:253297
           class: compliance
@@ -556,40 +590,6 @@ rule:
               text: Windows account lockout duration must be configured to 15 minutes or greater.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.windows11:def:253297:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253297
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253297
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-AC-000005 - Windows 11 account lockout duration must be configured to 15 minutes or greater.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The account lockout feature, when enabled, prevents brute-force password attacks on the system. This parameter
-                specifies the amount of time that an account will remain locked after the specified number of failed logon
-                attempts.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -722,7 +722,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253297r958736_rule
-      semantic_ir_sha256: f24195d7de66c6cb8928ccf08fe3ba7efc49ae9b4cce72c9f43d27140392a136
+      semantic_ir_sha256: 71576ef78e779431100ae74ebce738a57c5c4a87a7be4768e1d4aabe8127ebed
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 42352f9c0e9547bf32fc9eb9aed8b6d63719fc99eb7c7405e22420bde1b2374b
   assessments:

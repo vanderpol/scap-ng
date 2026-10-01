@@ -7,6 +7,63 @@ assessment:
   description: OL 9 must be configured so that the systemd Ctrl-Alt-Delete burst key sequence is disabled.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:23499001:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23499001
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/systemd/system.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23499002:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23499002
@@ -47,63 +104,6 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^.+\.conf$
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23499001:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23499001
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/systemd/system.conf
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -206,6 +206,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000014
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:234990:
+        source_definition_id: oval:mil.disa.stig.defs:def:234990
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23499000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The systemd Ctrl-Alt-Delete burst key sequence in the operating system must be disabled.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271751:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271751
         class: compliance
@@ -239,29 +262,6 @@ assessment:
               pressed, as could happen in the case of a mixed OS environment, this can create the risk of short-term loss
               of availability of systems due to unintentional reboot. In a graphical user environment, risk of unintentional
               reboot from the Ctrl-Alt-Delete sequence is reduced because the user will be prompted before any action is taken.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:234990:
-        source_definition_id: oval:mil.disa.stig.defs:def:234990
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23499000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The systemd Ctrl-Alt-Delete burst key sequence in the operating system must be disabled.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -389,6 +389,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271751r1184206_rule
-    semantic_ir_sha256: 3f1acce2181de34a316465a8fd1345ca8733482d3570dbc6e2a383c9c532c89e
+    semantic_ir_sha256: a1b7423c8ac5b298470775cb6dcb6ecda2d83f577fe2123c9a08217b025106e9
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: f05e39e545e974164059a15b7b192d87c98071a432d5898af7cd8a09debf98ea

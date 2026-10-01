@@ -17,33 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25332400:
-      source_state_id: oval:mil.disa.stig.win:ste:25332400
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: xsd_default
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: removable_storage
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      state_title: '''Audit Removable Storage'' is set to ''Success'''
     oval:mil.disa.stig.win:ste:25332401:
       source_state_id: oval:mil.disa.stig.win:ste:25332401
       source_type: auditeventpolicysubcategories_state
@@ -71,6 +44,33 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       state_title: '''Audit Removable Storage'' is set to ''Success and Failure'''
+    oval:mil.disa.stig.win:ste:25332400:
+      source_state_id: oval:mil.disa.stig.win:ste:25332400
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: removable_storage
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      state_title: '''Audit Removable Storage'' is set to ''Success'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25332401:
@@ -100,6 +100,33 @@ assessment:
         - oval:mil.disa.stig.win:ste:25332400
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253324:
+        source_definition_id: oval:mil.disa.stig.defs:def:253324
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Object Access - Removable Storage - Success Only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332400
+          - comment: Audit - Object Access - Removable Storage - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Object Access - Removable Storage successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253324:
         source_definition_id: oval:mil.disa.stig.windows11:def:253324
         class: compliance
@@ -137,33 +164,6 @@ assessment:
 
               Auditing object access for removable media records events related to access attempts on file system objects
               on removable storage devices.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253324:
-        source_definition_id: oval:mil.disa.stig.defs:def:253324
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Object Access - Removable Storage - Success Only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332400
-          - comment: Audit - Object Access - Removable Storage - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Object Access - Removable Storage successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -309,6 +309,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253324r991583_rule
-    semantic_ir_sha256: 6f8852be737278aa76d4e3526cfd86b8dcdeabb0a9f54d1a6cfb52f71364a6b2
+    semantic_ir_sha256: ec33e227d50cf399af63941d46321db3709b7a2475813919e9561a8230221f92
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: be8b73117f85e3ca0dd201ac69503a19c405159da3c52584fa6a53b9573cc930

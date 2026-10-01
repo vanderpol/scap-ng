@@ -7,28 +7,6 @@ assessment:
   description: RHEL 9 must mount /var/log/audit with the noexec option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23051900:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23051900
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      object_title: null
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var/log/audit
     oval:mil.disa.stig.ind:obj:23051901:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051901
@@ -83,37 +61,30 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.ind:ste:23051900:
-      source_state_id: oval:mil.disa.stig.ind:ste:23051900
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
+    oval:mil.disa.stig.linux:obj:23051900:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23051900
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
           datatype:
             origin: xsd_default
             value: string
-          entity_check:
-            origin: xsd_default
-            value: all
           mask:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: explicit
-            value: pattern match
+            origin: xsd_default
+            value: equals
         kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.*noexec.*$
-      state_title: null
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/log/audit
+  derive: {}
+  predicates:
     oval:mil.disa.stig.linux:ste:20000000:
       source_state_id: oval:mil.disa.stig.linux:ste:20000000
       source_type: partition_state
@@ -142,6 +113,35 @@ assessment:
         name: mount_options
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: noexec
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23051900:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051900
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.*noexec.*$
       state_title: null
   evaluate:
     tests:
@@ -358,6 +358,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257874r958804_rule
-    semantic_ir_sha256: 18e7e9381384625a34b8310025311e33229a2a17f3ecc4f701a2fe000d6b3f24
+    semantic_ir_sha256: d646b913018f50de4a19196f4e728a7f2e293b0c3e35c0f94bf0a8e71e527f74
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 2b600d55a25156c31d40fb0fd11dbee136826d54684bdd015554c393030f51ce

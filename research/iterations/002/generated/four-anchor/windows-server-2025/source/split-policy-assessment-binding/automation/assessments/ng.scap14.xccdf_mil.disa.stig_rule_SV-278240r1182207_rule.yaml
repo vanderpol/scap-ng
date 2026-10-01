@@ -7,56 +7,6 @@ assessment:
   description: Windows Server 2025 must preserve zone information when saving attachments.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25347801:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25347801
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      object_title: null
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_CURRENT_USER
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SaveZoneInformation
     oval:mil.disa.stig.win:obj:25347800:
       capability: scapng.collect.windows.ntuser
       source_object_id: oval:mil.disa.stig.win:obj:25347800
@@ -121,21 +71,73 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.win:ste:20000027
+    oval:mil.disa.stig.win:obj:25347801:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25347801
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_CURRENT_USER
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SaveZoneInformation
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000023:
-      source_state_id: oval:mil.disa.stig.win:ste:20000023
+    oval:mil.disa.stig.win:ste:20000026:
+      source_state_id: oval:mil.disa.stig.win:ste:20000026
       source_type: ntuser_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
-      - effective_attributes:
+      - attributes:
+          datatype: boolean
+        effective_attributes:
           check_existence:
             origin: xsd_default
             value: at_least_one_exists
           datatype:
-            origin: xsd_default
-            value: string
+            origin: explicit
+            value: boolean
           entity_check:
             origin: xsd_default
             value: all
@@ -146,11 +148,19 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: type
+        name: enabled
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
+        value: 'false'
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000027:
+      source_state_id: oval:mil.disa.stig.win:ste:20000027
+      source_type: ntuser_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
       - attributes:
           datatype: int
+          operation: greater than
         effective_attributes:
           check_existence:
             origin: xsd_default
@@ -165,12 +175,12 @@ assessment:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: xsd_default
-            value: equals
+            origin: explicit
+            value: greater than
         kind: element
-        name: value
+        name: days_since_modified
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '2'
+        value: '35'
       state_title: null
     oval:mil.disa.stig.win:ste:20000002:
       source_state_id: oval:mil.disa.stig.win:ste:20000002
@@ -221,15 +231,34 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '2'
       state_title: null
-    oval:mil.disa.stig.win:ste:20000027:
-      source_state_id: oval:mil.disa.stig.win:ste:20000027
+    oval:mil.disa.stig.win:ste:20000023:
+      source_state_id: oval:mil.disa.stig.win:ste:20000023
       source_type: ntuser_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
+      - effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
       - attributes:
           datatype: int
-          operation: greater than
         effective_attributes:
           check_existence:
             origin: xsd_default
@@ -244,41 +273,12 @@ assessment:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: explicit
-            value: greater than
-        kind: element
-        name: days_since_modified
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '35'
-      state_title: null
-    oval:mil.disa.stig.win:ste:20000026:
-      source_state_id: oval:mil.disa.stig.win:ste:20000026
-      source_type: ntuser_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: boolean
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: boolean
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
             origin: xsd_default
             value: equals
         kind: element
-        name: enabled
+        name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: 'false'
+        value: '2'
       state_title: null
   evaluate:
     tests:
@@ -310,34 +310,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000002
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253478:
-        source_definition_id: oval:mil.disa.stig.defs:def:253478
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25347800
-          - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
-              or 'Disabled'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25347801
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Zone information must be preserved when saving attachments.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278240:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278240
         class: compliance
@@ -369,6 +341,34 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Attachments from outside sources may contain malicious code. Preserving zone of origin (internet, intranet,
               local, restricted) information on file attachments allows Windows to determine risk.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253478:
+        source_definition_id: oval:mil.disa.stig.defs:def:253478
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25347800
+          - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
+              or 'Disabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25347801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Zone information must be preserved when saving attachments.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -511,6 +511,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278240r1182207_rule
-    semantic_ir_sha256: a453c204059719bbf13b921e687c7db149f6ac6119dba9a7594c8ac2113fc647
+    semantic_ir_sha256: fef7d7f0403d4c39e4019894091a1c1cad98fbeed2a56fbfce380c4fdbc7b18b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: a5fc84be4e1fdd0e91ca63d224ef57cf4680c5e5a0abf8a3c22c0975f2ef04f6

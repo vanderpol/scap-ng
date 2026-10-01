@@ -7,47 +7,6 @@ assessment:
   description: The Windows PowerShell 2.0 feature must be disabled on the system.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25328501:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:mil.disa.stig.win:obj:25328501
-      source_type: wmi57_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      object_title: Windows PowerShell 2.0 Engine Win32_OptionalFeature object
-      query:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: namespace
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - attributes:
-          datatype: string
-          operation: equals
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: equals
-        kind: element
-        name: wql
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'
     oval:mil.disa.stig.win:obj:25328500:
       capability: scapng.collect.windows.wmi57
       source_object_id: oval:mil.disa.stig.win:obj:25328500
@@ -89,6 +48,47 @@ assessment:
         name: wql
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2Root'
+    oval:mil.disa.stig.win:obj:25328501:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:mil.disa.stig.win:obj:25328501
+      source_type: wmi57_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: Windows PowerShell 2.0 Engine Win32_OptionalFeature object
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - attributes:
+          datatype: string
+          operation: equals
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'
   derive: {}
   predicates:
     oval:mil.disa.stig.win:ste:25328500:
@@ -131,19 +131,6 @@ assessment:
       state_title: Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25328501:
-        source_test_id: oval:mil.disa.stig.win:tst:25328501
-        source_type: wmi57_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Windows PowerShell 2.0 Engine optional feature is disabled
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25328501
-        predicates:
-        - oval:mil.disa.stig.win:ste:25328500
-        source_other: []
       oval:mil.disa.stig.win:tst:25328500:
         source_test_id: oval:mil.disa.stig.win:tst:25328500
         source_type: wmi57_test
@@ -157,35 +144,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25328500
         source_other: []
+      oval:mil.disa.stig.win:tst:25328501:
+        source_test_id: oval:mil.disa.stig.win:tst:25328501
+        source_type: wmi57_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Windows PowerShell 2.0 Engine optional feature is disabled
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25328501
+        predicates:
+        - oval:mil.disa.stig.win:ste:25328500
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253285:
-        source_definition_id: oval:mil.disa.stig.defs:def:253285
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState 2
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25328500
-          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
-              2
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25328501
-          comment: Determine if Windows PowerShell 2.0 feature is disabled
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The Windows PowerShell 2.0 feature must be disabled on the system.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253285:
         source_definition_id: oval:mil.disa.stig.windows11:def:253285
         class: compliance
@@ -218,6 +190,34 @@ assessment:
             text: Windows PowerShell 5.0 added advanced logging features, which can provide additional detail when malware
               has been run on a system. Disabling the Windows PowerShell 2.0 mitigates against a downgrade attack that evades
               the Windows PowerShell 5.0 script block logging feature.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253285:
+        source_definition_id: oval:mil.disa.stig.defs:def:253285
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState 2
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25328500
+          - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
+              2
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25328501
+          comment: Determine if Windows PowerShell 2.0 feature is disabled
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Windows PowerShell 2.0 feature must be disabled on the system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -371,6 +371,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
-    semantic_ir_sha256: 21d3a058ba4b563c95625d467e1b7b93eb8769b3c1700f3c131267a695177915
+    semantic_ir_sha256: 5220a2c89b93eddbb76d89533160c5a5d03000273e19fd2a24f5ba6b17d19f59
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 95202e961bdac796a470bc1bb60644023f0e5319e67af87d1cf24407e009242c

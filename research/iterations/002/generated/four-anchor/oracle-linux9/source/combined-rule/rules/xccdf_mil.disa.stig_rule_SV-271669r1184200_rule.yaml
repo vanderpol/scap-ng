@@ -334,6 +334,46 @@ rule:
     description: OL 9 must prevent special devices on nonroot local partitions.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23030100:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23030100
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '3'
+        object_title: null
+        query:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: ^/\S+$
+        - attributes:
+            action: include
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.linux:ste:23030102
       oval:mil.disa.stig.ind:obj:23030101:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23030101
@@ -389,46 +429,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.linux:obj:23030100:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23030100
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '3'
-        object_title: null
-        query:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: ^/\S+$
-        - attributes:
-            action: include
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.linux:ste:23030102
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23030100:
@@ -460,35 +460,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
         state_title: null
-      oval:mil.disa.stig.linux:ste:20000001:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000001
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: explicit
-              value: at least one
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nodev
-        state_title: null
       oval:mil.disa.stig.linux:ste:23030102:
         source_state_id: oval:mil.disa.stig.linux:ste:23030102
         source_type: partition_state
@@ -518,21 +489,37 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: ^/dev\S*$
         state_title: null
+      oval:mil.disa.stig.linux:ste:20000001:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000001
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: explicit
+              value: at least one
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: nodev
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23030100:
-          source_test_id: oval:mil.disa.stig.linux:tst:23030100
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23030100
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000001
-          source_other: []
         oval:mil.disa.stig.ind:tst:23030101:
           source_test_id: oval:mil.disa.stig.ind:tst:23030101
           source_type: textfilecontent54_test
@@ -545,6 +532,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:23030101
           predicates:
           - oval:mil.disa.stig.ind:ste:23030100
+          source_other: []
+        oval:mil.disa.stig.linux:tst:23030100:
+          source_test_id: oval:mil.disa.stig.linux:tst:23030100
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23030100
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000001
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230301:
@@ -734,7 +734,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271669r1184200_rule
-      semantic_ir_sha256: a2a9d9223e554d8ae96fa3e323357a79361a3b6cbb8d908576f71fcd74e75f0f
+      semantic_ir_sha256: 0a76ed329daf00699655a59bd8fbf9731455d56ba5ee6f4ea8f8c923df58e212
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0a65d36281a9bfd8190151264df0a9a9051f14e7e1a95f70440c88c7fe5f59d6
   assessments:

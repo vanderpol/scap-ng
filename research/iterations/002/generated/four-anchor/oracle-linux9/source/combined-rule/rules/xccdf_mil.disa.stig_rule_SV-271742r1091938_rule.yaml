@@ -347,42 +347,6 @@ rule:
     description: OL 9 debug-shell systemd service must be disabled.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23053200:
-        capability: scapng.collect.linux.systemdunitproperty
-        source_object_id: oval:mil.disa.stig.linux:obj:23053200
-        source_type: systemdunitproperty_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: unit
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: debug-shell.service
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: property
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: LoadState
       oval:mil.disa.stig.linux:obj:23053201:
         capability: scapng.collect.linux.systemdunitproperty
         source_object_id: oval:mil.disa.stig.linux:obj:23053201
@@ -419,6 +383,42 @@ rule:
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: UnitFileState
+      oval:mil.disa.stig.linux:obj:23053200:
+        capability: scapng.collect.linux.systemdunitproperty
+        source_object_id: oval:mil.disa.stig.linux:obj:23053200
+        source_type: systemdunitproperty_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: debug-shell.service
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: LoadState
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:20000005:
@@ -450,19 +450,6 @@ rule:
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23053200:
-          source_test_id: oval:mil.disa.stig.linux:tst:23053200
-          source_type: systemdunitproperty_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: debug-shell.service LoadState is masked if it exists.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23053200
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000005
-          source_other: []
         oval:mil.disa.stig.linux:tst:23053201:
           source_test_id: oval:mil.disa.stig.linux:tst:23053201
           source_type: systemdunitproperty_test
@@ -476,34 +463,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.linux:ste:20000005
           source_other: []
+        oval:mil.disa.stig.linux:tst:23053200:
+          source_test_id: oval:mil.disa.stig.linux:tst:23053200
+          source_type: systemdunitproperty_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: debug-shell.service LoadState is masked if it exists.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23053200
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000005
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230532:
-          source_definition_id: oval:mil.disa.stig.defs:def:230532
-          class: compliance
-          version: '6'
-          criteria:
-            children:
-            - comment: debug-shell.service LoadState is masked if it exists.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23053200
-            - comment: debug-shell.service UnitFileState is masked if it exists.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23053201
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The debug-shell systemd service must be disabled on the operating system.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271742:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271742
           class: compliance
@@ -538,6 +511,33 @@ rule:
                 that it will not be enabled via a dependency in systemd. This also prevents attackers with physical access
                 from trivially bypassing security on the machine through valid troubleshooting configurations and gaining
                 root access when the system is rebooted.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230532:
+          source_definition_id: oval:mil.disa.stig.defs:def:230532
+          class: compliance
+          version: '6'
+          criteria:
+            children:
+            - comment: debug-shell.service LoadState is masked if it exists.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23053200
+            - comment: debug-shell.service UnitFileState is masked if it exists.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23053201
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The debug-shell systemd service must be disabled on the operating system.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -668,7 +668,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271742r1091938_rule
-      semantic_ir_sha256: 538fce91f4a18eb57943fd48639db3935dbe5e286db401165cfd1be47760beed
+      semantic_ir_sha256: 6584370a9e5cf8b4184f6da14a023a846a64ae0603e67d111c5c402af76830b1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 92566a7f9ab2207cccfc103973c7f60db3b1b388d9ee196944545b6cfd2f0eb8
   assessments:

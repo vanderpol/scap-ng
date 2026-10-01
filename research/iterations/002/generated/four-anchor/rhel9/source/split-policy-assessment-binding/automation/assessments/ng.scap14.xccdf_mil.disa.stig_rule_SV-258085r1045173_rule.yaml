@@ -7,19 +7,17 @@ assessment:
   description: RHEL 9 must use the invoking user's password for privilege escalation when using "sudo".
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23764205:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764205
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+    oval:mil.disa.stig.unix:obj:23764200:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:23764200
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      object_title: /etc/sudoers Defaults !runaspw
+      object_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
       query:
-      - attributes:
-          datatype: string
-        effective_attributes:
+      - effective_attributes:
           datatype:
-            origin: explicit
+            origin: xsd_default
             value: string
           mask:
             origin: xsd_default
@@ -28,9 +26,52 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/sudoers.d
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: ^[^.]*[^.~]$
+    oval:mil.disa.stig.ind:obj:23764202:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23764202
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: /etc/sudoers.d Defaults !targetpw
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23764200
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: explicit
+            value: at least one
+        kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sudoers
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -46,7 +87,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!runaspw\s*$
+        value: ^\s*Defaults\s+!targetpw\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -181,13 +222,73 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23764203:
+    oval:mil.disa.stig.ind:obj:23764206:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764203
+      source_object_id: oval:mil.disa.stig.ind:obj:23764206
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      object_title: /etc/sudoers Defaults !rootpw
+      object_title: /etc/sudoers.d Defaults !runaspw
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23764200
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+          var_check:
+            origin: explicit
+            value: at least one
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*Defaults\s+!runaspw\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23764205:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23764205
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: /etc/sudoers Defaults !runaspw
       query:
       - attributes:
           datatype: string
@@ -220,7 +321,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!rootpw\s*$
+        value: ^\s*Defaults\s+!runaspw\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -295,58 +396,19 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.unix:obj:23764200:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:23764200
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      object_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc/sudoers.d
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: ^[^.]*[^.~]$
-    oval:mil.disa.stig.ind:obj:23764206:
+    oval:mil.disa.stig.ind:obj:23764203:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764206
+      source_object_id: oval:mil.disa.stig.ind:obj:23764203
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      object_title: /etc/sudoers.d Defaults !runaspw
+      object_title: /etc/sudoers Defaults !rootpw
       query:
       - attributes:
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.defs:var:23764200
+          datatype: string
         effective_attributes:
           datatype:
-            origin: xsd_default
+            origin: explicit
             value: string
           mask:
             origin: xsd_default
@@ -354,12 +416,10 @@ assessment:
           operation:
             origin: xsd_default
             value: equals
-          var_check:
-            origin: explicit
-            value: at least one
         kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -375,67 +435,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!runaspw\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23764202:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764202
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: /etc/sudoers.d Defaults !targetpw
-      query:
-      - attributes:
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.defs:var:23764200
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-          var_check:
-            origin: explicit
-            value: at least one
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!targetpw\s*$
+        value: ^\s*Defaults\s+!rootpw\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -528,6 +528,30 @@ assessment:
       state_title: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:23764205:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764205
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: Defaults !runaspw in /etc/sudoers
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764205
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23764206:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764206
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: Defaults !runaspw in /etc/sudoers.d
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764206
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:23764204:
         source_test_id: oval:mil.disa.stig.ind:tst:23764204
         source_type: textfilecontent54_test
@@ -539,6 +563,19 @@ assessment:
         collections:
         - oval:mil.disa.stig.ind:obj:23764204
         predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23764201:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764201
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /etc/sudoers.d included in /etc/sudoers
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764201
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23764200
         source_other: []
       oval:mil.disa.stig.ind:tst:23764202:
         source_test_id: oval:mil.disa.stig.ind:tst:23764202
@@ -564,31 +601,6 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23764203
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23764205:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764205
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Defaults !runaspw in /etc/sudoers
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764205
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23764201:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764201
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: /etc/sudoers.d included in /etc/sudoers
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764201
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23764200
-        source_other: []
       oval:mil.disa.stig.ind:tst:23764200:
         source_test_id: oval:mil.disa.stig.ind:tst:23764200
         source_type: textfilecontent54_test
@@ -601,19 +613,40 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23764200
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23764206:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764206
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Defaults !runaspw in /etc/sudoers.d
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764206
-        predicates: []
-        source_other: []
     definitions:
+      oval:mil.disa.stig.rhel9os:def:258085:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258085
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:237642
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-432020 - RHEL 9 must use the invoking user's password for privilege escalation when using "sudo".
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If the rootpw, targetpw, or runaspw flags are defined and not disabled, by default the operating system
+              will prompt the invoking user for the "root" user password.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:237642:
         source_definition_id: oval:mil.disa.stig.defs:def:237642
         class: compliance
@@ -669,39 +702,6 @@ assessment:
             text: The operating system must use the invoking user's password for privilege escalation when using "sudo".
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.rhel9os:def:258085:
-        source_definition_id: oval:mil.disa.stig.rhel9os:def:258085
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:237642
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: RHEL-09-432020 - RHEL 9 must use the invoking user's password for privilege escalation when using "sudo".
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Red Hat Enterprise Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: If the rootpw, targetpw, or runaspw flags are defined and not disabled, by default the operating system
-              will prompt the invoking user for the "root" user password.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -849,6 +849,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258085r1045173_rule
-    semantic_ir_sha256: 6e4f2b632b8b6306c9230a83eb30122a19ef3141e584558fff2532571515cfdb
+    semantic_ir_sha256: 6a554f1c2212220731339954f131165930b27682b7c7cb299a424f938c557df5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 764425a118e515d758f557b3149e1edfd0d32acbcbee2f69b96926fa6945bbfa

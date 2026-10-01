@@ -683,6 +683,18 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23031601
           source_other: []
+        oval:mil.disa.stig.ind:tst:23031602:
+          source_test_id: oval:mil.disa.stig.ind:tst:23031602
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/resolv.conf contains at least one nameserver entry
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23031602
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:23031600:
           source_test_id: oval:mil.disa.stig.ind:tst:23031600
           source_type: textfilecontent54_test
@@ -696,19 +708,42 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23031600
           source_other: []
-        oval:mil.disa.stig.ind:tst:23031602:
-          source_test_id: oval:mil.disa.stig.ind:tst:23031602
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /etc/resolv.conf contains at least one nameserver entry
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23031602
-          predicates: []
-          source_other: []
       definitions:
+        oval:mil.disa.stig.rhel9os:def:257948:
+          source_definition_id: oval:mil.disa.stig.rhel9os:def:257948
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:230316
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: RHEL-09-252035 - RHEL 9 systems using Domain Name Servers (DNS) resolution must have at least two name
+                servers configured.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Red Hat Enterprise Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: To provide availability for name resolution services, multiple redundant name servers are mandated. A
+                failure in name resolution could lead to the failure of security functions requiring name resolution, which
+                may include time synchronization, centralized authentication, and remote system logging.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:230316:
           source_definition_id: oval:mil.disa.stig.defs:def:230316
           class: compliance
@@ -747,41 +782,6 @@ rule:
               text: For Systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.rhel9os:def:257948:
-          source_definition_id: oval:mil.disa.stig.rhel9os:def:257948
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:230316
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: RHEL-09-252035 - RHEL 9 systems using Domain Name Servers (DNS) resolution must have at least two name
-                servers configured.
-            - attributes:
-                family: unix
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Red Hat Enterprise Linux 9
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: To provide availability for name resolution services, multiple redundant name servers are mandated. A
-                failure in name resolution could lead to the failure of security functions requiring name resolution, which
-                may include time synchronization, centralized authentication, and remote system logging.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -916,7 +916,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257948r1045004_rule
-      semantic_ir_sha256: 4b402b5310e67106b9c58abd2eaa7398f5e867d97310f1ccfba44560d45f4b52
+      semantic_ir_sha256: 89bcb5b3ca901113995abba7cc4f426cd1b1a7981e4bd350938c26dbd2e57040
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 143c8825a36e937ee9f4c9412c5355364a07f7f03857ab8542f24182ee852fe6
   assessments:

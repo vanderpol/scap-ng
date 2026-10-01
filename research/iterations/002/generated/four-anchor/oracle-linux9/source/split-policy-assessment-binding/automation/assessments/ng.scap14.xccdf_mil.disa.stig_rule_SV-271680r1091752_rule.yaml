@@ -214,18 +214,6 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25801300:
-        source_test_id: oval:mil.disa.stig.ind:tst:25801300
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25801300
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25802600:
         source_test_id: oval:mil.disa.stig.ind:tst:25802600
         source_type: textfilecontent54_test
@@ -238,7 +226,47 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25802600
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:25801300:
+        source_test_id: oval:mil.disa.stig.ind:tst:25801300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25801300
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258013:
+        source_definition_id: oval:mil.disa.stig.defs:def:258013
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: dconf user database(s) exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802600
+          - comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25801300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the banner-message-enable setting for the graphical
+              user interface.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271680:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271680
         class: compliance
@@ -274,34 +302,6 @@ assessment:
               \ Orders, directives, policies, regulations, standards, and guidance.\n\n\tFor U.S. government systems, system\
               \ use notifications are required only for access via login interfaces with human users and are not required\
               \ when such human interfaces do not exist.\n\n\tSatisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088"
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258013:
-        source_definition_id: oval:mil.disa.stig.defs:def:258013
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: dconf user database(s) exist
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25802600
-          - comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25801300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must prevent a user from overriding the banner-message-enable setting for the graphical
-              user interface.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -434,6 +434,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271680r1091752_rule
-    semantic_ir_sha256: 94bcc75d54887f0faade924774918ddaa1ca25cbe23768d3ba57a417cf008523
+    semantic_ir_sha256: 07175828ee790e9ee2aa372be66027f1ebd43a0e92ee350f8750a38e1951835b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: f3a55f8be32ee9e94aa09553e9192bac80dc6e4d346f69c8930d41eaf6d48fcf

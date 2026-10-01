@@ -349,6 +349,27 @@ rule:
     description: OL 9 must not permit direct logons to the root account using remote access via SSH.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23029602:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23029602
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: all sshd_config and sshd_config.d/* files
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23029600
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23029601
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23029600:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029600
@@ -475,27 +496,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23029602:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23029602
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        object_title: all sshd_config and sshd_config.d/* files
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23029600
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23029601
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000017:
@@ -729,7 +729,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271708r1092594_rule
-      semantic_ir_sha256: 1b9527f068bd70cadf0bc9feefea95f79fce7b3dba77d275413834adfecc4b1f
+      semantic_ir_sha256: 6193abd21056bdd37eec4f00ca0391bd8b46d07d5411a43302470fe1a0a587ba
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c2239e9a4c4fdb3fdc2c8b270aa87e0a21146a371114dfa1b8b641d13c1bfcc7
   assessments:

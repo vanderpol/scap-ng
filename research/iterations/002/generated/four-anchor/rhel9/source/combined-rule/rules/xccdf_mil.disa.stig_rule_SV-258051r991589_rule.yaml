@@ -358,13 +358,13 @@ rule:
     description: All RHEL 9 local interactive users must have a home directory assigned in the /etc/passwd file.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:20000018:
+      oval:mil.disa.stig.unix:obj:20000017:
         capability: scapng.collect.unix.password
-        source_object_id: oval:mil.disa.stig.unix:obj:20000018
+        source_object_id: oval:mil.disa.stig.unix:obj:20000017
         source_type: password_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        object_title: only root users (uid=0) home-dirs
+        object_title: only non-system users (uid>999) home-dirs
         query:
         - children:
           - kind: object_ref
@@ -372,7 +372,7 @@ rule:
           - action: exclude
             action_explicit: false
             kind: filter
-            state_ref: oval:mil.disa.stig.unix:ste:20000018
+            state_ref: oval:mil.disa.stig.unix:ste:20000017
           evaluation_semantics:
             complement_is_relative: true
             filter_default_action: exclude
@@ -406,13 +406,13 @@ rule:
           name: username
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '[\w]+'
-      oval:mil.disa.stig.unix:obj:20000017:
+      oval:mil.disa.stig.unix:obj:20000018:
         capability: scapng.collect.unix.password
-        source_object_id: oval:mil.disa.stig.unix:obj:20000017
+        source_object_id: oval:mil.disa.stig.unix:obj:20000018
         source_type: password_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        object_title: only non-system users (uid>999) home-dirs
+        object_title: only root users (uid=0) home-dirs
         query:
         - children:
           - kind: object_ref
@@ -420,7 +420,7 @@ rule:
           - action: exclude
             action_explicit: false
             kind: filter
-            state_ref: oval:mil.disa.stig.unix:ste:20000017
+            state_ref: oval:mil.disa.stig.unix:ste:20000018
           evaluation_semantics:
             complement_is_relative: true
             filter_default_action: exclude
@@ -462,36 +462,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '0'
         state_title: only uids > 0
-      oval:mil.disa.stig.unix:ste:20000016:
-        source_state_id: oval:mil.disa.stig.unix:ste:20000016
-        source_type: password_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: home_dir
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: .+
-        state_title: only users with the home directory defined
       oval:mil.disa.stig.unix:ste:20000017:
         source_state_id: oval:mil.disa.stig.unix:ste:20000017
         source_type: password_state
@@ -523,21 +493,38 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
         state_title: only uids < 1000
+      oval:mil.disa.stig.unix:ste:20000016:
+        source_state_id: oval:mil.disa.stig.unix:ste:20000016
+        source_type: password_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: home_dir
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: .+
+        state_title: only users with the home directory defined
     evaluate:
       tests:
-        oval:mil.disa.stig.unix:tst:25805101:
-          source_test_id: oval:mil.disa.stig.unix:tst:25805101
-          source_type: password_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          test_title: check if root's home directory is not defined
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.unix:obj:20000018
-          predicates:
-          - oval:mil.disa.stig.unix:ste:20000016
-          source_other: []
         oval:mil.disa.stig.unix:tst:25805100:
           source_test_id: oval:mil.disa.stig.unix:tst:25805100
           source_type: password_test
@@ -548,6 +535,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.unix:obj:20000017
+          predicates:
+          - oval:mil.disa.stig.unix:ste:20000016
+          source_other: []
+        oval:mil.disa.stig.unix:tst:25805101:
+          source_test_id: oval:mil.disa.stig.unix:tst:25805101
+          source_type: password_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          test_title: check if root's home directory is not defined
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.unix:obj:20000018
           predicates:
           - oval:mil.disa.stig.unix:ste:20000016
           source_other: []
@@ -736,7 +736,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258051r991589_rule
-      semantic_ir_sha256: e261d24c08dabb57bbcb3c923383b31ec4fb3cead7165ebb4be7800ce6559e43
+      semantic_ir_sha256: 625a1248a122d3a37b8d2d66e18ba8829bec00ccb69903943929a3e3c5564fb1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 562c765ee3680f7a3e2aa0f82f0339c2a66c533314eff710741338b12bcc6c19
   assessments:

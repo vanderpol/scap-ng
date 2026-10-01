@@ -7,6 +7,59 @@ assessment:
   description: RHEL 9 must ensure cryptographic verification of vendor software packages.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '13'
+      object_title: Retrieve package-signing 'release' key fingerprint.
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: gpg -q --keyid-format short --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release | grep -P 'release
+          key' -B 1
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Key fingerprint\s*=\s*(.*)
     oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781902:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781902
@@ -160,90 +213,8 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: release key
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '13'
-      object_title: Retrieve package-signing 'release' key fingerprint.
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: bash
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: gpg -q --keyid-format short --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release | grep -P 'release
-          key' -B 1
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: Key fingerprint\s*=\s*(.*)
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: xsd_default
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^567E\s+347A\s+D004\s+4ADE\s+55BA\s+8A5F\s+199E\s+2F91\s+FD43\s+1D51$
-      state_title: Confirm 'release' key finger print.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904
       source_type: shellcommand_state
@@ -273,6 +244,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^7E46\s+2425\s+8C40\s+6535\s+D56D\s+6F13\s+5054\s+E4A4\s+5A63\s+40B3$
       state_title: Confirm 'auxiliary' key fingerprint.
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^567E\s+347A\s+D004\s+4ADE\s+55BA\s+8A5F\s+199E\s+2F91\s+FD43\s+1D51$
+      state_title: Confirm 'release' key finger print.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902
       source_type: shellcommand_state
@@ -333,18 +333,18 @@ assessment:
       state_title: Confirm correct release key.
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781903:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781903
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values.
+        test_title: Confirm Red Hat package-signing 'release' key fingerprint matches vendor values.
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781904
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903
         predicates:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781902:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781902
@@ -359,18 +359,18 @@ assessment:
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902
         source_other: []
-      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781903:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781903
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: Confirm Red Hat package-signing 'release' key fingerprint matches vendor values.
+        test_title: Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values.
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781904
         predicates:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781901:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781901
@@ -564,6 +564,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257819r1015075_rule
-    semantic_ir_sha256: 8dc224297962dc8e436ad77b87b2c23a8cb5f9e205789ee18a320fb87f43345e
+    semantic_ir_sha256: eb91ccdf95db9dec7b075d9b8fa1174c98d621dab108265eb5af5c1ea483e61c
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 8cb0addb2c7d25486387487840e7fbf4ea8a76dbb552c82728a653dbafd80caf

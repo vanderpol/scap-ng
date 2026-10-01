@@ -387,19 +387,6 @@ rule:
         state_title: '''Sensitive Privilege Use'' is set to ''Success'' and ''Failure'''
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:27894801:
-          source_test_id: oval:mil.disa.stig.win:tst:27894801
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: '''Audit Sensitive Privilege Use'' is set to ''Success'' and ''Failure'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:27894801
-          source_other: []
         oval:mil.disa.stig.win:tst:27894800:
           source_test_id: oval:mil.disa.stig.win:tst:27894800
           source_type: auditeventpolicysubcategories_test
@@ -413,7 +400,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:27894800
           source_other: []
+        oval:mil.disa.stig.win:tst:27894801:
+          source_test_id: oval:mil.disa.stig.win:tst:27894801
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: '''Audit Sensitive Privilege Use'' is set to ''Success'' and ''Failure'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:27894801
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:278948:
+          source_definition_id: oval:mil.disa.stig.defs:def:278948
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Registry - Success only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27894800
+            - comment: Audit - Registry - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27894801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured to audit sensitive privileged use successes.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:278932:
           source_definition_id: oval:mil.disa.stig.windows11:def:278932
           class: compliance
@@ -449,33 +476,6 @@ rule:
                 is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected
                 behavior. Credential validation records events related to validation tests on credentials for a user account
                 logon.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:278948:
-          source_definition_id: oval:mil.disa.stig.defs:def:278948
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Registry - Success only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:27894800
-            - comment: Audit - Registry - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:27894801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured to audit sensitive privileged use successes.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -597,7 +597,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278932r1141916_rule
-      semantic_ir_sha256: 9ccb096b5743fd5ba98aba474cd3863445c3bbf4e88e690bf58030f0603f6a86
+      semantic_ir_sha256: 33028ff928b2acffaee03705aa9e546adc5b99e736ba78ee764b012eca2bb468
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: e456608d3b590ef08cb202f92cb7431d24ef633b770d91a7c53af2fcf9bf0d66
   assessments:

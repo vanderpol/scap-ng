@@ -7,6 +7,63 @@ assessment:
   description: OL 9 SSH daemon must prevent remote hosts from connecting to the proxy display.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:23055601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23055601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '4'
+      object_title: sshd_config X11UseLocalhost
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23055602:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23055602
@@ -114,63 +171,6 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23055601:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23055601
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '4'
-      object_title: sshd_config X11UseLocalhost
-      query:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:20000016:
@@ -219,6 +219,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000016
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230556:
+        source_definition_id: oval:mil.disa.stig.defs:def:230556
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: sshd_config X11UseLocalhost is set to 'yes'.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23055600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSH daemon must prevent remote hosts from connecting to the proxy display.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271716:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271716
         class: compliance
@@ -252,29 +275,6 @@ assessment:
               SSHD proxy display is configured to listen on the wildcard address. By default, SSHD binds the forwarding server
               to the loopback address and sets the hostname part of the "DISPLAY" environment variable to localhost. This
               prevents remote hosts from connecting to the proxy display.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230556:
-        source_definition_id: oval:mil.disa.stig.defs:def:230556
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: sshd_config X11UseLocalhost is set to 'yes'.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23055600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system SSH daemon must prevent remote hosts from connecting to the proxy display.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -404,6 +404,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
-    semantic_ir_sha256: bb6e39b8e09ca858e091cb8539cad399808379f87dc2cfc9bfe36603c1801427
+    semantic_ir_sha256: 79a6dd947b612f616c29ce406be72366efc2228a03fb108f8928d853152149b4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 92ad4a1ba1cb0311194d752b70bd812dbcc88407b9c62c788cbbe0f52a56055a

@@ -361,6 +361,42 @@ rule:
     description: Windows Server 2025 systems must have a Trusted Platform Module (TPM) enabled and ready for use.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25325500:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:mil.disa.stig.win:obj:25325500
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2\security\microsofttpm
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT IsEnabled_InitialValue FROM Win32_Tpm
       oval:mil.disa.stig.win:obj:25325501:
         capability: scapng.collect.windows.wmi57
         source_object_id: oval:mil.disa.stig.win:obj:25325501
@@ -433,152 +469,8 @@ rule:
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT IsOwned_InitialValue FROM Win32_Tpm
-      oval:mil.disa.stig.win:obj:25325500:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:mil.disa.stig.win:obj:25325500
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: null
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2\security\microsofttpm
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT IsEnabled_InitialValue FROM Win32_Tpm
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25325500:
-        source_state_id: oval:mil.disa.stig.win:ste:25325500
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: isenabled_initialvalue
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '1'
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: record
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: equals
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
-      oval:mil.disa.stig.win:ste:25325502:
-        source_state_id: oval:mil.disa.stig.win:ste:25325502
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: isowned_initialvalue
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '1'
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: record
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: equals
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
-      oval:mil.disa.stig.win:ste:25325505:
-        source_state_id: oval:mil.disa.stig.win:ste:25325505
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: isowned_initialvalue
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '-1'
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: record
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: equals
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        state_title: null
       oval:mil.disa.stig.win:ste:25325501:
         source_state_id: oval:mil.disa.stig.win:ste:25325501
         source_type: wmi57_state
@@ -591,6 +483,42 @@ rule:
           children:
           - attributes:
               name: isactivated_initialvalue
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: null
+      oval:mil.disa.stig.win:ste:25325500:
+        source_state_id: oval:mil.disa.stig.win:ste:25325500
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: isenabled_initialvalue
             kind: element
             name: field
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
@@ -651,6 +579,78 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: null
+      oval:mil.disa.stig.win:ste:25325505:
+        source_state_id: oval:mil.disa.stig.win:ste:25325505
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: isowned_initialvalue
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '-1'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: null
+      oval:mil.disa.stig.win:ste:25325502:
+        source_state_id: oval:mil.disa.stig.win:ste:25325502
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: isowned_initialvalue
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: record
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: null
       oval:mil.disa.stig.win:ste:25325504:
         source_state_id: oval:mil.disa.stig.win:ste:25325504
         source_type: wmi57_state
@@ -689,19 +689,19 @@ rule:
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25325501:
-          source_test_id: oval:mil.disa.stig.win:tst:25325501
+        oval:mil.disa.stig.win:tst:25325500:
+          source_test_id: oval:mil.disa.stig.win:tst:25325500
           source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: TPM IsActivated_InitialValue equals True
+          test_title: TPM IsEnabled_InitialValue equals True
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
           collections:
-          - oval:mil.disa.stig.win:obj:25325501
+          - oval:mil.disa.stig.win:obj:25325500
           predicates:
-          - oval:mil.disa.stig.win:ste:25325501
-          - oval:mil.disa.stig.win:ste:25325504
+          - oval:mil.disa.stig.win:ste:25325500
+          - oval:mil.disa.stig.win:ste:25325503
           source_other: []
         oval:mil.disa.stig.win:tst:25325502:
           source_test_id: oval:mil.disa.stig.win:tst:25325502
@@ -717,21 +717,52 @@ rule:
           - oval:mil.disa.stig.win:ste:25325502
           - oval:mil.disa.stig.win:ste:25325505
           source_other: []
-        oval:mil.disa.stig.win:tst:25325500:
-          source_test_id: oval:mil.disa.stig.win:tst:25325500
+        oval:mil.disa.stig.win:tst:25325501:
+          source_test_id: oval:mil.disa.stig.win:tst:25325501
           source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: TPM IsEnabled_InitialValue equals True
+          test_title: TPM IsActivated_InitialValue equals True
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
           collections:
-          - oval:mil.disa.stig.win:obj:25325500
+          - oval:mil.disa.stig.win:obj:25325501
           predicates:
-          - oval:mil.disa.stig.win:ste:25325500
-          - oval:mil.disa.stig.win:ste:25325503
+          - oval:mil.disa.stig.win:ste:25325501
+          - oval:mil.disa.stig.win:ste:25325504
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253255:
+          source_definition_id: oval:mil.disa.stig.defs:def:253255
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: TPM is enabled
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25325500
+            - comment: TPM is activated
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25325501
+            - comment: TPM is owned
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25325502
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:277993:
           source_definition_id: oval:mil.disa.stig.windows2025:def:277993
           class: compliance
@@ -766,37 +797,6 @@ rule:
                 attacks if compromised. A number of system requirements must be met for Credential Guard to be configured
                 and enabled properly. Without a TPM enabled and ready for use, Credential Guard keys are stored in a less
                 secure method using software.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253255:
-          source_definition_id: oval:mil.disa.stig.defs:def:253255
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: TPM is enabled
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25325500
-            - comment: TPM is activated
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25325501
-            - comment: TPM is owned
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25325502
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -932,7 +932,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-277993r1212171_rule
-      semantic_ir_sha256: 598e4f52a651c45557a20ff16ee77b52bb7749d625cedce788910b7c9df96411
+      semantic_ir_sha256: fe2b9baa27f019d1fa6e06dcd12ba72778633c9275b49af15476a8f78487079f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7630e6996ca56a92abefa66bccf770b86ecd8f41fcb3c841aafd168d87b7b56c
   assessments:

@@ -8,6 +8,56 @@ assessment:
     STIG compliance.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '18'
+      object_title: MDM is managing the device
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Get-Service -name IntuneManagementExtension
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: IntuneManagementExtension
     oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801:
       capability: scapng.collect.windows.cmdlet
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
@@ -141,58 +191,37 @@ assessment:
         kind: element
         name: select
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '18'
-      object_title: MDM is managing the device
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: Get-Service -name IntuneManagementExtension
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: IntuneManagementExtension
   derive: {}
   predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Running
+      state_title: stdout_line must contain the output running
     oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801
       source_type: cmdlet_state
@@ -229,35 +258,6 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: At least one enabled must be True
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: xsd_default
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: Running
-      state_title: stdout_line must contain the output running
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801:
@@ -477,6 +477,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-268318r1210288_rule
-    semantic_ir_sha256: 844ccfff150237d7e4b34129fbab6d356b7195d63b9e8b81d37532dd96b15c77
+    semantic_ir_sha256: ae0b0c3de64032b20448c3c55b7309b581b8c2f10bfe3d127222b2a8ea678a13
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 2ac4d08ad2b6c88e11a80406c518d2c37efcd0389bd790e053c581fd11b4d381

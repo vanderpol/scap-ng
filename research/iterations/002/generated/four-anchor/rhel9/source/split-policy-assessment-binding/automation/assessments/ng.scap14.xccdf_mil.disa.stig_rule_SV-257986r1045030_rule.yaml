@@ -7,12 +7,12 @@ assessment:
   description: RHEL 9 must enable the Pluggable Authentication Module (PAM) interface for SSHD.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25798601:
+    oval:mil.disa.stig.ind:obj:25798602:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798601
+      source_object_id: oval:mil.disa.stig.ind:obj:25798602
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
+      version: '2'
       object_title: null
       query:
       - effective_attributes:
@@ -26,9 +26,25 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: filepath
+        name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
+        value: /etc/ssh/sshd_config.d
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -83,12 +99,12 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:25798602:
+    oval:mil.disa.stig.ind:obj:25798601:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798602
+      source_object_id: oval:mil.disa.stig.ind:obj:25798601
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
+      version: '1'
       object_title: null
       query:
       - effective_attributes:
@@ -102,25 +118,9 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.+\.conf$
+        value: /etc/ssh/sshd_config
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -382,6 +382,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257986r1045030_rule
-    semantic_ir_sha256: ed0a7b5cb83414150195ddd9cd94749f4483c035df4c3bf5cb5a465e2e1fa883
+    semantic_ir_sha256: f32e96bd30d397de9fcd69fe52642420070ebd1ce8e04cbfd06d4e118b6bccfa
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e4e36d367815ca2a5594e08f5c2fd49e62439af02313e1a1292408ee70b258f8

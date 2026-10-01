@@ -63,6 +63,27 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AllowWindowsInkWorkspace
+    oval:mil.disa.stig.win:obj:25342400:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25342400
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '2'
+      object_title: Registry entries for Windows Ink Workspace
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.win:obj:25342401
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.win:obj:25342402
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.win:obj:25342401:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25342401
@@ -119,27 +140,6 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AllowWindowsInkWorkspace
-    oval:mil.disa.stig.win:obj:25342400:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25342400
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '2'
-      object_title: Registry entries for Windows Ink Workspace
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.win:obj:25342401
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.win:obj:25342402
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.win:ste:20000001:
@@ -207,6 +207,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253424:
+        source_definition_id: oval:mil.disa.stig.defs:def:253424
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Windows Ink Workspace disallows access above the lock
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25342400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Ink Workspace must be configured to disallow access above the lock.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253424:
         source_definition_id: oval:mil.disa.stig.windows11:def:253424
         class: compliance
@@ -240,29 +263,6 @@ assessment:
 
 
               Note: A different registry location is needed when systems are managed by Intune versus GPO.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253424:
-        source_definition_id: oval:mil.disa.stig.defs:def:253424
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Windows Ink Workspace disallows access above the lock
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25342400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows Ink Workspace must be configured to disallow access above the lock.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -385,6 +385,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253424r1210299_rule
-    semantic_ir_sha256: 3a41e879222a8c85bd994b31952ce7be141125d6656b0bbb1bb36003d6d753dd
+    semantic_ir_sha256: 1ea7205b8b46257585536255efe20733f239c38424048cfcf562653f183184f3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: da1990df64cb69597ec921268ae4da7f15f12a2a63312c8643760f19994c17f5

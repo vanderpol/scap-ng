@@ -17,35 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25330701:
-      source_state_id: oval:mil.disa.stig.win:ste:25330701
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: credential_validation
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      state_title: '''Credential Validation'' is set to ''Success'' and ''Failure'''
     oval:mil.disa.stig.win:ste:25330700:
       source_state_id: oval:mil.disa.stig.win:ste:25330700
       source_type: auditeventpolicysubcategories_state
@@ -75,6 +46,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       state_title: '''Credential Validation'' is set to ''Success'''
+    oval:mil.disa.stig.win:ste:25330701:
+      source_state_id: oval:mil.disa.stig.win:ste:25330701
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: credential_validation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: '''Credential Validation'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25330701:
@@ -104,6 +104,33 @@ assessment:
         - oval:mil.disa.stig.win:ste:25330700
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253307:
+        source_definition_id: oval:mil.disa.stig.defs:def:253307
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Credential Validation - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330700
+          - comment: Audit - Credential Validation - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330701
+          comment: Audit - Credential Validation - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Account Logon - Credential Validation successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278047:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278047
         class: compliance
@@ -139,33 +166,6 @@ assessment:
               \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
               \ behavior.\n\n  Credential Validation records events related to validation tests on credentials for a user\
               \ account logon."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253307:
-        source_definition_id: oval:mil.disa.stig.defs:def:253307
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Credential Validation - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330700
-          - comment: Audit - Credential Validation - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330701
-          comment: Audit - Credential Validation - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Account Logon - Credential Validation successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -292,6 +292,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278047r1180847_rule
-    semantic_ir_sha256: 99f68ecfb090d975e6dd92edfa7490a10a25120dbb4fc00b4568c786487f695d
+    semantic_ir_sha256: f5bcc4857ae1208acf2737102cb6b2b473d554cae16ab2ad0e60513d992719cc
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 032678b573cad1e9a685305e05c59452c531a4b2fa532a682ecf321efe5ad147

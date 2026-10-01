@@ -7,28 +7,6 @@ assessment:
   description: OL 9 must mount /var with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23029200:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23029200
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      object_title: null
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var
     oval:mil.disa.stig.ind:obj:25786900:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25786900
@@ -84,26 +62,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.linux:ste:20000001:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000001
-      source_type: partition_state
+    oval:mil.disa.stig.linux:obj:23029200:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23029200
+      source_type: partition_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
           datatype:
             origin: xsd_default
             value: string
-          entity_check:
-            origin: explicit
-            value: at least one
           mask:
             origin: xsd_default
             value: 'false'
@@ -111,10 +81,11 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: mount_options
+        name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: nodev
-      state_title: null
+        value: /var
+  derive: {}
+  predicates:
     oval:mil.disa.stig.ind:ste:25785400:
       source_state_id: oval:mil.disa.stig.ind:ste:25785400
       source_type: textfilecontent54_state
@@ -145,6 +116,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: (^|,)nodev(,|$)
       state_title: nodev option
+    oval:mil.disa.stig.linux:ste:20000001:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000001
+      source_type: partition_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: explicit
+            value: at least one
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nodev
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.linux:tst:25786900:
@@ -363,6 +363,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271656r1091680_rule
-    semantic_ir_sha256: 46dafa377ad7b8b09a56193057bcd76ac04866de52a2dd93812e67c981092853
+    semantic_ir_sha256: cfd93ea519ad8c7f591fc2f8fddffac437a52800e4a38878124fc0619c5b5ae5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 900cddfa03c591117f8eec477bbf056896ff9698c610f23fe5b28ae395313e61

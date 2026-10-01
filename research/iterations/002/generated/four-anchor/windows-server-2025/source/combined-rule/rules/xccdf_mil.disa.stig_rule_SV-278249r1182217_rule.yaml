@@ -490,35 +490,6 @@ rule:
           value: SELECT ID FROM Win32_ServerFeature
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25449900:
-        source_state_id: oval:mil.disa.stig.win:ste:25449900
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
-        state_title: null
       oval:mil.disa.stig.win:ste:20000029:
         source_state_id: oval:mil.disa.stig.win:ste:20000029
         source_type: userright_state
@@ -574,8 +545,49 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
         state_title: null
+      oval:mil.disa.stig.win:ste:25449900:
+        source_state_id: oval:mil.disa.stig.win:ste:25449900
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.win:tst:25449902:
+          source_test_id: oval:mil.disa.stig.win:tst:25449902
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Hyper-V Role is installed
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000014
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.win:tst:25449903:
           source_test_id: oval:mil.disa.stig.win:tst:25449903
           source_type: userright_test
@@ -590,18 +602,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000029
           - oval:mil.disa.stig.win:ste:20000030
           - oval:mil.disa.stig.win:ste:25449900
-          source_other: []
-        oval:mil.disa.stig.win:tst:25449902:
-          source_test_id: oval:mil.disa.stig.win:tst:25449902
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Hyper-V Role is installed
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000014
-          predicates: []
           source_other: []
         oval:mil.disa.stig.win:tst:25348901:
           source_test_id: oval:mil.disa.stig.win:tst:25348901
@@ -842,7 +842,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278249r1182217_rule
-      semantic_ir_sha256: 69ac5f3507d38d85d6da6cb21f2c2cde6b68990c973980db2c855a126bac4706
+      semantic_ir_sha256: 14ed60ebf91dc559dc5365d174db160f1cb88fb870ab4c0bd7b4f05f7ebb67c5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 2f2cb61bef58faee51bbd18cafb1dff11a2fbdf83a7125bfb3f253a305e5e4e3
   assessments:

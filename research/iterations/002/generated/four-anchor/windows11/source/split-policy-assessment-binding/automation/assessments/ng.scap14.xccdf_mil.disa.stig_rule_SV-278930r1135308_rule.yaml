@@ -17,35 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:27894600:
-      source_state_id: oval:mil.disa.stig.win:ste:27894600
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: registry
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_FAILURE
-      state_title: '''Registry'' is set to ''Failure'''
     oval:mil.disa.stig.win:ste:27894601:
       source_state_id: oval:mil.disa.stig.win:ste:27894601
       source_type: auditeventpolicysubcategories_state
@@ -75,6 +46,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       state_title: '''Registry'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:27894600:
+      source_state_id: oval:mil.disa.stig.win:ste:27894600
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: registry
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      state_title: '''Registry'' is set to ''Failure'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:27894600:
@@ -104,6 +104,33 @@ assessment:
         - oval:mil.disa.stig.win:ste:27894601
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:278946:
+        source_definition_id: oval:mil.disa.stig.defs:def:278946
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Registry - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894600
+          - comment: Audit - Registry - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured to audit registry failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:278930:
         source_definition_id: oval:mil.disa.stig.windows11:def:278930
         class: compliance
@@ -138,33 +165,6 @@ assessment:
               to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential
               for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
               Credential validation records events related to validation tests on credentials for a user account logon.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:278946:
-        source_definition_id: oval:mil.disa.stig.defs:def:278946
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Registry - Failure only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:27894600
-          - comment: Audit - Registry - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:27894601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must be configured to audit registry failures.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -285,6 +285,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278930r1135308_rule
-    semantic_ir_sha256: 55517d754822fcd235fa74e062cbf70d04c2b6f758de8c97bce9d9a2df34d39d
+    semantic_ir_sha256: e5f00620fd5c1234f34e2f9e8ef8809de4d7fc660e6930a41f82782c69bc140e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: c309eb9afb0c4d1cbdcaf6810b9236b9808bcbc36afb0888b956e2ea1626f3f3

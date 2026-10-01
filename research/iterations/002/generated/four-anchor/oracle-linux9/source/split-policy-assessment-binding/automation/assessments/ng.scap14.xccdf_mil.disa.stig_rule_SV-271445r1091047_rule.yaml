@@ -61,9 +61,9 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25780601:
+    oval:mil.disa.stig.ind:obj:23049901:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780601
+      source_object_id: oval:mil.disa.stig.ind:obj:23049901
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
@@ -80,9 +80,25 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: filepath
+        name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -101,6 +117,7 @@ assessment:
         value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
       - attributes:
           datatype: int
+          operation: greater than or equal
         effective_attributes:
           datatype:
             origin: explicit
@@ -109,8 +126,8 @@ assessment:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: xsd_default
-            value: equals
+            origin: explicit
+            value: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -186,9 +203,9 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23049901:
+    oval:mil.disa.stig.ind:obj:25780601:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23049901
+      source_object_id: oval:mil.disa.stig.ind:obj:25780601
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
@@ -205,25 +222,9 @@ assessment:
             origin: xsd_default
             value: equals
         kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.d
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*
+        value: /etc/modprobe.conf
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -242,7 +243,6 @@ assessment:
         value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
       - attributes:
           datatype: int
-          operation: greater than or equal
         effective_attributes:
           datatype:
             origin: explicit
@@ -251,8 +251,8 @@ assessment:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: explicit
-            value: greater than or equal
+            origin: xsd_default
+            value: equals
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -261,18 +261,6 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25780600:
-        source_test_id: oval:mil.disa.stig.ind:tst:25780600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: /etc/modprobe.conf contains 'install firewire-core /bin/false'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25780600
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23049901:
         source_test_id: oval:mil.disa.stig.ind:tst:23049901
         source_type: textfilecontent54_test
@@ -285,18 +273,6 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23049901
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23049900:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049900
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23049900
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25780601:
         source_test_id: oval:mil.disa.stig.ind:tst:25780601
         source_type: textfilecontent54_test
@@ -307,6 +283,30 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25780601
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25780600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25780600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /etc/modprobe.conf contains 'install firewire-core /bin/false'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25780600
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23049900:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049900
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23049900
         predicates: []
         source_other: []
     definitions:
@@ -507,6 +507,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271445r1091047_rule
-    semantic_ir_sha256: bd79e08b9353707859c258da1f54ae14ef01311b56f12c34920d84aae36c6a9e
+    semantic_ir_sha256: c2df7b07dc7f3b511bdd7afb4e6630b1f1e6a3e339dc613a9ebbc7c880b57c15
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 3247d762d300e4693976683c4b21ab40637aad3dfdb7996c4813d89f1dfb12aa

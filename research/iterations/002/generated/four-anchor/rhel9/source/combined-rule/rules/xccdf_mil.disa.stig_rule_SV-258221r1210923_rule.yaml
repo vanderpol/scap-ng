@@ -460,61 +460,6 @@ rule:
       that affect /etc/opasswd.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:28115801:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:28115801
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        object_title: null
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64?\s+-F\s+path=\/etc\/security\/opasswd\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: int
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:28115800:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:28115800
@@ -570,6 +515,61 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:28115801:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:28115801
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64?\s+-F\s+path=\/etc\/security\/opasswd\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
@@ -599,6 +599,34 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:281158:
+          source_definition_id: oval:mil.disa.stig.defs:def:281158
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of /etc/security/opasswd
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:28115800
+            - comment: Audit 64-bit invocations of /etc/security/opasswd
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:28115801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must generate audit records for all account creations, modifications, disabling,
+                and termination events that affect /etc/security/opasswd.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258221:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258221
           class: compliance
@@ -637,34 +665,6 @@ rule:
                 SRG-OS-000304-GPOS-00121, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000470-GPOS-00214, SRG-OS-000471-GPOS-00215,
                 SRG-OS-000239-GPOS-00089, SRG-OS-000240-GPOS-00090, SRG-OS-000241-GPOS-00091, SRG-OS-000303-GPOS-00120, SRG-OS-000466-GPOS-00210,
                 SRG-OS-000476-GPOS-00221'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:281158:
-          source_definition_id: oval:mil.disa.stig.defs:def:281158
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of /etc/security/opasswd
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:28115800
-            - comment: Audit 64-bit invocations of /etc/security/opasswd
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:28115801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must generate audit records for all account creations, modifications, disabling,
-                and termination events that affect /etc/security/opasswd.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -789,7 +789,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
-      semantic_ir_sha256: 045fcd1da21961466d865dc03cbca9ce7ff92d3123eb4825b5be53b564818c58
+      semantic_ir_sha256: 05c2aef8d4364303b64c5aa1c7c1295062312c43c811354565eaf6b28a923828
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b9c56d5e29a3c9528f17a390bf64921229e6f60f9cd95974315566cb281315f1
   assessments:

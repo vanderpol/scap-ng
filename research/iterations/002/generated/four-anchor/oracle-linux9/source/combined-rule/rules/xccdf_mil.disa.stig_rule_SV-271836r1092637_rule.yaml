@@ -598,6 +598,34 @@ rule:
           - oval:mil.disa.stig.linux:ste:25808000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258080:
+          source_definition_id: oval:mil.disa.stig.defs:def:258080
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: configured faillock directory has correct selinux context
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:25808000
+            - comment: /etc/security/faillock.conf dir option exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25808000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default
+                faillock tally directory.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271836:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271836
           class: compliance
@@ -630,34 +658,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Not having the correct SELinux context on the faillock directory may lead to unauthorized access to the
                 directory.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258080:
-          source_definition_id: oval:mil.disa.stig.defs:def:258080
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: configured faillock directory has correct selinux context
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:25808000
-            - comment: /etc/security/faillock.conf dir option exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25808000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default
-                faillock tally directory.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -803,7 +803,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271836r1092637_rule
-      semantic_ir_sha256: 6aa8c7dc8e0e2ffd6e1181cbd2df27b0996d8d07fff47e1a8eeada9659288aee
+      semantic_ir_sha256: 91c31f747b7ed621646f540bac0ec8e8924e37ef8047586d1414f86a48ea74e0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 978eb93ecd051b7cf0903653fbf5c572911d1bcbcb51193ea6c5f1f5d14bbb24
   assessments:

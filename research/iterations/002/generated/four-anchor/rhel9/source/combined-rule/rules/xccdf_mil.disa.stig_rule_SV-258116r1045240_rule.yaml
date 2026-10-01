@@ -374,61 +374,6 @@ rule:
       only encrypted representations of passwords.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:20441701:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:20441701
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        object_title: /etc/libuser.conf defaults section with crypt_style
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/libuser.conf
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*crypt_style\s*=\s*(\S+)\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: int
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:20441700:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:20441700
@@ -467,6 +412,61 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\[defaults]((?:\r?\n(?:[^[\r\n].*)?)*)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20441701:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20441701
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        object_title: /etc/libuser.conf defaults section with crypt_style
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/libuser.conf
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*crypt_style\s*=\s*(\S+)\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -547,19 +547,6 @@ rule:
         state_title: sha512
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:20441700:
-          source_test_id: oval:mil.disa.stig.ind:tst:20441700
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: libuser.conf, defaults/crypt_style exists
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:20441700
-          predicates:
-          - oval:mil.disa.stig.ind:ste:20441700
-          source_other: []
         oval:mil.disa.stig.ind:tst:20441701:
           source_test_id: oval:mil.disa.stig.ind:tst:20441701
           source_type: textfilecontent54_test
@@ -573,35 +560,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:20441701
           source_other: []
+        oval:mil.disa.stig.ind:tst:20441700:
+          source_test_id: oval:mil.disa.stig.ind:tst:20441700
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: libuser.conf, defaults/crypt_style exists
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:20441700
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20441700
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:204417:
-          source_definition_id: oval:mil.disa.stig.defs:def:204417
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: libuser.conf, defaults/crypt_style exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441700
-            - comment: libuser.conf, crypt_style = sha512
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured so that user and group account administration utilities are configured
-                to store only encrypted representations of passwords.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258116:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258116
           class: compliance
@@ -640,6 +612,34 @@ rule:
                 This setting ensures user and group account administration utilities are configured to store only encrypted
                 representations of passwords. Additionally, the "crypt_style" configuration option ensures the use of a strong
                 hashing algorithm that makes password cracking attacks more difficult.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:204417:
+          source_definition_id: oval:mil.disa.stig.defs:def:204417
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: libuser.conf, defaults/crypt_style exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441700
+            - comment: libuser.conf, crypt_style = sha512
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured so that user and group account administration utilities are configured
+                to store only encrypted representations of passwords.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -763,7 +763,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
-      semantic_ir_sha256: 6e2bcd29365704ec637661dbaeb02930f80badfea163392c54c5f4465f783948
+      semantic_ir_sha256: 1a73c455dd854ffdc70293ba4075d7aec34cac2c68b93af29b275613b676de5d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0d116c769e6926577934ec2d84f4cd0da8dc03020532b293db5e88ea20f91964
   assessments:

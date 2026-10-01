@@ -393,6 +393,33 @@ inventory_assessments:
         query: []
     derive: {}
     predicates:
+      oval:mil.disa.stig.ind:ste:10000000:
+        source_state_id: oval:mil.disa.stig.ind:ste:10000000
+        source_type: family_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: family
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: windows
+        state_title: Microsoft Windows family
       oval:mil.disa.stig.win:ste:10000007:
         source_state_id: oval:mil.disa.stig.win:ste:10000007
         source_type: registry_state
@@ -422,48 +449,8 @@ inventory_assessments:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ^(?i)Windows Server 2025.*$
         state_title: Windows Server 2025
-      oval:mil.disa.stig.ind:ste:10000000:
-        source_state_id: oval:mil.disa.stig.ind:ste:10000000
-        source_type: family_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: family
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: windows
-        state_title: Microsoft Windows family
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:10000011:
-          source_test_id: oval:mil.disa.stig.win:tst:10000011
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: The installed operating system is Windows Server 2025
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:10000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000007
-          source_other: []
         oval:mil.disa.stig.ind:tst:10000000:
           source_test_id: oval:mil.disa.stig.ind:tst:10000000
           source_type: family_test
@@ -476,6 +463,19 @@ inventory_assessments:
           - oval:mil.disa.stig.ind:obj:10000000
           predicates:
           - oval:mil.disa.stig.ind:ste:10000000
+          source_other: []
+        oval:mil.disa.stig.win:tst:10000011:
+          source_test_id: oval:mil.disa.stig.win:tst:10000011
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: The installed operating system is Windows Server 2025
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:10000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000007
           source_other: []
       definitions:
         oval:mil.disa.stig.windows2025:def:1:
@@ -543,7 +543,7 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
-      semantic_ir_sha256: da127f8fabf83721991e3251a9355e1cddd66a4ce031d601ffb5a00c9b08dc47
+      semantic_ir_sha256: 70fec9850d9699c2315ca8c32f2057cc6989c45ab205338c717b57d0bcd99bbf
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ce255dcd937de87152124b563299f8d53ac957107eda1a787975151795ba5643
     purpose: platform_inventory

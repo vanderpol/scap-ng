@@ -7,6 +7,27 @@ assessment:
   description: OL 9 must enable the Pluggable Authentication Module (PAM) interface for SSHD.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25798600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25798600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: UsePAM in all sshd_config and sshd_config.d/* files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25798601
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25798602
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25798601:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798601
@@ -133,27 +154,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25798600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      object_title: UsePAM in all sshd_config and sshd_config.d/* files
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25798601
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25798602
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:20000023:
@@ -381,6 +381,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271707r1091833_rule
-    semantic_ir_sha256: a28ae229e63fd2afaa0c7825b00c86417dd67f621f8c12398a4fd95e97d0f682
+    semantic_ir_sha256: 08401f48ed5988c4a8a9598d7b599e3ab7c4f4fd9bf02a77681e98a0869a340d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 7bdb5008eea9ada4628f1005e74353d55d9bbe0dfd1ea75cc5350e7535bbcc4a

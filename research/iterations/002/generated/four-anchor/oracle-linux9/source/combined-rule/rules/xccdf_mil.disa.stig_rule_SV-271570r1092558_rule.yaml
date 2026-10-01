@@ -350,61 +350,6 @@ rule:
     description: OL 9 must audit uses of the execve system call.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23038600:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038600
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: 32-bit execve syscall uid comparison
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+uid!=euid\s+-F\s+euid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: int
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23038601:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23038601
@@ -460,13 +405,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23038603:
+      oval:mil.disa.stig.ind:obj:23038600:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038603
+        source_object_id: oval:mil.disa.stig.ind:obj:23038600
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        object_title: 64-bit execve syscall gid comparison
+        object_title: 32-bit execve syscall uid comparison
         query:
         - effective_attributes:
             datatype:
@@ -497,7 +442,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+uid!=euid\s+-F\s+euid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -570,20 +515,75 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:23038603:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23038603
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: 64-bit execve syscall gid comparison
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23038600:
-          source_test_id: oval:mil.disa.stig.ind:tst:23038600
+        oval:mil.disa.stig.ind:tst:23038602:
+          source_test_id: oval:mil.disa.stig.ind:tst:23038602
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 32-bit invocations of execve syscall comparing uids
+          test_title: Audit 32-bit invocations of execve syscall comparing gids
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23038600
+          - oval:mil.disa.stig.ind:obj:23038602
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23038603:
@@ -610,16 +610,16 @@ rule:
           - oval:mil.disa.stig.ind:obj:23038601
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23038602:
-          source_test_id: oval:mil.disa.stig.ind:tst:23038602
+        oval:mil.disa.stig.ind:tst:23038600:
+          source_test_id: oval:mil.disa.stig.ind:tst:23038600
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 32-bit invocations of execve syscall comparing gids
+          test_title: Audit 32-bit invocations of execve syscall comparing uids
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23038602
+          - oval:mil.disa.stig.ind:obj:23038600
           predicates: []
           source_other: []
       definitions:
@@ -817,7 +817,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271570r1092558_rule
-      semantic_ir_sha256: 62d94bc63e477388d3042aca778380c2f8884ee2c05ab5f4c667403145a7c218
+      semantic_ir_sha256: ed3326f78da0032d376cfebe14fb3f6dbaa568f30ca7a9528cf482fe1a236e70
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f98485075dfe704494d4211a343e9724de00c9215eb3e47f16107a2f2efc7dde
   assessments:

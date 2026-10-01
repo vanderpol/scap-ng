@@ -7,61 +7,27 @@ assessment:
   description: OL 9 must require the maximum number of repeating characters be limited to three when passwords are changed.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23036101:
+    oval:mil.disa.stig.ind:obj:23036100:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036101
+      source_object_id: oval:mil.disa.stig.ind:obj:23036100
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
       object_title: null
       query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/pwquality.conf
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*maxrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23036101
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23036102
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:23036102:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23036102
@@ -148,59 +114,63 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23036100:
+    oval:mil.disa.stig.ind:obj:23036101:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036100
+      source_object_id: oval:mil.disa.stig.ind:obj:23036101
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
       object_title: null
       query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23036101
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23036102
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.ind:ste:20000015:
-      source_state_id: oval:mil.disa.stig.ind:ste:20000015
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
+      - effective_attributes:
           datatype:
-            origin: explicit
-            value: int
-          entity_check:
             origin: xsd_default
-            value: all
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/pwquality.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
           mask:
             origin: xsd_default
             value: 'false'
           operation:
             origin: explicit
-            value: greater than
+            value: pattern match
         kind: element
-        name: subexpression
+        name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      state_title: null
+        value: ^\s*maxrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
     oval:mil.disa.stig.ind:ste:23036100:
       source_state_id: oval:mil.disa.stig.ind:ste:23036100
       source_type: textfilecontent54_state
@@ -230,6 +200,36 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '3'
+      state_title: null
+    oval:mil.disa.stig.ind:ste:20000015:
+      source_state_id: oval:mil.disa.stig.ind:ste:20000015
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
       state_title: null
   evaluate:
     tests:
@@ -429,6 +429,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271619r1091569_rule
-    semantic_ir_sha256: 6d7fe78299f6bbccf8551b08bd28f5a35860850badf9041f1669bf1b58b8e8c1
+    semantic_ir_sha256: e6c4f0c3f9be212f76aef88b0671d95f1720fb833d83060c54d9683e0b954839
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 844174ffb82e3b09b9a5b4efc2791d6a374e0cb438ed158b1dd7ded47e4ab876

@@ -376,13 +376,13 @@ rule:
     description: OL 9 must force a frequent session key renegotiation for SSH connections to the server.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25798800:
+      oval:mil.disa.stig.ind:obj:23052700:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25798800
+        source_object_id: oval:mil.disa.stig.ind:obj:23052700
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: sshd_config includes
+        version: '3'
+        object_title: null
         query:
         - attributes:
             ignore_case: 'true'
@@ -399,11 +399,9 @@ rule:
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - attributes:
-            datatype: string
-          effective_attributes:
+        - effective_attributes:
             datatype:
-              origin: explicit
+              origin: xsd_default
               value: string
             mask:
               origin: xsd_default
@@ -430,7 +428,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*include\s+(.*)\s*$
+          value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -534,13 +532,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23052700:
+      oval:mil.disa.stig.ind:obj:25798800:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23052700
+        source_object_id: oval:mil.disa.stig.ind:obj:25798800
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        object_title: null
+        version: '1'
+        object_title: sshd_config includes
         query:
         - attributes:
             ignore_case: 'true'
@@ -557,9 +555,11 @@ rule:
           kind: element
           name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - effective_attributes:
+        - attributes:
+            datatype: string
+          effective_attributes:
             datatype:
-              origin: xsd_default
+              origin: explicit
               value: string
             mask:
               origin: xsd_default
@@ -586,7 +586,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
+          value: ^\s*include\s+(.*)\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -606,36 +606,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:25798801:
-        source_state_id: oval:mil.disa.stig.ind:ste:25798801
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: equals
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: equals
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config.d/*.conf
-        state_title: null
       oval:mil.disa.stig.ind:ste:23052700:
         source_state_id: oval:mil.disa.stig.ind:ste:23052700
         source_type: textfilecontent54_state
@@ -666,21 +636,38 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
         state_title: null
+      oval:mil.disa.stig.ind:ste:25798801:
+        source_state_id: oval:mil.disa.stig.ind:ste:25798801
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config.d/*.conf
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23052701:
-          source_test_id: oval:mil.disa.stig.ind:tst:23052701
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /etc/ssh/sshd_config.d:RekeyLimit max data and time are greater than zero.
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23052701
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23052700
-          source_other: []
         oval:mil.disa.stig.ind:tst:25798801:
           source_test_id: oval:mil.disa.stig.ind:tst:25798801
           source_type: textfilecontent54_test
@@ -704,6 +691,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23052700
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23052700
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23052701:
+          source_test_id: oval:mil.disa.stig.ind:tst:23052701
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/ssh/sshd_config.d:RekeyLimit max data and time are greater than zero.
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23052701
           predicates:
           - oval:mil.disa.stig.ind:ste:23052700
           source_other: []
@@ -914,7 +914,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271705r1091827_rule
-      semantic_ir_sha256: e97bf77229137e276020588fa8a6ee1ddfd10dd585cee947af7218d42f52f240
+      semantic_ir_sha256: 143ad8a7daf7e7852a18e7f2a6759d1b0a15bf0bca3d2a15d63dec799f39c552
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f6351290dc698095a0ceee2738df08429d92b96b89aa3e4e5805ddc54d05c84f
   assessments:

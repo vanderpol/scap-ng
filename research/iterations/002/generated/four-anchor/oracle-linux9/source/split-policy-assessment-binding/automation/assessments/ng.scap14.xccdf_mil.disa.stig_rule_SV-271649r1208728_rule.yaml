@@ -7,6 +7,28 @@ assessment:
   description: OL 9 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:24453000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:24453000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: null
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /boot/efi
     oval:mil.disa.stig.ind:obj:24453001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:24453001
@@ -61,28 +83,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:24453000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:24453000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      object_title: null
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /boot/efi
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:2445301:
@@ -145,19 +145,6 @@ assessment:
       state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:24453001:
-        source_test_id: oval:mil.disa.stig.ind:tst:24453001
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:24453001
-        predicates:
-        - oval:mil.disa.stig.ind:ste:2445301
-        source_other: []
       oval:mil.disa.stig.linux:tst:24453000:
         source_test_id: oval:mil.disa.stig.linux:tst:24453000
         source_type: partition_test
@@ -170,6 +157,19 @@ assessment:
         - oval:mil.disa.stig.linux:obj:24453000
         predicates:
         - oval:mil.disa.stig.linux:ste:20000002
+        source_other: []
+      oval:mil.disa.stig.ind:tst:24453001:
+        source_test_id: oval:mil.disa.stig.ind:tst:24453001
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:24453001
+        predicates:
+        - oval:mil.disa.stig.ind:ste:2445301
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:244530:
@@ -364,6 +364,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271649r1208728_rule
-    semantic_ir_sha256: 9930634c2504eed8579345193b54c80f56a1118e3dd72409cd0718d1c45433b1
+    semantic_ir_sha256: 4f81dea12f616faf44bb2361a343736dc247b7bcb71401e95522e0d0e142a7a8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 306c3067e6d79be6ed0bc363459c014065b687210ff54de6a6d37b32c90d241a

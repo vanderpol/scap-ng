@@ -377,6 +377,30 @@ rule:
     description: RHEL 9 user account passwords must have a 60-day maximum password lifetime restriction.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:23036702:
+        capability: scapng.collect.unix.shadow
+        source_object_id: oval:mil.disa.stig.unix:obj:23036702
+        source_type: shadow_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        object_title: /etc/shadow max password age for root
+        query:
+        - attributes:
+            datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: username
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: root
       oval:mil.disa.stig.unix:obj:23036701:
         capability: scapng.collect.unix.password
         source_object_id: oval:mil.disa.stig.unix:obj:23036701
@@ -475,30 +499,6 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.unix:ste:23036702
-      oval:mil.disa.stig.unix:obj:23036702:
-        capability: scapng.collect.unix.shadow
-        source_object_id: oval:mil.disa.stig.unix:obj:23036702
-        source_type: shadow_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        object_title: /etc/shadow max password age for root
-        query:
-        - attributes:
-            datatype: string
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: username
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: root
     derive:
       oval:mil.disa.stig.defs:var:23036700:
         source_variable_id: oval:mil.disa.stig.defs:var:23036700
@@ -611,47 +611,15 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:23036701
           variable_type: constant_variable
     predicates:
-      oval:mil.disa.stig.unix:ste:23036700:
-        source_state_id: oval:mil.disa.stig.unix:ste:23036700
-        source_type: shadow_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: int
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than
-          kind: element
-          name: chg_req
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: '0'
-        state_title: greater than zero
-      oval:mil.disa.stig.unix:ste:23036703:
-        source_state_id: oval:mil.disa.stig.unix:ste:23036703
+      oval:mil.disa.stig.unix:ste:23036704:
+        source_state_id: oval:mil.disa.stig.unix:ste:23036704
         source_type: password_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         operator: AND
         entities:
         - attributes:
             datatype: int
-            operation: not equal
-            var_check: all
-            var_ref: oval:mil.disa.stig.defs:var:23036701
+            operation: greater than or equal
           effective_attributes:
             check_existence:
               origin: xsd_default
@@ -667,14 +635,12 @@ rule:
               value: 'false'
             operation:
               origin: explicit
-              value: not equal
-            var_check:
-              origin: explicit
-              value: all
+              value: greater than or equal
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        state_title: anonymous users
+          value: '1000'
+        state_title: null
       oval:mil.disa.stig.unix:ste:23036702:
         source_state_id: oval:mil.disa.stig.unix:ste:23036702
         source_type: shadow_state
@@ -709,15 +675,15 @@ rule:
           name: username
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         state_title: Lines starting with usernames of system users
-      oval:mil.disa.stig.unix:ste:23036704:
-        source_state_id: oval:mil.disa.stig.unix:ste:23036704
-        source_type: password_state
+      oval:mil.disa.stig.unix:ste:23036700:
+        source_state_id: oval:mil.disa.stig.unix:ste:23036700
+        source_type: shadow_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         operator: AND
         entities:
         - attributes:
             datatype: int
-            operation: greater than or equal
+            operation: greater than
           effective_attributes:
             check_existence:
               origin: xsd_default
@@ -733,12 +699,12 @@ rule:
               value: 'false'
             operation:
               origin: explicit
-              value: greater than or equal
+              value: greater than
           kind: element
-          name: user_id
+          name: chg_req
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: '1000'
-        state_title: null
+          value: '0'
+        state_title: greater than zero
       oval:mil.disa.stig.unix:ste:23036701:
         source_state_id: oval:mil.disa.stig.unix:ste:23036701
         source_type: shadow_state
@@ -769,6 +735,40 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '60'
         state_title: less than or equal to sixty
+      oval:mil.disa.stig.unix:ste:23036703:
+        source_state_id: oval:mil.disa.stig.unix:ste:23036703
+        source_type: password_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: not equal
+            var_check: all
+            var_ref: oval:mil.disa.stig.defs:var:23036701
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: int
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: not equal
+            var_check:
+              origin: explicit
+              value: all
+          kind: element
+          name: user_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        state_title: anonymous users
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:23036701:
@@ -988,7 +988,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258042r1045133_rule
-      semantic_ir_sha256: 7883f3f11a0317e30fefbf8c8703d7dc556844c70ee6f68aae0bd40332b65c4a
+      semantic_ir_sha256: 803fa1487dfa7d05f85473b92fadb5ebf164b7863227ab73e2572739e3040ec7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: edf4c27bb57b14e8e2ea48513a5cf05d4c4543c34e323580eec95b0897426f6a
   assessments:

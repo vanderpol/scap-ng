@@ -7,9 +7,9 @@ assessment:
   description: OL 9 passwords must have a 24-hour minimum password lifetime restriction in /etc/shadow.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23036400:
+    oval:mil.disa.stig.ind:obj:23036403:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036400
+      source_object_id: oval:mil.disa.stig.ind:obj:23036403
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
@@ -30,12 +30,13 @@ assessment:
         kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/shadow
+        value: /etc/passwd
       - attributes:
+          datatype: string
           operation: pattern match
         effective_attributes:
           datatype:
-            origin: xsd_default
+            origin: explicit
             value: string
           mask:
             origin: xsd_default
@@ -46,10 +47,9 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '^root:[^:]*:[^:]*:0*:'
+        value: '^nobody:[^:]*:([0-9]+):'
       - attributes:
           datatype: int
-          operation: greater than or equal
         effective_attributes:
           datatype:
             origin: explicit
@@ -58,8 +58,8 @@ assessment:
             origin: xsd_default
             value: 'false'
           operation:
-            origin: explicit
-            value: greater than or equal
+            origin: xsd_default
+            value: equals
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -121,6 +121,63 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:23036401
+    oval:mil.disa.stig.ind:obj:23036400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/shadow
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^root:[^:]*:[^:]*:0*:'
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23036402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23036402
@@ -174,63 +231,6 @@ assessment:
           operation:
             origin: explicit
             value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23036403:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036403
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: null
-      query:
-      - attributes:
-          datatype: string
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/passwd
-      - attributes:
-          datatype: string
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '^nobody:[^:]*:([0-9]+):'
-      - attributes:
-          datatype: int
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -319,36 +319,6 @@ assessment:
         variable_id: oval:mil.disa.stig.defs:var:23036400
         variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.unix:ste:23036400:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036400
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: less than
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: int
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: less than
-        kind: element
-        name: user_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1000'
-      state_title: null
     oval:mil.disa.stig.unix:ste:23036401:
       source_state_id: oval:mil.disa.stig.unix:ste:23036401
       source_type: password_state
@@ -383,6 +353,36 @@ assessment:
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       state_title: null
+    oval:mil.disa.stig.unix:ste:23036400:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036400
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:23036401:
@@ -410,33 +410,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230364:
-        source_definition_id: oval:mil.disa.stig.defs:def:230364
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Root does not have a minimum password age of 0 or blank
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23036400
-          - comment: Non-system users do not have a minimum password age of 0 or blank
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23036401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271630:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271630
         class: compliance
@@ -470,6 +443,33 @@ assessment:
               reuse or history enforcement requirement. If users are allowed to immediately and continually change their password,
               the password could be repeatedly changed in a short period of time to defeat the organization's policy regarding
               password reuse.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230364:
+        source_definition_id: oval:mil.disa.stig.defs:def:230364
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Root does not have a minimum password age of 0 or blank
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23036400
+          - comment: Non-system users do not have a minimum password age of 0 or blank
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -595,6 +595,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271630r1091602_rule
-    semantic_ir_sha256: 9e71e9ba986093a5b5e4800fa65d62908760a1e7ffc592042d4bcb1913cd7b56
+    semantic_ir_sha256: ec0a4cde6e754430dab687d8e30ed303e41c98a7fdfda7bb76b1b759c655f5b4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 5c94e8cdfaf69356dcf781a55e708be809c8d6bd1a1c9bcb635e1a13c9986f93

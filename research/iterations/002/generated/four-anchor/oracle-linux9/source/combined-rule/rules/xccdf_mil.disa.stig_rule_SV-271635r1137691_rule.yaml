@@ -350,63 +350,6 @@ rule:
     description: OL 9 must require a boot loader superuser password.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25778701:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25778701
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: /boot/grub2/grubenv:kernelopts
-        query:
-        - attributes:
-            datatype: string
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /boot/grub2/user.cfg
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*GRUB2_PASSWORD=(\S+)\b
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: int
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25778700:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25778700
@@ -464,27 +407,36 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-    derive: {}
-    predicates:
-      oval:mil.disa.stig.ind:ste:25778701:
-        source_state_id: oval:mil.disa.stig.ind:ste:25778701
-        source_type: textfilecontent54_state
+      oval:mil.disa.stig.ind:obj:25778701:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25778701
+        source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
+        version: '1'
+        object_title: /boot/grub2/grubenv:kernelopts
+        query:
         - attributes:
             datatype: string
-            operation: pattern match
           effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
             datatype:
               origin: explicit
               value: string
-            entity_check:
+            mask:
               origin: xsd_default
-              value: all
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /boot/grub2/user.cfg
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
             mask:
               origin: xsd_default
               value: 'false'
@@ -492,10 +444,28 @@ rule:
               origin: explicit
               value: pattern match
           kind: element
-          name: subexpression
+          name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^grub\.pbkdf2\.sha512\.
-        state_title: GRUB superuser password
+          value: ^\s*GRUB2_PASSWORD=(\S+)\b
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
       oval:mil.disa.stig.ind:ste:25778700:
         source_state_id: oval:mil.disa.stig.ind:ste:25778700
         source_type: textfilecontent54_state
@@ -526,21 +496,38 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\S+$
         state_title: GRUB superuser name
+      oval:mil.disa.stig.ind:ste:25778701:
+        source_state_id: oval:mil.disa.stig.ind:ste:25778701
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^grub\.pbkdf2\.sha512\.
+        state_title: GRUB superuser password
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25778701:
-          source_test_id: oval:mil.disa.stig.ind:tst:25778701
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25778701
-          predicates:
-          - oval:mil.disa.stig.ind:ste:25778701
-          source_other: []
         oval:mil.disa.stig.ind:tst:25778700:
           source_test_id: oval:mil.disa.stig.ind:tst:25778700
           source_type: textfilecontent54_test
@@ -553,6 +540,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:25778700
           predicates:
           - oval:mil.disa.stig.ind:ste:25778700
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25778701:
+          source_test_id: oval:mil.disa.stig.ind:tst:25778701
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25778701
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25778701
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:257787:
@@ -748,7 +748,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271635r1137691_rule
-      semantic_ir_sha256: 75fcceaaac4d945d8c1fe2902be8571ad883623f2a161adfdd34d71af4ad309e
+      semantic_ir_sha256: 4228b4a1dcf3f67a61751b0419095c362239ca5c341ff1f592240c5aec866745
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 4616bd3ca4eaca080da338521d621ca498dc1fee890dc0311108cba4bff86612
   assessments:

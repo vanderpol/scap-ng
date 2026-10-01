@@ -598,56 +598,6 @@ rule:
       requirements.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802:
-        capability: scapng.collect.independent.shellcommand
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802
-        source_type: shellcommand_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: Run Icacls command against system drive root directory
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: shell
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: powershell
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: command
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: icacls($env:SystemDrive + '\')
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ':'
       oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801:
         capability: scapng.collect.windows.registry
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801
@@ -698,6 +648,56 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: everyoneincludesanonymous
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802:
+        capability: scapng.collect.independent.shellcommand
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802
+        source_type: shellcommand_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: Run Icacls command against system drive root directory
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: shell
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: powershell
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: command
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: icacls($env:SystemDrive + '\')
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ':'
     derive:
       oval:navy.navwar.niwcatlantic.scc.windows:var:27799801:
         source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27799801
@@ -858,19 +858,6 @@ rule:
         state_title: Permissions must equal expected output
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
-          check: only one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802
           source_type: shellcommand_test
@@ -883,6 +870,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+          check: only one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:277998:
@@ -1116,7 +1116,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
-      semantic_ir_sha256: 08191087aca3b357c38fb5b0249b0e2de08434643f27315e6b1bae83451778fd
+      semantic_ir_sha256: 4266190fe4ea244ae0c6cfeb3c7eec733dc03463fe5b26c93754f55ef2f2c887
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 635b1950dd644896d3c4a66569bff53a977b1ad05f62bdd034df4b4e8ab39368
   assessments:

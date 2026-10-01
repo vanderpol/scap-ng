@@ -458,13 +458,13 @@ rule:
     description: RHEL 9 must audit all uses of the chmod, fchmod, and fchmodat system calls.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23045604:
+      oval:mil.disa.stig.ind:obj:23045603:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045604
+        source_object_id: oval:mil.disa.stig.ind:obj:23045603
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        object_title: 32-bit fchmodat syscall
+        object_title: 64-bit fchmod syscall
         query:
         - effective_attributes:
             datatype:
@@ -495,7 +495,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchmodat\s+|(\s+|,)fchmodat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchmod\s+|(\s+|,)fchmod(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -568,6 +568,61 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:23045601:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23045601
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: 64-bit chmod syscall
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chmod\s+|(\s+|,)chmod(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          effective_attributes:
+            datatype:
+              origin: explicit
+              value: int
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23045602:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23045602
@@ -623,13 +678,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045603:
+      oval:mil.disa.stig.ind:obj:23045604:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045603
+        source_object_id: oval:mil.disa.stig.ind:obj:23045604
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        object_title: 64-bit fchmod syscall
+        object_title: 32-bit fchmodat syscall
         query:
         - effective_attributes:
             datatype:
@@ -660,7 +715,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchmod\s+|(\s+|,)fchmod(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchmodat\s+|(\s+|,)fchmodat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -733,101 +788,10 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045601:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045601
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: 64-bit chmod syscall
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chmod\s+|(\s+|,)chmod(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          effective_attributes:
-            datatype:
-              origin: explicit
-              value: int
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23045603:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045603
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 64-bit invocations of fchmod syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045603
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045602:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045602
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 32-bit invocations of fchmod syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045602
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045600:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045600
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 32-bit invocations of chmod syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045600
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23045605:
           source_test_id: oval:mil.disa.stig.ind:tst:23045605
           source_type: textfilecontent54_test
@@ -838,18 +802,6 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23045605
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045601:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045601
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: Audit 64-bit invocations of chmod syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045601
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23045604:
@@ -864,7 +816,99 @@ rule:
           - oval:mil.disa.stig.ind:obj:23045604
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:23045601:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045601
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Audit 64-bit invocations of chmod syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045601
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045603:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045603
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Audit 64-bit invocations of fchmod syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045603
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045600:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045600
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Audit 32-bit invocations of chmod syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045600
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045602:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045602
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Audit 32-bit invocations of fchmod syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045602
+          predicates: []
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230456:
+          source_definition_id: oval:mil.disa.stig.defs:def:230456
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of chmod syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045600
+            - comment: Audit 64-bit invocations of chmod syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045601
+            - comment: Audit 32-bit invocations of fchmod syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045602
+            - comment: Audit 64-bit invocations of fchmod syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045603
+            - comment: Audit 32-bit invocations of fchmodat syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045604
+            - comment: Audit 64-bit invocations of fchmodat syscall
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23045605
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the chmod, fchmod, and fchmodat system calls in the operating system must
+                generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258177:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258177
           class: compliance
@@ -916,50 +960,6 @@ rule:
 
                 Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,
                 SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000064-GPOS-00033, SRG-OS-000466-GPOS-00210, SRG-OS-000458-GPOS-00203'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230456:
-          source_definition_id: oval:mil.disa.stig.defs:def:230456
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of chmod syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045600
-            - comment: Audit 64-bit invocations of chmod syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045601
-            - comment: Audit 32-bit invocations of fchmod syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045602
-            - comment: Audit 64-bit invocations of fchmod syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045603
-            - comment: Audit 32-bit invocations of fchmodat syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045604
-            - comment: Audit 64-bit invocations of fchmodat syscall
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23045605
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the chmod, fchmod, and fchmodat system calls in the operating system must
-                generate an audit record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -1093,7 +1093,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258177r1155597_rule
-      semantic_ir_sha256: 2f13ea0533a2c2f9b600c2fff4cf57a4d84e8021c4d6bba55b4cb7a583692c11
+      semantic_ir_sha256: 2f80501cb5dbf9d02acee9644b1fbeda5882c143ef97eefbdfb87be93813b09a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: fd8b1f3fd93d66414a62bfa35c529f365139b96687598b59bef435bdbf017779
   assessments:

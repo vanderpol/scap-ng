@@ -525,6 +525,28 @@ rule:
       to prevent access from highly privileged domain accounts and from unauthenticated access on all systems.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25349200:
+        capability: scapng.collect.windows.userright
+        source_object_id: oval:mil.disa.stig.win:obj:25349200
+        source_type: userright_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: userright
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SE_DENY_BATCH_LOGON_NAME
       oval:mil.disa.stig.win:obj:10000100:
         capability: scapng.collect.windows.wmi57
         source_object_id: oval:mil.disa.stig.win:obj:10000100
@@ -561,30 +583,66 @@ rule:
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT DomainRole FROM win32_computersystem
-      oval:mil.disa.stig.win:obj:25349200:
-        capability: scapng.collect.windows.userright
-        source_object_id: oval:mil.disa.stig.win:obj:25349200
-        source_type: userright_object
+    derive: {}
+    predicates:
+      oval:mil.disa.stig.win:ste:20000041:
+        source_state_id: oval:mil.disa.stig.win:ste:20000041
+        source_type: userright_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: null
-        query:
-        - effective_attributes:
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
             datatype:
               origin: xsd_default
               value: string
+            entity_check:
+              origin: xsd_default
+              value: all
             mask:
               origin: xsd_default
               value: 'false'
             operation:
-              origin: xsd_default
-              value: equals
+              origin: explicit
+              value: pattern match
           kind: element
-          name: userright
+          name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SE_DENY_BATCH_LOGON_NAME
-    derive: {}
-    predicates:
+          value: ^(?i)(.+\\)?Enterprise Admins$
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000040:
+        source_state_id: oval:mil.disa.stig.win:ste:20000040
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Domain Admins$
+        state_title: null
       oval:mil.disa.stig.win:ste:20000033:
         source_state_id: oval:mil.disa.stig.win:ste:20000033
         source_type: userright_state
@@ -650,64 +708,6 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         state_title: Standalone Server
-      oval:mil.disa.stig.win:ste:20000041:
-        source_state_id: oval:mil.disa.stig.win:ste:20000041
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Enterprise Admins$
-        state_title: null
-      oval:mil.disa.stig.win:ste:20000040:
-        source_state_id: oval:mil.disa.stig.win:ste:20000040
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Domain Admins$
-        state_title: null
       oval:mil.disa.stig.win:ste:10000400:
         source_state_id: oval:mil.disa.stig.win:ste:10000400
         source_type: wmi57_state
@@ -746,6 +746,32 @@ rule:
         state_title: Domain Member Server
     evaluate:
       tests:
+        oval:mil.disa.stig.win:tst:10000400:
+          source_test_id: oval:mil.disa.stig.win:tst:10000400
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: The system is a Windows Domain Member Server
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:10000100
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000400
+          source_other: []
+        oval:mil.disa.stig.win:tst:25443601:
+          source_test_id: oval:mil.disa.stig.win:tst:25443601
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Deny log on as a batch job - Guests
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349200
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000033
+          source_other: []
         oval:mil.disa.stig.win:tst:10000300:
           source_test_id: oval:mil.disa.stig.win:tst:10000300
           source_type: wmi57_test
@@ -772,32 +798,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000041
           source_other: []
-        oval:mil.disa.stig.win:tst:25443601:
-          source_test_id: oval:mil.disa.stig.win:tst:25443601
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: Deny log on as a batch job - Guests
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349200
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000033
-          source_other: []
-        oval:mil.disa.stig.win:tst:10000400:
-          source_test_id: oval:mil.disa.stig.win:tst:10000400
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: The system is a Windows Domain Member Server
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:10000100
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000400
-          source_other: []
         oval:mil.disa.stig.win:tst:25349202:
           source_test_id: oval:mil.disa.stig.win:tst:25349202
           source_type: userright_test
@@ -812,56 +812,33 @@ rule:
           - oval:mil.disa.stig.win:ste:20000040
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:254436:
-          source_definition_id: oval:mil.disa.stig.defs:def:254436
-          class: compliance
-          version: '6'
+        oval:mil.disa.stig.win:def:100004:
+          source_definition_id: oval:mil.disa.stig.win:def:100004
+          class: inventory
+          version: '2'
           criteria:
             children:
-            - children:
-              - comment: System is a domain-joined member server
-                definition_ref: oval:mil.disa.stig.win:def:100004
-                kind: definition_ref
-                negate: false
-              - comment: Deny log on as a batch job - Domain Admins
-                kind: test_ref
-                negate: false
-                test_ref: oval:mil.disa.stig.win:tst:25349202
-              - comment: Deny log on as a batch job - Enterprise Admins
-                kind: test_ref
-                negate: false
-                test_ref: oval:mil.disa.stig.win:tst:25349203
-              - comment: Deny log on as a batch job - Guests
-                kind: test_ref
-                negate: false
-                test_ref: oval:mil.disa.stig.win:tst:25443601
-              comment: null
-              kind: boolean
+            - comment: null
+              kind: test_ref
               negate: false
-              operator: AND
-            - children:
-              - comment: System is a standalone server
-                definition_ref: oval:mil.disa.stig.win:def:100003
-                kind: definition_ref
-                negate: false
-              - comment: Deny log on as a batch job - Guests
-                kind: test_ref
-                negate: false
-                test_ref: oval:mil.disa.stig.win:tst:25443601
-              comment: null
-              kind: boolean
-              negate: false
-              operator: AND
+              test_ref: oval:mil.disa.stig.win:tst:10000400
             comment: null
             kind: boolean
             negate: false
-            operator: OR
+            operator: AND
           metadata:
             children:
             - name: title
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent
-                access from highly privileged domain accounts and from unauthenticated access on all systems.
+              text: The system is a Windows Domain Member Server
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows Server
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
@@ -936,33 +913,56 @@ rule:
                 \ must be assigned to prevent unauthenticated access."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.win:def:100004:
-          source_definition_id: oval:mil.disa.stig.win:def:100004
-          class: inventory
-          version: '2'
+        oval:mil.disa.stig.defs:def:254436:
+          source_definition_id: oval:mil.disa.stig.defs:def:254436
+          class: compliance
+          version: '6'
           criteria:
             children:
-            - comment: null
-              kind: test_ref
+            - children:
+              - comment: System is a domain-joined member server
+                definition_ref: oval:mil.disa.stig.win:def:100004
+                kind: definition_ref
+                negate: false
+              - comment: Deny log on as a batch job - Domain Admins
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.win:tst:25349202
+              - comment: Deny log on as a batch job - Enterprise Admins
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.win:tst:25349203
+              - comment: Deny log on as a batch job - Guests
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.win:tst:25443601
+              comment: null
+              kind: boolean
               negate: false
-              test_ref: oval:mil.disa.stig.win:tst:10000400
+              operator: AND
+            - children:
+              - comment: System is a standalone server
+                definition_ref: oval:mil.disa.stig.win:def:100003
+                kind: definition_ref
+                negate: false
+              - comment: Deny log on as a batch job - Guests
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.win:tst:25443601
+              comment: null
+              kind: boolean
+              negate: false
+              operator: AND
             comment: null
             kind: boolean
             negate: false
-            operator: AND
+            operator: OR
           metadata:
             children:
             - name: title
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system is a Windows Domain Member Server
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows Server
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent
+                access from highly privileged domain accounts and from unauthenticated access on all systems.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
@@ -1141,7 +1141,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278185r1182296_rule
-      semantic_ir_sha256: e755a9a8269ec6d705c7fdc7fc6758103625fa83d28b9ce93e2747235a6acd7d
+      semantic_ir_sha256: b09504f0ba9bda91db614175081521f1921a72d43b41039659cffd3fa9090e98
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0830277e98578d49b29fb84a5349619b00ddca509fdfcbe2a9785676eff4a29f
   assessments:

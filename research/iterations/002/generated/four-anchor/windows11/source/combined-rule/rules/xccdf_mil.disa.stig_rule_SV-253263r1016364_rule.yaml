@@ -444,56 +444,6 @@ rule:
           value: CurrentBuildNumber
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25326300:
-        source_state_id: oval:mil.disa.stig.win:ste:25326300
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: version
-            operation: greater than or equal
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: explicit
-              value: version
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: greater than or equal
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '6.3'
-        state_title: null
       oval:mil.disa.stig.win:ste:25326301:
         source_state_id: oval:mil.disa.stig.win:ste:25326301
         source_type: registry_state
@@ -544,6 +494,56 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '22621'
         state_title: null
+      oval:mil.disa.stig.win:ste:25326300:
+        source_state_id: oval:mil.disa.stig.win:ste:25326300
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: version
+            operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: explicit
+              value: version
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: greater than or equal
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '6.3'
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25326300:
@@ -573,6 +573,33 @@ rule:
           - oval:mil.disa.stig.win:ste:25326301
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253263:
+          source_definition_id: oval:mil.disa.stig.defs:def:253263
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: The OS Version is equal to or greater than 6.3
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25326300
+            - comment: The OS Build is equal to or greater than minimum build permitted for compliance
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25326301
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows systems must be maintained at a supported servicing level.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253263:
           source_definition_id: oval:mil.disa.stig.windows11:def:253263
           class: compliance
@@ -614,33 +641,6 @@ rule:
 
                 A separate servicing branch intended for special purpose systems is the Long-Term Servicing Channel (LTSC,
                 formerly Branch - LTSB) which will receive security updates for 10 years but excludes feature updates.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253263:
-          source_definition_id: oval:mil.disa.stig.defs:def:253263
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: The OS Version is equal to or greater than 6.3
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25326300
-            - comment: The OS Build is equal to or greater than minimum build permitted for compliance
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25326301
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows systems must be maintained at a supported servicing level.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -762,7 +762,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253263r1016364_rule
-      semantic_ir_sha256: 797aefaddcff59e03f09975f3393d26969b01afdd5d6d2a9069d801b8496e25d
+      semantic_ir_sha256: 68e9fe390d0af674cdc7aa6c66c0437ed6a47aaebd6728e010e0c7b0dd00d315
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f9c1f41d278f838faabb440932bc0bf5a02edda39f6a4161116fb581a2867ea8
   assessments:

@@ -76,36 +76,6 @@ assessment:
         value: DevicePasswordHistory
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25330000:
-      source_state_id: oval:mil.disa.stig.win:ste:25330000
-      source_type: passwordpolicy_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: int
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: password_hist_len
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '24'
-      state_title: Password History Length is greater than or equal to variable
     oval:mil.disa.stig.win:ste:25330001:
       source_state_id: oval:mil.disa.stig.win:ste:25330001
       source_type: registry_state
@@ -156,21 +126,38 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '24'
       state_title: null
+    oval:mil.disa.stig.win:ste:25330000:
+      source_state_id: oval:mil.disa.stig.win:ste:25330000
+      source_type: passwordpolicy_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: int
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: password_hist_len
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '24'
+      state_title: Password History Length is greater than or equal to variable
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25330001:
-        source_test_id: oval:mil.disa.stig.win:tst:25330001
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25330000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25330001
-        source_other: []
       oval:mil.disa.stig.win:tst:25330000:
         source_test_id: oval:mil.disa.stig.win:tst:25330000
         source_type: passwordpolicy_test
@@ -184,7 +171,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25330000
         source_other: []
+      oval:mil.disa.stig.win:tst:25330001:
+        source_test_id: oval:mil.disa.stig.win:tst:25330001
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25330000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25330001
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:25330000:
+        source_definition_id: oval:mil.disa.stig.defs:def:25330000
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330000
+          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The password history must be configured to 24 passwords remembered.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253300:
         source_definition_id: oval:mil.disa.stig.windows11:def:253300
         class: compliance
@@ -218,33 +245,6 @@ assessment:
               without being required to change a password to a unique password on a regularly scheduled basis. This enables
               users to effectively negate the purpose of mandating periodic password changes. The default value is 24 for
               Windows domain systems. DoW has decided this is the appropriate value for all Windows systems.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:25330000:
-        source_definition_id: oval:mil.disa.stig.defs:def:25330000
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330000
-          - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330001
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The password history must be configured to 24 passwords remembered.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -386,6 +386,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
-    semantic_ir_sha256: 20dc8f5a42cfc31f91fcc83dc35f7c919fb70a1e323d8c40a8ab7247f6e7f8eb
+    semantic_ir_sha256: cd74b6d08e927729e294ab1c4d2e5f8e06bc933db8d2bfcbde20d65c1c99f0e2
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e47ef39c0b48b39007dee904324c31f92416153c6bc7d2741761921485bd07b9

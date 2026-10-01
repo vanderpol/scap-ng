@@ -80,36 +80,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23026400:
-      source_state_id: oval:mil.disa.stig.ind:ste:23026400
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
-      state_title: null
     oval:mil.disa.stig.ind:ste:23026401:
       source_state_id: oval:mil.disa.stig.ind:ste:23026401
       source_type: textfilecontent54_state
@@ -140,6 +110,36 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
       state_title: null
+    oval:mil.disa.stig.ind:ste:23026400:
+      source_state_id: oval:mil.disa.stig.ind:ste:23026400
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23026401:
@@ -169,6 +169,35 @@ assessment:
         - oval:mil.disa.stig.ind:ste:23026400
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230264:
+        source_definition_id: oval:mil.disa.stig.defs:def:230264
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 1.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23026400
+          - comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 0.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23026401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent the installation of software, patches, service packs, device drivers,
+              or operating system components from a repository without verification they have been digitally signed using
+              a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257822:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257822
         class: compliance
@@ -209,35 +238,6 @@ assessment:
               Verifying the authenticity of software prior to installation validates the integrity of the software package
               received from a vendor. This verifies the software has not been tampered with and that it has been provided
               by a trusted vendor.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230264:
-        source_definition_id: oval:mil.disa.stig.defs:def:230264
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 1.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23026400
-          - comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 0.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23026401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must prevent the installation of software, patches, service packs, device drivers,
-              or operating system components from a repository without verification they have been digitally signed using
-              a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -371,6 +371,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257822r1155615_rule
-    semantic_ir_sha256: 85517ed4fbba12ef0c7723db5cfeda1ab73dfa6c7ff8a784f9e27d3e83d8b217
+    semantic_ir_sha256: 89aeb537f0c5fe553540a462cda84deaf47ea5dc7365eed4c4a17873fe897b58
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 5598d29492bcd987e1fe7a8e1b39f75c40d92a3be9799e3b3c6ebeb94ae42b41

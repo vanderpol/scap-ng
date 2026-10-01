@@ -572,6 +572,35 @@ rule:
           variable_id: oval:mil.disa.stig.ind:var:23031600
           variable_type: local_variable
     predicates:
+      oval:mil.disa.stig.ind:ste:23031600:
+        source_state_id: oval:mil.disa.stig.ind:ste:23031600
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (^|\s)dns(\s|$)
+        state_title: hosts entry contains dns
       oval:mil.disa.stig.ind:ste:23031601:
         source_state_id: oval:mil.disa.stig.ind:ste:23031601
         source_type: variable_state
@@ -602,35 +631,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '2'
         state_title: /etc/resolv.conf is configured with at least two name servers
-      oval:mil.disa.stig.ind:ste:23031600:
-        source_state_id: oval:mil.disa.stig.ind:ste:23031600
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
-            datatype:
-              origin: xsd_default
-              value: string
-            entity_check:
-              origin: xsd_default
-              value: all
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: explicit
-              value: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (^|\s)dns(\s|$)
-        state_title: hosts entry contains dns
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23031601:
@@ -646,18 +646,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23031601
           source_other: []
-        oval:mil.disa.stig.ind:tst:23031602:
-          source_test_id: oval:mil.disa.stig.ind:tst:23031602
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: /etc/resolv.conf contains at least one nameserver entry
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23031602
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23031600:
           source_test_id: oval:mil.disa.stig.ind:tst:23031600
           source_type: textfilecontent54_test
@@ -670,6 +658,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:23031600
           predicates:
           - oval:mil.disa.stig.ind:ste:23031600
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23031602:
+          source_test_id: oval:mil.disa.stig.ind:tst:23031602
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/resolv.conf contains at least one nameserver entry
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23031602
+          predicates: []
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230316:
@@ -873,7 +873,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
-      semantic_ir_sha256: 7192b3d5e069fcab84c622d5da646628429fd1dbfd18847ddb1eeccd7e967650
+      semantic_ir_sha256: 5591f5fa62f798e57e6b60c0a59c32baf1a7a1c9f00a0b2f0e6a839531e5566e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 4beae365607a317ec9e62d54abf2c78419371e31369c14716b81e0a11d5fe249
   assessments:

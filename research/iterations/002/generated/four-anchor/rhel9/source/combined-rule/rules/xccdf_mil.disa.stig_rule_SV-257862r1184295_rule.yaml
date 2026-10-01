@@ -326,28 +326,6 @@ rule:
     description: RHEL 9 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:24453000:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:24453000
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        object_title: null
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /boot/efi
       oval:mil.disa.stig.ind:obj:24453001:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:24453001
@@ -402,37 +380,30 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-    derive: {}
-    predicates:
-      oval:mil.disa.stig.ind:ste:2445301:
-        source_state_id: oval:mil.disa.stig.ind:ste:2445301
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          effective_attributes:
-            check_existence:
-              origin: xsd_default
-              value: at_least_one_exists
+      oval:mil.disa.stig.linux:obj:24453000:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:24453000
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - effective_attributes:
             datatype:
               origin: xsd_default
               value: string
-            entity_check:
-              origin: xsd_default
-              value: all
             mask:
               origin: xsd_default
               value: 'false'
             operation:
-              origin: explicit
-              value: pattern match
+              origin: xsd_default
+              value: equals
           kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
-        state_title: null
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /boot/efi
+    derive: {}
+    predicates:
       oval:mil.disa.stig.linux:ste:20000002:
         source_state_id: oval:mil.disa.stig.linux:ste:20000002
         source_type: partition_state
@@ -461,6 +432,35 @@ rule:
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nosuid
+        state_title: null
+      oval:mil.disa.stig.ind:ste:2445301:
+        source_state_id: oval:mil.disa.stig.ind:ste:2445301
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            datatype:
+              origin: xsd_default
+              value: string
+            entity_check:
+              origin: xsd_default
+              value: all
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: explicit
+              value: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
         state_title: null
     evaluate:
       tests:
@@ -680,7 +680,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257862r1184295_rule
-      semantic_ir_sha256: be21bd0cf3d43db310e1dc2042b0af5bb41aa648846ad9254f90dfa094a33f65
+      semantic_ir_sha256: e8ef2e1796b4d7e03d7b2da0436f97ced1d1387b16341fe5ea13bee3484c59ac
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 3a38d2754396d5ec1deb9bd4542a94c8cff5360aba9b212be45118a966017cae
   assessments:

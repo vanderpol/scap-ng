@@ -387,6 +387,32 @@ rule:
     description: OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:20000011:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:20000011
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        object_title: Audit log file location
+        query:
+        - attributes:
+            var_ref: oval:mil.disa.stig.defs:var:20000004
+          effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+            var_check:
+              origin: documented_implicit
+              value: all
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.ind:obj:20000001:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:20000001
@@ -442,32 +468,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:20000011:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:20000011
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        object_title: Audit log file location
-        query:
-        - attributes:
-            var_ref: oval:mil.disa.stig.defs:var:20000004
-          effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-            var_check:
-              origin: documented_implicit
-              value: all
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:20000004:
         source_variable_id: oval:mil.disa.stig.defs:var:20000004
@@ -940,7 +940,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271585r1091467_rule
-      semantic_ir_sha256: fdbf66625492bef55977ad6feccc9ae521e88f1fbffffa4dca5837a6f360e66f
+      semantic_ir_sha256: 62d223dd9165faede1e44bf8b7fe1a8d822f773b989b5bb0b3a81b9127a58c54
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c462a91285cdccf5a5ca695a33b27e7e6dc035a92fc22f010b0c4f150a46d89e
   assessments:

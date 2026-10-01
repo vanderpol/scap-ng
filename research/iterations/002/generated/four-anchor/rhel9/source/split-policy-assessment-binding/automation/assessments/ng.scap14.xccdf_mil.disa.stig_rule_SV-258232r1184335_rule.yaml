@@ -7,6 +7,61 @@ assessment:
   description: RHEL 9 IP tunnels must use FIPS 140-3 approved cryptographic algorithms.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25823200:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25823200
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: /etc/ipsec.conf includes
+      query:
+      - effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: xsd_default
+            value: equals
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ipsec.conf
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          datatype:
+            origin: xsd_default
+            value: string
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*include\s+(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        effective_attributes:
+          datatype:
+            origin: explicit
+            value: int
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25823201:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25823201
@@ -45,61 +100,6 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^.*\.conf$
-      - attributes:
-          operation: pattern match
-        effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*include\s+(.*)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        effective_attributes:
-          datatype:
-            origin: explicit
-            value: int
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:25823200:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25823200
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      object_title: /etc/ipsec.conf includes
-      query:
-      - effective_attributes:
-          datatype:
-            origin: xsd_default
-            value: string
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: xsd_default
-            value: equals
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ipsec.conf
       - attributes:
           operation: pattern match
         effective_attributes:
@@ -191,18 +191,18 @@ assessment:
       state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25823201:
-        source_test_id: oval:mil.disa.stig.ind:tst:25823201
+      oval:mil.disa.stig.ind:tst:25823200:
+        source_test_id: oval:mil.disa.stig.ind:tst:25823200
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: ipsec.conf includes /etc/ipsec.d/*.conf
+        test_title: ipsec.conf includes crypto-policy
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25823200
         predicates:
-        - oval:mil.disa.stig.ind:ste:25823201
+        - oval:mil.disa.stig.ind:ste:25823200
         source_other: []
       oval:mil.disa.stig.ind:tst:25823202:
         source_test_id: oval:mil.disa.stig.ind:tst:25823202
@@ -217,20 +217,53 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:25823200
         source_other: []
-      oval:mil.disa.stig.ind:tst:25823200:
-        source_test_id: oval:mil.disa.stig.ind:tst:25823200
+      oval:mil.disa.stig.ind:tst:25823201:
+        source_test_id: oval:mil.disa.stig.ind:tst:25823201
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        test_title: ipsec.conf includes crypto-policy
+        test_title: ipsec.conf includes /etc/ipsec.d/*.conf
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25823200
         predicates:
-        - oval:mil.disa.stig.ind:ste:25823200
+        - oval:mil.disa.stig.ind:ste:25823201
         source_other: []
     definitions:
+      oval:mil.disa.stig.rhel9os:def:258232:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258232
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258232
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic algorithms.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Overriding the system crypto policy makes the behavior of the Libreswan service violate expectations, and
+              makes system configuration more fragmented.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:258232:
         source_definition_id: oval:mil.disa.stig.defs:def:258232
         class: compliance
@@ -265,39 +298,6 @@ assessment:
             text: The operating system IP tunnels must use FIPS 140-2/140-3 approved cryptographic algorithms.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.rhel9os:def:258232:
-        source_definition_id: oval:mil.disa.stig.rhel9os:def:258232
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:258232
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic algorithms.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Red Hat Enterprise Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Overriding the system crypto policy makes the behavior of the Libreswan service violate expectations, and
-              makes system configuration more fragmented.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -430,6 +430,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258232r1184335_rule
-    semantic_ir_sha256: 9feace7e6db8bab1e0ba48e5537c0d0bb5d88d1c93582003d7ed733a982a667a
+    semantic_ir_sha256: 43c3db4479ccb4d8bf658cecdbfb9110b35b76fde3d32e364145e33d5fd19fa8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e083367d62008bb00c9c4d94b50c70a3af93cf54f0dc12cef37e665c97be8684

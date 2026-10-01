@@ -351,34 +351,17 @@ rule:
     description: OL 9 SSH daemon must display the date and time of the last successful account logon upon an SSH logon.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25798800:
+      oval:mil.disa.stig.ind:obj:23038200:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25798800
+        source_object_id: oval:mil.disa.stig.ind:obj:23038200
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        object_title: sshd_config includes
+        object_title: null
         query:
-        - attributes:
-            ignore_case: 'true'
-          effective_attributes:
+        - effective_attributes:
             datatype:
               origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - attributes:
-            datatype: string
-          effective_attributes:
-            datatype:
-              origin: explicit
               value: string
             mask:
               origin: xsd_default
@@ -405,7 +388,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*include\s+(.*)\s*$
+          value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -509,17 +492,34 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23038200:
+      oval:mil.disa.stig.ind:obj:25798800:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038200
+        source_object_id: oval:mil.disa.stig.ind:obj:25798800
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        object_title: null
+        object_title: sshd_config includes
         query:
-        - effective_attributes:
+        - attributes:
+            ignore_case: 'true'
+          effective_attributes:
             datatype:
               origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          effective_attributes:
+            datatype:
+              origin: explicit
               value: string
             mask:
               origin: xsd_default
@@ -546,7 +546,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          value: ^\s*include\s+(.*)\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -628,18 +628,18 @@ rule:
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25800900:
-          source_test_id: oval:mil.disa.stig.ind:tst:25800900
+        oval:mil.disa.stig.ind:tst:25798801:
+          source_test_id: oval:mil.disa.stig.ind:tst:25798801
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: '/etc/ssh/sshd_config.d: PrintLastLog is set to yes'
-          check: all
+          test_title: sshd_config includes sshd_config.d
+          check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:25800900
+          - oval:mil.disa.stig.ind:obj:25798800
           predicates:
-          - oval:mil.disa.stig.ind:ste:20000016
+          - oval:mil.disa.stig.ind:ste:25798801
           source_other: []
         oval:mil.disa.stig.ind:tst:23038200:
           source_test_id: oval:mil.disa.stig.ind:tst:23038200
@@ -654,18 +654,18 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:20000016
           source_other: []
-        oval:mil.disa.stig.ind:tst:25798801:
-          source_test_id: oval:mil.disa.stig.ind:tst:25798801
+        oval:mil.disa.stig.ind:tst:25800900:
+          source_test_id: oval:mil.disa.stig.ind:tst:25800900
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: sshd_config includes sshd_config.d
-          check: at least one
+          test_title: '/etc/ssh/sshd_config.d: PrintLastLog is set to yes'
+          check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:25798800
+          - oval:mil.disa.stig.ind:obj:25800900
           predicates:
-          - oval:mil.disa.stig.ind:ste:25798801
+          - oval:mil.disa.stig.ind:ste:20000016
           source_other: []
       definitions:
         oval:mil.disa.stig.ol9os:def:271715:
@@ -866,7 +866,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
-      semantic_ir_sha256: d3f47fc899d408c8e2fa9a059d8bcb95a8ba1e338c1bea1bd3ffbef393baae2c
+      semantic_ir_sha256: 9a2cad4cf7d8a2d9b07b2c7976e1d4b021a13b5ba8c987cfcf673eef98f77f3f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 62aad78b272e3a4fde3dcd68851685c4dcb8aadee6a5805f65a366a0580850c7
   assessments:
