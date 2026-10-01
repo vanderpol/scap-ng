@@ -10,26 +10,26 @@ class CurrentDesignGuards(unittest.TestCase):
         self.assertFalse(violations({'tailoring':{'enabled_rules':['SV-1']}}))
     def test_assessment_presentation_order_with_optional_sections(self):
         self.assertFalse(violations({'assessment':{
-            'collections':{}, 'variables':{}, 'tests':{}, 'evaluate':{}}}))
+            'objects':{}, 'variables':{}, 'states':{}, 'tests':{}, 'evaluate':{}}}))
         self.assertFalse(violations({'assessment':{'tests':{}, 'evaluate':{}}}))
         self.assertTrue(violations({'assessment':{
-            'tests':{}, 'evaluate':{}, 'variables':{}, 'collections':{}}}))
+            'tests':{}, 'evaluate':{}, 'variables':{}, 'objects':{}, 'states':{}}}))
 
     def test_rejects_superseded_policy_and_deprecated_false(self):
         self.assertTrue(violations({'rule':{'policy':'p.yaml'}}))
         self.assertTrue(violations({'policy':{'id':'p'}}))
         self.assertTrue(violations({'assessment':{'deprecated':False}}))
 
-    def test_rejects_old_object_names_and_nested_variable_collections(self):
-        a={'assessment':{'variables':{'v':{'expression':{'object_values':{'collect':{'object_title':'x'}}}}}}}
+    def test_rejects_stale_pre_alignment_vocabulary(self):
+        a={'assessment':{'variables':{'v':{'expression':{'object_values':{'collect':{'collection_title':'x'}}}}}}}
         self.assertEqual(len(violations(a)),3)
 
     def test_test_identity_and_unambiguous_current_vocabulary(self):
         self.assertTrue(violations({'assessment':{'tests':{'arbitrary':{}}}}))
-        self.assertFalse(violations({'assessment':{'collections':{'x-collection':{'capability':'unix.file'}},'tests':{'test-x':{'collection':'x-collection'}}}}))
+        self.assertFalse(violations({'assessment':{'objects':{'object-x':{'capability':'unix.file'}},'tests':{'test-x':{'object':'object-x'}}}}))
 
-    def test_named_collection_requires_own_capability(self):
-        self.assertTrue(violations({'assessment':{'collections':{'x-collection':{'select':{}}}}}))
-        self.assertFalse(violations({'assessment':{'collections':{'x-collection':{'capability':'unix.file','select':{}}}}}))
+    def test_named_object_requires_own_capability(self):
+        self.assertTrue(violations({'assessment':{'objects':{'object-x':{'select':{}}}}}))
+        self.assertFalse(violations({'assessment':{'objects':{'object-x':{'capability':'unix.file','select':{}}}}}))
 
 if __name__=='__main__': unittest.main()
