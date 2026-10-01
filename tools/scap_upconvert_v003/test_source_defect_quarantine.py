@@ -36,6 +36,17 @@ class SourceDefectQuarantineTests(unittest.TestCase):
             ],
         }
 
+    def test_referenced_oval_check_stays_automated_with_inline_text(self):
+        node=ET.Element("{"+review.NS["x"]+"}check")
+        node.set("selector","hybrid")
+        node.set("system","http://oval.mitre.org/XMLSchema/oval-definitions-5")
+        content=ET.SubElement(node,"{"+review.NS["x"]+"}check-content")
+        content.text="Publisher explanatory or fallback text."
+        ref=ET.SubElement(node,"{"+review.NS["x"]+"}check-content-ref")
+        ref.set("href","oval.xml")
+        ref.set("name","oval:test:def:1")
+        self.assertEqual(review.check_kind(node),"automated")
+
     def test_classifier_is_narrow(self):
         self.assertEqual(
             review.source_defect_reason("invalid_oval_record_datatype"),
