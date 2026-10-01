@@ -21,19 +21,25 @@ def text(node):
         return None
     return " ".join("".join(node.itertext()).split())
 
-def benchmark_from_zip(path):
-    found=[]
+def package_xml(path):
+    roots=[]
     with zipfile.ZipFile(path) as z:
         for name in sorted(z.namelist()):
             if not name.lower().endswith(".xml"):
                 continue
             try:
-                root=ET.fromstring(z.read(name))
+                roots.append((name,ET.fromstring(z.read(name))))
             except ET.ParseError:
                 continue
-            for node in root.iter():
-                if local(node.tag)=="Benchmark":
-                    found.append(node)
+    return roots
+
+
+def benchmark_from_roots(path, roots):
+    found=[]
+    for _,root in roots:
+        for node in root.iter():
+            if local(node.tag)=="Benchmark":
+                found.append(node)
     if len(found)!=1:
         raise ValueError(f"{path}: expected one Benchmark, found {len(found)}")
     return found[0]
@@ -47,7 +53,8 @@ def selected_rows(parent, name):
     return out
 
 def inspect(path):
-    root=benchmark_from_zip(path)
+    roots=package_xml(path)
+    root=benchmark_from_roots(path,roots)
     values=[]
     for node in root.findall(".//x:Value",NS):
         values.append({
@@ -110,6 +117,36 @@ def inspect(path):
         [ref for row in rule_platforms for ref in row["platforms"]]
         if isinstance(ref,str) and ref.startswith("cpe:")
     })
+    cpe_dictionary=[]
+    for xml_name,xml_root in roots:
+        for node in xml_root.iter():
+            if local(node.tag)!="cpe-item":
+                continue
+            legacy=node.get("name")
+            formatted=sorted({
+                child.get("name") for child in node.iter()
+                if local(child.tag)=="cpe23-item" and child.get("name")
+            })
+            checks=[
+                text(child) for child in node.iter()
+                if local(child.tag)=="check" and text(child)
+            ]
+            cpe_dictionary.append({
+                "xml":xml_name,
+                "legacy_name":legacy,
+                "formatted_names":formatted,
+                "checks":checks,
+            })
+    direct_resolution=[]
+    for ref in direct_cpe:
+        matches=[
+            row for row in cpe_dictionary
+            if row["legacy_name"]==ref or ref in row["formatted_names"]
+        ]
+        direct_resolution.append({
+            "idref":ref,
+            "matches":matches,
+        })
     return {
         "artifact":path.name,
         "sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -121,6 +158,8 @@ def inspect(path):
         "benchmark_platforms":benchmark_platforms,
         "rule_platform_reference_count":sum(len(x["platforms"]) for x in rule_platforms),
         "direct_cpe_platforms":direct_cpe,
+        "direct_cpe_resolution":direct_resolution,
+        "cpe_dictionary_item_count":len(cpe_dictionary),
     }
 
 def main():
