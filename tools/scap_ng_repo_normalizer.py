@@ -363,26 +363,8 @@ def main() -> int:
         # This is a new canonical Assessment identity, not a continuation of
         # whichever source file sorts first.
         assessment["version"] = 1
-        reuse_provenance = []
-        for row in group:
-            source_assessment = (load_yaml(row["path"]).get("assessment") or {})
-            reuse_provenance.append({
-                "source": str(row["path"].relative_to(source)),
-                "source_assessment": {
-                    "id": source_assessment.get("id"),
-                    "version": source_assessment.get("version"),
-                    "title": source_assessment.get("assessment_title"),
-                },
-                "consumers": [
-                    {
-                        "benchmark": consumer["benchmark"],
-                        "rule_id": consumer["rule_id"],
-                        "selector": consumer["selector"],
-                    }
-                    for consumer in row["consumers"]
-                ],
-            })
-        assessment["reuse_provenance"] = reuse_provenance
+        # Complete source/consumer lineage is emitted only in the separate
+        # normalizer report below; it is intentionally not native Assessment data.
         dump_yaml(shared_path, {"assessment": assessment})
 
         members = []
