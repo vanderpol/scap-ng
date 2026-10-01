@@ -538,6 +538,63 @@ is not required to materialize or count a pre-filter candidate population.
 The working vocabulary decision and migration crosswalk are recorded in
 [Assessment vocabulary alignment with OVAL](../../research/iterations/003/design/assessment-oval-vocabulary-alignment.md).
 
+
+## Structured record values
+
+The Assessment language SHALL support **record** values as first-class
+structured data. Record support is required for real OVAL capabilities including
+Windows WMI57, PowerShell cmdlet, LDAP/YAML-related structures, database-style
+query results, and other capabilities that collect multiple related named
+fields as one logical value.
+
+A record SHALL preserve the relationship among its fields. Implementations
+SHALL NOT flatten a record into unrelated scalar values when doing so would
+lose field identity, grouping, cardinality, or evaluation semantics.
+
+Conceptually, an Item field whose datatype is `record` contains one or more
+named typed fields:
+
+    result:
+      datatype: record
+      fields:
+        - name: Name
+          datatype: string
+          value: example
+        - name: Enabled
+          datatype: boolean
+          value: true
+
+The final serialization remains subject to capability-schema generation, but
+the following semantic requirements are normative:
+
+- record fields SHALL retain their names;
+- each field SHALL retain its datatype and collection/status information;
+- repeated field names SHALL be representable when the source capability
+  permits them;
+- a State SHALL be able to assert requirements against individual record
+  fields;
+- State evaluation SHALL preserve the record's field grouping rather than
+  treating fields as independent Items;
+- result/evidence output SHALL retain enough structure to explain which field
+  caused a match or failure;
+- Variables/Object components SHALL be able to extract a specific record field
+  where the inherited OVAL semantics require it.
+
+For OVAL-compatible record entities, migration SHALL preserve the inherited
+constraints that the enclosing record entity has datatype `record`, uses
+`equals` at the record-entity level, and does not use the ordinary scalar
+`var_ref` / `var_check` mechanism where OVAL prohibits those attributes.
+Field-level operations, datatypes, statuses, and cardinality SHALL follow the
+capability and Assessment-language rules applicable to those fields.
+
+Constraints that depend on relationships among fields or attributes and cannot
+be expressed safely in JSON Schema SHALL be enforced by the semantic validator.
+The generated disposable capability schemas SHALL record which constraints are
+schema-enforced and which require semantic validation.
+
+Record support is a retained semantic capability, not legacy serialization
+baggage, and SHALL be covered by positive and negative conformance fixtures.
+
 ## 8. Inventory facts from Platform Assessments
 
 A Platform Assessment MAY emit descriptive target-inventory facts in addition
