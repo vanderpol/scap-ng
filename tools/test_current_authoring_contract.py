@@ -26,6 +26,10 @@ class CurrentDesignGuards(unittest.TestCase):
 
     def test_test_identity_and_unambiguous_current_vocabulary(self):
         self.assertTrue(violations({'assessment':{'tests':{'arbitrary':{}}}}))
-        self.assertFalse(violations({'assessment':{'tests':{'test-x':{'collection':'x-collection'}}}}))
+        self.assertFalse(violations({'assessment':{'collections':{'x-collection':{'capability':'unix.file'}},'tests':{'test-x':{'collection':'x-collection'}}}}))
+
+    def test_named_collection_requires_own_capability(self):
+        self.assertTrue(violations({'assessment':{'collections':{'x-collection':{'select':{}}}}}))
+        self.assertFalse(violations({'assessment':{'collections':{'x-collection':{'capability':'unix.file','select':{}}}}}))
 
 if __name__=='__main__': unittest.main()
