@@ -92,16 +92,22 @@ def source_defect_reason(error):
     """Return a stable source-defect class for positively identified bad OVAL.
 
     Unknown conversion errors deliberately return None and remain hard blockers.
+    The Collection-graph validator may wrap a lower-level semantic mismatch;
+    unwrap only that known envelope before applying the narrow allowlist.
     """
     if not isinstance(error, str):
         return None
-    if error == "invalid_oval_record_datatype":
+    detail=error
+    prefix="collection_graph_type_binding:"
+    if detail.startswith(prefix):
+        detail=detail[len(prefix):]
+    if detail == "invalid_oval_record_datatype":
         return "invalid_oval_record_datatype"
-    if error.startswith("test_collection_capability_mismatch:"):
+    if detail.startswith("test_collection_capability_mismatch:"):
         return "test_collection_capability_mismatch"
-    if error.startswith("test_state_capability_mismatch:"):
+    if detail.startswith("test_state_capability_mismatch:"):
         return "test_state_capability_mismatch"
-    if error.startswith("Filter capability mismatch:"):
+    if detail.startswith("Filter capability mismatch:"):
         return "filter_collection_capability_mismatch"
     return None
 
