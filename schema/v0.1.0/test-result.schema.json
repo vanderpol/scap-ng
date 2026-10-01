@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/test-result.schema.json",
+  "title": "SCAP-NG Test Result v0.1.0 strawman",
+  "description": "Detailed result for one authored Test. Preserves existence, per-State, per-Item, and final Test aggregation layers.",
+  "type": "object",
+  "required": [
+    "id",
+    "outcome",
+    "object_refs",
+    "item_refs"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcome": {
+      "$ref": "result-types.schema.json#/$defs/technical_outcome"
+    },
+    "check_existence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "all_exist",
+        "any_exist",
+        "at_least_one_exists",
+        "none_exist",
+        "only_one_exists",
+        null
+      ]
+    },
+    "existence_outcome": {
+      "oneOf": [
+        {
+          "$ref": "result-types.schema.json#/$defs/technical_outcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "check": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "all",
+        "at_least_one",
+        "only_one",
+        "none_satisfy",
+        null
+      ]
+    },
+    "state_operator": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "AND",
+        "OR",
+        null
+      ]
+    },
+    "object_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "per_item_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_ref",
+          "outcome",
+          "state_results"
+        ],
+        "properties": {
+          "item_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "outcome": {
+            "$ref": "result-types.schema.json#/$defs/technical_outcome"
+          },
+          "state_results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "state_ref",
+                "outcome"
+              ],
+              "properties": {
+                "state_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "outcome": {
+                  "$ref": "result-types.schema.json#/$defs/technical_outcome"
+                },
+                "entity_results": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "reason": {
+      "type": [
+        "string",
+        "object",
+        "null"
+      ]
+    },
+    "decisive_expression": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
