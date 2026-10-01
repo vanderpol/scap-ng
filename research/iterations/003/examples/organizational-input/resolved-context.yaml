@@ -1,0 +1,31 @@
+effective_policy:
+  benchmark:
+    id: example.linux.security-policy
+    version: V1R1
+
+  parameters:
+    approved_time_sources:
+      value:
+        - ntp1.example.test
+        - ntp2.example.test
+      source: organizational_input
+      input_set:
+        id: example.production-site
+        version: 1
+      supplied_at: '2026-10-01T09:00:00-04:00'
+      authorization_status: approved
+
+  assessment_binding:
+    rule: EXAMPLE-ORG-INPUT-001
+    selector: automated
+    assessment: shared.time-source-approved
+    inputs:
+      required_time_sources:
+        parameter: approved_time_sources
+
+missing_input_result:
+  assessment: shared.time-source-approved
+  outcome: not_evaluated
+  reason:
+    code: missing_organizational_input
+    parameter: approved_time_sources
