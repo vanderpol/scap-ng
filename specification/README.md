@@ -181,3 +181,44 @@ it explicitly as one of:
 New native features SHOULD be justified by concrete content, implementation, or
 standards requirements rather than hypothetical use cases alone.
 
+
+
+## Vendor adoption and implementability
+
+SCAP-NG SHOULD optimize for broad, correct implementation by independent
+vendors.
+
+Specification simplicity is an interoperability and adoption requirement.
+A technically expressive feature that substantially increases implementation
+complexity, creates multiple equivalent ways to represent the same semantics,
+or requires scanner-specific interpretation SHOULD be rejected or simplified
+unless its value is demonstrated.
+
+The native standard SHOULD prefer:
+
+- one clear construct for one semantic purpose;
+- explicit behavior over hidden defaults;
+- deterministic processing over implementation-defined behavior;
+- shallow, composable concepts over overlapping feature families;
+- compile-time normalization over runtime legacy machinery;
+- machine-readable conformance requirements and known-good examples;
+- independently testable capabilities and evaluator semantics;
+- useful error reporting for unsupported or invalid content;
+- minimal mandatory implementation surface consistent with semantic fidelity.
+
+Optionality SHOULD be introduced cautiously. Every optional feature increases
+the risk of fragmented implementation profiles and content that works only on a
+subset of products.
+
+A new native feature SHOULD therefore demonstrate that its interoperability or
+functional benefit outweighs its implementation, testing, documentation, and
+long-term compatibility cost.
+
+The project SHOULD routinely ask:
+
+> Would two independent vendors reading only the specification and conformance
+> corpus implement this the same way?
+
+If the answer is not clearly yes, the design SHOULD be simplified or made more
+explicit before standardization.
+
