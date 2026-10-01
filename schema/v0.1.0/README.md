@@ -33,6 +33,8 @@ The current executable schemas cover:
 6. Benchmark Result (strawman with canonical Rule-result instances)
 7. Assessment Result (first-draft strawman)
 8. Organizational Input
+9. Reusable result types
+10. Reusable collected Item results
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
@@ -124,8 +126,16 @@ Collection/assertion/item-quantifier prototype.
 ## Planned next schemas
 
 Package-manifest and deeper reusable result-component schemas remain to be
-added. Tailoring, Organizational Input, Benchmark Result, and Assessment Result
-schemas now exist and will continue to evolve with the result-model work.
+added. Tailoring, Organizational Input, Benchmark Result, Assessment Result,
+reusable result-type, and collected-Item schemas now exist and will continue to
+evolve with the result-model work.
+
+The reusable result-type schema intentionally keeps the technical outcome domain
+to six states: `true`, `false`, `error`, `unknown`, `not_evaluated`, and
+`not_applicable`. Informational/reporting disposition belongs at the Rule
+policy/result layer and is not a seventh Assessment truth value. Likewise,
+non-compliance Assessment classes describe the meaning of technical truth; they
+do not silently dictate policy-facing pass/fail inversion.
 
 The full pinned NIWC Current native corpus census remains the primary evidence
 used to classify fields as required, optional, conditional, extensible, or
