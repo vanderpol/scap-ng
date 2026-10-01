@@ -259,6 +259,23 @@ actual class.
 `information` is reserved as a candidate future class and SHALL NOT be
 treated as normative until approved through OVAL Board / SCAP-NG governance.
 
+Assessment truth SHALL be interpreted at the Rule layer according to Assessment class.
+At minimum, the following mappings are normative for Boolean outcomes:
+
+| Assessment class | Assessment truth | Rule outcome |
+| --- | --- | --- |
+| compliance | true | pass |
+| compliance | false | fail |
+| vulnerability | true | fail |
+| vulnerability | false | pass |
+
+The `error`, `unknown`, `not_evaluated`, and `not_applicable` truth values SHALL
+remain distinct and SHALL NOT be coerced through the Boolean mapping above.
+
+A scanner SHALL NOT assume that Assessment `true` universally means Rule
+`pass`; Assessment truth and policy-facing Rule outcome are separate result
+layers.
+
 
 ## 15. Assessment Result file cardinality
 
