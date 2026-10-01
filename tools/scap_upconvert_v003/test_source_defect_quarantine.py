@@ -57,6 +57,8 @@ class SourceDefectQuarantineTests(unittest.TestCase):
     def test_known_source_defect_uses_verified_manual_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
+            tmp=root/"tmp"
+            tmp.mkdir()
             original=ET.Element("{"+review.OD+"}oval_definitions")
             with patch.object(
                 review,
@@ -68,7 +70,7 @@ class SourceDefectQuarantineTests(unittest.TestCase):
                 return_value=(None,"invalid_oval_record_datatype"),
             ):
                 result,failed=review.convert_rule(
-                    self.rec(),original,root,None,root/"tmp"
+                    self.rec(),original,root,None,tmp
                 )
 
             self.assertFalse(failed)
