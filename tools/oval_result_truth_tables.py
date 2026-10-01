@@ -17,6 +17,45 @@ NOT_APPLICABLE = "not applicable"
 RESULTS = {TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE}
 
 
+SET_FLAGS = (
+    "error",
+    "complete",
+    "incomplete",
+    "does_not_exist",
+    "not_collected",
+    "not_applicable",
+)
+
+# OVAL 5.12.3 set collected-object flag tables. Rows are the second operand;
+# columns are the first operand in SET_FLAGS order.
+SET_FLAG_TABLES = {
+    "UNION": {
+        "error":          ["error","error","error","error","error","error"],
+        "complete":       ["error","complete","incomplete","complete","incomplete","complete"],
+        "incomplete":     ["error","incomplete","incomplete","incomplete","incomplete","incomplete"],
+        "does_not_exist": ["error","complete","incomplete","does_not_exist","incomplete","does_not_exist"],
+        "not_collected":  ["error","incomplete","incomplete","incomplete","not_collected","not_collected"],
+        "not_applicable": ["error","complete","incomplete","does_not_exist","not_collected","not_applicable"],
+    },
+    "INTERSECTION": {
+        "error":          ["error","error","error","does_not_exist","error","error"],
+        "complete":       ["error","complete","incomplete","does_not_exist","not_collected","complete"],
+        "incomplete":     ["error","incomplete","incomplete","does_not_exist","not_collected","incomplete"],
+        "does_not_exist": ["does_not_exist","does_not_exist","does_not_exist","does_not_exist","does_not_exist","does_not_exist"],
+        "not_collected":  ["error","not_collected","not_collected","does_not_exist","not_collected","not_collected"],
+        "not_applicable": ["error","complete","incomplete","does_not_exist","not_collected","not_applicable"],
+    },
+    "COMPLEMENT": {
+        "error":          ["error","error","error","does_not_exist","error","error"],
+        "complete":       ["error","complete","incomplete","does_not_exist","not_collected","error"],
+        "incomplete":     ["error","error","error","does_not_exist","not_collected","error"],
+        "does_not_exist": ["error","complete","incomplete","does_not_exist","not_collected","error"],
+        "not_collected":  ["error","not_collected","not_collected","does_not_exist","not_collected","error"],
+        "not_applicable": ["error","error","error","error","error","error"],
+    },
+}
+
+
 def _counts(values):
     values = list(values)
     if not values:
@@ -89,6 +128,19 @@ def aggregate_operator(operator, values):
             return NOT_APPLICABLE
         raise AssertionError("unreachable XOR combination")
     raise ValueError(f"unsupported OperatorEnumeration: {operator}")
+
+
+def combine_set_flags(operator, first_flag, second_flag):
+    """Combine two collected-object flags per OVAL 5.12.3 set tables."""
+    operator = operator.upper()
+    if operator not in SET_FLAG_TABLES:
+        raise ValueError(f"unsupported set operator: {operator}")
+    if first_flag not in SET_FLAGS or second_flag not in SET_FLAGS:
+        raise ValueError(
+            f"unsupported collected-object flags: {first_flag}, {second_flag}"
+        )
+    return SET_FLAG_TABLES[operator][second_flag][SET_FLAGS.index(first_flag)]
+
 
 
 def aggregate_existence(mode, *, exists=0, does_not_exist=0, error=0, not_collected=0):
