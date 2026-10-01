@@ -159,27 +159,65 @@ def behavior_contract(root, type_name):
     return out
 
 
-def generic_entity_schema(allowed_datatypes):
-    return {
-        "type": "object",
-        "description": "Native entity/predicate payload. Shared operation/Variable/quantifier legality is validated by the common Assessment semantic validator.",
-        "properties": {
-            "value": {},
-            "variable": {"type": "string", "minLength": 1},
-            "operation": {"type": "string", "minLength": 1},
-            "datatype": {
-                "type": "string",
-                "enum": sorted(set(allowed_datatypes)),
-            },
+def generic_entity_schema(allowed_datatypes, *, state=False):
+    """Native scalar entity shape used by generated capability fragments.
+
+    Stage-1 native source materializes operation/datatype explicitly. Variable
+    references remain values ({variable: <id>}) so literal and derived values
+    occupy one stable slot. State-only quantifiers are not permitted on Object
+    selectors.
+    """
+    properties = {
+        "value": {
+            "oneOf": [
+                {"type": ["string", "number", "integer", "boolean", "null"]},
+                {
+                    "type": "object",
+                    "required": ["variable"],
+                    "properties": {
+                        "variable": {"type": "string", "minLength": 1},
+                    },
+                    "additionalProperties": False,
+                },
+            ]
+        },
+        "operation": {"type": "string", "minLength": 1},
+        "datatype": {
+            "type": "string",
+            "enum": sorted(set(allowed_datatypes)),
+        },
+        "var_check": {"type": "string", "minLength": 1},
+        "nil": {"type": "boolean"},
+    }
+    required = ["value", "operation", "datatype"]
+    if state:
+        properties.update({
             "entity_check": {"type": "string", "minLength": 1},
             "entity_existence": {"type": "string", "minLength": 1},
-            "var_check": {"type": "string", "minLength": 1},
-            "nil": {"type": "boolean"},
-        },
+        })
+        required.extend(["entity_check", "entity_existence"])
+
+    return {
+        "type": "object",
+        "properties": properties,
+        "required": required,
         "additionalProperties": False,
-        "anyOf": [
-            {"required": ["value"]},
-            {"required": ["variable"]},
+        "allOf": [
+            {
+                "if": {"required": ["var_check"]},
+                "then": {
+                    "properties": {
+                        "value": {
+                            "type": "object",
+                            "required": ["variable"],
+                            "properties": {
+                                "variable": {"type": "string", "minLength": 1},
+                            },
+                            "additionalProperties": False,
+                        }
+                    }
+                },
+            }
         ],
     }
 
@@ -202,7 +240,7 @@ def generate(mapping, repo_root):
         for name in alternative:
             field = object_fields[name]
             dtypes = source_datatypes(field)
-            selector_props[name] = generic_entity_schema(dtypes)
+            selector_props[name] = generic_entity_schema(dtypes, state=False)
             selector_props[name]["description"] = docs(field)
             selector_field_meta[name] = {
                 "source_type": field.get("type"),
@@ -357,20 +395,33 @@ def generate(mapping, repo_root):
                             },
                             **{
                                 key: value
-                                for key, value in generic_entity_schema(["string"])["properties"].items()
+                                for key, value in generic_entity_schema(["string"], state=True)["properties"].items()
                                 if key != "datatype"
                             },
                             "datatype": {"type": "string"},
                         },
+                        "required": [
+                            "field", "value", "operation", "datatype",
+                            "entity_check", "entity_existence"
+                        ],
                         "additionalProperties": False,
                         "allOf": [
                             {"oneOf": state_field_branches},
                             {
-                                "anyOf": [
-                                    {"required": ["value"]},
-                                    {"required": ["variable"]},
-                                ]
-                            },
+                                "if": {"required": ["var_check"]},
+                                "then": {
+                                    "properties": {
+                                        "value": {
+                                            "type": "object",
+                                            "required": ["variable"],
+                                            "properties": {
+                                                "variable": {"type": "string", "minLength": 1}
+                                            },
+                                            "additionalProperties": False
+                                        }
+                                    }
+                                }
+                            }
                         ],
                     },
                 },
