@@ -13,6 +13,7 @@ ERROR = "error"
 UNKNOWN = "unknown"
 NOT_EVALUATED = "not evaluated"
 NOT_APPLICABLE = "not applicable"
+NO_VALUES = "no values"
 
 RESULTS = {TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE}
 
@@ -300,16 +301,30 @@ def evaluate_missing_collected_object_record():
 
 
 def resolve_variable_reference(values):
-    """Normalize an OVAL variable reference result for downstream evaluation.
+    """Normalize variable cardinality without prematurely applying reference context.
 
-    OVAL 5.12.3 VariableType documentation requires an analysis error when a
-    variable returns no value. This applies before Object/State-specific use;
-    an empty variable SHALL NOT be reinterpreted as an empty Object collection.
+    OVAL 5.12.3 generic variable prose and entity var_ref prose are not identical:
+    a zero-value variable must remain distinguishable until the Object or State
+    reference site applies its more specific semantics.
     """
     values = list(values)
     if not values:
-        return {"status": ERROR, "values": []}
+        return {"status": NO_VALUES, "values": []}
     return {"status": TRUE, "values": values}
+
+
+def apply_variable_reference_context(variable_result, context):
+    """Apply OVAL entity var_ref semantics for a resolved variable result."""
+    status = variable_result["status"]
+    if status == NO_VALUES:
+        if context == "object":
+            return "does_not_exist"
+        if context == "state":
+            return ERROR
+        raise ValueError(f"unsupported variable reference context: {context}")
+    if status != TRUE:
+        return status
+    return TRUE
 
 
 def evaluate_variable_entity_reference(
