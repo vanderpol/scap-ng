@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 import yaml
 
-OLD_KEYS={'collect','object_title','object_values'}
-ASSESSMENT_SECTION_ORDER=('collections','variables','tests','evaluate')
+OLD_KEYS={'collect','collections','collection','assert','assertion','item_quantifier','object_values'}
+ASSESSMENT_SECTION_ORDER=('objects','variables','states','tests','evaluate')
 
 def violations(document):
     errors=[]
@@ -16,7 +16,7 @@ def violations(document):
         elif isinstance(value,dict):
             for key,item in value.items():
                 here=f'{path}.{key}'
-                if key in OLD_KEYS: errors.append(f'{here}: stale Object/collection or capability syntax')
+                if key in OLD_KEYS: errors.append(f'{here}: stale pre-alignment Assessment vocabulary')
                 visit(item,here)
     if 'policy' in document: errors.append('policy: superseded document type')
     rule=document.get('rule',{})
@@ -32,12 +32,15 @@ def violations(document):
     sections=[key for key in a if key in ASSESSMENT_SECTION_ORDER]
     expected=[key for key in ASSESSMENT_SECTION_ORDER if key in a]
     if sections != expected:
-        errors.append('assessment: presentation order must be collections, variables, tests, evaluate (omit absent sections)')
+        errors.append('assessment: presentation order must be objects, variables, states, tests, evaluate (omit absent sections)')
     if 'deprecated' in a: errors.append('assessment.deprecated: forbidden native attribute')
     if 'checks' in a: errors.append('assessment.checks: use Tests')
-    for name,payload in a.get('collections',{}).items():
+    for name,payload in a.get('objects',{}).items():
         if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
-            errors.append(f'assessment.collections.{name}: Collection must declare capability')
+            errors.append(f'assessment.objects.{name}: Object must declare capability')
+    for name,payload in a.get('states',{}).items():
+        if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
+            errors.append(f'assessment.states.{name}: State must declare capability')
     for name in a.get('tests',{}):
         if not name.startswith('test-'): errors.append(f'assessment.tests.{name}: missing test- prefix')
     visit(document,'document')
