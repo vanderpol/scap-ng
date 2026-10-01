@@ -66,6 +66,36 @@ tailored.
 A user SHALL NOT be required to create a Tailoring artifact merely to provide
 required Organizational Input.
 
+## Organizational Input priority and lifecycle
+
+Organizational Input is a first-class policy-resolution mechanism, not a
+Tailoring convenience.
+
+A Benchmark publisher SHOULD use Organizational Input when the requirement
+itself explicitly delegates a value to the deploying organization, site,
+mission, system owner, or other authorized authority and no universal publisher
+value can be asserted.
+
+An Organizational Input declaration SHOULD identify:
+
+- stable Parameter identity;
+- expected datatype and cardinality;
+- human-readable prompt/description;
+- validation constraints;
+- whether a value is required before the dependent Assessment can run;
+- provenance/authority metadata expected for the supplied value;
+- whether the value may be reused persistently across runs or must be supplied
+  per Assessment Request.
+
+The supplied value SHALL be validated before execution and SHALL become part of
+the frozen effective policy context for the run. Results SHALL preserve enough
+provenance to distinguish who/what supplied the value and under which
+organizational authority.
+
+Organizational Input SHALL NOT be used to override a concrete publisher
+requirement. If the publisher says X, supplying Y is not Organizational Input;
+it is a different policy.
+
 ## Publisher Profile Parameter refinement
 
 A publisher Profile MAY resolve a publisher-defined Parameter differently from
