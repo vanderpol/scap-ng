@@ -149,6 +149,32 @@ def oval_source_roots(zip_path: Path, components):
     return embedded + discovered
 
 
+def resolve_oval_components(oval_components, definition_id, href=None, component_refs=None):
+    """Resolve an OVAL Definition using both document href and Definition id.
+
+    OVAL ids are document-scoped. A SCAP package may legitimately contain the
+    same Definition id in multiple OVAL components, so Definition id alone is
+    insufficient when the source Check supplies an href.
+    """
+    matches=[component for component in oval_components if component.has_definition(definition_id)]
+    if len(matches)<=1 or not href:
+        return matches
+
+    raw=href.lstrip("#")
+    aliases={raw, PurePosixPath(raw).name}
+    if component_refs and raw in component_refs:
+        target=component_refs[raw]
+        aliases.add(target)
+        aliases.add(PurePosixPath(target).name)
+    aliases={value for value in aliases if value}
+    narrowed=[
+        component for component in matches
+        if component.component_id in aliases
+        or any(component.component_id.endswith(alias) for alias in aliases)
+    ]
+    return narrowed if narrowed else matches
+
+
 class OvalComponent:
     def __init__(self, component_id: str, root):
         self.component_id = component_id
@@ -627,7 +653,9 @@ def main() -> int:
         applicability_errors=[]
         for ref in oval_app_refs:
             definition_id=ref["definition_id"]
-            matches=[c for c in oval_components if c.has_definition(definition_id)]
+            matches=resolve_oval_components(
+                oval_components, definition_id, ref.get("href"), component_refs
+            )
             if len(matches)!=1:
                 applicability_errors.append({
                     **ref,
@@ -764,7 +792,9 @@ def main() -> int:
             cpe_inventory.append(entry)
             continue
 
-        matches=[comp for comp in oval_components if comp.has_definition(definition_id)]
+        matches=resolve_oval_components(
+            oval_components, definition_id, ref.get("href"), component_refs
+        )
         if len(matches)!=1:
             entry["status"]="unresolved" if not matches else "ambiguous"
             entry["match_count"]=len(matches)
@@ -867,7 +897,9 @@ def main() -> int:
 
             for check in oval_checks:
                 definition_id = check["name"]
-                matches = [c for c in oval_components if c.has_definition(definition_id)]
+                matches = resolve_oval_components(
+                    oval_components, definition_id, check.get("href"), component_refs
+                )
                 if len(matches) != 1:
                     if len(matches) > 1:
                         stats["ambiguous_definition_references"] += 1
