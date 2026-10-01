@@ -218,6 +218,41 @@ several component outcomes into one Rule outcome, migration SHALL preserve the
 source aggregation semantics rather than treating the first or last result as
 authoritative.
 
+### Assessment invocation identity and legacy OVAL `variable_instance`
+
+One authored Assessment MAY be evaluated more than once within a run when its
+effective runtime bindings differ. Each such execution SHALL have a distinct
+**Assessment invocation identity** in results.
+
+An Assessment invocation SHALL bind together:
+
+- the authored Assessment identity/version;
+- the effective Variable/Parameter/input bindings used for that execution;
+- the target/component instance when applicable;
+- the resulting Assessment/Test execution graph.
+
+Two executions SHALL NOT be collapsed merely because they reference the same
+authored Assessment or Test IDs. Conversely, scanners SHOULD reuse one invocation
+result when the same Assessment is intentionally shared under the same effective
+binding context and target instance.
+
+The invocation identifier is a runtime/result identity, not an authored content
+field. Its serialized spelling remains a schema decision (for example,
+`assessment_invocation_id` or `execution_id`), but it SHALL be stable and
+unique within the canonical result package.
+
+For OVAL migration, `variable_instance` is a legacy discriminator for repeated
+Definition/Test evaluations under different variable bindings. Migration SHALL
+map each distinct legacy variable instance to a distinct Assessment invocation
+when those instances represent distinct effective bindings. The legacy integer
+MAY be retained as migration provenance, but native SCAP-NG source SHALL NOT
+require authors to assign or manage `variable_instance` numbers.
+
+Detailed Assessment results SHALL preserve the effective typed bindings needed
+to explain why two invocations differ. A result consumer SHALL be able to
+distinguish separate executions without relying on array position, first/last
+ordering, or reconstructed legacy XML identity.
+
 ## 6. Deterministic message
 
 Every Rule result SHOULD contain a concise deterministic human-readable
