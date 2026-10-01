@@ -80,6 +80,14 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertGreaterEqual(report["summary"]["near_duplicate_review_groups"],1)
             shared=list((output/"shared"/"assessments").glob("*.yaml"))
             self.assertEqual(len(shared),1)
+            shared_assessment=yaml.safe_load(shared[0].read_text())["assessment"]
+            self.assertEqual(shared_assessment["version"],1)
+            provenance=shared_assessment["reuse_provenance"]
+            self.assertEqual(len(provenance),2)
+            self.assertEqual(
+                {row["source_assessment"]["id"] for row in provenance},
+                {"R1.automated","R2.automated"},
+            )
             rule=yaml.safe_load((output/"a"/"rules"/"R1.rule.yaml").read_text())["rule"]
             self.assertIn("shared/assessments",rule["assessment_choices"]["automated"]["assessment"])
             # The literal-different third Assessment is advisory only, not removed.
