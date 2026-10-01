@@ -132,8 +132,15 @@ jobs:
               raise SystemExit("Historical output cannot establish current-design coverage")
           deprecated=[]
           extensions=[]
+          source_defects=[]
           bad=[]
           extension_details=set()
+          source_defect_prefixes=(
+              "invalid_oval_record_datatype",
+              "test_collection_capability_mismatch:",
+              "test_state_capability_mismatch:",
+              "Filter capability mismatch:",
+          )
           for row in report["results"]:
               if row.get("equal"):
                   continue
@@ -152,6 +159,8 @@ jobs:
                       x["detail"] for x in features
                       if x.get("feature")=="nonstandard_oval_element" and x.get("detail")
                   )
+              elif isinstance(row.get("error"),str) and row["error"].startswith(source_defect_prefixes):
+                  source_defects.append(row)
               else:
                   bad.append(row)
           summary={
@@ -163,6 +172,7 @@ jobs:
               "deprecated_blockers":len(deprecated),
               "publisher_extension_blockers":len(extensions),
               "publisher_extension_elements":sorted(extension_details),
+              "source_content_defects":len(source_defects),
               "unexpected_failures":len(bad),
               "max_dependency_depth":report.get("max_dependency_depth",0),
           }
