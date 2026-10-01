@@ -1,0 +1,79 @@
+assessment:
+  id: ng.shared.b283dd5f9c58e2cf949990bb
+  version: 1
+  assessment_title: PKU2U Online Identities Authentication
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Control\Lsa\pku2u
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowOnlineID
+      object_title: null
+  variables:
+    network-security-allow-pku2u-authentication-requests-this-computer-use-online-variable:
+      title: 'Network Security: Allow PKU2U authentication requests to this computer to use online identities'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: network-security-allow-pku2u-authentication-requests-this-computer-use-online-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-security-allow-pku2u-authentication-requests-this-computer-use-online:
+      test_title: '''Network Security: Allow PKU2U authentication requests to this computer to use online identities'' is
+        set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-network-security-allow-pku2u-authentication-requests-this-computer-use-online

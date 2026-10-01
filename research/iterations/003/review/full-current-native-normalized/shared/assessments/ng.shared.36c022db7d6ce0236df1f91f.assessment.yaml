@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.36c022db7d6ce0236df1f91f
+  version: 1
+  assessment_title: The macOS system must configure audit_control to not contain access control lists.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-control-acls-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /bin/ls -le /etc/security/audit_control | /usr/bin/awk '{print $1}' | /usr/bin/grep ":"
+      object_title: audit_control_acls_configure_recommended_object
+  states:
+    state-audit-control-acls-configure-recommended-state:
+      state_title: audit_control_acls_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-audit-control-acls-configure-recommended-test:
+      test_title: audit_control_acls_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-control-acls-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-control-acls-configure-recommended-state
+  evaluate:
+    test: test-audit-control-acls-configure-recommended-test

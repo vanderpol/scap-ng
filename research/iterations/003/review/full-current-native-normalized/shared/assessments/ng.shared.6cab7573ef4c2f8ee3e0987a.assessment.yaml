@@ -1,0 +1,59 @@
+assessment:
+  id: ng.shared.6cab7573ef4c2f8ee3e0987a
+  version: 1
+  assessment_title: Directory Browsing on the IIS 10.0 web server must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    directory-browsing-webserver-setting-object:
+      capability: windows.appcmdlistconfig
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Webserver
+        identifier:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        section:
+          operation: equals
+          datatype: string
+          mask: false
+          value: directoryBrowse
+        parameter:
+          operation: equals
+          datatype: string
+          mask: false
+          value: enabled
+      object_title: Directory Browsing Webserver Setting
+  states:
+    state-appcmdlistconfig-result-must-equal-false:
+      state_title: appcmdlistconfig result must equal False.
+      capability: windows.appcmdlistconfig
+      state:
+        field: result
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-verify-directory-browsing-not-enabled:
+      test_title: Verify Directory Browsing is not enabled
+      capability: windows.appcmdlistconfig
+      object: directory-browsing-webserver-setting-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-appcmdlistconfig-result-must-equal-false
+  evaluate:
+    test: test-verify-directory-browsing-not-enabled

@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.6a2c6d15b60e8493b996b130
+  version: 1
+  assessment_title: SQL Server default account [sa] must have its name changed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT name FROM master.sys.sql_logins WHERE [name] = 'sa';
+      behaviors:
+        context: instance
+      object_title: null
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+  states: {}
+  tests:
+    test-check-if-sql-server-default-sa-system-administrator-account-name:
+      test_title: Check if the SQL Server default [sa] (system administrator) account name has been changed.
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-check-if-sql-server-default-sa-system-administrator-account-name

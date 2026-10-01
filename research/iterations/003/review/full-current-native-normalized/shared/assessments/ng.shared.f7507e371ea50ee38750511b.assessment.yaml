@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.f7507e371ea50ee38750511b
+  version: 1
+  assessment_title: Password Expiration Warning
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: PasswordExpiryWarning
+      object_title: null
+  variables:
+    prompt-user-change-password-before-expiration-variable:
+      title: Prompt User to Change Password Before Expiration
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: prompt_user_to_change_password_before_expiration_var
+        validation:
+          alternatives:
+          - literal: '14'
+            hint: 14_days
+  states:
+    state-reg-dword-type-and-value-is-greater-than-or-equal-to-var:
+      state_title: Reg_Dword type and value is greater than or equal to variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: prompt-user-change-password-before-expiration-variable
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-interactive-logon-prompt-user-change-password-before-expiration-set-14:
+      test_title: '''Interactive logon: Prompt user to change password before expiration'' is set for ''14'' days or more'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-is-greater-than-or-equal-to-var
+  evaluate:
+    test: test-interactive-logon-prompt-user-change-password-before-expiration-set-14

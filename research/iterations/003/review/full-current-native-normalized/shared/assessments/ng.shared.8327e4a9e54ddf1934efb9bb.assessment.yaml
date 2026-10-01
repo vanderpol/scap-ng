@@ -1,0 +1,65 @@
+assessment:
+  id: ng.shared.8327e4a9e54ddf1934efb9bb
+  version: 1
+  assessment_title: The Ubuntu operating system must retain a users session lock until that user reestablishes access using
+    established identification and authentication procedures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    ubuntu-retain-user-s-session-lock-until-that-user-reestablishes-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gsettings get org.gnome.desktop.screensaver lock-enabled
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: 'true'
+      object_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+        and authentication procedures.
+  states:
+    state-ubuntu-must-retain-a-user-s-session-lock-until-that-user:
+      state_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+        and authentication procedures.
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: 'true'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-ubuntu-retain-user-s-session-lock-until-that-user-reestablishes:
+      test_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+        and authentication procedures.
+      capability: independent.shellcommand
+      object: ubuntu-retain-user-s-session-lock-until-that-user-reestablishes-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-retain-a-user-s-session-lock-until-that-user
+  evaluate:
+    test: test-ubuntu-retain-user-s-session-lock-until-that-user-reestablishes

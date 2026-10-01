@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.ac0de6589d74ba95fd3f7361
+  version: 1
+  assessment_title: WN11-UR-000095 - The "Enable computer and user accounts to be trusted for delegation" user right must
+    not be assigned to any groups or accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-userright-object:
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_ENABLE_DELEGATION_NAME
+      object_title: null
+  states:
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-enable-computer-user-accounts-trusted-delegation-none:
+      test_title: Enable computer and user accounts to be trusted for delegation - None
+      capability: windows.userright
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-userright
+  evaluate:
+    test: test-enable-computer-user-accounts-trusted-delegation-none

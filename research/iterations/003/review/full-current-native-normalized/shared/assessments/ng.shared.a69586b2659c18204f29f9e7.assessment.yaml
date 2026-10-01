@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.a69586b2659c18204f29f9e7
+  version: 1
+  assessment_title: OL09-00-002340 - OL 9 must log SSH connection attempts and failures to the server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pull-value-etc-ssh-sshd-config-loglevel-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Pull value of /etc/ssh/sshd_config:LogLevel
+    pull-value-etc-ssh-sshd-config-d-loglevel-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Pull value of /etc/ssh/sshd_config.d:LogLevel
+    all-sshd-config-sshd-config-d-files-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: pull-value-etc-ssh-sshd-config-loglevel-object
+        - object: pull-value-etc-ssh-sshd-config-d-loglevel-object
+      object_title: all sshd_config and sshd_config.d/* files
+  states:
+    state-loglevel-value-is-set-to-verbose:
+      state_title: LogLevel value is set to VERBOSE
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^VERBOSE$|^"VERBOSE"$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-ssh-sshd-config-loglevel-verbose:
+      test_title: /etc/ssh/sshd_config:LogLevel == VERBOSE
+      capability: independent.textfilecontent54
+      object: all-sshd-config-sshd-config-d-files-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-loglevel-value-is-set-to-verbose
+  evaluate:
+    test: test-etc-ssh-sshd-config-loglevel-verbose

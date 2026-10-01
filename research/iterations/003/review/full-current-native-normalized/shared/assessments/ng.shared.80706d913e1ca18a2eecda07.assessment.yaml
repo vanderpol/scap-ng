@@ -1,0 +1,40 @@
+assessment:
+  id: ng.shared.80706d913e1ca18a2eecda07
+  version: 1
+  assessment_title: UID 0 Belongs Only To Root
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!root:)[^:]*:[^:]*:0
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-test-that-there-no-accounts-uid-0-except-root-in:
+      test_title: test that there are no accounts with UID 0 except root in the /etc/passwd file
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-test-that-there-no-accounts-uid-0-except-root-in

@@ -1,0 +1,40 @@
+assessment:
+  id: ng.shared.7fe641d1b355b17d1f4ba27c
+  version: 1
+  assessment_title: UBTU-18-010522 - The Ubuntu operating system must not have accounts configured with blank or null passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/shadow
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^:]+::[^:]*:[^:]*:'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-there-no-accounts-in-etc-shadow-that-have-blank-password:
+      test_title: There are no accounts in /etc/shadow that have blank password fields.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-there-no-accounts-in-etc-shadow-that-have-blank-password

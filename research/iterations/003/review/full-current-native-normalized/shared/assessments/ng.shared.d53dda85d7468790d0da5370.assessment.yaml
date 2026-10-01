@@ -1,0 +1,68 @@
+assessment:
+  id: ng.shared.d53dda85d7468790d0da5370
+  version: 1
+  assessment_title: OL07-00-040530 - The Oracle Linux operating system must display the date and time of the last successful
+    account logon upon logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/postlogin
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*session\s+.+\s+pam_lastlog\.so\s+(?:\w+\s+)*showfailed\b\s*(?:\w+\b\s*)*\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/postlogin
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*session\s+.+\s+pam_lastlog\.so\s+(?:\w+\s+)*silent\b\s*(?:\w+\b\s*)*\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-pam-lastlog-configured-show-last-successful-logon:
+      test_title: pam_lastlog is configured to show last successful logon
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-pam-lastlog-not-used-silent-option:
+      test_title: pam_lastlog is not used with the silent option
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: none satisfy
+  evaluate:
+    all:
+    - test: test-pam-lastlog-configured-show-last-successful-logon
+    - test: test-pam-lastlog-not-used-silent-option

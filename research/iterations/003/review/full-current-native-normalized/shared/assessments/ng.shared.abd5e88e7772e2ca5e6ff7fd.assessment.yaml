@@ -1,0 +1,16 @@
+assessment:
+  id: ng.shared.abd5e88e7772e2ca5e6ff7fd
+  version: 1
+  assessment_title: The Oracle Linux operating system must be configured so that all local interactive user home directories
+    are group-owned by the home directory owners primary group.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'Verify the assigned home directory of all local interactive users is group-owned by that user''s primary GID.
+    Check the home directory assignment for all local interactive users on the system with the following command: # ls -ld
+    $(awk -F: ''($3>=1000)&&($7 !~ /nologin/){print $6}'' /etc/passwd) -rwxr-x--- 1 smithj users 13 Apr 1 04:20 /home/smithj
+    Check the user''s primary group with the following command: # grep $(grep smithj /etc/passwd | awk -F: ''{print $4}'')
+    /etc/group users:x:250:smithj,marinc,chongt If the user home directory referenced in "/etc/passwd" is not group-owned
+    by that user''s primary GID, this is a finding.'
+  inputs: {}
+  evidence: []

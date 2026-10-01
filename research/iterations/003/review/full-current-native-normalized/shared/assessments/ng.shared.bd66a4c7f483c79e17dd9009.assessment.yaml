@@ -1,0 +1,79 @@
+assessment:
+  id: ng.shared.bd66a4c7f483c79e17dd9009
+  version: 1
+  assessment_title: Global System Objects Permission Strength
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Session Manager
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ProtectionMode
+      object_title: null
+  variables:
+    system-objects-strengthen-default-permissions-internal-system-objects-variable:
+      title: 'System objects: Strengthen default permissions of internal system objects'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: system_objects_strengthen_default_permissions_internal_system_objects_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: system-objects-strengthen-default-permissions-internal-system-objects-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-system-objects-strengthen-default-permissions-internal-system-objects-e-g:
+      test_title: '''System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)'' is
+        set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-system-objects-strengthen-default-permissions-internal-system-objects-e-g

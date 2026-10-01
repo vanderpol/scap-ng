@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.29547093fc88104a4ce62db0
+  version: 1
+  assessment_title: TS/RDS - Do Not Use Temp Folders
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows NT\Terminal Services
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: PerSessionTempDir
+      object_title: null
+  variables:
+    do-not-use-temporary-folders-per-session-variable:
+      title: Do not use temporary folders per session
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: do_not_use_temporary_folders_per_session_var
+        validation:
+          alternatives:
+          - literal: '1'
+            hint: disabled
+          - literal: '0'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: do-not-use-temporary-folders-per-session-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-do-not-use-temporary-folders-per-session-set-disabled:
+      test_title: '''Do not use temporary folders per session'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-do-not-use-temporary-folders-per-session-set-disabled

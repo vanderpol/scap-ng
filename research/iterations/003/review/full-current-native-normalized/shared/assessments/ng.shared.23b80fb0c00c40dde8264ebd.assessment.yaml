@@ -1,0 +1,125 @@
+assessment:
+  id: ng.shared.23b80fb0c00c40dde8264ebd
+  version: 1
+  assessment_title: UBTU-22-653060 - Ubuntu 22.04 LTS must be configured so that the audit log directory is not write-accessible
+    by unauthorized users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    audit-log-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: audit-data-directory-from-etc-audit-auditd-conf-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: Audit log directory
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: independent-textfilecontent54-object
+          field: subexpression
+  states:
+    state-mode-0750-or-less-permissive:
+      state_title: mode 0750 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-audit-log-directory-mode-0750-or-less-permissive:
+      test_title: Audit log directory is mode 0750 or less permissive
+      capability: unix.file
+      object: audit-log-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0750-or-less-permissive
+  evaluate:
+    test: test-audit-log-directory-mode-0750-or-less-permissive

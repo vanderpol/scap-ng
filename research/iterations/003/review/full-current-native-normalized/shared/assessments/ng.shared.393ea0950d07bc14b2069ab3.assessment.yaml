@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.393ea0950d07bc14b2069ab3
+  version: 1
+  assessment_title: Exchange message tracking logging must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-get-transportservice-display-messagetrackinglogenabled-configuration-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-TransportService | Select-Object -Property
+            Name, MessageTrackingLogEnabled | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-TransportService to display MessageTrackingLogEnabled configuration
+  states:
+    state-verify-setting-is-true:
+      state_title: Verify setting is true
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: (?i)true
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-if-value-messagetrackinglogenabled-not-set-true-this-finding:
+      test_title: If the value of MessageTrackingLogEnabled is not set to True, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-transportservice-display-messagetrackinglogenabled-configuration-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-setting-is-true
+  evaluate:
+    test: test-if-value-messagetrackinglogenabled-not-set-true-this-finding

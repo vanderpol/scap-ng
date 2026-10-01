@@ -1,0 +1,112 @@
+assessment:
+  id: ng.shared.72a7d771bc6ad50051b48f21
+  version: 1
+  assessment_title: OL09-00-002061 - OL 9 must mount /var/log with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-variable-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: mount-options-var-log-in-etc-fstab-variable
+      object_title: null
+  variables:
+    mount-options-var-log-in-etc-fstab-variable:
+      title: Mount options for /var/log in /etc/fstab
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              object: independent-textfilecontent54-object
+              field: subexpression
+          delimiter: ','
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: nodev
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-variable:
+      state_title: null
+      capability: independent.variable
+      state:
+        field: value
+        value: nodev
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+  tests:
+    test-var-log-mounted-nodev-option:
+      test_title: /var/log is mounted with the nodev option
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-partition
+    test-var-log-configured-nodev-option-in-etc-fstab:
+      test_title: /var/log is configured with the nodev option in /etc/fstab
+      capability: independent.variable
+      object: independent-variable-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-variable
+    test-var-log-configured-in-etc-fstab:
+      test_title: /var/log is configured in /etc/fstab
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-var-log-mounted-nodev-option
+    - test: test-var-log-configured-nodev-option-in-etc-fstab
+    - test: test-var-log-configured-in-etc-fstab

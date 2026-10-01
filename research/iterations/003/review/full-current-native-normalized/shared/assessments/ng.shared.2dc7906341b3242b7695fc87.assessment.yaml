@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.2dc7906341b3242b7695fc87
+  version: 1
+  assessment_title: The macOS system must be configured to disable Remote Apple Events.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-rae-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /bin/launchctl print-disabled system | /usr/bin/grep '"com.apple.AEServer" => disabled'
+      object_title: system_settings_rae_disable_recommended_object
+  states:
+    state-system-settings-rae-disable-recommended-state:
+      state_title: system_settings_rae_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-rae-disable-recommended-test:
+      test_title: system_settings_rae_disable_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-rae-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-rae-disable-recommended-state
+  evaluate:
+    test: test-system-settings-rae-disable-recommended-test

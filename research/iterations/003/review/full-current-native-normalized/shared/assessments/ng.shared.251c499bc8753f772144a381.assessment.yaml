@@ -1,0 +1,63 @@
+assessment:
+  id: ng.shared.251c499bc8753f772144a381
+  version: 1
+  assessment_title: Windows Server 2022 must have software certificate installation files removed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    search-p12-files-object:
+      capability: windows.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .[Pp]12$
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: Search for .p12 files
+    search-pfx-files-object:
+      capability: windows.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .[Pp][Ff][Xx]$
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: Search for .pfx files
+  states: {}
+  tests:
+    test-software-certificate-installation-files-removed-remove-p12-files:
+      test_title: Software certificate installation files must be removed. Remove .p12 files
+      capability: windows.file
+      object: search-p12-files-object
+      check_existence: none_exist
+      check: all
+    test-software-certificate-installation-files-removed-remove-pfx-files:
+      test_title: Software certificate installation files must be removed. Remove .pfx files
+      capability: windows.file
+      object: search-pfx-files-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-software-certificate-installation-files-removed-remove-p12-files
+    - test: test-software-certificate-installation-files-removed-remove-pfx-files

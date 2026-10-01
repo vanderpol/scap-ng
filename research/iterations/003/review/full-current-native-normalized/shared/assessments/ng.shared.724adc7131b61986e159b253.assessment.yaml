@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.724adc7131b61986e159b253
+  version: 1
+  assessment_title: WN10-AU-000065 - The system must be configured to audit Logon/Logoff - Logoff successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-logoff-success-only:
+      state_title: Audit - Logoff - Success only
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: logoff
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-logoff-success-and-failure:
+      state_title: Audit - Logoff - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: logoff
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-logoff-success-only:
+      test_title: Audit - Logoff - Success only
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-logoff-success-only
+    test-audit-logoff-success-failure:
+      test_title: Audit - Logoff - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-logoff-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-logoff-success-only
+    - test: test-audit-logoff-success-failure

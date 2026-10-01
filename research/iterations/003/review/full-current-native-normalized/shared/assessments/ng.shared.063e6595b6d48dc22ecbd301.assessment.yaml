@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.063e6595b6d48dc22ecbd301
+  version: 1
+  assessment_title: OL08-00-020330 - OL 8 must not allow accounts configured with blank or null passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?i)\s*PermitEmptyPasswords\s+(\w+)$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(yes|"yes")$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-permitemptypasswords-option-not-set-yes-in-etc-ssh-sshd-config:
+      test_title: The PermitEmptyPasswords option is not set to yes in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: any_exist
+      check: none satisfy
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-permitemptypasswords-option-not-set-yes-in-etc-ssh-sshd-config

@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.f47fba6085fe8d8a2c076d3d
+  version: 1
+  assessment_title: The operating system must shut down by default upon audit failure (unless availability is an overriding
+    concern).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    hkey-local-machine-system-policies-microsoft-cryptography-forcekeyprotection-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Cryptography
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ForceKeyProtection
+      object_title: HKEY_LOCAL_MACHINE\System\Policies\Microsoft\Cryptography\ForceKeyProtection
+  states:
+    state-reg-dword-type-and-value-equals-2:
+      state_title: Reg_Dword type and value equals 2
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-hkey-local-machine-system-policies-microsoft-cryptography-forcekeyprotection-exists-equals:
+      test_title: HKEY_LOCAL_MACHINE\System\Policies\Microsoft\Cryptography\ForceKeyProtection exists and equals 2
+      capability: windows.registry
+      object: hkey-local-machine-system-policies-microsoft-cryptography-forcekeyprotection-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-2
+  evaluate:
+    test: test-hkey-local-machine-system-policies-microsoft-cryptography-forcekeyprotection-exists-equals

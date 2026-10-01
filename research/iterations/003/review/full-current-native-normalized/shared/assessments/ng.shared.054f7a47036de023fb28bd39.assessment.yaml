@@ -1,0 +1,96 @@
+assessment:
+  id: ng.shared.054f7a47036de023fb28bd39
+  version: 1
+  assessment_title: WN10-PK-000015 - The DoD Interoperability Root CA cross-certificates must be installed in the Untrusted
+    Certificates Store on unclassified systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\49CBE933151872E17C8EAE7F0ABA97FB610F6477
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\EnterpriseCertificates\Disallowed\Certificates\49CBE933151872E17C8EAE7F0ABA97FB610F6477
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-3
+        - object: windows-registry-object-4
+      object_title: null
+    windows-registry-object-5:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\SystemCertificates\Disallowed\Certificates\49CBE933151872E17C8EAE7F0ABA97FB610F6477
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-2
+        - object: windows-registry-object-5
+      object_title: null
+  states: {}
+  tests:
+    test-dod-interoperability-root-ca-2-certificate-expiring-11-16-2024:
+      test_title: DoD Interoperability Root CA 2 certificate expiring 11/16/2024 is installed in the Untrusted Certificates
+        Store
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: at least one
+  evaluate:
+    test: test-dod-interoperability-root-ca-2-certificate-expiring-11-16-2024

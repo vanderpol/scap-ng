@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.c8f9dc79fa9e08725ce34a4a
+  version: 1
+  assessment_title: Manually managed application account passwords must be at least 14 characters in length.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieves-passwordpolicy-object-object:
+      capability: windows.passwordpolicy
+      object_title: Retrieves a passwordpolicy_object.
+  states:
+    state-this-passwordpolicy-state-represents-a-password-policy-t:
+      state_title: This passwordpolicy_state represents a password policy that has a min_passwd_len greater than or equal
+        to '14'.
+      capability: windows.passwordpolicy
+      state:
+        field: min_passwd_len
+        value: '14'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-verify-password-length-setting-required-14-or-more-characters:
+      test_title: Verify Password Length Setting is required to be 14 or more characters.
+      capability: windows.passwordpolicy
+      object: retrieves-passwordpolicy-object-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-this-passwordpolicy-state-represents-a-password-policy-t
+  evaluate:
+    test: test-verify-password-length-setting-required-14-or-more-characters

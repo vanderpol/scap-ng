@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.3e3d66b70d25ba8630f372a8
+  version: 1
+  assessment_title: WN10-SO-000110 - Unencrypted passwords must not be sent to third-party SMB Servers.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\LanmanWorkstation\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EnablePlainTextPassword
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-microsoft-network-client-send-unencrypted-password-connect-third-party-smb:
+      test_title: '''Microsoft Network Client: Send unencrypted password to connect to third-party SMB servers'' is set to
+        ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-microsoft-network-client-send-unencrypted-password-connect-third-party-smb

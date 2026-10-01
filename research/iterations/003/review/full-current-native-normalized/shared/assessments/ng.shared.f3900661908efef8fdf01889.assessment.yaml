@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.f3900661908efef8fdf01889
+  version: 1
+  assessment_title: OL09-00-000030 - OL 9 must require authentication to access single-user mode.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib/systemd/system
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: rescue.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*ExecStart=-\/usr\/lib\/systemd\/systemd-sulogin-shell\srescue$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/system/rescue.service.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*ExecStart=-\/usr\/lib\/systemd\/systemd-sulogin-shell\srescue$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-usr-lib-systemd-system-rescue-service-execstart-set-usr-lib:
+      test_title: /usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-systemd-system-rescue-service-d-conf-execstart-set-usr:
+      test_title: /etc/systemd/system/rescue.service.d/*.conf:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell
+        rescue
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - test: test-usr-lib-systemd-system-rescue-service-execstart-set-usr-lib
+    - test: test-etc-systemd-system-rescue-service-d-conf-execstart-set-usr

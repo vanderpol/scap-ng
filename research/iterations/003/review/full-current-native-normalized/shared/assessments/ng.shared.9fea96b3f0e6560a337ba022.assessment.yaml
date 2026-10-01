@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.9fea96b3f0e6560a337ba022
+  version: 1
+  assessment_title: The macOS system must be configured to audit all failed read actions on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-flags-fr-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\n' | /usr/bin/grep
+            -Ec '\-fr'
+      object_title: audit_flags_fr_configure_recommended_object
+  states:
+    state-audit-flags-fr-configure-recommended-state:
+      state_title: audit_flags_fr_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-flags-fr-configure-recommended-test:
+      test_title: audit_flags_fr_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-flags-fr-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-flags-fr-configure-recommended-state
+  evaluate:
+    test: test-audit-flags-fr-configure-recommended-test

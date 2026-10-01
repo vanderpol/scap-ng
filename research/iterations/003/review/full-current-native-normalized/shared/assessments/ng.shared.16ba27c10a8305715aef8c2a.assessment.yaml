@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.16ba27c10a8305715aef8c2a
+  version: 1
+  assessment_title: No nullok Option in /etc/pam.d/system-auth or /etc/pam.d/password-auth
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^#]*\s*nullok\s*
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^#]*\s*nullok\s*
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-make-sure-nullok-not-used-in-etc-pam-d-system:
+      test_title: make sure nullok is not used in /etc/pam.d/system-auth
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-make-sure-nullok-not-used-in-etc-pam-d-password:
+      test_title: make sure nullok is not used in /etc/pam.d/password-auth
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-make-sure-nullok-not-used-in-etc-pam-d-system
+    - test: test-make-sure-nullok-not-used-in-etc-pam-d-password

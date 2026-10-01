@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.c7eb23054d013f5455fb42d2
+  version: 1
+  assessment_title: AZLX-23-002540 - Amazon Linux 2023 must enable kernel parameters to enforce discretionary access control
+    on symlinks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fs.protected_symlinks
+      object_title: null
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-fs-protected-symlinks-setting-in-kernel-set-1:
+      test_title: fs.protected_symlinks setting in kernel is set to 1
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
+  evaluate:
+    test: test-fs-protected-symlinks-setting-in-kernel-set-1

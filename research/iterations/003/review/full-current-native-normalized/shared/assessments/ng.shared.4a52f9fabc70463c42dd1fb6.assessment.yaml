@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.4a52f9fabc70463c42dd1fb6
+  version: 1
+  assessment_title: AZLX-23-001005 - Amazon Linux 2023 must not be configured to bypass password requirements for privilege
+    escalation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/sudo
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\n]*\bpam_succeed_if\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-pam-succeed-if-not-present-in-etc-pam-d-sudo:
+      test_title: pam_succeed_if is not present in /etc/pam.d/sudo
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-pam-succeed-if-not-present-in-etc-pam-d-sudo

@@ -1,0 +1,87 @@
+assessment:
+  id: ng.shared.57fbf8910ede6ee85d3f4744
+  version: 1
+  assessment_title: The operating system must implement transaction recovery for transaction-based systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-dev-mounts-in-etc-mnttab-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/mnttab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/dev/.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: all /dev mounts in /etc/mnttab
+    non-logging-mounts-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: all-dev-mounts-in-etc-mnttab-object
+        filters:
+        - action: exclude
+          state: state-dev-fd
+        - action: exclude
+          state: state-logging-option
+        - action: exclude
+          state: state-zfs-or-vxfs-or-hsfs-fstype
+      object_title: non-logging mounts
+  states:
+    state-dev-fd:
+      state_title: /dev/fd.*
+      capability: independent.textfilecontent54
+      state:
+        field: text
+        value: ^/dev/fd.*$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-logging-option:
+      state_title: logging option
+      capability: independent.textfilecontent54
+      state:
+        field: text
+        value: ^\S+\s+\S+\s+\S+\s+(\S*,)?logging(,\S*)?\s+
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-zfs-or-vxfs-or-hsfs-fstype:
+      state_title: zfs or vxfs or hsfs fstype
+      capability: independent.textfilecontent54
+      state:
+        field: text
+        value: ^\S+\s+\S+\s+(vxfs|zfs|hsfs)\s+
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-no-non-logging-file-systems-mounted:
+      test_title: no non-logging file systems are mounted
+      capability: independent.textfilecontent54
+      object: non-logging-mounts-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-no-non-logging-file-systems-mounted

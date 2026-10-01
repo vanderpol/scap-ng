@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.5dfaddab89fae33f12d0e838
+  version: 1
+  assessment_title: OL08-00-040111 - OL 8 Bluetooth must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*install[ \t]+bluetooth[ \t]+/bin/false[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*blacklist[ \t]+bluetooth[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-modprobe-d-contains-file-that-contains-install-bluetooth-bin:
+      test_title: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-etc-modprobe-d-contains-file-that-contains-blacklist-bluetooth:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist bluetooth'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-etc-modprobe-d-contains-file-that-contains-install-bluetooth-bin
+    - test: test-etc-modprobe-d-contains-file-that-contains-blacklist-bluetooth

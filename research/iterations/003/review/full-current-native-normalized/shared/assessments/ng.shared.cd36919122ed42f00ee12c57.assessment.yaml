@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.cd36919122ed42f00ee12c57
+  version: 1
+  assessment_title: AZLX-23-002035 - Amazon Linux 2023 must take action when allocated audit record storage volume reaches
+    75 percent of the repository maximum audit record storage capacity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*space_left\s*=\s*([\d]+)%\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '25'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '100'
+        operation: less than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audit-auditd-conf-space-left-greater-than-or-equal:
+      test_title: '/etc/audit/auditd.conf: space_left greater than or equal to 25%'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-etc-audit-auditd-conf-space-left-less-than-100:
+      test_title: '/etc/audit/auditd.conf: space_left less than 100%'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54-2
+  evaluate:
+    all:
+    - test: test-etc-audit-auditd-conf-space-left-greater-than-or-equal
+    - test: test-etc-audit-auditd-conf-space-left-less-than-100

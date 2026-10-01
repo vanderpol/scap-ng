@@ -1,0 +1,68 @@
+assessment:
+  id: ng.shared.92b9873f3aaffdb158ca860b
+  version: 1
+  assessment_title: UBTU-22-654045 - Ubuntu 22.04 LTS must generate audit records for successful/unsuccessful attempts to
+    use the fdisk command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-w\s+/usr/sbin/fdisk(?:\s+-p\s+[rwa]*x[rwa]*)?(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(?:always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/fdisk\s+-F\s+perm=[rwa]*x[rwa]*(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-invocations-usr-sbin-fdisk-use-file-watch-syntax:
+      test_title: Audit invocations of /usr/sbin/fdisk. Use file watch syntax.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-audit-invocations-usr-sbin-fdisk-use-system-call-syntax:
+      test_title: Audit invocations of /usr/sbin/fdisk. Use system call syntax.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - test: test-audit-invocations-usr-sbin-fdisk-use-file-watch-syntax
+    - test: test-audit-invocations-usr-sbin-fdisk-use-system-call-syntax

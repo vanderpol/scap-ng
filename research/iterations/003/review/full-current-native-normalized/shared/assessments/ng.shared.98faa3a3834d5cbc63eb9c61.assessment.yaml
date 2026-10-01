@@ -1,0 +1,81 @@
+assessment:
+  id: ng.shared.98faa3a3834d5cbc63eb9c61
+  version: 1
+  assessment_title: The audit system must take appropriate action when the audit storage volume is full.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-audisp-audisp-remote-conf-disk-full-action-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/audisp-remote.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*disk_full_action\s+=\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+      object_title: /etc/audisp/audisp-remote.conf disk_full_action
+  states:
+    state-audisp-remote-action-syslog:
+      state_title: audisp-remote action syslog
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[Ss][Yy][Ss][Ll][Oo][Gg]$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audisp-remote-action-single:
+      state_title: audisp-remote action single
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[Ss][Ii][Nn][Gg][Ll][Ee]$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audisp-remote-action-single-2:
+      state_title: audisp-remote action single
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[Hh][Aa][Ll][Tt]$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audisp-audisp-remote-conf-disk-full-action-syslog-single:
+      test_title: /etc/audisp/audisp-remote.conf disk_full_action = syslog, single, or halt
+      capability: independent.textfilecontent54
+      object: etc-audisp-audisp-remote-conf-disk-full-action-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-audisp-remote-action-syslog
+      - state-audisp-remote-action-single
+      - state-audisp-remote-action-single-2
+  evaluate:
+    test: test-etc-audisp-audisp-remote-conf-disk-full-action-syslog-single

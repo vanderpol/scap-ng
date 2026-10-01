@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.9b78b19de27150a27304f4cb
+  version: 1
+  assessment_title: The macOS system must have the security assessment policy subsystem enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-gatekeeper-enable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/sbin/spctl --status | /usr/bin/grep "assessments enabled"
+      object_title: os_gatekeeper_enable_recommended_object
+  states:
+    state-os-gatekeeper-enable-recommended-state:
+      state_title: os_gatekeeper_enable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-gatekeeper-enable-recommended-test:
+      test_title: os_gatekeeper_enable_recommended_test
+      capability: independent.shellcommand
+      object: os-gatekeeper-enable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-gatekeeper-enable-recommended-state
+  evaluate:
+    test: test-os-gatekeeper-enable-recommended-test

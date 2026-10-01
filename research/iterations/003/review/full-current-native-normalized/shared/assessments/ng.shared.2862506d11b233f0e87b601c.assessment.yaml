@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.2862506d11b233f0e87b601c
+  version: 1
+  assessment_title: Default Autorun Behavior
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Explorer
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoAutorun
+      object_title: null
+  variables:
+    default-behavior-autorun-variable:
+      title: Default behavior for AutoRun
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: default_behavior_for_autorun_var
+        validation:
+          alternatives:
+          - literal: '1'
+            hint: do_not_execute_autorun_commands
+          - literal: '2'
+            hint: automatically_execute_autorun_commands
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: default-behavior-autorun-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-default-behavior-autorun-set-enabled-do-not-execute-any-autorun:
+      test_title: '''Default behavior for AutoRun'' is set to ''Enabled:Do not execute any autorun commands'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-default-behavior-autorun-set-enabled-do-not-execute-any-autorun

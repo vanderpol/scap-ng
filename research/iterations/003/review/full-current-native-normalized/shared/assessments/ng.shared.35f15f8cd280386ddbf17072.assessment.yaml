@@ -1,0 +1,68 @@
+assessment:
+  id: ng.shared.35f15f8cd280386ddbf17072
+  version: 1
+  assessment_title: UBTU-20-010296 - The Ubuntu operating system must generate audit records when successful/unsuccessful
+    attempts to use modprobe command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-w\s+/sbin/modprobe(?:\s+-p\s+[rwa]*x[rwa]*)?(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+path=/sbin/modprobe\s+-F\s+perm=[rwa]*x[rwa]*(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-invocations-sbin-modprobe-use-file-watch-syntax:
+      test_title: Audit invocations of /sbin/modprobe.  Use file watch syntax.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-audit-invocations-sbin-modprobe-use-system-call-syntax:
+      test_title: Audit invocations of /sbin/modprobe.  Use system call syntax.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - test: test-audit-invocations-sbin-modprobe-use-file-watch-syntax
+    - test: test-audit-invocations-sbin-modprobe-use-system-call-syntax

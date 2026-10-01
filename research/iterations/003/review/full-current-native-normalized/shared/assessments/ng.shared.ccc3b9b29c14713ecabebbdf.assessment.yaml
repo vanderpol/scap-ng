@@ -1,0 +1,36 @@
+assessment:
+  id: ng.shared.ccc3b9b29c14713ecabebbdf
+  version: 1
+  assessment_title: WN19-00-000130 - Windows Server 2019 local volumes must use a format that supports NTFS attributes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT filesystem FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!='NTFS' AND filesystem!='ReFS'
+            AND filesystem!='CSVFS'
+      object_title: null
+  states: {}
+  tests:
+    test-local-volumes-formatted-using-ntfs-refs-or-csvfs:
+      test_title: local volumes are formatted using NTFS, ReFS or CSVFS
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-local-volumes-formatted-using-ntfs-refs-or-csvfs

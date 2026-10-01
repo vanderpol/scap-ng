@@ -1,0 +1,96 @@
+assessment:
+  id: ng.shared.2837914ddd14a54e0d284e67
+  version: 1
+  assessment_title: Directory data (outside the root DSE) of a non-public directory must be configured to prevent anonymous
+    access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    analyze-dsheuristics-check-annonymous-access-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: $( try { $obj=Get-ADObject -Filter "objectClass -eq 'nTDSService'" -Properties dsHeuristics -SearchBase "CN=Services,$((Get-ADRootDSE).configurationNamingContext)"
+            -ErrorAction Stop; if ($null -eq $obj) { throw } $h=$obj.dsHeuristics; if ($null -eq $h) { [PSCustomObject]@{
+            Status='PASS'; Detail='dsHeuristics attribute is not set (Defaults secure)' } } else { $isAnon=($h.Length -ge
+            7) -and ($h[6] -eq '2'); $stat=if($isAnon){'FAIL'}else{'PASS'}; $msg=if($isAnon){'Allows Anonymous Access'}else{'Secure'};
+            $c=if($h.Length -ge 7){$h[6]}else{'N/A'}; [PSCustomObject]@{ Status=$stat; Detail=("dsHeuristics value is [{0}].
+            Seventh char is '{1}' ({2})." -f $h,$c,$msg) } } } catch { [PSCustomObject]@{ Status='ERROR'; Detail="Directory
+            Service object could not be located or read." } } ) | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Analyze the dsHeuristics to check for annonymous access
+    analyse-permissions-on-active-directory-users-computers-domain-security-permissions-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'if (([adsi]"LDAP://$((Get-ADDomain).DistinguishedName)").PSBase.ObjectSecurity.GetAccessRules($true, $true,
+            [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq ''S-1-5-7'' -and $_.AccessControlType
+            -eq ''Allow'' }) { Write-Host "FAIL: ANONYMOUS LOGON is configured with ALLOW permissions." } else { Write-Host
+            "PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions." }'
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+
+      object_title: Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.
+  states:
+    state-no-lines-shall-exist-listed-with-status-of-fail:
+      state_title: No lines shall exist listed with status of 'FAIL'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: FAIL
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: none satisfy
+        entity_existence: at_least_one_exists
+  tests:
+    test-analyze-dsheuristics-check-annonymous-access:
+      test_title: Analyze the dsHeuristics to check for annonymous access.
+      capability: independent.shellcommand
+      object: analyze-dsheuristics-check-annonymous-access-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-lines-shall-exist-listed-with-status-of-fail
+    test-open-active-directory-users-computers-select-view-advanced-features-right:
+      test_title: Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in
+        left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab
+        and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON.
+      capability: independent.shellcommand
+      object: analyse-permissions-on-active-directory-users-computers-domain-security-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-lines-shall-exist-listed-with-status-of-fail
+  evaluate:
+    all:
+    - test: test-analyze-dsheuristics-check-annonymous-access
+    - test: test-open-active-directory-users-computers-select-view-advanced-features-right

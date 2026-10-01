@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.e68099b61593d9d0fb7b5ee2
+  version: 1
+  assessment_title: WINCC-000018
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Servicing
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: UseWindowsUpdate
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-2:
+      state_title: Reg_Dword type and value equals 2
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-specify-settings-optional-component-installation-component-repair-set-enabled-never:
+      test_title: '''Specify settings for optional component installation and component repair'' is set to ''Enabled'' with
+        ''Never attempt to download payload from Windows Update'' selected'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-2
+  evaluate:
+    test: test-specify-settings-optional-component-installation-component-repair-set-enabled-never

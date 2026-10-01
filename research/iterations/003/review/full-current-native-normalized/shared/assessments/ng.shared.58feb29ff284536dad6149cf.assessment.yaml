@@ -1,0 +1,237 @@
+assessment:
+  id: ng.shared.58feb29ff284536dad6149cf
+  version: 1
+  assessment_title: UBTU-18-010033 - The Ubuntu operating system must be configured so that three consecutive invalid logon
+    attempts by a user automatically locks the account until released by an administrator.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/common-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+\[default=die\]\s+pam_faillock\.so\s+authfail\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/common-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+sufficient\s+pam_faillock\.so\s+authsucc\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*audit\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-4:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*silent\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-5:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*deny\s*=\s*([0-9])+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-6:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*fail_interval\s*=\s*([0-9]+)+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-7:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*unlock_time\s*=\s*([0-9])+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '3'
+        operation: less than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '900'
+        operation: less than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-3:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pam-faillock-so-module-authfail-present-in-etc-pam-d:
+      test_title: pam_faillock.so module authfail is present in /etc/pam.d/common-auth file
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-pam-faillock-so-module-authsucc-present-in-etc-pam-d:
+      test_title: pam_faillock.so module authsucc is present in /etc/pam.d/common-auth file
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+    test-pam-faillock-so-used-audit:
+      test_title: pam_faillock.so is used with audit
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-3
+      check_existence: at_least_one_exists
+      check: all
+    test-pam-faillock-so-used-silent:
+      test_title: pam_faillock.so is used with silent
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-4
+      check_existence: at_least_one_exists
+      check: all
+    test-pam-faillock-so-used-deny-set-3-or-less:
+      test_title: pam_faillock.so is used with deny set to 3 or less
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-5
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-pam-faillock-so-used-fail-interval-set-900-or-less:
+      test_title: pam_faillock.so is used with fail_interval set to 900 or less
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-6
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54-2
+    test-pam-faillock-so-used-unlock-time-set-0:
+      test_title: pam_faillock.so is used with unlock_time set to 0
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-7
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54-3
+  evaluate:
+    all:
+    - test: test-pam-faillock-so-module-authfail-present-in-etc-pam-d
+    - test: test-pam-faillock-so-module-authsucc-present-in-etc-pam-d
+    - test: test-pam-faillock-so-used-audit
+    - test: test-pam-faillock-so-used-silent
+    - test: test-pam-faillock-so-used-deny-set-3-or-less
+    - test: test-pam-faillock-so-used-fail-interval-set-900-or-less
+    - test: test-pam-faillock-so-used-unlock-time-set-0

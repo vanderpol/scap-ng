@@ -1,0 +1,130 @@
+assessment:
+  id: ng.shared.1413c2e1c5479fa36e1dd282
+  version: 1
+  assessment_title: The Ubuntu operating system library files must have mode 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-files-in-system-library-mode-755-gwrite-should-false-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        state: state-mode-755-or-less-permissive-gwrite-should-be-false
+      - action: exclude
+        state: state-symbolic-links
+      - action: exclude
+        state: state-unix-file
+      object_title: All files in system Library with mode 755 (gwrite should be = false)
+    all-files-in-system-library-mode-755-owrite-should-false-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        state: state-mode-755-or-less-permissive-owrite-should-be-false
+      - action: exclude
+        state: state-symbolic-links
+      - action: exclude
+        state: state-unix-file
+      object_title: All files in system Library with mode 755 (owrite should be = false)
+  variables:
+    system-wide-shared-library-files-directories-variable:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  states:
+    state-mode-755-or-less-permissive-gwrite-should-be-false:
+      state_title: Mode 755 or less permissive (gwrite should be = false)
+      capability: unix.file
+      state:
+        field: gwrite
+        value: 'false'
+        operation: equals
+        datatype: boolean
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-symbolic-links:
+      state_title: symbolic links
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: directory
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-mode-755-or-less-permissive-owrite-should-be-false:
+      state_title: Mode 755 or less permissive (owrite should be = false)
+      capability: unix.file
+      state:
+        field: owrite
+        value: 'false'
+        operation: equals
+        datatype: boolean
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-library-files-have-mode-755-or-less-permissive-gwrite:
+      test_title: System Library files have mode 755 or less permissive (gwrite should be = false)
+      capability: unix.file
+      object: all-files-in-system-library-mode-755-gwrite-should-false-object
+      check_existence: none_exist
+      check: all
+    test-system-library-files-have-mode-755-or-less-permissive-owrite:
+      test_title: System Library files have mode 755 or less permissive (owrite should be = false)
+      capability: unix.file
+      object: all-files-in-system-library-mode-755-owrite-should-false-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-system-library-files-have-mode-755-or-less-permissive-gwrite
+    - test: test-system-library-files-have-mode-755-or-less-permissive-owrite

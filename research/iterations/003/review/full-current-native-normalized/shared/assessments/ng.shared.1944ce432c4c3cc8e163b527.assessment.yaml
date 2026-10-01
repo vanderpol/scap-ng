@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.1944ce432c4c3cc8e163b527
+  version: 1
+  assessment_title: WN10-00-000175 - The Secondary Logon service must be disabled on Windows 10.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    secondary-logon-service-startup-type-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT startmode FROM Win32_Service WHERE name='seclogon'
+      object_title: Secondary Logon Service Startup Type
+  states:
+    state-service-startup-type-is-disabled:
+      state_title: Service Startup Type is Disabled
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: startmode
+            value: Disabled
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-secondary-logon-service-startup-type-disabled-or-service-uninstalled:
+      test_title: The Secondary Logon service Startup Type is Disabled or the service is uninstalled
+      capability: windows.wmi57
+      object: secondary-logon-service-startup-type-object
+      check_existence: any_exist
+      check: at least one
+      states:
+      - state-service-startup-type-is-disabled
+  evaluate:
+    test: test-secondary-logon-service-startup-type-disabled-or-service-uninstalled

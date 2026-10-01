@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.2dfd9694ce7f14ba74d1ff82
+  version: 1
+  assessment_title: AZLX-23-001060 - Amazon Linux 2023 must have the Advanced Intrusion Detection Environment (AIDE) package
+    installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: aide
+      object_title: null
+    unix-file-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/lib/aide/aide.db.gz
+      object_title: null
+  states:
+    state-not-empty:
+      state_title: not empty
+      capability: unix.file
+      state:
+        field: size
+        value: '0'
+        operation: greater than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-aide-package-installed:
+      test_title: aide package is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: at_least_one_exists
+      check: all
+    test-var-lib-aide-aide-db-gz-exists-not-empty:
+      test_title: /var/lib/aide/aide.db.gz exists and is not empty
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-not-empty
+  evaluate:
+    all:
+    - test: test-aide-package-installed
+    - test: test-var-lib-aide-aide-db-gz-exists-not-empty

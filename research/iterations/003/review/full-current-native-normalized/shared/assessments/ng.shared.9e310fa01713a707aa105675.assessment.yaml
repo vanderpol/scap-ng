@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.9e310fa01713a707aa105675
+  version: 1
+  assessment_title: Exchange must have the most current, approved Cumulative Update (CU) installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-get-exchangeserver-display-admindisplayversion-configuration-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ExchangeServer | Select-Object -Property
+            Name, AdminDisplayVersion |Format-List
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ''
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-ExchangeServer to display AdminDisplayVersion configuration
+  states: {}
+  tests:
+    test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements:
+      test_title: Unknown Test Results - An auditor must review system settings gathered and STIG requirements.
+      capability: independent.unknown
+      result: unknown
+    test-determine-most-current-approved-service-pack-if-value-admindisplayversion-does:
+      test_title: Determine the most current, approved service pack. If the value of AdminDisplayVersion does not return the
+        most current, approved Cumulative Update (CU), this is a finding.
+      capability: independent.shellcommand
+      object: run-get-exchangeserver-display-admindisplayversion-configuration-object
+      check_existence: any_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements
+    - test: test-determine-most-current-approved-service-pack-if-value-admindisplayversion-does

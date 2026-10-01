@@ -1,0 +1,40 @@
+assessment:
+  id: ng.shared.01eb18e4dcd0f69a9714110c
+  version: 1
+  assessment_title: OL08-00-040290 - OL 8 must be configured to prevent unrestricted mail relaying.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/postfix/main.cf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^smtpd_client_restrictions[ \t]*=[ \t]*permit_mynetworks[, \t]+reject[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-postfix-main-cf-smtpd-client-restrictions-permit-mynetworks-reject:
+      test_title: '/etc/postfix/main.cf: smtpd_client_restrictions = permit_mynetworks,reject'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-etc-postfix-main-cf-smtpd-client-restrictions-permit-mynetworks-reject

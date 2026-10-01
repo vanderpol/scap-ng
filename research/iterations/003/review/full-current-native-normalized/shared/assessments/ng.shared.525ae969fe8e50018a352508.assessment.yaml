@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.525ae969fe8e50018a352508
+  version: 1
+  assessment_title: OL09-00-000770 - OL 9 audit system must take appropriate action when the audit files have reached maximum
+    size.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*max_log_file_action\s*=\s*(\S+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ROTATE
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: SINGLE
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audit-auditd-conf-max-log-file-action-rotate-or:
+      test_title: '/etc/audit/auditd.conf: max_log_file_action is ROTATE or SINGLE'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
+  evaluate:
+    test: test-etc-audit-auditd-conf-max-log-file-action-rotate-or

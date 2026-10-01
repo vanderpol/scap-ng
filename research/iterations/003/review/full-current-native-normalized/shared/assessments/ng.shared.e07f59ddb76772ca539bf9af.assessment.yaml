@@ -1,0 +1,35 @@
+assessment:
+  id: ng.shared.e07f59ddb76772ca539bf9af
+  version: 1
+  assessment_title: The audit service must be running.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-auditd-object:
+      capability: unix.process58
+      select:
+        command_line:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '[\00]*\/sbin\/auditd[\00]*'
+        pid:
+          operation: greater than
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: check for auditd
+  states: {}
+  tests:
+    test-check-auditd:
+      test_title: check for auditd
+      capability: unix.process58
+      object: check-auditd-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-check-auditd

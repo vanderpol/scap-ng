@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.10f0df14b14ec8702676cda5
+  version: 1
+  assessment_title: WN10-SO-000245 - User Account Control approval mode for the built-in Administrator must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: FilterAdministratorToken
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-verifies-user-account-control-admin-approval-mode-built-in-administrator:
+      test_title: 'Verifies ''User Account Control: Admin Approval Mode for the Built-in Administrator account'' is set to
+        ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-verifies-user-account-control-admin-approval-mode-built-in-administrator

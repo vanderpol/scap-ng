@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.6a060e5c5ef990ccc519258b
+  version: 1
+  assessment_title: All local interactive user home directories must be group-owned by the home directory owners primary group.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-all-interactive-users-home-directories-not-group-owned-that-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'getent passwd | awk -F: ''$3>=1000 && $7 !="/bin/nologin" && $1 != "nobody" { print $1 ":" $6 ":" $4 }''
+            | while IFS='':'' read -r user homedir usergroup; do filegroup=$(stat -c ''%g'' "$homedir"); [ "$usergroup" !=
+            "$filegroup" ] && echo "User home directory for $user is not group owned by the user''s group. User: $user. HomeDir:
+            $homedir. User Group: $usergroup. HomeDir Group: $filegroup."; done'
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ''
+      object_title: Retrieve all interactive users' home directories are not group owned that user.
+  states:
+    state-confirm-that-no-home-directories-are-reported-with-file-:
+      state_title: Confirm that no home directories are reported with file group owner different from the user's main group.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-confirm-interactive-user-s-home-directories-group-owned-by-each:
+      test_title: Confirm interactive user's home directories are group owned by each respective user.
+      capability: independent.shellcommand
+      object: retrieve-all-interactive-users-home-directories-not-group-owned-that-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-confirm-that-no-home-directories-are-reported-with-file-
+  evaluate:
+    test: test-confirm-interactive-user-s-home-directories-group-owned-by-each

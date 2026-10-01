@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.e18dca5196ad80ba0489b28d
+  version: 1
+  assessment_title: Configure PAM in SSSD Services
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sssd/sssd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*\[sssd\]([^\n]*\n+)+?[\s]*services.*pam.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sssd/conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*\[sssd\]([^\n]*\n+)+?[\s]*services.*pam.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-check-if-pam-configured-in-services-setting-sssd-section:
+      test_title: check if pam is configured in the services setting of the sssd section
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+    test-check-if-pam-configured-in-services-setting-conf-file-in:
+      test_title: check if pam is configured in the services setting of a conf file in the sssd conf.d directory
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: all_exist
+      check: all
+  evaluate:
+    any:
+    - test: test-check-if-pam-configured-in-services-setting-sssd-section
+    - test: test-check-if-pam-configured-in-services-setting-conf-file-in

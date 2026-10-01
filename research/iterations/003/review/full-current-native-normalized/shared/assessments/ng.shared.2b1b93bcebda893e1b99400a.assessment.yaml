@@ -1,0 +1,30 @@
+assessment:
+  id: ng.shared.2b1b93bcebda893e1b99400a
+  version: 1
+  assessment_title: The operating system must have the required packages for multifactor authentication installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    package-pam-pkcs11-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pam_pkcs11
+      object_title: package 'pam_pkcs11'
+  states: {}
+  tests:
+    test-package-pam-pkcs11-installed:
+      test_title: package 'pam_pkcs11' is installed
+      capability: linux.rpminfo
+      object: package-pam-pkcs11-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-package-pam-pkcs11-installed

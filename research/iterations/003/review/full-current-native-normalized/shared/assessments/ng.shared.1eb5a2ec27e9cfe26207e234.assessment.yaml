@@ -1,0 +1,79 @@
+assessment:
+  id: ng.shared.1eb5a2ec27e9cfe26207e234
+  version: 1
+  assessment_title: Unencrypted Password is Sent to SMB Server
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\LanmanWorkstation\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EnablePlainTextPassword
+      object_title: null
+  variables:
+    microsoft-network-client-send-unencrypted-password-third-party-smb-servers-variable:
+      title: 'Microsoft network client: Send unencrypted password to third-party SMB servers'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: send_unencrypted_password_to_third_party_smb_servers_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: microsoft-network-client-send-unencrypted-password-third-party-smb-servers-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-microsoft-network-client-send-unencrypted-password-connect-third-party-smb:
+      test_title: '''Microsoft Network Client: Send unencrypted password to connect to third-party SMB servers'' is set to
+        ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-microsoft-network-client-send-unencrypted-password-connect-third-party-smb

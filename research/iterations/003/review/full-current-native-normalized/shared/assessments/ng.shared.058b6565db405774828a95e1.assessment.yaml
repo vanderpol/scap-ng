@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.058b6565db405774828a95e1
+  version: 1
+  assessment_title: The macOS system must provide an immediate real-time alert to the System Administrator (SA) and Information
+    System Security Officer (ISSO), at a minimum, of all audit failure events requiring real-time alerts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-settings-failure-notify-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/grep "logger -s -p" /etc/security/audit_warn
+      object_title: audit_settings_failure_notify_recommended_object
+  states:
+    state-audit-settings-failure-notify-recommended-state:
+      state_title: audit_settings_failure_notify_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: .*
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-settings-failure-notify-recommended-test:
+      test_title: audit_settings_failure_notify_recommended_test
+      capability: independent.shellcommand
+      object: audit-settings-failure-notify-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-settings-failure-notify-recommended-state
+  evaluate:
+    test: test-audit-settings-failure-notify-recommended-test

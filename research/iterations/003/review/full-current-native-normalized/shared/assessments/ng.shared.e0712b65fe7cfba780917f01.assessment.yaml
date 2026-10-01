@@ -1,0 +1,91 @@
+assessment:
+  id: ng.shared.e0712b65fe7cfba780917f01
+  version: 1
+  assessment_title: AZLX-23-001010 - Amazon Linux 2023 must require reauthentication when using the "sudo" command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+timestamp_timeout\s*=\s*([-\d]+)\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+timestamp_timeout\s*=\s*([-\d]+)\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-defaults-timestamp-timeout-configured-0-in-etc-sudoers-or-etc:
+      test_title: Defaults timestamp_timeout is configured to 0 in /etc/sudoers or /etc/sudoers.d.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-defaults-timestamp-timeout-configured-0-in-etc-sudoers-or-etc

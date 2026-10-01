@@ -1,0 +1,217 @@
+assessment:
+  id: ng.shared.9796fc3def6a9466ccab9bc0
+  version: 1
+  assessment_title: The system must prevent the use of dictionary words for passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-default-passwd-file-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*DICTIONLIST=(\S*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The (/etc/default/passwd) file.
+    etc-default-passwd-file-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*DICTIONDBDIR=(\S*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The (/etc/default/passwd) file.
+    dictionlist-s-listed-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/share/lib/dict
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: words
+      object_title: DICTIONLIST's listed file.
+    does-pw-dict-hwm-exist-in-path-specified-by-dictondbdir-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/passwd
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pw_dict.hwm
+      object_title: Does pw_dict.hwm exist in the path specified by DICTONDBDIR.
+    does-pw-dict-pwd-exist-in-path-specified-by-dictondbdir-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/passwd
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pw_dict.pwd
+      object_title: Does pw_dict.pwd exist in the path specified by DICTONDBDIR.
+    does-pw-dict-pwi-exist-in-path-specified-by-dictondbdir-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/passwd
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pw_dict.pwi
+      object_title: Does pw_dict.pwi exist in the path specified by DICTONDBDIR.
+    does-authtok-check-lock-exist-in-path-specified-by-dictondbdir-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/passwd
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: authtok_check.lock
+      object_title: Does authtok_check.lock exist in the path specified by DICTONDBDIR.
+  states:
+    state-the-usr-share-lib-dict-words-filepath:
+      state_title: The (/usr/share/lib/dict/words) filepath.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /usr/share/lib/dict/words
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-the-var-passwd-filepath:
+      state_title: The (/var/passwd) filepath.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /var/passwd
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-check-usr-share-lib-dict-words-is-not-empty:
+      state_title: Check /usr/share/lib/dict/words is not empty.
+      capability: unix.file
+      state:
+        field: size
+        value: '0'
+        operation: greater than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-in-etc-default-passwd-that-dictionlist-set-usr-share:
+      test_title: Check in /etc/default/passwd that DICTIONLIST is set to /usr/share/lib/dict/words.
+      capability: independent.textfilecontent54
+      object: etc-default-passwd-file-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-the-usr-share-lib-dict-words-filepath
+    test-check-in-etc-default-passwd-that-dictiondbdir-set-var-passwd:
+      test_title: Check in /etc/default/passwd that DICTIONDBDIR is set to /var/passwd.
+      capability: independent.textfilecontent54
+      object: etc-default-passwd-file-object-2
+      check_existence: all_exist
+      check: all
+      states:
+      - state-the-var-passwd-filepath
+    test-check-make-sure-that-usr-share-lib-dict-words-exists:
+      test_title: Check to make sure that /usr/share/lib/dict/words exists and is not empty.
+      capability: unix.file
+      object: dictionlist-s-listed-file-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-usr-share-lib-dict-words-is-not-empty
+    test-check-make-sure-that-pw-dict-hwm-exists-in-path:
+      test_title: Check to make sure that pw_dict.hwm exists in the path specified by DICTONDBDIR and is not empty.
+      capability: unix.file
+      object: does-pw-dict-hwm-exist-in-path-specified-by-dictondbdir-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-usr-share-lib-dict-words-is-not-empty
+    test-check-make-sure-that-pw-dict-pwd-exists-in-path:
+      test_title: Check to make sure that pw_dict.pwd exists in the path specified by DICTONDBDIR and is not empty.
+      capability: unix.file
+      object: does-pw-dict-pwd-exist-in-path-specified-by-dictondbdir-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-usr-share-lib-dict-words-is-not-empty
+    test-check-make-sure-that-pw-dict-pwi-exists-in-path:
+      test_title: Check to make sure that pw_dict.pwi exists in the path specified by DICTONDBDIR and is not empty.
+      capability: unix.file
+      object: does-pw-dict-pwi-exist-in-path-specified-by-dictondbdir-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-usr-share-lib-dict-words-is-not-empty
+    test-check-make-sure-that-authtok-check-lock-exists-in-path:
+      test_title: Check to make sure that authtok_check.lock exists in the path specified by DICTONDBDIR.
+      capability: unix.file
+      object: does-authtok-check-lock-exist-in-path-specified-by-dictondbdir-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-check-in-etc-default-passwd-that-dictionlist-set-usr-share
+    - test: test-check-in-etc-default-passwd-that-dictiondbdir-set-var-passwd
+    - test: test-check-make-sure-that-usr-share-lib-dict-words-exists
+    - test: test-check-make-sure-that-pw-dict-hwm-exists-in-path
+    - test: test-check-make-sure-that-pw-dict-pwd-exists-in-path
+    - test: test-check-make-sure-that-pw-dict-pwi-exists-in-path
+    - test: test-check-make-sure-that-authtok-check-lock-exists-in-path

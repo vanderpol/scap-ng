@@ -1,0 +1,30 @@
+assessment:
+  id: ng.shared.f553ce0dc7bae696dcc13ba2
+  version: 1
+  assessment_title: Ensure /var Located On Separate Partition
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var
+      object_title: null
+  states: {}
+  tests:
+    test-var-on-own-partition:
+      test_title: /var on own partition
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-var-on-own-partition

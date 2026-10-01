@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.66f71a4689d5a414bb094e82
+  version: 1
+  assessment_title: SMB Client Packet Signing (if server agrees)
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\LanmanWorkstation\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EnableSecuritySignature
+      object_title: null
+  variables:
+    microsoft-network-client-digitally-sign-communications-if-server-agrees-variable:
+      title: 'Microsoft network client: Digitally sign communications (if server agrees)'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: digitally_sign_communications_client_server_agrees_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: microsoft-network-client-digitally-sign-communications-if-server-agrees-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-microsoft-network-client-digitally-sign-communications-if-server-agrees-set:
+      test_title: '''Microsoft network client: Digitally sign communications (if server agrees)'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-microsoft-network-client-digitally-sign-communications-if-server-agrees-set

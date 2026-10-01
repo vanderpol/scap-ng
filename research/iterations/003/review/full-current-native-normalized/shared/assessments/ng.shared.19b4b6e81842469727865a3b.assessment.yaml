@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.19b4b6e81842469727865a3b
+  version: 1
+  assessment_title: Windows Peer to Peer Networking
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\policies\Microsoft\Peernet
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Disabled
+      object_title: null
+  variables:
+    turn-off-microsoft-peer-peer-networking-services-variable:
+      title: Turn Off Microsoft Peer-to-Peer Networking Services
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: turn_off_microsoft_peer_to_peer_networking_services_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: turn-off-microsoft-peer-peer-networking-services-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-turn-off-microsoft-peer-peer-networking-services-set-enabled:
+      test_title: '''Turn Off Microsoft Peer-to-Peer Networking Services'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-turn-off-microsoft-peer-peer-networking-services-set-enabled

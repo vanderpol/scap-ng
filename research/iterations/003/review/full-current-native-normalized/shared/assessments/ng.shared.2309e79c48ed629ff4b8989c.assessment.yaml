@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.2309e79c48ed629ff4b8989c
+  version: 1
+  assessment_title: OL09-00-003051 - OL 9 system accounts must not have an interactive login shell.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-password-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+      object_title: null
+    only-system-accounts-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: unix-password-object
+        filters:
+        - action: exclude
+          state: state-unix-password-2
+        - action: exclude
+          state: state-unix-password-3
+      object_title: only system accounts
+  states:
+    state-unix-password:
+      state_title: null
+      capability: unix.password
+      state:
+        field: login_shell
+        value: /sbin/nologin|/usr/sbin/nologin
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-password-2:
+      state_title: null
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-password-3:
+      state_title: null
+      capability: unix.password
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-accounts-in-etc-passwd-use-sbin-nologin:
+      test_title: The system accounts in /etc/passwd use /sbin/nologin.
+      capability: unix.password
+      object: only-system-accounts-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-password
+  evaluate:
+    test: test-system-accounts-in-etc-passwd-use-sbin-nologin

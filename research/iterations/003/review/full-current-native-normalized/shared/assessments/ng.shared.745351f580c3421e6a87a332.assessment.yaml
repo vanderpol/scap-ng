@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.745351f580c3421e6a87a332
+  version: 1
+  assessment_title: UBTU-22-654070 - Ubuntu 22.04 LTS must generate audit records for successful/unsuccessful uses of the
+    newgrp command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/bin/newgrp\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)\S+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-invocations-usr-bin-newgrp:
+      test_title: Audit invocations of /usr/bin/newgrp
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-invocations-usr-bin-newgrp

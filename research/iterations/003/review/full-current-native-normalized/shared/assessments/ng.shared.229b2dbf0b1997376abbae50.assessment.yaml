@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.229b2dbf0b1997376abbae50
+  version: 1
+  assessment_title: Direct root account login must not be permitted for SSH access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    permitrootlogin-set-in-etc-ssh-sshd-config-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[Pp][Ee][Rr][Mm][Ii][Tt][Rr][Oo][Oo][Tt][Ll][Oo][Gg][Ii][Nn]\s+(\S+)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: PermitRootLogin is set in /etc/ssh/sshd_config.
+  states:
+    state-permitrootlogin-is-set-to-no:
+      state_title: PermitRootLogin is set to no
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'no'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-permitrootlogin-set-no-in-etc-ssh-sshd-config:
+      test_title: PermitRootLogin is set to no in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      object: permitrootlogin-set-in-etc-ssh-sshd-config-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-permitrootlogin-is-set-to-no
+  evaluate:
+    test: test-permitrootlogin-set-no-in-etc-ssh-sshd-config

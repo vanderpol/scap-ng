@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.d96eac76fde34086bea895e7
+  version: 1
+  assessment_title: OL08-00-010830 - OL 8 must not allow users to override SSH environment variables.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(no|"no")$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-permituserenvironment-option-not-set-yes-in-etc-ssh-sshd-config:
+      test_title: The PermitUserEnvironment option is not set to yes in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-permituserenvironment-option-not-set-yes-in-etc-ssh-sshd-config

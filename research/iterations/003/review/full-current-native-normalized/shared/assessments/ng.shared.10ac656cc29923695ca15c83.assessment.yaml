@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.10ac656cc29923695ca15c83
+  version: 1
+  assessment_title: The macOS system must enforce on device dictation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-on-device-dictation-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''forceOnDeviceOnlyDictation'').js
+
+            EOS'
+      object_title: os_on_device_dictation_enforce_recommended_object
+  states:
+    state-os-on-device-dictation-enforce-recommended-state:
+      state_title: os_on_device_dictation_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-on-device-dictation-enforce-recommended-test:
+      test_title: os_on_device_dictation_enforce_recommended_test
+      capability: independent.shellcommand
+      object: os-on-device-dictation-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-on-device-dictation-enforce-recommended-state
+  evaluate:
+    test: test-os-on-device-dictation-enforce-recommended-test

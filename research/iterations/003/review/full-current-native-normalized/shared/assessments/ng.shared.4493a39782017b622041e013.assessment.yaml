@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.4493a39782017b622041e013
+  version: 1
+  assessment_title: The macOS system must disable sending audio recordings and transcripts to Apple.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-improve-assistive-voice-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.Accessibility'')\
+
+            .objectForKey(''AXSAudioDonationSiriImprovementEnabled'').js
+
+            EOS'
+      object_title: system_settings_improve_assistive_voice_disable_recommended_object
+  states:
+    state-system-settings-improve-assistive-voice-disable-recommen:
+      state_title: system_settings_improve_assistive_voice_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-improve-assistive-voice-disable-recommended-test:
+      test_title: system_settings_improve_assistive_voice_disable_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-improve-assistive-voice-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-improve-assistive-voice-disable-recommen
+  evaluate:
+    test: test-system-settings-improve-assistive-voice-disable-recommended-test

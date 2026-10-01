@@ -1,0 +1,137 @@
+assessment:
+  id: ng.shared.f227193656d368d091fae209
+  version: 1
+  assessment_title: The Cisco router must be configured to authenticate Network Time Protocol (NTP) sources using authentication
+    that is cryptographically based.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-line-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+      object_title: null
+  states:
+    state-check-for-ntp-authentication-key-1-hmac-sha2-256:
+      state_title: Check for ntp authentication-key 1 hmac-sha2-256
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: \nntp authentication-key 1 hmac-sha2-256 .+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-check-for-ntp-authenticate:
+      state_title: Check for ntp authenticate
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: \nntp authenticate
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-check-for-ntp-trusted-key:
+      state_title: Check for ntp trusted-key
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: '\nntp trusted-key '
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-check-for-ntp-server-x-x-x-x-key:
+      state_title: Check for ntp server x.x.x.x key
+      capability: iosxe.line
+      state:
+        all:
+        - field: show_subcommand
+          value: show running-config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: config_line
+          value: '\nntp server .+ key '
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-check-ntp-authentication-key:
+      test_title: Check for ntp authentication-key
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-check-for-ntp-authentication-key-1-hmac-sha2-256
+    test-check-ntp-authenticate:
+      test_title: Check for ntp authenticate
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-check-for-ntp-authenticate
+    test-check-ntp-trusted-key:
+      test_title: Check for ntp trusted-key
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-check-for-ntp-trusted-key
+    test-check-ntp-server-x-x-x-x-key:
+      test_title: Check for ntp server x.x.x.x key
+      capability: iosxe.line
+      object: iosxe-line-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-check-for-ntp-server-x-x-x-x-key
+  evaluate:
+    all:
+    - test: test-check-ntp-authentication-key
+    - test: test-check-ntp-authenticate
+    - test: test-check-ntp-trusted-key
+    - test: test-check-ntp-server-x-x-x-x-key

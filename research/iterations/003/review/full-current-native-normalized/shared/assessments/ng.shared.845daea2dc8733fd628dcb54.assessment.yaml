@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.845daea2dc8733fd628dcb54
+  version: 1
+  assessment_title: The macOS system must disable iPhone Mirroring.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-iphone-mirroring-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowiPhoneMirroring'').js
+
+            EOS'
+      object_title: os_iphone_mirroring_disable_recommended_object
+  states:
+    state-os-iphone-mirroring-disable-recommended-state:
+      state_title: os_iphone_mirroring_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-iphone-mirroring-disable-recommended-test:
+      test_title: os_iphone_mirroring_disable_recommended_test
+      capability: independent.shellcommand
+      object: os-iphone-mirroring-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-iphone-mirroring-disable-recommended-state
+  evaluate:
+    test: test-os-iphone-mirroring-disable-recommended-test

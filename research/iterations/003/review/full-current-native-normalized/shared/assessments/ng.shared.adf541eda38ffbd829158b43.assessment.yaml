@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.adf541eda38ffbd829158b43
+  version: 1
+  assessment_title: AZLX-23-000225 - Amazon Linux 2023 must implement address space layout randomization (ASLR) to protect
+    its memory from unauthorized code execution.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: kernel.randomize_va_space
+      object_title: null
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '2'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-kernel-randomize-va-space-setting-in-kernel-set-2:
+      test_title: kernel.randomize_va_space setting in kernel is set to 2
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
+  evaluate:
+    test: test-kernel-randomize-va-space-setting-in-kernel-set-2

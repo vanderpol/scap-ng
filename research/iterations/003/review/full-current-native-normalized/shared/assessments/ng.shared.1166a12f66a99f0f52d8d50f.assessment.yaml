@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.1166a12f66a99f0f52d8d50f
+  version: 1
+  assessment_title: Disable Automatic Logon
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AutoAdminLogon
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DefaultPassword
+      object_title: null
+  states:
+    state-reg-sz-type-and-value-equals-0:
+      state_title: Reg_Sz type and value equals 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-mss-autoadminlogon-enable-automatic-logon-not-recommended-set-disabled:
+      test_title: '''MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-sz-type-and-value-equals-0
+    test-automatic-logon-password-registry-value-defaultpassword-does-not-exist:
+      test_title: The automatic logon password registry value (DefaultPassword) does not exist
+      capability: windows.registry
+      object: windows-registry-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-mss-autoadminlogon-enable-automatic-logon-not-recommended-set-disabled
+    - test: test-automatic-logon-password-registry-value-defaultpassword-does-not-exist

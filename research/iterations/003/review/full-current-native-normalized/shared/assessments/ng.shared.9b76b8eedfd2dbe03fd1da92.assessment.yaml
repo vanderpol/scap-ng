@@ -1,0 +1,18 @@
+assessment:
+  id: ng.shared.9b76b8eedfd2dbe03fd1da92
+  version: 1
+  assessment_title: The system must implement TCP Wrappers.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'Determine if TCP Wrappers is configured. # inetadm -p | grep tcp_wrappers If the output of this command is "FALSE",
+    this is a finding. The above command will check whether TCP Wrappers is enabled for all TCP-based services started by
+    inetd. TCP Wrappers are enabled by default for sendmail and SunSSH (version 0.5.11). The use of OpenSSH access is controlled
+    by the sshd_config file starting with Solaris 11.3. SunSSH is removed starting with Solaris 11.4. Individual inetd services
+    may still be configured to use TCP Wrappers even if the global parameter (above) is set to "FALSE". To check the status
+    of individual inetd services, use the command: # for svc in `inetadm | awk ''/svc:\// { print $NF }''`; do val=`inetadm
+    -l ${svc} | grep -c tcp_wrappers=TRUE` if [ ${val} -eq 1 ]; then echo "TCP Wrappers enabled for ${svc}" fi done If the
+    required services are not configured to use TCP Wrappers, this is finding. # ls /etc/hosts.deny # ls /etc/hosts.allow
+    If these files are not found, this is a finding.'
+  inputs: {}
+  evidence: []

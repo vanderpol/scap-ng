@@ -1,0 +1,104 @@
+assessment:
+  id: ng.shared.1d6adf2d1983dc1078f0d7ab
+  version: 1
+  assessment_title: The root account must be the only account with GID of 0.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-users-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^-+].*$
+      object_title: All users
+    gid-0-not-root-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: all-users-object
+        filters:
+        - action: exclude
+          state: state-root-group-id
+      object_title: GID 0 and not root
+    gid-0-in-etc-group-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^:]+:[^:]*:0:(\S+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: GID 0 in /etc/group.
+  states:
+    state-the-root-account-must-be-the-only-account-with-gid-of-0:
+      state_title: The root account must be the only account with GID of 0.
+      capability: unix.password
+      state:
+        field: username
+        value: root
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-root-string:
+      state_title: root string.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: root
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-root-group-id:
+      state_title: Root group ID.
+      capability: unix.password
+      state:
+        field: group_id
+        value: '0'
+        operation: not equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-root-account-only-account-gid-0:
+      test_title: The root account must be the only account with GID of 0.
+      capability: unix.password
+      object: gid-0-not-root-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-the-root-account-must-be-the-only-account-with-gid-of-0
+    test-gid-0-only-assigned-root:
+      test_title: GID 0 must only be assigned to root.
+      capability: independent.textfilecontent54
+      object: gid-0-in-etc-group-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-root-string
+  evaluate:
+    all:
+    - test: test-root-account-only-account-gid-0
+    - test: test-gid-0-only-assigned-root

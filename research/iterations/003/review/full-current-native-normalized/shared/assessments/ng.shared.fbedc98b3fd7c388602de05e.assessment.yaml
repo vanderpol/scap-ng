@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.fbedc98b3fd7c388602de05e
+  version: 1
+  assessment_title: Audit - Security Group Management - Success
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-security-group-management-success-only:
+      state_title: Audit - Security Group Management - Success only
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_group_management
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-security-group-management-success-and-failure:
+      state_title: Audit - Security Group Management - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_group_management
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-security-group-management-success-only:
+      test_title: Audit - Security Group Management - Success only
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-security-group-management-success-only
+    test-audit-security-group-management-success-failure:
+      test_title: Audit - Security Group Management - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-security-group-management-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-security-group-management-success-only
+    - test: test-audit-security-group-management-success-failure

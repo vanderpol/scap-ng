@@ -1,0 +1,63 @@
+assessment:
+  id: ng.shared.b8ec92a97fa973c8fbfa18c8
+  version: 1
+  assessment_title: WN10-CC-000060 - Connections to non-domain networks when connected to a domain authenticated network must
+    be blocked.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fBlockNonDomain
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-prohibit-connection-non-domain-networks-when-connected-domain-authenticated-network:
+      test_title: '''Prohibit connection to non-domain networks when connected to domain authenticated network'' is set to
+        ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-prohibit-connection-non-domain-networks-when-connected-domain-authenticated-network

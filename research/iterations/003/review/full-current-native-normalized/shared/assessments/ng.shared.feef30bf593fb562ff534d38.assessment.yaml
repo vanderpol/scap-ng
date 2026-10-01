@@ -1,0 +1,131 @@
+assessment:
+  id: ng.shared.feef30bf593fb562ff534d38
+  version: 1
+  assessment_title: The Oracle Linux operating system must not send Internet Protocol version 4 (IPv4) Internet Control Message
+    Protocol (ICMP) redirects.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.conf.all.send_redirects
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?:^|\.*\n)\s*net\.ipv4\.conf\.all\.send_redirects\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: other-sysctl-configuration-file-locations-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?:^|\.*\n)\s*net\.ipv4\.conf\.all\.send_redirects\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object-2
+        - object: independent-textfilecontent54-object-3
+      object_title: null
+  variables:
+    other-sysctl-configuration-file-locations-variable:
+      title: other sysctl configuration file locations
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-kernel-runtime-parameter-net-ipv4-conf-all-send-redirects-set:
+      test_title: kernel runtime parameter net.ipv4.conf.all.send_redirects set to 0
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
+    test-net-ipv4-conf-all-send-redirects-setting-in-acceptable-directory:
+      test_title: net.ipv4.conf.all.send_redirects setting in acceptable directory is set to 0, and nothing else, and there
+        are no conflicting settings in other files
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-kernel-runtime-parameter-net-ipv4-conf-all-send-redirects-set
+    - test: test-net-ipv4-conf-all-send-redirects-setting-in-acceptable-directory

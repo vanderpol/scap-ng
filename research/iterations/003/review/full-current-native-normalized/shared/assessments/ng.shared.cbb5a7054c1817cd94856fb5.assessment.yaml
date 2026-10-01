@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.cbb5a7054c1817cd94856fb5
+  version: 1
+  assessment_title: UAC - Secure Desktop Mode
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: PromptOnSecureDesktop
+      object_title: null
+  variables:
+    switch-secure-desktop-when-prompting-elevation-variable:
+      title: Switch to the secure desktop when prompting for elevation
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: switch_secure_desktop_prompting_elevation_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: switch-secure-desktop-when-prompting-elevation-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-user-account-control-switch-secure-desktop-when-prompting-elevation-set:
+      test_title: '''User Account Control: Switch to the secure desktop when prompting for elevation'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-user-account-control-switch-secure-desktop-when-prompting-elevation-set

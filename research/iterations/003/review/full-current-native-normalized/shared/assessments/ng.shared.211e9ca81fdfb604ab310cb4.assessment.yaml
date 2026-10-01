@@ -1,0 +1,250 @@
+assessment:
+  id: ng.shared.211e9ca81fdfb604ab310cb4
+  version: 1
+  assessment_title: The operating system must reveal error messages only to authorized personnel.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    var-adm-messages-file-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/adm/messages
+      object_title: The /var/adm/messages file.
+    var-adm-folder-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/adm
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: The /var/adm folder.
+  states:
+    state-root-ownership-and-group-file-permissions-of-640:
+      state_title: 'Root ownership and group: file permissions of 640.'
+      capability: unix.file
+      state:
+        all:
+        - field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uread
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uwrite
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gread
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-root-ownership-and-system-group-file-permissions-of-750:
+      state_title: 'Root ownership and System group: file permissions of 750.'
+      capability: unix.file
+      state:
+        all:
+        - field: group_id
+          value: '3'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uread
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uwrite
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uexec
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gread
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-var-adm-messages-file-owned-by-root-root-group-also:
+      test_title: The /var/adm/messages file must be owned by Root and of the Root group. Also, the file permissions must
+        be 640.
+      capability: unix.file
+      object: var-adm-messages-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-root-ownership-and-group-file-permissions-of-640
+    test-var-adm-folder-owned-by-root-system-group-also-file:
+      test_title: The /var/adm folder must be owned by Root and of the System group. Also, the file permissions must be 750.
+      capability: unix.file
+      object: var-adm-folder-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-root-ownership-and-system-group-file-permissions-of-750
+  evaluate:
+    all:
+    - test: test-var-adm-messages-file-owned-by-root-root-group-also
+    - test: test-var-adm-folder-owned-by-root-system-group-also-file

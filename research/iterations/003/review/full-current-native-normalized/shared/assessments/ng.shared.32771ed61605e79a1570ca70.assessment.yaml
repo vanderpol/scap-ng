@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.32771ed61605e79a1570ca70
+  version: 1
+  assessment_title: Groups assigned to users must exist in the /etc/group file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-users-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^-+].*$
+      object_title: All users
+    gids-listed-in-etc-group-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^:]+:[^:]*:(\d+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: GIDs listed in /etc/group.
+  variables:
+    gids-all-groups-variable:
+      title: GIDs of all groups.
+      kind: local
+      datatype: int
+      expression:
+        values:
+          object: gids-listed-in-etc-group-object
+          field: subexpression
+  states:
+    state-checking-to-see-if-the-group-exists:
+      state_title: Checking to see if the group exists.
+      capability: unix.password
+      state:
+        field: group_id
+        value:
+          variable: gids-all-groups-variable
+        operation: equals
+        datatype: int
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-groups-listed-in-etc-passwd-file-exist:
+      test_title: Groups listed in the /etc/passwd file must exist.
+      capability: unix.password
+      object: all-users-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-checking-to-see-if-the-group-exists
+  evaluate:
+    test: test-groups-listed-in-etc-passwd-file-exist

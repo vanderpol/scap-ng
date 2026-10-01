@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.d95e07ac5569d2708a276bc3
+  version: 1
+  assessment_title: SQL Server execute permissions to access the registry must be revoked, unless specifically required and
+    approved.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT OBJECT_NAME(major_id) AS [Stored Procedure]\n,dpr.NAME AS [Principal]\nFROM sys.database_permissions\
+            \ AS dp\nINNER JOIN sys.database_principals AS dpr ON dp.grantee_principal_id = dpr.principal_id\nWHERE major_id\
+            \ IN (\n OBJECT_ID('xp_regaddmultistring')\n,OBJECT_ID('xp_regdeletekey')\n,OBJECT_ID('xp_regdeletevalue')\n,OBJECT_ID('xp_regenumvalues')\n\
+            ,OBJECT_ID('xp_regenumkeys')\n,OBJECT_ID('xp_regremovemultistring')\n,OBJECT_ID('xp_regwrite')\n,OBJECT_ID('xp_instance_regaddmultistring')\n\
+            ,OBJECT_ID('xp_instance_regdeletekey')\n,OBJECT_ID('xp_instance_regdeletevalue')\n,OBJECT_ID('xp_instance_regenumkeys')\n\
+            ,OBJECT_ID('xp_instance_regenumvalues')\n,OBJECT_ID('xp_instance_regremovemultistring')\n,OBJECT_ID('xp_instance_regwrite')\n\
+            )\nAND dp.[type] = 'EX'\nORDER BY dpr.NAME;"
+      behaviors:
+        context: instance
+      object_title: null
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+  states: {}
+  tests:
+    test-registry-extended-stored-procedures-have-been-revoked-from-all-users:
+      test_title: Registry extended stored procedures have been revoked from all users
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-registry-extended-stored-procedures-have-been-revoked-from-all-users

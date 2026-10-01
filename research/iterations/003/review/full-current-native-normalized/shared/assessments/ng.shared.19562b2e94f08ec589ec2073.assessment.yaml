@@ -1,0 +1,103 @@
+assessment:
+  id: ng.shared.19562b2e94f08ec589ec2073
+  version: 1
+  assessment_title: WN10-00-000165 - The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
+      object_title: null
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SMB1
+      object_title: null
+  states:
+    state-check-smb-v1-protocol-win32-optionalfeature-object-insta:
+      state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: at least one
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-smb-1-0-cifs-file-sharing-support-feature-not-installed:
+      test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-smb-v1-protocol-win32-optionalfeature-object-insta
+    test-configure-smbv1-server-set-disabled:
+      test_title: '''Configure SMBv1 Server'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    any:
+    - test: test-smb-1-0-cifs-file-sharing-support-feature-not-installed
+    - test: test-configure-smbv1-server-set-disabled

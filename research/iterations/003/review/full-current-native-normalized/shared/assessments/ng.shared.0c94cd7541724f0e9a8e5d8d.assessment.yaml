@@ -1,0 +1,84 @@
+assessment:
+  id: ng.shared.0c94cd7541724f0e9a8e5d8d
+  version: 1
+  assessment_title: Zone information must be preserved when saving attachments.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-explorer-nopreviewpane-setting-object:
+      capability: windows.ntuser
+      select:
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SaveZoneInformation
+      filters:
+      - action: exclude
+        state: state-exclude-disabled-accounts
+      - action: exclude
+        state: state-this-state-filters-out-all-items-where-the-type-and-valu
+      object_title: Windows Explorer NoPreviewPane Setting
+  variables:
+    empty-value-variable:
+      title: Empty value
+      kind: constant
+      datatype: string
+      expression:
+        literal: ''
+  states:
+    state-value-equals-2:
+      state_title: Value equals 2
+      capability: windows.ntuser
+      state:
+        field: value
+        value: '2'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-exclude-disabled-accounts:
+      state_title: Exclude Disabled Accounts
+      capability: windows.ntuser
+      state:
+        field: enabled
+        value: 'false'
+        operation: equals
+        datatype: boolean
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-this-state-filters-out-all-items-where-the-type-and-valu:
+      state_title: This state filters out all items where the type and value were not collected
+      capability: windows.ntuser
+      state:
+        field: type
+        value:
+          variable: empty-value-variable
+        operation: equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-zone-information-preserved-when-saving-attachments:
+      test_title: Zone information must be preserved when saving attachments.
+      capability: windows.ntuser
+      object: windows-explorer-nopreviewpane-setting-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-value-equals-2
+  evaluate:
+    test: test-zone-information-preserved-when-saving-attachments

@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.a9c00fa714842869fc23bbfd
+  version: 1
+  assessment_title: WN10-00-000032 - Windows 10 systems must use a BitLocker PIN with a minimum length of six digits for pre-boot
+    authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-bitlocker-minimumpin-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\FVE
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: MinimumPIN
+      object_title: Check for BitLocker MinimumPIN
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '6'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-bitlocker-6-digits-or-more:
+      test_title: BitLocker must be 6 digits or more.
+      capability: windows.registry
+      object: check-bitlocker-minimumpin-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-bitlocker-6-digits-or-more

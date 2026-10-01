@@ -1,0 +1,71 @@
+assessment:
+  id: ng.shared.bc562bcced1c3704b5ad5396
+  version: 1
+  assessment_title: SQL Server Service Broker endpoint must utilize AES encryption.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT name, type_desc, encryption_algorithm_desc\nFROM sys.service_broker_endpoints\nWHERE encryption_algorithm\
+            \ != 2\n\t\t\t\t"
+      behaviors:
+        context: instance
+      object_title: null
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+  states: {}
+  tests:
+    test-if-any-records-returned-this-finding:
+      test_title: If any records are returned, this is a finding.
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-if-any-records-returned-this-finding

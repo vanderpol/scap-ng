@@ -1,0 +1,19 @@
+assessment:
+  id: ng.shared.ebbf72bab64829cf4375c489
+  version: 1
+  assessment_title: The macOS system must require an administrator password to modify systemwide preferences.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'Verify the macOS system is configured to require administrator privileges to modify systemwide settings with
+    the following command: authDBs=("system.preferences" "system.preferences.energysaver" "system.preferences.network" "system.preferences.printing"
+    "system.preferences.sharing" "system.preferences.softwareupdate" "system.preferences.startupdisk" "system.preferences.timemachine")
+    result="1" for section in ${authDBs[@]}; do if [[ $(/usr/bin/security -q authorizationdb read "$section" | /usr/bin/xmllint
+    -xpath ''name(//*[contains(text(), "shared")]/following-sibling::*[1])'' -) != "false" ]]; then result="0" fi if [[ $(security
+    -q authorizationdb read "$section" | /usr/bin/xmllint -xpath ''//*[contains(text(), "group")]/following-sibling::*[1]/text()''
+    - ) != "admin" ]]; then result="0" fi if [[ $(/usr/bin/security -q authorizationdb read "$section" | /usr/bin/xmllint
+    -xpath ''name(//*[contains(text(), "authenticate-user")]/following-sibling::*[1])'' -) != "true" ]]; then result="0" fi
+    if [[ $(/usr/bin/security -q authorizationdb read "$section" | /usr/bin/xmllint -xpath ''name(//*[contains(text(), "session-owner")]/following-sibling::*[1])''
+    -) != "false" ]]; then result="0" fi done echo $result If the result is not "1", this is a finding.'
+  inputs: {}
+  evidence: []

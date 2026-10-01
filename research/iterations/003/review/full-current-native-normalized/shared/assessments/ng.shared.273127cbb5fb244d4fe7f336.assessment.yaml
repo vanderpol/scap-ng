@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.273127cbb5fb244d4fe7f336
+  version: 1
+  assessment_title: AZLX-23-002460 - Amazon Linux 2023 must automatically lock the root account until the root account is
+    released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*even_deny_root\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-check-etc-security-faillock-conf-even-deny-root-setting:
+      test_title: check /etc/security/faillock.conf for the even_deny_root setting
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-check-etc-security-faillock-conf-even-deny-root-setting

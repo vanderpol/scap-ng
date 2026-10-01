@@ -1,0 +1,203 @@
+assessment:
+  id: ng.shared.424cbb40d60cfd4192a4a727
+  version: 1
+  assessment_title: The Ubuntu operating system must, for networked systems, compare internal information system clocks at
+    least every 24 hours with a server which is synchronized to one of the redundant United States Naval Observatory (USNO)
+    time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning
+    System (GPS).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-networked-systems-etc-crony-conf-configure-maxpoll-less-than-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/chrony.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*server\s+\S+\s+iburst\s+maxpoll\s+(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'false'
+        multiline: 'true'
+        singleline: 'false'
+      object_title: 'Linux must, for networked systems:  /etc/crony.conf  configure maxpoll less than  17.'
+    linux-networked-systems-etc-chrony-conf-authoratative-time-servers-configured-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/chrony.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*server\s+(\S+)\s+iburst\s+maxpoll\s+\d+
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'false'
+        multiline: 'true'
+        singleline: 'false'
+      object_title: 'Linux must, for networked systems: /etc/chrony.conf - Authoratative time servers must be configured:(
+        tick.usno.navy.mil or tock.usno.navy.mil or ntp2.usno.navy.mil) or a time server designated for the appropriate DOD
+        network (NIPRNet/SIPRNet),'
+    linux-networked-systems-etc-crony-sources-or-conf-configure-maxpoll-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/chrony
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.(sources|conf)
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*server\s+\S+\s+iburst\s+maxpoll\s+(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: 'Linux must, for networked systems: /etc/crony/*(.sources or .conf) configure maxpoll less than 17.'
+    linux-networked-systems-etc-chrony-sources-or-conf-authoratative-time-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/chrony
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.(sources|conf)
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*server\s+(\S+)\s+iburst\s+maxpoll\s+\d+
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: 'Linux must, for networked systems: /etc/chrony/*(.sources or .conf) - Authoratative time servers must
+        be configured:( tick.usno.navy.mil or tock.usno.navy.mil or ntp2.usno.navy.mil) or a time server designated for the
+        appropriate DOD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS).'
+  states:
+    state-maxburst-less-than-17:
+      state_title: maxburst less than  17.
+      capability: independent.textfilecontent54
+      state:
+        all:
+        - field: instance
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: subexpression
+          value: '17'
+          operation: less than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-linux-must-for-networked-systems-compare-internal-inform:
+      state_title: Linux must, for networked systems, compare internal information system clocks  to United States Naval Observatory
+        (USNO) time servers, or a time server designated for the appropriate DOD network (NIPRNet/SIPRNet), and/or the Global
+        Positioning System (GPS). (Can only test USNO Sources.)
+      capability: independent.textfilecontent54
+      state:
+        all:
+        - field: instance
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: subexpression
+          value: (tick\.usno\.navy\.mil|tock\.usno\.navy\.mil|ntp2\.usno\.navy\.mil)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-linux-networked-systems-compare-internal-information-system-clocks-at-least:
+      test_title: Linux must, for networked systems, compare internal information system clocks at least every 24 hours. /etc/crony.conf  configure
+        maxpoll less than  17.
+      capability: independent.textfilecontent54
+      object: linux-networked-systems-etc-crony-conf-configure-maxpoll-less-than-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-maxburst-less-than-17
+    test-linux-networked-systems-compare-internal-information-system-clocks-at-least-2:
+      test_title: 'Linux must, for networked systems, compare internal information system clocks at least every 24 hours with
+        a server synchronized to one of the redundant United States Naval Observatory (USNO) time servers: /etc/chrony.conf
+        ( tick.usno.navy.mil or tock.usno.navy.mil or ntp2.usno.navy.mil), or a time server designated for the appropriate
+        DOD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS).(Only check for USNO.)'
+      capability: independent.textfilecontent54
+      object: linux-networked-systems-etc-chrony-conf-authoratative-time-servers-configured-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-must-for-networked-systems-compare-internal-inform
+    test-linux-networked-systems-compare-internal-information-system-clocks-at-least-3:
+      test_title: Linux must, for networked systems, compare internal information system clocks at least every 24 hours. /etc/crony/*(.sources
+        or .conf) configure maxpoll less than 17.
+      capability: independent.textfilecontent54
+      object: linux-networked-systems-etc-crony-sources-or-conf-configure-maxpoll-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-maxburst-less-than-17
+    test-linux-networked-systems-compare-internal-information-system-clocks-at-least-4:
+      test_title: 'Linux must, for networked systems, compare internal information system clocks at least every 24 hours with
+        a server synchronized to one of the redundant United States Naval Observatory (USNO) time servers: /etc/chrony/*(.sources
+        or .conf) Authoratative time servers must be configured:( tick.usno.navy.mil or tock.usno.navy.mil or ntp2.usno.navy.mil),
+        or a time server designated for the appropriate DOD network (NIPRNet/SIPRNet), and/or the Global Positioning System
+        (GPS).(Only check for USNO.)'
+      capability: independent.textfilecontent54
+      object: linux-networked-systems-etc-chrony-sources-or-conf-authoratative-time-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-must-for-networked-systems-compare-internal-inform
+  evaluate:
+    any:
+    - all:
+      - test: test-linux-networked-systems-compare-internal-information-system-clocks-at-least
+      - test: test-linux-networked-systems-compare-internal-information-system-clocks-at-least-2
+    - all:
+      - test: test-linux-networked-systems-compare-internal-information-system-clocks-at-least-3
+      - test: test-linux-networked-systems-compare-internal-information-system-clocks-at-least-4

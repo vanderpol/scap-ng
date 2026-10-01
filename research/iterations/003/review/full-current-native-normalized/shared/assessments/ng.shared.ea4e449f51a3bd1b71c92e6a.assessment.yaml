@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.ea4e449f51a3bd1b71c92e6a
+  version: 1
+  assessment_title: The macOS system must require a minimum password length of 14 characters.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pwpolicy-minimum-length-enforce-stig-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/pwpolicy -getaccountpolicies | /usr/bin/tail +2 | /usr/bin/xmllint --xpath 'boolean(//*[contains(text(),"policyAttributePassword
+            matches '\''.{14,}'\''")])' -
+      object_title: pwpolicy_minimum_length_enforce_stig_object
+  states:
+    state-pwpolicy-minimum-length-enforce-stig-state:
+      state_title: pwpolicy_minimum_length_enforce_stig_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pwpolicy-minimum-length-enforce-stig-test:
+      test_title: pwpolicy_minimum_length_enforce_stig_test
+      capability: independent.shellcommand
+      object: pwpolicy-minimum-length-enforce-stig-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-pwpolicy-minimum-length-enforce-stig-state
+  evaluate:
+    test: test-pwpolicy-minimum-length-enforce-stig-test

@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.cc09e3f7a6bc807726ed90bc
+  version: 1
+  assessment_title: The /etc/zones directory, and its contents, must have the vendor default owner, group, and permissions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pkg-verify-system-zones-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg verify system/zones
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!.*Planning:).*
+      object_title: pkg verify system/zones
+  states:
+    state-no-stdout-line-should-exist:
+      state_title: No stdout_line should exist
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  tests:
+    test-etc-zones-directory-its-contents-have-vendor-default-owner-group:
+      test_title: The /etc/zones directory, and its contents, must have the vendor default owner, group, and permissions.
+      capability: independent.shellcommand
+      object: pkg-verify-system-zones-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-stdout-line-should-exist
+  evaluate:
+    test: test-etc-zones-directory-its-contents-have-vendor-default-owner-group

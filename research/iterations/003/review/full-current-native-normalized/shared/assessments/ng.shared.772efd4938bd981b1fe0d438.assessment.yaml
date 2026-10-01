@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.772efd4938bd981b1fe0d438
+  version: 1
+  assessment_title: The system must notify the user when a Bluetooth device attempts to connect.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-object:
+      capability: windows.ntuser
+      select:
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\BluetoothAuthenticationAgent
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AcceptIncomingRequests
+      object_title: Retrieve AcceptIncomingRequests from BluetoothAuthenticationAgent
+  states:
+    state-value-equal-to-1:
+      state_title: Value equal to 1
+      capability: windows.ntuser
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-notify-user-when-bluetooth-device-attempts-connect:
+      test_title: The system must notify the user when a Bluetooth device attempts to connect.
+      capability: windows.ntuser
+      object: retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-value-equal-to-1
+  evaluate:
+    test: test-system-notify-user-when-bluetooth-device-attempts-connect

@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.d45803b9f4e7f3a713712432
+  version: 1
+  assessment_title: The system must be configured to store any process core dumps in a specific, centralized directory.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    coreadm-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: coreadm
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: 'global core file pattern: (.*)'
+      object_title: coreadm
+  states:
+    state-check-that-the-output-starts-with-with-an-exit-status-of:
+      state_title: Check that the output starts with /' with an exit status of 0
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: subexpression
+          value: ^\/.*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-system-configured-store-any-process-core-dumps-in-specific-centralized:
+      test_title: The system must be configured to store any process core dumps in a specific, centralized directory.
+      capability: independent.shellcommand
+      object: coreadm-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-the-output-starts-with-with-an-exit-status-of
+  evaluate:
+    test: test-system-configured-store-any-process-core-dumps-in-specific-centralized

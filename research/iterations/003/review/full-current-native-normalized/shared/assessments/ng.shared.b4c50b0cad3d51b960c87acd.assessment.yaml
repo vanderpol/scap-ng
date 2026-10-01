@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.b4c50b0cad3d51b960c87acd
+  version: 1
+  assessment_title: Encrypting and Signing of Secure Channel Traffic
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: RequireSignOrSeal
+      object_title: null
+  variables:
+    domain-member-digitally-encrypt-or-sign-secure-channel-data-always-variable:
+      title: 'Domain member: Digitally encrypt or sign secure channel data (always)'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: digitally_encrypt_or_sign_secure_channel_data_always_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: domain-member-digitally-encrypt-or-sign-secure-channel-data-always-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-domain-member-digitally-encrypt-or-sign-secure-channel-data-always:
+      test_title: '''Domain member: Digitally encrypt or sign secure channel data (always)'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-domain-member-digitally-encrypt-or-sign-secure-channel-data-always

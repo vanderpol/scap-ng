@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.69544a997c5f7d5f01adc5a6
+  version: 1
+  assessment_title: OL08-00-040230 - OL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast
+    address.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-sysctl-object:
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.icmp_echo_ignore_broadcasts
+      object_title: null
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-net-ipv4-icmp-echo-ignore-broadcasts-set-1-in-kernel:
+      test_title: net.ipv4.icmp_echo_ignore_broadcasts is set to 1 in kernel
+      capability: unix.sysctl
+      object: unix-sysctl-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-sysctl
+  evaluate:
+    test: test-net-ipv4-icmp-echo-ignore-broadcasts-set-1-in-kernel

@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.26ff3e8b0fe02fba61d50230
+  version: 1
+  assessment_title: WN12-SO-000064
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SupportedEncryptionTypes
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-equals-2147483640:
+      state_title: Reg_Dword type and value equals 2147483640
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2147483640'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-security-configure-encryption-types-allowed-kerberos-set-enabled-aes128:
+      test_title: '''Network Security: Configure encryption types allowed for Kerberos'' is set to ''Enabled'' with ''AES128_HMAC_SHA1'',
+        ''AES256_HMAC_SHA1'', ''Future encryption types'' selected'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-2147483640
+  evaluate:
+    test: test-network-security-configure-encryption-types-allowed-kerberos-set-enabled-aes128

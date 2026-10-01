@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.0416f7ff64fd7756de008fa0
+  version: 1
+  assessment_title: OL08-00-010570 - OL 8 must prevent files with the setuid and setgid bit set from being executed on file
+    systems that contain user home directories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-partition-object:
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\/home
+      object_title: null
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: nosuid
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+  tests:
+    test-home-mounted-nosuid-option:
+      test_title: /home is mounted with the nosuid option.
+      capability: linux.partition
+      object: linux-partition-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-partition
+  evaluate:
+    test: test-home-mounted-nosuid-option

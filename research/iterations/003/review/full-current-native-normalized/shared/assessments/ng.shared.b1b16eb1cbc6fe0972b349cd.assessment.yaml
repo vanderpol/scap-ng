@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.b1b16eb1cbc6fe0972b349cd
+  version: 1
+  assessment_title: The default umask for FTP users must be 077.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    smf-listing-ftp-service-object:
+      capability: solaris.smf
+      select:
+        fmri:
+          operation: equals
+          datatype: string
+          mask: false
+          value: svc://localhost/network/ftp:default
+      object_title: SMF listing of FTP service.
+    umask-id-string-in-etc-proftpd-conf-file-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/proftpd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Umask\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Umask ID string in The (/etc/proftpd.conf) file.
+  states:
+    state-077-state-for-umask:
+      state_title: 077 state for umask.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '077'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-see-if-ftp-service-listed-under-smf:
+      test_title: Check to see if the FTP service is listed under the SMF.
+      capability: solaris.smf
+      object: smf-listing-ftp-service-object
+      check_existence: none_exist
+      check: all
+    test-ftp-umask-value-set-077:
+      test_title: FTP umask value must be set to 077.
+      capability: independent.textfilecontent54
+      object: umask-id-string-in-etc-proftpd-conf-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-077-state-for-umask
+  evaluate:
+    any:
+    - test: test-check-see-if-ftp-service-listed-under-smf
+    - test: test-ftp-umask-value-set-077

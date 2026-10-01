@@ -1,0 +1,74 @@
+assessment:
+  id: ng.shared.1552e0cba97108daad7f0006
+  version: 1
+  assessment_title: UBTU-22-653050 - Ubuntu 22.04 LTS must be configured to permit only authorized users ownership of the
+    audit log files.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*log_file\s*=\s*(\S+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    audit-log-file-location-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: audit-data-directory-from-etc-audit-auditd-conf-variable
+      object_title: Audit log file location
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: independent-textfilecontent54-object
+          field: subexpression
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-logs-owned-by-root:
+      test_title: audit logs are owned by root
+      capability: unix.file
+      object: audit-log-file-location-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    test: test-audit-logs-owned-by-root

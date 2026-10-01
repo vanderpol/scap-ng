@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.7aa29d1308399fd81f72bc71
+  version: 1
+  assessment_title: AZLX-23-001080 - Amazon Linux 2023 must have the firewalld servicew active.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    firewalld-service-activestate-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: firewalld.service
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+      object_title: firewalld.service ActiveState
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-if-firewalld-in-active-state:
+      test_title: Check if firewalld is in 'active' state
+      capability: linux.systemdunitproperty
+      object: firewalld-service-activestate-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+  evaluate:
+    test: test-check-if-firewalld-in-active-state

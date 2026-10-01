@@ -1,0 +1,196 @@
+assessment:
+  id: ng.shared.6dce33e75eecea9c2bdf6c57
+  version: 1
+  assessment_title: WN11-UR-000085 - The "Deny log on locally" user right on workstations must be configured to prevent access
+    from highly privileged domain accounts on domain systems and unauthenticated access on all systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT DomainRole FROM win32_computersystem
+      object_title: null
+    windows-userright-object:
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_DENY_INTERACTIVE_LOGON_NAME
+      object_title: null
+  states:
+    state-domain-member-workstation:
+      state_title: Domain Member Workstation
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '1'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-domain-member-server:
+      state_title: Domain Member Server
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '3'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ^(?i)(.+\\)?Domain Admins$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-2:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: ^(?i)(.+\\)?Enterprise Admins$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-userright-3:
+      state_title: null
+      capability: windows.userright
+      state:
+        field: trustee_name
+        value: Guests
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-standalone-workstation:
+      state_title: Standalone Workstation
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '0'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-standalone-server:
+      state_title: Standalone Server
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '2'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-non-dc-domain-joined-windows-server-or-workstation:
+      test_title: The system is a non-DC domain-joined Windows server or workstation
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-domain-member-workstation
+      - state-domain-member-server
+    test-deny-log-on-locally-domain-admins:
+      test_title: Deny log on locally - Domain Admins
+      capability: windows.userright
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-windows-userright
+    test-deny-log-on-locally-enterprise-admins:
+      test_title: Deny log on locally - Enterprise Admins
+      capability: windows.userright
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-windows-userright-2
+    test-deny-log-on-locally-guests:
+      test_title: Deny log on locally - Guests
+      capability: windows.userright
+      object: windows-userright-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-windows-userright-3
+    test-system-standalone-windows-server-or-workstation:
+      test_title: The system is a standalone Windows server or workstation
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-standalone-workstation
+      - state-standalone-server
+  evaluate:
+    any:
+    - all:
+      - test: test-system-non-dc-domain-joined-windows-server-or-workstation
+      - test: test-deny-log-on-locally-domain-admins
+      - test: test-deny-log-on-locally-enterprise-admins
+      - test: test-deny-log-on-locally-guests
+    - all:
+      - test: test-system-standalone-windows-server-or-workstation
+      - test: test-deny-log-on-locally-guests

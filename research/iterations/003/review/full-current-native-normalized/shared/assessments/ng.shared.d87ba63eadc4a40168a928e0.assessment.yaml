@@ -1,0 +1,251 @@
+assessment:
+  id: ng.shared.d87ba63eadc4a40168a928e0
+  version: 1
+  assessment_title: WN12-00-000160
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    smb-v1-protocol-win32-optionalfeature-object-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
+      object_title: SMB v1 Protocol Win32_OptionalFeature object
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CurrentVersion
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SMB1
+      object_title: null
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\mrxsmb10
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Start
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\LanmanWorkstation
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DependOnService
+      object_title: null
+  states:
+    state-check-smb-v1-protocol-win32-optionalfeature-object-insta:
+      state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: installstate
+            value: '2'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: at least one
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-reg-sz-type-and-value-equals-6-3:
+      state_title: Reg_Sz type and value equals 6.3
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '6.3'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-equals-0:
+      state_title: REG_DWORD type and value equals 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-equals-4:
+      state_title: REG_DWORD type and value equals 4
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '4'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-multi-sz-type-and-value-does-not-equal-mrxsmb10:
+      state_title: REG_MULTI_SZ type and value does not equal 'MRxSmb10'
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_multi_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: ^[Mm][Rr][Xx][Ss][Mm][Bb]10$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: none satisfy
+          entity_existence: at_least_one_exists
+  tests:
+    test-smb-1-0-cifs-file-sharing-support-feature-not-installed:
+      test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+      capability: windows.wmi57
+      object: smb-v1-protocol-win32-optionalfeature-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-check-smb-v1-protocol-win32-optionalfeature-object-insta
+    test-system-running-windows-8-1-or-windows-server-2012-r2:
+      test_title: The system is running Windows 8.1 or Windows Server 2012 R2
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-sz-type-and-value-equals-6-3
+    test-configure-smbv1-server-set-disabled:
+      test_title: '''Configure SMBv1 Server'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-0
+    test-configure-smbv1-client-driver-set-enabled-disable-driver-recommended-selected:
+      test_title: '''Configure SMBv1 client driver'' is set to ''Enabled'' with ''Disable driver (recommended)'' selected
+        for ''Configure MrxSmb10 driver'''
+      capability: windows.registry
+      object: windows-registry-object-3
+      check_existence: all_exist
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-4
+    test-configure-smbv1-client-extra-setting-needed-pre-win8-1-2012r2:
+      test_title: '''Configure SMBv1 client (extra setting needed for pre-Win8.1/2012R2) is set to ''Enabled'' with ''MrxSmb10''
+        excluded from ''Configure LanmanWorkstation Dependencies:'''
+      capability: windows.registry
+      object: windows-registry-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-multi-sz-type-and-value-does-not-equal-mrxsmb10
+  evaluate:
+    any:
+    - all:
+      - test: test-smb-1-0-cifs-file-sharing-support-feature-not-installed
+      - test: test-system-running-windows-8-1-or-windows-server-2012-r2
+    - all:
+      - test: test-configure-smbv1-server-set-disabled
+      - all:
+        - test: test-configure-smbv1-client-driver-set-enabled-disable-driver-recommended-selected
+        - test: test-configure-smbv1-client-extra-setting-needed-pre-win8-1-2012r2
+    - not:
+        test: test-system-running-windows-8-1-or-windows-server-2012-r2

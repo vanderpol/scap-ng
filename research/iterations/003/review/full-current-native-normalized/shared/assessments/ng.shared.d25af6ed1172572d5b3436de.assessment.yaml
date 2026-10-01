@@ -1,0 +1,148 @@
+assessment:
+  id: ng.shared.d25af6ed1172572d5b3436de
+  version: 1
+  assessment_title: All run control scripts must have mode 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-rc-etc-init-d-directories-object-2:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: run-control-scripts-dir-paths-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      object_title: The /etc/rc* and /etc/init.d directories.
+    etc-rc-etc-init-d-directories-object:
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - object: etc-rc-etc-init-d-directories-object-2
+        filters:
+        - action: exclude
+          state: state-symbolic-link
+      object_title: The /etc/rc* and /etc/init.d directories.
+    lib-svc-method-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /lib/svc/method
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      object_title: The /lib/svc/method directory.
+    etc-rc-etc-init-d-directories-object-3:
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - object: lib-svc-method-directory-object
+        filters:
+        - action: exclude
+          state: state-symbolic-link
+      object_title: The /etc/rc* and /etc/init.d directories.
+  variables:
+    run-control-scripts-dir-paths-variable:
+      title: Run control scripts' dir paths.
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/init.d
+        - /etc/rc0.d
+        - /etc/rc1.d
+        - /etc/rc2.d
+        - /etc/rc3.d
+        - /etc/rcS.d
+        - /etc/rcm
+  states:
+    state-0755-permissions-or-less-permissive:
+      state_title: 0755 permissions or less permissive.
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-symbolic-link:
+      state_title: symbolic link
+      capability: unix.file
+      state:
+        field: type
+        value: symbolic link
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-files-under-etc-rc-etc-init-d-directories-have:
+      test_title: All files under /etc/rc* and /etc/init.d directories must have file permissions of 0755 or less.
+      capability: unix.file
+      object: etc-rc-etc-init-d-directories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-0755-permissions-or-less-permissive
+    test-all-files-under-lib-svc-method-directory-have-file-permissions:
+      test_title: All files under the /lib/svc/method directory must have file permissions of 0755 or less.
+      capability: unix.file
+      object: etc-rc-etc-init-d-directories-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-0755-permissions-or-less-permissive
+  evaluate:
+    all:
+    - test: test-all-files-under-etc-rc-etc-init-d-directories-have
+    - test: test-all-files-under-lib-svc-method-directory-have-file-permissions

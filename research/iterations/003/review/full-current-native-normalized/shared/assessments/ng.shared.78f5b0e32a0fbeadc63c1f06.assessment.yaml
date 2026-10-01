@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.78f5b0e32a0fbeadc63c1f06
+  version: 1
+  assessment_title: Kernel core dumps must be disabled unless needed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    dumpadm-show-savecore-enabled-line-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: dumpadm
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: Savecore enabled
+      object_title: dumpadm, show Savecore enabled line
+  states:
+    state-savecore-enabled-should-report-no:
+      state_title: Savecore enabled should report 'no'
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: 'no'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-kernel-core-dumps-disabled-unless-needed:
+      test_title: Kernel core dumps must be disabled unless needed.
+      capability: independent.shellcommand
+      object: dumpadm-show-savecore-enabled-line-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-savecore-enabled-should-report-no
+  evaluate:
+    test: test-kernel-core-dumps-disabled-unless-needed

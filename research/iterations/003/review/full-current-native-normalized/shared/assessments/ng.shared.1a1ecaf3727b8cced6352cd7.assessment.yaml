@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.1a1ecaf3727b8cced6352cd7
+  version: 1
+  assessment_title: The macOS system must enable macOS Application Firewall.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-firewall-enable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.security.firewall'')\
+
+            .objectForKey(''EnableFirewall'').js
+
+            EOS'
+      object_title: system_settings_firewall_enable_recommended_object
+  states:
+    state-system-settings-firewall-enable-recommended-state:
+      state_title: system_settings_firewall_enable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-firewall-enable-recommended-test:
+      test_title: system_settings_firewall_enable_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-firewall-enable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-firewall-enable-recommended-state
+  evaluate:
+    test: test-system-settings-firewall-enable-recommended-test

@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.05e4ce114cbe279c14b147cb
+  version: 1
+  assessment_title: UBTU-22-255045 - Ubuntu 22.04 LTS SSH daemon must prevent remote hosts from connecting to the proxy display.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    sshd-config-x11uselocalhost-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: sshd_config X11UseLocalhost
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    sshd-config-x11uselocalhost-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: sshd-config-x11uselocalhost-object-2
+        - object: independent-textfilecontent54-object
+      object_title: sshd_config X11UseLocalhost
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(yes|"yes")$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-sshd-config-x11uselocalhost-set-yes:
+      test_title: sshd_config X11UseLocalhost is set to yes.
+      capability: independent.textfilecontent54
+      object: sshd-config-x11uselocalhost-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-sshd-config-x11uselocalhost-set-yes

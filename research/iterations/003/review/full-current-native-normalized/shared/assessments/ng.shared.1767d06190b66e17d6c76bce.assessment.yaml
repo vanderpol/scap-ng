@@ -1,0 +1,114 @@
+assessment:
+  id: ng.shared.1767d06190b66e17d6c76bce
+  version: 1
+  assessment_title: The Windows dialog box title for the legal banner must be configured.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    legalnoticecaption-setting-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: LegalNoticeCaption
+      object_title: LegalNoticeCaption Setting
+  states:
+    state-logon-banner-dod-notice-and-consent-banner:
+      state_title: Logon Banner - DoD Notice and Consent Banner.
+      capability: windows.registry
+      state:
+        field: value
+        value: DoD Notice and Consent Banner
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-logon-banner-us-department-of-defense-warning-statement:
+      state_title: Logon Banner - US Department of Defense Warning Statement.
+      capability: windows.registry
+      state:
+        field: value
+        value: US Department of Defense Warning Statement
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-logon-banner-dow-notice-and-consent-banner:
+      state_title: Logon Banner - DoW Notice and Consent Banner.
+      capability: windows.registry
+      state:
+        field: value
+        value: DoW Notice and Consent Banner
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-logon-banner-us-department-of-war-warning-statement:
+      state_title: Logon Banner - US Department of War Warning Statement.
+      capability: windows.registry
+      state:
+        field: value
+        value: US Department of War Warning Statement
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-windows-dialog-box-title-legal-banner-configured-title-option-1:
+      test_title: The Windows dialog box title for the legal banner must be configured. Title Option 1
+      capability: windows.registry
+      object: legalnoticecaption-setting-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-logon-banner-dod-notice-and-consent-banner
+    test-windows-dialog-box-title-legal-banner-configured-title-option-2:
+      test_title: The Windows dialog box title for the legal banner must be configured. Title Option 2
+      capability: windows.registry
+      object: legalnoticecaption-setting-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-logon-banner-us-department-of-defense-warning-statement
+    test-windows-dialog-box-title-legal-banner-configured-title-option-3:
+      test_title: The Windows dialog box title for the legal banner must be configured. Title Option 3
+      capability: windows.registry
+      object: legalnoticecaption-setting-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-logon-banner-dow-notice-and-consent-banner
+    test-windows-dialog-box-title-legal-banner-configured-title-option-4:
+      test_title: The Windows dialog box title for the legal banner must be configured. Title Option 4
+      capability: windows.registry
+      object: legalnoticecaption-setting-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-logon-banner-us-department-of-war-warning-statement
+  evaluate:
+    any:
+    - test: test-windows-dialog-box-title-legal-banner-configured-title-option-1
+    - test: test-windows-dialog-box-title-legal-banner-configured-title-option-2
+    - test: test-windows-dialog-box-title-legal-banner-configured-title-option-3
+    - test: test-windows-dialog-box-title-legal-banner-configured-title-option-4

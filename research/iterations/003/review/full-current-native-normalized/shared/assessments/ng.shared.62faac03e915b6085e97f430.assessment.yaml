@@ -1,0 +1,162 @@
+assessment:
+  id: ng.shared.62faac03e915b6085e97f430
+  version: 1
+  assessment_title: SQL Server must be configured to generate audit records for DoD-defined auditable events within all DBMS/database
+    components.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT name AS 'audit_name', status_desc AS 'audit_status', audit_file_path AS 'current_audit_file' \nFROM\
+            \ sys.dm_server_audit_status \n"
+      behaviors:
+        context: instance
+      object_title: null
+    variable-object-containing-end-user-provided-action-names-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: end-user-provided-list-required-audit-events-variable
+      object_title: Variable object containing end user provided action_names.
+    independent-sqlext-object-2:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT a.name AS 'audit_name', \ns.name AS 'spec_name', \nd.audit_action_name AS 'action_name', \nd.audited_result\
+            \ AS 'result' \nFROM sys.server_audit_specifications s \nJOIN sys.server_audits a ON s.audit_guid = a.audit_guid\
+            \ \nJOIN sys.server_audit_specification_details d ON s.server_specification_id = d.server_specification_id \n\
+            WHERE a.is_state_enabled = 1\n"
+      behaviors:
+        context: instance
+      object_title: null
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+    end-user-provided-list-required-audit-events-variable:
+      title: End user provided list of required audit events
+      kind: external
+      datatype: string
+      input:
+        required: true
+        cardinality: one_or_more
+    list-system-gathered-action-name-variable:
+      title: List of system gathered action_name
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: independent-sqlext-object-2
+          field: result
+          record_field: action_name
+  states:
+    state-this-state-checks-to-see-if-user-provided-action-names-i:
+      state_title: This state checks to see if user provided action_names is equal to ''.
+      capability: independent.variable
+      state:
+        field: value
+        value:
+          variable: list-system-gathered-action-name-variable
+        operation: case insensitive equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-all-currently-defined-audits-sql-server-instance-will-listed-if:
+      test_title: All currently defined audits for the SQL server instance will be listed. If no audits are returned, this
+        is a finding.
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: at_least_one_exists
+      check: all
+    test-compare-documentation-list-generated-audit-events-if-there-any-missing:
+      test_title: Compare the documentation to the list of generated audit events. If there are any missing events, this is
+        a finding.
+      capability: independent.variable
+      object: variable-object-containing-end-user-provided-action-names-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-this-state-checks-to-see-if-user-provided-action-names-i
+  evaluate:
+    all:
+    - test: test-all-currently-defined-audits-sql-server-instance-will-listed-if
+    - test: test-compare-documentation-list-generated-audit-events-if-there-any-missing

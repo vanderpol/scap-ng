@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.abec0e212ff00ded2adb7140
+  version: 1
+  assessment_title: OL 8 must clear memory when it is freed to prevent use-after-free attacks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-init-on-free-setting-from-etc-default-grub-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*GRUB_CMDLINE_LINUX="(.*?)"$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Retrieve 'init_on_free' setting from /etc/default/grub.
+  states:
+    state-confirm-init-of-free-is-set-to-1:
+      state_title: Confirm init_of_free is set to '1'.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[^#]*\binit_on_free=1\b
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-confirm-that-init-on-free-set-1-in-etc-default:
+      test_title: Confirm that 'init_on_free' is set to '1' in /etc/default/grub.
+      capability: independent.textfilecontent54
+      object: retrieve-init-on-free-setting-from-etc-default-grub-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-init-of-free-is-set-to-1
+  evaluate:
+    test: test-confirm-that-init-on-free-set-1-in-etc-default

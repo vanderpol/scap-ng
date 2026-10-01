@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.d6d2981806f31d0daa0ec7e7
+  version: 1
+  assessment_title: WN10-CC-000220 - Turning off File Explorer heap termination on corruption must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\Explorer
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoHeapTerminationOnCorruption
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-turn-off-heap-termination-on-corruption-set-not-configured-or:
+      test_title: '''Turn off heap termination on corruption'' is set to ''Not Configured'' or ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-turn-off-heap-termination-on-corruption-set-not-configured-or

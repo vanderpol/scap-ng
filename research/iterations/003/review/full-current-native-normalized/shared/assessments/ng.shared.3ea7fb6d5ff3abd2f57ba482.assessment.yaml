@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.3ea7fb6d5ff3abd2f57ba482
+  version: 1
+  assessment_title: The macOS system must be configured to disable password forwarding for FileVault.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-filevault-autologin-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.loginwindow'')\
+
+            .objectForKey(''DisableFDEAutoLogin'').js
+
+            EOS'
+      object_title: os_filevault_autologin_disable_recommended_object
+  states:
+    state-os-filevault-autologin-disable-recommended-state:
+      state_title: os_filevault_autologin_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-filevault-autologin-disable-recommended-test:
+      test_title: os_filevault_autologin_disable_recommended_test
+      capability: independent.shellcommand
+      object: os-filevault-autologin-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-filevault-autologin-disable-recommended-state
+  evaluate:
+    test: test-os-filevault-autologin-disable-recommended-test

@@ -1,0 +1,108 @@
+assessment:
+  id: ng.shared.fc94c6a033cc154e1b19a589
+  version: 1
+  assessment_title: OL08-00-010186 - OL 8 IP tunnels must use FIPS 140-3-approved cryptographic algorithms.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-ipsec-conf-includes-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ipsec.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*include\s+(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/ipsec.conf includes
+    etc-ipsec-d-conf-includes-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ipsec.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*include\s+(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/ipsec.d/*.conf includes
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /etc/crypto-policies/back-ends/libreswan.config
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /etc/ipsec.d/*.conf
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-ipsec-conf-includes-crypto-policy:
+      test_title: ipsec.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      object: etc-ipsec-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
+    test-ipsec-conf-includes-etc-ipsec-d-conf:
+      test_title: ipsec.conf includes /etc/ipsec.d/*.conf
+      capability: independent.textfilecontent54
+      object: etc-ipsec-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54-2
+    test-etc-ipsec-d-conf-includes-crypto-policy:
+      test_title: /etc/ipsec.d/*.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      object: etc-ipsec-d-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    any:
+    - test: test-ipsec-conf-includes-crypto-policy
+    - all:
+      - test: test-ipsec-conf-includes-etc-ipsec-d-conf
+      - test: test-etc-ipsec-d-conf-includes-crypto-policy

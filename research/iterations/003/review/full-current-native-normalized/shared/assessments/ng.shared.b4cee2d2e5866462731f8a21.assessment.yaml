@@ -1,0 +1,87 @@
+assessment:
+  id: ng.shared.b4cee2d2e5866462731f8a21
+  version: 1
+  assessment_title: AZLX-23-002515 - Amazon Linux 2023 must enable auditing of processes that start prior to the audit daemon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    bls-options-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/loader/entries
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^options\s+(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: BLS options
+    etc-default-grub-grub-cmdline-linux-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (^|\s)audit=1(\s|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-bls-options-contain-audit-1:
+      test_title: BLS options contain audit=1
+      capability: independent.textfilecontent54
+      object: bls-options-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-audit:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain audit=1
+      capability: independent.textfilecontent54
+      object: etc-default-grub-grub-cmdline-linux-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-bls-options-contain-audit-1
+    - test: test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-audit

@@ -1,0 +1,171 @@
+assessment:
+  id: ng.shared.d453bec4148751b272a5076d
+  version: 1
+  assessment_title: OL 8 systems below version 8.2 must ensure account lockouts persist.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    test-etc-pam-d-password-auth-pam-faillock-so-preauth-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*auth\s+required\s+pam_faillock.so\s+preauth\s+.*?(dir=\S+)\s*.*?\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Test /etc/pam.d/password-auth pam_faillock.so preauth line for dir parameter.
+    test-etc-pam-d-password-auth-pam-faillock-so-authfail-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*auth\s+required\s+pam_faillock.so\s+authfail\s+.*?(dir=\S+)\s*.*?\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Test /etc/pam.d/password-auth pam_faillock.so authfail line for dir parameter.
+    check-account-required-line-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*account\s+required\s+pam_faillock.so\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Check for account required line.
+    test-etc-pam-d-password-auth-pam-faillock-so-preauth-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*auth\s+required\s+pam_faillock.so\s+preauth\s+.*?(dir=\S+)\s*.*?\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Test /etc/pam.d/password-auth pam_faillock.so preauth line for dir parameter.
+    test-etc-pam-d-password-auth-pam-faillock-so-authfail-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*auth\s+required\s+pam_faillock.so\s+authfail\s+.*?(dir=\S+)\s*.*?\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Test /etc/pam.d/password-auth pam_faillock.so authfail line for dir parameter.
+    check-account-required-line-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n*\s*account\s+required\s+pam_faillock.so\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Check for account required line.
+  states: {}
+  tests:
+    test-ensure-account-lockouts-persist-test-etc-pam-d-password-auth:
+      test_title: Ensure account lockouts persist. Test /etc/pam.d/password-auth pam_faillock.so preauth line for dir parameter.
+      capability: independent.textfilecontent54
+      object: test-etc-pam-d-password-auth-pam-faillock-so-preauth-object
+      check_existence: at_least_one_exists
+      check: all
+    test-ensure-account-lockouts-persist-test-etc-pam-d-password-auth-2:
+      test_title: Ensure account lockouts persist. Test /etc/pam.d/password-auth pam_faillock.so authfail line for dir parameter.
+      capability: independent.textfilecontent54
+      object: test-etc-pam-d-password-auth-pam-faillock-so-authfail-object
+      check_existence: at_least_one_exists
+      check: all
+    test-ensure-account-lockouts-persist-check-account-required-line:
+      test_title: Ensure account lockouts persist. Check for account required line.
+      capability: independent.textfilecontent54
+      object: check-account-required-line-object
+      check_existence: at_least_one_exists
+      check: all
+    test-ensure-account-lockouts-persist-test-etc-pam-d-system-auth:
+      test_title: Ensure account lockouts persist. Test /etc/pam.d/system-auth pam_faillock.so preauth line for dir parameter.
+      capability: independent.textfilecontent54
+      object: test-etc-pam-d-password-auth-pam-faillock-so-preauth-object-2
+      check_existence: at_least_one_exists
+      check: all
+    test-ensure-account-lockouts-persist-test-etc-pam-d-system-auth-2:
+      test_title: Ensure account lockouts persist. Test /etc/pam.d/system-auth pam_faillock.so authfail line for dir parameter.
+      capability: independent.textfilecontent54
+      object: test-etc-pam-d-password-auth-pam-faillock-so-authfail-object-2
+      check_existence: at_least_one_exists
+      check: all
+    test-ensure-account-lockouts-persist-check-account-required-line-2:
+      test_title: Ensure account lockouts persist. Check for account required line.
+      capability: independent.textfilecontent54
+      object: check-account-required-line-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - test: test-ensure-account-lockouts-persist-test-etc-pam-d-password-auth
+    - test: test-ensure-account-lockouts-persist-test-etc-pam-d-password-auth-2
+    - test: test-ensure-account-lockouts-persist-check-account-required-line
+    - test: test-ensure-account-lockouts-persist-test-etc-pam-d-system-auth
+    - test: test-ensure-account-lockouts-persist-test-etc-pam-d-system-auth-2
+    - test: test-ensure-account-lockouts-persist-check-account-required-line-2

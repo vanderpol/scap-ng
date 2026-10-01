@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.23aa335ea177a521d50d7fa9
+  version: 1
+  assessment_title: WN10-AU-000135 - The system must be configured to audit System - Other System Events failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-windows-auditeventpolicysubcategories:
+      state_title: null
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_system_events
+        value: AUDIT_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-auditeventpolicysubcategories-2:
+      state_title: null
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: other_system_events
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-other-system-events-set-failure-or-success-failure:
+      test_title: '''Other System Events'' is set to ''Failure'' or ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-auditeventpolicysubcategories
+      - state-windows-auditeventpolicysubcategories-2
+  evaluate:
+    test: test-other-system-events-set-failure-or-success-failure

@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.658ec48e70c0baec5c40e44b
+  version: 1
+  assessment_title: Audit - User Account Management - Failure
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-user-account-management-failure-only:
+      state_title: Audit - User Account Management - Failure only
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: user_account_management
+        value: AUDIT_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-user-account-management-success-and-failure:
+      state_title: Audit - User Account Management - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: user_account_management
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-user-account-management-failure-only:
+      test_title: Audit - User Account Management - Failure only
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-user-account-management-failure-only
+    test-audit-user-account-management-success-failure:
+      test_title: Audit - User Account Management - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-user-account-management-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-user-account-management-failure-only
+    - test: test-audit-user-account-management-success-failure

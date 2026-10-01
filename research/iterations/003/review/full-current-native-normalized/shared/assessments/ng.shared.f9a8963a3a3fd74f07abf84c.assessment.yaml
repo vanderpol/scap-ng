@@ -1,0 +1,656 @@
+assessment:
+  id: ng.shared.f9a8963a3a3fd74f07abf84c
+  version: 1
+  assessment_title: WN16-DC-000070 - Permissions on the Active Directory data files must only allow System and Administrators
+    access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    database-log-files-path-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\NTDS\Parameters
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: Database log files path
+      object_title: Database log files path
+    database-log-files-system-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: database-log-files-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-18
+      object_title: Database log files - SYSTEM permissions
+    database-log-files-administrators-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: database-log-files-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-32-544
+      object_title: Database log files - Administrators permissions
+    database-log-files-other-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: database-log-files-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        state: state-administrators-rights
+      - action: exclude
+        state: state-local-system-rights
+      - action: exclude
+        state: state-no-rights
+      object_title: Database log files - Other permissions
+    dsa-database-file-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\NTDS\Parameters
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: DSA Database file
+      object_title: DSA Database file
+    files-in-same-directory-as-dsa-database-system-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-database-working-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-18
+      object_title: Files in the same directory as the DSA Database - SYSTEM permissions
+    files-in-same-directory-as-dsa-database-administrators-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-database-working-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-32-544
+      object_title: Files in the same directory as the DSA Database - Administrators permissions
+    files-in-same-directory-as-dsa-database-other-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-database-working-path-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        state: state-administrators-rights
+      - action: exclude
+        state: state-local-system-rights
+      - action: exclude
+        state: state-no-rights
+      object_title: Files in the same directory as the DSA Database - Other permissions
+    dsa-working-directory-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\NTDS\Parameters
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: DSA Working Directory
+      object_title: DSA Working Directory
+    files-in-dsa-working-directory-system-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-working-directory-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-18
+      object_title: Files in the DSA Working Directory - SYSTEM permissions
+    files-in-dsa-working-directory-administrators-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-working-directory-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: equals
+          datatype: string
+          mask: false
+          value: S-1-5-32-544
+      object_title: Files in the DSA Working Directory - Administrators permissions
+    files-in-dsa-working-directory-other-permissions-object:
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: dsa-working-directory-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(.*)$
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        state: state-administrators-rights
+      - action: exclude
+        state: state-local-system-rights
+      - action: exclude
+        state: state-no-rights
+      object_title: Files in the DSA Working Directory - Other permissions
+  variables:
+    database-log-files-path-variable:
+      title: Database log files path
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: database-log-files-path-object
+          field: value
+    dsa-database-working-path-variable:
+      title: DSA Database working path
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: dsa-database-file-object
+              field: value
+          pattern: ^(.+)\\
+    dsa-working-directory-variable:
+      title: DSA Working Directory
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: dsa-working-directory-object
+          field: value
+  states:
+    state-full-rights:
+      state_title: Full Rights
+      capability: windows.fileeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_read_control
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_synchronize
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_read
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_data
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_data
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_append_data
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_ea
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_ea
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_execute
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_delete_child
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_attributes
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_attributes
+          value: 'true'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-administrators-rights:
+      state_title: Administrators Rights
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-544
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-local-system-rights:
+      state_title: Local System Rights
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-18
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-no-rights:
+      state_title: No Rights
+      capability: windows.fileeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_read_control
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_synchronize
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_read
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_data
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_data
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_append_data
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_ea
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_ea
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_execute
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_delete_child
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_read_attributes
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: file_write_attributes
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-database-log-files-nt-authority-system-has-full-control:
+      test_title: 'Database log files: NT Authority\SYSTEM has full control'
+      capability: windows.fileeffectiverights53
+      object: database-log-files-system-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-database-log-files-builtin-administrators-has-full-control:
+      test_title: 'Database log files: BUILTIN\Administrators has full control'
+      capability: windows.fileeffectiverights53
+      object: database-log-files-administrators-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-database-log-files-no-other-permissions:
+      test_title: 'Database log files: No other permissions'
+      capability: windows.fileeffectiverights53
+      object: database-log-files-other-permissions-object
+      check_existence: none_exist
+      check: all
+    test-dsa-database-file-nt-authority-system-has-full-control:
+      test_title: 'DSA Database file: NT Authority\SYSTEM has full control'
+      capability: windows.fileeffectiverights53
+      object: files-in-same-directory-as-dsa-database-system-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-dsa-database-file-builtin-administrators-has-full-control:
+      test_title: 'DSA Database file: BUILTIN\Administrators has full control'
+      capability: windows.fileeffectiverights53
+      object: files-in-same-directory-as-dsa-database-administrators-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-dsa-database-file-no-other-permissions:
+      test_title: 'DSA Database file: No other permissions'
+      capability: windows.fileeffectiverights53
+      object: files-in-same-directory-as-dsa-database-other-permissions-object
+      check_existence: none_exist
+      check: all
+    test-dsa-working-directory-nt-authority-system-has-full-control:
+      test_title: 'DSA Working Directory: NT Authority\SYSTEM has full control'
+      capability: windows.fileeffectiverights53
+      object: files-in-dsa-working-directory-system-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-dsa-working-directory-builtin-administrators-has-full-control:
+      test_title: 'DSA Working Directory: BUILTIN\Administrators has full control'
+      capability: windows.fileeffectiverights53
+      object: files-in-dsa-working-directory-administrators-permissions-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-full-rights
+    test-dsa-working-directory-no-other-permissions:
+      test_title: 'DSA Working Directory: No other permissions'
+      capability: windows.fileeffectiverights53
+      object: files-in-dsa-working-directory-other-permissions-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-database-log-files-nt-authority-system-has-full-control
+    - test: test-database-log-files-builtin-administrators-has-full-control
+    - test: test-database-log-files-no-other-permissions
+    - test: test-dsa-database-file-nt-authority-system-has-full-control
+    - test: test-dsa-database-file-builtin-administrators-has-full-control
+    - test: test-dsa-database-file-no-other-permissions
+    - test: test-dsa-working-directory-nt-authority-system-has-full-control
+    - test: test-dsa-working-directory-builtin-administrators-has-full-control
+    - test: test-dsa-working-directory-no-other-permissions

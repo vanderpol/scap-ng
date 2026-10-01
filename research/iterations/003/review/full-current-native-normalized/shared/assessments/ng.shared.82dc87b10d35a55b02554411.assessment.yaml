@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.82dc87b10d35a55b02554411
+  version: 1
+  assessment_title: The System packages must be up to date with the most recent vendor updates and security fixes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    pkg-update-n-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg update -n
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      object_title: pkg update -n
+  states:
+    state-check-that-a-line-returns-no-updates-available-for-this-:
+      state_title: Check that a line returns No updates available for this image, and command exit status is 0
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: No updates available for this image.
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  tests:
+    test-system-packages-up-date-most-recent-vendor-updates-security-fixes:
+      test_title: The System packages must be up to date with the most recent vendor updates and security fixes.
+      capability: independent.shellcommand
+      object: pkg-update-n-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-a-line-returns-no-updates-available-for-this-
+  evaluate:
+    test: test-system-packages-up-date-most-recent-vendor-updates-security-fixes

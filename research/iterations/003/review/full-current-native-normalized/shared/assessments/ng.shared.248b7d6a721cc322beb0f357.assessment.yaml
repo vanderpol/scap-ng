@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.248b7d6a721cc322beb0f357
+  version: 1
+  assessment_title: AZLX-23-002315 - Amazon Linux 2023 must ensure the /var/log directory have mode "0755" or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: null
+  states:
+    state-mode-0755-or-less-permissive:
+      state_title: mode 0755 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-var-log-directory-has-mode-0755-or-less-permissive:
+      test_title: /var/log directory has mode 0755 or less permissive.
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
+  evaluate:
+    test: test-var-log-directory-has-mode-0755-or-less-permissive

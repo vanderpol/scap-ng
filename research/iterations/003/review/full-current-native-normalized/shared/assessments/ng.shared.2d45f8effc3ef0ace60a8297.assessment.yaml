@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.2d45f8effc3ef0ace60a8297
+  version: 1
+  assessment_title: UBTU-20-010014 - The Ubuntu operating system must require users to reauthenticate for privilege escalation
+    or when changing roles.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!#).*\s+!\s*authenticate.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!#).*\s+!\s*authenticate.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-authenticate-does-not-exist-in-etc-sudoers:
+      test_title: '''!authenticate'' does not exist in /etc/sudoers'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: none_exist
+      check: all
+    test-authenticate-does-not-exist-in-etc-sudoers-d:
+      test_title: '''!authenticate'' does not exist in /etc/sudoers.d'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-authenticate-does-not-exist-in-etc-sudoers
+    - test: test-authenticate-does-not-exist-in-etc-sudoers-d

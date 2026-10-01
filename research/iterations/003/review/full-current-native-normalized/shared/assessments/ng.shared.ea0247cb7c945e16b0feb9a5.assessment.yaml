@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.ea0247cb7c945e16b0feb9a5
+  version: 1
+  assessment_title: OL09-00-002530 - OL 9 /boot/grub2/grub.cfg file must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/grub2/grub.cfg
+      object_title: null
+  states:
+    state-group-owned-by-root:
+      state_title: group-owned by root
+      capability: unix.file
+      state:
+        field: group_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-boot-grub2-grub-cfg-file-group-owned-by-root:
+      test_title: /boot/grub2/grub.cfg file is group-owned by root
+      capability: unix.file
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-group-owned-by-root
+  evaluate:
+    test: test-boot-grub2-grub-cfg-file-group-owned-by-root

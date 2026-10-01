@@ -1,0 +1,60 @@
+assessment:
+  id: ng.shared.ef4fc973bb89820a96310f23
+  version: 1
+  assessment_title: Minimum Password Length
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    password-policy-object:
+      capability: windows.passwordpolicy
+      object_title: Password policy
+  variables:
+    minimum-password-length-variable:
+      title: Minimum Password Length
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: password_minimum_length_var
+        validation:
+          alternatives:
+          - literal: '8'
+            hint: 8_characters
+          - literal: '9'
+            hint: 9_characters
+          - literal: '12'
+            hint: 12_characters
+          - literal: '14'
+            hint: 14_characters
+          - literal: '15'
+            hint: 15_characters
+  states:
+    state-minimum-password-length-is-greater-than-or-equal-to-vari:
+      state_title: Minimum Password Length is greater than or equal to variable
+      capability: windows.passwordpolicy
+      state:
+        field: min_passwd_len
+        value:
+          variable: minimum-password-length-variable
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-minimum-password-length-set-at-least-14-characters:
+      test_title: '''Minimum password length'' is set to at least ''14'' characters'
+      capability: windows.passwordpolicy
+      object: password-policy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-minimum-password-length-is-greater-than-or-equal-to-vari
+  evaluate:
+    test: test-minimum-password-length-set-at-least-14-characters

@@ -1,0 +1,90 @@
+assessment:
+  id: ng.shared.6cd170c75b3afc905b9dc705
+  version: 1
+  assessment_title: Ubuntu 20.04 LTS must audit any script or executable called by cron as root or by any privileged user.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-auditctl-l-look-etc-cron-d-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: auditctl -l
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      object_title: 'run auditctl -l, look for: /etc/cron.d.'
+  states:
+    state-check-that-line-contains-w-etc-cron-d-p-wa-k-cronjobs:
+      state_title: 'Check that line contains: -w /etc/cron.d -p wa -k cronjobs.'
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ^\-w\s\/etc\/cron\.d\s\-p\swa\s\-k\scronjobs\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    state-check-that-line-contains-w-var-spool-cron-p-wa-k-cronjob:
+      state_title: 'Check that line contains: -w /var/spool/cron -p wa -k cronjobs.'
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ^\-w\s\/var\/spool\/cron\s\-p\swa\s\-k\scronjobs\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  tests:
+    test-test-that-etc-cron-d-being-audited:
+      test_title: Test that /etc/cron.d is being audited
+      capability: independent.shellcommand
+      object: run-auditctl-l-look-etc-cron-d-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-line-contains-w-etc-cron-d-p-wa-k-cronjobs
+    test-test-that-var-spool-cron-being-audited:
+      test_title: Test that /var/spool/cron is being audited.
+      capability: independent.shellcommand
+      object: run-auditctl-l-look-etc-cron-d-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-check-that-line-contains-w-var-spool-cron-p-wa-k-cronjob
+  evaluate:
+    all:
+    - test: test-test-that-etc-cron-d-being-audited
+    - test: test-test-that-var-spool-cron-being-audited

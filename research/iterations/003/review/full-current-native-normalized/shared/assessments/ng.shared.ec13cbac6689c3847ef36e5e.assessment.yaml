@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.ec13cbac6689c3847ef36e5e
+  version: 1
+  assessment_title: The macOS system must implement cryptographic mechanisms to protect the confidentiality and integrity
+    of all information at rest.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    system-settings-filevault-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "dontAllowDisable=$(/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\
+            \n.objectForKey('dontAllowFDEDisable').js\nEOS\n)\nfileVault=$(/usr/bin/fdesetup status | /usr/bin/grep -c \"\
+            FileVault is On.\")\nif [[ \"$dontAllowDisable\" == \"true\" ]] && [[ \"$fileVault\" == 1 ]]; then\n  echo \"\
+            1\"\nelse\n  echo \"0\"\nfi"
+      object_title: system_settings_filevault_enforce_recommended_object
+  states:
+    state-system-settings-filevault-enforce-recommended-state:
+      state_title: system_settings_filevault_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-filevault-enforce-recommended-test:
+      test_title: system_settings_filevault_enforce_recommended_test
+      capability: independent.shellcommand
+      object: system-settings-filevault-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-system-settings-filevault-enforce-recommended-state
+  evaluate:
+    test: test-system-settings-filevault-enforce-recommended-test

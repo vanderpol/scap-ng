@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.18e01f05a2a92e8271092395
+  version: 1
+  assessment_title: WN10-CC-000285 - The Remote Desktop Session Host must require secure RPC communications.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows NT\Terminal Services
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fEncryptRPCTraffic
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-require-secure-rpc-communication-set-enabled:
+      test_title: '''Require secure RPC communication'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-require-secure-rpc-communication-set-enabled

@@ -1,0 +1,188 @@
+assessment:
+  id: ng.shared.dcbea11f7968fdef5c476947
+  version: 1
+  assessment_title: The operating system must monitor for unauthorized connections of mobile devices to organizational information
+    systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-information-object:
+      capability: unix.uname
+      object_title: OS information
+    etc-zones-index-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones/index
+      object_title: /etc/zones/index
+    etc-zones-index-global-entry-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones/index
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^global:'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/zones/index global entry
+    var-share-zones-index-json-object:
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/share/zones/index.json
+      object_title: /var/share/zones/index.json
+    var-share-zones-index-json-path-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/share/zones/index.json
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '"path":\s+"/"'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /var/share/zones/index.json 'path:/'
+    etc-system-file-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/system
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*exclude:\s*scsa2usb\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The /etc/system file.
+    etc-system-d-files-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/system.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*exclude:\s*scsa2usb\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/system.d files.
+  states:
+    state-11-3-or-less:
+      state_title: 11.3 or less.
+      capability: unix.uname
+      state:
+        field: os_version
+        value: ^11($|\.[0-3]\b)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-solaris-less-than-11-4:
+      test_title: Solaris (less than) 11.4
+      capability: unix.uname
+      object: os-information-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-11-3-or-less
+    test-etc-zones-index-does-not-exist:
+      test_title: /etc/zones/index does not exist
+      capability: unix.file
+      object: etc-zones-index-object
+      check_existence: none_exist
+      check: all
+    test-etc-zones-index-contains-global:
+      test_title: /etc/zones/index contains global
+      capability: independent.textfilecontent54
+      object: etc-zones-index-global-entry-object
+      check_existence: at_least_one_exists
+      check: all
+    test-var-share-zones-index-json-does-not-exist:
+      test_title: /var/share/zones/index.json does not exist
+      capability: unix.file
+      object: var-share-zones-index-json-object
+      check_existence: none_exist
+      check: all
+    test-var-share-zones-index-json-does-not-contain-path:
+      test_title: /var/share/zones/index.json does not contain 'path:/'
+      capability: independent.textfilecontent54
+      object: var-share-zones-index-json-path-object
+      check_existence: none_exist
+      check: all
+    test-determine-if-usb-mass-storage-devices-locked-out-by-kernel:
+      test_title: Determine if USB mass storage devices are locked out by the kernel in /etc/system.
+      capability: independent.textfilecontent54
+      object: etc-system-file-object
+      check_existence: at_least_one_exists
+      check: all
+    test-determine-if-usb-mass-storage-devices-locked-out-by-kernel-2:
+      test_title: Determine if USB mass storage devices are locked out by the kernel in /etc/system.d/*.
+      capability: independent.textfilecontent54
+      object: etc-system-d-files-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - not:
+        all:
+        - any:
+          - not:
+              test: test-solaris-less-than-11-4
+          - any:
+            - test: test-etc-zones-index-does-not-exist
+            - test: test-etc-zones-index-contains-global
+        - any:
+          - test: test-solaris-less-than-11-4
+          - any:
+            - test: test-var-share-zones-index-json-does-not-exist
+            - test: test-var-share-zones-index-json-does-not-contain-path
+    - test: test-determine-if-usb-mass-storage-devices-locked-out-by-kernel
+    - test: test-determine-if-usb-mass-storage-devices-locked-out-by-kernel-2

@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.29524d64bb69b2fce0ded29c
+  version: 1
+  assessment_title: The system must require passwords to contain at least one lowercase alphabetic character.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    default-passwd-file-etc-default-passwd-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*MINLOWER=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The default passwd file (/etc/default/passwd).
+  states:
+    state-greater-than-or-equal-to-one:
+      state_title: Greater than or equal to one.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-system-default-password-minlower-setting:
+      test_title: Check the system default password MINLOWER setting.
+      capability: independent.textfilecontent54
+      object: default-passwd-file-etc-default-passwd-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-greater-than-or-equal-to-one
+  evaluate:
+    test: test-check-system-default-password-minlower-setting

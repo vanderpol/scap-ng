@@ -1,0 +1,57 @@
+assessment:
+  id: ng.shared.4d96ad6a5b26336e80e8276d
+  version: 1
+  assessment_title: Exchange Send Fatal Errors to Microsoft must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-get-exchangeserver-display-errorreportingenabled-configuration-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-TransportService | Get-ExchangeServer -status
+            | Select-Object -Property Name, Identity, ErrorReportingEnabled | Format-Table -HideTableHeaders | Out-String
+            -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+      object_title: Run Get-ExchangeServer to display ErrorReportingEnabled configuration
+  states:
+    state-verify-setting-is-false:
+      state_title: Verify setting is false
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: (?i)false$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-each-exchange-server-if-value-errorreportingenabled-not-set-false-this:
+      test_title: For each Exchange Server, if the value of ErrorReportingEnabled is not set to False, this is a finding.
+      capability: independent.shellcommand
+      object: run-get-exchangeserver-display-errorreportingenabled-configuration-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-setting-is-false
+  evaluate:
+    test: test-each-exchange-server-if-value-errorreportingenabled-not-set-false-this

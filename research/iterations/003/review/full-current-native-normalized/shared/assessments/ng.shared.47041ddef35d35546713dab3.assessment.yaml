@@ -1,0 +1,59 @@
+assessment:
+  id: ng.shared.47041ddef35d35546713dab3
+  version: 1
+  assessment_title: OL08-00-010049 - OL 8 must display a banner before granting local or remote access to the system via a
+    graphical user logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/db/local.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*banner-message-enable\s*=\s*(\w+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-dconf-db-local-d-banner-message-enable-set-true:
+      test_title: /etc/dconf/db/local.d/*/banner-message-enable is set to true
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-dconf-db-local-d-banner-message-enable-set-true

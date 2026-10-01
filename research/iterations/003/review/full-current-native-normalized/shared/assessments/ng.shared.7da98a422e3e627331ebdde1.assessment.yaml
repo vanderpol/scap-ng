@@ -1,0 +1,83 @@
+assessment:
+  id: ng.shared.7da98a422e3e627331ebdde1
+  version: 1
+  assessment_title: The Oracle Linux operating system must specify the default "include" directory for the /etc/sudoers file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-rsyslog-config-cron-logging-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: grep include /etc/sudoers
+      object_title: Retrieve rsyslog config for cron logging.
+    retrieve-includes-from-etc-sudoers-file-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: grep -r include /etc/sudoers.d
+      object_title: Retrieve includes from /etc/sudoers file.
+  states:
+    state-confirm-includes-in-etc-sudoers:
+      state_title: Confirm includes in /etc/sudoers.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^\s*#includedir\s+\/etc\/sudoers.d\s*$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: only_one_exists
+    state-confirm-no-includes-in-etc-sudoers-d-directory:
+      state_title: Confirm no 'includes' in /etc/sudoers.d directory.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
+  tests:
+    test-confirm-default-include-directory-used-in-etc-sudoers:
+      test_title: Confirm the default 'include' directory is used in /etc/sudoers.
+      capability: independent.shellcommand
+      object: retrieve-rsyslog-config-cron-logging-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-confirm-includes-in-etc-sudoers
+    test-confirm-cron-logging-implemented:
+      test_title: Confirm cron logging is implemented.
+      capability: independent.shellcommand
+      object: retrieve-includes-from-etc-sudoers-file-object
+      check_existence: only_one_exists
+      check: all
+      states:
+      - state-confirm-no-includes-in-etc-sudoers-d-directory
+  evaluate:
+    all:
+    - test: test-confirm-default-include-directory-used-in-etc-sudoers
+    - test: test-confirm-cron-logging-implemented

@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.c27548aa5921acd049ad099b
+  version: 1
+  assessment_title: The Oracle Linux operating system must take appropriate action when the audisp-remote buffer is full.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-etc-audisp-audispd-conf-value-assigned-overflow-action-setting-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/audispd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*overflow_action[ ]*=[ ]*([\w]+)\s*
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Check /etc/audisp/audispd.conf for the value assigned to overflow_action setting.
+  states:
+    state-the-value-is-set-to-a-case-insensitive-syslog-single-or-:
+      state_title: The value is set to a case insensitive syslog, single, or halt
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^syslog|single|halt$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-value-assigned-overflow-action-in-etc-audisp-audispd-conf:
+      test_title: Check the value assigned to overflow_action in /etc/audisp/audispd.conf
+      capability: independent.textfilecontent54
+      object: check-etc-audisp-audispd-conf-value-assigned-overflow-action-setting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-value-is-set-to-a-case-insensitive-syslog-single-or-
+  evaluate:
+    test: test-check-value-assigned-overflow-action-in-etc-audisp-audispd-conf

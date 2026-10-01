@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.2c53c90d289de44decbb0245
+  version: 1
+  assessment_title: SQL Server must use NIST FIPS 140-2/140-3-validated cryptographic operations for encryption, hashing,
+    and signing.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    determine-via-registry-that-fips-enabled-in-local-security-policy-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Enabled
+      object_title: Determine via the registry that FIPS is enabled in the Local security policy
+  states:
+    state-registry-key-dword-value-equals-1:
+      state_title: Registry key dword value equals 1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-check-if-fips-compliant-algorithms-encryption-hashing-signing-disabled:
+      test_title: Check if 'FIPS compliant algorithms for encryption, hashing, and signing' is disabled.
+      capability: windows.registry
+      object: determine-via-registry-that-fips-enabled-in-local-security-policy-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-registry-key-dword-value-equals-1
+  evaluate:
+    test: test-check-if-fips-compliant-algorithms-encryption-hashing-signing-disabled

@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.2f8bb923806568792aa3d5ef
+  version: 1
+  assessment_title: OL09-00-001095 - OL 9 user account passwords for new users or password changes must have a 60-day maximum
+    password lifetime restriction in /etc/login.defs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*PASS_MAX_DAYS\s+(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: greater than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '60'
+        operation: less than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pass-max-days-less-than-or-equal-60-but-greater:
+      test_title: PASS_MAX_DAYS is less than or equal to 60 but greater than 0.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
+  evaluate:
+    test: test-pass-max-days-less-than-or-equal-60-but-greater

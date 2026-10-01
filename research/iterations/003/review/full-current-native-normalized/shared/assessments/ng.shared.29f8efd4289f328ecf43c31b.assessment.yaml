@@ -1,0 +1,132 @@
+assessment:
+  id: ng.shared.29f8efd4289f328ecf43c31b
+  version: 1
+  assessment_title: SQL Server must protect against a user falsely repudiating by use of system-versioned tables (Temporal
+    Tables).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: sql-that-verifies-that-authorized-documented-temporal-tables-exist-variable
+      behaviors:
+        context: database
+      object_title: null
+    end-user-provided-list-authorized-documented-temporal-tables-or-none-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: end-user-provided-list-authorized-documented-temporal-tables-or-none-variable
+      object_title: End user provided list of authorized and documented temporal tables or NONE_REQUIRED
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-variable:
+      title: Microsoft SQL Server version
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+    end-user-provided-list-authorized-documented-temporal-tables-or-none-variable:
+      title: End user provided list of authorized and documented temporal tables or NONE_REQUIRED
+      kind: external
+      datatype: string
+      input:
+        required: true
+        cardinality: one_or_more
+    sql-that-verifies-that-authorized-documented-temporal-tables-exist-variable:
+      title: SQL that verifies that the authorized and documented temporal tables exist
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'SELECT SCHEMA_NAME(T.schema_id) AS schema_name, T.name AS table_name, T.temporal_type_desc, SCHEMA_NAME(H.schema_id)
+              + ''.'' + H.name AS history_table
+
+              FROM sys.tables T
+
+              JOIN sys.tables H ON T.history_table_id = H.object_id
+
+              WHERE T.temporal_type != 0
+
+              AND T.name = '''
+            datatype: string
+        - variable: end-user-provided-list-authorized-documented-temporal-tables-or-none-variable
+        - literal:
+            value: ''' ORDER BY schema_name, table_name'
+            datatype: string
+  states:
+    state-no-temporal-tables-are-required:
+      state_title: No temporal tables are required
+      capability: independent.variable
+      state:
+        field: value
+        value: NONE_REQUIRED
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-end-user-provided-list-authorized-documented-temporal-tables-all-exist:
+      test_title: End user provided list of authorized and documented temporal tables all exist
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: at_least_one_exists
+      check: all
+    test-end-user-specified-that-no-temporal-tables-required:
+      test_title: End user specified that no temporal tables are required
+      capability: independent.variable
+      object: end-user-provided-list-authorized-documented-temporal-tables-or-none-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-no-temporal-tables-are-required
+  evaluate:
+    any:
+    - test: test-end-user-provided-list-authorized-documented-temporal-tables-all-exist
+    - test: test-end-user-specified-that-no-temporal-tables-required

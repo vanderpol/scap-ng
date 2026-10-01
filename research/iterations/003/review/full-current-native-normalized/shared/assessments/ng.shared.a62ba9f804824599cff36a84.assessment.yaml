@@ -1,0 +1,90 @@
+assessment:
+  id: ng.shared.a62ba9f804824599cff36a84
+  version: 1
+  assessment_title: Smart Card Removal Option
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: scremoveoption
+      object_title: null
+  states:
+    state-reg-sz-type-and-value-equals-1:
+      state_title: Reg_Sz type and value equals 1
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-sz-type-and-value-equals-2:
+      state_title: Reg_Sz type and value equals 2
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-interactive-logon-smart-card-removal-behavior-set-lock-workstation:
+      test_title: '''Interactive logon: Smart card removal behavior'' is set to ''Lock Workstation'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-sz-type-and-value-equals-1
+    test-interactive-logon-smart-card-removal-behavior-set-force-logoff:
+      test_title: '''Interactive logon: Smart card removal behavior'' is set to ''Force Logoff'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-sz-type-and-value-equals-2
+  evaluate:
+    any:
+    - test: test-interactive-logon-smart-card-removal-behavior-set-lock-workstation
+    - test: test-interactive-logon-smart-card-removal-behavior-set-force-logoff

@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.ef6d0266c5e164b9621bb4e1
+  version: 1
+  assessment_title: The macOS system must remove password hints from user accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-password-hint-remove-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "HINT=$(/usr/bin/dscl . -list /Users hint | /usr/bin/awk '{ print $2 }')\n\nif [ -z \"$HINT\" ]; then\n \
+            \ echo \"PASS\"\nelse\n  echo \"FAIL\"\nfi"
+      object_title: os_password_hint_remove_recommended_object
+  states:
+    state-os-password-hint-remove-recommended-state:
+      state_title: os_password_hint_remove_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: PASS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-password-hint-remove-recommended-test:
+      test_title: os_password_hint_remove_recommended_test
+      capability: independent.shellcommand
+      object: os-password-hint-remove-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-password-hint-remove-recommended-state
+  evaluate:
+    test: test-os-password-hint-remove-recommended-test

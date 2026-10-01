@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.39d9f755887cccbe83135b5d
+  version: 1
+  assessment_title: OL09-00-002129 - OL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical
+    user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    org-gnome-settings-daemon-plugins-media-keys-logout-in-etc-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/db/local.d/locks
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/org/gnome/settings-daemon/plugins/media-keys/logout$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /org/gnome/settings-daemon/plugins/media-keys/logout in /etc/dconf/db/local.d/locks/*
+  states: {}
+  tests:
+    test-org-gnome-settings-daemon-plugins-media-keys-logout-locked-in:
+      test_title: /org/gnome/settings-daemon/plugins/media-keys/logout is locked in /etc/dconf/db/local.d/locks/*
+      capability: independent.textfilecontent54
+      object: org-gnome-settings-daemon-plugins-media-keys-logout-in-etc-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-org-gnome-settings-daemon-plugins-media-keys-logout-locked-in

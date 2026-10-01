@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.a9338a1b7b7bcdb4bd979de5
+  version: 1
+  assessment_title: Audit - Sensitive Privilege Use - Success
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-audit-sensitive-privilege-use-success-only:
+      state_title: Audit - Sensitive Privilege Use - Success only
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: sensitive_privilege_use
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-audit-sensitive-privilege-use-success-and-failure:
+      state_title: Audit - Sensitive Privilege Use - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: sensitive_privilege_use
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-sensitive-privilege-use-success-only:
+      test_title: Audit - Sensitive Privilege Use - Success only
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-sensitive-privilege-use-success-only
+    test-audit-sensitive-privilege-use-success-failure:
+      test_title: Audit - Sensitive Privilege Use - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-audit-sensitive-privilege-use-success-and-failure
+  evaluate:
+    any:
+    - test: test-audit-sensitive-privilege-use-success-only
+    - test: test-audit-sensitive-privilege-use-success-failure

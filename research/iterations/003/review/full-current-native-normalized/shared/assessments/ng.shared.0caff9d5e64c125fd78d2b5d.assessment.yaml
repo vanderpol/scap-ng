@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.0caff9d5e64c125fd78d2b5d
+  version: 1
+  assessment_title: Optional Subsystems
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Session Manager\SubSystems
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Optional
+      object_title: null
+  states:
+    state-reg-multi-sz-type-and-blank-value:
+      state_title: Reg_Multi_Sz type and blank value
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_multi_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: .+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: none satisfy
+          entity_existence: at_least_one_exists
+  tests:
+    test-system-settings-optional-subsystems-blank:
+      test_title: '''System Settings: Optional Subsystems'' is blank'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-multi-sz-type-and-blank-value
+  evaluate:
+    test: test-system-settings-optional-subsystems-blank

@@ -1,0 +1,139 @@
+assessment:
+  id: ng.shared.ce645922b2f7d72a851558a4
+  version: 1
+  assessment_title: OL08-00-020014 - OL 8 systems below version 8.2 must automatically lock an account until the locked account
+    is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+preauth.*[ \t]+unlock_time=([0-9]+)(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+preauth.*[ \t]+unlock_time=([0-9]+)(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/system-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+authfail.*[ \t]+unlock_time=([0-9]+)(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-4:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*auth\s+required\s+pam_faillock\.so\s+authfail.*[ \t]+unlock_time=([0-9]+)(?:[ \t]+.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-unlock-time-set-0-in-etc-pam-d-system:
+      test_title: check unlock_time is set to 0 in /etc/pam.d/system-auth (preauth)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-check-unlock-time-set-0-in-etc-pam-d-password:
+      test_title: check unlock_time is set to 0 in /etc/pam.d/password-auth (preauth)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-check-unlock-time-set-0-in-etc-pam-d-system-2:
+      test_title: check unlock_time is set to 0 in /etc/pam.d/system-auth (authfail)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-3
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+    test-check-unlock-time-set-0-in-etc-pam-d-password-2:
+      test_title: check unlock_time is set to 0 in /etc/pam.d/password-auth (authfail)
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-4
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    all:
+    - test: test-check-unlock-time-set-0-in-etc-pam-d-system
+    - test: test-check-unlock-time-set-0-in-etc-pam-d-password
+    - test: test-check-unlock-time-set-0-in-etc-pam-d-system-2
+    - test: test-check-unlock-time-set-0-in-etc-pam-d-password-2

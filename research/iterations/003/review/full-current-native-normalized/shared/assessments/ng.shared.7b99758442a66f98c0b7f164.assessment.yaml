@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.7b99758442a66f98c0b7f164
+  version: 1
+  assessment_title: OL09-00-002301 - OL 9 must define default permissions for the bash shell.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/bashrc
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^#]*\s*(?i)umask\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '077'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-umask-set-077-in-etc-bashrc:
+      test_title: UMASK is set to 077 in /etc/bashrc
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-umask-set-077-in-etc-bashrc

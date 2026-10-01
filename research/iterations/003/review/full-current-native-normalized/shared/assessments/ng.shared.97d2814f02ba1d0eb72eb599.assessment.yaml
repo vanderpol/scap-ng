@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.97d2814f02ba1d0eb72eb599
+  version: 1
+  assessment_title: OL08-00-030741 - OL 8 must disable the chrony daemon from acting as a server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/chrony.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*port[ \t]+(\d+)[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-chrony-daemon-disabled-from-acting-as-server:
+      test_title: The chrony daemon is disabled from acting as a server.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-chrony-daemon-disabled-from-acting-as-server

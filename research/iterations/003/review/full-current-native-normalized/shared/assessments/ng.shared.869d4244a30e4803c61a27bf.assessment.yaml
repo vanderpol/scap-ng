@@ -1,0 +1,40 @@
+assessment:
+  id: ng.shared.869d4244a30e4803c61a27bf
+  version: 1
+  assessment_title: OL09-00-000820 - OL 9 must take appropriate action when a critical audit processing failure occurs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*-f[ \t]+2\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-audit-audit-rules-f-2-option-present:
+      test_title: '/etc/audit/audit.rules: -f 2 option is present'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-etc-audit-audit-rules-f-2-option-present

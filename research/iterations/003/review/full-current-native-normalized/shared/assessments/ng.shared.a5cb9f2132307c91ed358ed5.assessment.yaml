@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.a5cb9f2132307c91ed358ed5
+  version: 1
+  assessment_title: AZLX-23-002595 - Amazon Linux 2023 must ensure the pcscd service is active.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-systemdunitproperty-object:
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pcscd.socket
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-pcscd-socket-active:
+      test_title: The pcscd socket is active.
+      capability: linux.systemdunitproperty
+      object: linux-systemdunitproperty-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
+  evaluate:
+    test: test-pcscd-socket-active

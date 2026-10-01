@@ -1,0 +1,62 @@
+assessment:
+  id: ng.shared.c2951dda9885b102bb85e546
+  version: 1
+  assessment_title: WN22-MS-000050 - Windows Server 2022 must limit the caching of logon credentials to four or less on domain-joined
+    member servers.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: CachedLogonsCount
+      object_title: null
+  states:
+    state-reg-sz-value-of-4-or-less:
+      state_title: Reg_sz value of 4 or less
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '4'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-interactive-logon-number-previous-logons-cache-set-4-or-less:
+      test_title: '''Interactive logon: Number of previous logons to cache'' is set to 4 or less'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-sz-value-of-4-or-less
+  evaluate:
+    test: test-interactive-logon-number-previous-logons-cache-set-4-or-less

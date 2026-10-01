@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.ec8e3b05e4657baeb77ffb1c
+  version: 1
+  assessment_title: The Windows DNS Server log must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-command-get-dnsserverdiagnostics-computername-env-computername-eventloglevel-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: (Get-DnsServerDiagnostics -ComputerName $env:COMPUTERNAME).EventLogLevel
+      object_title: Run command:(Get-DnsServerDiagnostics -ComputerName $env:COMPUTERNAME).EventLogLevel
+  states:
+    state-verify-eventloglevel-is-not-equal-to-0-no-events:
+      state_title: Verify EventLogLevel is not equal to 0 (No Events)
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '0'
+        operation: not equal
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-verify-eventloglevel-is-not-equal-to-1-errors-only:
+      state_title: Verify EventLogLevel is not equal to 1 (Errors Only)
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '1'
+        operation: not equal
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-verify-errors-warnings-or-all-events-selected:
+      test_title: Verify 'Errors and warnings' or 'All events' is selected
+      capability: independent.shellcommand
+      object: run-command-get-dnsserverdiagnostics-computername-env-computername-eventloglevel-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-verify-eventloglevel-is-not-equal-to-0-no-events
+      - state-verify-eventloglevel-is-not-equal-to-1-errors-only
+  evaluate:
+    test: test-verify-errors-warnings-or-all-events-selected

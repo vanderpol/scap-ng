@@ -1,0 +1,31 @@
+assessment:
+  id: ng.shared.e07404186260c08be50d4d90
+  version: 1
+  assessment_title: CISC-ND-000150 - The Cisco router must be configured to enforce the limit of three consecutive invalid
+    logon attempts, after which time it must lock out the user account from accessing the device for 15 minutes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-global-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^login[ \t]+block-for[ \t]+\d+[ \t]+attempts[ \t]+(?:1|2|3)[ \t]+within[ \t]+\d+[ \t]*$
+      object_title: null
+  states: {}
+  tests:
+    test-limit-three-consecutive-invalid-logon-attempts:
+      test_title: limit of three consecutive invalid logon attempts
+      capability: iosxe.global
+      object: iosxe-global-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-limit-three-consecutive-invalid-logon-attempts

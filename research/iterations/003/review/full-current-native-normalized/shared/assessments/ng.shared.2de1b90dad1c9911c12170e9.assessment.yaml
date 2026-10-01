@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.2de1b90dad1c9911c12170e9
+  version: 1
+  assessment_title: UBTU-24-909000 - Ubuntu 24.04 LTS audit system must protect auditing rules from unauthorized change.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \n[ \t]*-e[ \t]+2\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        multiline: 'false'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-audit-audit-rules-e-2-option-present-last-line:
+      test_title: '/etc/audit/audit.rules: -e 2 option is present and is the last line in the file'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-etc-audit-audit-rules-e-2-option-present-last-line

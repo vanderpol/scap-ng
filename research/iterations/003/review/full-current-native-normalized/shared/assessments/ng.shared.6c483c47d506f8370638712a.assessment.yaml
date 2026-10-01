@@ -1,0 +1,202 @@
+assessment:
+  id: ng.shared.6c483c47d506f8370638712a
+  version: 1
+  assessment_title: SLES-12-010112 - The SUSE operating system must use the invoking user's password for privilege escalation
+    when using "sudo".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!targetpw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d/
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!targetpw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object-3:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!rootpw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-4:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d/
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!rootpw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+    independent-textfilecontent54-object-5:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!runaspw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-6:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d/
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)Defaults\s+!runaspw\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        max_depth: '-1'
+        recurse_direction: down
+      object_title: null
+  states: {}
+  tests:
+    test-check-etc-sudoers-defaults-targetpw:
+      test_title: Check /etc/sudoers for Defaults !targetpw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-check-etc-sudoers-d-defaults-targetpw:
+      test_title: Check /etc/sudoers.d/ for Defaults !targetpw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+    test-check-etc-sudoers-defaults-rootpw:
+      test_title: Check /etc/sudoers for Defaults !rootpw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-3
+      check_existence: at_least_one_exists
+      check: all
+    test-check-etc-sudoers-d-defaults-rootpw:
+      test_title: Check /etc/sudoers.d/ for Defaults !rootpw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-4
+      check_existence: at_least_one_exists
+      check: all
+    test-check-etc-sudoers-defaults-runaspw:
+      test_title: Check /etc/sudoers for Defaults !runaspw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-5
+      check_existence: at_least_one_exists
+      check: all
+    test-check-etc-sudoers-d-defaults-runaspw:
+      test_title: Check /etc/sudoers.d/ for Defaults !runaspw
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-6
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    all:
+    - any:
+      - test: test-check-etc-sudoers-defaults-targetpw
+      - test: test-check-etc-sudoers-d-defaults-targetpw
+    - any:
+      - test: test-check-etc-sudoers-defaults-rootpw
+      - test: test-check-etc-sudoers-d-defaults-rootpw
+    - any:
+      - test: test-check-etc-sudoers-defaults-runaspw
+      - test: test-check-etc-sudoers-d-defaults-runaspw

@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.c25be4658c4574e713daabb8
+  version: 1
+  assessment_title: UBTU-18-010122 - The Ubuntu operating system must configure the /var/log directory to be group-owned by
+    syslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    var-log-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: /var/log directory
+    etc-group-syslog-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^syslog:[^:]*:([0-9]+):'
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/group for syslog
+  variables:
+    gid-syslog-variable:
+      title: GID for syslog
+      kind: local
+      datatype: int
+      expression:
+        values:
+          object: etc-group-syslog-object
+          field: subexpression
+  states:
+    state-group-owned-by-syslog:
+      state_title: Group-owned by syslog
+      capability: unix.file
+      state:
+        field: group_id
+        value:
+          variable: gid-syslog-variable
+        operation: equals
+        datatype: int
+        mask: false
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-var-log-directory-group-owned-by-syslog:
+      test_title: /var/log directory must be group-owned by syslog
+      capability: unix.file
+      object: var-log-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-group-owned-by-syslog
+  evaluate:
+    test: test-var-log-directory-group-owned-by-syslog

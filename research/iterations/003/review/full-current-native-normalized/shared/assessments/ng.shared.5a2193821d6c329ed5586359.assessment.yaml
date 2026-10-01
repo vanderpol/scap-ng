@@ -1,0 +1,73 @@
+assessment:
+  id: ng.shared.5a2193821d6c329ed5586359
+  version: 1
+  assessment_title: OL09-00-002582 - OL 9 cron configuration files directory must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-cron-files-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^cron.*$
+      object_title: /etc/cron* files
+    etc-cron-directories-object:
+      capability: unix.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/etc/cron.*$
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: /etc/cron* directories
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-cron-files-owned-by-root:
+      test_title: /etc/cron* files owned by root
+      capability: unix.file
+      object: etc-cron-files-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-owned-by-root
+    test-etc-cron-directories-owned-by-root:
+      test_title: /etc/cron* directories owned by root
+      capability: unix.file
+      object: etc-cron-directories-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-owned-by-root
+  evaluate:
+    all:
+    - test: test-etc-cron-files-owned-by-root
+    - test: test-etc-cron-directories-owned-by-root

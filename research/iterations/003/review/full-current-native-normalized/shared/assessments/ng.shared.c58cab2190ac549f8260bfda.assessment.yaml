@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.c58cab2190ac549f8260bfda
+  version: 1
+  assessment_title: CISC-ND-000460 - The Cisco router must be configured to limit privileges to change the software resident
+    within software libraries.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iosxe-global-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^file[ \t]+privilege
+      object_title: null
+    iosxe-global-object-2:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^file[ \t]+privilege[ \t]+15[ \t]*$
+      object_title: null
+  states: {}
+  tests:
+    test-check-file-privilege:
+      test_title: Check for file privilege
+      capability: iosxe.global
+      object: iosxe-global-object
+      check_existence: at_least_one_exists
+      check: all
+    test-check-file-privilege-15:
+      test_title: Check for file privilege 15
+      capability: iosxe.global
+      object: iosxe-global-object-2
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    any:
+    - not:
+        test: test-check-file-privilege
+    - test: test-check-file-privilege-15

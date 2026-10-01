@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.3b91e7169cb0ebf48e05fbae
+  version: 1
+  assessment_title: OL08-00-010160 - The OL 8 "pam_unix.so" module must be configured in the password-auth file to use a FIPS
+    140-2 approved cryptographic hashing algorithm for system authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*password[ \t]+sufficient[ \t]+pam_unix\.so(?:[ \t]+|(?:[ \t][^#\r\f\n]+[ \t]))sha512(?:[ \t]|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-etc-pam-d-password-auth-password-includes-pam-unix-so:
+      test_title: /etc/pam.d/password-auth:password includes pam_unix.so sha512
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: only_one_exists
+      check: all
+  evaluate:
+    test: test-etc-pam-d-password-auth-password-includes-pam-unix-so

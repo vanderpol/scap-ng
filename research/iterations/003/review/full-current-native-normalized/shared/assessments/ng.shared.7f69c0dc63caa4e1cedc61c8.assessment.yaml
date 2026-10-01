@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.7f69c0dc63caa4e1cedc61c8
+  version: 1
+  assessment_title: AZLX-23-002205 - Amazon Linux 2023 must generate audit records for all account creations, modifications,
+    disabling, and termination events that affect /etc/passwd.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-w\s+/etc/passwd(\s+-p\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\s+(-k\s+|-F\s+key=)[\w-]+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-audit-modifications-etc-passwd:
+      test_title: Audit modifications to /etc/passwd
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-audit-modifications-etc-passwd

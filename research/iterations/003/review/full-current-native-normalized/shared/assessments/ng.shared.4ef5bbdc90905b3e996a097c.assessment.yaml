@@ -1,0 +1,234 @@
+assessment:
+  id: ng.shared.4ef5bbdc90905b3e996a097c
+  version: 1
+  assessment_title: OL08-00-010770 - All OL 8 local initialization files must have mode "0740" or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    users-username-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '[\w]+'
+      object_title: Users with an username
+    only-non-system-users-uid-999-home-dirs-excluding-root-object:
+      capability: unix.password
+      set:
+        operator: complement
+        members:
+        - object: users-username-object
+        filters:
+        - action: exclude
+          state: state-only-uids-1000
+        - action: exclude
+          state: state-root-directory
+      object_title: only non-system users (uid>999) home-dirs excluding root directory
+    local-initialization-files-non-system-users-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-non-system-users-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\.[^\s\.]+
+      filters:
+      - action: exclude
+        state: state-unix-file
+      behaviors:
+        max_depth: '1'
+        recurse: symlinks
+        recurse_direction: down
+      object_title: local initialization files of non-system users.
+    only-root-users-uid-0-home-dirs-excluding-root-directory-object:
+      capability: unix.password
+      set:
+        operator: complement
+        members:
+        - object: users-username-object
+        filters:
+        - action: exclude
+          state: state-only-uids-0
+        - action: exclude
+          state: state-root-directory
+      object_title: only root users (uid=0) home-dirs excluding root directory
+    local-initialization-files-root-user-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directory-root-user-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\.[^\s\.]+
+      filters:
+      - action: exclude
+        state: state-unix-file
+      behaviors:
+        max_depth: '1'
+        recurse: symlinks
+        recurse_direction: down
+      object_title: local initialization files of root user.
+  variables:
+    home-directories-non-system-users-variable:
+      title: The home directories of non-system users.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: only-non-system-users-uid-999-home-dirs-excluding-root-object
+          field: home_dir
+    home-directory-root-user-variable:
+      title: The home directory of the root user.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: only-root-users-uid-0-home-dirs-excluding-root-directory-object
+          field: home_dir
+  states:
+    state-mode-0740-or-less-permissive:
+      state_title: mode 0740 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-only-uids-1000:
+      state_title: only uids < 1000
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: less than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-root-directory:
+      state_title: root directory
+      capability: unix.password
+      state:
+        field: home_dir
+        value: /
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-file:
+      state_title: null
+      capability: unix.file
+      state:
+        field: type
+        value: directory
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-only-uids-0:
+      state_title: only uids > 0
+      capability: unix.password
+      state:
+        field: user_id
+        value: '0'
+        operation: greater than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-local-initialization-files-non-system-users-have-mode-0740-or:
+      test_title: Local initialization files for non-system users have mode 0740 or less permissive.
+      capability: unix.file
+      object: local-initialization-files-non-system-users-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-mode-0740-or-less-permissive
+    test-local-initialization-files-root-have-mode-0740-or-less-permissive:
+      test_title: Local initialization files for root have mode 0740 or less permissive.
+      capability: unix.file
+      object: local-initialization-files-root-user-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0740-or-less-permissive
+  evaluate:
+    all:
+    - test: test-local-initialization-files-non-system-users-have-mode-0740-or
+    - test: test-local-initialization-files-root-have-mode-0740-or-less-permissive

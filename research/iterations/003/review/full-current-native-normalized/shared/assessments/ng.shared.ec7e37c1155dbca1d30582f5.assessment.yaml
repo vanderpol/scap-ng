@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.ec7e37c1155dbca1d30582f5
+  version: 1
+  assessment_title: Device Install - Generic Driver Error Report
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\DeviceInstall\Settings
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisableSendGenericDriverNotFoundToWER
+      object_title: null
+  variables:
+    do-not-send-windows-error-report-when-generic-driver-installed-variable:
+      title: Do not send a Windows Error Report when a generic driver is installed on a device
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: do_not_send_windows_error_report_when_generic_driver_is_installed_on_device_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  states:
+    state-reg-dword-type-and-value-equals-variable:
+      state_title: Reg_Dword type and value equals variable
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value:
+            variable: do-not-send-windows-error-report-when-generic-driver-installed-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-do-not-send-windows-error-report-when-generic-driver-installed:
+      test_title: '''Do not send a Windows error report when a generic driver is installed on a device'' is set to ''Enabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-reg-dword-type-and-value-equals-variable
+  evaluate:
+    test: test-do-not-send-windows-error-report-when-generic-driver-installed

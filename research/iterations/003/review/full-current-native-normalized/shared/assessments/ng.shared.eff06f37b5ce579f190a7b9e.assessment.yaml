@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.eff06f37b5ce579f190a7b9e
+  version: 1
+  assessment_title: AZLX-23-002489 - Amazon Linux 2023 must ensure the password complexity module is enabled in the password-auth
+    file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/password-auth
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*password\s+(?:required|requisite)\s+pam_pwquality\.so\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states: {}
+  tests:
+    test-pam-pwquality-module-included-in-password-auth:
+      test_title: The pam_pwquality module is included in password-auth.
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-pam-pwquality-module-included-in-password-auth

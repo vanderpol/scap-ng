@@ -1,0 +1,178 @@
+assessment:
+  id: ng.shared.08d447713e4cca31a40ced57
+  version: 1
+  assessment_title: WN10-PK-000020 - The US DoD CCEB Interoperability Root CA cross-certificates must be installed in the
+    Untrusted Certificates Store on unclassified systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\9B74964506C7ED9138070D08D5F8B969866560C8
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\EnterpriseCertificates\Disallowed\Certificates\9B74964506C7ED9138070D08D5F8B969866560C8
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-3
+        - object: windows-registry-object-4
+      object_title: null
+    windows-registry-object-5:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\SystemCertificates\Disallowed\Certificates\9B74964506C7ED9138070D08D5F8B969866560C8
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-2
+        - object: windows-registry-object-5
+      object_title: null
+    windows-registry-object-8:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\D471CA32F7A692CE6CBB6196BD3377FE4DBCD106
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-9:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\EnterpriseCertificates\Disallowed\Certificates\D471CA32F7A692CE6CBB6196BD3377FE4DBCD106
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-7:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-8
+        - object: windows-registry-object-9
+      object_title: null
+    windows-registry-object-10:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\SystemCertificates\Disallowed\Certificates\D471CA32F7A692CE6CBB6196BD3377FE4DBCD106
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+$
+      object_title: null
+    windows-registry-object-6:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: windows-registry-object-7
+        - object: windows-registry-object-10
+      object_title: null
+  states: {}
+  tests:
+    test-us-dod-cceb-interoperability-root-ca-2-cross-certificate-expiring:
+      test_title: US DoD CCEB Interoperability Root CA 2 cross-certificate expiring 7/18/2025 is installed in the Untrusted
+        Certificates Store
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: at least one
+    test-us-dod-cceb-interoperability-root-ca-2-cross-certificate-expiring-2:
+      test_title: US DoD CCEB Interoperability Root CA 2 cross-certificate expiring 7/18/2026 is installed in the Untrusted
+        Certificates Store
+      capability: windows.registry
+      object: windows-registry-object-6
+      check_existence: at_least_one_exists
+      check: at least one
+  evaluate:
+    all:
+    - test: test-us-dod-cceb-interoperability-root-ca-2-cross-certificate-expiring
+    - test: test-us-dod-cceb-interoperability-root-ca-2-cross-certificate-expiring-2

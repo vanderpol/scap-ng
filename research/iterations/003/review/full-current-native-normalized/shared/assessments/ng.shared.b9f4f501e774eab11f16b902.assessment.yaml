@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.b9f4f501e774eab11f16b902
+  version: 1
+  assessment_title: The macOS system must cover or disable the built-in or attached camera when not in use.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-camera-disable-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowCamera'').js
+
+            EOS'
+      object_title: os_camera_disable_recommended_object
+  states:
+    state-os-camera-disable-recommended-state:
+      state_title: os_camera_disable_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-camera-disable-recommended-test:
+      test_title: os_camera_disable_recommended_test
+      capability: independent.shellcommand
+      object: os-camera-disable-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-camera-disable-recommended-state
+  evaluate:
+    test: test-os-camera-disable-recommended-test

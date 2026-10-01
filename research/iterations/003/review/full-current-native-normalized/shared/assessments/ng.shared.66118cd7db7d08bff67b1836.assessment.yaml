@@ -1,0 +1,121 @@
+assessment:
+  id: ng.shared.66118cd7db7d08bff67b1836
+  version: 1
+  assessment_title: The operating system must terminate all sessions and network connections when non-local maintenance is
+    completed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    clientaliveinterval-set-in-etc-ssh-sshd-config-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[Cc][Ll][Ii][Ee][Nn][Tt][Aa][Ll][Ii][Vv][Ee][Ii][Nn][Tt][Ee][Rr][Vv][Aa][Ll]\s+(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: ClientAliveInterval is set in /etc/ssh/sshd_config.
+    clientalivecountmax-set-in-etc-ssh-sshd-config-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[Cc][Ll][Ii][Ee][Nn][Tt][Aa][Ll][Ii][Vv][Ee][Cc][Oo][Uu][Nn][Tt][Mm][Aa][Xx]\s+(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: ClientAliveCountMax is set in /etc/ssh/sshd_config.
+  variables:
+    clientaliveinterval-set-600-variable:
+      title: ClientAliveInterval  is set to 600
+      kind: constant
+      datatype: string
+      expression:
+        literal: '600'
+    clientalivecountmax-set-0-variable:
+      title: ClientAliveCountMax is set to 0
+      kind: constant
+      datatype: string
+      expression:
+        literal: '0'
+  states:
+    state-clientaliveinterval-is-set-to-600:
+      state_title: ClientAliveInterval  is set to 600
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: clientaliveinterval-set-600-variable
+        operation: equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-clientalivecountmax-is-set-to-0:
+      state_title: ClientAliveCountMax  is set to 0
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value:
+          variable: clientalivecountmax-set-0-variable
+        operation: equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-clientaliveinterval-set-600-in-etc-ssh-sshd-config:
+      test_title: ClientAliveInterval is set to 600 in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      object: clientaliveinterval-set-in-etc-ssh-sshd-config-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-clientaliveinterval-is-set-to-600
+    test-clientalivecountmax-set-0-in-etc-ssh-sshd-config:
+      test_title: ClientAliveCountMax is set to 0 in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      object: clientalivecountmax-set-in-etc-ssh-sshd-config-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-clientalivecountmax-is-set-to-0
+  evaluate:
+    all:
+    - test: test-clientaliveinterval-set-600-in-etc-ssh-sshd-config
+    - test: test-clientalivecountmax-set-0-in-etc-ssh-sshd-config

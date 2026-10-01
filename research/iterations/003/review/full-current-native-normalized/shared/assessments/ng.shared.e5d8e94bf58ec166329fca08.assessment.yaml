@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.e5d8e94bf58ec166329fca08
+  version: 1
+  assessment_title: UBTU-18-010414 - The Ubuntu operating system must use strong authenticators in establishing nonlocal maintenance
+    and diagnostic sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-ssh-sshd-config-usepam-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*UsePAM\s+(\w*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/ssh/sshd_config:UsePAM
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: 'yes'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-ssh-sshd-config-usepam-yes:
+      test_title: /etc/ssh/sshd_config:UsePAM = yes
+      capability: independent.textfilecontent54
+      object: etc-ssh-sshd-config-usepam-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-ssh-sshd-config-usepam-yes

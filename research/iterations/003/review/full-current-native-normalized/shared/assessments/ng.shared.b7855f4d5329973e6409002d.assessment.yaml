@@ -1,0 +1,127 @@
+assessment:
+  id: ng.shared.b7855f4d5329973e6409002d
+  version: 1
+  assessment_title: UBTU-18-010134 - The Ubuntu operating system library directories must have mode 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    lib-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /lib
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: /lib directory
+    lib64-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /lib64
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: /lib64 directory
+    usr-lib-directory-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      object_title: /usr/lib directory
+  states:
+    state-mode-0755-or-less-permissive:
+      state_title: Mode 0755 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-mode-lib-directory-0755-or-less-permissive:
+      test_title: Mode of /lib directory is 0755 or less permissive
+      capability: unix.file
+      object: lib-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
+    test-mode-lib64-directory-0755-or-less-permissive:
+      test_title: Mode of /lib64 directory is 0755 or less permissive
+      capability: unix.file
+      object: lib64-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
+    test-mode-usr-lib-directory-0755-or-less-permissive:
+      test_title: Mode of /usr/lib directory is 0755 or less permissive
+      capability: unix.file
+      object: usr-lib-directory-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
+  evaluate:
+    all:
+    - test: test-mode-lib-directory-0755-or-less-permissive
+    - test: test-mode-lib64-directory-0755-or-less-permissive
+    - test: test-mode-usr-lib-directory-0755-or-less-permissive

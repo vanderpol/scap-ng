@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.53d8b1e5e229e20271af6b18
+  version: 1
+  assessment_title: UBTU-18-010106 - The Ubuntu operating system must enforce 24 hours/1 day as the minimum password lifetime.
+    Passwords for new users must have a 24 hours/1 day minimum password lifetime restriction.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-login-defs-pass-min-days-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*PASS_MIN_DAYS\s+(\d*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: /etc/login.defs:PASS_MIN_DAYS
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-login-defs-pass-min-days-1:
+      test_title: /etc/login.defs:PASS_MIN_DAYS >= 1
+      capability: independent.textfilecontent54
+      object: etc-login-defs-pass-min-days-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-etc-login-defs-pass-min-days-1

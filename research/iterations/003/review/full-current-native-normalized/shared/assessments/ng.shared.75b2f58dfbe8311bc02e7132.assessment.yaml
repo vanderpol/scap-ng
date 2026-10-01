@@ -1,0 +1,99 @@
+assessment:
+  id: ng.shared.75b2f58dfbe8311bc02e7132
+  version: 1
+  assessment_title: Disable GDM Guest Login
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gdm
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/gdm/custom.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\[daemon]\n(?!([^\n]*\n+)*\[[^\n\]]*]([^\n]*\n+)*TimedLoginEnable[ ]?=[ ]?)([^\n]*\n+)*TimedLoginEnable[
+            ]?=[ ]?
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+    independent-textfilecontent54-object-2:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/gdm/custom.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ ]*TimedLoginEnable[ ]?=[ ]?([^\W]*)[ ]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-gdm-timedloginenable-false:
+      state_title: GDM TimedLoginEnable = false
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[Ff][Aa][Ll][Ss][Ee]$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-gdm-installed:
+      test_title: package gdm is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: all_exist
+      check: all
+    test-timedloginenable-present-in-daemon-section:
+      test_title: TimedLoginEnable present in daemon section
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-all-timedloginenable-lines-set-correctly:
+      test_title: All TimedLoginEnable lines are set correctly
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-gdm-timedloginenable-false
+  evaluate:
+    any:
+    - not:
+        test: test-package-gdm-installed
+    - all:
+      - test: test-timedloginenable-present-in-daemon-section
+      - test: test-all-timedloginenable-lines-set-correctly

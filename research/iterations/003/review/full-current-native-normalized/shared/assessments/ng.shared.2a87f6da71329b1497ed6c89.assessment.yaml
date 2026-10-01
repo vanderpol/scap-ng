@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.2a87f6da71329b1497ed6c89
+  version: 1
+  assessment_title: OL08-00-030040 - The OL 8 System must take appropriate action when an audit processing failure occurs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*disk_error_action\s*=\s*(\w+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^syslog$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^single$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-3:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)^halt$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-etc-audit-auditd-conf-disk-error-action-syslog-single-or:
+      test_title: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
+      - state-independent-textfilecontent54-3
+  evaluate:
+    test: test-etc-audit-auditd-conf-disk-error-action-syslog-single-or

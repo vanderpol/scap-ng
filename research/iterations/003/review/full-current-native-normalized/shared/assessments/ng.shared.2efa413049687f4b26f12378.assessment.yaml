@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.2efa413049687f4b26f12378
+  version: 1
+  assessment_title: The macOS system must prevent AdminHostInfo from being available at LoginWindow.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-loginwindow-adminhostinfo-undefined-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.loginwindow'')\
+
+            .objectIsForcedForKey(''AdminHostInfo'')
+
+            EOS'
+      object_title: os_loginwindow_adminhostinfo_undefined_recommended_object
+  states:
+    state-os-loginwindow-adminhostinfo-undefined-recommended-state:
+      state_title: os_loginwindow_adminhostinfo_undefined_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-loginwindow-adminhostinfo-undefined-recommended-test:
+      test_title: os_loginwindow_adminhostinfo_undefined_recommended_test
+      capability: independent.shellcommand
+      object: os-loginwindow-adminhostinfo-undefined-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-loginwindow-adminhostinfo-undefined-recommended-state
+  evaluate:
+    test: test-os-loginwindow-adminhostinfo-undefined-recommended-test

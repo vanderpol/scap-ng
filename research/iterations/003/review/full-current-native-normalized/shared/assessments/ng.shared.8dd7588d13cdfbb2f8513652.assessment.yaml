@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.8dd7588d13cdfbb2f8513652
+  version: 1
+  assessment_title: OL08-00-010120 - OL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored
+    passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    extract-password-hashes-from-etc-shadow-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/shadow
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^:]+:([^:]*):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: Extract password hashes from /etc/shadow.
+    filter-out-acceptable-shadow-password-entries-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: extract-password-hashes-from-etc-shadow-object
+        filters:
+        - action: exclude
+          state: state-exclude-inactive-locked-hashes-with-leading-or
+        - action: exclude
+          state: state-exclude-hashes-with-leading-6
+      object_title: Filter out acceptable shadow password entries.
+  states:
+    state-exclude-inactive-locked-hashes-with-leading-or:
+      state_title: Exclude inactive/locked hashes (with leading '!' or '*').
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[!*]
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-exclude-hashes-with-leading-6:
+      state_title: Exclude hashes with leading '$6$'.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^[$][6][$]
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-no-active-password-hash-in-etc-shadow-has-prefix-other:
+      test_title: No active password hash in /etc/shadow has a prefix other than '$6$'.
+      capability: independent.textfilecontent54
+      object: filter-out-acceptable-shadow-password-entries-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-no-active-password-hash-in-etc-shadow-has-prefix-other

@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.8b137750ea5c94b0281dccf9
+  version: 1
+  assessment_title: The delay between login prompts following a failed login attempt must be at least 4 seconds.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    sleeptime-etc-default-login-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: login
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*SLEEPTIME=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: SLEEPTIME /etc/default/login
+  states:
+    state-sleeptime-must-not-be-less-than-4:
+      state_title: SLEEPTIME must not be less than 4
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '4'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-sleeptime-set-4-or-more-in-etc-default-login:
+      test_title: SLEEPTIME is set to 4 or more in /etc/default/login
+      capability: independent.textfilecontent54
+      object: sleeptime-etc-default-login-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-sleeptime-must-not-be-less-than-4
+  evaluate:
+    test: test-sleeptime-set-4-or-more-in-etc-default-login

@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.5dd9b2e4ba0312b1a864bcd5
+  version: 1
+  assessment_title: The macOS system must configure audit_control owner to root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    audit-control-owner-configure-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $3}'
+      object_title: audit_control_owner_configure_recommended_object
+  states:
+    state-audit-control-owner-configure-recommended-state:
+      state_title: audit_control_owner_configure_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '0'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-control-owner-configure-recommended-test:
+      test_title: audit_control_owner_configure_recommended_test
+      capability: independent.shellcommand
+      object: audit-control-owner-configure-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-audit-control-owner-configure-recommended-state
+  evaluate:
+    test: test-audit-control-owner-configure-recommended-test

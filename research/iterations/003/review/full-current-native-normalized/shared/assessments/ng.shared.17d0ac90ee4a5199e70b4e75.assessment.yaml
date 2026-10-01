@@ -1,0 +1,159 @@
+assessment:
+  id: ng.shared.17d0ac90ee4a5199e70b4e75
+  version: 1
+  assessment_title: Gnome lock-delay setting lock
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: dconf
+      object_title: null
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/db/
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[0-9].*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\[org/gnome/desktop/screensaver\]([^\n]*\n+)+?lock-delay\s*=\s*uint32\s+[0-5]\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        multiline: 'true'
+        max_depth: '1'
+        recurse_direction: down
+      object_title: null
+    lock-delay-locks-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: lock-paths-databases-that-have-lock-delay-settings-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/org/gnome/desktop/screensaver/lock-delay$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        multiline: 'true'
+        max_depth: '1'
+        recurse_direction: down
+      object_title: lock-delay locks
+    lock-delay-entries-that-not-locked-object:
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - object: independent-textfilecontent54-object
+        filters:
+        - action: exclude
+          state: state-match-paths-for-databases-that-have-lock-delay-locked
+      object_title: lock-delay entries that are not locked
+  variables:
+    lock-paths-databases-that-have-lock-delay-settings-variable:
+      title: lock paths for databases that have lock-delay settings
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: independent-textfilecontent54-object
+            field: path
+        - literal:
+            value: /locks
+            datatype: string
+    paths-databases-that-have-lock-delay-locked-variable:
+      title: paths for databases that have lock-delay locked
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: lock-delay-locks-object
+              field: path
+          pattern: ^(.*)/locks$
+  states:
+    state-match-paths-for-databases-that-have-lock-delay-locked:
+      state_title: match paths for databases that have lock-delay locked
+      capability: independent.textfilecontent54
+      state:
+        field: path
+        value:
+          variable: paths-databases-that-have-lock-delay-locked-variable
+        operation: equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-package-dconf-installed:
+      test_title: package dconf is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: all_exist
+      check: all
+    test-lock-delay-configuration-present:
+      test_title: lock-delay configuration is present
+      capability: independent.textfilecontent54
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+    test-lock-delay-lock-exists:
+      test_title: lock-delay lock exists
+      capability: independent.textfilecontent54
+      object: lock-delay-locks-object
+      check_existence: at_least_one_exists
+      check: all
+    test-all-lock-delay-entries-locked:
+      test_title: all lock-delay entries are locked
+      capability: independent.textfilecontent54
+      object: lock-delay-entries-that-not-locked-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    any:
+    - not:
+        test: test-package-dconf-installed
+    - all:
+      - test: test-lock-delay-configuration-present
+      - test: test-lock-delay-lock-exists
+      - test: test-all-lock-delay-entries-locked

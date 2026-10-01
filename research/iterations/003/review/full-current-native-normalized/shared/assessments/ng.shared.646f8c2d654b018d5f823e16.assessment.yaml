@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.646f8c2d654b018d5f823e16
+  version: 1
+  assessment_title: WN19-00-000340 - Windows Server 2019 must not have the Peer Name Resolution Protocol installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT startmode FROM Win32_Service WHERE name='PNRPSvc'
+      object_title: null
+  states:
+    state-windows-wmi57:
+      state_title: null
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: startmode
+            value: Disabled
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+        operation: equals
+        datatype: record
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-peer-name-resolution-protocol-server-feature-disabled-or-not-present:
+      test_title: The Peer Name Resolution Protocol server feature is disabled or not present
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-windows-wmi57
+  evaluate:
+    test: test-peer-name-resolution-protocol-server-feature-disabled-or-not-present

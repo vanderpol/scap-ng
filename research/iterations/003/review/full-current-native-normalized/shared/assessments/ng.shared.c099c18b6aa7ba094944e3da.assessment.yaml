@@ -1,0 +1,82 @@
+assessment:
+  id: ng.shared.c099c18b6aa7ba094944e3da
+  version: 1
+  assessment_title: WN12-SO-000021
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: InactivityTimeoutSecs
+      object_title: null
+  states:
+    state-reg-dword-type-and-value-is-less-than-or-equals-900:
+      state_title: Reg_Dword type and value is less than or equals 900
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '900'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-reg-dword-type-and-value-is-greater-than-0:
+      state_title: Reg_Dword type and value is greater than 0
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-interactive-logon-machine-inactivity-limit-set-900-seconds-or-less:
+      test_title: '''Interactive logon: Machine inactivity limit'' is set to ''900'' seconds or less'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: AND
+      states:
+      - state-reg-dword-type-and-value-is-less-than-or-equals-900
+      - state-reg-dword-type-and-value-is-greater-than-0
+  evaluate:
+    test: test-interactive-logon-machine-inactivity-limit-set-900-seconds-or-less

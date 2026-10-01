@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.fc8831f453d49e18623cf995
+  version: 1
+  assessment_title: The macOS system must use an approved antivirus program.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    os-config-data-install-enforce-recommended-object-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.SoftwareUpdate'')\
+
+            .objectForKey(''ConfigDataInstall'').js
+
+            EOS'
+      object_title: os_config_data_install_enforce_recommended_object
+  states:
+    state-os-config-data-install-enforce-recommended-state:
+      state_title: os_config_data_install_enforce_recommended_state
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'true'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-os-config-data-install-enforce-recommended-test:
+      test_title: os_config_data_install_enforce_recommended_test
+      capability: independent.shellcommand
+      object: os-config-data-install-enforce-recommended-object-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-os-config-data-install-enforce-recommended-state
+  evaluate:
+    test: test-os-config-data-install-enforce-recommended-test

@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.787b425779819ab23409bea7
+  version: 1
+  assessment_title: WN10-CC-000335 - The Windows Remote Management (WinRM) client must not allow unencrypted traffic.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\WinRM\Client
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowUnencryptedTraffic
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-allow-unencrypted-traffic-set-disabled:
+      test_title: '''Allow unencrypted traffic'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-allow-unencrypted-traffic-set-disabled

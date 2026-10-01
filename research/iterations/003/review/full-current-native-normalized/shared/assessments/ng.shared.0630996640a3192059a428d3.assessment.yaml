@@ -1,0 +1,213 @@
+assessment:
+  id: ng.shared.0630996640a3192059a428d3
+  version: 1
+  assessment_title: The default umask for system and users must be 077.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-users-object:
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^-+].*$
+      object_title: All users
+    home-directories-all-user-accounts-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: all-users-object
+        filters:
+        - action: exclude
+          state: state-system-accounts
+        - action: exclude
+          state: state-system-account
+        - action: exclude
+          state: state-system-account-2
+        - action: exclude
+          state: state-system-account-3
+      object_title: The home directories of all user accounts.
+    user-initialization-file-profile-s-umask-setting-object:
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-all-user-accounts-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[.].*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*umask\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The user initialization file, .profile's, umask setting
+    default-login-s-umask-setting-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/login
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*UMASK=(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: The default login's umask setting.
+    home-directories-all-user-accounts-that-don-t-have-profile-object:
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - object: all-users-object
+        filters:
+        - action: exclude
+          state: state-system-accounts
+        - action: exclude
+          state: state-system-account
+        - action: exclude
+          state: state-system-account-2
+        - action: exclude
+          state: state-system-account-3
+        - action: exclude
+          state: state-user-accounts-that-have-a-profile
+      object_title: The home directories of all user accounts that don't have .profile files.
+  variables:
+    home-directories-all-user-accounts-variable:
+      title: The home directories of all user accounts.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: home-directories-all-user-accounts-object
+          field: home_dir
+    home-directories-all-user-accounts-that-have-profile-variable:
+      title: The home directories of all user accounts that have .profile
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: user-initialization-file-profile-s-umask-setting-object
+          field: path
+  states:
+    state-umask-setting-of-077:
+      state_title: Umask setting of 077.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '077'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-accounts:
+      state_title: System accounts.
+      capability: unix.password
+      state:
+        field: user_id
+        value: '100'
+        operation: less than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-account:
+      state_title: System account.
+      capability: unix.password
+      state:
+        field: user_id
+        value: '60001'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-account-2:
+      state_title: System account.
+      capability: unix.password
+      state:
+        field: user_id
+        value: '60002'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-account-3:
+      state_title: System account.
+      capability: unix.password
+      state:
+        field: user_id
+        value: '65534'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-user-accounts-that-have-a-profile:
+      state_title: User accounts that have a .profile
+      capability: unix.password
+      state:
+        field: home_dir
+        value:
+          variable: home-directories-all-user-accounts-that-have-profile-variable
+        operation: equals
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-check-umask-setting-in-every-user-initialization-file-make-sure:
+      test_title: Check the umask setting in every user initialization file to make sure it is 077.
+      capability: independent.textfilecontent54
+      object: user-initialization-file-profile-s-umask-setting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-umask-setting-of-077
+    test-check-umask-setting-in-default-login-file-make-sure-it:
+      test_title: Check the umask setting in the default login file to make sure it is 077.
+      capability: independent.textfilecontent54
+      object: default-login-s-umask-setting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-umask-setting-of-077
+    test-home-directories-all-user-accounts-that-don-t-have-profile:
+      test_title: The home directories of all user accounts that don't have .profile files.
+      capability: unix.password
+      object: home-directories-all-user-accounts-that-don-t-have-profile-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-check-umask-setting-in-every-user-initialization-file-make-sure
+    - test: test-check-umask-setting-in-default-login-file-make-sure-it
+    - test: test-home-directories-all-user-accounts-that-don-t-have-profile

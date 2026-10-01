@@ -1,0 +1,54 @@
+assessment:
+  id: ng.shared.7bd57d7979359fb17f357282
+  version: 1
+  assessment_title: UBTU-20-010009 - Ubuntu operating systems when booted must require authentication upon booting into single-user
+    and maintenance modes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    root-password-hash-in-boot-grub-grub-cfg-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/grub/grub.cfg
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(password\S*)\s+root\s+
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      object_title: root password hash in /boot/grub/grub.cfg
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: password_pbkdf2
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-boot-grub-grub-cfg-uses-password-pbkdf2-root:
+      test_title: /boot/grub/grub.cfg uses password_pbkdf2 for root
+      capability: independent.textfilecontent54
+      object: root-password-hash-in-boot-grub-grub-cfg-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
+  evaluate:
+    test: test-boot-grub-grub-cfg-uses-password-pbkdf2-root

@@ -1,0 +1,160 @@
+assessment:
+  id: ng.shared.5714ab130466f2c48a281dd4
+  version: 1
+  assessment_title: The Ubuntu operating system must be configured to use AppArmor.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    ubuntu-configured-use-apparmor-apparmor-enaabled-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'systemctl is-enabled apparmor.service '
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: enabled
+      object_title: Ubuntu must be configured to use AppArmor. AppArmor is enaabled.
+    ubuntu-configured-use-apparmor-apparmor-active-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: systemctl is-active apparmor.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: active
+      object_title: Ubuntu must be configured to use AppArmor. AppArmor is active.
+    ubuntu-configured-use-apparmor-apparmor-profiles-loaded-enforcing-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: apparmor_status | grep -i profile
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(\d+)\s+profiles\s+are\s+in\s+enforce\s+mode\s*
+      object_title: Ubuntu must be configured to use AppArmor. Apparmor profiles are loaded and enforcing.
+    ubuntu-configured-use-apparmor-apparmor-profiles-loaded-enforcing-object-2:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: apparmor_status | grep -i profile
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(\d+)\s+profiles\s+are\s+loaded\s*
+      object_title: Ubuntu must be configured to use AppArmor. Apparmor profiles are loaded and enforcing.
+  states:
+    state-ubuntu-must-be-configured-to-use-apparmor-apparmor-is-en:
+      state_title: Ubuntu must be configured to use AppArmor. Apparmor is enabled .
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^\s*enabled
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ubuntu-must-be-configured-to-use-apparmor-apparmor-is-ac:
+      state_title: Ubuntu must be configured to use AppArmor. Apparmor is active .
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^\s*active
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ubuntu-must-be-configured-to-use-apparmor-apparmor-profi:
+      state_title: Ubuntu must be configured to use AppArmor. Apparmor profiles are loaded and enforcing.
+      capability: independent.shellcommand
+      state:
+        field: subexpression
+        value: '1'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-ubuntu-configured-use-apparmor-apparmor-enabled:
+      test_title: Ubuntu must be configured to use AppArmor.AppArmor is enabled.
+      capability: independent.shellcommand
+      object: ubuntu-configured-use-apparmor-apparmor-enaabled-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-be-configured-to-use-apparmor-apparmor-is-en
+    test-ubuntu-configured-use-apparmor-apparmor-active:
+      test_title: Ubuntu must be configured to use AppArmor. AppArmor is Active.
+      capability: independent.shellcommand
+      object: ubuntu-configured-use-apparmor-apparmor-active-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-be-configured-to-use-apparmor-apparmor-is-ac
+    test-ubuntu-configured-use-apparmor-apparmor-profiles-enforcing:
+      test_title: Ubuntu must be configured to use AppArmor. AppArmor profiles are enforcing.
+      capability: independent.shellcommand
+      object: ubuntu-configured-use-apparmor-apparmor-profiles-loaded-enforcing-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-be-configured-to-use-apparmor-apparmor-profi
+    test-ubuntu-configured-use-apparmor-apparmor-profiles-loaded:
+      test_title: Ubuntu must be configured to use AppArmor. AppArmor profiles are loaded.
+      capability: independent.shellcommand
+      object: ubuntu-configured-use-apparmor-apparmor-profiles-loaded-enforcing-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ubuntu-must-be-configured-to-use-apparmor-apparmor-profi
+  evaluate:
+    all:
+    - test: test-ubuntu-configured-use-apparmor-apparmor-enabled
+    - test: test-ubuntu-configured-use-apparmor-apparmor-active
+    - test: test-ubuntu-configured-use-apparmor-apparmor-profiles-enforcing
+    - test: test-ubuntu-configured-use-apparmor-apparmor-profiles-loaded
