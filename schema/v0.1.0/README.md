@@ -37,6 +37,8 @@ The current executable schemas cover:
 10. Reusable collected Item results
 11. Detailed Test results
 12. Object collection results
+13. Variable results
+14. Scan-level result index
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
@@ -166,3 +168,15 @@ These files are design probes and MAY change as Manual Assessment semantics are
 reviewed. They SHALL NOT be treated as evidence that arbitrary OCIL-style
 branching or workflow has been adopted.
 
+
+
+## Result crosswalk and worked examples
+
+The OVAL Results/System Characteristics semantic crosswalk is maintained in
+`specification/results/oval-results-system-characteristics-crosswalk.md`.
+
+Issue #40 worked examples live in
+`research/iterations/003/results/issue40/` and cover existence, multi-State,
+multi-variable, collection-error, bounded-evidence, Windows registry, and
+scan-level result cases. These examples are validated by the current-design
+regression suite using an offline local schema registry.
