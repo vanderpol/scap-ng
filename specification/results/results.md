@@ -654,3 +654,120 @@ is reached.
 **Specification navigation:** [← Previous: Source, Compilation, Packaging, and Integrity](../package/package-and-integrity.md) · [Contents](../README.md) · [Next: SCAP 1.4 Migration →](../migration/scap-1.4-migration.md)
 
 <!-- spec-nav:end -->
+
+
+## Signed Benchmark Result packages
+
+SCAP-NG SHOULD make cryptographic signing of completed Benchmark Results simple
+enough to be routinely implemented by scanners and enterprise assessment
+pipelines.
+
+The preferred baseline model is **one signature over the immutable result
+package manifest**, not separate signatures embedded throughout every Rule,
+Assessment Result, or evidence object.
+
+A signed result package SHALL contain an integrity manifest that identifies the
+authoritative Benchmark Result and every package member needed to interpret
+that result, including referenced Assessment Results and retained evidence when
+those are stored as separate members.
+
+Each manifest entry SHALL include, at minimum:
+
+- package-relative member identity/path;
+- member type;
+- cryptographic digest;
+- content size SHOULD be included.
+
+The manifest SHALL also identify the digest algorithm and the exact result
+format/schema versions needed to interpret the package.
+
+A signature SHALL bind the complete manifest representation. Therefore, changing
+the Benchmark Result, a referenced Assessment Result, evidence, or another
+integrity-bound member changes the manifest verification outcome without
+requiring every nested object to carry its own signature.
+
+Conceptually:
+
+    result-package/
+      manifest.json
+      manifest.sig
+      benchmark-result.json
+      assessment-results/
+        ...
+      evidence/
+        ...
+
+The exact signature envelope/algorithm profile remains a security-profile
+decision, but the core result model SHALL NOT depend on XML Signature.
+
+### Signing and verification behavior
+
+A conforming signed-result implementation SHALL provide deterministic answers
+to at least:
+
+1. Is the result package internally intact?
+2. Does every integrity-bound member match the digest recorded in the signed
+   manifest?
+3. Is the manifest signature cryptographically valid?
+4. What signer/key/certificate identity produced the signature?
+5. What trust decision, if any, was made for that signer?
+
+Cryptographic validity and signer trust SHALL be reported separately. A valid
+signature from an untrusted or unknown key SHALL NOT be described as a trusted
+result.
+
+Signature verification SHALL NOT change Assessment truth or Rule outcomes.
+Signature/trust status is provenance/integrity metadata about the result
+artifact.
+
+### Canonicalization and implementation simplicity
+
+The signature design SHOULD minimize canonicalization complexity.
+
+The preferred implementation pattern is:
+
+1. serialize each result member in its specified scanner-facing deterministic
+   form;
+2. hash the exact member bytes;
+3. create a deterministic manifest containing those hashes;
+4. sign the exact canonical manifest bytes;
+5. verify by reproducing the member hashes and verifying the signature over the
+   manifest.
+
+A verifier SHALL NOT need to reconstruct the original Benchmark, replay the
+scan, or canonicalize arbitrary semantically equivalent JSON merely to verify
+result integrity.
+
+### Signer metadata and enterprise use
+
+A signed result SHOULD identify enough signer metadata to support both local
+scanner keys and enterprise signing services. This MAY include:
+
+- signer/key identifier;
+- certificate chain or reference, when certificate-based trust is used;
+- signing time when supplied by an authenticated signing process;
+- scanner/product identity associated with result production;
+- organization or service identity when an enterprise signer is used.
+
+The standard SHOULD define a small mandatory interoperable signing profile and
+permit additional enterprise trust profiles without changing the result data
+model.
+
+### Unsigned results
+
+An unsigned Benchmark Result remains structurally valid unless a deployment or
+conformance profile requires signing. Its signature status SHALL be explicit;
+absence of a signature SHALL NOT be confused with verification failure.
+
+Organizations MAY require signed results as local policy.
+
+### Legacy XML signatures
+
+Legacy XCCDF/OVAL XML signatures, when encountered during migration/import, are
+source-integrity/provenance information. They SHALL NOT require SCAP-NG result
+packages to reproduce XML Signature structures.
+
+A migration tool MAY verify and record the status of a legacy source signature.
+The authoritative integrity mechanism for a native completed SCAP-NG result
+package is the SCAP-NG result-package signature defined above.
+
