@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Authoring-readiness guard; not a complete schema or semantic evaluator."""
+"""Authoring-readiness guard for the OVAL-aligned Test/Object/State/Variable vocabulary; not a complete schema or semantic evaluator."""
 import argparse
 import json
 from pathlib import Path
 import yaml
 
-OLD_KEYS={'collect','collections','collection','assert','assertion','item_quantifier','object_values'}
+OLD_KEYS={'collect','collections','collection','collection_title','assert','assertion','item_quantifier','object_values'}
 ASSESSMENT_SECTION_ORDER=('objects','variables','states','tests','evaluate')
 
 def violations(document):
