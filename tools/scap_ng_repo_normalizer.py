@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shutil
+from difflib import SequenceMatcher
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -167,6 +168,96 @@ def rewrite_rules(output_root: Path, input_root: Path, replacements: dict[Path, 
     return rewritten
 
 
+
+def _tokens(value: str | None) -> list[str]:
+    if not value:
+        return []
+    return re.findall(r"[a-z0-9]+", value.lower())
+
+
+def _normalized_title(value: str | None) -> str:
+    return " ".join(_tokens(value))
+
+
+def near_rule_candidates(benchmarks: list[dict], *, limit: int = 500) -> list[dict]:
+    """Find cross-benchmark Rule text candidates for manual overlap review.
+
+    This is advisory only.  It intentionally does not claim policy equivalence.
+    Candidate blocking uses title token trigrams so the corpus scan stays bounded.
+    """
+    rules=[]
+    for benchmark in benchmarks:
+        for row in benchmark["rules"]:
+            doc=load_yaml(row["rule_path"])
+            rule=doc.get("rule") or {}
+            title=rule.get("title") or ""
+            tokens=_tokens(title)
+            rules.append({
+                "benchmark":row["benchmark"],
+                "benchmark_id":row.get("benchmark_id"),
+                "rule_id":row.get("rule_id"),
+                "title":title,
+                "discussion":rule.get("discussion") or "",
+                "remediation":((rule.get("remediation") or {}).get("guidance") or ""),
+                "identifiers":rule.get("identifiers") or [],
+                "tokens":tokens,
+                "normalized_title":" ".join(tokens),
+            })
+
+    inverted: dict[tuple[str,...], list[int]] = defaultdict(list)
+    for idx,row in enumerate(rules):
+        toks=row["tokens"]
+        shingles={tuple(toks[i:i+3]) for i in range(max(0,len(toks)-2))}
+        if not shingles and toks:
+            shingles={tuple(toks)}
+        for shingle in shingles:
+            inverted[shingle].append(idx)
+
+    candidates=set()
+    for ids in inverted.values():
+        # Avoid pathological generic shingles while retaining useful overlap.
+        if len(ids)>200:
+            continue
+        for pos,left in enumerate(ids):
+            for right in ids[pos+1:]:
+                if rules[left]["benchmark"]==rules[right]["benchmark"]:
+                    continue
+                candidates.add((min(left,right),max(left,right)))
+
+    out=[]
+    for left_idx,right_idx in candidates:
+        left,right=rules[left_idx],rules[right_idx]
+        lt=set(left["tokens"]); rt=set(right["tokens"])
+        union=lt|rt
+        jaccard=(len(lt&rt)/len(union)) if union else 0.0
+        title_ratio=SequenceMatcher(None,left["normalized_title"],right["normalized_title"]).ratio()
+        discussion_ratio=SequenceMatcher(
+            None,
+            " ".join(_tokens(left["discussion"]))[:4000],
+            " ".join(_tokens(right["discussion"]))[:4000],
+        ).ratio()
+        score=0.55*title_ratio+0.30*jaccard+0.15*discussion_ratio
+        if score < 0.62:
+            continue
+        left_ids={(x.get("scheme"),x.get("value")) for x in left["identifiers"] if isinstance(x,dict)}
+        right_ids={(x.get("scheme"),x.get("value")) for x in right["identifiers"] if isinstance(x,dict)}
+        shared_ids=sorted(
+            [{"scheme":s,"value":v} for s,v in left_ids & right_ids],
+            key=lambda x:(x["scheme"] or "",x["value"] or ""),
+        )
+        out.append({
+            "similarity_score":round(score,4),
+            "title_similarity":round(title_ratio,4),
+            "title_token_jaccard":round(jaccard,4),
+            "discussion_similarity":round(discussion_ratio,4),
+            "shared_identifiers":shared_ids,
+            "left":{k:left[k] for k in ("benchmark","benchmark_id","rule_id","title")},
+            "right":{k:right[k] for k in ("benchmark","benchmark_id","rule_id","title")},
+            "classification":"manual_overlap_review_only",
+        })
+    out.sort(key=lambda x:(-x["similarity_score"],x["left"]["benchmark"],x["left"]["rule_id"] or ""))
+    return out[:limit]
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus_root", type=Path)
@@ -304,6 +395,7 @@ def main() -> int:
             x["shape_fingerprint"],
         )
     )
+    rule_candidates = near_rule_candidates(benchmarks, limit=args.top_near)
 
     before_assessment_instances = len(rows)
     after_assessment_definitions = before_assessment_instances - duplicate_instances_avoided
@@ -325,10 +417,12 @@ def main() -> int:
             "exact_definition_reduction_pct": reduction_pct,
             "rule_files_rewritten": rewritten_rule_files,
             "near_duplicate_review_groups": len(near_groups),
+            "near_duplicate_rule_candidates_reported": len(rule_candidates),
         },
         "exact_groups": exact_report,
         "near_duplicate_review_groups": near_groups[: args.top_near],
         "near_duplicate_groups_total": len(near_groups),
+        "near_duplicate_rule_candidates": rule_candidates,
         "safety": {
             "automatic_merge_basis": "exact normalized Assessment semantics only",
             "near_duplicates_merged": False,
