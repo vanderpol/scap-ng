@@ -203,6 +203,30 @@ a standardized class.
 Research implementations MAY experiment with the concept only when clearly
 marked as non-conformant/experimental.
 
+#### Placement of informational semantics
+
+Informational behavior does not need to be a Benchmark-level property.
+
+The design distinguishes two cases:
+
+1. **Intrinsic informational Assessment** — if an Assessment's purpose is
+   inherently informational wherever it is reused, that intent SHOULD live with
+   the Assessment itself. If the Board adopts `class: information`, that class
+   is the preferred standardized expression.
+2. **Policy-context informational disposition** — if an otherwise ordinary
+   compliance/vulnerability/patch/inventory Assessment is treated as
+   reporting-only in one Rule context, that disposition belongs to the Rule
+   binding/result policy and SHALL NOT mutate the reusable Assessment's class or
+   technical truth.
+
+A Benchmark SHALL NOT be required to carry informational disposition merely to
+support either case. Benchmark-wide policy MAY influence scoring/reporting in
+future profiles, but it is not the authoritative home for the meaning of one
+Assessment or one Rule's reporting disposition.
+
+Canonical Results SHOULD record both the technical Assessment outcome and the
+effective informational/reporting disposition when they differ.
+
 
 ## Assessment-result dependencies
 
