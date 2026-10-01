@@ -97,6 +97,7 @@ def project_scan(
                 "observed_state": rule.get("observed_state", []),
                 "instances": rule.get("instances", []),
                 "evidence_refs": rule.get("evidence_refs", []),
+                "evidence_summary": rule.get("evidence_summary"),
                 "organizational_inputs": rule.get("organizational_inputs", []),
             }
             events.append(event)
