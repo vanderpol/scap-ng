@@ -4,6 +4,8 @@
   xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2"
   xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
   xmlns:oval-res="http://oval.mitre.org/XMLSchema/oval-results-5"
+  xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
   xmlns:oval-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5"
   xmlns:unix-sc="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix"
   id="issue21-detailed-arf">
@@ -39,7 +41,7 @@
             <oval:schema_version platform="http://oval.mitre.org/XMLSchema/oval-system-characteristics-5#unix">5.12.3</oval:schema_version>
             <oval:timestamp>2026-10-01T23:01:00</oval:timestamp>
           </oval-res:generator>
-          <oval-res:directives include_source_definitions="false">
+          <oval-res:directives include_source_definitions="true">
             <oval-res:definition_true reported="true" content="full"/>
             <oval-res:definition_false reported="true" content="full"/>
             <oval-res:definition_unknown reported="true" content="full"/>
@@ -47,6 +49,53 @@
             <oval-res:definition_not_evaluated reported="true" content="full"/>
             <oval-res:definition_not_applicable reported="true" content="full"/>
           </oval-res:directives>
+          <oval-def:oval_definitions>
+            <oval-def:generator>
+              <oval:product_name>issue21-comparison-content</oval:product_name>
+              <oval:product_version>1</oval:product_version>
+              <oval:schema_version>5.12.3</oval:schema_version>
+              <oval:schema_version platform="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">5.12.3</oval:schema_version>
+              <oval:timestamp>2026-10-01T23:00:00</oval:timestamp>
+            </oval-def:generator>
+            <oval-def:definitions>
+              <oval-def:definition id="oval:scap-ng.dev:def:1" version="1" class="compliance">
+                <oval-def:metadata>
+                  <oval-def:title>Example file permissions must be 0644</oval-def:title>
+                  <oval-def:description>/etc/example must be owned by root and have permissions equivalent to mode 0644.</oval-def:description>
+                </oval-def:metadata>
+                <oval-def:criteria operator="AND">
+                  <oval-def:criterion test_ref="oval:scap-ng.dev:tst:1" comment="Check /etc/example ownership and permissions"/>
+                </oval-def:criteria>
+              </oval-def:definition>
+            </oval-def:definitions>
+            <oval-def:tests>
+              <unix-def:file_test id="oval:scap-ng.dev:tst:1" version="1"
+                check_existence="at_least_one_exists" check="all" state_operator="AND"
+                comment="Check /etc/example ownership and permissions">
+                <unix-def:object object_ref="oval:scap-ng.dev:obj:1"/>
+                <unix-def:state state_ref="oval:scap-ng.dev:ste:1"/>
+              </unix-def:file_test>
+            </oval-def:tests>
+            <oval-def:objects>
+              <unix-def:file_object id="oval:scap-ng.dev:obj:1" version="1" comment="Collect /etc/example">
+                <unix-def:filepath>/etc/example</unix-def:filepath>
+              </unix-def:file_object>
+            </oval-def:objects>
+            <oval-def:states>
+              <unix-def:file_state id="oval:scap-ng.dev:ste:1" version="1" operator="AND" comment="root-owned mode 0644">
+                <unix-def:user_id datatype="int">0</unix-def:user_id>
+                <unix-def:uread datatype="boolean">true</unix-def:uread>
+                <unix-def:uwrite datatype="boolean">true</unix-def:uwrite>
+                <unix-def:uexec datatype="boolean">false</unix-def:uexec>
+                <unix-def:gread datatype="boolean">true</unix-def:gread>
+                <unix-def:gwrite datatype="boolean">false</unix-def:gwrite>
+                <unix-def:gexec datatype="boolean">false</unix-def:gexec>
+                <unix-def:oread datatype="boolean">true</unix-def:oread>
+                <unix-def:owrite datatype="boolean">false</unix-def:owrite>
+                <unix-def:oexec datatype="boolean">false</unix-def:oexec>
+              </unix-def:file_state>
+            </oval-def:states>
+          </oval-def:oval_definitions>
           <oval-res:results>
             <oval-res:system>
               <oval-res:definitions>
