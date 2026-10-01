@@ -295,11 +295,56 @@ class EarlyTerminationSemantics(unittest.TestCase):
         self.assertIsNone(decisive_partial_existence("only_one_exists", exists=1))
 
         self.assertIsNone(decisive_partial_existence("all_exist", exists=1))
-        self.assertIsNone(decisive_partial_existence("any_exist", exists=1))
+        self.assertEqual(decisive_partial_existence("any_exist", exists=1), TRUE)
+        self.assertIsNone(decisive_partial_existence("any_exist", exists=0))
 
     def test_error_like_observations_do_not_create_new_shortcuts(self):
         self.assertIsNone(decisive_partial_check("all", [TRUE, ERROR]))
         self.assertIsNone(decisive_partial_check("at least one", [FALSE, UNKNOWN]))
+
+    def test_every_check_shortcut_is_stable_under_additional_results(self):
+        cases = (
+            ("all", [FALSE], FALSE),
+            ("at least one", [TRUE], TRUE),
+            ("only one", [TRUE, TRUE], FALSE),
+            ("none satisfy", [TRUE], FALSE),
+        )
+        future_results = (TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE)
+        for check, observed, expected in cases:
+            self.assertEqual(decisive_partial_check(check, observed), expected)
+            for first in future_results:
+                with self.subTest(check=check, suffix=(first,)):
+                    self.assertEqual(aggregate_check(check, observed + [first]), expected)
+                for second in future_results:
+                    with self.subTest(check=check, suffix=(first, second)):
+                        self.assertEqual(
+                            aggregate_check(check, observed + [first, second]),
+                            expected,
+                        )
+
+    def test_every_existence_shortcut_is_stable_under_additional_statuses(self):
+        cases = (
+            ("at_least_one_exists", 1, TRUE),
+            ("any_exist", 1, TRUE),
+            ("none_exist", 1, FALSE),
+            ("only_one_exists", 2, FALSE),
+        )
+        future_statuses = ("exists", "does_not_exist", "error", "not_collected")
+        for mode, starting_exists, expected in cases:
+            self.assertEqual(
+                decisive_partial_existence(mode, exists=starting_exists),
+                expected,
+            )
+            for status in future_statuses:
+                counts = {
+                    "exists": starting_exists,
+                    "does_not_exist": 0,
+                    "error": 0,
+                    "not_collected": 0,
+                }
+                counts[status] += 1
+                with self.subTest(mode=mode, status=status):
+                    self.assertEqual(aggregate_existence(mode, **counts), expected)
 
 
 class FilterStateSelectionSemantics(unittest.TestCase):
