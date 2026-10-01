@@ -171,6 +171,30 @@ def aggregate_operator(operator, values):
     raise ValueError(f"unsupported OperatorEnumeration: {operator}")
 
 
+def apply_filter_state_result(action, state_result):
+    """Apply only source-backed Boolean filter selection semantics.
+
+    OVAL 5.12.3 defines include/exclude behavior when an item matches or does
+    not match the referenced State, but the generic schema text does not fully
+    define how non-Boolean State outcomes should alter collection status.
+    Until that propagation is independently evidenced, reject non-Boolean
+    results rather than coercing them through host-language truthiness.
+    """
+    action = (action or "exclude").lower()
+    if action not in {"include", "exclude"}:
+        raise ValueError(f"unsupported filter action: {action}")
+    if state_result == TRUE:
+        return action == "include"
+    if state_result == FALSE:
+        return action == "exclude"
+    if state_result in {ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE}:
+        raise NotImplementedError(
+            f"filter State result propagation is unresolved for {state_result}"
+        )
+    raise ValueError(f"unsupported filter State result: {state_result}")
+
+
+
 def combine_set_flags(operator, first_flag, second_flag):
     """Combine two collected-object flags per OVAL 5.12.3 set tables."""
     operator = operator.upper()
