@@ -196,3 +196,126 @@ def align_assessment_vocabulary(document: dict) -> dict:
 def verify_alignment(intermediate: dict, aligned: dict) -> None:
     if aligned != align_assessment_vocabulary(intermediate):
         raise ValueError("Assessment changed beyond declared OVAL vocabulary alignment")
+
+
+def legacy_intermediate_vocabulary(document: dict) -> dict:
+    """Return the older Collection/assertion intermediate shape for legacy emitters.
+
+    This is an internal compatibility bridge only. It exists so semantic
+    round-trip machinery can consume the authoritative OVAL-aligned authored
+    vocabulary without making Collection an authored native concept again.
+    """
+    result = copy.deepcopy(document)
+    assessment = result.get("assessment")
+    if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
+        return result
+    if "objects" not in assessment:
+        return result
+
+    states = assessment.get("states", {})
+    objects = assessment.pop("objects", {})
+    object_names = {
+        old: old.replace("-object", "-collection")
+        for old in objects
+    }
+
+    def remap_refs(value):
+        if isinstance(value, list):
+            return [remap_refs(x) for x in value]
+        if not isinstance(value, dict):
+            if isinstance(value, str) and value in object_names:
+                return object_names[value]
+            return value
+        out = {}
+        for key, item in value.items():
+            new_key = "collection" if key == "object" else key
+            if new_key == "collection" and isinstance(item, str) and item in object_names:
+                out[new_key] = object_names[item]
+            else:
+                out[new_key] = remap_refs(item)
+        return out
+
+    collections = {}
+    for name, payload in objects.items():
+        payload = remap_refs(payload)
+        if "object_title" in payload:
+            payload["collection_title"] = payload.pop("object_title")
+        collections[object_names[name]] = payload
+
+    def expand_filters(value):
+        if isinstance(value, list):
+            return [expand_filters(x) for x in value]
+        if not isinstance(value, dict):
+            return value
+        if "state" in value and "action" in value and isinstance(value["state"], str):
+            ref = value["state"]
+            if ref not in states:
+                raise ValueError(f"Unknown State reference in Object filter: {ref}")
+            state = states[ref]
+            out = {k: expand_filters(v) for k, v in value.items() if k != "state"}
+            out["match"] = copy.deepcopy(state.get("state"))
+            if state.get("state_title") is not None:
+                out["state_title"] = state.get("state_title")
+            if state.get("capability") is not None:
+                out["capability"] = state.get("capability")
+            return out
+        return {k: expand_filters(v) for k, v in value.items()}
+
+    collections = expand_filters(collections)
+    if "variables" in assessment:
+        assessment["variables"] = remap_refs(assessment["variables"])
+
+    for test in assessment.get("tests", {}).values():
+        obj = test.pop("object", None)
+        if obj is not None:
+            test["collection"] = object_names.get(obj, obj)
+
+        assertion = {}
+        if "check_existence" in test:
+            assertion["existence"] = test.pop("check_existence")
+        if "check" in test:
+            assertion["item_quantifier"] = test.pop("check")
+        state_refs = test.pop("states", [])
+        if state_refs:
+            assertion["state_operator"] = test.pop("state_operator", "AND")
+            embedded = []
+            for ref in state_refs:
+                if ref not in states:
+                    raise ValueError(f"Unknown State reference in Test: {ref}")
+                state = states[ref]
+                embedded.append({
+                    "state_title": state.get("state_title"),
+                    "capability": state.get("capability"),
+                    "state": copy.deepcopy(state.get("state")),
+                })
+            if len(embedded) == 1:
+                only = embedded[0]
+                assertion["state_title"] = only.get("state_title")
+                assertion["state_capability"] = only.get("capability")
+                assertion["state"] = only.get("state")
+                # Do not synthesize a legacy state_operator for one State unless
+                # it was explicitly present in the aligned Test.
+                if "state_operator" not in test and assertion.get("state_operator") == "AND":
+                    assertion.pop("state_operator", None)
+            else:
+                assertion["states"] = embedded
+        elif "state_operator" in test:
+            assertion["state_operator"] = test.pop("state_operator")
+
+        if assertion:
+            test["assertion"] = assertion
+
+    assessment.pop("states", None)
+    assessment["collections"] = collections
+
+    # Match legacy intermediate presentation expected by existing emitters.
+    ordered = {}
+    section_order = ("collections", "variables", "tests", "evaluate")
+    for key, value in assessment.items():
+        if key not in section_order:
+            ordered[key] = value
+    for key in section_order:
+        if key in assessment:
+            ordered[key] = assessment[key]
+    result["assessment"] = ordered
+    return result
