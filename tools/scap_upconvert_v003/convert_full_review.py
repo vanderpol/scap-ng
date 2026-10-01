@@ -26,7 +26,7 @@ from scap_upconvert_v003.audit_profile_selection import (
     extract_selection, expected_selections, native_profile_id, audit)
 from scap_upconvert_v003.cleanliness import assert_native_clean
 from check_current_authoring_contract import violations
-from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
+from scap_upconvert_v003.assessment_oval_vocabulary import (align_assessment_vocabulary, WORKING_ASSESSMENT_SPECIFICATION_ID, WORKING_ASSESSMENT_SPECIFICATION_VERSION)
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 
@@ -504,6 +504,7 @@ def main(argv=None):
         front,_=source.normalize_front_matter(xr);rear,_=source.normalize_rear_matter(xr)
         groups,grouping=source.build_groups(rs);version=xr.find('x:version',source.NS)
         benchmark={'id':args.benchmark_id,'ng_schema_version':None,'use_case':'compliance',
+                   'assessment_specifications':[{'id':WORKING_ASSESSMENT_SPECIFICATION_ID,'version':WORKING_ASSESSMENT_SPECIFICATION_VERSION}],
                    'title':source.localized_texts(xr,'title'),'description':source.localized_texts(xr,'description'),
                    'language':xr.get('{http://www.w3.org/XML/1998/namespace}lang'),
                    'status':source.benchmark_status(xr),'version':{'value':source.text(version),'time':version.get('time'),'update':version.get('update')},
