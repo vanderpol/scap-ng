@@ -62,11 +62,55 @@ def main():
     enums=defaultdict(set)
     complex_types={}
     deprecated=[]
+    deprecated_enum_values=[]
 
     for path in sorted(args.schema_root.rglob("*.xsd")):
         root=ET.parse(path).getroot()
         target=root.get("targetNamespace")
         rel=path.relative_to(args.schema_root).as_posix()
+
+        # Enumerated values can themselves carry oval:deprecated_info, often
+        # inside anonymous simpleTypes nested under behavior attributes. Track
+        # these separately from deprecated global Test/Object/State elements so
+        # native capability generation cannot inherit them accidentally.
+        parent_map={child:parent for parent in root.iter() for child in parent}
+        for enum_node in root.iter(XSD+"enumeration"):
+            value=enum_node.get("value")
+            if value is None:
+                continue
+            deprecated_nodes=[
+                n for n in enum_node.iter()
+                if n.tag.rsplit("}",1)[-1]=="deprecated_info"
+            ]
+            if not deprecated_nodes:
+                continue
+
+            context={
+                "attribute":None,
+                "element":None,
+                "simple_type":None,
+                "complex_type":None,
+            }
+            current=parent_map.get(enum_node)
+            while current is not None:
+                local=current.tag.rsplit("}",1)[-1]
+                if local=="attribute" and context["attribute"] is None:
+                    context["attribute"]=current.get("name") or current.get("ref")
+                elif local=="element" and context["element"] is None:
+                    context["element"]=current.get("name") or current.get("ref")
+                elif local=="simpleType" and context["simple_type"] is None:
+                    context["simple_type"]=current.get("name")
+                elif local=="complexType" and context["complex_type"] is None:
+                    context["complex_type"]=current.get("name")
+                current=parent_map.get(current)
+
+            deprecated_enum_values.append({
+                "schema":rel,
+                "namespace":target,
+                "value":value,
+                **context,
+                "deprecation_evidence":" ".join(text(n) for n in deprecated_nodes),
+            })
 
         for child in root:
             kind=child.tag.rsplit("}",1)[-1]
@@ -195,6 +239,16 @@ def main():
         "complex_types":complex_types,
         "platform_surface_by_namespace":dict(sorted(by_ns.items())),
         "deprecated_annotation_count":len(deprecated),
+        "deprecated_enum_values":sorted(
+            deprecated_enum_values,
+            key=lambda x:(
+                x["schema"],
+                x.get("complex_type") or "",
+                x.get("attribute") or "",
+                x["value"],
+            ),
+        ),
+        "deprecated_enum_value_count":len(deprecated_enum_values),
         "support_override_file":args.support_overrides.as_posix() if args.support_overrides else None,
         "support_override_count":len(support_overrides),
         "coverage_assertions":{
@@ -220,6 +274,7 @@ def main():
         "component_group_operations":len(component_members),
         "missing_component_operations":missing_components,
         "namespaces":len(by_ns),
+        "deprecated_enum_values":len(deprecated_enum_values),
     },indent=2,sort_keys=True))
     return 1 if missing_components else 0
 
