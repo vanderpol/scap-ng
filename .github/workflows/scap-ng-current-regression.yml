@@ -6,6 +6,7 @@ on:
       - tools/scap_upconvert_v003/**
       - tools/scap_ng_roundtrip_v003/**
       - tools/test_*.py
+      - schema/v0.1.0/**
       - tools/scap_ng_repo_normalizer.py
       - tools/scap_ng_content_compiler.py
       - tools/check_current_authoring_contract.py
@@ -33,7 +34,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1 cryptography
+      - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1 cryptography jsonschema
       - name: Current source graph and actual corpus CLI
         run: |
           python tools/test_named_collection_graph.py
@@ -41,6 +42,7 @@ jobs:
           python tools/test_current_corpus_cli.py
           python tools/test_current_validation_names.py
           python tools/test_scap14_splitter_extended_component.py
+          python tools/test_benchmark_result_instances.py
       - name: Variables, defaults, State entities and explicit semantics
         run: |
           python tools/test_variable_filter_dependencies.py
