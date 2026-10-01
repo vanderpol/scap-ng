@@ -26,6 +26,7 @@ from scap_upconvert_v003.audit_profile_selection import (
     extract_selection, expected_selections, native_profile_id, audit)
 from scap_upconvert_v003.cleanliness import assert_native_clean
 from check_current_authoring_contract import violations
+from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 
@@ -414,6 +415,9 @@ def main(argv=None):
             # Compare the source definition before applying the separate source-platform negation.
             if negate: native['assessment']['evaluate']={'not':native['assessment']['evaluate']}
             native['assessment']['purpose']='applicability';native['assessment']['assessment_title']=title
+            native=align_assessment_vocabulary(native)
+            errors=violations(native)
+            if errors: raise ValueError('Current vocabulary guard: '+str(errors))
             path='assessments/applicability/'+app_id+'.assessment.yaml'
             review.write_yaml(args.output/path,native)
             registry[app_id]={'assessment':path};app_ids[ref]=app_id
