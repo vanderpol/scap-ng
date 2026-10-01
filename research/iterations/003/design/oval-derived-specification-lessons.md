@@ -74,7 +74,7 @@ Each entry captures (a) discovery, (b) required normative direction or candidate
 
 **Specification:** preserve collection selection, set combinators, filter polarity/order, behaviors, existence, state comparisons and evidence boundaries as separate concepts. Do not transform a collection constraint into a result assertion without demonstrating equivalence. Collection and comparison operations need capability-specific field typing.
 
-**Proof:** set/member/filter combinations, zero collections, nested filters, multi-value variables, conflicting filters, cardinality tests.
+**Proof:** set/member/filter combinations, zero collections, nested filters, multi-value variables, conflicting filters, cardinality tests, and explicit rejection of non-Boolean filter-State outcomes until their collection-status propagation is independently evidenced.
 
 ### 8. Existence and quantifiers are central
 
