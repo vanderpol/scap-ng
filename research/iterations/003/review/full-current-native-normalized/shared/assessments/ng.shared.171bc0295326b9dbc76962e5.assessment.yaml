@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.171bc0295326b9dbc76962e5
+  version: 1
+  assessment_title: The macOS system must only allow applications with a valid digital signature to run.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-gatekeeper-identified-developers-allowed-recommended-object-collection:
+      collection_title: system_settings_gatekeeper_identified_developers_allowed_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/sbin/spctl --status --verbose | /usr/bin/grep "developer id enabled"
+  tests:
+    test-system-settings-gatekeeper-identified-developers-allowed-recommended-test:
+      test_title: system_settings_gatekeeper_identified_developers_allowed_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-gatekeeper-identified-developers-allowed-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_gatekeeper_identified_developers_allowed_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-gatekeeper-identified-developers-allowed-recommended-test

@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.b6aa6a8ad2337694e1ba0b3f
+  version: 1
+  assessment_title: Set SHA512 Password Hashing Algorithm in /etc/libuser.conf
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-libuser-conf-crypt-style-first-instance-collection:
+      collection_title: /etc/libuser.conf, crypt_style, first instance
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/libuser.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*crypt_style[\s]+=[\s]+(\S+)[\s]*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-password-hashing-algorithm-should-set-correctly-in-etc-libuser-conf:
+      test_title: The password hashing algorithm should be set correctly in /etc/libuser.conf
+      capability: independent.textfilecontent54
+      collection: etc-libuser-conf-crypt-style-first-instance-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: crypt_style = sha512, case insensitive
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^[Ss][Hh][Aa]512$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-password-hashing-algorithm-should-set-correctly-in-etc-libuser-conf

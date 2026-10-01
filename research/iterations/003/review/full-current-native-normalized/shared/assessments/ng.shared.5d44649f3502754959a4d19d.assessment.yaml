@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.5d44649f3502754959a4d19d
+  version: 1
+  assessment_title: The macOS system must disable content caching service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-content-caching-disable-recommended-object-collection:
+      collection_title: system_settings_content_caching_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowContentCaching'').js
+
+            EOS'
+  tests:
+    test-system-settings-content-caching-disable-recommended-test:
+      test_title: system_settings_content_caching_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-content-caching-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_content_caching_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-content-caching-disable-recommended-test

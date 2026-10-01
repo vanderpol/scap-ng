@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.25694c8d5a96df3bc24207fe
+  version: 1
+  assessment_title: Exchange Message size restrictions must be controlled on receive connectors.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-receiveconnector-display-maxmessagesize-configuration-collection:
+      collection_title: Run Get-ReceiveConnector to display MaxMessageSize configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ReceiveConnector | Select-Object -Property
+            Name, Identity, MaxMessageSize | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ''
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements:
+      test_title: Unknown Test Results - An auditor must review system settings gathered and STIG requirements.
+      capability: independent.unknown
+      result: unknown
+    test-review-edsp-or-document-that-contains-this-information-determine-global:
+      test_title: Review the EDSP or document that contains this information. Determine the global maximum message receive
+        size and whether signoff with risk acceptance is documented for the Receive connector to have a different value. For
+        each internet-facing Receive connector, if the value of MaxMessageSize is not the same as the global value, this is
+        a finding. Or, if MaxMessageSize is set to a numeric value different from the global value and has signoff and risk
+        acceptance in the EDSP, this is not a finding.
+      capability: independent.shellcommand
+      collection: run-get-receiveconnector-display-maxmessagesize-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements
+    - test: test-review-edsp-or-document-that-contains-this-information-determine-global

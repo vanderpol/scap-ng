@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.1cdd54a44624d5482f0b2466
+  version: 1
+  assessment_title: WN12-AU-000106
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-event-subcategories-policy-collection:
+      collection_title: Audit event subcategories policy
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-other-system-events-set-failure:
+      test_title: '''Audit Other System Events'' is set to ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: audit-event-subcategories-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Other System Events'' is set to ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: other_system_events
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-other-system-events-set-success-failure:
+      test_title: '''Audit Other System Events'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: audit-event-subcategories-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Other System Events'' is set to ''Success'' and ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: other_system_events
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-other-system-events-set-failure
+    - test: test-audit-other-system-events-set-success-failure

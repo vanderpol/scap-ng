@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.76a5b8b849c7cb5f8818abbc
+  version: 1
+  assessment_title: CISC-ND-000090 - The Cisco router must be configured to automatically audit account creation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    iosxe-line-collection:
+      collection_title: null
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+  tests:
+    test-check-archive-log-config-logging-enable:
+      test_title: Check for archive - log config - logging enable
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: iosxe.line
+        state:
+          field: config_line
+          value: \narchive\n log config\n(  \S+[^\n]*\n)*  logging enable\n
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-check-archive-log-config-logging-enable

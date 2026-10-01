@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.4b1beaad37b5ec3a9e1b5ef5
+  version: 1
+  assessment_title: Audit - Audit Policy Change - Success
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-audit-policy-change-success-only:
+      test_title: Audit - Audit Policy Change - Success only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Audit Policy Change - Success only
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: audit_policy_change
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-audit-policy-change-success-failure:
+      test_title: Audit - Audit Policy Change - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Audit Policy Change - Success and Failure
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: audit_policy_change
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-audit-policy-change-success-only
+    - test: test-audit-audit-policy-change-success-failure

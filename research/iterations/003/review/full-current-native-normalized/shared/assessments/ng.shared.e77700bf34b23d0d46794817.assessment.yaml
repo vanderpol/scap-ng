@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.e77700bf34b23d0d46794817
+  version: 1
+  assessment_title: AZLX-23-002470 - Amazon Linux 2023 must maintain an account lock until the locked account is released
+    by an administrator.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*unlock_time\s*=\s*([\d]+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-unlock-time-set-0-in-etc-security-faillock-conf:
+      test_title: unlock_time is set to 0 in /etc/security/faillock.conf
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-unlock-time-set-0-in-etc-security-faillock-conf

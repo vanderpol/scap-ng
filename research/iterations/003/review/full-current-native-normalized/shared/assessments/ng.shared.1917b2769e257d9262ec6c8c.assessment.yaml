@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.1917b2769e257d9262ec6c8c
+  version: 1
+  assessment_title: The macOS system must disable root logon for SSH.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-sshd-permit-root-login-configure-recommended-object-collection:
+      collection_title: os_sshd_permit_root_login_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/sbin/sshd -G | /usr/bin/awk '/permitrootlogin/{print $2}'
+  tests:
+    test-os-sshd-permit-root-login-configure-recommended-test:
+      test_title: os_sshd_permit_root_login_configure_recommended_test
+      capability: independent.shellcommand
+      collection: os-sshd-permit-root-login-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_sshd_permit_root_login_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'no'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-sshd-permit-root-login-configure-recommended-test

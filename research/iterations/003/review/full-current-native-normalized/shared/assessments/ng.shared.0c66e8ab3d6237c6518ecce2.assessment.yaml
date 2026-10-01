@@ -1,0 +1,214 @@
+assessment:
+  id: ng.shared.0c66e8ab3d6237c6518ecce2
+  version: 1
+  assessment_title: The Oracle Linux operating system must be configured so that all local interactive user home directories
+    are defined in the /etc/passwd file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    users-username-collection:
+      collection_title: Users with an username
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '[\w]+'
+    only-non-system-users-uid-999-home-dirs-collection:
+      collection_title: only non-system users (uid>999) home-dirs
+      capability: unix.password
+      set:
+        operator: complement
+        members:
+        - collection: users-username-collection
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            value: '1000'
+            operation: less than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only uids < 1000
+          capability: unix.password
+    only-root-users-uid-0-home-dirs-collection:
+      collection_title: only root users (uid=0) home-dirs
+      capability: unix.password
+      set:
+        operator: complement
+        members:
+        - collection: users-username-collection
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only uids > 0
+          capability: unix.password
+    non-null-home-directories-non-system-users-uid-999-collection:
+      collection_title: non-null home directories for non-system users (uid>999)
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - collection: only-non-system-users-uid-999-home-dirs-collection
+        filters:
+        - action: include
+          match:
+            field: home_dir
+            value: .+
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only users with the home directory defined
+          capability: unix.password
+        - action: exclude
+          match:
+            field: home_dir
+            value: /
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: the root directory
+          capability: unix.password
+    verify-all-non-system-user-home-directories-exist-collection:
+      collection_title: Verify all non-system user home directories exist
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-non-system-users-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+    non-null-home-directory-ies-root-user-s-uid-0-collection:
+      collection_title: non-null home directory(ies?) for root user(s?) (uid=0)
+      capability: unix.password
+      set:
+        operator: union
+        members:
+        - collection: only-root-users-uid-0-home-dirs-collection
+        filters:
+        - action: include
+          match:
+            field: home_dir
+            value: .+
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only users with the home directory defined
+          capability: unix.password
+    verify-all-root-users-home-directories-exist-collection:
+      collection_title: Verify all root users home directories exist
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directory-root-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  variables:
+    home-directories-non-system-users-variable:
+      title: home directories of non-system users
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: non-null-home-directories-non-system-users-uid-999-collection
+          field: home_dir
+    home-directory-root-variable:
+      title: home directory of root
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: non-null-home-directory-ies-root-user-s-uid-0-collection
+          field: home_dir
+  tests:
+    test-check-users-without-home-directory-not-defined:
+      test_title: check for users without a home directory not defined
+      capability: unix.password
+      collection: only-non-system-users-uid-999-home-dirs-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: only users with the home directory defined
+        state_capability: unix.password
+        state:
+          field: home_dir
+          value: .+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-check-if-root-s-home-directory-not-defined:
+      test_title: check if root's home directory is not defined
+      capability: unix.password
+      collection: only-root-users-uid-0-home-dirs-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: only users with the home directory defined
+        state_capability: unix.password
+        state:
+          field: home_dir
+          value: .+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-verify-all-user-home-directories-exist:
+      test_title: Verify all user home directories exist
+      capability: unix.file
+      collection: verify-all-non-system-user-home-directories-exist-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-verify-root-s-home-directory-exists:
+      test_title: Verify root's home directory exists
+      capability: unix.file
+      collection: verify-all-root-users-home-directories-exist-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - all:
+      - test: test-check-users-without-home-directory-not-defined
+      - test: test-check-if-root-s-home-directory-not-defined
+    - test: test-verify-all-user-home-directories-exist
+    - test: test-verify-root-s-home-directory-exists

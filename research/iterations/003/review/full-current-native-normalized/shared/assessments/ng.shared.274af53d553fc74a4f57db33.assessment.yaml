@@ -1,0 +1,191 @@
+assessment:
+  id: ng.shared.274af53d553fc74a4f57db33
+  version: 1
+  assessment_title: Audit System Administrator Actions
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib/systemd/system/auditd.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ExecStartPost=\-\/sbin\/augenrules.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/rules.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.rules$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\-w[\s]+/etc/sudoers[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+(-k[\s]+|-F[\s]+key=)[-\w]+[\s]*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-3:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/rules.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.rules$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\-w[\s]+/etc/sudoers\.d/?[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+(-k[\s]+|-F[\s]+key=)[-\w]+[\s]*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-4:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib/systemd/system/auditd.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ExecStartPost=\-\/sbin\/auditctl.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-5:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\-w[\s]+/etc/sudoers[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+(-k[\s]+|-F[\s]+key=)[-\w]+[\s]*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-6:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\-w[\s]+/etc/sudoers\.d/?[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+(-k[\s]+|-F[\s]+key=)[-\w]+[\s]*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-audit-augenrules:
+      test_title: audit augenrules
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-augenrules-sudoers:
+      test_title: audit augenrules sudoers
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-augenrules-sudoers-d:
+      test_title: audit augenrules sudoers.d
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-auditctl:
+      test_title: audit auditctl
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-4
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-auditctl-sudoers:
+      test_title: audit auditctl sudoers
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-5
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-auditctl-sudoers-d:
+      test_title: audit auditctl sudoers.d
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-6
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - all:
+      - test: test-audit-augenrules
+      - test: test-audit-augenrules-sudoers
+      - test: test-audit-augenrules-sudoers-d
+    - all:
+      - test: test-audit-auditctl
+      - test: test-audit-auditctl-sudoers
+      - test: test-audit-auditctl-sudoers-d

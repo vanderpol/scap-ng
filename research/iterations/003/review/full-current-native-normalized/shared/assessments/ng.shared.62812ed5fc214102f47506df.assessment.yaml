@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.62812ed5fc214102f47506df
+  version: 1
+  assessment_title: The macOS system must disable Bluetooth sharing.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-bluetooth-sharing-disable-recommended-object-collection:
+      collection_title: system_settings_bluetooth_sharing_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'CURRENT_USER=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow.plist lastUserName)
+
+            /usr/bin/sudo -u "$CURRENT_USER" /usr/bin/defaults -currentHost read com.apple.Bluetooth PrefKeyServicesEnabled'
+  tests:
+    test-system-settings-bluetooth-sharing-disable-recommended-test:
+      test_title: system_settings_bluetooth_sharing_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-bluetooth-sharing-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_bluetooth_sharing_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-bluetooth-sharing-disable-recommended-test

@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.7d0571e9bd74b085523db563
+  version: 1
+  assessment_title: Windows Customer Experience Improvement Program
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\SQMClient\Windows
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CEIPEnable
+  variables:
+    turn-off-windows-customer-experience-improvement-program-variable:
+      title: Turn off Windows Customer Experience Improvement Program
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: disable_the_windows_messenger_customer_experience_improvement_program_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: enabled
+          - literal: '1'
+            hint: disabled
+  tests:
+    test-turn-off-windows-customer-experience-improvement-program-set-disabled:
+      test_title: '''Turn off Windows Customer Experience Improvement Program'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: turn-off-windows-customer-experience-improvement-program-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-turn-off-windows-customer-experience-improvement-program-set-disabled

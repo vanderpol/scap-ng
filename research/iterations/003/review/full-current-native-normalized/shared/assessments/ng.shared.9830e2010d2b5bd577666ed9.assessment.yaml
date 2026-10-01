@@ -1,0 +1,121 @@
+assessment:
+  id: ng.shared.9830e2010d2b5bd577666ed9
+  version: 1
+  assessment_title: Kernel "net.ipv4.conf.all.accept_redirects" Parameter Configuration and Runtime Check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*net\.ipv4\.conf\.all\.accept_redirects[\s]*=[\s]*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-3:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: other-sysctl-configuration-file-locations-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*net\.ipv4\.conf\.all\.accept_redirects[\s]*=[\s]*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: independent-textfilecontent54-collection-2
+        - collection: independent-textfilecontent54-collection-3
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.conf.all.accept_redirects
+  variables:
+    other-sysctl-configuration-file-locations-variable:
+      title: other sysctl configuration file locations
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  tests:
+    test-net-ipv4-conf-all-accept-redirects-static-configuration:
+      test_title: net.ipv4.conf.all.accept_redirects static configuration
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-kernel-runtime-parameter-net-ipv4-conf-all-accept-redirects-set:
+      test_title: kernel runtime parameter net.ipv4.conf.all.accept_redirects set to the appropriate value
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-net-ipv4-conf-all-accept-redirects-static-configuration
+    - test: test-kernel-runtime-parameter-net-ipv4-conf-all-accept-redirects-set

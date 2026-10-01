@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.03366bc629085eb619efc952
+  version: 1
+  assessment_title: WN10-CC-000275 - Local drives must be prevented from sharing with Remote Desktop Session Hosts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows NT\Terminal Services
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fDisableCdm
+  tests:
+    test-do-not-allow-drive-redirection-set-enabled:
+      test_title: '''Do not allow drive redirection'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-do-not-allow-drive-redirection-set-enabled

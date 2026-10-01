@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.18bc17587d201b3ffed7451d
+  version: 1
+  assessment_title: The macOS system must be configured with system log files set to mode 640 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-newsyslog-files-permissions-configure-recommended-object-collection:
+      collection_title: os_newsyslog_files_permissions_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/stat -f '%A:%N' $(/usr/bin/grep -v '^#' /etc/newsyslog.conf|/usr/bin/awk '{ print $1 }')|/usr/bin/awk
+            '!/640/{print $1}'
+  tests:
+    test-os-newsyslog-files-permissions-configure-recommended-test:
+      test_title: os_newsyslog_files_permissions_configure_recommended_test
+      capability: independent.shellcommand
+      collection: os-newsyslog-files-permissions-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_newsyslog_files_permissions_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-os-newsyslog-files-permissions-configure-recommended-test

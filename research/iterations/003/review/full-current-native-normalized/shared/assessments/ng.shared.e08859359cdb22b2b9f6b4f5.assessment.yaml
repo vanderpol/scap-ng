@@ -1,0 +1,348 @@
+assessment:
+  id: ng.shared.e08859359cdb22b2b9f6b4f5
+  version: 1
+  assessment_title: Run control scripts' executable search paths must contain only absolute paths.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    path-variables-in-etc-rc-collection:
+      collection_title: PATH variables in /etc/rc*/*
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: run-control-script-directories-derived-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*PATH=([^ \s]*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    paths-etc-rc-collection:
+      collection_title: paths for /etc/rc*/*
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: split-paths-etc-rc-variable
+    path-variables-in-etc-init-d-collection:
+      collection_title: PATH variables in /etc/init.d/*
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/init.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*PATH=([^ \s]*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    paths-etc-init-d-collection:
+      collection_title: paths for /etc/init.d/*
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: split-paths-etc-init-d-variable
+    path-variables-in-lib-svc-method-collection:
+      collection_title: PATH variables in /lib/svc/method/*
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /lib/svc/method
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*PATH=([^ \s]*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    paths-lib-svc-method-collection:
+      collection_title: paths for /lib/svc/method/*
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: split-paths-lib-svc-method-variable
+    path-variables-in-etc-rc-collection-2:
+      collection_title: PATH variables in /etc/rc*
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: locations-rc-scripts-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^rc[012356S]
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*PATH=([^ \s]*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    paths-etc-rc-collection-2:
+      collection_title: paths for /etc/rc*
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: split-paths-etc-rc-variable-2
+  variables:
+    etc-directory-variable:
+      title: /etc directory
+      kind: constant
+      datatype: string
+      expression:
+        literal: /etc/
+    run-control-sub-directories-etc-variable:
+      title: run-control sub-directories of /etc
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - rc.config.d
+        - rc0.d
+        - rc1.d
+        - rc2.d
+        - rc3.d
+        - rc5.d
+        - rc6.d
+        - rcS.d
+    run-control-script-directories-derived-variable:
+      title: run-control script directories (derived)
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: etc-directory-variable
+        - variable: run-control-sub-directories-etc-variable
+    split-paths-etc-rc-variable:
+      title: split paths for /etc/rc*/*
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              collection: path-variables-in-etc-rc-collection
+              field: subexpression
+          delimiter: ':'
+    split-paths-etc-init-d-variable:
+      title: split paths for /etc/init.d/*
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              collection: path-variables-in-etc-init-d-collection
+              field: subexpression
+          delimiter: ':'
+    split-paths-lib-svc-method-variable:
+      title: split paths for /lib/svc/method/*
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              collection: path-variables-in-lib-svc-method-collection
+              field: subexpression
+          delimiter: ':'
+    locations-rc-scripts-variable:
+      title: locations for rc* scripts
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc
+        - /sbin
+    split-paths-etc-rc-variable-2:
+      title: split paths for /etc/rc*
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              collection: path-variables-in-etc-rc-collection-2
+              field: subexpression
+          delimiter: ':'
+  tests:
+    test-there-path-variables-in-etc-rc:
+      test_title: there are PATH variables in /etc/rc*/*
+      capability: independent.textfilecontent54
+      collection: path-variables-in-etc-rc-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-test-paths-etc-rc:
+      test_title: test paths for /etc/rc*/*
+      capability: independent.variable
+      collection: paths-etc-rc-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: paths must start with ${PATH}, $PATH or /
+        state_capability: independent.variable
+        state:
+          field: value
+          value: ^(\$\{PATH\}|\$PATH|^/)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-there-path-variables-in-etc-init-d:
+      test_title: there are PATH variables in /etc/init.d/*
+      capability: independent.textfilecontent54
+      collection: path-variables-in-etc-init-d-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-test-paths-etc-init-d:
+      test_title: test paths for /etc/init.d/*
+      capability: independent.variable
+      collection: paths-etc-init-d-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: paths must start with ${PATH}, $PATH or /
+        state_capability: independent.variable
+        state:
+          field: value
+          value: ^(\$\{PATH\}|\$PATH|^/)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-there-path-variables-in-lib-svc-method:
+      test_title: there are PATH variables in /lib/svc/method/*
+      capability: independent.textfilecontent54
+      collection: path-variables-in-lib-svc-method-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-test-paths-lib-svc-method:
+      test_title: test paths for /lib/svc/method/*
+      capability: independent.variable
+      collection: paths-lib-svc-method-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: paths must start with ${PATH}, $PATH or /
+        state_capability: independent.variable
+        state:
+          field: value
+          value: ^(\$\{PATH\}|\$PATH|^/)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-there-path-variables-in-etc-rc-2:
+      test_title: there are PATH variables in /etc/rc*
+      capability: independent.textfilecontent54
+      collection: path-variables-in-etc-rc-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-test-paths-etc-rc-2:
+      test_title: test paths for /etc/rc*
+      capability: independent.variable
+      collection: paths-etc-rc-collection-2
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: paths must start with ${PATH}, $PATH or /
+        state_capability: independent.variable
+        state:
+          field: value
+          value: ^(\$\{PATH\}|\$PATH|^/)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - any:
+      - not:
+          test: test-there-path-variables-in-etc-rc
+      - test: test-test-paths-etc-rc
+    - any:
+      - not:
+          test: test-there-path-variables-in-etc-init-d
+      - test: test-test-paths-etc-init-d
+    - any:
+      - not:
+          test: test-there-path-variables-in-lib-svc-method
+      - test: test-test-paths-lib-svc-method
+    - any:
+      - not:
+          test: test-there-path-variables-in-etc-rc-2
+      - test: test-test-paths-etc-rc-2

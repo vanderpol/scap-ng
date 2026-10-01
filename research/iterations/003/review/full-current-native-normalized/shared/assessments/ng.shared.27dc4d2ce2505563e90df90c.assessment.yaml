@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.27dc4d2ce2505563e90df90c
+  version: 1
+  assessment_title: WN10-AU-000010 - The system must be configured to audit Account Logon - Credential Validation successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-credential-validation-set-success:
+      test_title: '''Audit Credential Validation'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Credential Validation'' is set to ''Success'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: credential_validation
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-credential-validation-set-success-failure:
+      test_title: '''Audit Credential Validation'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Credential Validation'' is set to ''Success'' and ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: credential_validation
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-credential-validation-set-success
+    - test: test-audit-credential-validation-set-success-failure

@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.fe1a51d457b261c48dad60ae
+  version: 1
+  assessment_title: The macOS system must disable iCloud Keychain synchronization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    icloud-keychain-disable-recommended-object-collection:
+      collection_title: icloud_keychain_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowCloudKeychainSync'').js
+
+            EOS'
+  tests:
+    test-icloud-keychain-disable-recommended-test:
+      test_title: icloud_keychain_disable_recommended_test
+      capability: independent.shellcommand
+      collection: icloud-keychain-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: icloud_keychain_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-icloud-keychain-disable-recommended-test

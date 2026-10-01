@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.808f6683a43330537e184d14
+  version: 1
+  assessment_title: AZLX-23-002200 - Amazon Linux 2023 audit tools must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-tools-collection:
+      collection_title: audit tools
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: audit-tools-variable
+  variables:
+    audit-tools-variable:
+      title: audit tools
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules
+  tests:
+    test-audit-tools-group-owned-by-root:
+      test_title: The audit tools are group-owned by root.
+      capability: unix.file
+      collection: audit-tools-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: group-owned by root
+        state_capability: unix.file
+        state:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-tools-group-owned-by-root

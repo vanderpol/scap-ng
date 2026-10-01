@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.b6318bfa8fc4fe82ebacb0a0
+  version: 1
+  assessment_title: Computer Identity Authentication for NTLM
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Control\Lsa
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: UseMachineId
+  variables:
+    network-security-allow-local-system-use-computer-identity-ntlm-variable:
+      title: 'Network security: Allow Local System to use computer identity for NTLM'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-network-security-allow-local-system-use-computer-identity-ntlm-set:
+      test_title: '''Network Security: Allow Local System to use computer identity for NTLM'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: network-security-allow-local-system-use-computer-identity-ntlm-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-network-security-allow-local-system-use-computer-identity-ntlm-set

@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.2b51e5b3d100dde5a0d08095
+  version: 1
+  assessment_title: OL08-00-040209 - OL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from
+    being accepted.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.conf.default.accept_redirects
+  tests:
+    test-net-ipv4-conf-default-accept-redirects-setting-in-kernel-set:
+      test_title: net.ipv4.conf.default.accept_redirects setting in kernel is set to 0
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv4-conf-default-accept-redirects-setting-in-kernel-set

@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.a3aae41bbba36a6027ec8d3e
+  version: 1
+  assessment_title: Power Mgmt - Password Wake on Battery
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DCSettingIndex
+  variables:
+    require-password-when-computer-wakes-on-battery-variable:
+      title: Require a Password when a Computer Wakes (On Battery)
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: require_a_password_when_a_computer_wakes_on_battery_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-require-password-when-computer-wakes-on-battery-set-enabled:
+      test_title: '''Require a password when a computer wakes (on battery)'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: require-password-when-computer-wakes-on-battery-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-require-password-when-computer-wakes-on-battery-set-enabled

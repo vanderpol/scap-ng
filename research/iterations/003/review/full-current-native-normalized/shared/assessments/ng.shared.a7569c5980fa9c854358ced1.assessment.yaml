@@ -1,0 +1,109 @@
+assessment:
+  id: ng.shared.a7569c5980fa9c854358ced1
+  version: 1
+  assessment_title: The Oracle Linux operating system must be configured so that all files and directories contained in local
+    interactive user home directories have a mode of 0750 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-home-directories-from-etc-passwd-file-interactive-users-collection:
+      collection_title: Retrieve home directories from the /etc/passwd file for interactive users.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'ls -d $(awk -F: ''($3>=1000)&&($7 !~ /nologin/){print $6}'' /etc/passwd) 2>1'
+    retrieve-noncompliant-files-from-user-home-directories-collection:
+      collection_title: Retrieve noncompliant files from user home directories.
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: retreive-location-user-home-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          all:
+          - field: gexec
+            value: '0'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: '0'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: '0'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: '0'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        state_title: Filter exclude files that have gexec, oread, owrite, and oexec set to zero/false.
+        capability: unix.file
+      - action: exclude
+        match:
+          field: filename
+          value: ^\.
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Filter exclude files starting with '.'.
+        capability: unix.file
+      behaviors:
+        recurse: directories
+        recurse_file_system: local
+        max_depth: '-1'
+        recurse_direction: down
+  variables:
+    retreive-location-user-home-directories-variable:
+      title: Retreive location of user home directories.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: retrieve-home-directories-from-etc-passwd-file-interactive-users-collection
+          field: stdout_line
+  tests:
+    test-confirm-permissions-on-files-in-interactive-user-s-home-directories:
+      test_title: Confirm permissions on files in interactive user's home directories are 0750 or less permissive.
+      capability: unix.file
+      collection: retrieve-noncompliant-files-from-user-home-directories-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-confirm-permissions-on-files-in-interactive-user-s-home-directories

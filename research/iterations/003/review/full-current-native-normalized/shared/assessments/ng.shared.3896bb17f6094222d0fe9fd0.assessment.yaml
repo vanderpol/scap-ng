@@ -1,0 +1,60 @@
+assessment:
+  id: ng.shared.3896bb17f6094222d0fe9fd0
+  version: 1
+  assessment_title: UBTU-18-010107 - The Ubuntu operating system must enforce a 60-day maximum password lifetime restriction.
+    Passwords for new users must have a 60-day maximum password lifetime restriction.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-login-defs-pass-max-days-collection:
+      collection_title: /etc/login.defs:PASS_MAX_DAYS
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/login.defs
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*PASS_MAX_DAYS\s+(\d*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-0-lt-etc-login-defs-pass-max-days-le-60:
+      test_title: 0 -lt /etc/login.defs:PASS_MAX_DAYS -le 60
+      capability: independent.textfilecontent54
+      collection: etc-login-defs-pass-max-days-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: '60'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-0-lt-etc-login-defs-pass-max-days-le-60

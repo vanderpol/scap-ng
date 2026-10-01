@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.25e1247510fac4d2f6afd9db
+  version: 1
+  assessment_title: The built-in administrator account must be renamed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    return-renamed-administrator-account-collection:
+      collection_title: Return the renamed administrator account
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: $( if((Get-CimInstance Win32_OperatingSystem).ProductType -eq 2){ Get-ADUser -Filter * -Properties SID |
+            Where-Object {$_.SID -match "^S-1-5-[0-9-]+-500$"} | Select-Object Name -First 1 | Format-List } else { Get-Localuser
+            | Where-Object {$_.SID -match '^S-1-5-[0-9-]+-500$'} } ) | Format-List
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Name\s+:\s+(.+)
+  tests:
+    test-windows-built-in-administrator-account-renamed:
+      test_title: Windows built-in administrator account must be renamed.
+      capability: independent.shellcommand
+      collection: return-renamed-administrator-account-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Account must not be Administrator
+        state_capability: independent.shellcommand
+        state:
+          field: subexpression
+          value: Administrator
+          operation: case insensitive not equal
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-windows-built-in-administrator-account-renamed

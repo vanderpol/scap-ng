@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.c5415785dae2e9831a73850a
+  version: 1
+  assessment_title: Ensure NOPASSWD Is Not Used in Sudo
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!#).*[\s]+NOPASSWD[\s]*\:.*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(?!#).*[\s]+NOPASSWD[\s]*\:.*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-nopasswd-does-not-exist-etc-sudoers:
+      test_title: NOPASSWD does not exist /etc/sudoers
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-nopasswd-does-not-exist-in-etc-sudoers-d:
+      test_title: NOPASSWD does not exist in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-nopasswd-does-not-exist-etc-sudoers
+    - test: test-nopasswd-does-not-exist-in-etc-sudoers-d

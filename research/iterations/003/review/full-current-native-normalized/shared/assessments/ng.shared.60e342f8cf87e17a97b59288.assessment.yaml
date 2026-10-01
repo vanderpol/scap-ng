@@ -1,0 +1,98 @@
+assessment:
+  id: ng.shared.60e342f8cf87e17a97b59288
+  version: 1
+  assessment_title: UBTU-20-010134 - The Ubuntu operating system must permit only authorized accounts to own the audit configuration
+    files.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+    unix-file-collection-2:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/rules.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .rules$
+    unix-file-collection-3:
+      collection_title: null
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+  tests:
+    test-etc-audit-auditd-conf-owned-by-root:
+      test_title: /etc/audit/auditd.conf are owned by root
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-rules-files-in-etc-audit-rules-d-owned-by-root:
+      test_title: .rules files in /etc/audit/rules.d are owned by root
+      capability: unix.file
+      collection: unix-file-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-audit-audit-rules-owned-by-root:
+      test_title: /etc/audit/audit.rules is owned by root
+      capability: unix.file
+      collection: unix-file-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-etc-audit-auditd-conf-owned-by-root
+    - test: test-rules-files-in-etc-audit-rules-d-owned-by-root
+    - test: test-etc-audit-audit-rules-owned-by-root

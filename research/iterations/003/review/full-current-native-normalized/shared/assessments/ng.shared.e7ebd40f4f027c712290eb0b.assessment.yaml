@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.e7ebd40f4f027c712290eb0b
+  version: 1
+  assessment_title: All OL 8 files and directories must have a valid group owner.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    verify-all-local-files-directories-on-rhel-8-have-valid-collection:
+      collection_title: Verify all local files and directories on RHEL 8 have a valid group.  Limit results to the first 100
+        failures found.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup -print | head -n 100
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-verify-all-local-files-directories-on-rhel-8-have-valid:
+      test_title: Verify all local files and directories on RHEL 8 have a valid group.
+      capability: independent.shellcommand
+      collection: verify-all-local-files-directories-on-rhel-8-have-valid-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm no files or directories with invalid group are found.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-verify-all-local-files-directories-on-rhel-8-have-valid

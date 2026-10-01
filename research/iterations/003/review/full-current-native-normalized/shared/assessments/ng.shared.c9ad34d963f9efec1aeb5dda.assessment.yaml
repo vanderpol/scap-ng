@@ -1,0 +1,69 @@
+assessment:
+  id: ng.shared.c9ad34d963f9efec1aeb5dda
+  version: 1
+  assessment_title: Exchange Outbound Connection Timeout must be 10 minutes or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-sendconnector-display-connectioninactivitytimeout-configuration-collection:
+      collection_title: Run Get-SendConnector to display ConnectionInactivityTimeOut configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-SendConnector | Select-Object -Property
+            Name, Identity, ConnectionInactivityTimeOut | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .*\s+(\d+:\d+:\d+)\s*$
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-each-send-connector-if-value-connectioninactivitytimeout-not-set-00-10:
+      test_title: For each Send connector, if the value of ConnectionInactivityTimeOut is not set to 00:10:00, this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-sendconnector-display-connectioninactivitytimeout-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify value is less than equal to 00:10:00
+        state_capability: independent.shellcommand
+        state:
+          field: subexpression
+          value: ^00:(?:0[0-9]:[0-5][0-9]|10:00)$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-no-send-connectors-exist-on-this-exchange-server:
+      test_title: No Send Connectors exist on this Exchange Server.
+      capability: independent.shellcommand
+      collection: run-get-sendconnector-display-connectioninactivitytimeout-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify No Send Connectors Exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    any:
+    - test: test-each-send-connector-if-value-connectioninactivitytimeout-not-set-00-10
+    - test: test-no-send-connectors-exist-on-this-exchange-server

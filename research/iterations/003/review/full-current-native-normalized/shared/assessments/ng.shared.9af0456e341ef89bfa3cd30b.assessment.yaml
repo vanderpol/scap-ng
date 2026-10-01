@@ -1,0 +1,28 @@
+assessment:
+  id: ng.shared.9af0456e341ef89bfa3cd30b
+  version: 1
+  assessment_title: The system must use a separate file system for /tmp (or equivalent).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    tmp-collection:
+      collection_title: /tmp
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /tmp
+  tests:
+    test-check-tmp:
+      test_title: check for /tmp
+      capability: linux.partition
+      collection: tmp-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-check-tmp

@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.2435f6a8a6dc6687a5ea0f77
+  version: 1
+  assessment_title: Camera access from the lock screen must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    prevent-enabling-lock-screen-camera-collection:
+      collection_title: Prevent enabling lock screen camera
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\Personalization
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoLockScreenCamera
+  tests:
+    test-camera-access-from-lock-screen-disabled:
+      test_title: Camera access from the lock screen must be disabled.
+      capability: windows.registry
+      collection: prevent-enabling-lock-screen-camera-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: only one
+        state_title: Value Equal To 1
+        state_capability: windows.registry
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-camera-access-from-lock-screen-disabled

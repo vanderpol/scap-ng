@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.3cb7cea458bf67ff9e1a1dcc
+  version: 1
+  assessment_title: Windows Peer to Peer Networking
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\policies\Microsoft\Peernet
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Disabled
+  variables:
+    turn-off-microsoft-peer-peer-networking-services-variable:
+      title: Turn Off Microsoft Peer-to-Peer Networking Services
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: turn_off_microsoft_peer_to_peer_networking_services_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-turn-off-microsoft-peer-peer-networking-services-set-enabled:
+      test_title: '''Turn Off Microsoft Peer-to-Peer Networking Services'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: turn-off-microsoft-peer-peer-networking-services-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-turn-off-microsoft-peer-peer-networking-services-set-enabled

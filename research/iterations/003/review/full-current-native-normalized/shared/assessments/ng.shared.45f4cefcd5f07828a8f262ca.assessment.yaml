@@ -1,0 +1,34 @@
+assessment:
+  id: ng.shared.45f4cefcd5f07828a8f262ca
+  version: 1
+  assessment_title: WN19-00-000330 - Windows Server 2019 must not have the Microsoft FTP service installed unless required
+    by the organization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ftp-server-collection:
+      collection_title: FTP Server
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT startmode FROM Win32_Service WHERE name='ftpsvc'
+  tests:
+    test-check-make-sure-ftp-server-role-not-present:
+      test_title: Check to make sure the FTP server role is not present.
+      capability: windows.wmi57
+      collection: ftp-server-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: at least one
+        state: null
+  evaluate:
+    test: test-check-make-sure-ftp-server-role-not-present

@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.fe63844ee6b21d8e1490521d
+  version: 1
+  assessment_title: The macOS system must shut down by default upon audit failure (unless availability is an overriding concern).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-failure-halt-recommended-object-collection:
+      collection_title: audit_failure_halt_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/awk -F':' '/^policy/ {print $NF}' /etc/security/audit_control | /usr/bin/tr ',' '\n' | /usr/bin/grep
+            -Ec 'ahlt'
+  tests:
+    test-audit-failure-halt-recommended-test:
+      test_title: audit_failure_halt_recommended_test
+      capability: independent.shellcommand
+      collection: audit-failure-halt-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: audit_failure_halt_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-failure-halt-recommended-test

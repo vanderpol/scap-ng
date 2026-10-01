@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.34f7c01e3536887cbf102e24
+  version: 1
+  assessment_title: NTLM NULL Session Fallback
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Control\Lsa\MSV1_0
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: allownullsessionfallback
+  variables:
+    network-security-allow-localsystem-null-session-fallback-variable:
+      title: 'Network security: Allow LocalSystem NULL session fallback'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: Network_security_Allow_LocalSystem_NULL_session_fallback_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-network-security-allow-localsystem-null-session-fallback-set-disabled:
+      test_title: '''Network security: Allow LocalSystem NULL session fallback'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: network-security-allow-localsystem-null-session-fallback-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-network-security-allow-localsystem-null-session-fallback-set-disabled

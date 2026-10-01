@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.b7f9104e3e39d98be5393658
+  version: 1
+  assessment_title: Directory Browsing on the IIS 10.0 web server must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    directory-browsing-webserver-setting-collection:
+      collection_title: Directory Browsing Webserver Setting
+      capability: windows.appcmdlistconfig
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Webserver
+        identifier:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        section:
+          operation: equals
+          datatype: string
+          mask: false
+          value: directoryBrowse
+        parameter:
+          operation: equals
+          datatype: string
+          mask: false
+          value: enabled
+  tests:
+    test-verify-directory-browsing-not-enabled:
+      test_title: Verify Directory Browsing is not enabled
+      capability: windows.appcmdlistconfig
+      collection: directory-browsing-webserver-setting-collection
+      assertion:
+        existence: only_one_exists
+        item_quantifier: all
+        state_title: appcmdlistconfig result must equal False.
+        state_capability: windows.appcmdlistconfig
+        state:
+          field: result
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-verify-directory-browsing-not-enabled

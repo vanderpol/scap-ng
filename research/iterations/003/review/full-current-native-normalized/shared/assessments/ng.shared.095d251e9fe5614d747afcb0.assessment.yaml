@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.095d251e9fe5614d747afcb0
+  version: 1
+  assessment_title: All GIDs Are Present In /etc/group
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-gids-in-etc-passwd-file-collection:
+      collection_title: All of the GIDs in the /etc/passwd file
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^#\s\:]+:[^#\s\:]+:[0-9]+:([0-9]+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-gids-in-etc-group-file-collection:
+      collection_title: All of the GIDs in the /etc/group file
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^#\s\:]+:[^#\s\:]*:([0-9]+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    gids-from-etc-group-variable:
+      title: GIDs from /etc/group
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: all-gids-in-etc-group-file-collection
+          field: subexpression
+  tests:
+    test-verify-all-gids-referenced-in-etc-passwd-defined-in-etc:
+      test_title: Verify all GIDs referenced in /etc/passwd are defined in /etc/group
+      capability: independent.textfilecontent54
+      collection: all-gids-in-etc-passwd-file-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: Compare what is in /etc/passwd against what is in /etc/group
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value:
+            variable: gids-from-etc-group-variable
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-verify-all-gids-referenced-in-etc-passwd-defined-in-etc

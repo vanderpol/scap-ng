@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.5907eabf2ab8347d91118b23
+  version: 1
+  assessment_title: WN10-SO-000015 - Local accounts with blank passwords must be restricted to prevent access from the network.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Lsa
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: LimitBlankPasswordUse
+  tests:
+    test-accounts-limit-local-account-use-blank-passwords-console-logon-only:
+      test_title: '''Accounts: Limit local account use of blank passwords to console logon only'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-accounts-limit-local-account-use-blank-passwords-console-logon-only

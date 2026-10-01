@@ -1,0 +1,156 @@
+assessment:
+  id: ng.shared.a8d7438b34906d97f45ac889
+  version: 1
+  assessment_title: Permissions on user home directories must be 750 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-accounts-collection:
+      collection_title: all accounts
+      capability: unix.shadow
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    all-accounts-ps-status-collection-2:
+      collection_title: all accounts with PS status
+      capability: unix.shadow
+      set:
+        operator: union
+        members:
+        - collection: all-accounts-collection
+        filters:
+        - action: exclude
+          match:
+            field: password
+            value: ^\*LK\*
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Locked account
+          capability: unix.shadow
+        - action: exclude
+          match:
+            field: password
+            value: NP
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Login account
+          capability: unix.shadow
+        - action: exclude
+          match:
+            field: password
+            value: UP
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: UP account status
+          capability: unix.shadow
+        - action: exclude
+          match:
+            field: password
+            value: ^$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: no password account status
+          capability: unix.shadow
+    all-accounts-ps-status-collection:
+      collection_title: all accounts with PS status
+      capability: unix.password
+      select:
+        username:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: user-names-ps-status-accounts-variable
+    account-home-directories-collection:
+      collection_title: account home directories
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-ps-status-accounts-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  variables:
+    user-names-ps-status-accounts-variable:
+      title: user names for PS status accounts
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: all-accounts-ps-status-collection-2
+          field: username
+    home-directories-ps-status-accounts-variable:
+      title: home directories for PS status accounts
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: all-accounts-ps-status-collection
+          field: home_dir
+  tests:
+    test-user-home-directory-permissions-750-or-less-permissive:
+      test_title: user home directory permissions are 750 or less permissive
+      capability: unix.file
+      collection: account-home-directories-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: 750 or less permissive
+        state_capability: unix.file
+        state:
+          all:
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-user-home-directory-permissions-750-or-less-permissive

@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.4d20ffb02b69c9fbea667889
+  version: 1
+  assessment_title: AZLX-23-000220 - Amazon Linux 2023 must restrict usage of ptrace to descendant processes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: kernel.yama.ptrace_scope
+  tests:
+    test-kernel-yama-ptrace-scope-setting-in-kernel-set-1:
+      test_title: kernel.yama.ptrace_scope setting in kernel is set to 1
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-kernel-yama-ptrace-scope-setting-in-kernel-set-1

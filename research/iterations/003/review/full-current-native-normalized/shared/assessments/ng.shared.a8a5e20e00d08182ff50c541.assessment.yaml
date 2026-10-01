@@ -1,0 +1,249 @@
+assessment:
+  id: ng.shared.a8a5e20e00d08182ff50c541
+  version: 1
+  assessment_title: The limitpriv zone option must be set to the vendor default or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-information-collection:
+      collection_title: OS information
+      capability: unix.uname
+    etc-zones-index-collection:
+      collection_title: /etc/zones/index
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones/index
+    etc-zones-index-global-entry-collection:
+      collection_title: /etc/zones/index global entry
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones/index
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^global:'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    var-share-zones-index-json-collection:
+      collection_title: /var/share/zones/index.json
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/share/zones/index.json
+    var-share-zones-index-json-path-collection:
+      collection_title: /var/share/zones/index.json 'path:/'
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/share/zones/index.json
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '"path":\s+"/"'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    names-all-zones-from-zone-index-collection:
+      collection_title: The names of all the zones from the zone index.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones/index
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^\s*([^#:]*):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    names-all-zones-from-zone-index-minus-global-zone-collection:
+      collection_title: The names of all the zones from the zone index minus the global zone
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: names-all-zones-from-zone-index-collection
+        filters:
+        - action: exclude
+          match:
+            field: subexpression
+            value: global
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: The global zone listing in index.
+          capability: independent.textfilecontent54
+    limitpriv-attribute-from-specified-zone-excluding-those-brand-solaris-kz-collection:
+      collection_title: The limitpriv attribute from the specified zone, excluding those with brand solaris-kz.
+      capability: independent.xmlfilecontent
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/zones
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: zone-configuartion-filenames-variable
+        xpath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /zone[@brand != "solaris-kz"]/@limitpriv
+    limitpriv-attribute-from-specified-zone-collection:
+      collection_title: The limitpriv attribute from the specified zone.
+      capability: independent.xmlfilecontent
+      set:
+        operator: union
+        members:
+        - collection: limitpriv-attribute-from-specified-zone-excluding-those-brand-solaris-kz-collection
+        filters:
+        - action: exclude
+          match:
+            field: value_of
+            value: default
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: The default state of attribute limitpriv.
+          capability: independent.xmlfilecontent
+        - action: exclude
+          match:
+            field: value_of
+            value: ^$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: The empty state of attribute limitpriv.
+          capability: independent.xmlfilecontent
+  variables:
+    system-s-various-zone-names-variable:
+      title: The system's various zone names.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: names-all-zones-from-zone-index-minus-global-zone-collection
+          field: subexpression
+    zone-configuartion-filenames-variable:
+      title: The zone configuartion filenames.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: system-s-various-zone-names-variable
+        - literal:
+            value: .xml
+            datatype: string
+  tests:
+    test-solaris-less-than-11-4:
+      test_title: Solaris (less than) 11.4
+      capability: unix.uname
+      collection: os-information-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: 11.3 or less.
+        state_capability: unix.uname
+        state:
+          field: os_version
+          value: ^11($|\.[0-3]\b)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-zones-index-does-not-exist:
+      test_title: /etc/zones/index does not exist
+      capability: unix.file
+      collection: etc-zones-index-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-etc-zones-index-contains-global:
+      test_title: /etc/zones/index contains global
+      capability: independent.textfilecontent54
+      collection: etc-zones-index-global-entry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-var-share-zones-index-json-does-not-exist:
+      test_title: /var/share/zones/index.json does not exist
+      capability: unix.file
+      collection: var-share-zones-index-json-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-var-share-zones-index-json-does-not-contain-path:
+      test_title: /var/share/zones/index.json does not contain 'path:/'
+      capability: independent.textfilecontent54
+      collection: var-share-zones-index-json-path-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-make-sure-that-all-different-zones-on-system-have-their:
+      test_title: Make sure that all the different zones on the system have their limitpriv attribute set to default.
+      capability: independent.xmlfilecontent
+      collection: limitpriv-attribute-from-specified-zone-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - not:
+        all:
+        - any:
+          - not:
+              test: test-solaris-less-than-11-4
+          - any:
+            - test: test-etc-zones-index-does-not-exist
+            - test: test-etc-zones-index-contains-global
+        - any:
+          - test: test-solaris-less-than-11-4
+          - any:
+            - test: test-var-share-zones-index-json-does-not-exist
+            - test: test-var-share-zones-index-json-does-not-contain-path
+    - test: test-make-sure-that-all-different-zones-on-system-have-their

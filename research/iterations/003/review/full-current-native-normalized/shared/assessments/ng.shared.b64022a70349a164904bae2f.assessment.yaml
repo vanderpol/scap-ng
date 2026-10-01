@@ -1,0 +1,84 @@
+assessment:
+  id: ng.shared.b64022a70349a164904bae2f
+  version: 1
+  assessment_title: Ubuntu 22.04 LTS must have directories that contain system commands group-owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-system-command-directories-not-owned-by-root-group-collection:
+      collection_title: All system-command directories not owned by root-group
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        match:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: owned by root-group
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: file
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  tests:
+    test-system-command-directories-owned-by-root-group:
+      test_title: System command directories are owned by root group.
+      capability: unix.file
+      collection: all-system-command-directories-not-owned-by-root-group-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-system-command-directories-owned-by-root-group

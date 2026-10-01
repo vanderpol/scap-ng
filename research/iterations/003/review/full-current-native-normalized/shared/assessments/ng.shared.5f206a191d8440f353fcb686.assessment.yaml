@@ -1,0 +1,86 @@
+assessment:
+  id: ng.shared.5f206a191d8440f353fcb686
+  version: 1
+  assessment_title: OL09-00-001050 - OL 9 must be configured so that user and group account administration utilities are configured
+    to store only encrypted representations of passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-libuser-conf-defaults-section-crypt-style-collection:
+      collection_title: /etc/libuser.conf defaults section with crypt_style
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/libuser.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\[defaults]((?:\r?\n(?:[^[\r\n].*)?)*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-libuser-conf-defaults-section-crypt-style-collection-2:
+      collection_title: /etc/libuser.conf defaults section with crypt_style
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/libuser.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*crypt_style\s*=\s*(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-libuser-conf-defaults-crypt-style-exists:
+      test_title: libuser.conf, defaults/crypt_style exists
+      capability: independent.textfilecontent54
+      collection: etc-libuser-conf-defaults-section-crypt-style-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: defaults/crypt_style
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-libuser-conf-crypt-style-sha512:
+      test_title: libuser.conf, crypt_style = sha512
+      capability: independent.textfilecontent54
+      collection: etc-libuser-conf-defaults-section-crypt-style-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: sha512
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: sha512
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-libuser-conf-defaults-crypt-style-exists
+    - test: test-libuser-conf-crypt-style-sha512

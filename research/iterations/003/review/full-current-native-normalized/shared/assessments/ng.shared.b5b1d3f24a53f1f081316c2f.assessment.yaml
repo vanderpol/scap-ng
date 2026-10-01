@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.b5b1d3f24a53f1f081316c2f
+  version: 1
+  assessment_title: The macOS system must enable Recovery Lock.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-recovery-lock-enable-recommended-object-collection:
+      collection_title: os_recovery_lock_enable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/libexec/mdmclient QuerySecurityInfo 2>/dev/null | /usr/bin/grep "IsRecoveryLockEnabled = 1"
+  tests:
+    test-os-recovery-lock-enable-recommended-test:
+      test_title: os_recovery_lock_enable_recommended_test
+      capability: independent.shellcommand
+      collection: os-recovery-lock-enable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_recovery_lock_enable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-recovery-lock-enable-recommended-test

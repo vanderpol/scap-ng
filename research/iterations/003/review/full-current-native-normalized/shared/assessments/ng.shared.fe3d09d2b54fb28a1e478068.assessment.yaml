@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.fe3d09d2b54fb28a1e478068
+  version: 1
+  assessment_title: The pidgin IM client package must not be installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pkg-info-communication-im-pidgin-collection:
+      collection_title: pkg info communication/im/pidgin
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg info communication/im/pidgin
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-pidgin-im-client-package-not-installed:
+      test_title: The pidgin IM client package must not be installed.
+      capability: independent.shellcommand
+      collection: pkg-info-communication-im-pidgin-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line should not exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-pidgin-im-client-package-not-installed

@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.c268359c628e5f0b5b2132d5
+  version: 1
+  assessment_title: The macOS system must disable sending search data from Spotlight to Apple.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-improve-search-disable-recommended-object-collection:
+      collection_title: system_settings_improve_search_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.assistant.support'')\
+
+            .objectForKey(''Search Queries Data Sharing Status'').js
+
+            EOS'
+  tests:
+    test-system-settings-improve-search-disable-recommended-test:
+      test_title: system_settings_improve_search_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-improve-search-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_improve_search_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '2'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-improve-search-disable-recommended-test

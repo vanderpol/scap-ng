@@ -1,0 +1,113 @@
+assessment:
+  id: ng.shared.53e23469974c64b90fb8d200
+  version: 1
+  assessment_title: The operating system must enforce minimum password lifetime restrictions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    gather-non-root-unlocked-users-passwords-greater-than-60-days-collection:
+      collection_title: Gather non-root, unlocked users with passwords greater than 60 days
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'logins -ox |awk -F: ''( $1 != "root" && $8 != "LK" && $8 != "NL" && $10 < "1" ) { print }'''
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    check-etc-default-passwd-mindays-setting-collection:
+      collection_title: Check /etc/default/passwd for MINDAYS setting
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^MINDAYS=(.*)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    check-etc-default-passwd-ensure-minweeks-not-defined-collection:
+      collection_title: Check /etc/default/passwd to ensure MINWEEKS is not defined
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^MINWEEKS=
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-etc-passwd-users-minimum-password-less-than-1-day:
+      test_title: Check /etc/passwd for users with a minimum password less than 1 day
+      capability: independent.shellcommand
+      collection: gather-non-root-unlocked-users-passwords-greater-than-60-days-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line should not return any users
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+    test-check-etc-default-passwd-mindays-setting:
+      test_title: Check /etc/default/passwd for MINDAYS setting
+      capability: independent.textfilecontent54
+      collection: check-etc-default-passwd-mindays-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: MINDAYS is 1 or more
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-check-etc-default-passwd-ensure-minweeks-not-defined:
+      test_title: Check /etc/default/passwd to ensure MINWEEKS is not defined
+      capability: independent.textfilecontent54
+      collection: check-etc-default-passwd-ensure-minweeks-not-defined-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-check-etc-passwd-users-minimum-password-less-than-1-day
+    - test: test-check-etc-default-passwd-mindays-setting
+    - test: test-check-etc-default-passwd-ensure-minweeks-not-defined

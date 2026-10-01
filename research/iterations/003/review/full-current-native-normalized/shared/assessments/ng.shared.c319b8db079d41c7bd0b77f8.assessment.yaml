@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.c319b8db079d41c7bd0b77f8
+  version: 1
+  assessment_title: Power Mgmt - Password Wake When Plugged In
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ACSettingIndex
+  variables:
+    require-password-when-computer-wakes-plugged-variable:
+      title: Require a Password when a Computer Wakes (Plugged)
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: require_a_password_when_a_computer_wakes_plugged_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-require-password-when-computer-wakes-plugged-in-set-enabled:
+      test_title: '''Require a password when a computer wakes (plugged in)'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: require-password-when-computer-wakes-plugged-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-require-password-when-computer-wakes-plugged-in-set-enabled

@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.4ed89f3553b0fd47afc7336a
+  version: 1
+  assessment_title: CISC-ND-001030 - The Cisco router must be configured to synchronize its clock with the primary and secondary
+    time sources using redundant authoritative time sources.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    iosxe-global-collection:
+      collection_title: null
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ntp[ \t]+server[ \t]+\S+[ \t]*
+    independent-variable-collection:
+      collection_title: null
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: number-ntp-servers-configured-variable
+  variables:
+    number-ntp-servers-configured-variable:
+      title: Number of NTP servers configured
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            collection: iosxe-global-collection
+            field: global_command
+  tests:
+    test-at-least-two-ntp-servers-configured:
+      test_title: At least two NTP servers are configured
+      capability: independent.variable
+      collection: independent-variable-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.variable
+        state:
+          field: value
+          value: '2'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-at-least-two-ntp-servers-configured

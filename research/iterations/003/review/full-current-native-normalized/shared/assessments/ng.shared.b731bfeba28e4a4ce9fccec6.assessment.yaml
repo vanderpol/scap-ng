@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.b731bfeba28e4a4ce9fccec6
+  version: 1
+  assessment_title: The Oracle Linux operating system must specify the default "include" directory for the /etc/sudoers file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-rsyslog-config-cron-logging-collection:
+      collection_title: Retrieve rsyslog config for cron logging.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: grep include /etc/sudoers
+    retrieve-includes-from-etc-sudoers-file-collection:
+      collection_title: Retrieve includes from /etc/sudoers file.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: grep -r include /etc/sudoers.d
+  tests:
+    test-confirm-default-include-directory-used-in-etc-sudoers:
+      test_title: Confirm the default 'include' directory is used in /etc/sudoers.
+      capability: independent.shellcommand
+      collection: retrieve-rsyslog-config-cron-logging-collection
+      assertion:
+        existence: only_one_exists
+        item_quantifier: all
+        state_title: Confirm includes in /etc/sudoers.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ^\s*#includedir\s+\/etc\/sudoers.d\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: only_one_exists
+    test-confirm-cron-logging-implemented:
+      test_title: Confirm cron logging is implemented.
+      capability: independent.shellcommand
+      collection: retrieve-includes-from-etc-sudoers-file-collection
+      assertion:
+        existence: only_one_exists
+        item_quantifier: all
+        state_title: Confirm no 'includes' in /etc/sudoers.d directory.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    all:
+    - test: test-confirm-default-include-directory-used-in-etc-sudoers
+    - test: test-confirm-cron-logging-implemented

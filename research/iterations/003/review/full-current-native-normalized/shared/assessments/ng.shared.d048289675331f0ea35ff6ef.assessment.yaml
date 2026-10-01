@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.d048289675331f0ea35ff6ef
+  version: 1
+  assessment_title: Ctrl+Alt+Del Security Attention Sequence
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisableCAD
+  variables:
+    interactive-logon-do-not-require-ctrl-alt-del-variable:
+      title: 'Interactive logon: Do not require CTRL+ALT+DEL'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: do_not_require_ctrlaltdel_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-interactive-logon-do-not-require-ctrl-alt-del-set-disabled:
+      test_title: '''Interactive logon: Do not require CTRL+ALT+DEL'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: interactive-logon-do-not-require-ctrl-alt-del-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-interactive-logon-do-not-require-ctrl-alt-del-set-disabled

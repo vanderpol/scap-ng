@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.66f1e9a7d4e87e602814ac43
+  version: 1
+  assessment_title: OL08-00-040321 - The graphical display manager must not be the default target on OL 8 unless approved.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-symlink-collection:
+      collection_title: null
+      capability: unix.symlink
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/system/default.target
+  tests:
+    test-default-target-symlinked-multi-user-target:
+      test_title: default.target is symlinked to multi-user.target
+      capability: unix.symlink
+      collection: unix-symlink-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.symlink
+        state:
+          field: canonical_path
+          value: '[\S]*\/multi\-user\.target$'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-default-target-symlinked-multi-user-target

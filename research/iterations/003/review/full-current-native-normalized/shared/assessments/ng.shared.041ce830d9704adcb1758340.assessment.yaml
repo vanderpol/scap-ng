@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.041ce830d9704adcb1758340
+  version: 1
+  assessment_title: WN11-UR-000005 - The "Access Credential Manager as a trusted caller" user right must not be assigned to
+    any groups or accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_TRUSTED_CREDMAN_ACCESS_NAME
+  tests:
+    test-access-credential-manager-as-trusted-caller-none:
+      test_title: Access Credential Manager as a trusted caller - None
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-access-credential-manager-as-trusted-caller-none

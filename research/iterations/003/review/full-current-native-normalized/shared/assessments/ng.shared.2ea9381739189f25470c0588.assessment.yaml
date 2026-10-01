@@ -1,0 +1,53 @@
+assessment:
+  id: ng.shared.2ea9381739189f25470c0588
+  version: 1
+  assessment_title: OL08-00-040160 - All OL 8 networked systems must have and implement SSH to protect the confidentiality
+    and integrity of transmitted and received information, as well as information during preparation for transmission.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: openssh-server
+    unix-process58-collection:
+      collection_title: null
+      capability: unix.process58
+      select:
+        command_line:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/usr/sbin/sshd\b
+        pid:
+          operation: greater than
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-openssh-server-package-installed:
+      test_title: The openssh-server package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-ssh-daemon-running:
+      test_title: The ssh daemon is running.
+      capability: unix.process58
+      collection: unix-process58-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-openssh-server-package-installed
+    - test: test-ssh-daemon-running

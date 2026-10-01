@@ -1,0 +1,68 @@
+assessment:
+  id: ng.shared.f3ce81a92fc030941af136fc
+  version: 1
+  assessment_title: The system must restrict the ability of users to assume excessive privileges to members of a defined group
+    and prevent unauthorized users from accessing administrative tools.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-user-attr-file-collection:
+      collection_title: The (/etc/user_attr) file.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/user_attr
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^root:[^:]*:[^:]*:[^:]*:([^:]*;)?type=role(;|\s|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-user-attr-file-collection-2:
+      collection_title: The (/etc/user_attr) file.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/user_attr
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^:]+:[^:]*:[^:]*:[^:]*:[^:]*([^:]*;)?roles=([^:;\s]+,)?root(,|;|\s|$)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-root-configured-as-role:
+      test_title: Root must be configured as a role.
+      capability: independent.textfilecontent54
+      collection: etc-user-attr-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-at-least-one-local-user-assigned-root-role:
+      test_title: At least one local user must be assigned the root role.
+      capability: independent.textfilecontent54
+      collection: etc-user-attr-file-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-root-configured-as-role
+    - test: test-at-least-one-local-user-assigned-root-role

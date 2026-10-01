@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.3ae15e4612671c027836b627
+  version: 1
+  assessment_title: AZLX-23-002045 - Amazon Linux 2023 must take action when allocated audit record storage volume reaches
+    95 percent of the audit record storage capacity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*admin_space_left\s*=\s*(\S+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-audit-auditd-conf-admin-space-left-5:
+      test_title: '/etc/audit/auditd.conf: admin_space_left = 5%'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: 5%
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-audit-auditd-conf-admin-space-left-5

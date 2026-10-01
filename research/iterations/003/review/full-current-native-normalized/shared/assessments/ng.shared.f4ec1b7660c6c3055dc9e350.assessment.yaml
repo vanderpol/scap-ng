@@ -1,0 +1,33 @@
+assessment:
+  id: ng.shared.f4ec1b7660c6c3055dc9e350
+  version: 1
+  assessment_title: File system automounter must be disabled unless required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    check-automount-collection:
+      collection_title: check for automount
+      capability: unix.process58
+      select:
+        command_line:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(/usr)?/sbin/automount.*
+        pid:
+          operation: greater than
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-automount:
+      test_title: check for automount
+      capability: unix.process58
+      collection: check-automount-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-check-automount

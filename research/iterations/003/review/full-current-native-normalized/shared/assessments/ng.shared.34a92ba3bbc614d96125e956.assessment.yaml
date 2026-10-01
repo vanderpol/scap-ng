@@ -1,0 +1,92 @@
+assessment:
+  id: ng.shared.34a92ba3bbc614d96125e956
+  version: 1
+  assessment_title: OL09-00-002392 - OL 9 must disable the ability of systemd to spawn an interactive boot process.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    bls-options-collection:
+      collection_title: BLS options
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/loader/entries
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^options\s+(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-default-grub-grub-cmdline-linux-collection:
+      collection_title: /etc/default/grub GRUB_CMDLINE_LINUX
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-bls-options-contain-systemd-confirm-spawn:
+      test_title: BLS options contain systemd.confirm_spawn
+      capability: independent.textfilecontent54
+      collection: bls-options-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (^|\s)systemd\.confirm_spawn(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-systemd:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain systemd.confirm_spawn
+      capability: independent.textfilecontent54
+      collection: etc-default-grub-grub-cmdline-linux-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (^|\s)systemd\.confirm_spawn(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - not:
+        test: test-bls-options-contain-systemd-confirm-spawn
+    - not:
+        test: test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-systemd

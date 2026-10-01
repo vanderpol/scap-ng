@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.3cd4cd215fcb80d8a2c259d5
+  version: 1
+  assessment_title: Exchange servers must use approved DOD certificates.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-exchangecertificate-gather-certificatedomains-collection:
+      collection_title: Run Get-ExchangeCertificate to gather CertificateDomains.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ExchangeCertificate | Select-Object CertificateDomains,
+            Issuer, Status | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-if-value-certificatedomains-does-not-indicate-it-issued-by-dod:
+      test_title: If the value of CertificateDomains does not indicate it is issued by the DOD, this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-exchangecertificate-gather-certificatedomains-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Verify DoD root exists in subexpression
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: (?i)dod.*\svalid$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-if-value-certificatedomains-does-not-indicate-it-issued-by-dod

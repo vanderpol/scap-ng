@@ -1,0 +1,59 @@
+assessment:
+  id: ng.shared.589ae7ef6892f091af732d40
+  version: 1
+  assessment_title: The Ubuntu operating system must retain a users session lock until that user reestablishes access using
+    established identification and authentication procedures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ubuntu-retain-user-s-session-lock-until-that-user-reestablishes-collection:
+      collection_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+        and authentication procedures.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gsettings get org.gnome.desktop.screensaver lock-enabled
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: 'true'
+  tests:
+    test-ubuntu-retain-user-s-session-lock-until-that-user-reestablishes:
+      test_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+        and authentication procedures.
+      capability: independent.shellcommand
+      collection: ubuntu-retain-user-s-session-lock-until-that-user-reestablishes-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Ubuntu must retain a user's session lock until that user reestablishes access using established identification
+          and authentication procedures.
+        state_capability: independent.shellcommand
+        state:
+          all:
+          - field: exit_status
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stdout_line
+            value: 'true'
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-ubuntu-retain-user-s-session-lock-until-that-user-reestablishes

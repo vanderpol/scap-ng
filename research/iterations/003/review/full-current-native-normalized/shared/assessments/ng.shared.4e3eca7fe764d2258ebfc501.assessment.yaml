@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.4e3eca7fe764d2258ebfc501
+  version: 1
+  assessment_title: OL 8 must clear memory when it is freed to prevent use-after-free attacks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-init-on-free-setting-from-etc-default-grub-collection:
+      collection_title: Retrieve 'init_on_free' setting from /etc/default/grub.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*GRUB_CMDLINE_LINUX="(.*?)"$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-confirm-that-init-on-free-set-1-in-etc-default:
+      test_title: Confirm that 'init_on_free' is set to '1' in /etc/default/grub.
+      capability: independent.textfilecontent54
+      collection: retrieve-init-on-free-setting-from-etc-default-grub-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm init_of_free is set to '1'.
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^[^#]*\binit_on_free=1\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-confirm-that-init-on-free-set-1-in-etc-default

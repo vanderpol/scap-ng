@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.c5fd75e5eef4c4aff92be26f
+  version: 1
+  assessment_title: OL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-collection:
+      collection_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+  tests:
+    test-verify-that-rhel-9-configured-so-that-cryptographic-hashes-system:
+      test_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+      capability: independent.shellcommand
+      collection: verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm no files are identified.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-verify-that-rhel-9-configured-so-that-cryptographic-hashes-system

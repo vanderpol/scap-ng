@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.8a85650e502803ae2e8c7441
+  version: 1
+  assessment_title: SLES-12-010881 - The SUSE operating system must have directories that contain system commands owned by
+    root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      filters:
+      - action: include
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  tests:
+    test-directories-contining-system-commands-owned-by-root:
+      test_title: Directories contining system commands are owned by root
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-directories-contining-system-commands-owned-by-root

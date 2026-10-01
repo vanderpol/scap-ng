@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.3d834ced94d2202bb13023cc
+  version: 1
+  assessment_title: The VNC server package must not be installed unless required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pkg-info-x11-server-xvnc-collection:
+      collection_title: pkg info x11/server/xvnc
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg info x11/server/xvnc
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-vnc-server-package-not-installed-unless-required:
+      test_title: The VNC server package must not be installed unless required.
+      capability: independent.shellcommand
+      collection: pkg-info-x11-server-xvnc-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line should not exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-vnc-server-package-not-installed-unless-required

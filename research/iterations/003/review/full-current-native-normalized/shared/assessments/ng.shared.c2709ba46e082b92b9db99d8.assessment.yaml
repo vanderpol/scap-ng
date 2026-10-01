@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.c2709ba46e082b92b9db99d8
+  version: 1
+  assessment_title: The TFTP service daemon must not be installed unless required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pkg-info-service-network-tftp-collection:
+      collection_title: pkg info service/network/tftp
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg info service/network/tftp
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-tftp-daemon-not-installed-unless-required:
+      test_title: The TFTP daemon must not be installed unless required.
+      capability: independent.shellcommand
+      collection: pkg-info-service-network-tftp-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line should not exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-tftp-daemon-not-installed-unless-required

@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.4f7bfa1c295da916d2c6a222
+  version: 1
+  assessment_title: WN11-CC-000037 - Local administrator accounts must have their privileged token filtered to prevent elevated
+    privileges from being used over the network on domain systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: LocalAccountTokenFilterPolicy
+  tests:
+    test-local-admin-accounts-filtered-token-policy-enabled:
+      test_title: Local admin accounts filtered token policy is enabled
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-local-admin-accounts-filtered-token-policy-enabled

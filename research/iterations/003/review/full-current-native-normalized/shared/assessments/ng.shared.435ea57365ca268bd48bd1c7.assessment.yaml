@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.435ea57365ca268bd48bd1c7
+  version: 1
+  assessment_title: WN10-SO-000055 - The maximum age for machine account passwords must be configured to 30 days or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: MaximumPasswordAge
+  tests:
+    test-domain-member-maximum-machine-account-password-age-set-30-or:
+      test_title: '''Domain member: Maximum machine account password age'' is set to 30 or less (but not 0).'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: null
+          capability: windows.registry
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '0'
+              operation: greater than
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          capability: windows.registry
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '30'
+              operation: less than or equal
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+  evaluate:
+    test: test-domain-member-maximum-machine-account-password-age-set-30-or

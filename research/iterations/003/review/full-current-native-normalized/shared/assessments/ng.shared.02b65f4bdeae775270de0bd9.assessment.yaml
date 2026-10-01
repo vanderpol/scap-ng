@@ -1,0 +1,180 @@
+assessment:
+  id: ng.shared.02b65f4bdeae775270de0bd9
+  version: 1
+  assessment_title: WN19-MS-000080 - Windows Server 2019 "Deny access to this computer from the network" user right on domain-joined
+    member servers must be configured to prevent access from highly privileged domain accounts and local accounts and from
+    unauthenticated access on all systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-wmi57-collection:
+      collection_title: null
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT DomainRole FROM win32_computersystem
+    windows-userright-collection:
+      collection_title: null
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_DENY_NETWORK_LOGON_NAME
+  tests:
+    test-system-windows-domain-member-server:
+      test_title: The system is a Windows Domain Member Server
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Domain Member Server
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: domainrole
+              value: '3'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-access-this-computer-from-network-guests:
+      test_title: Deny access to this computer from the network - Guests
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: Guests
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-access-this-computer-from-network-domain-admins:
+      test_title: Deny access to this computer from the network - Domain Admins
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: ^(?i)(.+\\)?Domain Admins$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-access-this-computer-from-network-enterprise-admins:
+      test_title: Deny access to this computer from the network - Enterprise Admins
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: ^(?i)(.+\\)?Enterprise Admins$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-access-this-computer-from-network-local-account:
+      test_title: Deny access to this computer from the network - Local account
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: ^(?i)(NT Authority\\)?Local account$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-access-this-computer-from-network-local-account-member-administrators:
+      test_title: Deny access to this computer from the network - Local account and member of Administrators
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: windows.userright
+        state:
+          field: trustee_name
+          value: ^(?i)(NT Authority\\)?Local account and member of Administrators group$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-system-windows-standalone-server:
+      test_title: The system is a Windows Standalone Server
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Standalone Server
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: domainrole
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - all:
+      - test: test-system-windows-domain-member-server
+      - test: test-deny-access-this-computer-from-network-guests
+      - test: test-deny-access-this-computer-from-network-domain-admins
+      - test: test-deny-access-this-computer-from-network-enterprise-admins
+      - any:
+        - test: test-deny-access-this-computer-from-network-local-account
+        - test: test-deny-access-this-computer-from-network-local-account-member-administrators
+    - all:
+      - test: test-system-windows-standalone-server
+      - test: test-deny-access-this-computer-from-network-guests

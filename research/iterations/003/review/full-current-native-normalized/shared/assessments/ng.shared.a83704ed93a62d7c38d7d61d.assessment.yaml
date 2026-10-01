@@ -1,0 +1,141 @@
+assessment:
+  id: ng.shared.a83704ed93a62d7c38d7d61d
+  version: 1
+  assessment_title: AZLX-23-001220 - Amazon Linux 2023 SSH daemon must not allow Kerberos authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)KerberosAuthentication(?-i)\s+("?\w+"?)\s*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    sshd-config-includes-collection:
+      collection_title: sshd_config includes
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*include\s+(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    independent-textfilecontent54-collection-3:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)KerberosAuthentication(?-i)\s+("?\w+"?)\s*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: independent-textfilecontent54-collection
+        - collection: independent-textfilecontent54-collection-3
+  tests:
+    test-etc-ssh-sshd-config-kerberosauthentication-no:
+      test_title: /etc/ssh/sshd_config:KerberosAuthentication == no
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(no|"no")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      capability: independent.textfilecontent54
+      collection: sshd-config-includes-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /etc/ssh/sshd_config.d/*.conf
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-ssh-sshd-config-sshd-config-d-kerberosauthentication-no:
+      test_title: /etc/ssh/sshd_config + sshd_config.d:KerberosAuthentication == no
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(no|"no")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - all:
+      - test: test-etc-ssh-sshd-config-kerberosauthentication-no
+      - not:
+          test: test-sshd-config-includes-sshd-config-d
+    - all:
+      - test: test-sshd-config-includes-sshd-config-d
+      - test: test-etc-ssh-sshd-config-sshd-config-d-kerberosauthentication-no

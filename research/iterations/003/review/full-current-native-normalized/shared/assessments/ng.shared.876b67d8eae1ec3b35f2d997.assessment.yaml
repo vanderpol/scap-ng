@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.876b67d8eae1ec3b35f2d997
+  version: 1
+  assessment_title: The macOS system must be configured with audit log files owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-files-owner-configure-recommended-object-collection:
+      collection_title: audit_files_owner_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/bin/ls -n $(/usr/bin/grep ''^dir'' /etc/security/audit_control | /usr/bin/awk -F: ''{print $2}'') | /usr/bin/awk
+            ''{s+=$3} END {print s}'''
+  tests:
+    test-audit-files-owner-configure-recommended-test:
+      test_title: audit_files_owner_configure_recommended_test
+      capability: independent.shellcommand
+      collection: audit-files-owner-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: audit_files_owner_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-files-owner-configure-recommended-test

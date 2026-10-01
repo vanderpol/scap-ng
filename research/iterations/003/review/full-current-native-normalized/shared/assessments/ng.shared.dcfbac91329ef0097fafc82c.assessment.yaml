@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.dcfbac91329ef0097fafc82c
+  version: 1
+  assessment_title: Exchange send connector connections count must be limited.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-transportservice-display-maxoutboundconnections-configuration-collection:
+      collection_title: Run Get-TransportService to display MaxOutboundConnections configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-TransportService | Select-Object -Property
+            Name, Identity, MaxOutboundConnections  | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+\s(\d+)\s*$
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-if-value-maxoutboundconnections-not-set-1000-this-finding:
+      test_title: If the value of MaxOutboundConnections is not set to 1000, this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-transportservice-display-maxoutboundconnections-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify value is 1000
+        state_capability: independent.shellcommand
+        state:
+          field: subexpression
+          value: '1000'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-if-value-maxoutboundconnections-not-set-1000-this-finding

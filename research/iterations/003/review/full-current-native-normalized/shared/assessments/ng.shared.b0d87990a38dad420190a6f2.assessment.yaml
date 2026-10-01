@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.b0d87990a38dad420190a6f2
+  version: 1
+  assessment_title: Ensure Only Protocol 2 Connections Allowed
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: openssh-server
+    ssh-protocol-collection:
+      collection_title: SSH Protocol
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Protocol[ \t]+([^\s#]*)[ \t]*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-sshd-uses-protocol-2:
+      test_title: sshd uses protocol 2
+      capability: independent.textfilecontent54
+      collection: ssh-protocol-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: Protocol = 2
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(2|"2")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-package-openssh-server-removed-2:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: version >= 7.4
+        state_capability: linux.rpminfo
+        state:
+          field: evr
+          value: 0:7.4p1-0
+          operation: greater than or equal
+          datatype: evr_string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - any:
+      - test: test-sshd-uses-protocol-2
+      - test: test-package-openssh-server-removed-2

@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.eaae3bc68d0ab1414246f23d
+  version: 1
+  assessment_title: The system must require passwords to contain at least one uppercase alphabetic character.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    default-passwd-file-etc-default-passwd-collection:
+      collection_title: The default passwd file (/etc/default/passwd).
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*MINUPPER=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-system-default-password-minupper-setting:
+      test_title: Check the system default password MINUPPER setting.
+      capability: independent.textfilecontent54
+      collection: default-passwd-file-etc-default-passwd-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Greater than or equal to one.
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-check-system-default-password-minupper-setting

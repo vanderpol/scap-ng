@@ -1,0 +1,63 @@
+assessment:
+  id: ng.shared.0c5b430661105a3ffc3031bd
+  version: 1
+  assessment_title: AZLX-23-002345 - Amazon Linux 2023 system commands must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-files-in-system-command-directories-less-files-owned-by-collection:
+      collection_title: All files in system command directories, less files owned by root
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: system-command-directories-including-usr-libexec-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: owned by root
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-command-directories-including-usr-libexec-variable:
+      title: system command directories (including /usr/libexec)
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/libexec
+        - /usr/local/bin
+        - /usr/local/sbin
+  tests:
+    test-no-system-command-files-exist-except-those-owned-by-root:
+      test_title: No system command files exist except those owned by root
+      capability: unix.file
+      collection: all-files-in-system-command-directories-less-files-owned-by-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-no-system-command-files-exist-except-those-owned-by-root

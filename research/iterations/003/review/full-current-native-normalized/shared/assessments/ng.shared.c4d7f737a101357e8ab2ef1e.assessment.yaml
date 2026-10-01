@@ -1,0 +1,161 @@
+assessment:
+  id: ng.shared.c4d7f737a101357e8ab2ef1e
+  version: 1
+  assessment_title: UBTU-20-010416 - The Ubuntu operating system must generate error messages that provide information necessary
+    for corrective actions without revealing information that could be exploited by adversaries.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-files-in-var-log-except-var-log-btmp-var-collection:
+      collection_title: All files in /var/log except /var/log/btmp, /var/log/lastlog, and /var/log/wtmp
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: filepath
+          value: /var/log/btmp
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: /var/log/btmp
+        capability: unix.file
+      - action: exclude
+        match:
+          field: filepath
+          value: /var/log/wtmp
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: /var/log/wtmp
+        capability: unix.file
+      - action: exclude
+        match:
+          field: filepath
+          value: /var/log/lastlog
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: /var/log/lastlog
+        capability: unix.file
+      - action: exclude
+        match:
+          field: filepath
+          value: /var/log/history.log
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: /var/log/lastlog
+        capability: unix.file
+      - action: exclude
+        match:
+          field: filepath
+          value: /var/log/eipp.log.xz
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: /var/log/lastlog
+        capability: unix.file
+      behaviors:
+        max_depth: '-1'
+        recurse: directories
+        recurse_direction: down
+        recurse_file_system: local
+  tests:
+    test-all-files-in-var-log-except-var-log-btmp-var:
+      test_title: All files in /var/log except /var/log/btmp, /var/log/lastlog, and /var/log/wtmp are mode 640 or less permissive
+      capability: unix.file
+      collection: all-files-in-var-log-except-var-log-btmp-var-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: mode 0640 or less permissive
+        state_capability: unix.file
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: uexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-all-files-in-var-log-except-var-log-btmp-var

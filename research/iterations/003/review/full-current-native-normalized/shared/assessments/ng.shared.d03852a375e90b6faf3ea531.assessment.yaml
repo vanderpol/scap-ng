@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.d03852a375e90b6faf3ea531
+  version: 1
+  assessment_title: WN19-DC-000060 - Windows Server 2019 computer clock synchronization tolerance must be limited to five
+    minutes or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    kerberos-policy-maximum-tolerance-computer-clock-synchronization-5-minutes-or-collection:
+      collection_title: Kerberos Policy - Maximum tolerance for computer clock synchronization must be 5 minutes or less
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\rsop\computer
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxClockSkew'
+  tests:
+    test-kerberos-policy-maximum-tolerance-computer-clock-synchronization-5-minutes-or:
+      test_title: Kerberos Policy - Maximum tolerance for computer clock synchronization - 5 minutes or less
+      capability: windows.wmi57
+      collection: kerberos-policy-maximum-tolerance-computer-clock-synchronization-5-minutes-or-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Maximum tolerance for computer clock synchronization lte 5
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: setting
+              value: '5'
+              operation: less than or equal
+              datatype: int
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-kerberos-policy-maximum-tolerance-computer-clock-synchronization-5-minutes-or

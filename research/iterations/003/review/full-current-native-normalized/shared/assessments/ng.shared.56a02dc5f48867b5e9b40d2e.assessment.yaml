@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.56a02dc5f48867b5e9b40d2e
+  version: 1
+  assessment_title: WN19-00-000320 - Windows Server 2019 must not have the Fax Server role installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    fax-server-collection:
+      collection_title: Fax Server
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT startmode FROM Win32_Service WHERE name='fax'
+  tests:
+    test-fax-server-role-not-installed:
+      test_title: The Fax server role is not installed.
+      capability: windows.wmi57
+      collection: fax-server-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: StartMode is Disabled
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: startmode
+              value: Disabled
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-fax-server-role-not-installed

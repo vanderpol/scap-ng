@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.b33037becf4210e11b613d87
+  version: 1
+  assessment_title: There must be no shosts.equiv files on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: shosts.equiv
+      behaviors:
+        max_depth: '-1'
+        recurse: directories
+        recurse_direction: down
+        recurse_file_system: local
+  tests:
+    test-there-no-shosts-equiv-files-on-system:
+      test_title: There must be no shosts.equiv files on the system.
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-there-no-shosts-equiv-files-on-system

@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.81ad9299dbd6c7464899d1d9
+  version: 1
+  assessment_title: WN10-AU-000584 - Windows 10 must be configured to audit handle manipulation successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-handle-manipulation-set-success:
+      test_title: '''Audit Handle Manipulation'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Handle Manipulation'' is set to ''Success'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: handle_manipulation
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-handle-manipulation-set-success-failure:
+      test_title: '''Audit Handle Manipulation'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Handle Manipulation'' is set to ''Success'' and ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: handle_manipulation
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-handle-manipulation-set-success
+    - test: test-audit-handle-manipulation-set-success-failure

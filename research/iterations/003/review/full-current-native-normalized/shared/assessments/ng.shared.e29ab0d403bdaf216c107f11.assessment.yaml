@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.e29ab0d403bdaf216c107f11
+  version: 1
+  assessment_title: Audit - Sensitive Privilege Use - Failure
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-sensitive-privilege-use-failure-only:
+      test_title: Audit - Sensitive Privilege Use - Failure only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Sensitive Privilege Use - Failure only
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: sensitive_privilege_use
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-sensitive-privilege-use-success-failure:
+      test_title: Audit - Sensitive Privilege Use - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Sensitive Privilege Use - Success and Failure
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: sensitive_privilege_use
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-sensitive-privilege-use-failure-only
+    - test: test-audit-sensitive-privilege-use-success-failure

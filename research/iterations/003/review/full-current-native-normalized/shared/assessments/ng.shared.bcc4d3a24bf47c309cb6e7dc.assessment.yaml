@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.bcc4d3a24bf47c309cb6e7dc
+  version: 1
+  assessment_title: The macOS system must generate audit records for DOD-defined events such as successful/unsuccessful logon
+    attempts, successful/unsuccessful direct access attempts, starting and ending time for user access, and concurrent logons
+    to the same account from different sources.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-flags-aa-configure-recommended-object-collection:
+      collection_title: audit_flags_aa_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\n' | /usr/bin/grep
+            -Ec 'aa'
+  tests:
+    test-audit-flags-aa-configure-recommended-test:
+      test_title: audit_flags_aa_configure_recommended_test
+      capability: independent.shellcommand
+      collection: audit-flags-aa-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: audit_flags_aa_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-flags-aa-configure-recommended-test

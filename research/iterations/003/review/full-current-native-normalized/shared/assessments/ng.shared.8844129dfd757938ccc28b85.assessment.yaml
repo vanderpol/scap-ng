@@ -1,0 +1,121 @@
+assessment:
+  id: ng.shared.8844129dfd757938ccc28b85
+  version: 1
+  assessment_title: RHEL-08-040261 - RHEL 8 must not accept router advertisements on all IPv6 interfaces.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv6.conf.all.accept_ra
+    setting-net-ipv6-conf-all-accept-ra-in-sysctl-d-collection:
+      collection_title: Setting for net.ipv6.conf.all.accept_ra in sysctl.d directories.
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: directories-containing-sysctl-configuration-files-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*net\.ipv6\.conf\.all\.accept_ra\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    setting-net-ipv6-conf-all-accept-ra-in-etc-sysctl-collection:
+      collection_title: Setting for net.ipv6.conf.all.accept_ra in /etc/sysctl.conf.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*net\.ipv6\.conf\.all\.accept_ra\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    setting-net-ipv6-conf-all-accept-ra-in-all-sysctl-collection:
+      collection_title: Setting for net.ipv6.conf.all.accept_ra in all sysctl configuration files.
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: setting-net-ipv6-conf-all-accept-ra-in-sysctl-d-collection
+        - collection: setting-net-ipv6-conf-all-accept-ra-in-etc-sysctl-collection
+  variables:
+    directories-containing-sysctl-configuration-files-variable:
+      title: Directories containing sysctl configuration files
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  tests:
+    test-net-ipv6-conf-all-accept-ra-set-0-in-kernel:
+      test_title: net.ipv6.conf.all.accept_ra is set to 0 in kernel
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-net-ipv6-conf-all-accept-ra-set-0-in-sysctl:
+      test_title: net.ipv6.conf.all.accept_ra is set to 0 in the sysctl configuration files.
+      capability: independent.textfilecontent54
+      collection: setting-net-ipv6-conf-all-accept-ra-in-all-sysctl-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-net-ipv6-conf-all-accept-ra-set-0-in-kernel
+    - test: test-net-ipv6-conf-all-accept-ra-set-0-in-sysctl

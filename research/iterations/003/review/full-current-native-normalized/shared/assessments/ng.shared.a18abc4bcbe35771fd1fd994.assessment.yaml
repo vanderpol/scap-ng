@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.a18abc4bcbe35771fd1fd994
+  version: 1
+  assessment_title: WN10-CC-000370 - The convenience PIN for Windows 10 must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowDomainPINLogon
+  tests:
+    test-turn-on-convenience-pin-sign-in-disabled:
+      test_title: '''Turn on convenience PIN sign-in'' is ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-turn-on-convenience-pin-sign-in-disabled

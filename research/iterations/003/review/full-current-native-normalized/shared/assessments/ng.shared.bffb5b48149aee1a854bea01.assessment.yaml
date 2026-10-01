@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.bffb5b48149aee1a854bea01
+  version: 1
+  assessment_title: WN10-AU-000500 - The Application event log size must be configured to 32768 KB or greater.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\EventLog\Application
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: MaxSize
+  tests:
+    test-application-event-log-size-configured-32768-kb-or-greater:
+      test_title: The Application event log size is configured to 32768 KB or greater
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '32768'
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-application-event-log-size-configured-32768-kb-or-greater

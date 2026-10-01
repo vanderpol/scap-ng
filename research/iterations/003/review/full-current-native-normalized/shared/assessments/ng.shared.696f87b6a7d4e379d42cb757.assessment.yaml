@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.696f87b6a7d4e379d42cb757
+  version: 1
+  assessment_title: UBTU-18-010425 - The Ubuntu operating system, for PKI-based authentication, must validate certificates
+    by constructing a certification path (which includes status information) to an accepted trust anchor.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    check-what-cert-policy-set-in-etc-pam-pkcs11-pam-collection:
+      collection_title: Check what cert_policy is set to in /etc/pam_pkcs11/pam_pkcs11.conf
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam_pkcs11/pam_pkcs11.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*cert_policy[ \t]+=[ \t]+([\w\,"' ]+);\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-all-cert-policy-entries-set-ca-option-in-etc:
+      test_title: Check all cert_policy entries are set with the ca option in /etc/pam_pkcs11/pam_pkcs11.conf
+      capability: independent.textfilecontent54
+      collection: check-what-cert-policy-set-in-etc-pam-pkcs11-pam-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The ca option is present in the collected string
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^["']*ca["']*$|^["']*ca["',\s]|["',\s]ca["',\s]|["',\s]ca["']*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-check-all-cert-policy-entries-set-ca-option-in-etc

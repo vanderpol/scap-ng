@@ -1,0 +1,260 @@
+assessment:
+  id: ng.shared.73f7a2c1be8566cc423230f0
+  version: 1
+  assessment_title: The Ubuntu operating system audit event multiplexor must be configured to off-load audit logs onto a different
+    system or storage media from the system being audited.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection:
+      collection_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the
+        system being audited. package audispd-plugins must be installed.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: dpkg -l | grep audispd-plugins
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \s*ii\s+(audispd-plugins)\s+
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-2:
+      collection_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the
+        system being audited.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/plugins.d/au-remote.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*active\s*=\s*yes\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-3:
+      collection_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+        server is on diffierent network from the system being audited.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/audisp-remote.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*remote_server\s*=\s*(\S+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-4:
+      collection_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+        server is on diffierent network from the system being audited.
+      capability: unix.interface
+      select:
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: type
+          value: ARPHRD_LOOPBACK
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+          being audited.Check off site server is not on local ip address (not loopback.)
+        capability: unix.interface
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-5:
+      collection_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+        server is on diffierent network from the system being audited.
+      capability: unix.interface
+      select:
+        name:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: type
+          value: ARPHRD_ETHER
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+          being audited.Check off site server is not on local ip address.
+        capability: unix.interface
+  variables:
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-variable:
+      title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload ip address
+        is not a local interface ip address.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-4
+          field: inet_addr
+    audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-variable-2:
+      title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload ip address
+        is not a local interface ip address.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-5
+          field: inet_addr
+  tests:
+    test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system:
+      test_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+        being audited. Check if the 'audispd-plugins' package is installed
+      capability: independent.shellcommand
+      collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+          being audited. Check if the 'audispd-plugins' package is installed
+        state_capability: independent.shellcommand
+        state:
+          field: subexpression
+          value: audispd\-plugins
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-2:
+      test_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+        being audited. Check that config file contains 'active = yes'.
+      capability: independent.textfilecontent54
+      collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+          being audited.
+        state_capability: independent.textfilecontent54
+        state:
+          field: text
+          value: ^[ \t]*active\s*=\s*yes\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-3:
+      test_title: Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+        being audited. Check offload host is configured and contains a valid ip addrees.
+      capability: independent.textfilecontent54
+      collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+          ip address is configured and a valid ip address.
+        state_capability: independent.textfilecontent54
+        state:
+          all:
+          - field: instance
+            value: '1'
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: subexpression
+            value: ^((((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])))|((?:(?!0{1,4}:)(?:(?:[0-9a-fA-F]){1,4}):)(?:(?:(?:(?:[0-9a-fA-F]){1,4}):)|:){4}(?:[0-9a-fA-F]){1,4}))$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-4:
+      test_title: 'Audit event multiplexor must be configured to offload audit logs onto a different system from the system
+        being audited. Check offload host is configured and does not contain a local (on the system being tested) IP address.
+        Note: this test checks for a match. The crtieria is negated!'
+      capability: independent.textfilecontent54
+      collection: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_operator: OR
+        states:
+        - state_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+            ip address configured is not a local interface ip address.
+          capability: independent.textfilecontent54
+          state:
+            all:
+            - field: instance
+              value: '1'
+              operation: greater than or equal
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: subexpression
+              value:
+                variable: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-variable
+              operation: pattern match
+              datatype: string
+              mask: false
+              variable_check: all
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: Audit event multiplexor must be configured to offload audit logs onto a different system. Verify offload
+            ip address configured is not a local interface ip address.
+          capability: independent.textfilecontent54
+          state:
+            all:
+            - field: instance
+              value: '1'
+              operation: greater than or equal
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: subexpression
+              value:
+                variable: audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-variable-2
+              operation: pattern match
+              datatype: string
+              mask: false
+              variable_check: all
+              entity_check: all
+              entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system
+    - test: test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-2
+    - test: test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-3
+    - not:
+        test: test-audit-event-multiplexor-configured-offload-audit-logs-onto-different-system-4

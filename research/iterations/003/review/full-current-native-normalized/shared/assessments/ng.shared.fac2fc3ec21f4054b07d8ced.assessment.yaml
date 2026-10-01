@@ -1,0 +1,112 @@
+assessment:
+  id: ng.shared.fac2fc3ec21f4054b07d8ced
+  version: 1
+  assessment_title: UBTU-22-232095 - Ubuntu 22.04 LTS must configure the files used by the system journal to be group-owned
+    by "systemd-journal".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /run/log/journal
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+      behaviors:
+        recurse_direction: down
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^systemd-journal:[^:]*:([0-9]+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    unix-file-collection-2:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log/journal
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+      behaviors:
+        recurse_direction: down
+  variables:
+    gid-systemd-journal-variable:
+      title: GID for systemd-journal
+      kind: local
+      datatype: int
+      expression:
+        values:
+          collection: independent-textfilecontent54-collection
+          field: subexpression
+  tests:
+    test-run-log-journal-files-owned-by-systemd-journal:
+      test_title: '/run/log/journal: files owned by systemd-journal'
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: group id for systemd-journal
+        state_capability: unix.file
+        state:
+          field: group_id
+          value:
+            variable: gid-systemd-journal-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-var-log-journal-files-owned-by-systemd-journal:
+      test_title: '/var/log/journal: files owned by systemd-journal'
+      capability: unix.file
+      collection: unix-file-collection-2
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: group id for systemd-journal
+        state_capability: unix.file
+        state:
+          field: group_id
+          value:
+            variable: gid-systemd-journal-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-run-log-journal-files-owned-by-systemd-journal
+    - test: test-var-log-journal-files-owned-by-systemd-journal

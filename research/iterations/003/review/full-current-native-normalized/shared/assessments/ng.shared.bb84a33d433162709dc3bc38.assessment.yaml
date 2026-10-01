@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.bb84a33d433162709dc3bc38
+  version: 1
+  assessment_title: The Oracle Linux operating system must label all off-loaded audit logs before sending them to the central
+    log server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    check-etc-audisp-audispd-conf-value-assigned-name-format-setting-collection:
+      collection_title: Check /etc/audisp/audispd.conf for the value assigned to name_format setting.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/audispd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*name_format[ ]*=[ ]*([\w]+)\s*
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-value-assigned-name-format-in-etc-audisp-audispd-conf:
+      test_title: Check the value assigned to name_format in /etc/audisp/audispd.conf
+      capability: independent.textfilecontent54
+      collection: check-etc-audisp-audispd-conf-value-assigned-name-format-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The value is set to a case insensitive hostname, fqd, or numeric
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)^hostname|fqd|numeric$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-check-value-assigned-name-format-in-etc-audisp-audispd-conf

@@ -1,0 +1,74 @@
+assessment:
+  id: ng.shared.d29e7ce1f3dca9948f542a84
+  version: 1
+  assessment_title: UBTU-22-232110 - Ubuntu 22.04 LTS must configure audit tools to be owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-tools-collection-2:
+      collection_title: audit tools
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: audit-tools-variable
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /sbin
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: audisp.*
+    audit-tools-collection:
+      collection_title: audit tools
+      capability: unix.file
+      set:
+        operator: union
+        members:
+        - collection: audit-tools-collection-2
+        - collection: unix-file-collection
+  variables:
+    audit-tools-variable:
+      title: audit tools
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/augenrules
+  tests:
+    test-audit-tools-owned-by-root:
+      test_title: audit tools are owned by root
+      capability: unix.file
+      collection: audit-tools-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-tools-owned-by-root

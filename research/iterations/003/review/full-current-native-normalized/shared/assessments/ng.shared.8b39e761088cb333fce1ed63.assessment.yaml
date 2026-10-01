@@ -1,0 +1,85 @@
+assessment:
+  id: ng.shared.8b39e761088cb333fce1ed63
+  version: 1
+  assessment_title: Mount Remote Filesystems with noexec
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\[?[\.\w:-]+\]?:[/\w-]+\s+[/\w-]+\s+nfs[4]?\s+(.*)$
+        instance:
+          operation: not equal
+          datatype: int
+          mask: false
+          value: '0'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/mtab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\[?[\.\w:-]+\]?:[/\w-]+\s+[/\w-]+\s+nfs[4]?\s+(.*)$
+        instance:
+          operation: not equal
+          datatype: int
+          mask: false
+          value: '0'
+  tests:
+    test-all-nfs-in-etc-fstab-has-noexec:
+      test_title: all nfs  in /etc/fstab has noexec
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^.*noexec.*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-all-nfs-in-etc-mtab-has-noexec:
+      test_title: all nfs  in /etc/mtab has noexec
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^.*noexec.*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-all-nfs-in-etc-fstab-has-noexec
+    - test: test-all-nfs-in-etc-mtab-has-noexec

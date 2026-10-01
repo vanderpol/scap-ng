@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.e02a234c0e159bc9c2f405c9
+  version: 1
+  assessment_title: The SQL Server Browser service must be disabled unless specifically required and approved.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    sql-server-browser-service-collection:
+      collection_title: SQL Server Browser Service
+      capability: windows.service
+      select:
+        service_name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SQLBrowser
+  tests:
+    test-sql-server-browser-service-should-disabled-if-found:
+      test_title: SQL Server Browser service should be Disabled if found
+      capability: windows.service
+      collection: sql-server-browser-service-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: SQL query result field 'name' = 'external scripts enabled' and config_value = 0
+        state_capability: windows.service
+        state:
+          all:
+          - field: start_type
+            value: SERVICE_DISABLED
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: current_state
+            value: SERVICE_STOPPED
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-sql-server-browser-service-should-disabled-if-found

@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.c4d087ef2e6ed64ac786f199
+  version: 1
+  assessment_title: WN19-UR-000030 - Windows Server 2019 Allow log on locally user right must only be assigned to the Administrators
+    group.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_INTERACTIVE_LOGON_NAME
+  tests:
+    test-allow-log-on-locally-administrators:
+      test_title: Allow log on locally - Administrators
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          capability: windows.userright
+          state:
+            field: trustee_name
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: windows.userright
+          state:
+            field: trustee_name
+            value: Administrators
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-allow-log-on-locally-administrators

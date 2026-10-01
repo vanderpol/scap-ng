@@ -1,0 +1,74 @@
+assessment:
+  id: ng.shared.5a7c4dc6da386e1ddc603e78
+  version: 1
+  assessment_title: SPN Target Name Validation Level
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\LanManServer\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SMBServerNameHardeningLevel
+  variables:
+    microsoft-network-server-spn-target-name-validation-variable:
+      title: 'Microsoft network server: SPN Target name validation'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: microsoft_network_server_server_spn_target_name_validation_level_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: 'off'
+          - literal: '1'
+            hint: accept_if_provided_by_client
+          - literal: '2'
+            hint: required_from_client
+  tests:
+    test-microsoft-network-server-server-spn-target-name-validation-level-set:
+      test_title: '''Microsoft network server: Server SPN target name validation level'' is set to ''Off'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: microsoft-network-server-spn-target-name-validation-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-microsoft-network-server-server-spn-target-name-validation-level-set

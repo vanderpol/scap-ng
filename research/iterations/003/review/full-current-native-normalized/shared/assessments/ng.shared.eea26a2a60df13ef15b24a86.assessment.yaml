@@ -1,0 +1,107 @@
+assessment:
+  id: ng.shared.eea26a2a60df13ef15b24a86
+  version: 1
+  assessment_title: OL09-00-006002 - OL 9 must configure a DNS processing mode set be Network Manager.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    networkmanager-conf-dns-setting-collection:
+      collection_title: NetworkManager.conf dns setting
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/NetworkManager/NetworkManager.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^dns=(\S*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    networkmanager-conf-main-section-collection:
+      collection_title: NetworkManager.conf main section
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/NetworkManager/NetworkManager.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\[main\]((?:\r?\n(?:[^[\r\n].*)?)*)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-dns-setting-exists-in-networkmanager-conf-default-none-or-systemd:
+      test_title: DNS setting exists in NetworkManager.conf and is default, none or systemd-resolved
+      capability: independent.textfilecontent54
+      collection: networkmanager-conf-dns-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: none
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: default
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: systemd-resolved
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-dns-setting-exists-in-networkmanager-conf-main-section:
+      test_title: DNS setting exists in NetworkManager.conf main section
+      capability: independent.textfilecontent54
+      collection: networkmanager-conf-main-section-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: \ndns=
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-dns-setting-exists-in-networkmanager-conf-default-none-or-systemd
+    - test: test-dns-setting-exists-in-networkmanager-conf-main-section

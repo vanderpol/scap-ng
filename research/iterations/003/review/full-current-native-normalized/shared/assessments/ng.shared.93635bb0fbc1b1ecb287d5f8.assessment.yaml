@@ -1,0 +1,45 @@
+assessment:
+  id: ng.shared.93635bb0fbc1b1ecb287d5f8
+  version: 1
+  assessment_title: The macOS system must disable sending diagnostic and usage data to Apple.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-diagnostics-reports-disable-recommended-object-collection:
+      collection_title: system_settings_diagnostics_reports_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\nlet pref1 = $.NSUserDefaults.alloc.initWithSuiteName('com.apple.SubmitDiagInfo')\\\
+            \n.objectForKey('AutoSubmit').js\nlet pref2 = $.NSUserDefaults.alloc.initWithSuiteName('com.apple.applicationaccess')\\\
+            \n.objectForKey('allowDiagnosticSubmission').js\nif ( pref1 == false && pref2 == false ){\n    return(\"true\"\
+            )\n} else {\n    return(\"false\")\n}\n}\nEOS"
+  tests:
+    test-system-settings-diagnostics-reports-disable-recommended-test:
+      test_title: system_settings_diagnostics_reports_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-diagnostics-reports-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_diagnostics_reports_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-diagnostics-reports-disable-recommended-test

@@ -1,0 +1,75 @@
+assessment:
+  id: ng.shared.6aa907f27c9c2066bea978eb
+  version: 1
+  assessment_title: OL08-00-040133 - OL 8 must mount "/var/tmp" with the "nosuid" option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/tmp
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\s]+\s+/var/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-if-var-tmp-mounted-it-mounted-nosuid-option:
+      test_title: If /var/tmp is mounted, it is mounted with the nosuid option
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: nosuid
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    test-if-var-tmp-configured-in-etc-fstab-it-configured-nosuid:
+      test_title: If /var/tmp is configured in /etc/fstab, it is configured with the nosuid option
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-if-var-tmp-mounted-it-mounted-nosuid-option
+    - test: test-if-var-tmp-configured-in-etc-fstab-it-configured-nosuid

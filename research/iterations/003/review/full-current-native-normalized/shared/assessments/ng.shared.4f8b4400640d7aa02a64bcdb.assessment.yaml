@@ -1,0 +1,28 @@
+assessment:
+  id: ng.shared.4f8b4400640d7aa02a64bcdb
+  version: 1
+  assessment_title: OL08-00-010544 - OL 8 must use a separate file system for /var/tmp.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    var-tmp-collection:
+      collection_title: /var/tmp
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/tmp
+  tests:
+    test-var-tmp-mounted:
+      test_title: /var/tmp is mounted
+      capability: linux.partition
+      collection: var-tmp-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-var-tmp-mounted

@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.0afec12c1a413cfd938f11e6
+  version: 1
+  assessment_title: The rhost-based authentication for SSH must be diabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ignorerhosts-setting-in-etc-ssh-sshd-config-collection:
+      collection_title: IgnoreRhosts setting in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[Ii][Gg][Nn][Oo][Rr][Ee][Rr][Hh][Oo][Ss][Tt][Ss]\s+(\S+)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-ignorerhosts-unset-or-set-yes-in-etc-ssh-sshd-config:
+      test_title: IgnoreRhosts is unset or set to yes in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      collection: ignorerhosts-setting-in-etc-ssh-sshd-config-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: IgnoreRhosts is set to yes
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: 'yes'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-ignorerhosts-unset-or-set-yes-in-etc-ssh-sshd-config

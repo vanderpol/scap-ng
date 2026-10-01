@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.eb45ae7f9de4c8828b2e6e6e
+  version: 1
+  assessment_title: WINCC-000065
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\AppCompat
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisablePcaUI
+  tests:
+    test-detect-compatibility-issues-applications-drivers-set-disabled:
+      test_title: '''Detect compatibility issues for applications and drivers'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 0
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-detect-compatibility-issues-applications-drivers-set-disabled

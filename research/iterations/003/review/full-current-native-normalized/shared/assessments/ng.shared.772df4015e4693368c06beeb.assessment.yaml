@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.772df4015e4693368c06beeb
+  version: 1
+  assessment_title: The macOS system must disable iCloud desktop and document folder synchronization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    icloud-sync-disable-recommended-object-collection:
+      collection_title: icloud_sync_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowCloudDesktopAndDocuments'').js
+
+            EOS'
+  tests:
+    test-icloud-sync-disable-recommended-test:
+      test_title: icloud_sync_disable_recommended_test
+      capability: independent.shellcommand
+      collection: icloud-sync-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: icloud_sync_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-icloud-sync-disable-recommended-test

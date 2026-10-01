@@ -1,0 +1,113 @@
+assessment:
+  id: ng.shared.7a78b757c0f651fbe683abc9
+  version: 1
+  assessment_title: AZLX-23-002450 - Amazon Linux 2023 must use a Linux Security Module configured to enforce limits on system
+    services.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    sys-fs-selinux-collection:
+      collection_title: /sys/fs/selinux
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /sys/fs/selinux
+    sys-fs-selinux-enforce-value-collection:
+      collection_title: /sys/fs/selinux/enforce value
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /sys/fs/selinux/enforce
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(\d+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-selinux-config-selinux-value-collection:
+      collection_title: /etc/selinux/config:SELINUX value
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/selinux/config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^SELINUX=(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-selinux-active:
+      test_title: selinux is active
+      capability: linux.partition
+      collection: sys-fs-selinux-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: fs_type
+          value: selinuxfs
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-selinux-enforcing:
+      test_title: selinux is enforcing
+      capability: independent.textfilecontent54
+      collection: sys-fs-selinux-enforce-value-collection
+      assertion:
+        existence: only_one_exists
+        item_quantifier: all
+        state_title: /sys/fs/selinux/enforce != 0
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: not equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-selinux-config-selinux-enforcing:
+      test_title: /etc/selinux/config:SELINUX=enforcing
+      capability: independent.textfilecontent54
+      collection: etc-selinux-config-selinux-value-collection
+      assertion:
+        existence: only_one_exists
+        item_quantifier: all
+        state_title: /etc/selinux/config:SELINUX=enforcing
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: enforcing
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-selinux-active
+    - test: test-selinux-enforcing
+    - test: test-etc-selinux-config-selinux-enforcing

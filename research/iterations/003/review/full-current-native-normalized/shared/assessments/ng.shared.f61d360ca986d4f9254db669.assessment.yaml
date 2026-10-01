@@ -1,0 +1,82 @@
+assessment:
+  id: ng.shared.f61d360ca986d4f9254db669
+  version: 1
+  assessment_title: UBTU-18-010128 - The Ubuntu operating system must configure audit tools with a mode of 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-tool-executable-files-collection:
+      collection_title: audit tool executable files
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: audit-tool-executable-files-variable
+  variables:
+    audit-tool-executable-files-variable:
+      title: audit tool executable files
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/audispd
+        - /sbin/augenrules
+  tests:
+    test-audit-tool-executable-file-permissions-at-least-0755:
+      test_title: audit tool executable file permissions at least 0755
+      capability: unix.file
+      collection: audit-tool-executable-files-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: 0755 permissions or less
+        state_capability: unix.file
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-tool-executable-file-permissions-at-least-0755

@@ -1,0 +1,182 @@
+assessment:
+  id: ng.shared.dba75091842aac36ec72cf52
+  version: 1
+  assessment_title: The Cisco router must be configured to terminate all network connections associated with device management
+    after five minutes of inactivity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    show-running-config-collection:
+      collection_title: Show running-config
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+    merged-single-delimited-line-timeout-values-collection:
+      collection_title: Merged single delimited line of timeout values
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: merge-timeout-lines-into-single-string-variable
+    iosxe-global-collection:
+      collection_title: null
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^line con \d+|^line vty \d+
+    iosxe-global-collection-2:
+      collection_title: null
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ip http timeout-policy idle
+    variable-containing-numeric-portion-http-timeout-policy-collection:
+      collection_title: Variable containing the numeric portion of the http timeout-policy
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: regex-capture-http-timeout-variable
+    iosxe-global-collection-3:
+      collection_title: null
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^no ip http secure-server
+  variables:
+    split-configuration-into-separate-lines-variable:
+      title: Split the configuration into separate lines
+      kind: local
+      datatype: int
+      expression:
+        split:
+          value:
+            values:
+              collection: show-running-config-collection
+              field: config_line
+          delimiter: \n
+    regex-capture-timeout-lines-variable:
+      title: Regex capture timeout lines
+      kind: local
+      datatype: int
+      expression:
+        regex_capture:
+          value:
+            variable: split-configuration-into-separate-lines-variable
+          pattern: \s+exec-(.*)
+    merge-timeout-lines-into-single-string-variable:
+      title: Merge timeout lines into a single string
+      kind: local
+      datatype: int
+      expression:
+        merge:
+          values:
+            variable: regex-capture-timeout-lines-variable
+          delimiter: ' '
+          sort: document
+          order: ascending
+    number-line-vty-s-on-system-variable:
+      title: Number of line and vty's on the system
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            collection: iosxe-global-collection
+            field: global_command
+    regex-match-all-exec-timeout-lines-variable:
+      title: Regex to match all exec-timeout lines
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: (timeout (5|4|3|2|1) 0\s*){
+            datatype: string
+        - variable: number-line-vty-s-on-system-variable
+        - literal:
+            value: '}'
+            datatype: string
+    regex-capture-http-timeout-variable:
+      title: Regex capture http timeout
+      kind: local
+      datatype: int
+      expression:
+        regex_capture:
+          value:
+            values:
+              collection: iosxe-global-collection-2
+              field: global_command
+          pattern: ip http timeout-policy idle (\d+)
+  tests:
+    test-all-line-vty-connections-have-exec-timeout-timeout-less-than:
+      test_title: All line and vty connections must have exec-timeout with a timeout less than or equal to 5
+      capability: independent.variable
+      collection: merged-single-delimited-line-timeout-values-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Perform a pattern match against a merged single line of all exec-timeout lines verifying timeout is less
+          than or equal to 5.  The number of timeouts must equal the number of line/vty ports found on the system.
+        state_capability: independent.variable
+        state:
+          field: value
+          value:
+            variable: regex-match-all-exec-timeout-lines-variable
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-test-ip-http-timeout-policy-idle-less-than-or-equal:
+      test_title: Test ip http timeout-policy idle less than or equal to 300 seconds
+      capability: independent.variable
+      collection: variable-containing-numeric-portion-http-timeout-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: http timeout must be less than or equal to 300
+        state_capability: independent.variable
+        state:
+          field: value
+          value: '300'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-ip-http-secure-server-disabled:
+      test_title: ip http secure server is disabled
+      capability: iosxe.global
+      collection: iosxe-global-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state: null
+  evaluate:
+    all:
+    - test: test-all-line-vty-connections-have-exec-timeout-timeout-less-than
+    - any:
+      - test: test-test-ip-http-timeout-policy-idle-less-than-or-equal
+      - test: test-ip-http-secure-server-disabled

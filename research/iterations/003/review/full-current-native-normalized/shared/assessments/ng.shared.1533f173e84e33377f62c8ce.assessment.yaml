@@ -1,0 +1,58 @@
+assessment:
+  id: ng.shared.1533f173e84e33377f62c8ce
+  version: 1
+  assessment_title: The Active Directory AdminSDHolder object must be configured with proper audit settings.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    query-both-fail-success-auditing-settings-adminsdholder-collection:
+      collection_title: Query both Fail and Success auditing settings for AdminSDHolder
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '$p=''AD:\CN=AdminSDHolder,CN=System,''+(Get-ADDomain).DistinguishedName;$a=(Get-Acl $p -Audit).Audit;$f=[bool]($a|Where-Object{$_.IdentityReference
+            -match ''Everyone|S-1-1-0'' -and $_.AuditFlags -eq ''Failure'' -and ($_.ActiveDirectoryRights -match ''GenericAll|FullControl|All'')
+            -and $_.InheritanceType -eq ''None''});$s=[bool]($a|Where-Object{$_.IdentityReference -match ''Everyone|S-1-1-0''
+            -and $_.AuditFlags -eq ''Success'' -and ($_.ActiveDirectoryRights -match ''ExtendedRight|WriteProperty'') -and
+            $_.InheritanceType -eq ''None''});if(-not $f -or -not $s){$r=@();if(-not $f){$r+=''MISSING/INVALID: Everyone [Failure]
+            GenericAll/FullControl (Must be This object only)''};if(-not $s){$r+=''MISSING/INVALID: Everyone [Success] ExtendedRight/WriteProperty
+            (Must be This object only)''};''Target_Object={0} | IdentityReference=Everyone (S-1-1-0) | Status=FAIL | Details={1}''
+            -f $p.Replace(''AD:\'',''''),($r -join '' / '')}else{''Target_Object={0} | IdentityReference=Everyone (S-1-1-0)
+            | Status=PASS | Details=All mandatory Failure and Success audit policies are correctly configured per the STIG.''
+            -f $p.Replace(''AD:\'','''')}'
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-windows-server-active-directory-adminsdholder-object-configured-proper-audit-settings:
+      test_title: Windows Server Active Directory AdminSDHolder object must be configured with proper audit settings.
+      capability: independent.shellcommand
+      collection: query-both-fail-success-auditing-settings-adminsdholder-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: No lines shall exist listed with status of 'FAIL'
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '=FAIL '
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: none satisfy
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-windows-server-active-directory-adminsdholder-object-configured-proper-audit-settings

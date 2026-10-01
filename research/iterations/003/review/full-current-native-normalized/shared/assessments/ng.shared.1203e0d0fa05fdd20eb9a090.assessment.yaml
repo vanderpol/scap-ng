@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.1203e0d0fa05fdd20eb9a090
+  version: 1
+  assessment_title: The macOS system must be configured with system log files owned by root and group-owned by wheel or admin.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-asl-log-files-owner-group-configure-recommended-object-collection:
+      collection_title: os_asl_log_files_owner_group_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/stat -f '%Su:%Sg:%N' $(/usr/bin/grep -e '^>' /etc/asl.conf /etc/asl/*|/usr/bin/awk '{ print $2 }')|/usr/bin/awk
+            '!/^root:wheel:/{print $1}'
+  tests:
+    test-os-asl-log-files-owner-group-configure-recommended-test:
+      test_title: os_asl_log_files_owner_group_configure_recommended_test
+      capability: independent.shellcommand
+      collection: os-asl-log-files-owner-group-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_asl_log_files_owner_group_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-os-asl-log-files-owner-group-configure-recommended-test

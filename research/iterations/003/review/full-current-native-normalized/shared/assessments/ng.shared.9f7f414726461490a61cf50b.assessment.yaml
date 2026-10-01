@@ -1,0 +1,55 @@
+assessment:
+  id: ng.shared.9f7f414726461490a61cf50b
+  version: 1
+  assessment_title: WN10-SO-000050 - The computer account password must not be prevented from being reset.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisablePasswordChange
+  tests:
+    test-domain-member-disable-machine-account-password-changes-set-disabled:
+      test_title: '''Domain member: Disable machine account password changes'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-domain-member-disable-machine-account-password-changes-set-disabled

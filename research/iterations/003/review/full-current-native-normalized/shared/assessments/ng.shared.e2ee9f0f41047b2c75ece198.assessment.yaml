@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.e2ee9f0f41047b2c75ece198
+  version: 1
+  assessment_title: The macOS system must be configured to disable the UUCP service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-uucp-disable-recommended-object-collection:
+      collection_title: os_uucp_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /bin/launchctl print-disabled system | /usr/bin/grep '"com.apple.uucp" => disabled'
+  tests:
+    test-os-uucp-disable-recommended-test:
+      test_title: os_uucp_disable_recommended_test
+      capability: independent.shellcommand
+      collection: os-uucp-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_uucp_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-uucp-disable-recommended-test

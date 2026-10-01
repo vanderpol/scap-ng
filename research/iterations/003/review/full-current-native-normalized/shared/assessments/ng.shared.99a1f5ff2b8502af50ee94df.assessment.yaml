@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.99a1f5ff2b8502af50ee94df
+  version: 1
+  assessment_title: OL08-00-040136 - The OL 8 "fapolicy" module must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    fapolicyd-service-activestate-collection:
+      collection_title: fapolicyd.service ActiveState
+      capability: linux.systemdunitproperty
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fapolicyd.service
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+  tests:
+    test-fapolicyd-service-active:
+      test_title: fapolicyd.service is active
+      capability: linux.systemdunitproperty
+      collection: fapolicyd-service-activestate-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-fapolicyd-service-active

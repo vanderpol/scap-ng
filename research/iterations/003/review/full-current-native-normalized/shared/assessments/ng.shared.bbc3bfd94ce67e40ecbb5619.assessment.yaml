@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.bbc3bfd94ce67e40ecbb5619
+  version: 1
+  assessment_title: OL08-00-040210 - OL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from
+    being accepted.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv6.conf.default.accept_redirects
+  tests:
+    test-net-ipv6-conf-default-accept-redirects-set-0-in-kernel:
+      test_title: net.ipv6.conf.default.accept_redirects is set to 0 in kernel
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv6-conf-default-accept-redirects-set-0-in-kernel

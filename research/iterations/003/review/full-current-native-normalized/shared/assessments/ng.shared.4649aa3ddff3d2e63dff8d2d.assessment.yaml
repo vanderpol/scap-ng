@@ -1,0 +1,292 @@
+assessment:
+  id: ng.shared.4649aa3ddff3d2e63dff8d2d
+  version: 1
+  assessment_title: The Windows DNS Server must enforce approved authorizations between DNS servers using digital signatures
+    in the Resource Record Set (RRSet).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    list-all-forward-reverse-lookup-zones-collection:
+      collection_title: The list of all forward and reverse lookup zones
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}
+    list-all-forward-lookup-zones-that-not-integrated-active-directory-collection:
+      collection_title: The list of all forward lookup zones that are not integrated with Active Directory
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object
+            {$_.ZoneName}
+    list-all-forward-lookup-zones-collection:
+      collection_title: The list of all forward lookup zones
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone)} | ForEach-Object {$_.ZoneName}
+    issigned-setting-each-forward-lookup-zone-collection:
+      collection_title: The 'IsSigned' setting for each forward lookup zone
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-get-issigned-setting-each-forward-lookup-zone-variable
+    number-resource-record-signatures-rrsig-given-zone-collection:
+      collection_title: The number of Resource Record Signatures (RRSIG) for a given zone
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-get-number-resource-record-signatures-rrsigs-given-zone-variable
+    number-nsec3-records-given-zone-collection:
+      collection_title: The number of NSEC3 records for a given zone
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-get-number-nsec3-records-given-zone-variable
+    number-dnskey-records-given-zone-collection:
+      collection_title: The number of DNSKEY records for a given zone
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-get-number-dnskey-records-given-zone-variable
+  variables:
+    command-get-issigned-setting-each-forward-lookup-zone-variable:
+      title: The command to get the 'IsSigned' setting for each forward lookup zone
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DnsServerZone -Name '
+            datatype: string
+        - values:
+            collection: list-all-forward-lookup-zones-collection
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IsSigned}} catch {}'
+            datatype: string
+    command-get-number-resource-record-signatures-rrsigs-given-zone-variable:
+      title: The command to get the number of Resource Record Signatures (RRSIGs) for a given zone
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName '
+            datatype: string
+        - values:
+            collection: list-all-forward-lookup-zones-collection
+            field: stdout_line
+        - literal:
+            value: ' -RRType RRSig | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output ''0''}'
+            datatype: string
+    command-get-number-nsec3-records-given-zone-variable:
+      title: The command to get the number of NSEC3 records for a given zone
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName '
+            datatype: string
+        - values:
+            collection: list-all-forward-lookup-zones-collection
+            field: stdout_line
+        - literal:
+            value: ' -RRType NSec3 | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output ''0''}'
+            datatype: string
+    command-get-number-dnskey-records-given-zone-variable:
+      title: The command to get the number of DNSKEY records for a given zone
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName '
+            datatype: string
+        - values:
+            collection: list-all-forward-lookup-zones-collection
+            field: stdout_line
+        - literal:
+            value: ' -RRType DnsKey | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output ''0''}'
+            datatype: string
+  tests:
+    test-dns-server-caching-only-there-no-forward-or-reverse-lookup:
+      test_title: DNS server is caching only (there are no forward or reverse lookup zones)
+      capability: independent.shellcommand
+      collection: list-all-forward-reverse-lookup-zones-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: There are no forward or reverse lookup zones
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+    test-all-forward-lookup-zones-if-any-integrated-active-directory:
+      test_title: All forward lookup zones (if any) are integrated with Active Directory
+      capability: independent.shellcommand
+      collection: list-all-forward-lookup-zones-that-not-integrated-active-directory-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: There are no forward lookup zones that are not integrated with Active Directory
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+    test-all-forward-lookup-zones-dnssec-signed:
+      test_title: All forward lookup zones are DNSSEC signed
+      capability: independent.shellcommand
+      collection: issigned-setting-each-forward-lookup-zone-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The 'IsSigned' setting for each forward lookup zone is set to 'True'
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'True'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: only_one_exists
+    test-all-forward-lookup-zones-have-at-least-one-resource-record:
+      test_title: All forward lookup zones have at least one Resource Record Signature (RRSIG)
+      capability: independent.shellcommand
+      collection: number-resource-record-signatures-rrsig-given-zone-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The number of RRSIGs (Resource Record Signatures) associated with a zone is greater than 0
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: only_one_exists
+    test-all-forward-lookup-zones-have-at-least-one-nsec3-record:
+      test_title: All forward lookup zones have at least one NSEC3 record
+      capability: independent.shellcommand
+      collection: number-nsec3-records-given-zone-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The number of NSEC3 records associated with a zone is greater than 0
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: only_one_exists
+    test-all-forward-lookup-zones-have-at-least-one-dnskey-record:
+      test_title: All forward lookup zones have at least one DNSKEY record
+      capability: independent.shellcommand
+      collection: number-dnskey-records-given-zone-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The number of DNSKEY records associated with a zone is greater than 0
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: only_one_exists
+  evaluate:
+    any:
+    - test: test-dns-server-caching-only-there-no-forward-or-reverse-lookup
+    - test: test-all-forward-lookup-zones-if-any-integrated-active-directory
+    - all:
+      - test: test-all-forward-lookup-zones-dnssec-signed
+      - test: test-all-forward-lookup-zones-have-at-least-one-resource-record
+      - test: test-all-forward-lookup-zones-have-at-least-one-nsec3-record
+      - test: test-all-forward-lookup-zones-have-at-least-one-dnskey-record

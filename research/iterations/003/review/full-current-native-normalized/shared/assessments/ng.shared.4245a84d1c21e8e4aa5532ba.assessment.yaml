@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.4245a84d1c21e8e4aa5532ba
+  version: 1
+  assessment_title: The system must require at least eight characters be changed between the old and new passwords during
+    a password change.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-default-passwd-mindiff-setting-collection:
+      collection_title: /etc/default/passwd MINDIFF setting
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^MINDIFF=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-default-passwd-mindiff-setting-8:
+      test_title: /etc/default/passwd MINDIFF setting >= 8
+      capability: independent.textfilecontent54
+      collection: etc-default-passwd-mindiff-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: /etc/default/passwd MINDIFF setting >= 8
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '8'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-default-passwd-mindiff-setting-8

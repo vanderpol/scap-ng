@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.e0af2e10f99fa474d27b8303
+  version: 1
+  assessment_title: FTP servers must be configured to prevent anonymous logons.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ftp-authentication-anonymous-authentication-collection:
+      collection_title: FTP Authentication - Anonymous Authentication
+      capability: windows.appcmdlistconfig
+      select:
+        identifier_type:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Site
+        identifier:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        section:
+          operation: equals
+          datatype: string
+          mask: false
+          value: system.applicationHost/sites
+        parameter:
+          operation: equals
+          datatype: string
+          mask: false
+          value: siteDefaults.ftpServer.security.authentication.anonymousAuthentication.enabled
+  tests:
+    test-ftp-servers-configured-prevent-anonymous-logons:
+      test_title: FTP servers must be configured to prevent anonymous logons.
+      capability: windows.appcmdlistconfig
+      collection: ftp-authentication-anonymous-authentication-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Result Must Equal false
+        state_capability: windows.appcmdlistconfig
+        state:
+          field: result
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-ftp-servers-configured-prevent-anonymous-logons

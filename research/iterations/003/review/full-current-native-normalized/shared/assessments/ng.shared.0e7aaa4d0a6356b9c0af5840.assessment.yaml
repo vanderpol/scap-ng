@@ -1,0 +1,178 @@
+assessment:
+  id: ng.shared.0e7aaa4d0a6356b9c0af5840
+  version: 1
+  assessment_title: Exchange software must be installed on a separate partition from the OS.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    location-exchange-instatallation-collection:
+      collection_title: Location of Exchange Instatallation
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: (Get-ItemProperty -Path 'HKLM:SOFTWARE\Microsoft\ExchangeServer\v15\Setup' -Name 'MsiInstallPath').MsiInstallPath
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+    boot-drive-collection:
+      collection_title: Boot Drive
+      capability: windows.wmi
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT SystemDrive FROM Win32_OperatingSystem
+    boot-drive-letter-collection:
+      collection_title: Boot Drive Letter
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: windows-drive-letter-variable
+    search-directory-exchange-resides-on-other-executables-collection:
+      collection_title: Search Directory Exchange resides on for other Executables.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: powershell-command-search-executables-while-excluding-exchange-installation-directory-variable
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+  variables:
+    windows-drive-letter-variable:
+      title: Windows Drive Letter
+      kind: local
+      datatype: string
+      expression:
+        substring:
+          value:
+            values:
+              collection: boot-drive-collection
+              field: result
+          start: '1'
+          length: '1'
+    exchange-installation-drive-letter-variable:
+      title: Exchange Installation Drive Letter
+      kind: local
+      datatype: string
+      expression:
+        substring:
+          value:
+            values:
+              collection: location-exchange-instatallation-collection
+              field: stdout_line
+          start: '1'
+          length: '1'
+    exchange-installation-location-without-drive-letter-variable:
+      title: 'Exchange Installation Location without drive letter and :'
+      kind: local
+      datatype: string
+      expression:
+        substring:
+          value:
+            values:
+              collection: location-exchange-instatallation-collection
+              field: stdout_line
+          start: '3'
+          length: '-1'
+    powershell-command-search-executables-while-excluding-exchange-installation-directory-variable:
+      title: Powershell command to search for Executables while excluding exchange installation directory
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'get-childitem -path '
+            datatype: string
+        - variable: exchange-installation-drive-letter-variable
+        - literal:
+            value: :\ -Filter *.exe -Recurse -File -ErrorAction SilentlyContinue | Where-Object {$_.FullName -notlike '*
+            datatype: string
+        - variable: exchange-installation-location-without-drive-letter-variable
+        - literal:
+            value: '*'' } | select-object -First 200 Fullname | Format-Table -HideTableHeaders | Out-String -Width 4096'
+            datatype: string
+  tests:
+    test-determine-installation-directory-exchange:
+      test_title: Determine Installation Directory Of Exchange.
+      capability: independent.shellcommand
+      collection: location-exchange-instatallation-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-if-exchange-resides-on-partition-other-than-that-os-this:
+      test_title: If Exchange resides on a partition other than that of the OS, this is not a finding.
+      capability: independent.variable
+      collection: boot-drive-letter-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: verify directories are not the same
+        state_capability: independent.variable
+        state:
+          field: value
+          value:
+            variable: exchange-installation-drive-letter-variable
+          operation: not equal
+          datatype: string
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-if-exchange-resides-on-partition-other-applications-installed-this-finding:
+      test_title: If Exchange resides on a partition with other applications installed, this is a finding.
+      capability: independent.shellcommand
+      collection: search-directory-exchange-resides-on-other-executables-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: No executables should exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    all:
+    - test: test-determine-installation-directory-exchange
+    - test: test-if-exchange-resides-on-partition-other-than-that-os-this
+    - test: test-if-exchange-resides-on-partition-other-applications-installed-this-finding

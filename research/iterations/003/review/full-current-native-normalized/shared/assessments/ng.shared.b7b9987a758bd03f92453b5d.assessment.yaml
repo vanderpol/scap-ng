@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.b7b9987a758bd03f92453b5d
+  version: 1
+  assessment_title: The macOS system must be configured to disable prompts to configure Unlock with Watch.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-skip-unlock-watch-enable-recommended-object-collection:
+      collection_title: os_skip_unlock_with_watch_enable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.SetupAssistant.managed'')\
+
+            .objectForKey(''SkipUnlockWithWatch'').js
+
+            EOS'
+  tests:
+    test-os-skip-unlock-watch-enable-recommended-test:
+      test_title: os_skip_unlock_with_watch_enable_recommended_test
+      capability: independent.shellcommand
+      collection: os-skip-unlock-watch-enable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_skip_unlock_with_watch_enable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-skip-unlock-watch-enable-recommended-test

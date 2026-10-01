@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.cba9df81b0caa4e37f9147ea
+  version: 1
+  assessment_title: AZLX-23-000120 - Amazon Linux 2023 must check the GPG signature of software packages originating from
+    external software repositories before installation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-dnf-dnf-conf-gpgcheck-collection:
+      collection_title: /etc/dnf/dnf.conf gpgcheck
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dnf/dnf.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^gpgcheck=(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-dnf-dnf-conf-gpgcheck-1:
+      test_title: /etc/dnf/dnf.conf gpgcheck=1
+      capability: independent.textfilecontent54
+      collection: etc-dnf-dnf-conf-gpgcheck-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: /etc/dnf/dnf.conf gpgcheck=1
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-dnf-dnf-conf-gpgcheck-1

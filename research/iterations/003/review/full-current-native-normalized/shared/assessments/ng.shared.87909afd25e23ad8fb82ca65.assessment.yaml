@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.87909afd25e23ad8fb82ca65
+  version: 1
+  assessment_title: The audit system must take appropriate action when the audit storage volume is full.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-audisp-audisp-remote-conf-disk-full-action-collection:
+      collection_title: /etc/audisp/audisp-remote.conf disk_full_action
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audisp/audisp-remote.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*disk_full_action\s+=\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+  tests:
+    test-etc-audisp-audisp-remote-conf-disk-full-action-syslog-single:
+      test_title: /etc/audisp/audisp-remote.conf disk_full_action = syslog, single, or halt
+      capability: independent.textfilecontent54
+      collection: etc-audisp-audisp-remote-conf-disk-full-action-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: audisp-remote action syslog
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: ^[Ss][Yy][Ss][Ll][Oo][Gg]$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: audisp-remote action single
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: ^[Ss][Ii][Nn][Gg][Ll][Ee]$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: audisp-remote action single
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: ^[Hh][Aa][Ll][Tt]$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-audisp-audisp-remote-conf-disk-full-action-syslog-single

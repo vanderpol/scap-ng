@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.ac041f3d3fe8f37974cb02a3
+  version: 1
+  assessment_title: WN19-AU-000090 - Windows Server 2019 must be configured to audit Account Management - Other Account Management
+    Events successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-other-account-management-events-success-only-or-success-failure:
+      test_title: Audit - Other Account Management Events - 'Success only' or 'Success and Failure'
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          capability: windows.auditeventpolicysubcategories
+          state:
+            field: other_account_management_events
+            value: AUDIT_SUCCESS
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: windows.auditeventpolicysubcategories
+          state:
+            field: other_account_management_events
+            value: AUDIT_SUCCESS_FAILURE
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-other-account-management-events-success-only-or-success-failure

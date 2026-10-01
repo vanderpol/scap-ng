@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.8ac4bb01d38002d53baf8e7c
+  version: 1
+  assessment_title: AZLX-23-000210 - Amazon Linux 2023 must restrict exposed kernel pointer addresses access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: kernel.kptr_restrict
+  tests:
+    test-kernel-kptr-restrict-set-1:
+      test_title: kernel.kptr_restrict is set to 1
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-kernel-kptr-restrict-set-1

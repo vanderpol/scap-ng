@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.86c32f4dfa399d705dd9439f
+  version: 1
+  assessment_title: The operating system must configure auditing to reduce the likelihood of storage capacity being exceeded.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-results-auditconfig-getplugin-audit-binfile-collection:
+      collection_title: Retrieve results of 'auditconfig -getplugin audit_binfile'.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: auditconfig -getplugin audit_binfile
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \s*Attributes:\s*.*
+  tests:
+    test-test-that-operating-system-configured-reduce-likelihood-auditing-storage-capacity:
+      test_title: Test that the operating system is configured to reduce the likelihood of auditing storage capacity being
+        exceeded.
+      capability: independent.shellcommand
+      collection: retrieve-results-auditconfig-getplugin-audit-binfile-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm the size of a binary audit file is deliberately set to a specific numeric value.
+        state_capability: independent.shellcommand
+        state:
+          all:
+          - field: exit_status
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stdout_line
+            value: p_fsize=\d+M
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: at least one
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-test-that-operating-system-configured-reduce-likelihood-auditing-storage-capacity

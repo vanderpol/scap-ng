@@ -1,0 +1,81 @@
+assessment:
+  id: ng.shared.44e27e0befccb8a2ecb74270
+  version: 1
+  assessment_title: The Ubuntu operating system library files must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-system-library-files-not-owned-by-root-collection:
+      collection_title: All system-library files not owned by root
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.so(\.\d+)*$
+      filters:
+      - action: exclude
+        match:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: owned by root
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-wide-shared-library-files-directories-variable:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  tests:
+    test-system-library-files-owned-by-root:
+      test_title: System Library files are owned by root
+      capability: unix.file
+      collection: all-system-library-files-not-owned-by-root-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-system-library-files-owned-by-root

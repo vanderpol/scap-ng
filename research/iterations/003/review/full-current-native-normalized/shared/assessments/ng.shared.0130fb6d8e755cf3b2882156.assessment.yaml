@@ -1,0 +1,191 @@
+assessment:
+  id: ng.shared.0130fb6d8e755cf3b2882156
+  version: 1
+  assessment_title: Network – Mapper I/O Driver
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowLLTDIOOnDomain
+    windows-registry-collection-2:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowLLTDIOOnPublicNet
+    windows-registry-collection-3:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EnableLLTDIO
+    windows-registry-collection-4:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\LLTD
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ProhibitLLTDIOOnPrivateNet
+  tests:
+    test-allowlltdioondomain-value-equals-0:
+      test_title: AllowLLTDIOOnDomain value equals 0
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 0
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-allowlltdioonpublicnet-value-equals-0:
+      test_title: AllowLLTDIOOnPublicNet value equals 0
+      capability: windows.registry
+      collection: windows-registry-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 0
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-enablelltdio-value-equals-0:
+      test_title: EnableLLTDIO value equals 0
+      capability: windows.registry
+      collection: windows-registry-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 0
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-prohibitlltdioonprivatenet-value-equals-0:
+      test_title: ProhibitLLTDIOOnPrivateNet value equals 0
+      capability: windows.registry
+      collection: windows-registry-collection-4
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 0
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-allowlltdioondomain-value-equals-0
+    - test: test-allowlltdioonpublicnet-value-equals-0
+    - test: test-enablelltdio-value-equals-0
+    - test: test-prohibitlltdioonprivatenet-value-equals-0

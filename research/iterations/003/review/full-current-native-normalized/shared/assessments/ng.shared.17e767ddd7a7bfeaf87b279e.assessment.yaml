@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.17e767ddd7a7bfeaf87b279e
+  version: 1
+  assessment_title: WN10-AU-000050 - The system must be configured to audit Detailed Tracking - Process Creation successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-process-creation-success-only:
+      test_title: Audit - Process Creation - Success only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Process Creation - Success only
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: process_creation
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-process-creation-success-failure:
+      test_title: Audit - Process Creation - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Process Creation - Success and Failure
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: process_creation
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-process-creation-success-only
+    - test: test-audit-process-creation-success-failure

@@ -1,0 +1,194 @@
+assessment:
+  id: ng.shared.bd7ea7ae102d9be5c1e26cc0
+  version: 1
+  assessment_title: The Apache web server must set an inactive timeout for sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    gather-unique-apache-http-installation-paths-collection:
+      collection_title: Gather unique apache http installation paths
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ^\/\S+(\/httpd|\/apache2)\s*
+    gather-all-loaded-config-files-collection:
+      collection_title: Gather all loaded config files
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-gather-httpd-apache2-list-all-loaded-configuration-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ' \('
+    gather-all-requestreadtimeout-data-from-all-loaded-conf-files-collection:
+      collection_title: Gather all RequestReadTimeout data from all loaded conf files
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: shell-command-check-requestreadtimeout-in-all-loaded-conf-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+
+    gather-all-installed-modules-filter-on-reqtimeout-module-collection:
+      collection_title: Gather all installed modules and filter on reqtimeout_module
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: command-gather-httpd-apache2-modules-variable
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: reqtimeout_module
+  variables:
+    apache-path-httpd-or-apache2-variable:
+      title: Apache path to httpd or apache2
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              collection: gather-unique-apache-http-installation-paths-collection
+              field: stdout_line
+          pattern: '(^\/.+\/httpd|^\/.+\/apache2) '
+    command-gather-httpd-apache2-list-all-loaded-configuration-files-variable:
+      title: command to gather httpd/apache2 list of all loaded configuration files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-path-httpd-or-apache2-variable
+        - literal:
+            value: ' -t -D DUMP_INCLUDES'
+            datatype: string
+    all-loaded-configuration-filepaths-variable:
+      title: All loaded configuration filepaths
+      kind: local
+      datatype: string
+      expression:
+        unique:
+          regex_capture:
+            value:
+              values:
+                collection: gather-all-loaded-config-files-collection
+                field: stdout_line
+            pattern: \(.*\) (/.*)
+    merged-list-all-loaded-config-files-variable:
+      title: Merged list of all loaded config files
+      kind: local
+      datatype: string
+      expression:
+        merge:
+          values:
+            variable: all-loaded-configuration-filepaths-variable
+          delimiter: ' '
+          sort: document
+          order: ascending
+    shell-command-check-requestreadtimeout-in-all-loaded-conf-files-variable:
+      title: shell command to check RequestReadTimeout in all loaded conf files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iHn ''^\s*RequestReadTimeout'' '
+            datatype: string
+        - variable: merged-list-all-loaded-config-files-variable
+    command-gather-httpd-apache2-modules-variable:
+      title: command to gather httpd/apache2 modules
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-path-httpd-or-apache2-variable
+        - literal:
+            value: ' -M'
+            datatype: string
+  tests:
+    test-verify-requestreadtimeout-directive-exists-in-httpd-conf-apache2-conf-or:
+      test_title: Verify the RequestReadTimeout directive exists in httpd.conf/apache2.conf or included conf files
+      capability: independent.shellcommand
+      collection: gather-all-requestreadtimeout-data-from-all-loaded-conf-files-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: RequestReadTimeout is configured
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: (?i)RequestReadTimeout .+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-apache-reqtimeout-module-enabled:
+      test_title: Apache reqtimeout_module must be enabled
+      capability: independent.shellcommand
+      collection: gather-all-installed-modules-filter-on-reqtimeout-module-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: reqtimeout_module must be enabled
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: reqtimeout_module
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-verify-requestreadtimeout-directive-exists-in-httpd-conf-apache2-conf-or
+    - test: test-apache-reqtimeout-module-enabled

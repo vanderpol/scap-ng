@@ -1,0 +1,123 @@
+assessment:
+  id: ng.shared.fd04783a3c44de20cd61c6aa
+  version: 1
+  assessment_title: AZLX-23-002135 - Amazon Linux 2023 must audit all uses of the init_module and finit_module system calls.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    32-bit-init-module-syscall-collection:
+      collection_title: 32-bit init_module syscall
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+init_module\s+|(\s+|,)init_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    64-bit-init-module-syscall-collection:
+      collection_title: 64-bit init_module syscall
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+init_module\s+|(\s+|,)init_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    32-bit-finit-module-syscall-collection:
+      collection_title: 32-bit finit_module syscall
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    64-bit-finit-module-syscall-collection:
+      collection_title: 64-bit finit_module syscall
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-audit-32-bit-invocations-init-module-syscall:
+      test_title: Audit 32-bit invocations of init_module syscall
+      capability: independent.textfilecontent54
+      collection: 32-bit-init-module-syscall-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-64-bit-invocations-init-module-syscall:
+      test_title: Audit 64-bit invocations of init_module syscall
+      capability: independent.textfilecontent54
+      collection: 64-bit-init-module-syscall-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-32-bit-invocations-finit-module-syscall:
+      test_title: Audit 32-bit invocations of finit_module syscall
+      capability: independent.textfilecontent54
+      collection: 32-bit-finit-module-syscall-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-64-bit-invocations-finit-module-syscall:
+      test_title: Audit 64-bit invocations of finit_module syscall
+      capability: independent.textfilecontent54
+      collection: 64-bit-finit-module-syscall-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-audit-32-bit-invocations-init-module-syscall
+    - test: test-audit-64-bit-invocations-init-module-syscall
+    - test: test-audit-32-bit-invocations-finit-module-syscall
+    - test: test-audit-64-bit-invocations-finit-module-syscall

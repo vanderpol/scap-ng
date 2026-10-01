@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.e7118c41c4a060a36696d5d6
+  version: 1
+  assessment_title: Direct Access - Route Through Internal Network
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\TCPIP\v6Transition
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Force_Tunneling
+  variables:
+    route-all-traffic-through-internal-network-variable:
+      title: Route all traffic through the internal network
+      kind: external
+      datatype: string
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: route_all_traffic_through_the_internal_network_var
+        validation:
+          alternatives:
+          - literal: Enabled
+            hint: enabled_enabled_state
+          - literal: Disabled
+            hint: enabled_disabled_state
+  tests:
+    test-route-all-traffic-through-internal-network-set-enabled-enabled-state:
+      test_title: '''Route all traffic through the internal network'' is set to ''Enabled: Enabled State'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Sz type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_sz
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: route-all-traffic-through-internal-network-variable
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-route-all-traffic-through-internal-network-set-enabled-enabled-state

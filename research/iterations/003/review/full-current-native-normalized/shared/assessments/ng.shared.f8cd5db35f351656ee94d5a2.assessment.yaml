@@ -1,0 +1,81 @@
+assessment:
+  id: ng.shared.f8cd5db35f351656ee94d5a2
+  version: 1
+  assessment_title: AZLX-23-002485 - Amazon Linux 2023 must ensure all interactive users have unique User IDs (UIDs).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    interactive-users-collection:
+      collection_title: Interactive Users
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: user_id
+          value: '1000'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Interactive Users
+        capability: unix.password
+    count-passwd-entries-collection:
+      collection_title: count of passwd entries
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: count-passwd-entries-variable
+  variables:
+    count-passwd-entries-variable:
+      title: count of passwd entries
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            collection: interactive-users-collection
+            field: user_id
+    count-unique-uids-variable:
+      title: count of unique UIDs
+      kind: local
+      datatype: int
+      expression:
+        count:
+          unique:
+            values:
+              collection: interactive-users-collection
+              field: user_id
+  tests:
+    test-uids-unique:
+      test_title: UIDs are unique
+      capability: independent.variable
+      collection: count-passwd-entries-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: count of passwd UIDs
+        state_capability: independent.variable
+        state:
+          field: value
+          value:
+            variable: count-unique-uids-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-uids-unique

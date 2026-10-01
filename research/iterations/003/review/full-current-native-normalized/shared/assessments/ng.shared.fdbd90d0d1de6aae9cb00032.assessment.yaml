@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.fdbd90d0d1de6aae9cb00032
+  version: 1
+  assessment_title: The macOS system must disable iCloud Game Center.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    icloud-game-center-disable-recommended-object-collection:
+      collection_title: icloud_game_center_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.applicationaccess'')\
+
+            .objectForKey(''allowGameCenter'').js
+
+            EOS'
+  tests:
+    test-icloud-game-center-disable-recommended-test:
+      test_title: icloud_game_center_disable_recommended_test
+      capability: independent.shellcommand
+      collection: icloud-game-center-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: icloud_game_center_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-icloud-game-center-disable-recommended-test

@@ -1,0 +1,29 @@
+assessment:
+  id: ng.shared.37b94794d7e095ce6f0b40cd
+  version: 1
+  assessment_title: AZLX-23-000310 - Amazon Linux 2023 must not have the nfs-utils package installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: nfs-utils
+  tests:
+    test-nfs-utils-package-installed:
+      test_title: nfs-utils package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    not:
+      test: test-nfs-utils-package-installed

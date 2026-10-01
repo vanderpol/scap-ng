@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.37727f78b840fc4777ea4898
+  version: 1
+  assessment_title: OL08-00-040021 - OL 8 must not have the asynchronous transfer mode (ATM) kernel module installed if not
+    required for operational support.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/modprobe.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-modprobe-d-contains-file-that-contains-install-atm-bin:
+      test_title: /etc/modprobe.d contains a file that contains 'install atm /bin/false'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-etc-modprobe-d-contains-file-that-contains-blacklist-atm:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist atm'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-etc-modprobe-d-contains-file-that-contains-install-atm-bin
+    - test: test-etc-modprobe-d-contains-file-that-contains-blacklist-atm

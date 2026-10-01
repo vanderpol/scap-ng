@@ -1,0 +1,130 @@
+assessment:
+  id: ng.shared.d378f5716f86ece8c74eccfe
+  version: 1
+  assessment_title: Shutdown System When Auditing Failures Occur
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib/systemd/system/auditd.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ExecStartPost=\-\/sbin\/augenrules.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/rules.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.rules$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\-f\s*2\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-3:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/lib/systemd/system/auditd.service
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ExecStartPost=\-\/sbin\/auditctl.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-4:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\-f\s*2\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-audit-augenrules:
+      test_title: audit augenrules
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-augenrules-configuration-shutdown:
+      test_title: audit augenrules configuration shutdown
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-auditctl:
+      test_title: audit auditctl
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-3
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-audit-auditctl-configuration-shutdown:
+      test_title: audit auditctl configuration shutdown
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-4
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - all:
+      - test: test-audit-augenrules
+      - test: test-audit-augenrules-configuration-shutdown
+    - all:
+      - test: test-audit-auditctl
+      - test: test-audit-auditctl-configuration-shutdown

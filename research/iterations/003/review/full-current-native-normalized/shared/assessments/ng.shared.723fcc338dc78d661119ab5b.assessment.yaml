@@ -1,0 +1,102 @@
+assessment:
+  id: ng.shared.723fcc338dc78d661119ab5b
+  version: 1
+  assessment_title: Caching of logon credentials
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CachedLogonsCount
+    registry-path-determine-domain-membership-collection:
+      collection_title: Registry path to determine domain membership.
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\TCPIP\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Domain
+  tests:
+    test-interactive-logon-number-previous-logons-cache-in-case-domain-controller:
+      test_title: '''Interactive Logon: Number of previous logons to cache (in case domain controller is not available)''
+        is set to ''4'' logons or less'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_SZ type and value equals 4 or less
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_sz
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '4'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-system-not-member-domain:
+      test_title: System is not a member of a domain
+      capability: windows.registry
+      collection: registry-path-determine-domain-membership-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Sz type and blank value
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_sz
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-interactive-logon-number-previous-logons-cache-in-case-domain-controller
+    - test: test-system-not-member-domain

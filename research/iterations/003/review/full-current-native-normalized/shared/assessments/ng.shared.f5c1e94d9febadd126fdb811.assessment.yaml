@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.f5c1e94d9febadd126fdb811
+  version: 1
+  assessment_title: AZLX-23-002510 - Amazon Linux 2023 must terminate idle user sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/logind.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*StopIdleSessionSec\s*=\s*(-?\d*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-system-terminates-idle-user-sessions:
+      test_title: The system terminates idle user sessions.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '600'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-terminates-idle-user-sessions

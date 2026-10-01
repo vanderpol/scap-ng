@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.7f99080838959710e6d2eeda
+  version: 1
+  assessment_title: OL09-00-003023 - OL 9 must ensure account lockouts persist.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*dir\s*=\s*(\S+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-security-faillock-conf-dir-var-log-faillock:
+      test_title: '/etc/security/faillock.conf: dir = var/log/faillock'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /var/log/faillock
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-security-faillock-conf-dir-var-log-faillock

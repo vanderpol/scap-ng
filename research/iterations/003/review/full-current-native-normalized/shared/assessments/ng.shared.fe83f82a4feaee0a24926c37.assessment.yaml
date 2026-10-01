@@ -1,0 +1,78 @@
+assessment:
+  id: ng.shared.fe83f82a4feaee0a24926c37
+  version: 1
+  assessment_title: Use Privilege Separation
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: openssh-server
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[\s]*(?i)UsePrivilegeSeparation(?-i)[\s]+(\w+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-package-openssh-server-removed:
+      test_title: package openssh-server is removed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-tests-value-useprivilegeseparation-setting-in-etc-ssh-sshd-config-file:
+      test_title: tests the value of UsePrivilegeSeparation setting in the /etc/ssh/sshd_config file
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: sandbox
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: 'yes'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-package-openssh-server-removed
+    - test: test-tests-value-useprivilegeseparation-setting-in-etc-ssh-sshd-config-file

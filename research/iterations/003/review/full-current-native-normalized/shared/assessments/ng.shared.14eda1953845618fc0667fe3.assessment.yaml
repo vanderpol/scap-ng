@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.14eda1953845618fc0667fe3
+  version: 1
+  assessment_title: Users must have a valid home directory assignment.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-users-collection:
+      collection_title: All users
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^-+].*$
+  tests:
+    test-user-home-directory-assignments-not-blank:
+      test_title: user home directory assignments are not blank
+      capability: unix.password
+      collection: all-users-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: non-empty home directory entry
+        state_capability: unix.password
+        state:
+          field: home_dir
+          value: ^.+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-user-home-directory-assignments-not-blank

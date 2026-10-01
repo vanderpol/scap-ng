@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.947943f4aeb7e8aa79324dd4
+  version: 1
+  assessment_title: WN19-SO-000350 - Windows Server 2019 users must be required to enter a password to access private keys
+    stored on the computer.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Cryptography
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: ForceKeyProtection
+  tests:
+    test-users-required-enter-password-access-private-keys-stored-on-computer:
+      test_title: Users are required to enter a password to access private keys stored on the computer.
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '2'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-users-required-enter-password-access-private-keys-stored-on-computer

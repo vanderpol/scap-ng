@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.65a9175298d35e9bc7625b12
+  version: 1
+  assessment_title: The macOS system must configure SSH ServerAliveInterval option set to 900.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-ssh-server-alive-interval-configure-stig-object-collection:
+      collection_title: os_ssh_server_alive_interval_configure_stig_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "ret=\"pass\"\nfor u in $(/usr/bin/dscl . -list /Users UniqueID | /usr/bin/awk '$2 > 500 {print $1}'); do\n\
+            \  sshCheck=$(/usr/bin/sudo -u $u /usr/bin/ssh -G . | /usr/bin/grep -c \"^serveraliveinterval 900\")\n  if [[\
+            \ \"$sshCheck\" == \"0\" ]]; then\n    ret=\"fail\"\n    break\n  fi\ndone\n/bin/echo $ret"
+  tests:
+    test-os-ssh-server-alive-interval-configure-stig-test:
+      test_title: os_ssh_server_alive_interval_configure_stig_test
+      capability: independent.shellcommand
+      collection: os-ssh-server-alive-interval-configure-stig-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_ssh_server_alive_interval_configure_stig_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: pass
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-ssh-server-alive-interval-configure-stig-test

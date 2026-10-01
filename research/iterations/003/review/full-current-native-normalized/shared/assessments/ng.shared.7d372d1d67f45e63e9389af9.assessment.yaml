@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.7d372d1d67f45e63e9389af9
+  version: 1
+  assessment_title: WN10-AU-000081 - Windows 10 must be configured to audit Object Access - File Share failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-file-share-set-failure:
+      test_title: '''Audit File Share'' is set to ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''File Share'' is set to ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: file_share
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-file-share-set-success-failure:
+      test_title: '''Audit File Share'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''File Share'' is set to ''Success'' and ''Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: file_share
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-file-share-set-failure
+    - test: test-audit-file-share-set-success-failure

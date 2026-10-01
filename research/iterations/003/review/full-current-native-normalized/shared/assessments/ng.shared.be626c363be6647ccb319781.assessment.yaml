@@ -1,0 +1,122 @@
+assessment:
+  id: ng.shared.be626c363be6647ccb319781
+  version: 1
+  assessment_title: UBTU-18-010514 - The Ubuntu operating system must implement address space layout randomization to protect
+    its memory from unauthorized code execution.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: kernel.randomize_va_space
+    etc-sysctl-conf-collection:
+      collection_title: /etc/sysctl.conf
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sysctl.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?:^|.*\n)\s*kernel\.randomize_va_space\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    other-sysctl-configuration-files-collection:
+      collection_title: other sysctl configuration files
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: other-sysctl-configuration-file-locations-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?:^|.*\n)\s*kernel\.randomize_va_space\s*=\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-sysctl-configuration-files-collection:
+      collection_title: all sysctl configuration files
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: etc-sysctl-conf-collection
+        - collection: other-sysctl-configuration-files-collection
+  variables:
+    other-sysctl-configuration-file-locations-variable:
+      title: other sysctl configuration file locations
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+  tests:
+    test-kernel-randomize-va-space-setting-in-kernel-set-2:
+      test_title: kernel.randomize_va_space setting in kernel is set to 2
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-kernel-randomize-va-space-setting-in-sysctl-configuration-files-set:
+      test_title: kernel.randomize_va_space setting in sysctl configuration files is set to 2, if it is set at all
+      capability: independent.textfilecontent54
+      collection: all-sysctl-configuration-files-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-kernel-randomize-va-space-setting-in-kernel-set-2
+    - test: test-kernel-randomize-va-space-setting-in-sysctl-configuration-files-set

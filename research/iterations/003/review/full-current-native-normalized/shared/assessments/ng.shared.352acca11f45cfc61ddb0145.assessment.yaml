@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.352acca11f45cfc61ddb0145
+  version: 1
+  assessment_title: Direct root account login must not be permitted for SSH access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    permitrootlogin-set-in-etc-ssh-sshd-config-collection:
+      collection_title: PermitRootLogin is set in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[Pp][Ee][Rr][Mm][Ii][Tt][Rr][Oo][Oo][Tt][Ll][Oo][Gg][Ii][Nn]\s+(\S+)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-permitrootlogin-set-no-in-etc-ssh-sshd-config:
+      test_title: PermitRootLogin is set to no in /etc/ssh/sshd_config.
+      capability: independent.textfilecontent54
+      collection: permitrootlogin-set-in-etc-ssh-sshd-config-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: PermitRootLogin is set to no
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: 'no'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-permitrootlogin-set-no-in-etc-ssh-sshd-config

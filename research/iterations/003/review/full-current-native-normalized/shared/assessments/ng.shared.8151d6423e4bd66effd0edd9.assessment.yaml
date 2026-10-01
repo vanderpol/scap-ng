@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.8151d6423e4bd66effd0edd9
+  version: 1
+  assessment_title: Safe DLL Search Mode
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Session Manager
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SafeDllSearchMode
+  variables:
+    mss-safedllsearchmode-enable-safe-dll-search-mode-recommended-variable:
+      title: 'MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: safe_dll_search_mode_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-mss-safedllsearchmode-enable-safe-dll-search-mode-recommended-set-enabled:
+      test_title: '''MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: mss-safedllsearchmode-enable-safe-dll-search-mode-recommended-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-mss-safedllsearchmode-enable-safe-dll-search-mode-recommended-set-enabled

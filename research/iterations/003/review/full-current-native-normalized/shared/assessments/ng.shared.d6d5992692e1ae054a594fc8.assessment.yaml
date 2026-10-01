@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.d6d5992692e1ae054a594fc8
+  version: 1
+  assessment_title: UAC - Application Elevations
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ValidateAdminCodeSignatures
+  variables:
+    only-elevate-executables-that-signed-validated-variable:
+      title: Only elevate executables that are signed and validated
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: only_elevate_executables_signed_validated_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-user-account-control-only-elevate-executables-that-signed-validated-set:
+      test_title: '''User Account Control: Only elevate executables that are signed and validated'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: only-elevate-executables-that-signed-validated-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-user-account-control-only-elevate-executables-that-signed-validated-set

@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.2aa8fbca095a360a3cff0d7f
+  version: 1
+  assessment_title: The IIS 10.0 web server must have Web Distributed Authoring and Versioning (WebDAV) disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    verify-iis-webdav-authoring-rules-not-installed-via-registry-test-collection:
+      collection_title: Verify IIS WebDAV Authoring Rules is not installed via registry test
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\InetStp\Components
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: WebDAV
+  tests:
+    test-verify-iis-webdav-authoring-rules-not-installed-via-registry-test:
+      test_title: Verify IIS WebDAV Authoring Rules is not installed via registry test
+      capability: windows.registry
+      collection: verify-iis-webdav-authoring-rules-not-installed-via-registry-test-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-verify-iis-webdav-authoring-rules-not-installed-via-registry-test

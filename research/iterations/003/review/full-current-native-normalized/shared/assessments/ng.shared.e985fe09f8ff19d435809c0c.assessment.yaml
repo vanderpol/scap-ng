@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.e985fe09f8ff19d435809c0c
+  version: 1
+  assessment_title: The macOS system must configure audit_control group to wheel.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    audit-control-group-configure-recommended-object-collection:
+      collection_title: audit_control_group_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $4}'
+  tests:
+    test-audit-control-group-configure-recommended-test:
+      test_title: audit_control_group_configure_recommended_test
+      capability: independent.shellcommand
+      collection: audit-control-group-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: audit_control_group_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '0'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-control-group-configure-recommended-test

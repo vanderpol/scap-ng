@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.251869c14e773c55c1535ce4
+  version: 1
+  assessment_title: WN11-AU-000060 - The system must be configured to audit Logon/Logoff - Group Membership successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-logon-logoff-group-membership-success-only:
+      test_title: Audit - Logon/Logoff - Group Membership - Success Only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Audit Group Membership'' is set to ''Success'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: group_membership
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-logon-logoff-group-membership-success-failure:
+      test_title: Audit - Logon/Logoff - Group Membership - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Audit Group Membership'' is set to ''Success and Failure'''
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: group_membership
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-logon-logoff-group-membership-success-only
+    - test: test-audit-logon-logoff-group-membership-success-failure

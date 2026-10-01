@@ -1,0 +1,79 @@
+assessment:
+  id: ng.shared.6efde48142853f885cba108b
+  version: 1
+  assessment_title: The operating system must implement transaction recovery for transaction-based systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-dev-mounts-in-etc-mnttab-collection:
+      collection_title: all /dev mounts in /etc/mnttab
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/mnttab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/dev/.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    non-logging-mounts-collection:
+      collection_title: non-logging mounts
+      capability: independent.textfilecontent54
+      set:
+        operator: union
+        members:
+        - collection: all-dev-mounts-in-etc-mnttab-collection
+        filters:
+        - action: exclude
+          match:
+            field: text
+            value: ^/dev/fd.*$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: /dev/fd.*
+          capability: independent.textfilecontent54
+        - action: exclude
+          match:
+            field: text
+            value: ^\S+\s+\S+\s+\S+\s+(\S*,)?logging(,\S*)?\s+
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: logging option
+          capability: independent.textfilecontent54
+        - action: exclude
+          match:
+            field: text
+            value: ^\S+\s+\S+\s+(vxfs|zfs|hsfs)\s+
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: zfs or vxfs or hsfs fstype
+          capability: independent.textfilecontent54
+  tests:
+    test-no-non-logging-file-systems-mounted:
+      test_title: no non-logging file systems are mounted
+      capability: independent.textfilecontent54
+      collection: non-logging-mounts-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-no-non-logging-file-systems-mounted

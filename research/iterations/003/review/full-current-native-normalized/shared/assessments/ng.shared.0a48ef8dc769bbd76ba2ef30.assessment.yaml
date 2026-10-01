@@ -1,0 +1,150 @@
+assessment:
+  id: ng.shared.0a48ef8dc769bbd76ba2ef30
+  version: 1
+  assessment_title: The Cisco router must be configured to back up the configuration when changes occur.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    iosxe-line-collection:
+      collection_title: null
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+  tests:
+    test-verify-event-manager-applet-backup-config-present:
+      test_title: Verify 'event manager applet BACKUP_CONFIG is present'
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Check for event manager applet BACKUP_CONFIG
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value: \nevent manager applet BACKUP_CONFIG
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-action-info-type-routername-switchname-present:
+      test_title: The action info type routername/switchname is present.
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Check The action info type routername or switchname is present.
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value: \n action \d+ info (type routername|switchname)
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-action-cli-command-enable-present:
+      test_title: The action cli command 'enable' is present
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Check The action cli enable is present.
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value: \n action \d+ cli command "enable"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-action-cli-command-copy-run-scp-present:
+      test_title: The action cli command 'copy run scp' is present
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Check The action cli copy run scp is present.
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value: \n action \d+ cli command "copy run scp"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-action-cli-command-syslog-priority-informational-msg-present:
+      test_title: The action cli command 'syslog priority informational msg' is present
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: Check The action syslog priority informational msg.
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value: \n action \d+ syslog priority informational msg
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-verify-event-manager-applet-backup-config-present
+    - test: test-action-info-type-routername-switchname-present
+    - test: test-action-cli-command-enable-present
+    - test: test-action-cli-command-copy-run-scp-present
+    - test: test-action-cli-command-syslog-priority-informational-msg-present

@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.3f3518360c61bdef0999beb3
+  version: 1
+  assessment_title: Exchange must have the most current, approved Cumulative Update (CU) installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-exchangeserver-display-admindisplayversion-configuration-collection:
+      collection_title: Run Get-ExchangeServer to display AdminDisplayVersion configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ExchangeServer | Select-Object -Property
+            Name, AdminDisplayVersion |Format-List
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ''
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements:
+      test_title: Unknown Test Results - An auditor must review system settings gathered and STIG requirements.
+      capability: independent.unknown
+      result: unknown
+    test-determine-most-current-approved-service-pack-if-value-admindisplayversion-does:
+      test_title: Determine the most current, approved service pack. If the value of AdminDisplayVersion does not return the
+        most current, approved Cumulative Update (CU), this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-exchangeserver-display-admindisplayversion-configuration-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-unknown-test-results-auditor-review-system-settings-gathered-stig-requirements
+    - test: test-determine-most-current-approved-service-pack-if-value-admindisplayversion-does

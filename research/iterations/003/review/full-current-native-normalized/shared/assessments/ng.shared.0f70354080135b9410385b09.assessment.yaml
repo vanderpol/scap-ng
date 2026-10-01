@@ -1,0 +1,69 @@
+assessment:
+  id: ng.shared.0f70354080135b9410385b09
+  version: 1
+  assessment_title: Exchange internal Send connectors must use an authentication level.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-sendconnector-display-tlsauthlevel-configuration-collection:
+      collection_title: Run Get-SendConnector to display TlsAuthLevel configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-SendConnector | Select-Object -Property
+            Name, Identity, TlsAuthLevel | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-each-send-connector-if-value-tlsauthlevel-not-set-domainvalidation-this:
+      test_title: For each Send connector, if the value of TlsAuthLevel is not set to DomainValidation, this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-sendconnector-display-tlsauthlevel-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify value is DomainValidation
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: (?i)DomainValidation\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-no-send-connectors-exist-on-this-exchange-server:
+      test_title: No Send Connectors exist on this Exchange Server.
+      capability: independent.shellcommand
+      collection: run-get-sendconnector-display-tlsauthlevel-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify No Send Connectors Exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    any:
+    - test: test-each-send-connector-if-value-tlsauthlevel-not-set-domainvalidation-this
+    - test: test-no-send-connectors-exist-on-this-exchange-server

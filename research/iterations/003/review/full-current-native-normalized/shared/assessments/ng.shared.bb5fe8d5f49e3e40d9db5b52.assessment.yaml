@@ -1,0 +1,74 @@
+assessment:
+  id: ng.shared.bb5fe8d5f49e3e40d9db5b52
+  version: 1
+  assessment_title: Windows Online Troubleshooting Service
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\ScriptedDiagnosticsProvider\Policy
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EnableQueryRemoteServer
+  variables:
+    troubleshooting-allow-user-access-online-troubleshooting-content-on-microsoft-servers-variable:
+      title: 'Troubleshooting: Allow user to access online troubleshooting content on Microsoft servers from the Troubleshooting
+        Control Panel (via Windows Online Troubleshooting Service - WOTS)'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: troubleshooting_allow_user_to_access_online_troubleshooting_content_on_microsoft_servers_from_the_troubleshooting_control_panel_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-troubleshooting-allow-users-access-online-troubleshooting-content-on-microsoft-servers:
+      test_title: '''Troubleshooting: Allow users to access online troubleshooting content on Microsoft servers from the Troubleshooting
+        Control Panel (via Windows Online Troubleshooting Service - WOTS)'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: troubleshooting-allow-user-access-online-troubleshooting-content-on-microsoft-servers-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-troubleshooting-allow-users-access-online-troubleshooting-content-on-microsoft-servers

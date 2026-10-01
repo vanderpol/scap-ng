@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.b6e523275430c59d0e3f259b
+  version: 1
+  assessment_title: UBTU-22-232100 - Ubuntu 22.04 LTS must be configured so that the "journalctl" command is owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/journalctl
+  tests:
+    test-usr-bin-journalctl-command-owned-by-root:
+      test_title: /usr/bin/journalctl command is owned by root
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-usr-bin-journalctl-command-owned-by-root

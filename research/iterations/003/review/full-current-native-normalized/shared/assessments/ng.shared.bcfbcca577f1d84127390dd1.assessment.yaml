@@ -1,0 +1,120 @@
+assessment:
+  id: ng.shared.bcfbcca577f1d84127390dd1
+  version: 1
+  assessment_title: SQL Server must generate audit records when attempts to access privileges, categorized information, and
+    security objects occur.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-sqlext-collection:
+      collection_title: null
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT name AS 'audit_name', status_desc AS 'audit_status', audit_file_path AS 'current_audit_file' \nFROM\
+            \ sys.dm_server_audit_status \n"
+      behaviors:
+        context: instance
+    independent-sqlext-collection-2:
+      collection_title: null
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-dbms-variable
+        version:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: microsoft-sql-server-version-2016-2022-variable
+        instance:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "SELECT a.name AS 'AuditName', \ns.name AS 'SpecName', \nd.audit_action_name AS 'ActionName', \nd.audited_result\
+            \ AS 'Result' \nFROM sys.server_audit_specifications s \nJOIN sys.server_audits a ON s.audit_guid = a.audit_guid\
+            \ \nJOIN sys.server_audit_specification_details d ON s.server_specification_id = d.server_specification_id \n\
+            WHERE a.is_state_enabled = 1 AND d.audit_action_name = 'SCHEMA_OBJECT_ACCESS_GROUP' \n"
+      behaviors:
+        context: instance
+  variables:
+    microsoft-sql-server-dbms-variable:
+      title: Microsoft SQL Server DBMS
+      kind: constant
+      datatype: string
+      expression:
+        literal: sqlserver
+    microsoft-sql-server-version-2016-2022-variable:
+      title: Microsoft SQL Server version 2016-2022
+      kind: constant
+      datatype: string
+      expression:
+        literal: 2016|2017|2019|2022
+  tests:
+    test-all-currently-defined-audits-sql-server-instance-will-listed-if:
+      test_title: All currently defined audits for the SQL server instance will be listed. If no audits are returned, this
+        is a finding.
+      capability: independent.sqlext
+      collection: independent-sqlext-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-if-schema-object-access-group-not-returned-in-active-audit:
+      test_title: If the SCHEMA_OBJECT_ACCESS_GROUP is not returned in an active audit, this is a finding.
+      capability: independent.sqlext
+      collection: independent-sqlext-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-all-currently-defined-audits-sql-server-instance-will-listed-if
+    - test: test-if-schema-object-access-group-not-returned-in-active-audit

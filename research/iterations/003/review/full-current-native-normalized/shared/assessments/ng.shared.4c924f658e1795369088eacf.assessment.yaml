@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.4c924f658e1795369088eacf
+  version: 1
+  assessment_title: Groups assigned to users must exist in the /etc/group file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-users-collection:
+      collection_title: All users
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^-+].*$
+    gids-listed-in-etc-group-collection:
+      collection_title: GIDs listed in /etc/group.
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/group
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^:]+:[^:]*:(\d+):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    gids-all-groups-variable:
+      title: GIDs of all groups.
+      kind: local
+      datatype: int
+      expression:
+        values:
+          collection: gids-listed-in-etc-group-collection
+          field: subexpression
+  tests:
+    test-groups-listed-in-etc-passwd-file-exist:
+      test_title: Groups listed in the /etc/passwd file must exist.
+      capability: unix.password
+      collection: all-users-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Checking to see if the group exists.
+        state_capability: unix.password
+        state:
+          field: group_id
+          value:
+            variable: gids-all-groups-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: at least one
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-groups-listed-in-etc-passwd-file-exist

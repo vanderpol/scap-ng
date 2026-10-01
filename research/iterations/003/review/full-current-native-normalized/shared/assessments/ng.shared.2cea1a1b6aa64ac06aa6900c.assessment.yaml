@@ -1,0 +1,93 @@
+assessment:
+  id: ng.shared.2cea1a1b6aa64ac06aa6900c
+  version: 1
+  assessment_title: WINCC-000030
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-winstore-exist-collection:
+      collection_title: Windows/WinStore exist
+      capability: windows.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: C:\Windows\WinStore
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      behaviors:
+        recurse_direction: down
+        max_depth: '-1'
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\Explorer
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoUseStoreOpenWith
+  tests:
+    test-windows-winstore-does-not-exist-not-applicable:
+      test_title: Windows\WinStore does not exist, Not Applicable
+      capability: windows.file
+      collection: windows-winstore-exist-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-turn-off-access-store-set-enabled:
+      test_title: '''Turn off access to the Store'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 1
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-windows-winstore-exist:
+      test_title: Windows\WinStore exist
+      capability: windows.file
+      collection: windows-winstore-exist-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - test: test-windows-winstore-does-not-exist-not-applicable
+    - all:
+      - test: test-turn-off-access-store-set-enabled
+      - test: test-windows-winstore-exist

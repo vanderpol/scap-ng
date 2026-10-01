@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.0078d38efbe60c466ef02d8a
+  version: 1
+  assessment_title: The macOS system must configure SSHD ClientAliveCountMax to 1.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-sshd-client-alive-count-max-configure-stig-object-collection:
+      collection_title: os_sshd_client_alive_count_max_configure_stig_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/sbin/sshd -G | /usr/bin/awk '/clientalivecountmax/{print $2}'
+  tests:
+    test-os-sshd-client-alive-count-max-configure-stig-test:
+      test_title: os_sshd_client_alive_count_max_configure_stig_test
+      capability: independent.shellcommand
+      collection: os-sshd-client-alive-count-max-configure-stig-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: os_sshd_client_alive_count_max_configure_stig_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-os-sshd-client-alive-count-max-configure-stig-test

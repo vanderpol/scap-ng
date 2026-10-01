@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.eddff56d309057856ea1a70e
+  version: 1
+  assessment_title: The macOS system must not allow an unattended or automatic logon to the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-automatic-login-disable-recommended-object-collection:
+      collection_title: system_settings_automatic_login_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.loginwindow'')\
+
+            .objectForKey(''com.apple.login.mcx.DisableAutoLoginClient'').js
+
+            EOS'
+  tests:
+    test-system-settings-automatic-login-disable-recommended-test:
+      test_title: system_settings_automatic_login_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-automatic-login-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_automatic_login_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-automatic-login-disable-recommended-test

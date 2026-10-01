@@ -1,0 +1,157 @@
+assessment:
+  id: ng.shared.748a41608311b76130e8f0e9
+  version: 1
+  assessment_title: Event Viewer must be protected from unauthorized modification and deletion
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-root-directory-registry-object-collection:
+      collection_title: System Root Directory Registry Object
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SystemRoot
+    event-viewer-rights-collection:
+      collection_title: Event Viewer Rights
+      capability: windows.fileeffectiverights53
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: systemroot-system32-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Eventvwr.exe
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    eventvwr-rights-except-trustedinstaller-collection:
+      collection_title: Eventvwr Rights except for TrustedInstaller
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - collection: event-viewer-rights-collection
+        filters:
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: TrustedInstaller
+          capability: windows.fileeffectiverights53
+  variables:
+    systemroot-system32-variable:
+      title: SystemRoot\System32
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            collection: system-root-directory-registry-object-collection
+            field: value
+        - literal:
+            value: \System32
+            datatype: string
+  tests:
+    test-eventvwr-exe-only-read-execute-rights-users-other-than-trustedinstaller:
+      test_title: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
+      capability: windows.fileeffectiverights53
+      collection: eventvwr-rights-except-trustedinstaller-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: No Rights except Read and Execute
+        state_capability: windows.fileeffectiverights53
+        state:
+          all:
+          - field: standard_delete
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: standard_write_dac
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: standard_write_owner
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: generic_write
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: file_write_data
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: file_append_data
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: file_write_ea
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: file_delete_child
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: file_write_attributes
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-eventvwr-exe-only-read-execute-rights-users-other-than-trustedinstaller

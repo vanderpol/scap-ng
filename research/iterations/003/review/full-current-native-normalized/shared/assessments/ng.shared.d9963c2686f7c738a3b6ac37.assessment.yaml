@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.d9963c2686f7c738a3b6ac37
+  version: 1
+  assessment_title: User passwords must be at least 15 characters in length.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    default-passwd-file-etc-default-passwd-collection:
+      collection_title: The default passwd file (/etc/default/passwd)
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: passwd
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*PASSLENGTH=(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-check-default-password-length-setting:
+      test_title: Check the default password length setting.
+      capability: independent.textfilecontent54
+      collection: default-passwd-file-etc-default-passwd-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: subexpression value greater than or equal to 15
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '15'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-check-default-password-length-setting

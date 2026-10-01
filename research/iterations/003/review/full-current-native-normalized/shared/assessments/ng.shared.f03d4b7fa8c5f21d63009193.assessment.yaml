@@ -1,0 +1,275 @@
+assessment:
+  id: ng.shared.f03d4b7fa8c5f21d63009193
+  version: 1
+  assessment_title: WN10-AU-000515 - Windows 10 permissions for the Application event log must prevent access by non-privileged
+    accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    path-application-evtx-collection:
+      collection_title: path Application.evtx
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\EventLog\Application
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: file
+    application-event-log-strict-filepath-as-listed-collection:
+      collection_title: The Application event log. Strict filepath, as listed.
+      capability: windows.fileeffectiverights53
+      select:
+        filepath:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: strict-path-application-evtx-variable
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    permissions-application-event-log-minus-those-allowed-strict-filepath-as-collection:
+      collection_title: Permissions of Application event log, minus those allowed. Strict filepath, as listed.
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - collection: application-event-log-strict-filepath-as-listed-collection
+        filters:
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Event Log process account. Deterministically built with respect to service name.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-18
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: SYSTEM account.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-32-544
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Administrators account.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-19
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: LOCAL SERVICE account, the owner.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-15-2-1
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+          capability: windows.fileeffectiverights53
+    system-root-directory-collection:
+      collection_title: System Root Directory
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SystemRoot
+    application-event-log-built-filepath-collection:
+      collection_title: The Application event log. Built filepath.
+      capability: windows.fileeffectiverights53
+      select:
+        filepath:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: path-application-evtx-systemroot-environment-variable-replaced-its-value-variable
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    permissions-application-event-log-minus-those-allowed-built-filepath-collection:
+      collection_title: Permissions of Application event log, minus those allowed. Built filepath.
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - collection: application-event-log-built-filepath-collection
+        filters:
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Event Log process account. Deterministically built with respect to service name.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-18
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: SYSTEM account.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-32-544
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Administrators account.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-5-19
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: LOCAL SERVICE account, the owner.
+          capability: windows.fileeffectiverights53
+        - action: exclude
+          match:
+            field: trustee_sid
+            value: S-1-15-2-1
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+          capability: windows.fileeffectiverights53
+  variables:
+    strict-path-application-evtx-variable:
+      title: Strict path to Application.evtx.
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              collection: path-application-evtx-collection
+              field: value
+          pattern: ^(.*)$
+    path-application-evtx-systemroot-environment-variable-replaced-its-value-variable:
+      title: Path to Application.evtx with the SystemRoot environment variable replaced with its value.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            collection: system-root-directory-collection
+            field: value
+        - regex_capture:
+            value:
+              values:
+                collection: path-application-evtx-collection
+                field: value
+            pattern: ^%.*%(.*)$
+  tests:
+    test-application-event-log-have-at-least-default-permissions-strict-path:
+      test_title: The Application event log must have at least default permissions. Strict Path
+      capability: windows.fileeffectiverights53
+      collection: permissions-application-event-log-minus-those-allowed-strict-filepath-as-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-application-event-log-registry-specified-location-have-systemroot-environment-variable:
+      test_title: The Application event log registry specified location must have the %SystemRoot% environment variable.
+      capability: windows.registry
+      collection: path-application-evtx-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '%SystemRoot% environment variable.'
+        state_capability: windows.registry
+        state:
+          field: value
+          value: ^(?i)%SystemRoot%.*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-application-event-log-have-at-least-default-permissions-built-path:
+      test_title: The Application event log must have at least default permissions. Built Path
+      capability: windows.fileeffectiverights53
+      collection: permissions-application-event-log-minus-those-allowed-built-filepath-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - all:
+      - test: test-application-event-log-have-at-least-default-permissions-strict-path
+      - not:
+          test: test-application-event-log-registry-specified-location-have-systemroot-environment-variable
+    - all:
+      - test: test-application-event-log-have-at-least-default-permissions-built-path
+      - test: test-application-event-log-registry-specified-location-have-systemroot-environment-variable

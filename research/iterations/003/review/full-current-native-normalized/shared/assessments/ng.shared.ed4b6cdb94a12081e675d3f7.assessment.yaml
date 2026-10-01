@@ -1,0 +1,116 @@
+assessment:
+  id: ng.shared.ed4b6cdb94a12081e675d3f7
+  version: 1
+  assessment_title: The Active Directory SYSVOL directory must have the proper access control permissions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    filepath-sysvol-collection:
+      collection_title: Filepath to SysVol
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SysVol
+    run-icacls-command-against-sysvol-directory-collection:
+      collection_title: Run Icacls command against SYSVOL Directory
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: cmd
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: icacls-path-sysvol-directory-variable
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ':'
+  variables:
+    icacls-path-sysvol-directory-variable:
+      title: icacls and Path to SYSVOL directory
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'icacls '
+            datatype: string
+        - regex_capture:
+            value:
+              values:
+                collection: filepath-sysvol-collection
+                field: value
+            pattern: (^[a-zA-Z]:\\.+)\\sysvol
+    required-permissions-variable:
+      title: Required Permissions
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - (?i)NT AUTHORITY\\Authenticated Users:\(RX\)
+        - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)BUILTIN\\Server Operators:\(RX\)
+        - (?i)BUILTIN\\Server Operators:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)BUILTIN\\Administrators:\(M,WDAC,WO\)
+        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(F\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
+  tests:
+    test-permissions-conform-minimum-requirements:
+      test_title: Permissions must conform to minimum requirements.
+      capability: independent.shellcommand
+      collection: run-icacls-command-against-sysvol-directory-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Permissions must equal expected output
+        state_capability: independent.shellcommand
+        state:
+          all:
+          - field: exit_status
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stdout_line
+            value:
+              variable: required-permissions-variable
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: at least one
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stderr_line
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: none_exist
+  evaluate:
+    test: test-permissions-conform-minimum-requirements

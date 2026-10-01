@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.12a91b833a643727257864a4
+  version: 1
+  assessment_title: AZLX-23-002300 - Amazon Linux 2023 library files must be group-owned by root or a system account.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (\.so\S*)$
+      filters:
+      - action: include
+        match:
+          field: type
+          value: regular
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      - action: exclude
+        match:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: group-owned by root
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-wide-shared-library-files-directories-variable:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  tests:
+    test-operating-system-library-files-group-owned-by-root:
+      test_title: The operating system library files are group owned by root
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-operating-system-library-files-group-owned-by-root

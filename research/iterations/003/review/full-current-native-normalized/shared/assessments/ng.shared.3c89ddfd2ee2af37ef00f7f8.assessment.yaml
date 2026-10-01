@@ -1,0 +1,178 @@
+assessment:
+  id: ng.shared.3c89ddfd2ee2af37ef00f7f8
+  version: 1
+  assessment_title: The Cisco router must be configured to enforce approved authorizations for controlling the flow of management
+    information within the device based on control policies.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    show-running-config-collection:
+      collection_title: show running-config
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+    all-vty-lines-collection:
+      collection_title: all vty lines
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^line vty \d+
+  variables:
+    number-vty-s-on-system-variable:
+      title: Number of vty's on the system
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            collection: all-vty-lines-collection
+            field: global_command
+    regex-match-all-vty-lines-login-authentication-variable:
+      title: Regex to match all vty lines to login authentication
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: ((?s)\nline vty \d+ \d+.*?\n access-class \S+? in\n.+){
+            datatype: string
+        - variable: number-vty-s-on-system-variable
+        - literal:
+            value: '}'
+            datatype: string
+    name-access-class-applied-first-vty-if-present-variable:
+      title: Name of access-class applied to the first VTY (if present)
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              collection: show-running-config-collection
+              field: config_line
+          pattern: (?s)\nline vty \d \d\n.*? access-class (\S+) in\n
+    regex-verify-access-list-used-on-vty-lines-permits-only-variable:
+      title: Regex to verify access-list used on VTY lines permits only management IP's and deny all others
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: '(?s)\nip access-list extended '
+            datatype: string
+        - variable: name-access-class-applied-first-vty-if-present-variable
+        - literal:
+            value: \n.*? permit (tcp host|ip) .+0.0.0.255.+ deny\s+ip any any
+            datatype: string
+    regex-verify-same-acces-class-applied-all-vty-lines-variable:
+      title: Regex to verify the same acces-class is applied to all VTY lines
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: '((?s)\nline vty \d+ \d+.*?\n access-class '
+            datatype: string
+        - variable: name-access-class-applied-first-vty-if-present-variable
+        - literal:
+            value: ' in\n.+){'
+            datatype: string
+        - variable: number-vty-s-on-system-variable
+        - literal:
+            value: '}'
+            datatype: string
+  tests:
+    test-verify-that-all-vty-lines-have-acl-inbound-applied:
+      test_title: Verify that all VTY lines have an ACL inbound applied
+      capability: iosxe.line
+      collection: show-running-config-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: all vty lines are configured with 'access-class <ACL> in'
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value:
+              variable: regex-match-all-vty-lines-login-authentication-variable
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-verify-that-acl-applied-vty-permits-only-hosts-from-management:
+      test_title: Verify that the ACL applied to the VTY permits only hosts from the management network
+      capability: iosxe.line
+      collection: show-running-config-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: access-list used by VTY lines only allows access from management network and denies all others'
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value:
+              variable: regex-verify-access-list-used-on-vty-lines-permits-only-variable
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-verify-that-same-acl-applied-all-vty-lines:
+      test_title: Verify that the same ACL is applied to all VTY lines
+      capability: iosxe.line
+      collection: show-running-config-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: The same access-class is applied to all VTY lines'
+        state_capability: iosxe.line
+        state:
+          all:
+          - field: show_subcommand
+            value: show running-config
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: config_line
+            value:
+              variable: regex-verify-same-acces-class-applied-all-vty-lines-variable
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-verify-that-all-vty-lines-have-acl-inbound-applied
+    - test: test-verify-that-acl-applied-vty-permits-only-hosts-from-management
+    - test: test-verify-that-same-acl-applied-all-vty-lines

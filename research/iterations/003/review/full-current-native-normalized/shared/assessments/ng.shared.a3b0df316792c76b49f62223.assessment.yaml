@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.a3b0df316792c76b49f62223
+  version: 1
+  assessment_title: WN10-AU-000120 - The system must be configured to audit System - IPSec Driver failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-ipsec-driver-failure-only:
+      test_title: Audit - IPSec Driver - Failure only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - IPSec Driver - Failure only
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: ipsec_driver
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-ipsec-driver-success-failure:
+      test_title: Audit - IPSec Driver - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - IPSec Driver - Success and Failure
+        state_capability: windows.auditeventpolicysubcategories
+        state:
+          field: ipsec_driver
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-ipsec-driver-failure-only
+    - test: test-audit-ipsec-driver-success-failure

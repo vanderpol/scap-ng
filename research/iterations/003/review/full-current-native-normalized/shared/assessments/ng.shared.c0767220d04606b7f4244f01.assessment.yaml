@@ -1,0 +1,140 @@
+assessment:
+  id: ng.shared.c0767220d04606b7f4244f01
+  version: 1
+  assessment_title: Ubuntu 22.04 LTS must have system commands set to a mode of "755" or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-files-in-system-command-directories-mode-755-gwrite-should-collection:
+      collection_title: All files in system command directories with mode 755 (gwrite should be = false)
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Mode 755 or less permissive (gwrite should be = false.)
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+    all-files-in-system-command-directories-mode-755-owrite-should-collection:
+      collection_title: All files in system command directories with mode 755 (owrite should be = false)
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Mode 755 or less permissive (owrite should be = false.)
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+        capability: unix.file
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  tests:
+    test-files-in-system-command-dirs-have-mode-755-or-less:
+      test_title: Files in System command dirs have mode 755 or less permissive (gwrite should be = false.)
+      capability: unix.file
+      collection: all-files-in-system-command-directories-mode-755-gwrite-should-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-files-in-system-command-dirs-have-mode-755-or-less-2:
+      test_title: Files in System command dirs have mode 755 or less permissive (owrite should be = false.)
+      capability: unix.file
+      collection: all-files-in-system-command-directories-mode-755-owrite-should-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-files-in-system-command-dirs-have-mode-755-or-less
+    - test: test-files-in-system-command-dirs-have-mode-755-or-less-2

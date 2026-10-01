@@ -1,0 +1,44 @@
+assessment:
+  id: ng.shared.257646ac9b4218d805fe6c31
+  version: 1
+  assessment_title: OL 8 must enable a user session lock until that user reestablishes access using established identification
+    and authentication procedures for graphical user sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-org-gnome-desktop-screensaver-lock-enabled-setting-collection:
+      collection_title: Retrieve org.gnome.desktop.screensaver lock-enabled setting.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gsettings get org.gnome.desktop.screensaver lock-enabled
+  tests:
+    test-verify-operating-system-enables-user-s-session-lock-until-that:
+      test_title: Verify the operating system enables a user's session lock until that user re-establishes access using established
+        identification and authentication procedures.
+      capability: independent.shellcommand
+      collection: retrieve-org-gnome-desktop-screensaver-lock-enabled-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Check value of org.gnome.desktop.screensaver lock-enabled setting.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-verify-operating-system-enables-user-s-session-lock-until-that

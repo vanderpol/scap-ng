@@ -1,0 +1,67 @@
+assessment:
+  id: ng.shared.6051f99143c2a342b11fea93
+  version: 1
+  assessment_title: Maximum Password Age
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    password-policy-collection:
+      collection_title: Password policy
+      capability: windows.passwordpolicy
+  variables:
+    maximum-password-age-variable:
+      title: Maximum Password Age
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: password_maximum_age_var
+        validation:
+          alternatives:
+          - literal: '5184000'
+            hint: 5184000_seconds
+          - literal: '7776000'
+            hint: 7776000_seconds
+  tests:
+    test-maximum-password-age-set-60-days-or-less:
+      test_title: '''Maximum Password Age'' is set to ''60'' days or less'
+      capability: windows.passwordpolicy
+      collection: password-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Maximum Password Age is less than or equal to variable
+        state_capability: windows.passwordpolicy
+        state:
+          field: max_passwd_age
+          value:
+            variable: maximum-password-age-variable
+          operation: less than or equal
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-maximum-password-age-not-set-0:
+      test_title: '''Maximum Password Age'' is not set to ''0'''
+      capability: windows.passwordpolicy
+      collection: password-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Maximum Password Age is not equal to 0
+        state_capability: windows.passwordpolicy
+        state:
+          field: max_passwd_age
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-maximum-password-age-set-60-days-or-less
+    - test: test-maximum-password-age-not-set-0

@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.92d6c46aaf6e761df54b51e6
+  version: 1
+  assessment_title: OL09-00-000940 - OL 9 must use the CAC smart card driver.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/opensc.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*card_drivers\s*=(.*);
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-opensc-conf-card-drivers-cac:
+      test_title: '/etc/opensc.conf: card_drivers = cac'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)\bcac\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-opensc-conf-card-drivers-cac

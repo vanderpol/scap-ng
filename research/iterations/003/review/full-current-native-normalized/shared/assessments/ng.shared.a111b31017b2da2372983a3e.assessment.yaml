@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.a111b31017b2da2372983a3e
+  version: 1
+  assessment_title: WN10-AU-000575 - Windows 10 must be configured to audit MPSSVC Rule-Level Policy Change Successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+      capability: windows.auditeventpolicysubcategories
+  tests:
+    test-audit-mpssvc-rule-level-policy-change-set-success-or-success:
+      test_title: '''Audit MPSSVC Rule-Level Policy Change'' is set to ''Success'' or ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: '''MPSSVC Rule-Level Policy Change'' is set to ''Success'''
+          capability: windows.auditeventpolicysubcategories
+          state:
+            field: mpssvc_rule_level_policy_change
+            value: AUDIT_SUCCESS
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: '''MPSSVC Rule-Level Policy Change'' is set to ''Success'' and ''Failure'''
+          capability: windows.auditeventpolicysubcategories
+          state:
+            field: mpssvc_rule_level_policy_change
+            value: AUDIT_SUCCESS_FAILURE
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-mpssvc-rule-level-policy-change-set-success-or-success

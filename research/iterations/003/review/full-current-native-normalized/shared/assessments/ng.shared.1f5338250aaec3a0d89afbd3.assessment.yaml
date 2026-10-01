@@ -1,0 +1,76 @@
+assessment:
+  id: ng.shared.1f5338250aaec3a0d89afbd3
+  version: 1
+  assessment_title: OL09-00-002582 - OL 9 cron configuration files directory must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-cron-files-collection:
+      collection_title: /etc/cron* files
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^cron.*$
+    etc-cron-directories-collection:
+      collection_title: /etc/cron* directories
+      capability: unix.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/etc/cron.*$
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  tests:
+    test-etc-cron-files-owned-by-root:
+      test_title: /etc/cron* files owned by root
+      capability: unix.file
+      collection: etc-cron-files-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-cron-directories-owned-by-root:
+      test_title: /etc/cron* directories owned by root
+      capability: unix.file
+      collection: etc-cron-directories-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-etc-cron-files-owned-by-root
+    - test: test-etc-cron-directories-owned-by-root

@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.bb9d23887ce1b7f83c2e9ccf
+  version: 1
+  assessment_title: Exchange Outbound Connection limit per Domain Count must be controlled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-transportservice-display-maxperdomainoutboundconnections-configuration-collection:
+      collection_title: Run Get-TransportService to display MaxPerDomainOutboundConnections configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-TransportService | Select-Object -Property
+            Name, Identity, MaxPerDomainOutboundConnections | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-if-value-maxperdomainoutboundconnections-not-set-20-this-finding:
+      test_title: If the value of MaxPerDomainOutboundConnections is not set to 20, this is a finding
+      capability: independent.shellcommand
+      collection: run-get-transportservice-display-maxperdomainoutboundconnections-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify value is 20
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 20\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-if-value-maxperdomainoutboundconnections-not-set-20-this-finding

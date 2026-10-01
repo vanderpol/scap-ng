@@ -1,0 +1,96 @@
+assessment:
+  id: ng.shared.6939b0495ffd4a5cda99b0f1
+  version: 1
+  assessment_title: The Windows 10 system must use an anti-virus program.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    gather-antivirusproduct-from-securitycenter2-collection:
+      collection_title: Gather AntivirusProduct from SecurityCenter2
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          mask: false
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          mask: false
+          value:
+            record:
+            - name: classname
+              value: antivirusproduct
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+            - name: namespace
+              value: root\securitycenter2
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          mask: false
+          value:
+            record:
+            - name: property
+              value: displayname,productstate
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+  tests:
+    test-windows-use-antivirus-program:
+      test_title: Windows must use an antivirus program
+      capability: windows.cmdlet
+      collection: gather-antivirusproduct-from-securitycenter2-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: An antivirus program must be installed and running
+        state_capability: windows.cmdlet
+        state:
+          field: value
+          value:
+            record:
+            - name: productstate
+              value: '4096'
+              operation: bitwise and
+              datatype: int
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-windows-use-antivirus-program

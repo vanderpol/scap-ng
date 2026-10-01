@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.9d6be3943b314ef4b2da6adb
+  version: 1
+  assessment_title: The finger daemon package must not be installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pkg-info-service-network-finger-collection:
+      collection_title: pkg info service/network/finger
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pkg info service/network/finger
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-finger-daemon-package-not-installed:
+      test_title: The finger daemon package must not be installed.
+      capability: independent.shellcommand
+      collection: pkg-info-service-network-finger-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line should not exist
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-finger-daemon-package-not-installed

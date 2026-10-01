@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.b9c81d73e223300efe4eb1d7
+  version: 1
+  assessment_title: WN19-DC-000350 - Windows Server 2019 Add workstations to domain user right must only be assigned to the
+    Administrators group on domain controllers.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      capability: windows.userright
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_MACHINE_ACCOUNT_NAME
+  tests:
+    test-add-workstations-domain-administrators:
+      test_title: Add workstations to domain - Administrators
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          capability: windows.userright
+          state:
+            field: trustee_name
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: windows.userright
+          state:
+            field: trustee_name
+            value: Administrators
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-add-workstations-domain-administrators

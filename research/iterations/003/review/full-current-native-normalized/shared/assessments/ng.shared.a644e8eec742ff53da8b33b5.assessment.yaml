@@ -1,0 +1,103 @@
+assessment:
+  id: ng.shared.a644e8eec742ff53da8b33b5
+  version: 1
+  assessment_title: UBTU-22-232090 - Ubuntu 22.04 LTS must configure the files used by the system journal to be owned by "root".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    files-in-run-log-journal-recursively-collection:
+      collection_title: Files in /run/log/journal (recursively)
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /run/log/journal
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: type
+          value: regular
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+        recurse_file_system: local
+    files-in-var-log-journal-recursively-collection:
+      collection_title: Files in /var/log/journal (recursively)
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log/journal
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: type
+          value: regular
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+        recurse_file_system: local
+  tests:
+    test-files-in-run-log-journal-recursively-owned-by-root:
+      test_title: Files in /run/log/journal (recursively) are owned by root
+      capability: unix.file
+      collection: files-in-run-log-journal-recursively-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-files-in-var-log-journal-recursively-owned-by-root:
+      test_title: Files in /var/log/journal (recursively) are owned by root
+      capability: unix.file
+      collection: files-in-var-log-journal-recursively-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-files-in-run-log-journal-recursively-owned-by-root
+    - test: test-files-in-var-log-journal-recursively-owned-by-root

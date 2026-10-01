@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.d136c56d00186d22ca1b9604
+  version: 1
+  assessment_title: The macOS system must accept and verify Personal Identity Verification (PIV) credentials, implement a
+    local cache of revocation data to support path discovery and validation in case of the inability to access revocation
+    information via the network, and only allow the use of DOD PKI-established certificate authorities for verification of
+    the establishment of protected sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    auth-smartcard-certificate-trust-enforce-moderate-recommended-object-collection:
+      collection_title: auth_smartcard_certificate_trust_enforce_moderate_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.security.smartcard'')\
+
+            .objectForKey(''checkCertificateTrust'').js
+
+            EOS'
+  tests:
+    test-auth-smartcard-certificate-trust-enforce-moderate-recommended-test:
+      test_title: auth_smartcard_certificate_trust_enforce_moderate_recommended_test
+      capability: independent.shellcommand
+      collection: auth-smartcard-certificate-trust-enforce-moderate-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: auth_smartcard_certificate_trust_enforce_moderate_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '2'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-auth-smartcard-certificate-trust-enforce-moderate-recommended-test

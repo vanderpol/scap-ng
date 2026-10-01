@@ -1,0 +1,74 @@
+assessment:
+  id: ng.shared.2210100a1ee0ad13d4d0af75
+  version: 1
+  assessment_title: Maximum Log Size - Application
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\EventLog\Application
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: MaxSize
+  variables:
+    maximum-application-log-size-variable:
+      title: Maximum Application Log Size
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: maximum_application_log_size_var
+        validation:
+          alternatives:
+          - literal: '16384'
+            hint: enabled:16384_kb
+          - literal: '32768'
+            hint: enabled:32768_kb
+          - literal: '81920'
+            hint: enabled:81920_kb
+  tests:
+    test-specify-maximum-log-size-kb-set-at-minimum-enabled-32768:
+      test_title: '''Specify the maximum log size (KB)'' is set at a minimum to ''Enabled:32768'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals or is greater than variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: maximum-application-log-size-variable
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-specify-maximum-log-size-kb-set-at-minimum-enabled-32768

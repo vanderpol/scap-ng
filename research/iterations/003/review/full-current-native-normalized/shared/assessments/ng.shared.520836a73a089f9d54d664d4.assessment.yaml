@@ -1,0 +1,88 @@
+assessment:
+  id: ng.shared.520836a73a089f9d54d664d4
+  version: 1
+  assessment_title: UBTU-22-232140 - Ubuntu 22.04 LTS must be configured so that the "journalctl" command is not accessible
+    by unauthorized users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/bin/journalctl
+  tests:
+    test-usr-bin-journalctl-command-has-mode-0740-or-less-permissive:
+      test_title: /usr/bin/journalctl command has mode 0740 or less permissive
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: mode 0740 or less permissive
+        state_capability: unix.file
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-usr-bin-journalctl-command-has-mode-0740-or-less-permissive

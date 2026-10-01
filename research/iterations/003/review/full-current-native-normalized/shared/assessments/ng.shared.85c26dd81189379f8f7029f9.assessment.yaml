@@ -1,0 +1,77 @@
+assessment:
+  id: ng.shared.85c26dd81189379f8f7029f9
+  version: 1
+  assessment_title: IPSec Exemptions
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\IPSEC
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoDefaultExempt
+  variables:
+    mss-nodefaultexempt-configure-ipsec-exemptions-various-types-network-traffic-variable:
+      title: 'MSS: (NoDefaultExempt) Configure IPSec exemptions for various types of network traffic'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: no_default_exempt_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: multicast_broadcast_rsvp_kerberos_isakmp_exempt
+          - literal: '1'
+            hint: multicast_broadcast_isakmp_exempt
+          - literal: '2'
+            hint: rsvp_kerberos_isakmp_exempt
+          - literal: '3'
+            hint: isakmp_exempt
+  tests:
+    test-mss-nodefaultexempt-configure-ipsec-exemptions-various-types-network-traffic-set:
+      test_title: '''MSS: (NoDefaultExempt) Configure IPSec exemptions for various types of network traffic'' is set to ''Only
+        ISAKMP is exempt (recommended for Windows Server 2003)'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: mss-nodefaultexempt-configure-ipsec-exemptions-various-types-network-traffic-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-mss-nodefaultexempt-configure-ipsec-exemptions-various-types-network-traffic-set

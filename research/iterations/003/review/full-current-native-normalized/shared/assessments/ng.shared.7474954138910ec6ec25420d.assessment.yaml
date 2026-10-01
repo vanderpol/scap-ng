@@ -1,0 +1,176 @@
+assessment:
+  id: ng.shared.7474954138910ec6ec25420d
+  version: 1
+  assessment_title: All .Xauthority files must have mode 0600 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    gdm-graphical-login-collection:
+      collection_title: The gdm graphical-login.
+      capability: solaris.smf
+      select:
+        fmri:
+          operation: equals
+          datatype: string
+          mask: false
+          value: svc://localhost/application/graphical-login/gdm:default
+    xdm-graphical-login-collection:
+      collection_title: The xdm graphical-login.
+      capability: solaris.smf
+      select:
+        fmri:
+          operation: equals
+          datatype: string
+          mask: false
+          value: svc://localhost/application/graphical-login/xdm:default
+    all-usernames-collection:
+      collection_title: All usernames
+      capability: unix.password
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+    xauthority-file-location-collection:
+      collection_title: .Xauthority file location
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: user-home-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .Xauthority
+  variables:
+    user-home-directories-variable:
+      title: User Home Directories
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: all-usernames-collection
+          field: home_dir
+  tests:
+    test-check-see-if-xwindows-being-run-by-system-using-cdm:
+      test_title: Check to see if XWindows is being run by the system, using CDM.
+      capability: solaris.smf
+      collection: gdm-graphical-login-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: gdm graphical-login is online.
+        state_capability: solaris.smf
+        state:
+          field: service_state
+          value: ONLINE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-check-see-if-xwindows-being-run-by-system-using-xdm:
+      test_title: Check to see if XWindows is being run by the system, using XDM.
+      capability: solaris.smf
+      collection: xdm-graphical-login-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: gdm graphical-login is online.
+        state_capability: solaris.smf
+        state:
+          field: service_state
+          value: ONLINE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-xauthority-files-have-mode-0600-or-less-permissive:
+      test_title: .Xauthority files must have mode 0600 or less permissive
+      capability: unix.file
+      collection: xauthority-file-location-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: Permission 0600
+        state_capability: unix.file
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: uexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - not:
+        any:
+        - test: test-check-see-if-xwindows-being-run-by-system-using-cdm
+        - test: test-check-see-if-xwindows-being-run-by-system-using-xdm
+    - test: test-xauthority-files-have-mode-0600-or-less-permissive

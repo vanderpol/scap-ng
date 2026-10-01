@@ -1,0 +1,118 @@
+assessment:
+  id: ng.shared.5129c85cb99de3c7412631b0
+  version: 1
+  assessment_title: Signing of Secure Channel Traffic
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SignSecureChannel
+    windows-registry-collection-2:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: System\CurrentControlSet\Services\Netlogon\Parameters
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: RequireSignOrSeal
+  variables:
+    domain-member-digitally-sign-secure-channel-data-when-possible-variable:
+      title: 'Domain member: Digitally sign secure channel data (when possible)'
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: digitally_sign_secure_channel_data_when_possible_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-domain-member-digitally-sign-secure-channel-data-when-possible-set:
+      test_title: '''Domain member: Digitally sign secure channel data (when possible)'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: domain-member-digitally-sign-secure-channel-data-when-possible-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-domain-member-digitally-encrypt-or-sign-secure-channel-data-always:
+      test_title: '''Domain member: Digitally encrypt or sign secure channel data (always)'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals 1
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-domain-member-digitally-sign-secure-channel-data-when-possible-set
+    - test: test-domain-member-digitally-encrypt-or-sign-secure-channel-data-always

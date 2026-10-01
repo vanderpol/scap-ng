@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.afaa80462e34cd94aab17df4
+  version: 1
+  assessment_title: OL08-00-010675 - OL 8 must disable core dump backtraces.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/coredump.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*ProcessSizeMax\s*=\s*(\w*)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-core-dump-backtraces-disabled:
+      test_title: core dump backtraces are disabled
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-core-dump-backtraces-disabled

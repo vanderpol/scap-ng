@@ -1,0 +1,68 @@
+assessment:
+  id: ng.shared.40022be477273bf0c96fd2ac
+  version: 1
+  assessment_title: UBTU-20-010449 - The Ubuntu operating system must be configured so that Advance Package Tool (APT) removes
+    all software components after updated versions have been installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/apt/apt.conf.d/50unattended-upgrades
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Unattended-Upgrade::Remove-Unused-Dependencies\s+"true"\s*;\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/apt/apt.conf.d/50unattended-upgrades
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Unattended-Upgrade::Remove-Unused-Kernel-Packages\s+"true"\s*;\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-unattended-upgrade-remove-unused-dependencies-set-true:
+      test_title: Unattended-Upgrade::Remove-Unused-Dependencies is set to true
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-unattended-upgrade-remove-unused-kernel-packages-set-true:
+      test_title: Unattended-Upgrade::Remove-Unused-Kernel-Packages is set to true
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-unattended-upgrade-remove-unused-dependencies-set-true
+    - test: test-unattended-upgrade-remove-unused-kernel-packages-set-true

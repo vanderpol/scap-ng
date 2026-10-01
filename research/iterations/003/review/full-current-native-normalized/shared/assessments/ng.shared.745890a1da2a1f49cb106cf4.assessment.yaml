@@ -1,0 +1,84 @@
+assessment:
+  id: ng.shared.745890a1da2a1f49cb106cf4
+  version: 1
+  assessment_title: Session Security for NTLM SSP Based Servers
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NTLMMinServerSec
+  tests:
+    test-network-security-minimum-session-security-ntlm-ssp-based-including-secure:
+      test_title: '''Network security: Minimum session security for NTLM SSP based (including secure RPC) servers'' is set
+        to ''Require NTLMv2 session security'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value bitwise and 524288
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '524288'
+            operation: bitwise and
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-network-security-minimum-session-security-ntlm-ssp-based-including-secure-2:
+      test_title: '''Network security: Minimum session security for NTLM SSP based (including secure RPC) servers'' is set
+        to ''Require 128-bit encryption'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value bitwise and 536870912
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '536870912'
+            operation: bitwise and
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-network-security-minimum-session-security-ntlm-ssp-based-including-secure
+    - test: test-network-security-minimum-session-security-ntlm-ssp-based-including-secure-2

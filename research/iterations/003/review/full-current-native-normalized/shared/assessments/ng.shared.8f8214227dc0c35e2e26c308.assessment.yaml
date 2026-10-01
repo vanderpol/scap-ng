@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.8f8214227dc0c35e2e26c308
+  version: 1
+  assessment_title: The operating system must immediately notify the System Administrator (SA) and Information System Security
+    Officer (ISSO) (at a minimum) via email when the threshold for the repository maximum audit record storage capacity is
+    reached.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-audit-auditd-conf-space-left-action-collection:
+      collection_title: /etc/audit/auditd.conf space_left_action
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[ ]*space_left_action[ ]+=[ ]+([^ ]*)[ ]*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+        multiline: 'true'
+  tests:
+    test-etc-audit-auditd-conf-space-left-action-email:
+      test_title: /etc/audit/auditd.conf space_left_action = email
+      capability: independent.textfilecontent54
+      collection: etc-audit-auditd-conf-space-left-action-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: space_left_action = email
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^[Ee][Mm][Aa][Ii][Ll]$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-audit-auditd-conf-space-left-action-email

@@ -1,0 +1,89 @@
+assessment:
+  id: ng.shared.0e71c5d37d04377af94c65fb
+  version: 1
+  assessment_title: WN10-00-000100 - Internet Information System (IIS) or its subcomponents must not be installed on a workstation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-wmi57-collection:
+      collection_title: null
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-WebServerRole'
+    windows-wmi57-collection-2:
+      collection_title: null
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-HostableWebCore'
+  tests:
+    test-internet-information-services-feature-not-installed:
+      test_title: '''Internet Information Services'' feature is not installed'
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: InstallState is equal to 2
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-internet-information-services-hostable-web-core-feature-not-installed:
+      test_title: '''Internet Information Services Hostable Web Core'' feature is not installed'
+      capability: windows.wmi57
+      collection: windows-wmi57-collection-2
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: InstallState is equal to 2
+        state_capability: windows.wmi57
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-internet-information-services-feature-not-installed
+    - test: test-internet-information-services-hostable-web-core-feature-not-installed

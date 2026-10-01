@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.0ef327fd06ada8eaab91c461
+  version: 1
+  assessment_title: Amazon Linux 2023 must ensure a sticky bit be set on all public directories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    check-see-that-all-world-writable-directories-have-sticky-bit-collection:
+      collection_title: Check to see that all world-writable directories have the sticky bit set. Gather world-writable directories.
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        match:
+          field: owrite
+          value: '0'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Filter exclude directories that are not world writable.
+        capability: unix.file
+      - action: exclude
+        match:
+          field: sticky
+          value: '1'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Filter exclude any with sticky bit.
+        capability: unix.file
+      behaviors:
+        recurse_direction: down
+        recurse: directories
+        max_depth: '-1'
+  tests:
+    test-check-that-all-world-writable-directories-have-sticky-bit-set:
+      test_title: Check that all world-writable directories have the sticky bit set.
+      capability: unix.file
+      collection: check-see-that-all-world-writable-directories-have-sticky-bit-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-check-that-all-world-writable-directories-have-sticky-bit-set

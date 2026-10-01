@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.0fae4514f9d0551e6df699ec
+  version: 1
+  assessment_title: The operating system must be a supported release.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    os-information-collection:
+      collection_title: OS information
+      capability: unix.uname
+  tests:
+    test-installed-operating-system-s-name-sunos:
+      test_title: Installed operating system's name is SunOS
+      capability: unix.uname
+      collection: os-information-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: The OS name
+        state_capability: unix.uname
+        state:
+          field: os_name
+          value: SunOS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-installed-operating-system-release-5-11:
+      test_title: Installed operating system is release 5.11
+      capability: unix.uname
+      collection: os-information-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: The release of the installed OS
+        state_capability: unix.uname
+        state:
+          field: os_release
+          value: '5.11'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-installed-operating-system-s-name-sunos
+    - test: test-installed-operating-system-release-5-11

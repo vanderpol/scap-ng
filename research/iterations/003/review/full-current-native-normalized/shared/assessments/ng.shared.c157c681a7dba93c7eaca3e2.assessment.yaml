@@ -1,0 +1,83 @@
+assessment:
+  id: ng.shared.c157c681a7dba93c7eaca3e2
+  version: 1
+  assessment_title: Lockout Duration
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    lockout-policy-collection:
+      collection_title: Lockout policy
+      capability: windows.lockoutpolicy
+  tests:
+    test-account-lockout-duration-set-0:
+      test_title: '''Account lockout duration'' is set to ''0'''
+      capability: windows.lockoutpolicy
+      collection: lockout-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: Lockout Duration equals -1
+          capability: windows.lockoutpolicy
+          state:
+            field: lockout_duration
+            value: '0'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: lockout duration is forever,option2
+          capability: windows.lockoutpolicy
+          state:
+            field: lockout_duration
+            value: '4294967295'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-account-lockout-threshold-not-set-0:
+      test_title: '''Account lockout threshold'' is not set to ''0'''
+      capability: windows.lockoutpolicy
+      collection: lockout-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Lockout Threshold is greater than 0
+        state_capability: windows.lockoutpolicy
+        state:
+          field: lockout_threshold
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-account-lockout-duration-set-15-or-greater:
+      test_title: '''Account lockout duration'' is set to ''15 or greater'''
+      capability: windows.lockoutpolicy
+      collection: lockout-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Lockout Duration is greater than or equal to 15 minutes
+        state_capability: windows.lockoutpolicy
+        state:
+          field: lockout_duration
+          value: '900'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - all:
+      - test: test-account-lockout-duration-set-0
+      - test: test-account-lockout-threshold-not-set-0
+    - all:
+      - test: test-account-lockout-duration-set-15-or-greater
+      - test: test-account-lockout-threshold-not-set-0

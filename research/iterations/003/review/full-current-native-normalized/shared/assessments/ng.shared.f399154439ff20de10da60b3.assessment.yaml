@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.f399154439ff20de10da60b3
+  version: 1
+  assessment_title: AZLX-23-002055 - Amazon Linux 2023 must immediately notify the system administrator (SA) and information
+    system security officer (ISSO), at a minimum, of an audit processing failure event.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)^\s*action_mail_acct\s*=\s*(\w+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-audit-auditd-conf-action-mail-acct-root:
+      test_title: '/etc/audit/auditd.conf: action_mail_acct = root'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)^root$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-audit-auditd-conf-action-mail-acct-root

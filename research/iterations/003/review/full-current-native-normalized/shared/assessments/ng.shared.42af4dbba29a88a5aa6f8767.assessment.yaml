@@ -1,0 +1,134 @@
+assessment:
+  id: ng.shared.42af4dbba29a88a5aa6f8767
+  version: 1
+  assessment_title: AZLX-23-001230 - Amazon Linux 2023 SSHD must accept public key authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    sshd-config-includes-collection:
+      collection_title: sshd_config includes
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*include\s+(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+  tests:
+    test-sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      capability: independent.textfilecontent54
+      collection: sshd-config-includes-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /etc/ssh/sshd_config.d/*.conf
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-ssh-sshd-config-d-pubkeyauthentication-set-yes:
+      test_title: '/etc/ssh/sshd_config.d: PubkeyAuthentication is set to yes'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(yes|"yes")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-ssh-sshd-config-pubkeyauthentication-set-yes:
+      test_title: '/etc/ssh/sshd_config: PubkeyAuthentication is set to yes'
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(yes|"yes")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - all:
+      - test: test-sshd-config-includes-sshd-config-d
+      - test: test-etc-ssh-sshd-config-d-pubkeyauthentication-set-yes
+    - test: test-etc-ssh-sshd-config-pubkeyauthentication-set-yes

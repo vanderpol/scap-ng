@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.7a3af0a51c192fb669ce419d
+  version: 1
+  assessment_title: CISC-ND-000210 - The Cisco device must be configured to audit all administrator activity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    iosxe-line-collection:
+      collection_title: null
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          mask: false
+          value: show running-config
+    iosxe-global-collection:
+      collection_title: null
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: logging userinfo
+  tests:
+    test-check-archive-log-config-logging-enable:
+      test_title: Check for archive - log config - logging enable
+      capability: iosxe.line
+      collection: iosxe-line-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state_capability: iosxe.line
+        state:
+          field: config_line
+          value: \narchive\n log config\n(  \S+[^\n]*\n)*  logging enable\n
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-logging-userinfo:
+      test_title: logging userinfo
+      capability: iosxe.global
+      collection: iosxe-global-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-check-archive-log-config-logging-enable
+    - test: test-logging-userinfo

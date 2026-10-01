@@ -1,0 +1,106 @@
+assessment:
+  id: ng.shared.dd68e324529301ff8ef8caff
+  version: 1
+  assessment_title: AZLX-23-002020 - Amazon Linux 2023 must use a separate file system for the system audit data path.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    linux-partition-collection:
+      collection_title: null
+      capability: linux.partition
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: audit-data-directory-from-etc-audit-auditd-conf-variable
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: regex-find-audit-data-partition-in-etc-fstab-variable
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: independent-textfilecontent54-collection
+          field: subexpression
+    regex-find-audit-data-partition-in-etc-fstab-variable:
+      title: regex to find audit data partition in /etc/fstab
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: ^[^# \t]+\s+
+            datatype: string
+        - values:
+            collection: independent-textfilecontent54-collection
+            field: subexpression
+        - literal:
+            value: \s+
+            datatype: string
+  tests:
+    test-there-separate-file-system-audit-data-directory:
+      test_title: There is a separate file system for audit data directory.
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-there-separate-file-system-configured-audit-data-directory:
+      test_title: There is a separate file system configured for audit data directory.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection-2
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-there-separate-file-system-audit-data-directory
+    - test: test-there-separate-file-system-configured-audit-data-directory

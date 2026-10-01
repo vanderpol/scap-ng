@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.7dd0147e6d893d105f3425cc
+  version: 1
+  assessment_title: The system must not allow autologin capabilities from the GNOME desktop.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-pam-d-gdm-autologin-uncommented-lines-collection:
+      collection_title: /etc/pam.d/gdm-autologin uncommented lines
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/pam.d/gdm-autologin
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^#].*
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-pam-d-gdm-autologin-contains-no-auth-or-account:
+      test_title: /etc/pam.d/gdm-autologin contains no auth or account entries
+      capability: independent.textfilecontent54
+      collection: etc-pam-d-gdm-autologin-uncommented-lines-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: none satisfy
+        state_title: /etc/pam.d/gdm-autologin auth or account entries
+        state_capability: independent.textfilecontent54
+        state:
+          field: text
+          value: .*(auth|account).*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-pam-d-gdm-autologin-contains-no-auth-or-account

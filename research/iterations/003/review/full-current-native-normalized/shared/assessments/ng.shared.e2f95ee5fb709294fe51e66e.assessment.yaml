@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.e2f95ee5fb709294fe51e66e
+  version: 1
+  assessment_title: The macOS system must retain the session lock until the user reestablishes access using established identification
+    and authentication procedures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-screensaver-password-enforce-recommended-object-collection:
+      collection_title: system_settings_screensaver_password_enforce_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.screensaver'')\
+
+            .objectForKey(''askForPassword'').js
+
+            EOS'
+  tests:
+    test-system-settings-screensaver-password-enforce-recommended-test:
+      test_title: system_settings_screensaver_password_enforce_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-screensaver-password-enforce-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_screensaver_password_enforce_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-screensaver-password-enforce-recommended-test

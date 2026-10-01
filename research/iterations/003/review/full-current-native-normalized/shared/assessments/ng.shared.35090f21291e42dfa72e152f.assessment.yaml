@@ -1,0 +1,56 @@
+assessment:
+  id: ng.shared.35090f21291e42dfa72e152f
+  version: 1
+  assessment_title: All RHEL 8 local files and directories must have a valid owner.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    verify-all-local-files-directories-on-rhel-8-have-valid-collection:
+      collection_title: Verify all local files and directories on RHEL 8 have a valid owner.  Limit results to the first 100
+        failures found.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser -print | head -n 100
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+  tests:
+    test-verify-all-local-files-directories-on-rhel-8-have-valid:
+      test_title: Verify all local files and directories on RHEL 8 have a valid owner.
+      capability: independent.shellcommand
+      collection: verify-all-local-files-directories-on-rhel-8-have-valid-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify that no files/directories are found to be non-compliant to the STIG
+        state_capability: independent.shellcommand
+        state:
+          all:
+          - field: exit_status
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stdout_line
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: none_exist
+  evaluate:
+    test: test-verify-all-local-files-directories-on-rhel-8-have-valid

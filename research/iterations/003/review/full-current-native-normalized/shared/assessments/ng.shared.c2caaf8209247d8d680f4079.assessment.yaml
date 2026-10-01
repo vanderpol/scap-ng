@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.c2caaf8209247d8d680f4079
+  version: 1
+  assessment_title: The Exchange SMTP automated banner response must not reveal server details.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    run-get-receiveconnector-display-banner-configuration-collection:
+      collection_title: Run Get-ReceiveConnector to display Banner configuration
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: add-pssnapin Microsoft.Exchange.Management.Powershell.Snapin;Get-ReceiveConnector | Select-Object -Property
+            Name, Identity, Banner | Format-Table -HideTableHeaders | Out-String -Width 4096
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: \w
+      behaviors:
+        error_if_stderr_exists: 'true'
+  tests:
+    test-each-receive-connector-if-value-banner-not-set-220-smtp:
+      test_title: For each Receive connector, if the value of Banner is not set to 220 SMTP Server Ready, this is a finding.
+      capability: independent.shellcommand
+      collection: run-get-receiveconnector-display-banner-configuration-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify value is 220 SMTP Server Ready
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: (?i)220 SMTP Server Ready\s*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-each-receive-connector-if-value-banner-not-set-220-smtp

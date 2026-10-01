@@ -1,0 +1,42 @@
+assessment:
+  id: ng.shared.755fd17b4b5ad86e0bfbb730
+  version: 1
+  assessment_title: The macOS system must disable Remote Management.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-remote-management-disable-recommended-object-collection:
+      collection_title: system_settings_remote_management_disable_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /usr/libexec/mdmclient QuerySecurityInfo 2>/dev/null | /usr/bin/grep "RemoteDesktopEnabled = 0"
+  tests:
+    test-system-settings-remote-management-disable-recommended-test:
+      test_title: system_settings_remote_management_disable_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-remote-management-disable-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_remote_management_disable_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-remote-management-disable-recommended-test

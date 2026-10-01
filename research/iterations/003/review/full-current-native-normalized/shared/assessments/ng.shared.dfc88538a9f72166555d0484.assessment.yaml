@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.dfc88538a9f72166555d0484
+  version: 1
+  assessment_title: Reversible Password Encryption
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    password-policy-collection:
+      collection_title: Password policy
+      capability: windows.passwordpolicy
+  variables:
+    enforce-reversible-encryption-when-storing-passwords-variable:
+      title: Enforce Reversible Encryption When Storing Passwords
+      kind: external
+      datatype: boolean
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: password_reversible_encryption_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-store-password-using-reversible-encryption-set-disabled:
+      test_title: '''Store password using reversible encryption'' is set to ''Disabled'''
+      capability: windows.passwordpolicy
+      collection: password-policy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reversible Encryption equals variable
+        state_capability: windows.passwordpolicy
+        state:
+          field: reversible_encryption
+          value:
+            variable: enforce-reversible-encryption-when-storing-passwords-variable
+          operation: equals
+          datatype: boolean
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-store-password-using-reversible-encryption-set-disabled

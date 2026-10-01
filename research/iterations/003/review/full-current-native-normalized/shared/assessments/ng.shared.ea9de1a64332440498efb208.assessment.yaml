@@ -1,0 +1,50 @@
+assessment:
+  id: ng.shared.ea9de1a64332440498efb208
+  version: 1
+  assessment_title: All local interactive user home directories must be group-owned by the home directory owners primary group.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-all-interactive-users-home-directories-not-group-owned-that-collection:
+      collection_title: Retrieve all interactive users' home directories are not group owned that user.
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: 'getent passwd | awk -F: ''$3>=1000 && $7 !="/bin/nologin" && $1 != "nobody" { print $1 ":" $6 ":" $4 }''
+            | while IFS='':'' read -r user homedir usergroup; do filegroup=$(stat -c ''%g'' "$homedir"); [ "$usergroup" !=
+            "$filegroup" ] && echo "User home directory for $user is not group owned by the user''s group. User: $user. HomeDir:
+            $homedir. User Group: $usergroup. HomeDir Group: $filegroup."; done'
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ''
+  tests:
+    test-confirm-interactive-user-s-home-directories-group-owned-by-each:
+      test_title: Confirm interactive user's home directories are group owned by each respective user.
+      capability: independent.shellcommand
+      collection: retrieve-all-interactive-users-home-directories-not-group-owned-that-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: Confirm that no home directories are reported with file group owner different from the user's main group.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    test: test-confirm-interactive-user-s-home-directories-group-owned-by-each

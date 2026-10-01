@@ -1,0 +1,72 @@
+assessment:
+  id: ng.shared.cd86e865af0a21d6b0787091
+  version: 1
+  assessment_title: TS/RDS - Password Prompting
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows NT\Terminal Services
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fPromptForPassword
+  variables:
+    always-prompt-password-upon-connection-variable:
+      title: Always prompt for password upon connection
+      kind: external
+      datatype: int
+      input:
+        required: true
+        cardinality: one_or_more
+        parameter: always_prompt_for_password_upon_connection_var
+        validation:
+          alternatives:
+          - literal: '0'
+            hint: disabled
+          - literal: '1'
+            hint: enabled
+  tests:
+    test-always-prompt-password-upon-connection-set-enabled:
+      test_title: '''Always prompt for password upon connection'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Reg_Dword type and value equals variable
+        state_capability: windows.registry
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value:
+              variable: always-prompt-password-upon-connection-variable
+            operation: equals
+            datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-always-prompt-password-upon-connection-set-enabled

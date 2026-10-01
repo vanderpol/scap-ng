@@ -1,0 +1,52 @@
+assessment:
+  id: ng.shared.10d927d4cef151f5e651ca5c
+  version: 1
+  assessment_title: The macOS system must prevent nonprivileged users from executing privileged functions to include disabling,
+    circumventing, or altering implemented security safeguards/countermeasures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    system-settings-system-wide-preferences-configure-recommended-object-collection:
+      collection_title: system_settings_system_wide_preferences_configure_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\"\
+            \ \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\"\
+            )\nresult=\"1\"\nfor section in ${authDBs[@]}; do\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\"\
+            \ | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"shared\")]/following-sibling::*[1])' -) != \"false\"\
+            \ ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint\
+            \ -xpath '//*[contains(text(), \"group\")]/following-sibling::*[1]/text()' - ) != \"admin\" ]]; then\n    result=\"\
+            0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(),\
+            \ \"authenticate-user\")]/following-sibling::*[1])' -) != \"true\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security\
+            \ -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"session-owner\"\
+            )]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\ndone\necho $result"
+  tests:
+    test-system-settings-system-wide-preferences-configure-recommended-test:
+      test_title: system_settings_system_wide_preferences_configure_recommended_test
+      capability: independent.shellcommand
+      collection: system-settings-system-wide-preferences-configure-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: system_settings_system_wide_preferences_configure_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-settings-system-wide-preferences-configure-recommended-test

@@ -1,0 +1,48 @@
+assessment:
+  id: ng.shared.a6dcd8adf068152743e4b6e1
+  version: 1
+  assessment_title: The macOS system must allow smart card authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    auth-smartcard-allow-recommended-object-collection:
+      collection_title: auth_smartcard_allow_recommended_object
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: zsh
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: '/usr/bin/osascript -l JavaScript << EOS
+
+            $.NSUserDefaults.alloc.initWithSuiteName(''com.apple.security.smartcard'')\
+
+            .objectForKey(''allowSmartCard'').js
+
+            EOS'
+  tests:
+    test-auth-smartcard-allow-recommended-test:
+      test_title: auth_smartcard_allow_recommended_test
+      capability: independent.shellcommand
+      collection: auth-smartcard-allow-recommended-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: auth_smartcard_allow_recommended_state
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-auth-smartcard-allow-recommended-test

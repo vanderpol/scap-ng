@@ -1,0 +1,37 @@
+assessment:
+  id: ng.shared.b58bd97a04884a58090c8feb
+  version: 1
+  assessment_title: OL08-00-040250 - OL 8 must not forward IPv6 source-routed packets by default.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      capability: unix.sysctl
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv6.conf.default.accept_source_route
+  tests:
+    test-net-ipv6-conf-default-accept-source-route-setting-in-kernel:
+      test_title: net.ipv6.conf.default.accept_source_route setting in kernel is set to 0
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv6-conf-default-accept-source-route-setting-in-kernel

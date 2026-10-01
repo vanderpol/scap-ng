@@ -1,0 +1,86 @@
+assessment:
+  id: ng.shared.a204b9c1e6d9d9f60e80e177
+  version: 1
+  assessment_title: Software certificate installation files must be removed from Windows 10.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    search-p12-files-collection:
+      collection_title: Search for .p12 files
+      capability: windows.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.[Pp]12$
+      filters:
+      - action: exclude
+        match:
+          field: filepath
+          value: '[Aa]dobe.+Preflight\.p12$'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Preflight.p12 Adobe file should not report failure
+        capability: windows.file
+      - action: exclude
+        match:
+          field: filepath
+          value: '[Ee]wallet\.p12$'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: ewallet.p12 Oracle Wallet Manager should not report failure
+        capability: windows.file
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+    search-pfx-files-collection:
+      collection_title: Search for .pfx files
+      capability: windows.file
+      select:
+        path:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.[Pp][Ff][Xx]$
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+  tests:
+    test-software-certificate-installation-files-removed-p12-files:
+      test_title: Software certificate installation files must be removed. .p12 files
+      capability: windows.file
+      collection: search-p12-files-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-software-certificate-installation-files-removed-pfx-files:
+      test_title: Software certificate installation files must be removed. .pfx files
+      capability: windows.file
+      collection: search-pfx-files-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-software-certificate-installation-files-removed-p12-files
+    - test: test-software-certificate-installation-files-removed-pfx-files
