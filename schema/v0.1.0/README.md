@@ -39,6 +39,8 @@ The current executable schemas cover:
 12. Object collection results
 13. Variable results
 14. Scan-level result index
+15. Per-Item State results
+16. State Entity results
 
 JSON Schema validates document shape, required fields, basic types, selected
 enumerated vocabularies, and manual-versus-automated structural requirements.
