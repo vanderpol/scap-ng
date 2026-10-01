@@ -155,6 +155,8 @@ The compiler SHOULD omit authoring comments from canonical scanner packages.
 A separate conversion report MAY preserve complete machine-readable legacy
 lineage.
 
+Migration, conversion, and repository-normalization evidence SHALL remain outside the native scanner-facing content graph. Such evidence MAY reference native logical identities for traceability, but native Benchmark, Rule, Assessment, Collection, and applicability objects SHALL NOT depend on conversion evidence to execute. A compiler SHALL NOT include migration diagnostics, source-defect reports, round-trip traces, or normalization lineage in a scanner package by default. Any future standardized provenance package member SHALL be explicitly typed and separable from Assessment evaluation semantics.
+
 <!-- spec-nav:start -->
 
 ---
