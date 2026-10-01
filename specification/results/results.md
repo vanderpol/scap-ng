@@ -259,6 +259,99 @@ actual class.
 `information` is reserved as a candidate future class and SHALL NOT be
 treated as normative until approved through OVAL Board / SCAP-NG governance.
 
+
+## 15. Assessment Result file cardinality
+
+A canonical SCAP-NG result package SHALL produce one Assessment Result artifact
+for each Assessment invocation that contributes to the run.
+
+For the common case in which a Benchmark-selected Assessment is invoked once
+against one target with one effective binding, this is a 1:1 relationship:
+
+- one authored Assessment file;
+- one corresponding Assessment Result file for that invocation.
+
+If the same Assessment is invoked more than once with materially different
+bindings, targets, or execution contexts, each invocation SHALL have its own
+execution identity and Assessment Result artifact.
+
+Assessment Result artifacts SHALL be independently understandable. They SHALL
+NOT require another Assessment Result file merely to resolve the Tests, Objects,
+Items, Variable bindings, or evidence needed to explain their outcome. Shared
+runtime collection work MAY be reused, but observations required by the
+consuming Assessment Result SHALL be represented in that result according to
+the final imported-Item rules.
+
+Benchmark/Rule results SHOULD reference the corresponding Assessment Result
+execution identity rather than embedding the complete detailed execution graph.
+
+## 16. Failure counts and evidence maximums
+
+Assessment Result and Benchmark/Rule Result reporting SHOULD use the same
+terminology for bounded failure evidence.
+
+The canonical terms are:
+
+- `observed_failures`: failures actually encountered during evaluation;
+- `actual_failures`: the total failure population when known, otherwise
+  `unknown`;
+- `maximum`: the configured maximum number of failure-evidence records to
+  retain/return; this is an evidence maximum, **not** a compliance threshold;
+- `returned`: failure-evidence records actually retained in the result;
+- `truncated_population`: whether the returned failure evidence represents
+  only part of the known/observed failing population;
+- `logical_complete`: enough evaluation occurred to determine the Assessment
+  truth/result;
+- `population_complete`: the relevant population was evaluated completely;
+- `evidence_complete`: all evidence required by the configured retention
+  policy was retained;
+- `stop_reason`: why evaluation stopped, including
+  `evidence_maximum_reached` where appropriate.
+
+A fully evaluated example may report:
+
+    evaluation:
+      logical_complete: true
+      population_complete: true
+      evidence_complete: true
+      stop_reason: complete
+      evaluated_items: 34
+
+    summary:
+      observed_failures: 3
+      actual_failures: 3
+
+    evidence:
+      failures:
+        maximum: 50
+        returned: 3
+        truncated_population: false
+
+If evaluation is deliberately stopped after 20 failures because the configured
+evidence maximum has been reached, the result may instead report:
+
+    evaluation:
+      logical_complete: true
+      population_complete: false
+      evidence_complete: false
+      stop_reason: evidence_maximum_reached
+      evaluated_items: 1847
+
+    summary:
+      observed_failures: 20
+      actual_failures: unknown
+
+    evidence:
+      failures:
+        maximum: 20
+        returned: 20
+        truncated_population: true
+
+The word `threshold` SHOULD NOT be used for this evidence-retention setting,
+because it may incorrectly imply that compliance truth changes when the value
+is reached.
+
+
 <!-- spec-nav:start -->
 
 ---
