@@ -153,6 +153,7 @@ def generic_entity_schema(allowed_datatypes):
             "entity_check": {"type": "string", "minLength": 1},
             "entity_existence": {"type": "string", "minLength": 1},
             "var_check": {"type": "string", "minLength": 1},
+            "nil": {"type": "boolean"},
         },
         "additionalProperties": False,
         "anyOf": [
