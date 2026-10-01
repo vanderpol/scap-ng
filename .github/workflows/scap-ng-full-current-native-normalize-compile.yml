@@ -125,6 +125,37 @@ jobs:
           Path("work/evidence/generation-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
           print(json.dumps({k:v for k,v in summary.items() if k!="blocked_packages"},indent=2))
           PY
+      - name: Preserve conversion output for review
+        run: |
+          python - <<'PY'
+          import shutil
+          from pathlib import Path
+
+          review = Path("work/evidence/conversion-output")
+          (review / "logs").mkdir(parents=True, exist_ok=True)
+          (review / "status").mkdir(parents=True, exist_ok=True)
+          (review / "source-generation").mkdir(parents=True, exist_ok=True)
+
+          for p in sorted(Path("downloads").rglob("logs/*.log")):
+              target = review / "logs" / p.name
+              if target.exists():
+                  raise SystemExit(f"Duplicate conversion log name: {p.name}")
+              shutil.copy2(p, target)
+
+          for p in sorted(Path("downloads").rglob("status/*.json")):
+              target = review / "status" / p.name
+              if target.exists():
+                  raise SystemExit(f"Duplicate conversion status name: {p.name}")
+              shutil.copy2(p, target)
+
+          for p in sorted(Path("work/fresh-current").glob("*/source-generation.json")):
+              target = review / "source-generation" / f"{p.parent.name}.source-generation.json"
+              shutil.copy2(p, target)
+
+          print(f"conversion_logs={len(list((review/'logs').glob('*.log')))}")
+          print(f"conversion_status={len(list((review/'status').glob('*.json')))}")
+          print(f"source_generation_summaries={len(list((review/'source-generation').glob('*.json')))}")
+          PY
       - name: Refuse historical generated input
         run: |
           python - <<'PY'
@@ -213,18 +244,67 @@ jobs:
             work/evidence
           if-no-files-found: error
           compression-level: 6
-      - name: Publish compact evidence to main
+      - name: Publish normalization review snapshot to main
         working-directory: scap-ng
         run: |
           set -euo pipefail
-          dst="research/iterations/003/evidence/full-current-native-normalize-compile"
-          rm -rf "$dst"; mkdir -p "$dst"
-          cp ../work/evidence/*.json "$dst"/
-          cp ../work/evidence/README.md "$dst"/README.md
+
+          evidence_dst="research/iterations/003/evidence/full-current-native-normalize-compile"
+          review_dst="research/iterations/003/review/full-current-native-normalized"
+
+          rm -rf "$evidence_dst" "$review_dst"
+          mkdir -p "$evidence_dst" "$review_dst/shared" "$review_dst/evidence"
+
+          # Keep the compact machine-readable evidence location stable.
+          cp ../work/evidence/*.json "$evidence_dst"/
+          cp ../work/evidence/README.md "$evidence_dst"/README.md
+
+          # Publish the actual post-normalizer canonical shared Assessments for
+          # design review.  Do not add conversion/normalization provenance to
+          # native Assessment files; that evidence remains separate below.
+          cp -R ../work/normalized-current/shared/assessments "$review_dst/shared/"
+
+          # Preserve converter output, handled-error/status records, source
+          # generation summaries, and normalization/compiler statistics beside
+          # the reviewable shared Assessment snapshot.
+          cp -R ../work/evidence/conversion-output "$review_dst/"
+          cp ../work/evidence/*.json "$review_dst/evidence"/
+
+          cp ../work/evidence/README.md "$review_dst/README.md"
+          cat >> "$review_dst/README.md" <<'EOF'
+
+## Review snapshot layout
+
+This directory is a generated **iteration-003 review artifact**, not hand-authored
+normative SCAP-NG source.
+
+- `shared/assessments/` — canonical Assessments after exact semantic
+  normalization across the complete pinned NIWC Current corpus.
+- `conversion-output/logs/` — stdout/stderr captured from each SCAP 1.4 to
+  native NG conversion invocation. These are retained so handled warnings,
+  exclusions, and source-content problems can be reviewed.
+- `conversion-output/status/` — per-package converter exit/status records.
+- `conversion-output/source-generation/` — per-package structured generation
+  summaries emitted by the conversion scripts.
+- `evidence/normalizer-report.json` — exact-reuse groups, complete
+  source/consumer lineage, near-duplicate review candidates, and reuse totals.
+- `evidence/experiment-summary.json` — compact corpus-wide generation,
+  normalization, and compile statistics.
+- `evidence/compiler-before.json` and `compiler-after.json` — package metrics
+  before and after repository normalization.
+- `evidence/native-schema-census.json` — native construct census used for
+  schema stabilization.
+
+The shared Assessment files intentionally contain only native Assessment data.
+Conversion and normalization provenance is kept in the adjacent evidence so a
+reviewer can inspect lineage without making migration metadata part of the
+native authoring model.
+EOF
+
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$dst"
+          git config user.email "4189824+github-actions[bot]@users.noreply.github.com"
+          git add "$evidence_dst" "$review_dst"
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "Publish full NIWC native normalization experiment"
+          git commit -m "Publish normalized shared Assessment review snapshot"
           git pull --rebase origin main
           git push
