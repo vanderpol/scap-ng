@@ -1,0 +1,109 @@
+assessment_result:
+  result_schema_version: 0.1.0-draft
+  execution_id: example-rhel9-system-account-shells-1
+
+  assessment:
+    source_oval_definition_id: oval:mil.disa.stig.defs:def:258046
+    version: 2
+    assessment_title: The operating system system accounts must not have an interactive login shell.
+
+  class: compliance
+  purpose: assessment
+  mode: automated
+  outcome: false
+
+  evaluation:
+    logical_complete: true
+    population_complete: true
+    evidence_complete: true
+    stop_reason: complete
+    evaluated_items: 34
+
+  summary:
+    observed_failures: 3
+    actual_failures: 3
+
+  evidence:
+    failures:
+      maximum: 50
+      returned: 3
+      truncated_population: false
+
+  evaluate_result:
+    test: test-system-account-shells
+    outcome: false
+
+  tests:
+    - id: test-system-account-shells
+      source_oval_test_id: oval:mil.disa.stig.unix:tst:25804600
+      test_title: The system accounts in /etc/passwd use /sbin/nologin.
+      capability: unix.password
+      outcome: false
+      existence: at_least_one_exists
+      check: all
+      object_ref: object-system-accounts
+      state_refs: [state-nologin]
+      item_count: 34
+      failing_item_refs: [item-sync, item-shutdown, item-halt]
+      decisive_explanation:
+        reason: value_mismatch
+        observed_items: 34
+        observed_failures: 3
+        actual_failures: 3
+        message: 3 of 34 evaluated system accounts have interactive login shells.
+
+  objects:
+    - id: object-system-accounts
+      source_oval_object_id: oval:mil.disa.stig.unix:obj:25804601
+      object_title: only system accounts
+      capability: unix.password
+      collection_status: complete
+      item_count: 34
+
+  states:
+    - id: state-nologin
+      source_oval_state_id: oval:mil.disa.stig.unix:ste:25804600
+      expected:
+        login_shell:
+          operation: pattern_match
+          value: /sbin/nologin|/usr/sbin/nologin
+
+  # Only the three failing Items are expanded in this review projection.
+  # The canonical self-contained result would retain/import the complete local
+  # Item set according to the final evidence/item retention rules.
+  items:
+    - id: item-sync
+      source_item_id: "91"
+      capability: unix.password
+      status: exists
+      fields:
+        username: sync
+        user_id: 5
+        home_dir: /sbin
+        login_shell: /bin/sync
+      test_result: false
+
+    - id: item-shutdown
+      source_item_id: "92"
+      capability: unix.password
+      status: exists
+      fields:
+        username: shutdown
+        user_id: 6
+        home_dir: /sbin
+        login_shell: /sbin/shutdown
+      test_result: false
+
+    - id: item-halt
+      source_item_id: "93"
+      capability: unix.password
+      status: exists
+      fields:
+        username: halt
+        user_id: 7
+        home_dir: /sbin
+        login_shell: /sbin/halt
+      test_result: false
+
+  variables: []
+  diagnostics: []
