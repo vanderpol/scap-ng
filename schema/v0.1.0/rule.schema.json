@@ -147,13 +147,53 @@
         },
         "organizational_input_requirements": {
           "type": "object",
-          "description": "Rule-level discoverability map of Organizational Input dependencies by Assessment choice. Always present; empty when no choice depends on Organizational Input.",
+          "description": "Rule-level discoverability map of Organizational Input dependencies by Assessment choice. Always present; empty when no choice depends on Organizational Input. Technical use locations are identified by Test, State, and State slot.",
           "additionalProperties": {
             "type": "array",
-            "uniqueItems": true,
             "items": {
-              "type": "string",
-              "minLength": 1
+              "type": "object",
+              "required": [
+                "input",
+                "uses"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "required": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "uses": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "test",
+                      "state",
+                      "state_slot"
+                    ],
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "state": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "state_slot": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
             }
           }
         }
