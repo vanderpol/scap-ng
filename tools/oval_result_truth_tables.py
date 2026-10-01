@@ -386,10 +386,11 @@ def evaluate_variable_entity_reference(
 ):
     """Propagate variable resolution status into State/Object entity evaluation.
 
-    A zero-value variable has already normalized to ERROR via
-    resolve_variable_reference(). Non-success variable status is propagated
-    before any var_check/entity_check aggregation; quantifiers cannot turn an
-    unresolved/error variable into a successful predicate.
+    Zero-value cardinality must be resolved through apply_variable_reference_context()
+    before this helper is called because Object and State references intentionally
+    diverge. Non-success variable status is propagated before any
+    var_check/entity_check aggregation; quantifiers cannot turn an unresolved or
+    error-like variable into a successful predicate.
     """
     if variable_status != TRUE:
         if variable_status not in RESULTS:
