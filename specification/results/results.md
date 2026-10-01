@@ -103,11 +103,44 @@ This SHOULD include, as applicable:
 - bounded evidence;
 - Assessment mode;
 - effective check selector and Assessment Method identity;
+- `expected_state`, always present;
 - Tailoring and Organizational Input provenance where relevant.
 
 The full Rule discussion, remediation, Manual Assessment procedure, and
 Assessment implementation SHOULD NOT automatically be copied into every Rule
 result.
+
+## Expected-state visibility
+
+Every Rule Result SHALL expose an `expected_state` collection, including when
+all expected values come directly from publisher-authored Assessment State and
+no Organizational Input is involved.
+
+The purpose is interoperability: consumers SHALL NOT be required to discover a
+rare result element only when an exceptional policy source is encountered.
+`expected_state` is therefore a stable part of the Rule Result contract.
+
+For an automated Rule Result, each expected-state entry SHOULD identify, as
+applicable:
+
+- State identity or structural path;
+- State slot/entity identity;
+- datatype;
+- comparison operation;
+- entity/state quantifier semantics needed to interpret the value;
+- effective expected value or protected/redacted representation;
+- source of that value, such as `publisher`, `publisher_profile`, or
+  `organizational_input`;
+- source/provenance reference when the value was not directly publisher-authored.
+
+When a Rule has no materialized expected State (for example, a procedure-only
+Manual Assessment), `expected_state` SHALL still be present as an empty
+collection unless the final manual-result model defines an equivalent populated
+representation. Absence of the field SHALL NOT be used to signal 'not used'.
+
+For organization-defined expected values, the same expected-state entry format
+SHALL be used. Organizational Input therefore changes the `source` and adds a
+provenance reference; it does not introduce a separate hidden result surface.
 
 ## 6. Deterministic message
 
