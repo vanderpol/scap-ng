@@ -236,6 +236,42 @@ Organizational Input is policy data only. It SHALL NOT:
 Its effect is limited to supplying typed expected-state/input values at
 explicitly declared bindings.
 
+## Scanner capability and Rule discoverability
+
+Support for collecting or resolving Organizational Input MAY be an optional
+scanner capability. A scanner that does not implement Organizational Input
+resolution MAY still process the Benchmark and report affected Rules as not
+evaluated.
+
+Every Rule SHALL expose an `organizational_input_requirements` structure, even
+when empty, so a scanner can determine from the Rule which Assessment choices
+depend on Organizational Input without first executing or deeply interpreting
+the Assessment graph.
+
+The Rule-level declaration is discoverability metadata. The authoritative
+technical binding remains in the selected Assessment's expected-State/input
+contract. Compilation SHALL verify that the Rule-level declaration and the
+selected Assessment binding agree.
+
+A scanner that advertises Organizational Input support SHALL validate supplied
+values against the applicable declared contract before using them. A scanner
+SHALL NOT claim support and then bypass type/cardinality/schema validation.
+
+Outcome behavior for an effectively selected Rule is:
+
+- scanner does not support required Organizational Input -> `not_evaluated`
+  with reason `unsupported_organizational_input`;
+- scanner supports it but a required value was not supplied -> `not_evaluated`
+  with reason `missing_organizational_input`;
+- a value was supplied but fails the declared schema/type/cardinality/
+  constraint validation -> `not_evaluated` with reason
+  `invalid_organizational_input`;
+- a valid value is available -> materialize the expected State and evaluate
+  normally; ordinary Assessment truth then maps to Rule pass/fail semantics.
+
+None of these first three conditions is evidence that the target itself is
+noncompliant or not applicable.
+
 ## Publisher Profile Parameter refinement
 
 A publisher Profile MAY resolve a publisher-defined Parameter differently from
