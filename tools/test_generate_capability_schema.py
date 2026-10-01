@@ -60,7 +60,14 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             {"none","files","files and directories"},
         )
         self.assertEqual(direction_deprecated,{"up"})
-        self.assertIn("up",props["recurse_direction"]["enum"])
+        self.assertNotIn("up",props["recurse_direction"]["enum"])
+        self.assertNotIn("none",props["recurse"]["enum"])
+        self.assertNotIn("files",props["recurse"]["enum"])
+        self.assertNotIn("files and directories",props["recurse"]["enum"])
+        self.assertEqual(
+            props["recurse_direction"]["x-scap-ng-deprecated-enum-policy"],
+            "reject",
+        )
 
     def test_valid_filepath_object(self):
         self.validate_def("object", {
@@ -74,6 +81,33 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 }
             },
         })
+
+    def test_deprecated_behavior_values_are_rejected(self):
+        for key,value in (
+            ("recurse_direction","up"),
+            ("recurse","none"),
+            ("recurse","files"),
+            ("recurse","files and directories"),
+        ):
+            with self.subTest(key=key,value=value):
+                with self.assertRaises(jsonschema.ValidationError):
+                    self.validate_def("object", {
+                        "object_title": None,
+                        "capability": "unix.file",
+                        "select": {
+                            "path": {
+                                "value": "/etc",
+                                "operation": "equals",
+                                "datatype": "string",
+                            },
+                            "filename": {
+                                "value": "passwd",
+                                "operation": "equals",
+                                "datatype": "string",
+                            },
+                        },
+                        "behaviors": {key:value},
+                    })
 
     def test_valid_path_filename_object(self):
         self.validate_def("object", {
