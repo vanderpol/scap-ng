@@ -43,6 +43,89 @@ def profile_description(element):
     return value
 
 
+def _typed_xccdf_value(raw, kind):
+    if raw is None:
+        return None
+    if kind == "boolean":
+        value=raw.strip().lower()
+        if value in ("true","1"): return True
+        if value in ("false","0"): return False
+        raise ValueError("Invalid XCCDF boolean Value: "+raw)
+    if kind == "number":
+        value=raw.strip()
+        try:
+            return int(value,10)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError as exc:
+                raise ValueError("Invalid XCCDF number Value: "+raw) from exc
+    return raw
+
+
+def render_parameters(xr):
+    """Render the scalar XCCDF Value surface proven by the pinned corpus."""
+    parameters=[]
+    source_to_native={}
+    used=set()
+    for node in xr.findall(".//x:Value",source.NS):
+        source_id=node.get("id")
+        if not source_id:
+            raise ValueError("XCCDF Value missing id")
+        kind=node.get("type") or "string"
+        if kind not in ("string","boolean","number"):
+            raise ValueError("Unsupported XCCDF Value type: "+kind)
+        base=[child for child in node.findall("x:value",source.NS) if child.get("selector") is None]
+        if len(base)!=1:
+            raise ValueError(source_id+": expected exactly one unselected XCCDF value")
+        native_id=source.safe_id(source_id.split("_value_",1)[-1])
+        if native_id in used:
+            raise ValueError("Duplicate native Parameter id: "+native_id)
+        used.add(native_id); source_to_native[source_id]=native_id
+        choices=[]
+        for child in node.findall("x:value",source.NS):
+            selector=child.get("selector")
+            if selector is None:
+                continue
+            choices.append({
+                "selector":selector,
+                "value":_typed_xccdf_value(source.text(child),kind),
+            })
+        description=source.text(node.find("x:description",source.NS)) or source.text(node.find("x:title",source.NS))
+        constraints={}
+        operator=node.get("operator") or "equals"
+        if operator!="equals":
+            constraints["comparison_operator"]=operator
+        if choices:
+            constraints["choices"]=choices
+        parameters.append({
+            "id":native_id,
+            "type":kind,
+            "description":description,
+            "source":"publisher",
+            "value":_typed_xccdf_value(source.text(base[0]),kind),
+            "tailorable":(node.get("prohibitChanges") or "false").lower() not in ("true","1"),
+            "required":False,
+            "constraints":constraints,
+        })
+    return parameters,source_to_native
+
+
+def check_parameter_bindings(check, parameter_ids):
+    bindings={}
+    for export in check.findall("x:check-export",source.NS):
+        variable=export.get("export-name"); value_id=export.get("value-id")
+        if not variable or not value_id:
+            raise ValueError("Invalid XCCDF check-export")
+        if value_id not in parameter_ids:
+            raise ValueError("Unresolved XCCDF Value binding: "+value_id)
+        prior=bindings.get(variable)
+        if prior and prior!=parameter_ids[value_id]:
+            raise ValueError("Conflicting XCCDF check-export binding: "+variable)
+        bindings[variable]=parameter_ids[value_id]
+    return bindings
+
+
 def render_profiles(xr, resolved, baseline, expected):
     if not all(baseline.values()):
         raise ValueError('Source baseline disables Rules; native Benchmark membership enables every Rule')
@@ -166,8 +249,9 @@ def main(argv=None):
     rs=source.records(xr); by_source={r['source_rule_id']:r['id'] for r in rs}
     if len(rs)!=len(by_source) or len(rs)!=len({r['id'] for r in rs}): raise ValueError('Duplicate Rules')
     # Reject unsupported policy forms rather than flattening them silently.
-    for name in ('Value','complex-check'):
-        if xr.findall('.//x:'+name,source.NS): raise ValueError('Full review does not yet support '+name)
+    if xr.findall('.//x:complex-check',source.NS):
+        raise ValueError('Full review does not yet support complex-check')
+    parameters,parameter_ids=render_parameters(xr)
     sr,sg,ancestry,resolved=extract_selection(args.input)
     baseline,expected=expected_selections(sr,sg,ancestry,resolved)
     profiles=render_profiles(xr,resolved,baseline,expected)
@@ -193,7 +277,9 @@ def main(argv=None):
                     original=ET.Element('{'+review.OD+'}oval_definitions')
                     for name in ('definitions','tests','objects','states','variables'):
                         ET.SubElement(original,'{'+review.OD+'}'+name)
-                result,failed_rule=review.convert_rule(rec,original,args.output,schema,temp)
+                result,failed_rule=review.convert_rule(
+                    rec,original,args.output,schema,temp,parameter_ids=parameter_ids
+                )
                 evidence['rules'].append(result); blocked=blocked or failed_rule
             quarantined=sum(
                 len(row.get('source_defect_fallbacks',[]))
