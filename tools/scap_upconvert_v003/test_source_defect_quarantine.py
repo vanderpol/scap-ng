@@ -51,6 +51,18 @@ class SourceDefectQuarantineTests(unittest.TestCase):
             review.source_defect_reason("Filter capability mismatch: example"),
             "filter_collection_capability_mismatch",
         )
+        self.assertEqual(
+            review.source_defect_reason(
+                "collection_graph_type_binding:Filter capability mismatch: example"
+            ),
+            "filter_collection_capability_mismatch",
+        )
+        self.assertEqual(
+            review.source_defect_reason(
+                "collection_graph_type_binding:invalid_oval_record_datatype"
+            ),
+            "invalid_oval_record_datatype",
+        )
         self.assertIsNone(review.source_defect_reason("definition_not_found"))
         self.assertIsNone(review.source_defect_reason("roundtrip_mismatch"))
 
