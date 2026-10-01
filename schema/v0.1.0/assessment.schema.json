@@ -6,29 +6,38 @@
   "required": ["assessment"],
   "properties": {
     "assessment": {
-      "type":"object",
-      "required":["id","version","assessment_title","mode","class","purpose"],
-      "properties":{
-        "id":{"type":"string","minLength":1},
-        "version":{"type":"integer","minimum":1},
-        "assessment_title":{"type":"string"},
-        "mode":{"type":"string"},
-        "class":{"type":"string"},
-        "purpose":{"type":"string"},
-        "collections":{"type":"object"},
-        "variables":{"type":"object"},
-        "tests":{"type":"object"},
-        "evaluate":{"type":"object"},
-        "procedure":{"type":"string"},
-        "inputs":{"type":"array"},
-        "evidence":{"type":"array"}
+      "type": "object",
+      "required": ["id","version","assessment_title","mode","class","purpose"],
+      "properties": {
+        "id": {"type":"string","minLength":1},
+        "version": {"type":"integer","minimum":1},
+        "assessment_title": {"type":["string","null"]},
+        "mode": {"type":"string","enum":["manual","automated"]},
+        "class": {
+          "type":"string",
+          "enum":["compliance","vulnerability","patch","inventory","miscellaneous"]
+        },
+        "purpose": {"type":"string","enum":["assessment","applicability"]},
+        "collections": {"type":"object"},
+        "variables": {"type":"object"},
+        "tests": {"type":"object"},
+        "evaluate": {"type":"object"},
+        "procedure": {"type":"string"},
+        "inputs": {"type":"array"},
+        "evidence": {"type":"array"}
       },
-      "additionalProperties":false,
-      "allOf":[
-        {"if":{"properties":{"mode":{"const":"manual"}},"required":["mode"]},"then":{"required":["procedure","inputs","evidence"]}},
-        {"if":{"properties":{"mode":{"const":"automated"}},"required":["mode"]},"then":{"required":["collections","tests","evaluate"]}}
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties":{"mode":{"const":"manual"}},"required":["mode"]},
+          "then": {"required":["procedure","inputs","evidence"]}
+        },
+        {
+          "if": {"properties":{"mode":{"const":"automated"}},"required":["mode"]},
+          "then": {"required":["collections","tests","evaluate"]}
+        }
       ]
     }
   },
-  "additionalProperties":false
+  "additionalProperties": false
 }
