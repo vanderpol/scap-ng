@@ -640,18 +640,23 @@ actual class.
 `information` is reserved as a candidate future class and SHALL NOT be
 treated as normative until approved through OVAL Board / SCAP-NG governance.
 
-Assessment truth SHALL be interpreted at the Rule layer according to Assessment class.
-At minimum, the following mappings are normative for Boolean outcomes:
+Assessment truth SHALL be interpreted at the Rule layer using the consuming
+Rule's explicit policy interpretation. Assessment class defines what technical
+truth means; it does not by itself dictate the policy-facing Rule outcome.
 
-| Assessment class | Assessment truth | Rule outcome |
-| --- | --- | --- |
-| compliance | true | pass |
-| compliance | false | fail |
-| vulnerability | true | fail |
-| vulnerability | false | pass |
+For ordinary compliance Assessments, the default interpretation is
+`true -> pass` and `false -> fail`. For vulnerability, patch, inventory,
+miscellaneous, or other non-compliance classes used directly by a pass/fail
+Rule, the Rule binding SHALL explicitly define how technical truth maps to the
+policy outcome unless a future standards profile defines an unambiguous default.
+
+A scanner SHALL NOT infer hidden class-name inversions such as
+`vulnerability: true -> fail` or `patch: true -> pass` merely from the
+Assessment class name. Detailed results SHALL preserve both the technical
+Assessment outcome and the effective Rule interpretation used.
 
 The `error`, `unknown`, `not_evaluated`, and `not_applicable` truth values SHALL
-remain distinct and SHALL NOT be coerced through the Boolean mapping above.
+remain distinct and SHALL NOT be coerced through Boolean policy mappings.
 
 A scanner SHALL NOT assume that Assessment `true` universally means Rule
 `pass`; Assessment truth and policy-facing Rule outcome are separate result
