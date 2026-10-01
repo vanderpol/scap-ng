@@ -338,6 +338,34 @@ NOT create a second independent provenance truth.
 This model permits compact canonical storage while allowing SIEM/Splunk/Elastic
 events to be independently useful.
 
+## Organizational Input result conformance
+
+Result producers SHALL use standardized structured reasons when an
+Organizational-Input-dependent Rule cannot be evaluated:
+
+| Condition | Rule outcome | reason.code |
+| --- | --- | --- |
+| Scanner lacks Organizational Input capability | `not_evaluated` | `unsupported_organizational_input` |
+| Scanner supports capability but required input is absent | `not_evaluated` | `missing_organizational_input` |
+| Input is present but invalid | `not_evaluated` | `invalid_organizational_input` |
+| Input is valid | normal evaluation | ordinary result/failure reason |
+
+These states SHALL NOT be represented as `fail`, `not_applicable`, or generic
+`error` merely because policy data was unavailable or unsupported.
+
+The Benchmark Result SHALL identify whether the scanner advertises
+Organizational Input capability. Rule Results SHALL continue to contain
+`expected_state` even in the not-evaluated cases; unresolved slots MAY omit or
+redact the value but SHALL retain enough structure/source information to show
+what expected State could not be resolved.
+
+Versioned result schemas SHOULD validate these standardized reason codes and
+required result surfaces. Semantic validators SHALL additionally verify
+cross-object constraints that JSON Schema cannot prove by itself, including
+that `organizational_input_ref` resolves, Rule declarations agree with the
+selected Assessment contract, and supplied values conform to capability-specific
+State schemas.
+
 ## 13. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
