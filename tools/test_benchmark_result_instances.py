@@ -18,6 +18,7 @@ for path in SCHEMA_DIR.glob("*.schema.json"):
         LOCAL_SCHEMAS[doc["$id"]]=doc
 RESOLVER=RefResolver.from_schema(SCHEMA, store=LOCAL_SCHEMAS)
 ASSESSMENT_SCHEMA=LOCAL_SCHEMAS["assessment-result.schema.json"]
+SCAN_SCHEMA=LOCAL_SCHEMAS["scan-result.schema.json"]
 
 
 def validate(doc, schema=SCHEMA):
@@ -152,6 +153,11 @@ class AssessmentResultComponentTests(unittest.TestCase):
         for path in sorted(fixture_dir.glob("*.result.json")):
             with self.subTest(path=path.name):
                 validate(json.loads(path.read_text()), ASSESSMENT_SCHEMA)
+
+
+    def test_issue40_scan_result_example_validates(self):
+        path=ROOT/"research/iterations/003/results/issue40/scan-result.example.json"
+        validate(json.loads(path.read_text()), SCAN_SCHEMA)
 
 
 if __name__=="__main__":
