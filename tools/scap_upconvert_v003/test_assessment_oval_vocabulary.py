@@ -1,6 +1,6 @@
 import unittest
 
-from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
+from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary, legacy_intermediate_vocabulary
 
 
 class VocabularyAlignmentTests(unittest.TestCase):
@@ -83,6 +83,40 @@ class VocabularyAlignmentTests(unittest.TestCase):
             result["tests"]["test-one"]["states"],
             result["tests"]["test-two"]["states"],
         )
+
+    def test_alignment_round_trips_through_legacy_bridge(self):
+        source = {
+            "assessment": {
+                "id": "a", "version": 1, "assessment_title": None,
+                "mode": "automated", "class": "compliance", "purpose": "assessment",
+                "collections": {
+                    "config-collection": {
+                        "collection_title": "Config",
+                        "capability": "unix.file",
+                        "select": {"filepath": "/etc/example"},
+                    }
+                },
+                "variables": {},
+                "tests": {
+                    "test-config": {
+                        "test_title": "Config",
+                        "capability": "unix.file",
+                        "collection": "config-collection",
+                        "assertion": {
+                            "existence": "at_least_one_exists",
+                            "item_quantifier": "all",
+                            "state_title": "Mode",
+                            "state_capability": "unix.file",
+                            "state": {"field": "mode", "value": "0644"},
+                        },
+                    }
+                },
+                "evaluate": {"test": "test-config"},
+            }
+        }
+        aligned = align_assessment_vocabulary(source)
+        restored = legacy_intermediate_vocabulary(aligned)
+        self.assertEqual(restored, source)
 
 
 if __name__ == "__main__":
