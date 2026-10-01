@@ -356,11 +356,17 @@ class FilterStateSelectionSemantics(unittest.TestCase):
         self.assertTrue(apply_filter_state_result("include", TRUE))
         self.assertFalse(apply_filter_state_result("include", FALSE))
 
-    def test_non_boolean_results_are_not_silently_coerced(self):
+    def test_non_boolean_results_become_collection_errors(self):
         for result in (ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE):
             with self.subTest(result=result):
-                with self.assertRaises(NotImplementedError):
-                    apply_filter_state_result("exclude", result)
+                self.assertEqual(
+                    apply_filter_state_result("exclude", result),
+                    ERROR,
+                )
+                self.assertEqual(
+                    apply_filter_state_result("include", result),
+                    ERROR,
+                )
 
 
 
