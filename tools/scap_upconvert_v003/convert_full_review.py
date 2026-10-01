@@ -491,6 +491,7 @@ def main(argv=None):
                   'conflicts':[by_source[x] for x in rec['conflicts']],
                   'applicability':[app_ids[x.lstrip('#')] for x in rec['platforms'] if app_ids.get(x.lstrip('#'))],
                   'parameters':{},'remediation':content.get('remediation'),
+                  'organizational_input_requirements':{},
                   'assessment_choices':choices,'default_assessment_choice':default}
             review.write_yaml(args.output/'rules'/f'{rid}.rule.yaml',{'rule':rule})
             result['source_selection']={'rule_selected':element.get('selected'),
