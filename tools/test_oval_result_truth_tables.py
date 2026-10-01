@@ -7,7 +7,7 @@ from oval_result_truth_tables import (
     aggregate_check, aggregate_operator, aggregate_existence,
     evaluate_collected_object_test, evaluate_missing_collected_object_record,
     aggregate_many_to_many, aggregate_state, aggregate_item_states,
-    resolve_variable_reference,
+    resolve_variable_reference, evaluate_variable_entity_reference,
 )
 
 
@@ -239,6 +239,49 @@ class VariableReferenceSemantics(unittest.TestCase):
         result = resolve_variable_reference([])
         self.assertNotEqual(result["status"], FALSE)
         self.assertEqual(result["status"], ERROR)
+
+
+class VariableStatusPropagation(unittest.TestCase):
+    def test_error_short_circuits_quantifiers(self):
+        self.assertEqual(
+            evaluate_variable_entity_reference(
+                variable_status=ERROR,
+                var_check="at least one",
+                entity_check="at least one",
+                comparison_rows=[[TRUE]],
+            ),
+            ERROR,
+        )
+
+    def test_unknown_short_circuits_quantifiers(self):
+        self.assertEqual(
+            evaluate_variable_entity_reference(
+                variable_status=UNKNOWN,
+                var_check="all",
+                entity_check="all",
+                comparison_rows=[[TRUE, TRUE]],
+            ),
+            UNKNOWN,
+        )
+
+    def test_resolved_variable_uses_existing_quantifier_order(self):
+        self.assertEqual(
+            evaluate_variable_entity_reference(
+                variable_status=TRUE,
+                var_check="at least one",
+                entity_check="all",
+                comparison_rows=[[TRUE, FALSE], [TRUE, FALSE]],
+            ),
+            TRUE,
+        )
+
+    def test_resolved_variable_requires_comparison_rows(self):
+        with self.assertRaises(ValueError):
+            evaluate_variable_entity_reference(
+                variable_status=TRUE,
+                var_check="all",
+                entity_check="all",
+            )
 
 
 class StateEntityAggregationOrder(unittest.TestCase):
