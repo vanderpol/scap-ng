@@ -187,3 +187,23 @@ publication.
 **Specification navigation:** [Contents](README.md) · [Next: SCAP-NG Requirements Index →](requirements-index.md)
 
 <!-- spec-nav:end -->
+
+## Scope and identity of embedded Assessment nodes
+
+SCAP-NG uses a structural scoping rule for private versus reusable Assessment
+components:
+
+> **Containment implies private scope; IDs imply referenceable scope.**
+
+An Object or State embedded directly within a Test is private to that Test and
+need not carry an authored ID. A component that must be referenced outside its
+containing Test is represented as a named Object or State.
+
+This rule permits simple one-Test/one-Object/one-State Assessments to remain
+compact while preserving first-class Test, Object, and State semantics. It also
+provides an explicit normalization path for migrated OVAL content: single-use
+components may be inlined when dependency analysis proves that no reuse or
+external reference would be lost.
+
+Inlining changes authoring representation, not semantic provenance. Conversion
+or normalization evidence must retain source identities where available.
