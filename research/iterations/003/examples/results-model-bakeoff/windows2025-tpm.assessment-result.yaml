@@ -1,0 +1,136 @@
+assessment_result:
+  result_schema_version: 0.1.0-draft
+  execution_id: example-windows2025-tpm-1
+
+  assessment:
+    source_oval_definition_id: oval:mil.disa.stig.defs:def:253255
+    version: 1
+    assessment_title: Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled.
+
+  class: compliance
+  purpose: assessment
+  mode: automated
+  outcome: false
+
+  completeness:
+    logical: true
+    population: true
+    evidence: true
+
+  evaluate_result:
+    operator: all
+    outcome: false
+    children:
+      - test: test-tpm-enabled
+        outcome: false
+      - test: test-tpm-activated
+        outcome: false
+      - test: test-tpm-owned
+        outcome: false
+
+  tests:
+    - id: test-tpm-enabled
+      source_oval_test_id: oval:mil.disa.stig.win:tst:25325500
+      test_title: TPM IsEnabled_InitialValue equals True.
+      capability: windows.wmi57
+      outcome: false
+      existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      object_ref: object-tpm-enabled
+      state_refs: [state-tpm-enabled-true, state-tpm-enabled-alt]
+      item_refs: [item-1]
+      decisive_explanation:
+        reason: required_item_missing
+        message: No existing TPM result satisfied the required collection existence condition.
+
+    - id: test-tpm-activated
+      source_oval_test_id: oval:mil.disa.stig.win:tst:25325501
+      test_title: TPM IsActivated_InitialValue equals True.
+      capability: windows.wmi57
+      outcome: false
+      existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      object_ref: object-tpm-activated
+      state_refs: [state-tpm-activated-true, state-tpm-activated-alt]
+      item_refs: [item-2]
+      decisive_explanation:
+        reason: required_item_missing
+        message: No existing TPM result satisfied the required collection existence condition.
+
+    - id: test-tpm-owned
+      source_oval_test_id: oval:mil.disa.stig.win:tst:25325502
+      test_title: TPM IsOwned_InitialValue equals True.
+      capability: windows.wmi57
+      outcome: false
+      existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      object_ref: object-tpm-owned
+      state_refs: [state-tpm-owned-true, state-tpm-owned-alt]
+      item_refs: [item-3]
+      decisive_explanation:
+        reason: required_item_missing
+        message: No existing TPM result satisfied the required collection existence condition.
+
+  objects:
+    - id: object-tpm-enabled
+      source_oval_object_id: oval:mil.disa.stig.win:obj:25325500
+      capability: windows.wmi57
+      collection_status: does_not_exist
+      select:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsEnabled_InitialValue FROM Win32_Tpm
+      item_refs: [item-1]
+
+    - id: object-tpm-activated
+      source_oval_object_id: oval:mil.disa.stig.win:obj:25325501
+      capability: windows.wmi57
+      collection_status: does_not_exist
+      select:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsActivated_InitialValue FROM Win32_Tpm
+      item_refs: [item-2]
+
+    - id: object-tpm-owned
+      source_oval_object_id: oval:mil.disa.stig.win:obj:25325502
+      capability: windows.wmi57
+      collection_status: does_not_exist
+      select:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsOwned_InitialValue FROM Win32_Tpm
+      item_refs: [item-3]
+
+  items:
+    - id: item-1
+      source_item_id: "9"
+      capability: windows.wmi57
+      status: does_not_exist
+      imported: false
+      fields:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsEnabled_InitialValue FROM Win32_Tpm
+
+    - id: item-2
+      source_item_id: "10"
+      capability: windows.wmi57
+      status: does_not_exist
+      imported: false
+      fields:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsActivated_InitialValue FROM Win32_Tpm
+
+    - id: item-3
+      source_item_id: "11"
+      capability: windows.wmi57
+      status: does_not_exist
+      imported: false
+      fields:
+        namespace: 'root\cimv2\security\microsofttpm'
+        wql: SELECT IsOwned_InitialValue FROM Win32_Tpm
+
+  variables: []
+  diagnostics:
+    - type: source_result_note
+      message: In the source OVAL Results each tested_item is "not evaluated" because the Object existence requirement failed before State comparison.
