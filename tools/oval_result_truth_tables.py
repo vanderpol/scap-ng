@@ -319,6 +319,28 @@ def evaluate_collected_object_test(
     return UNKNOWN
 
 
+def select_collected_object_instance(records, *, object_id, version, variable_instance=1):
+    """Select one OVAL collected_object by its schema identity tuple.
+
+    OVAL System Characteristics keys collected objects by id, version, and
+    variable_instance. Missing is represented as None; duplicates are invalid
+    input and must not be resolved by arbitrary first/last wins behavior.
+    """
+    matches = [
+        record for record in records
+        if record.get("id") == object_id
+        and record.get("version") == version
+        and record.get("variable_instance", 1) == variable_instance
+    ]
+    if len(matches) > 1:
+        raise ValueError(
+            "duplicate collected_object identity: "
+            f"{object_id}@{version}#{variable_instance}"
+        )
+    return matches[0] if matches else None
+
+
+
 def evaluate_missing_collected_object_record():
     """OVAL Test result when collected_objects exists but matching object does not."""
     return UNKNOWN
