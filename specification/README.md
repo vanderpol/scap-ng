@@ -222,3 +222,40 @@ The project SHOULD routinely ask:
 If the answer is not clearly yes, the design SHOULD be simplified or made more
 explicit before standardization.
 
+
+
+## Complexity budget
+
+Implementation complexity SHALL be treated as a standards cost.
+
+When two candidate designs preserve the required semantics and interoperability,
+SCAP-NG SHOULD prefer the design that requires:
+
+- fewer distinct concepts;
+- fewer runtime branches and special cases;
+- fewer context-sensitive interpretation rules;
+- fewer cross-file joins to understand one result;
+- fewer hidden defaults;
+- fewer equivalent authoring forms;
+- fewer optional behaviors;
+- less scanner-specific policy logic;
+- simpler validation and conformance testing.
+
+A feature SHALL NOT be considered "free" merely because it can be expressed in
+a schema. Every additional construct creates parser, validator, compiler,
+runtime, result, test, documentation, and interoperability obligations.
+
+The specification SHOULD push complexity toward deterministic build-time
+normalization when doing so preserves semantics and produces simpler
+scanner-facing content.
+
+Runtime behavior SHOULD remain boring and predictable. A scanner SHOULD be able
+to execute already-resolved content without re-performing historical XCCDF,
+OVAL, packaging, inheritance, fallback, or authoring machinery that could have
+been resolved earlier.
+
+A proposed feature that materially increases implementation complexity SHOULD
+identify the concrete requirement it satisfies and why an existing simpler
+construct cannot satisfy it. Hypothetical flexibility alone is insufficient
+justification.
+
