@@ -731,6 +731,55 @@ the final imported-Item rules.
 Benchmark/Rule results SHOULD reference the corresponding Assessment Result
 execution identity rather than embedding the complete detailed execution graph.
 
+### Detailed result normalization and evidence placement
+
+The canonical result package SHALL be normalized across the scan, Benchmark,
+Rule, and Assessment layers, but one Assessment Result SHALL remain
+self-contained for the logical evaluation data needed to understand that
+Assessment invocation.
+
+Within an Assessment Result, Test Results, Object collection results, collected
+Items, Variable Results, State Results, and Entity Results MAY be represented as
+normalized arrays keyed by stable result-local identities and referenced from
+one another. Implementations SHALL NOT require a consumer to retrieve a
+different Assessment Result merely to resolve the logical Test/Object/Item/
+Variable graph for the current invocation.
+
+Collected Items that materially participate in the Assessment's logical result
+or decisive explanation SHALL be represented in that Assessment Result. Large
+auxiliary evidence such as complete command output, packet captures, screenshots,
+or other bulky artifacts MAY be stored as separate integrity-bound result-package
+members referenced by stable identity and digest. Moving such auxiliary evidence
+out of line SHALL NOT remove the typed observations needed to interpret the
+Assessment result.
+
+A separate duplicate "debug tree" is not mandatory when the preserved
+Test/Item/State/Entity graph already provides enough structured information to
+reconstruct and explain the outcome. For a nontrivial automated result, the
+Assessment Result SHALL retain sufficient structured intermediate results to
+explain the final outcome. A compact `decisive_expression` or equivalent
+minimal-proof projection SHOULD be emitted when useful, but it SHALL be derived
+from the authoritative evaluation graph rather than becoming a second source of
+truth.
+
+### Typed scalar, multi-valued, and record results
+
+Result values SHALL carry explicit datatypes.
+
+A single scalar value is represented as one typed value. A multi-valued entity
+or Variable is represented as an ordered or unordered collection of typed values
+according to the semantics of the producing capability; it SHALL NOT be hidden
+inside an untyped scalar container.
+
+A record value SHALL expose a structured set of named record fields. Each record
+field SHALL itself carry typed value information, and a record field MAY contain
+multiple typed values when the source capability permits repeated fields.
+
+For OVAL-compatible migration, Variables SHALL NOT be record-typed. Record
+structures are retained on collected Item/entity data. This preserves the OVAL
+record constraint while still allowing record-producing capabilities such as
+WMI57/cmdlet-style collection to retain their observed structure.
+
 ## 17. Failure counts and evidence maximums
 
 Assessment Result and Benchmark/Rule Result reporting SHOULD use the same
