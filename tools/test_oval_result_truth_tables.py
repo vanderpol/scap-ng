@@ -8,6 +8,7 @@ from oval_result_truth_tables import (
     evaluate_collected_object_test, evaluate_missing_collected_object_record,
     aggregate_many_to_many, aggregate_state, aggregate_item_states,
     resolve_variable_reference, evaluate_variable_entity_reference,
+    combine_set_flags, SET_FLAGS,
 )
 
 
@@ -214,6 +215,36 @@ class CollectedObjectControlFlow(unittest.TestCase):
     def test_invalid_flag_rejected(self):
         with self.assertRaises(ValueError):
             evaluate_collected_object_test("mystery", existence="at_least_one_exists")
+
+
+class SetFlagPropagation(unittest.TestCase):
+    def test_union_representative_cases(self):
+        self.assertEqual(combine_set_flags("UNION", "complete", "does_not_exist"), "complete")
+        self.assertEqual(combine_set_flags("UNION", "complete", "incomplete"), "incomplete")
+        self.assertEqual(combine_set_flags("UNION", "not_collected", "not_applicable"), "not_collected")
+
+    def test_intersection_representative_cases(self):
+        self.assertEqual(combine_set_flags("INTERSECTION", "error", "does_not_exist"), "does_not_exist")
+        self.assertEqual(combine_set_flags("INTERSECTION", "complete", "not_collected"), "not_collected")
+        self.assertEqual(combine_set_flags("INTERSECTION", "complete", "not_applicable"), "complete")
+
+    def test_complement_is_order_sensitive(self):
+        self.assertEqual(combine_set_flags("COMPLEMENT", "complete", "does_not_exist"), "complete")
+        self.assertEqual(combine_set_flags("COMPLEMENT", "does_not_exist", "complete"), "does_not_exist")
+        self.assertEqual(combine_set_flags("COMPLEMENT", "complete", "not_applicable"), "error")
+
+    def test_every_table_cell_produces_known_flag(self):
+        for operator in ("UNION", "INTERSECTION", "COMPLEMENT"):
+            for left in SET_FLAGS:
+                for right in SET_FLAGS:
+                    with self.subTest(operator=operator, left=left, right=right):
+                        self.assertIn(combine_set_flags(operator, left, right), SET_FLAGS)
+
+    def test_invalid_inputs_rejected(self):
+        with self.assertRaises(ValueError):
+            combine_set_flags("XOR", "complete", "complete")
+        with self.assertRaises(ValueError):
+            combine_set_flags("UNION", "mystery", "complete")
 
 
 class VariableReferenceSemantics(unittest.TestCase):
