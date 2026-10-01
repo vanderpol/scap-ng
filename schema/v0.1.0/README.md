@@ -118,3 +118,25 @@ continue to evolve with the result-model work.
 The full pinned NIWC Current native corpus census remains the primary evidence
 used to classify fields as required, optional, conditional, extensible, or
 migration-only before schemas become normative.
+
+
+## Manual Assessment high-level drafts
+
+The following disposable schemas exercise the simplified Manual Assessment model
+without importing OCIL's questionnaire/workflow object graph:
+
+- `manual-assessment.schema.json`
+- `manual-assessment-result.schema.json`
+
+The model intentionally keeps the common manual path small:
+
+1. authoritative human-readable procedure/check text;
+2. a declared response vocabulary and explicit response-to-outcome mapping;
+3. optional comments/evidence;
+4. evaluator identity and completion time;
+5. import/delegation provenance when applicable.
+
+These files are design probes and MAY change as Manual Assessment semantics are
+reviewed. They SHALL NOT be treated as evidence that arbitrary OCIL-style
+branching or workflow has been adopted.
+
