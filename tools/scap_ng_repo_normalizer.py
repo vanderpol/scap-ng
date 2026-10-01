@@ -402,7 +402,10 @@ def main() -> int:
             {
                 "source": str(row["path"].relative_to(source)),
                 "exact_fingerprint": row["exact"],
-                "consumers": row["consumers"],
+                "consumers": [
+                    report_consumer(consumer, source)
+                    for consumer in row["consumers"]
+                ],
             }
             for row in group
         ]
