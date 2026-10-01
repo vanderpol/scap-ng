@@ -13,6 +13,11 @@ import hashlib
 import json
 import re
 
+# Pre-alpha implementation identity only. This is deliberately NOT the final
+# OVAL-successor standards name/identifier; that remains an OVAL Board decision.
+WORKING_ASSESSMENT_SPECIFICATION_ID = "scap-ng.pre-alpha.assessment"
+WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.1.0"
+
 
 def _slug(value: str | None, fallback: str) -> str:
     text = (value or "").strip().lower()
@@ -53,6 +58,11 @@ def align_assessment_vocabulary(document: dict) -> dict:
         return result
     if assessment.get("mode") != "automated":
         return result
+
+    assessment.setdefault("specification", {
+        "id": WORKING_ASSESSMENT_SPECIFICATION_ID,
+        "version": WORKING_ASSESSMENT_SPECIFICATION_VERSION,
+    })
 
     collections = assessment.pop("collections", {})
     objects = {}
@@ -211,6 +221,10 @@ def legacy_intermediate_vocabulary(document: dict) -> dict:
         return result
     if "objects" not in assessment:
         return result
+
+    # The legacy semantic IR predates independent assessment-specification
+    # identity. The reverse emitter does not need this authoring metadata.
+    assessment.pop("specification", None)
 
     states = assessment.get("states", {})
     objects = assessment.pop("objects", {})
