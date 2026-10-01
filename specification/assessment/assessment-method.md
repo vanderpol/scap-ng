@@ -53,6 +53,46 @@ authoritative metadata.
 
 Manual and automated methods MAY be peer methods for the same Rule.
 
+## Assessment input contracts and Rule bindings
+
+An Assessment that consumes policy data SHALL declare named typed input
+contracts. The Assessment SHALL describe the data it needs without hard-coding
+a Benchmark-specific Parameter identity.
+
+A Rule Assessment selection SHALL bind Benchmark Parameters to the named inputs
+of the selected Assessment.
+
+Illustrative structure:
+
+    assessment:
+      id: time-source-check
+      inputs:
+        required_time_sources:
+          datatype: string
+          cardinality: one_or_more
+          required: true
+
+    rule:
+      assessment_choices:
+        automated:
+          assessment: ../assessments/time-source-check.assessment.yaml
+          inputs:
+            required_time_sources:
+              parameter: approved_time_sources
+
+This binding model is the native semantic successor to XCCDF `check-export`
+feeding an OVAL external Variable, but it does not require the Assessment to
+know the publisher's Parameter ID.
+
+A Parameter-to-input binding SHALL be type/cardinality compatible. Compilation
+or policy resolution SHALL reject an unknown input, unknown Parameter, or
+incompatible binding.
+
+Within an Assessment, an input MAY feed a Variable, State value, or another
+explicitly permitted policy-data location. It SHALL NOT alter Test selection,
+Object collection semantics, operations, commands, privileges, or executable
+control flow.
+
 ## 4. Assessment class and invocation purpose
 
 An Assessment Method SHALL declare an assessment `class` describing the
