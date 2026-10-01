@@ -250,6 +250,23 @@ class EarlyTerminationSemantics(unittest.TestCase):
         self.assertIsNone(decisive_partial_check("at least one", [FALSE, UNKNOWN]))
 
 
+class FilterStateSelectionSemantics(unittest.TestCase):
+    def test_default_exclude_behavior_for_boolean_results(self):
+        self.assertFalse(apply_filter_state_result(None, TRUE))
+        self.assertTrue(apply_filter_state_result(None, FALSE))
+
+    def test_include_behavior_for_boolean_results(self):
+        self.assertTrue(apply_filter_state_result("include", TRUE))
+        self.assertFalse(apply_filter_state_result("include", FALSE))
+
+    def test_non_boolean_results_are_not_silently_coerced(self):
+        for result in (ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE):
+            with self.subTest(result=result):
+                with self.assertRaises(NotImplementedError):
+                    apply_filter_state_result("exclude", result)
+
+
+
 class SetFlagPropagation(unittest.TestCase):
     def test_union_representative_cases(self):
         self.assertEqual(combine_set_flags("UNION", "complete", "does_not_exist"), "complete")
