@@ -1,0 +1,85 @@
+# Legacy Feature Disposition Ledger
+
+**Status:** pre-alpha standards decision record
+
+## Purpose
+
+SCAP-NG intentionally simplifies some SCAP 1.4 / XCCDF / OVAL constructs. No
+legacy construct SHALL disappear from the design history without an explicit
+disposition record.
+
+This ledger exists so that:
+
+- reviewers can see exactly what was retained, normalized, replaced, deferred,
+  or proposed for removal;
+- migration tooling can preserve source semantics/provenance even when native
+  authoring no longer exposes the original construct;
+- standards bodies can revisit a simplification without reconstructing history
+  from commits and issue threads;
+- a removed feature can be restored deliberately if interoperability evidence
+  or implementer feedback justifies it.
+
+A disposition marked **Board decision pending** is not a finalized removal.
+
+## Disposition vocabulary
+
+- **retain** — native NG keeps the construct or equivalent semantic primitive.
+- **normalize** — legacy syntax/mechanism is removed from native runtime, but
+  its effective semantics are deterministically compiled into retained NG
+  constructs.
+- **replace** — legacy construct is split or replaced by clearer native
+  concepts that preserve the required semantics.
+- **provenance-only** — the construct does not affect native execution but is
+  retained in migration/result provenance where needed.
+- **block** — source construct cannot currently be migrated losslessly and
+  fails/quarantines rather than being guessed.
+- **Board decision pending** — current project preference exists, but standards
+  governance must decide retain/revise/drop.
+- **drop** — construct has no retained native semantic role. A final drop SHALL
+  include rationale and restoration criteria.
+
+## Restoration rule
+
+For every **normalize**, **replace**, **block**, **Board decision pending**, or
+**drop** entry, maintain enough source mapping and rationale to answer:
+
+1. What exact legacy behavior did the construct provide?
+2. Where did that behavior move in NG, if anywhere?
+3. What information is preserved during migration?
+4. What interoperability/complexity problem motivated the change?
+5. What evidence would justify restoring a native analogue?
+6. What schemas/specification/runtime components would need to change if it
+   were restored?
+
+## Current dispositions
+
+| Legacy construct | Current NG disposition | Effective semantic handling | Restoration / review note |
+| --- | --- | --- | --- |
+| XCCDF Rule `role` | **replace** | Split into technical Assessment truth, Organizational Input dependencies, Rule scoring eligibility, reporting disposition, and explicit policy-driven non-execution. | Restore a single role-like field only if implementers demonstrate that the split materially harms interoperability/usability. |
+| XCCDF `role=unscored` caused by missing organization-specific policy value | **replace** | Ordinary compliance Assessment + explicit Organizational Input; missing input => `not_evaluated` with reason. | Do not restore informational coercion merely for legacy convenience. |
+| XCCDF genuinely reporting-only `unscored` | **retain semantics / replace syntax** | Context-specific Rule reporting/scoring disposition, or intrinsic informational Assessment if Board adopts that class. | Board review of standardized `information` Assessment class remains open. |
+| XCCDF `role=unchecked` | **replace** | Explicit policy-driven non-execution; canonical result records `not_evaluated` with stable reason. | Native shorthand could be reconsidered if Rule authoring becomes awkward. |
+| OVAL/XCCDF XML Digital Signature on imported source | **normalize / provenance-only** | Verify original representation before conversion; preserve verification facts; sign NG package independently. | Legacy XML signature cannot cryptographically authenticate converted representation. |
+| XCCDF ordered `check-content-ref` fallback + embedded `check-content` | **normalize** | Resolve first successful ref in source order at build time; embedded content only after refs fail; record provenance. | Restore runtime fallback only if a concrete deployment requires mutable late binding and reproducibility/trust issues are solved. |
+| XCCDF `cluster-id` | **normalize** | Expand Profile operation to explicit compatible members in source order before normal Profile resolution. | Restore only if native cluster authoring provides material value beyond ordinary groups/explicit operations. |
+| XCCDF `hidden` | **provenance/presentation-only** | Does not alter Assessment execution; optional migration/presentation metadata may retain it. | A future document-generation profile may standardize a native presentation analogue. |
+| XCCDF Rule/Value/Profile `extends` | **normalize** | Resolve XCCDF property-specific inheritance during migration; emit complete effective native object. | Native inheritance could be reconsidered independently, but should not be reintroduced solely for compatibility. |
+| XCCDF `abstract` | **normalize** | Template marker used during inheritance resolution; effective abstract items are not independently executable native objects. | Restore native templates only if authoring reuse warrants a clean NG-native mechanism. |
+| Deprecated XCCDF Group extension | **block by default** | Do not invent generated descendant IDs because XCCDF defines no interoperable generation algorithm. | Can be revisited if a deterministic compatibility algorithm is standardized. |
+| OVAL entity `mask` | **drop from generic native assessment surface** | Pinned corpus census found no source-explicit usage; sensitive evidence should use explicit result/evidence redaction instead. Migration diagnoses unexpected explicit legacy usage. | Restore only with concrete source corpus/interoperability evidence showing comparison-level mask semantics are required. |
+| OVAL Results `reported` directives | **Board decision pending** | Working preference: canonical complete logical result + explicit projections. | Board should decide retain/revise/drop before schema freeze. |
+| OVAL Results `thin` / `full` | **Board decision pending** | Working preference: one canonical self-describing result + deterministic reduced-detail projections. | Strong candidate for Board discussion because implementers may value source-side size reduction. |
+| OVAL Results `include_source_definitions` | **Board decision pending** | Working preference: package/result references and projections rather than changing canonical result shape. | Review alongside thin/full/reported directives. |
+| OVAL Results `variable_instance` authored identity | **replace** | Native Assessment invocation identity captures effective binding/target context; legacy integer may remain provenance. | Restore explicit integer only if an external interoperability contract requires it. |
+| OVAL `extend_definition` | **retain semantics / replace serialization** | Static Assessment-result dependency used as an `evaluate` leaf; preserve result-domain semantics/provenance. | No reason to restore XML-specific construct name. |
+| OVAL filter non-Boolean State behavior | **clarify** | Native rule: non-Boolean filter State outcome => collection/evaluation error. | Revisit only if stronger normative evidence contradicts this; MITRE ovaldi currently supports the chosen legacy sanity-check direction. |
+| Deprecated OVAL Definition instances | **drop native execution feature / provenance diagnostic** | Detect, report, and quarantine reachable deprecated Definitions rather than inventing a deprecated-Assessment mode. | Revisit only with real published content requiring interoperable execution semantics. |
+
+## Maintenance requirement
+
+Whenever a future change removes, normalizes, replaces, blocks, or defers a
+legacy construct, the same change set SHOULD update this ledger.
+
+Issue/Board discussion links and corpus/conformance evidence SHOULD be added as
+the design stabilizes so the ledger can become part of the formal compatibility
+crosswalk.
