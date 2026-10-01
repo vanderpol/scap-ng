@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/manual-assessment.schema.json",
+  "title": "SCAP-NG Manual Assessment v0.1.0 high-level draft",
+  "description": "Disposable high-level schema for simple, traceable human determinations. Intentionally avoids OCIL-style questionnaire/workflow graphs.",
+  "type": "object",
+  "required": [
+    "assessment"
+  ],
+  "properties": {
+    "assessment": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "assessment_title",
+        "mode",
+        "class",
+        "purpose",
+        "procedure",
+        "response"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "assessment_title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mode": {
+          "const": "manual"
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "compliance",
+            "vulnerability",
+            "patch",
+            "inventory",
+            "miscellaneous"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "assessment",
+            "applicability"
+          ]
+        },
+        "procedure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response": {
+          "type": "object",
+          "description": "Small human-response contract. UI labels are separate from normalized SCAP-NG outcomes.",
+          "required": [
+            "type",
+            "choices"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Publisher-defined or standardized response vocabulary identifier.",
+              "minLength": 1
+            },
+            "choices": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "value",
+                  "outcome"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "label": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "outcome": {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false",
+                      "error",
+                      "unknown",
+                      "not_evaluated",
+                      "not_applicable"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "allow_comment": {
+              "type": "boolean",
+              "default": true
+            },
+            "allow_evidence": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence_guidance": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
