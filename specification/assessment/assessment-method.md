@@ -282,6 +282,76 @@ discarded merely because the referenced Definition has been represented as an
 Assessment dependency. Its exact native migration is defined with the
 applicability model.
 
+
+## Intrinsic Assessment applicability
+
+An automated Assessment MAY define an intrinsic applicability expression that
+determines whether that Assessment is valid for the current target before its
+normal `evaluate` expression is interpreted.
+
+Intrinsic Assessment applicability is part of the standalone assessment
+language. It is distinct from SCAP-NG Rule applicability:
+
+- **Assessment applicability** answers whether this Assessment itself is valid
+  for the current target/execution context and can produce
+  `not_applicable`.
+- **Rule applicability** is SCAP-NG policy-layer logic deciding whether a Rule
+  applies before selecting/executing its compliance Assessment.
+
+Illustrative native shape:
+
+    assessment:
+      applicability:
+        all:
+          - test: product-installed
+          - assessment: supported-platform
+
+      evaluate:
+        all:
+          - test: version-in-range
+          - test: configuration-correct
+
+The same logical leaf forms available to `evaluate` SHALL be usable by the
+intrinsic applicability expression when semantically appropriate, including
+local Test results and statically declared Assessment-result dependencies.
+
+Evaluation SHALL conceptually proceed as follows:
+
+1. If no intrinsic applicability expression is present, the Assessment is
+   intrinsically applicable.
+2. If intrinsic applicability evaluates `true`, evaluate the normal
+   `evaluate` expression.
+3. If intrinsic applicability evaluates `false`, the Assessment outcome SHALL
+   be `not_applicable`; the normal evaluation expression need not execute.
+4. `error`, `unknown`, or `not_evaluated` produced while establishing
+   applicability SHALL remain distinguishable and SHALL NOT be coerced to
+   `false` or `not_applicable`.
+5. An implementation MAY short-circuit work whose result cannot affect the
+   final outcome, subject to the normal dependency/evidence/completeness rules.
+
+### OVAL `applicability_check` migration
+
+OVAL 5.12.3 permits `applicability_check=true` on `criteria`,
+`criterion`, and `extend_definition` nodes. Those markers identify portions
+of the Definition criteria used to determine whether the Definition applies to
+the target.
+
+Lossless migration SHALL preserve that distinction. A false applicability
+condition SHALL NOT be collapsed into an ordinary false Assessment result when
+the source semantics require `not_applicable`.
+
+A converter SHOULD derive the native intrinsic applicability expression from
+the source applicability-marked criteria while preserving source nesting,
+operators, negation, referenced Tests/Definitions, and provenance. If the source
+graph cannot be separated into applicability and normal evaluation without a
+provably equivalent transformation, migration SHALL retain an explicit
+compatibility representation or report a blocker rather than silently dropping
+the applicability marker.
+
+This intrinsic applicability mechanism is required independently of SCAP-NG so
+that a standalone converted OVAL Definition retains its result semantics even
+when it is executed without a Benchmark or Rule wrapper.
+
 ## 5. Automated semantics
 
 Automated Assessments SHALL make behavior-affecting cardinality, existence, and
