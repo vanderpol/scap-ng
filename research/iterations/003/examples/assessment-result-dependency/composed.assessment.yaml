@@ -1,0 +1,38 @@
+# Non-normative pre-alpha fixture: OVAL extend_definition -> Assessment result dependency
+assessment:
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: "0.1.0"
+  id: example.composed-assessment
+  version: 1
+  assessment_title: Example composed Assessment
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  dependencies:
+    platform_applicable:
+      assessment: ../applicability/example-platform.assessment.yaml
+      expected_id: example.platform-applicable
+      expected_version: 1
+      purpose: applicability
+
+  objects: {}
+  variables: {}
+  states: {}
+
+  tests:
+    local-setting-correct:
+      test_title: Local setting is correct
+      capability: independent.unknown
+      result: unknown
+
+  evaluate:
+    all:
+      - assessment: platform_applicable
+      - test: local-setting-correct
+
+# Migration note:
+# An OVAL extend_definition leaf maps to the dependency alias above.
+# Source criteria nesting and negate/applicability_check metadata are preserved
+# by the converter/provenance model rather than flattened away.
