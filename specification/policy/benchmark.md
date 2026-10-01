@@ -77,6 +77,11 @@ The OVAL Board is expected to decide the name and identity of the standalone
 next-generation OVAL successor. SCAP-NG SHALL use the Board-defined identifier
 once ratified and SHALL NOT use the previously released `OVAL 6` designation.
 
+For pre-alpha implementation and regression testing only, this project uses
+`scap-ng.pre-alpha.assessment` version `0.1.0` as the dependency identifier.
+It is deliberately project-scoped and provisional. Its presence SHALL NOT be
+interpreted as a Board naming decision.
+
 ## 2. Benchmark as the publisher baseline
 
 Benchmark Rule membership establishes the publisher baseline.
