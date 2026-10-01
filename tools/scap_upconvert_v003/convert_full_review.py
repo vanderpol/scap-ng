@@ -378,7 +378,28 @@ def main(argv=None):
                     continue
                 raise ValueError('Applicability source blocked: '+str(unsupported))
             provenance={};native,error=source.lower_definition(definition_oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
-            if error: raise ValueError('Applicability: '+str(error))
+            if error:
+                defect=review.source_defect_reason(error)
+                if defect:
+                    blocked_applicability[ref]={
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'classification':'source_content_defect',
+                        'reason':defect,
+                        'error':error,
+                    }
+                    app_ids[ref]=None
+                    app_evidence.append({
+                        'source_platform':ref,
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'status':'skipped_source_defect_applicability',
+                        'classification':'source_content_defect',
+                        'reason':defect,
+                        'error':error,
+                    })
+                    continue
+                raise ValueError('Applicability: '+str(error))
             tree,new_id=build(native);schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
             reverse=temp/'reverse.xml';tree.write(reverse,encoding='utf-8')
             parity=compare(definition_original_path,reverse,did,new_id,root_only=True)
@@ -399,27 +420,50 @@ def main(argv=None):
             if len(source_selectors)!=len(set(source_selectors)): raise ValueError('Duplicate Rule selector: '+rid)
             blocked_refs=[x.lstrip('#') for x in rec['platforms'] if x.lstrip('#') in blocked_applicability]
             if blocked_refs:
-                manual_ref=result['selectors'].get('manual') or result.get('manual_fallback_assessment')
+                manual_ref=(
+                    result['selectors'].get('manual')
+                    or result.get('manual_fallback_assessment')
+                    or result.get('source_defect_manual_fallback_assessment')
+                )
                 if not manual_ref:
-                    raise ValueError('Deprecated applicability requires source manual fallback for '+rid)
+                    raise ValueError('Blocked applicability requires source manual fallback for '+rid)
                 choices={'default':{'assessment':'../'+manual_ref},'manual':{'assessment':'../'+manual_ref}}
+                blocked_rows=[blocked_applicability[x] for x in blocked_refs]
+                reasons=sorted({row.get('classification') or row.get('reason') for row in blocked_rows})
                 result['applicability_manual_fallback']={
                     'source_platforms':blocked_refs,
-                    'reason':'deprecated_oval_test',
+                    'reasons':reasons,
                     'manual_assessment':manual_ref,
                 }
-                existing={row['selector'] for row in result.get('manual_fallbacks',[])}
-                for selector in source_selectors:
-                    if selector!='manual' and selector not in existing:
-                        result.setdefault('manual_fallbacks',[]).append({
-                            'selector':selector,
-                            'source_definition':None,
-                            'unsupported':[{
-                                'feature':'deprecated_oval_test',
-                                'detail':'Rule applicability uses a deprecated OVAL Test',
-                            }],
-                            'reason':'deprecated_applicability',
-                        })
+                deprecated_refs=[x for x in blocked_refs if blocked_applicability[x].get('reason')=='deprecated_oval_test']
+                defect_refs=[x for x in blocked_refs if blocked_applicability[x].get('classification')=='source_content_defect']
+                if deprecated_refs:
+                    existing={row['selector'] for row in result.get('manual_fallbacks',[])}
+                    for selector in source_selectors:
+                        if selector!='manual' and selector not in existing:
+                            result.setdefault('manual_fallbacks',[]).append({
+                                'selector':selector,
+                                'source_definition':None,
+                                'unsupported':[{
+                                    'feature':'deprecated_oval_test',
+                                    'detail':'Rule applicability uses a deprecated OVAL Test',
+                                }],
+                                'reason':'deprecated_applicability',
+                            })
+                if defect_refs:
+                    existing={row['selector'] for row in result.get('source_defect_fallbacks',[])}
+                    for selector in source_selectors:
+                        if selector!='manual' and selector not in existing:
+                            first=blocked_applicability[defect_refs[0]]
+                            result.setdefault('source_defect_fallbacks',[]).append({
+                                'selector':selector,
+                                'source_definition':first.get('source_definition'),
+                                'classification':'source_content_defect',
+                                'reason':first.get('reason'),
+                                'error':first.get('error'),
+                                'context':'applicability',
+                            })
+                    result['source_defect_manual_fallback_assessment']=manual_ref
             default='default' if 'default' in choices else next(iter(choices),None)
             if default is None: raise ValueError('Rule has no Assessment: '+rid)
             content=source.rule_content(element)
