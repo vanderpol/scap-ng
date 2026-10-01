@@ -143,6 +143,51 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("object", bad)
 
+    def test_object_selector_rejects_state_only_quantifiers(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object", {
+                "object_title": None,
+                "capability": "unix.file",
+                "select": {
+                    "filepath": {
+                        "value": "/etc/passwd",
+                        "operation": "equals",
+                        "datatype": "string",
+                        "entity_existence": "none_exist",
+                    }
+                },
+            })
+
+    def test_var_check_requires_variable_value(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("state", {
+                "state_title": None,
+                "capability": "unix.file",
+                "state": {
+                    "field": "filename",
+                    "value": "passwd",
+                    "operation": "equals",
+                    "datatype": "string",
+                    "entity_check": "all",
+                    "entity_existence": "at_least_one_exists",
+                    "var_check": "all",
+                },
+            })
+
+        self.validate_def("state", {
+            "state_title": None,
+            "capability": "unix.file",
+            "state": {
+                "field": "filename",
+                "value": {"variable": "approved-name"},
+                "operation": "equals",
+                "datatype": "string",
+                "entity_check": "all",
+                "entity_existence": "at_least_one_exists",
+                "var_check": "all",
+            },
+        })
+
     def test_wrong_capability_is_rejected(self):
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("test", {
@@ -190,6 +235,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "value": 1,
                     "operation": "equals",
                     "datatype": "int",
+                    "entity_check": "all",
+                    "entity_existence": "at_least_one_exists",
                 },
             })
 
@@ -201,6 +248,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "value": True,
                 "operation": "equals",
                 "datatype": "boolean",
+                "entity_check": "all",
+                "entity_existence": "at_least_one_exists",
             },
         })
 
@@ -214,6 +263,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "value": True,
                     "operation": "equals",
                     "datatype": "boolean",
+                    "entity_check": "all",
+                    "entity_existence": "at_least_one_exists",
                 },
             })
 
