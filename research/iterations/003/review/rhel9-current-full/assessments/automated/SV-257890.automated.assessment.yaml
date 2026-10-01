@@ -9,6 +9,7 @@ assessment:
   collections:
     local-interactive-users-without-nologin-collection:
       collection_title: Local interactive users without nologin
+      capability: unix.password
       select:
         username:
           operation: pattern match
@@ -26,6 +27,7 @@ assessment:
           entity_check: all
           entity_existence: at_least_one_exists
         state_title: nologin shell
+        capability: unix.password
       - action: exclude
         match:
           field: user_id
@@ -36,6 +38,7 @@ assessment:
           entity_check: all
           entity_existence: at_least_one_exists
         state_title: uid < 1000
+        capability: unix.password
       - action: exclude
         match:
           field: user_id
@@ -46,8 +49,10 @@ assessment:
           entity_check: all
           entity_existence: at_least_one_exists
         state_title: uid = 65534 (nobody)
+        capability: unix.password
     home-directories-local-interactive-users-without-nologin-collection:
       collection_title: home directories of local interactive users without nologin
+      capability: unix.file
       select:
         path:
           operation: equals
@@ -71,8 +76,6 @@ assessment:
         values:
           collection: local-interactive-users-without-nologin-collection
           field: home_dir
-      collection_capabilities:
-        local-interactive-users-without-nologin-collection: unix.password
   tests:
     test-all-local-interactive-user-home-directories-0750-or-less:
       test_title: All local interactive user home directories are 0750 or less
@@ -82,6 +85,7 @@ assessment:
         existence: any_exist
         item_quantifier: all
         state_title: mode 0750 or less permissive
+        state_capability: unix.file
         state:
           all:
           - field: suid

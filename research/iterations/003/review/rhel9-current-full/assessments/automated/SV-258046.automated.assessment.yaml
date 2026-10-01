@@ -8,6 +8,7 @@ assessment:
   collections:
     unix-password-collection:
       collection_title: null
+      capability: unix.password
       select:
         username:
           operation: pattern match
@@ -16,6 +17,7 @@ assessment:
           value: .+
     only-system-accounts-collection:
       collection_title: only system accounts
+      capability: unix.password
       set:
         operator: union
         members:
@@ -30,6 +32,7 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
+          capability: unix.password
         - action: exclude
           match:
             field: user_id
@@ -39,6 +42,7 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
+          capability: unix.password
   tests:
     test-system-accounts-in-etc-passwd-use-sbin-nologin:
       test_title: The system accounts in /etc/passwd use /sbin/nologin.
@@ -48,6 +52,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: null
+        state_capability: unix.password
         state:
           field: login_shell
           value: /sbin/nologin|/usr/sbin/nologin

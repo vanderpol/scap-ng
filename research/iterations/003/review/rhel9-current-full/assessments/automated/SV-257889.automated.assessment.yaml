@@ -8,6 +8,7 @@ assessment:
   collections:
     users-username-collection:
       collection_title: Users with an username
+      capability: unix.password
       select:
         username:
           operation: pattern match
@@ -16,6 +17,7 @@ assessment:
           value: '[\w]+'
     only-non-system-users-uid-999-home-dirs-excluding-root-collection:
       collection_title: only non-system users (uid>999) home-dirs excluding root directory
+      capability: unix.password
       set:
         operator: complement
         members:
@@ -31,6 +33,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: only uids < 1000
+          capability: unix.password
         - action: exclude
           match:
             field: home_dir
@@ -41,8 +44,10 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: root directory
+          capability: unix.password
     local-initialization-files-non-system-users-collection:
       collection_title: local initialization files of non-system users.
+      capability: unix.file
       select:
         path:
           operation: equals
@@ -66,12 +71,14 @@ assessment:
           mask: false
           entity_check: all
           entity_existence: at_least_one_exists
+        capability: unix.file
       behaviors:
         max_depth: '1'
         recurse: symlinks
         recurse_direction: down
     only-root-users-uid-0-home-dirs-excluding-root-directory-collection:
       collection_title: only root users (uid=0) home-dirs excluding root directory
+      capability: unix.password
       set:
         operator: complement
         members:
@@ -87,6 +94,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: only uids > 0
+          capability: unix.password
         - action: exclude
           match:
             field: home_dir
@@ -97,8 +105,10 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: root directory
+          capability: unix.password
     local-initialization-files-root-user-collection:
       collection_title: local initialization files of root user.
+      capability: unix.file
       select:
         path:
           operation: equals
@@ -122,6 +132,7 @@ assessment:
           mask: false
           entity_check: all
           entity_existence: at_least_one_exists
+        capability: unix.file
       behaviors:
         max_depth: '1'
         recurse: symlinks
@@ -135,8 +146,6 @@ assessment:
         values:
           collection: only-non-system-users-uid-999-home-dirs-excluding-root-collection
           field: home_dir
-      collection_capabilities:
-        only-non-system-users-uid-999-home-dirs-excluding-root-collection: unix.password
     home-directory-root-user-variable:
       title: The home directory of the root user.
       kind: local
@@ -145,8 +154,6 @@ assessment:
         values:
           collection: only-root-users-uid-0-home-dirs-excluding-root-directory-collection
           field: home_dir
-      collection_capabilities:
-        only-root-users-uid-0-home-dirs-excluding-root-directory-collection: unix.password
   tests:
     test-local-initialization-files-non-system-users-have-mode-0740-or:
       test_title: Local initialization files for non-system users have mode 0740 or less permissive.
@@ -156,6 +163,7 @@ assessment:
         existence: any_exist
         item_quantifier: all
         state_title: mode 0740 or less permissive
+        state_capability: unix.file
         state:
           all:
           - field: suid
@@ -222,6 +230,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: mode 0740 or less permissive
+        state_capability: unix.file
         state:
           all:
           - field: suid

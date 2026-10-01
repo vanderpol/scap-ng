@@ -8,6 +8,7 @@ assessment:
   collections:
     confirm-aide-file-integrity-tool-package-installed-collection:
       collection_title: Confirm the aide file integrity tool package is installed.
+      capability: linux.rpminfo
       select:
         name:
           operation: equals
@@ -16,6 +17,7 @@ assessment:
           value: aide
     find-aide-conf-file-collection:
       collection_title: Find the aide.conf file.
+      capability: unix.file
       select:
         path:
           operation: equals
@@ -34,6 +36,7 @@ assessment:
         recurse_file_system: local
     retrieve-path-working-db-file-collection:
       collection_title: Retrieve path to the working DB file.
+      capability: independent.textfilecontent54
       select:
         filepath:
           operation: equals
@@ -54,6 +57,7 @@ assessment:
           value: '1'
     retrieve-filename-working-db-file-collection:
       collection_title: Retrieve filename of the working DB file.
+      capability: independent.textfilecontent54
       select:
         filepath:
           operation: equals
@@ -74,6 +78,7 @@ assessment:
           value: '1'
     retrieve-details-working-db-file-collection:
       collection_title: Retrieve details of the working DB file.
+      capability: unix.file
       select:
         filepath:
           operation: equals
@@ -91,8 +96,6 @@ assessment:
         values:
           collection: find-aide-conf-file-collection
           field: filepath
-      collection_capabilities:
-        find-aide-conf-file-collection: unix.file
     retrieve-location-working-aide-database-file-variable:
       title: Retrieve location of the working aide database file.
       kind: local
@@ -108,9 +111,6 @@ assessment:
         - values:
             collection: retrieve-filename-working-db-file-collection
             field: subexpression
-      collection_capabilities:
-        retrieve-path-working-db-file-collection: independent.textfilecontent54
-        retrieve-filename-working-db-file-collection: independent.textfilecontent54
   tests:
     test-confirm-aide-file-integrity-tool-package-installed:
       test_title: Confirm the aide file integrity tool package is installed.
@@ -128,6 +128,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: Confirm existence of DB file.
+        state_capability: unix.file
         state:
           field: filepath
           value: .*

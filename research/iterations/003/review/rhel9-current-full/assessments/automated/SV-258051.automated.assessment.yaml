@@ -9,6 +9,7 @@ assessment:
   collections:
     users-username-collection:
       collection_title: Users with an username
+      capability: unix.password
       select:
         username:
           operation: pattern match
@@ -17,6 +18,7 @@ assessment:
           value: '[\w]+'
     only-non-system-users-uid-999-home-dirs-collection:
       collection_title: only non-system users (uid>999) home-dirs
+      capability: unix.password
       set:
         operator: complement
         members:
@@ -32,8 +34,10 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: only uids < 1000
+          capability: unix.password
     only-root-users-uid-0-home-dirs-collection:
       collection_title: only root users (uid=0) home-dirs
+      capability: unix.password
       set:
         operator: complement
         members:
@@ -49,6 +53,7 @@ assessment:
             entity_check: all
             entity_existence: at_least_one_exists
           state_title: only uids > 0
+          capability: unix.password
   tests:
     test-check-users-without-home-directory-not-defined:
       test_title: check for users without a home directory not defined
@@ -58,6 +63,7 @@ assessment:
         existence: all_exist
         item_quantifier: all
         state_title: only users with the home directory defined
+        state_capability: unix.password
         state:
           field: home_dir
           value: .+
@@ -74,6 +80,7 @@ assessment:
         existence: all_exist
         item_quantifier: all
         state_title: only users with the home directory defined
+        state_capability: unix.password
         state:
           field: home_dir
           value: .+

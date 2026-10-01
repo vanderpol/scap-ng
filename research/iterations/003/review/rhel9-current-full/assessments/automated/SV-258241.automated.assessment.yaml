@@ -8,6 +8,7 @@ assessment:
   collections:
     retrieve-system-wide-crypto-policy-ies-collection:
       collection_title: Retrieve system wide crypto policy(ies).
+      capability: independent.shellcommand
       select:
         shell:
           operation: equals
@@ -21,6 +22,7 @@ assessment:
           value: update-crypto-policies --show
     retrieve-current-minimum-crypto-policy-configuration-collection:
       collection_title: Retrieve the current minimum crypto-policy configuration.
+      capability: independent.textfilecontent54
       select:
         filepath:
           operation: equals
@@ -39,6 +41,7 @@ assessment:
           value: '1'
     retrieve-current-minimum-crypto-policy-configuration-hash-values-subexpression-collection:
       collection_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
+      capability: independent.textfilecontent54
       select:
         filepath:
           operation: equals
@@ -57,6 +60,7 @@ assessment:
           value: '1'
     retrieve-current-minimum-rsa-size-collection:
       collection_title: Retrieve the current minimum rsa size.
+      capability: independent.textfilecontent54
       select:
         filepath:
           operation: equals
@@ -98,6 +102,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: Confirm system wide crypto policy(ies) are correct.
+        state_capability: independent.shellcommand
         state:
           all:
           - field: exit_status
@@ -122,6 +127,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: Confirm correct algorithms.
+        state_capability: independent.textfilecontent54
         state:
           field: text
           value:
@@ -140,6 +146,7 @@ assessment:
         existence: any_exist
         item_quantifier: all
         state_title: Check for existence of SHA1 algorithms (negated at criterion level).
+        state_capability: independent.textfilecontent54
         state:
           field: text
           value: SHA1-\d
@@ -156,6 +163,7 @@ assessment:
         existence: any_exist
         item_quantifier: all
         state_title: Confirm minimum hash values of 224.
+        state_capability: independent.textfilecontent54
         state:
           field: subexpression
           value: \b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))
@@ -172,6 +180,7 @@ assessment:
         existence: at_least_one_exists
         item_quantifier: all
         state_title: Confirm minimum rsa size of 2048.
+        state_capability: independent.textfilecontent54
         state:
           field: subexpression
           value: '2048'
