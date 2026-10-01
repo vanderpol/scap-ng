@@ -255,56 +255,6 @@ inventory_assessments:
     description: Product inventory for cpe:/o:microsoft:windows_11
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:10000001:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:10000001
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        object_title: CurrentBuildNumber registry entry
-        query:
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
-        - effective_attributes:
-            datatype:
-              origin: xsd_default
-              value: string
-            mask:
-              origin: xsd_default
-              value: 'false'
-            operation:
-              origin: xsd_default
-              value: equals
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: CurrentBuildNumber
       oval:mil.disa.stig.ind:obj:10000000:
         capability: scapng.collect.independent.family
         source_object_id: oval:mil.disa.stig.ind:obj:10000000
@@ -363,6 +313,56 @@ inventory_assessments:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ProductName
+      oval:mil.disa.stig.win:obj:10000001:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:10000001
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: CurrentBuildNumber registry entry
+        query:
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        - effective_attributes:
+            datatype:
+              origin: xsd_default
+              value: string
+            mask:
+              origin: xsd_default
+              value: 'false'
+            operation:
+              origin: xsd_default
+              value: equals
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: CurrentBuildNumber
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:10000001:
@@ -453,6 +453,19 @@ inventory_assessments:
         state_title: Microsoft Windows family
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:10000000:
+          source_test_id: oval:mil.disa.stig.ind:tst:10000000
+          source_type: family_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: The installed operating system belongs to the Microsoft Windows family
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:10000000
+          predicates:
+          - oval:mil.disa.stig.ind:ste:10000000
+          source_other: []
         oval:mil.disa.stig.win:tst:10000000:
           source_test_id: oval:mil.disa.stig.win:tst:10000000
           source_type: registry_test
@@ -478,19 +491,6 @@ inventory_assessments:
           - oval:mil.disa.stig.win:obj:10000001
           predicates:
           - oval:mil.disa.stig.win:ste:10000001
-          source_other: []
-        oval:mil.disa.stig.ind:tst:10000000:
-          source_test_id: oval:mil.disa.stig.ind:tst:10000000
-          source_type: family_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          test_title: The installed operating system belongs to the Microsoft Windows family
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:10000000
-          predicates:
-          - oval:mil.disa.stig.ind:ste:10000000
           source_other: []
       definitions:
         oval:mil.disa.stig.windows11:def:1:
@@ -562,7 +562,7 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:microsoft:windows_11
-      semantic_ir_sha256: bfbf39342700dcad17ee78ddec0394716e7ef46fc3caaabeed2c2921c1ae7914
+      semantic_ir_sha256: f948ef155b3d04a259a394d9f517ff2e8594123eba8c2fa6d8f1c7a4688a9912
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f053ddb6588338ec2738a956b06689d0fa9606f30c24da1a44272febba04af4b
     purpose: platform_inventory
