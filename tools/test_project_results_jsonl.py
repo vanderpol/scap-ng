@@ -350,7 +350,9 @@ class ProjectionTests(unittest.TestCase):
         rule=benchmark["benchmark_result"]["rule_results"][0]
         observed=assessment["assessment_result"]["items"][0]["fields"]["mode"]["value"]
         expected=rule["expected_state"][0]["value"]
+        compact_observed=rule["observed_state"][0]["value"]
         self.assertEqual("0666", observed)
+        self.assertEqual(observed, compact_observed)
         self.assertEqual("0644", expected)
         self.assertIn(observed, rule["message"])
         self.assertIn(expected, rule["message"])
