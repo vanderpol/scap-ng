@@ -96,6 +96,8 @@ class SourceDefectQuarantineTests(unittest.TestCase):
     def test_unknown_error_still_blocks_even_with_manual(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
+            tmp=root/"tmp"
+            tmp.mkdir()
             original=ET.Element("{"+review.OD+"}oval_definitions")
             with patch.object(
                 review,
@@ -107,7 +109,7 @@ class SourceDefectQuarantineTests(unittest.TestCase):
                 return_value=(None,"definition_not_found"),
             ):
                 result,failed=review.convert_rule(
-                    self.rec(),original,root,None,root/"tmp"
+                    self.rec(),original,root,None,tmp
                 )
 
             self.assertTrue(failed)
