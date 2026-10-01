@@ -10,7 +10,7 @@ from oval_result_truth_tables import (
     resolve_variable_reference, apply_variable_reference_context,
     evaluate_variable_entity_reference, combine_set_flags, SET_FLAGS,
     decisive_partial_check, decisive_partial_existence,
-    NO_VALUES, apply_filter_state_result,
+    NO_VALUES, apply_filter_state_result, select_collected_object_instance,
 )
 
 
@@ -103,6 +103,57 @@ class ExistenceTruthTables(unittest.TestCase):
             aggregate_check("all", [])
         with self.assertRaises(ValueError):
             aggregate_operator("AND", [])
+
+
+class CollectedObjectIdentitySemantics(unittest.TestCase):
+    def test_selects_exact_id_version_variable_instance(self):
+        records = [
+            {"id": "obj-1", "version": 1, "variable_instance": 1, "flag": "complete"},
+            {"id": "obj-1", "version": 1, "variable_instance": 2, "flag": "complete"},
+        ]
+        self.assertEqual(
+            select_collected_object_instance(
+                records,
+                object_id="obj-1",
+                version=1,
+                variable_instance=2,
+            )["variable_instance"],
+            2,
+        )
+
+    def test_missing_exact_identity_is_none(self):
+        self.assertIsNone(
+            select_collected_object_instance(
+                [{"id": "obj-1", "version": 1, "variable_instance": 1}],
+                object_id="obj-1",
+                version=1,
+                variable_instance=2,
+            )
+        )
+
+    def test_duplicate_exact_identity_is_rejected(self):
+        records = [
+            {"id": "obj-1", "version": 1, "variable_instance": 1},
+            {"id": "obj-1", "version": 1, "variable_instance": 1},
+        ]
+        with self.assertRaises(ValueError):
+            select_collected_object_instance(
+                records,
+                object_id="obj-1",
+                version=1,
+                variable_instance=1,
+            )
+
+    def test_default_variable_instance_is_one(self):
+        record = {"id": "obj-1", "version": 1, "flag": "complete"}
+        self.assertIs(
+            select_collected_object_instance(
+                [record],
+                object_id="obj-1",
+                version=1,
+            ),
+            record,
+        )
 
 
 class CollectedObjectControlFlow(unittest.TestCase):
