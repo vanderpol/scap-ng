@@ -180,5 +180,39 @@ class AssessmentResultComponentTests(unittest.TestCase):
         validate(json.loads(path.read_text()), ASSESSMENT_SCHEMA)
 
 
+class ResultSchemaRegistryTests(unittest.TestCase):
+    def test_all_result_schemas_are_valid_draft_2020_12(self):
+        for name, schema in sorted(LOCAL_SCHEMAS.items()):
+            if not name.endswith(".schema.json"):
+                continue
+            with self.subTest(schema=name):
+                jsonschema.Draft202012Validator.check_schema(schema)
+
+    def test_all_relative_schema_refs_resolve_offline(self):
+        filenames={p.name for p in SCHEMA_DIR.glob("*.schema.json")}
+
+        def refs(node):
+            if isinstance(node, dict):
+                ref=node.get("$ref")
+                if isinstance(ref, str):
+                    yield ref
+                for value in node.values():
+                    yield from refs(value)
+            elif isinstance(node, list):
+                for value in node:
+                    yield from refs(value)
+
+        for path in sorted(SCHEMA_DIR.glob("*.schema.json")):
+            schema=json.loads(path.read_text())
+            for ref in refs(schema):
+                if ref.startswith("#") or "://" in ref:
+                    continue
+                target=ref.split("#", 1)[0]
+                if not target:
+                    continue
+                with self.subTest(schema=path.name, ref=ref):
+                    self.assertIn(target, filenames)
+
+
 if __name__=="__main__":
     unittest.main()
