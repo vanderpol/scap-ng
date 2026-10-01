@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    dconf-database-directories-collection:
-      collection_title: dconf database directories
+  objects:
+    dconf-database-directories-object:
       capability: unix.file
       select:
         path:
@@ -24,21 +23,12 @@ assessment:
           value: ''
       filters:
       - action: include
-        match:
-          field: path
-          value: ^/etc/dconf/db/.*\.d$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: dconf database directories
-        capability: unix.file
+        state: state-dconf-database-directories
       behaviors:
         max_depth: '1'
         recurse_direction: down
-    dconf-org-gnome-login-screen-sections-collection:
-      collection_title: dconf org/gnome/login-screen sections
+      object_title: dconf database directories
+    dconf-org-gnome-login-screen-sections-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -63,6 +53,7 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: dconf org/gnome/login-screen sections
   variables:
     dconf-database-directories-variable:
       title: dconf database directories
@@ -70,25 +61,39 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: dconf-database-directories-collection
+          object: dconf-database-directories-object
           field: path
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: text
+        value: \ndisable-restart-buttons=(true|'true')\s*(\n|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-dconf-database-directories:
+      state_title: dconf database directories
+      capability: unix.file
+      state:
+        field: path
+        value: ^/etc/dconf/db/.*\.d$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-dconf-disable-restart-buttons-true:
       test_title: dconf disable-restart-buttons true
       capability: independent.textfilecontent54
-      collection: dconf-org-gnome-login-screen-sections-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: text
-          value: \ndisable-restart-buttons=(true|'true')\s*(\n|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: dconf-org-gnome-login-screen-sections-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     test: test-dconf-disable-restart-buttons-true

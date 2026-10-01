@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    check-that-etc-dconf-profile-user-system-db-at-minimum-collection:
-      collection_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+  objects:
+    check-that-etc-dconf-profile-user-system-db-at-minimum-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-collection:
-      collection_title: Check that the idle-delay setting is locked from nonprivileged user modification
+      object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+    check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -50,23 +49,21 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: Check that the idle-delay setting is locked from nonprivileged user modification
+  states: {}
   tests:
     test-check-that-etc-dconf-profile-user-system-db-at-minimum:
       test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
       capability: independent.textfilecontent54
-      collection: check-that-etc-dconf-profile-user-system-db-at-minimum-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: check-that-etc-dconf-profile-user-system-db-at-minimum-object
+      check_existence: at_least_one_exists
+      check: all
     test-check-that-idle-delay-setting-locked-from-nonprivileged-user-modification:
       test_title: Check that the idle-delay setting is locked from nonprivileged user modification
       capability: independent.textfilecontent54
-      collection: check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: check-that-idle-delay-setting-locked-from-nonprivileged-user-modification-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     all:
     - test: test-check-that-etc-dconf-profile-user-system-db-at-minimum

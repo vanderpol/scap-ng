@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    bind-collection:
-      collection_title: bind
+  objects:
+    bind-object:
       capability: unix.symlink
       select:
         filepath:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/bind.config
-    gnutls-collection:
-      collection_title: gnutls
+      object_title: bind
+    gnutls-object:
       capability: unix.symlink
       select:
         filepath:
@@ -24,8 +23,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/gnutls.config
-    java-collection:
-      collection_title: java
+      object_title: gnutls
+    java-object:
       capability: unix.symlink
       select:
         filepath:
@@ -33,8 +32,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/java.config
-    javasystem-collection:
-      collection_title: javasystem
+      object_title: java
+    javasystem-object:
       capability: unix.symlink
       select:
         filepath:
@@ -42,8 +41,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/javasystem.config
-    krb5-collection:
-      collection_title: krb5
+      object_title: javasystem
+    krb5-object:
       capability: unix.symlink
       select:
         filepath:
@@ -51,8 +50,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/krb5.config
-    libreswan-collection:
-      collection_title: libreswan
+      object_title: krb5
+    libreswan-object:
       capability: unix.symlink
       select:
         filepath:
@@ -60,8 +59,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/libreswan.config
-    libssh-collection:
-      collection_title: libssh
+      object_title: libreswan
+    libssh-object:
       capability: unix.symlink
       select:
         filepath:
@@ -69,8 +68,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/libssh.config
-    nss-collection:
-      collection_title: nss
+      object_title: libssh
+    nss-object:
       capability: unix.file
       select:
         filepath:
@@ -78,8 +77,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/nss.config
-    openssh-collection:
-      collection_title: openssh
+      object_title: nss
+    openssh-object:
       capability: unix.symlink
       select:
         filepath:
@@ -87,8 +86,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/openssh.config
-    opensshserver-collection:
-      collection_title: opensshserver
+      object_title: openssh
+    opensshserver-object:
       capability: unix.symlink
       select:
         filepath:
@@ -96,8 +95,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/opensshserver.config
-    opensslcnf-collection:
-      collection_title: opensslcnf
+      object_title: opensshserver
+    opensslcnf-object:
       capability: unix.symlink
       select:
         filepath:
@@ -105,8 +104,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/opensslcnf.config
-    openssl-collection:
-      collection_title: openssl
+      object_title: opensslcnf
+    openssl-object:
       capability: unix.symlink
       select:
         filepath:
@@ -114,211 +113,237 @@ assessment:
           datatype: string
           mask: false
           value: /etc/crypto-policies/back-ends/openssl.config
+      object_title: openssl
+  states:
+    state-bind:
+      state_title: bind
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/bind.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-gnutls:
+      state_title: gnutls
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/gnutls.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-java:
+      state_title: java
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/java.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-javasystem:
+      state_title: javasystem
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/javasystem.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-krb5:
+      state_title: krb5
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/krb5.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-libreswan:
+      state_title: libreswan
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/libreswan.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-libssh:
+      state_title: libssh
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/libssh.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-ensure-nss-is-a-regular-file:
+      state_title: Ensure nss is a regular file
+      capability: unix.file
+      state:
+        field: type
+        value: regular
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-openssh:
+      state_title: openssh
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/openssh.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-opensshserver:
+      state_title: opensshserver
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/opensshserver.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-opensslcnf:
+      state_title: opensslcnf
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/opensslcnf.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-openssl:
+      state_title: openssl
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /usr/share/crypto-policies/FIPS/openssl.txt
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-bind:
       test_title: bind
       capability: unix.symlink
-      collection: bind-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: bind
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/bind.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: bind-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-bind
     test-gnutls:
       test_title: gnutls
       capability: unix.symlink
-      collection: gnutls-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: gnutls
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/gnutls.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: gnutls-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-gnutls
     test-java:
       test_title: java
       capability: unix.symlink
-      collection: java-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: java
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/java.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: java-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-java
     test-javasystem:
       test_title: javasystem
       capability: unix.symlink
-      collection: javasystem-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: javasystem
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/javasystem.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: javasystem-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-javasystem
     test-krb5:
       test_title: krb5
       capability: unix.symlink
-      collection: krb5-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: krb5
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/krb5.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: krb5-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-krb5
     test-libreswan:
       test_title: libreswan
       capability: unix.symlink
-      collection: libreswan-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: libreswan
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/libreswan.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: libreswan-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-libreswan
     test-libssh:
       test_title: libssh
       capability: unix.symlink
-      collection: libssh-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: libssh
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/libssh.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: libssh-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-libssh
     test-nss:
       test_title: nss
       capability: unix.file
-      collection: nss-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Ensure nss is a regular file
-        state_capability: unix.file
-        state:
-          field: type
-          value: regular
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: nss-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-ensure-nss-is-a-regular-file
     test-openssh:
       test_title: openssh
       capability: unix.symlink
-      collection: openssh-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: openssh
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/openssh.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: openssh-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-openssh
     test-opensshserver:
       test_title: opensshserver
       capability: unix.symlink
-      collection: opensshserver-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: opensshserver
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/opensshserver.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: opensshserver-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-opensshserver
     test-opensslcnf:
       test_title: opensslcnf
       capability: unix.symlink
-      collection: opensslcnf-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: opensslcnf
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/opensslcnf.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: opensslcnf-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-opensslcnf
     test-openssl:
       test_title: openssl
       capability: unix.symlink
-      collection: openssl-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: openssl
-        state_capability: unix.symlink
-        state:
-          field: canonical_path
-          value: /usr/share/crypto-policies/FIPS/openssl.txt
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: openssl-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-openssl
   evaluate:
     all:
     - test: test-bind

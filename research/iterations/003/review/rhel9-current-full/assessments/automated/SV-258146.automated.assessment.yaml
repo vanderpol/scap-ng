@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    rsyslog-conf-actionsendstreamdriverauthmode-collection:
-      collection_title: 'rsyslog.conf: ActionSendStreamDriverAuthMode'
+  objects:
+    rsyslog-conf-actionsendstreamdriverauthmode-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -28,8 +27,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-d-conf-actionsendstreamdriverauthmode-collection:
-      collection_title: 'rsyslog.d/*.conf: ActionSendStreamDriverAuthMode'
+      object_title: 'rsyslog.conf: ActionSendStreamDriverAuthMode'
+    rsyslog-d-conf-actionsendstreamdriverauthmode-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -54,16 +53,16 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    actionsendstreamdriverauthmode-collection:
-      collection_title: ActionSendStreamDriverAuthMode
+      object_title: 'rsyslog.d/*.conf: ActionSendStreamDriverAuthMode'
+    actionsendstreamdriverauthmode-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: rsyslog-conf-actionsendstreamdriverauthmode-collection
-        - collection: rsyslog-d-conf-actionsendstreamdriverauthmode-collection
-    rsyslog-conf-action-all-messages-collection:
-      collection_title: 'rsyslog.conf: action for all messages'
+        - object: rsyslog-conf-actionsendstreamdriverauthmode-object
+        - object: rsyslog-d-conf-actionsendstreamdriverauthmode-object
+      object_title: ActionSendStreamDriverAuthMode
+    rsyslog-conf-action-all-messages-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -83,8 +82,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-d-conf-action-all-messages-collection:
-      collection_title: 'rsyslog.d/*.conf: action for all messages'
+      object_title: 'rsyslog.conf: action for all messages'
+    rsyslog-d-conf-action-all-messages-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -109,16 +108,16 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-action-all-messages-collection:
-      collection_title: 'rsyslog: action for all messages'
+      object_title: 'rsyslog.d/*.conf: action for all messages'
+    rsyslog-action-all-messages-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: rsyslog-conf-action-all-messages-collection
-        - collection: rsyslog-d-conf-action-all-messages-collection
-    rsyslog-conf-module-blocks-collection:
-      collection_title: 'rsyslog.conf: module blocks'
+        - object: rsyslog-conf-action-all-messages-object
+        - object: rsyslog-d-conf-action-all-messages-object
+      object_title: 'rsyslog: action for all messages'
+    rsyslog-conf-module-blocks-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -138,8 +137,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-d-conf-module-blocks-collection:
-      collection_title: 'rsyslog.d/*.conf: module blocks'
+      object_title: 'rsyslog.conf: module blocks'
+    rsyslog-d-conf-module-blocks-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -164,78 +163,87 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-module-blocks-collection:
-      collection_title: 'rsyslog: module blocks'
+      object_title: 'rsyslog.d/*.conf: module blocks'
+    rsyslog-module-blocks-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: rsyslog-conf-module-blocks-collection
-        - collection: rsyslog-d-conf-module-blocks-collection
+        - object: rsyslog-conf-module-blocks-object
+        - object: rsyslog-d-conf-module-blocks-object
+      object_title: 'rsyslog: module blocks'
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: x509/name
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-3:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\s*=\s*"x509/name"
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-4:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\b
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-actionsendstreamdriverauthmode-x509-name:
       test_title: ActionSendStreamDriverAuthMode == x509/name
       capability: independent.textfilecontent54
-      collection: actionsendstreamdriverauthmode-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: x509/name
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: actionsendstreamdriverauthmode-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
     test-streamdriverauthmode-set-x509-name-advanced-syntax:
       test_title: StreamDriverAuthMode is set to x509/name (advanced syntax)
       capability: independent.textfilecontent54
-      collection: rsyslog-action-all-messages-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_operator: AND
-        states:
-        - state_title: null
-          capability: independent.textfilecontent54
-          state:
-            field: subexpression
-            value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
-            operation: pattern match
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: independent.textfilecontent54
-          state:
-            field: subexpression
-            value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\s*=\s*"x509/name"
-            operation: pattern match
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: rsyslog-action-all-messages-object
+      check_existence: at_least_one_exists
+      check: at least one
+      state_operator: AND
+      states:
+      - state-independent-textfilecontent54-2
+      - state-independent-textfilecontent54-3
     test-streamdriverauthmode-not-set-in-module-block-advanced-syntax:
       test_title: StreamDriverAuthMode is not set in a module block (advanced syntax)
       capability: independent.textfilecontent54
-      collection: rsyslog-module-blocks-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: none satisfy
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\b
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: rsyslog-module-blocks-object
+      check_existence: any_exist
+      check: none satisfy
+      states:
+      - state-independent-textfilecontent54-4
   evaluate:
     all:
     - any:

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    sshd-config-x11uselocalhost-collection-2:
-      collection_title: sshd_config X11UseLocalhost
+  objects:
+    sshd-config-x11uselocalhost-object-2:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,8 +24,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    independent-textfilecontent54-collection:
-      collection_title: null
+      object_title: sshd_config X11UseLocalhost
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -52,31 +51,35 @@ assessment:
       behaviors:
         max_depth: '-1'
         recurse_direction: down
-    sshd-config-x11uselocalhost-collection:
-      collection_title: sshd_config X11UseLocalhost
+      object_title: null
+    sshd-config-x11uselocalhost-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: sshd-config-x11uselocalhost-collection-2
-        - collection: independent-textfilecontent54-collection
+        - object: sshd-config-x11uselocalhost-object-2
+        - object: independent-textfilecontent54-object
+      object_title: sshd_config X11UseLocalhost
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(yes|"yes")$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-sshd-config-x11uselocalhost-set-yes:
       test_title: sshd_config X11UseLocalhost is set to yes.
       capability: independent.textfilecontent54
-      collection: sshd-config-x11uselocalhost-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: ^(yes|"yes")$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: sshd-config-x11uselocalhost-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     test: test-sshd-config-x11uselocalhost-set-yes

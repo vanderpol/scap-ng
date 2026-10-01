@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    independent-textfilecontent54-collection:
-      collection_title: null
+  objects:
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -28,8 +27,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    audit-log-directory-collection:
-      collection_title: Audit log directory
+      object_title: null
+    audit-log-directory-object:
       capability: unix.file
       select:
         path:
@@ -45,6 +44,7 @@ assessment:
           mask: false
           nil: true
           value: ''
+      object_title: Audit log directory
   variables:
     audit-data-directory-from-etc-audit-auditd-conf-variable:
       title: audit data directory from /etc/audit/auditd.conf
@@ -52,25 +52,28 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: independent-textfilecontent54-collection
+          object: independent-textfilecontent54-object
           field: subexpression
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-audit-log-directories-owned-by-root:
       test_title: audit log directories are owned by root
       capability: unix.file
-      collection: audit-log-directory-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: owned by root
-        state_capability: unix.file
-        state:
-          field: user_id
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: audit-log-directory-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-owned-by-root
   evaluate:
     test: test-audit-log-directories-owned-by-root

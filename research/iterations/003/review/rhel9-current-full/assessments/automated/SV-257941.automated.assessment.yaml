@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    all-interfaces-collection:
-      collection_title: All Interfaces
+  objects:
+    all-interfaces-object:
       capability: unix.interface
       select:
         name:
@@ -15,23 +14,27 @@ assessment:
           datatype: string
           mask: false
           value: .*
+      object_title: All Interfaces
+  states:
+    state-interface-is-not-in-promisc-mode:
+      state_title: Interface is not in PROMISC mode
+      capability: unix.interface
+      state:
+        field: flag
+        value: (^|\s)PROMISC(\s|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: none satisfy
+        entity_existence: at_least_one_exists
   tests:
     test-no-network-interfaces-in-promiscuous-mode:
       test_title: no network interfaces are in promiscuous mode
       capability: unix.interface
-      collection: all-interfaces-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: Interface is not in PROMISC mode
-        state_capability: unix.interface
-        state:
-          field: flag
-          value: (^|\s)PROMISC(\s|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: none satisfy
-          entity_existence: at_least_one_exists
+      object: all-interfaces-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-interface-is-not-in-promisc-mode
   evaluate:
     test: test-no-network-interfaces-in-promiscuous-mode

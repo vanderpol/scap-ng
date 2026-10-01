@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    independent-textfilecontent54-collection:
-      collection_title: null
+  objects:
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    last-non-whitespace-line-etc-fapolicyd-compiled-rules-collection:
-      collection_title: The last non-whitespace line of /etc/fapolicyd/compiled.rules
+      object_title: null
+    last-non-whitespace-line-etc-fapolicyd-compiled-rules-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -47,41 +46,47 @@ assessment:
           value: '1'
       behaviors:
         multiline: 'false'
+      object_title: The last non-whitespace line of /etc/fapolicyd/compiled.rules
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-fapolicyd-fapolicyd-conf-permissive-0:
       test_title: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
     test-etc-fapolicyd-compiled-rules-deny-all:
       test_title: '/etc/fapolicyd/compiled.rules: deny all'
       capability: independent.textfilecontent54
-      collection: last-non-whitespace-line-etc-fapolicyd-compiled-rules-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: last-non-whitespace-line-etc-fapolicyd-compiled-rules-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54-2
   evaluate:
     all:
     - test: test-etc-fapolicyd-fapolicyd-conf-permissive-0

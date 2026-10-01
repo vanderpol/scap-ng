@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-gsettings-autorun-never-setting-collection:
-      collection_title: Retrieve the gsettings autorun-never setting.
+  objects:
+    retrieve-gsettings-autorun-never-setting-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -20,31 +19,35 @@ assessment:
           datatype: string
           mask: false
           value: gsettings get org.gnome.desktop.media-handling autorun-never
+      object_title: Retrieve the gsettings autorun-never setting.
+  states:
+    state-confirm-value-is-true:
+      state_title: Confirm value is 'true'.
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-verify-rhel-9-disables-graphical-user-interface-autorun-function:
       test_title: Verify RHEL 9 disables the graphical user interface autorun function.
       capability: independent.shellcommand
-      collection: retrieve-gsettings-autorun-never-setting-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm value is 'true'.
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value: 'true'
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: retrieve-gsettings-autorun-never-setting-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-value-is-true
   evaluate:
     test: test-verify-rhel-9-disables-graphical-user-interface-autorun-function

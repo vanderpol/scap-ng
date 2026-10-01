@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    rsyslog-conf-remote-log-acceptance-config-collection:
-      collection_title: 'rsyslog.conf: remote log acceptance config'
+  objects:
+    rsyslog-conf-remote-log-acceptance-config-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -30,8 +29,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    rsyslog-d-conf-remote-log-acceptance-config-collection:
-      collection_title: 'rsyslog.d/*.conf: remote log acceptance config'
+      object_title: 'rsyslog.conf: remote log acceptance config'
+    rsyslog-d-conf-remote-log-acceptance-config-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -58,14 +57,15 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    remote-log-acceptance-config-collection:
-      collection_title: remote log acceptance config
+      object_title: 'rsyslog.d/*.conf: remote log acceptance config'
+    remote-log-acceptance-config-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: rsyslog-conf-remote-log-acceptance-config-collection
-        - collection: rsyslog-d-conf-remote-log-acceptance-config-collection
+        - object: rsyslog-conf-remote-log-acceptance-config-object
+        - object: rsyslog-d-conf-remote-log-acceptance-config-object
+      object_title: remote log acceptance config
   variables:
     patterns-remote-log-acceptance-config-variable:
       title: Patterns for remote log acceptance config
@@ -82,14 +82,13 @@ assessment:
         - ^[^#]*input\s*\(.*\btype\b\s*=\s*"imtcp"\s*\bport\b\s*=\s*"514".*\)
         - ^[^#]*input\s*\(.*\btype\b\s*=\s*"imudp"\s*\bport\b\s*=\s*"514".*\)
         - ^[^#]*input\s*\(.*\btype\b\s*=\s*"imrelp"\s*\bport\b\s*=\s*"514".*\)
+  states: {}
   tests:
     test-no-remote-log-acceptance:
       test_title: no remote log acceptance
       capability: independent.textfilecontent54
-      collection: remote-log-acceptance-config-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: remote-log-acceptance-config-object
+      check_existence: none_exist
+      check: all
   evaluate:
     test: test-no-remote-log-acceptance

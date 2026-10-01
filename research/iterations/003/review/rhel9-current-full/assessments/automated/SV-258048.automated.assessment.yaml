@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    return-any-user-who-does-not-have-valid-primary-group-collection:
-      collection_title: Return any user who does not have a valid primary group
+  objects:
+    return-any-user-who-does-not-have-valid-primary-group-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -25,23 +24,27 @@ assessment:
           datatype: string
           mask: false
           value: no group
+      object_title: Return any user who does not have a valid primary group
+  states:
+    state-confirm-no-users-are-reported-that-have-an-invalid-prima:
+      state_title: Confirm no users are reported that have an invalid primary group
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
   tests:
     test-interactive-users-have-primary-group-that-exists:
       test_title: Interactive users must have a primary group that exists.
       capability: independent.shellcommand
-      collection: return-any-user-who-does-not-have-valid-primary-group-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm no users are reported that have an invalid primary group
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: none_exist
+      object: return-any-user-who-does-not-have-valid-primary-group-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-no-users-are-reported-that-have-an-invalid-prima
   evaluate:
     test: test-interactive-users-have-primary-group-that-exists

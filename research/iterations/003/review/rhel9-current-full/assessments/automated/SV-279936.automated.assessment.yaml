@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-relevant-rules-via-auditctl-collection:
-      collection_title: Retrieve relevant rules via auditctl
+  objects:
+    retrieve-relevant-rules-via-auditctl-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -25,6 +24,7 @@ assessment:
           datatype: string
           mask: false
           value: subj_type=crond_t
+      object_title: Retrieve relevant rules via auditctl
   variables:
     required-rule-strings-variable:
       title: Required rule strings.
@@ -36,33 +36,36 @@ assessment:
         - -a\s+always,exit\s+-F\s+arch=b32\s+-S\s+execve\s+-F\s+subj_type=crond_t\s+-F\s+euid=0\s+(-k\s+cron_exec|-F\s+key=cron_exec)
         - -a\s+always,exit\s+-F\s+arch=b64\s+-S\s+execve\s+-F\s+subj_type=crond_t\s+-F\s+auid>=1000\s+-F\s+auid!=unset\s+(-k\s+cron_exec|-F\s+key=cron_exec)
         - -a\s+always,exit\s+-F\s+arch=b32\s+-S\s+execve\s+-F\s+subj_type=crond_t\s+-F\s+auid>=1000\s+-F\s+auid!=unset\s+(-k\s+cron_exec|-F\s+key=cron_exec)
+  states:
+    state-generic-placeholder-comment:
+      state_title: Generic Placeholder Comment
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value:
+            variable: required-rule-strings-variable
+          operation: pattern match
+          datatype: string
+          mask: false
+          variable_check: all
+          entity_check: at least one
+          entity_existence: at_least_one_exists
   tests:
     test-generic-placeholder-comment:
       test_title: Generic Placeholder Comment
       capability: independent.shellcommand
-      collection: retrieve-relevant-rules-via-auditctl-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Generic Placeholder Comment
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value:
-              variable: required-rule-strings-variable
-            operation: pattern match
-            datatype: string
-            mask: false
-            variable_check: all
-            entity_check: at least one
-            entity_existence: at_least_one_exists
+      object: retrieve-relevant-rules-via-auditctl-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-generic-placeholder-comment
   evaluate:
     test: test-generic-placeholder-comment

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    bls-options-collection:
-      collection_title: BLS options
+  objects:
+    bls-options-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -30,8 +29,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-default-grub-grub-cmdline-linux-collection:
-      collection_title: /etc/default/grub GRUB_CMDLINE_LINUX
+      object_title: BLS options
+    etc-default-grub-grub-cmdline-linux-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -49,41 +48,36 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (^|\s)init_on_free=1(\s|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-bls-options-contain-init-on-free-1:
       test_title: BLS options contain init_on_free=1
       capability: independent.textfilecontent54
-      collection: bls-options-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (^|\s)init_on_free=1(\s|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: bls-options-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
     test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-init:
       test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1
       capability: independent.textfilecontent54
-      collection: etc-default-grub-grub-cmdline-linux-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (^|\s)init_on_free=1(\s|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-default-grub-grub-cmdline-linux-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     all:
     - test: test-bls-options-contain-init-on-free-1

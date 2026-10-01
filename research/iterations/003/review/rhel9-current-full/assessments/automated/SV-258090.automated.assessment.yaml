@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    fapolicyd-service-activestate-collection:
-      collection_title: fapolicyd.service ActiveState
+  objects:
+    fapolicyd-service-activestate-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: ActiveState
+      object_title: fapolicyd.service ActiveState
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-fapolicyd-service-active:
       test_title: fapolicyd.service is active
       capability: linux.systemdunitproperty
-      collection: fapolicyd-service-activestate-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: active
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: fapolicyd-service-activestate-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
   evaluate:
     test: test-fapolicyd-service-active

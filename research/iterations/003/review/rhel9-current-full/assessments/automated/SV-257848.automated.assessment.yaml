@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    var-tmp-collection:
-      collection_title: /var/tmp
+  objects:
+    var-tmp-object:
       capability: linux.partition
       select:
         mount_point:
@@ -15,14 +14,14 @@ assessment:
           datatype: string
           mask: false
           value: /var/tmp
+      object_title: /var/tmp
+  states: {}
   tests:
     test-var-tmp-mounted:
       test_title: /var/tmp is mounted
       capability: linux.partition
-      collection: var-tmp-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: var-tmp-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     test: test-var-tmp-mounted

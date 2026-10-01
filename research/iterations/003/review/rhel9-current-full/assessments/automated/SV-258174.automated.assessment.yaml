@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrive-location-alias-maps-collection:
-      collection_title: Retrive location of alias maps.
+  objects:
+    retrive-location-alias-maps-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -26,8 +25,8 @@ assessment:
           datatype: string
           mask: false
           value: ^\s*alias_maps\s+=\s+(hash:.*)$
-    confirm-postfix-alias-map-s-exist-collection:
-      collection_title: Confirm postfix alias map(s) exist.
+      object_title: Retrive location of alias maps.
+    confirm-postfix-alias-map-s-exist-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -42,6 +41,7 @@ assessment:
           variable_check: all
           value:
             variable: retrieve-location-alias-map-construct-postmap-query-variable
+      object_title: Confirm postfix alias map(s) exist.
   variables:
     retrieve-location-alias-map-construct-postmap-query-variable:
       title: Retrieve location of alias map and construct postmap query.
@@ -53,33 +53,36 @@ assessment:
             value: 'postmap -q root '
             datatype: string
         - values:
-            collection: retrive-location-alias-maps-collection
+            object: retrive-location-alias-maps-object
             field: subexpression
+  states:
+    state-confirm-an-alias-is-returned-by-the-postconf-query:
+      state_title: Confirm an alias is returned by the postconf query.
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: \w+
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-confirm-postfix-configured-notify-in-event-audit-processing-failure:
       test_title: Confirm postfix is configured to notify in the event of an audit processing failure.
       capability: independent.shellcommand
-      collection: confirm-postfix-alias-map-s-exist-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm an alias is returned by the postconf query.
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value: \w+
-            operation: pattern match
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: confirm-postfix-alias-map-s-exist-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-an-alias-is-returned-by-the-postconf-query
   evaluate:
     test: test-confirm-postfix-configured-notify-in-event-audit-processing-failure

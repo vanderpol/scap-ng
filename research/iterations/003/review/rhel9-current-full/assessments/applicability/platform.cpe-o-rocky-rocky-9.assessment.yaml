@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: inventory
   purpose: applicability
-  collections:
-    gather-cpe-name-attribute-collection:
-      collection_title: gather the CPE_NAME attribute
+  objects:
+    gather-cpe-name-attribute-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,23 +24,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: gather the CPE_NAME attribute
+  states:
+    state-cpe-name-matches-rocky-rocky-9:
+      state_title: CPE_NAME matches rocky:rocky:9
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: rocky:rocky:9
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-os-release-file-has-cpe-name-rocky-rocky-9:
       test_title: The os-release file has CPE_NAME of rocky:rocky:9
       capability: independent.textfilecontent54
-      collection: gather-cpe-name-attribute-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: CPE_NAME matches rocky:rocky:9
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: rocky:rocky:9
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: gather-cpe-name-attribute-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-cpe-name-matches-rocky-rocky-9
   evaluate:
     test: test-os-release-file-has-cpe-name-rocky-rocky-9

@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-sudoers-defaults-targetpw-collection:
-      collection_title: /etc/sudoers Defaults !targetpw
+  objects:
+    etc-sudoers-defaults-targetpw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-defaults-rootpw-collection:
-      collection_title: /etc/sudoers Defaults !rootpw
+      object_title: /etc/sudoers Defaults !targetpw
+    etc-sudoers-defaults-rootpw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -45,8 +44,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-defaults-runaspw-collection:
-      collection_title: /etc/sudoers Defaults !runaspw
+      object_title: /etc/sudoers Defaults !rootpw
+    etc-sudoers-defaults-runaspw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -64,8 +63,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-includedir-collection:
-      collection_title: /etc/sudoers includedir
+      object_title: /etc/sudoers Defaults !runaspw
+    etc-sudoers-includedir-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -83,8 +82,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-d-config-files-excluding-files-ending-or-containing-collection:
-      collection_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
+      object_title: /etc/sudoers includedir
+    etc-sudoers-d-config-files-excluding-files-ending-or-containing-object:
       capability: unix.file
       select:
         path:
@@ -97,8 +96,8 @@ assessment:
           datatype: string
           mask: false
           value: ^[^.]*[^.~]$
-    etc-sudoers-d-defaults-targetpw-collection:
-      collection_title: /etc/sudoers.d Defaults !targetpw
+      object_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
+    etc-sudoers-d-defaults-targetpw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -118,8 +117,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-d-defaults-rootpw-collection:
-      collection_title: /etc/sudoers.d Defaults !rootpw
+      object_title: /etc/sudoers.d Defaults !targetpw
+    etc-sudoers-d-defaults-rootpw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -139,8 +138,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-sudoers-d-defaults-runaspw-collection:
-      collection_title: /etc/sudoers.d Defaults !runaspw
+      object_title: /etc/sudoers.d Defaults !rootpw
+    etc-sudoers-d-defaults-runaspw-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -160,6 +159,7 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/sudoers.d Defaults !runaspw
   variables:
     sudoers-d-config-files-variable:
       title: sudoers.d config files
@@ -167,74 +167,65 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: etc-sudoers-d-config-files-excluding-files-ending-or-containing-collection
+          object: etc-sudoers-d-config-files-excluding-files-ending-or-containing-object
           field: filepath
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /etc/sudoers.d
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-defaults-targetpw-in-etc-sudoers:
       test_title: Defaults !targetpw in /etc/sudoers
       capability: independent.textfilecontent54
-      collection: etc-sudoers-defaults-targetpw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-defaults-targetpw-object
+      check_existence: at_least_one_exists
+      check: all
     test-defaults-rootpw-in-etc-sudoers:
       test_title: Defaults !rootpw in /etc/sudoers
       capability: independent.textfilecontent54
-      collection: etc-sudoers-defaults-rootpw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-defaults-rootpw-object
+      check_existence: at_least_one_exists
+      check: all
     test-defaults-runaspw-in-etc-sudoers:
       test_title: Defaults !runaspw in /etc/sudoers
       capability: independent.textfilecontent54
-      collection: etc-sudoers-defaults-runaspw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-defaults-runaspw-object
+      check_existence: at_least_one_exists
+      check: all
     test-etc-sudoers-d-included-in-etc-sudoers:
       test_title: /etc/sudoers.d included in /etc/sudoers
       capability: independent.textfilecontent54
-      collection: etc-sudoers-includedir-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: /etc/sudoers.d
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-sudoers-includedir-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
     test-defaults-targetpw-in-etc-sudoers-d:
       test_title: Defaults !targetpw in /etc/sudoers.d
       capability: independent.textfilecontent54
-      collection: etc-sudoers-d-defaults-targetpw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-d-defaults-targetpw-object
+      check_existence: at_least_one_exists
+      check: all
     test-defaults-rootpw-in-etc-sudoers-d:
       test_title: Defaults !rootpw in /etc/sudoers.d
       capability: independent.textfilecontent54
-      collection: etc-sudoers-d-defaults-rootpw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-d-defaults-rootpw-object
+      check_existence: at_least_one_exists
+      check: all
     test-defaults-runaspw-in-etc-sudoers-d:
       test_title: Defaults !runaspw in /etc/sudoers.d
       capability: independent.textfilecontent54
-      collection: etc-sudoers-d-defaults-runaspw-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-sudoers-d-defaults-runaspw-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     any:
     - all:

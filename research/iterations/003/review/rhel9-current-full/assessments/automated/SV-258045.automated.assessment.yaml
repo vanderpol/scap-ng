@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    interactive-users-collection:
-      collection_title: Interactive Users
+  objects:
+    interactive-users-object:
       capability: unix.password
       select:
         username:
@@ -17,18 +16,9 @@ assessment:
           value: .*
       filters:
       - action: include
-        match:
-          field: user_id
-          value: '1000'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: Interactive Users
-        capability: unix.password
-    count-passwd-entries-collection:
-      collection_title: count of passwd entries
+        state: state-interactive-users
+      object_title: Interactive Users
+    count-passwd-entries-object:
       capability: independent.variable
       select:
         var_ref:
@@ -37,6 +27,7 @@ assessment:
           mask: false
           value:
             variable: count-passwd-entries-variable
+      object_title: count of passwd entries
   variables:
     count-passwd-entries-variable:
       title: count of passwd entries
@@ -45,7 +36,7 @@ assessment:
       expression:
         count:
           values:
-            collection: interactive-users-collection
+            object: interactive-users-object
             field: user_id
     count-unique-uids-variable:
       title: count of unique UIDs
@@ -55,27 +46,41 @@ assessment:
         count:
           unique:
             values:
-              collection: interactive-users-collection
+              object: interactive-users-object
               field: user_id
+  states:
+    state-count-of-passwd-uids:
+      state_title: count of passwd UIDs
+      capability: independent.variable
+      state:
+        field: value
+        value:
+          variable: count-unique-uids-variable
+        operation: equals
+        datatype: int
+        mask: false
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-interactive-users:
+      state_title: Interactive Users
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-uids-unique:
       test_title: UIDs are unique
       capability: independent.variable
-      collection: count-passwd-entries-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: count of passwd UIDs
-        state_capability: independent.variable
-        state:
-          field: value
-          value:
-            variable: count-unique-uids-variable
-          operation: equals
-          datatype: int
-          mask: false
-          variable_check: all
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: count-passwd-entries-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-count-of-passwd-uids
   evaluate:
     test: test-uids-unique

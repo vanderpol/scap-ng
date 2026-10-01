@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-systemdunitproperty-collection:
-      collection_title: null
+  objects:
+    linux-systemdunitproperty-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: ActiveState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-chronyd-service-active:
       test_title: chronyd service is active
       capability: linux.systemdunitproperty
-      collection: linux-systemdunitproperty-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: active
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: linux-systemdunitproperty-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-systemdunitproperty
   evaluate:
     test: test-chronyd-service-active

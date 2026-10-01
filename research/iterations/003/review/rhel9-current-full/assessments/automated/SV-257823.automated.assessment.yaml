@@ -5,10 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-collection:
-      collection_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match
-        vendor values.
+  objects:
+    verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -21,24 +19,29 @@ assessment:
           datatype: string
           mask: false
           value: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+      object_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor
+        values.
+  states:
+    state-confirm-no-files-are-identified:
+      state_title: Confirm no files are identified.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
   tests:
     test-verify-that-rhel-9-configured-so-that-cryptographic-hashes-system:
       test_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor
         values.
       capability: independent.shellcommand
-      collection: verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm no files are identified.
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: none_exist
+      object: verify-that-rhel-9-configured-so-that-cryptographic-hashes-system-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-no-files-are-identified
   evaluate:
     test: test-verify-that-rhel-9-configured-so-that-cryptographic-hashes-system

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    usbguard-service-activestate-collection:
-      collection_title: usbguard.service ActiveState
+  objects:
+    usbguard-service-activestate-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: ActiveState
+      object_title: usbguard.service ActiveState
+  states:
+    state-usbguard-service-active:
+      state_title: usbguard.service active
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: active
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-usbguard-service-active:
       test_title: usbguard.service is active
       capability: linux.systemdunitproperty
-      collection: usbguard-service-activestate-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: usbguard.service active
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: active
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: usbguard-service-activestate-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-usbguard-service-active
   evaluate:
     test: test-usbguard-service-active

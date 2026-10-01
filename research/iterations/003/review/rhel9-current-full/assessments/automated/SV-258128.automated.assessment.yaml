@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    usr-lib-systemd-system-emergency-service-execstart-collection:
-      collection_title: /usr/lib/systemd/system/emergency.service ExecStart
+  objects:
+    usr-lib-systemd-system-emergency-service-execstart-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,23 +24,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /usr/lib/systemd/system/emergency.service ExecStart
+  states:
+    state-emergency-service-execstart:
+      state_title: emergency.service ExecStart
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: -/usr/lib/systemd/systemd-sulogin-shell emergency
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-emergency-service-config-correct:
       test_title: emergency.service config correct
       capability: independent.textfilecontent54
-      collection: usr-lib-systemd-system-emergency-service-execstart-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: emergency.service ExecStart
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: -/usr/lib/systemd/systemd-sulogin-shell emergency
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: usr-lib-systemd-system-emergency-service-execstart-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-emergency-service-execstart
   evaluate:
     test: test-emergency-service-config-correct

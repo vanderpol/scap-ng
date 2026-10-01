@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    dconf-user-databases-collection:
-      collection_title: dconf user databases
+  objects:
+    dconf-user-databases-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database-collection:
-      collection_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories
+      object_title: dconf user databases
+    org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -52,6 +51,7 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories
   variables:
     dconf-user-database-locks-directories-variable:
       title: dconf user database locks directories
@@ -63,28 +63,25 @@ assessment:
             value: /etc/dconf/db/
             datatype: string
         - values:
-            collection: dconf-user-databases-collection
+            object: dconf-user-databases-object
             field: subexpression
         - literal:
             value: .d/locks
             datatype: string
+  states: {}
   tests:
     test-dconf-user-database-s-exist:
       test_title: dconf user database(s) exist
       capability: independent.textfilecontent54
-      collection: dconf-user-databases-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: dconf-user-databases-object
+      check_existence: at_least_one_exists
+      check: all
     test-org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database:
       test_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
       capability: independent.textfilecontent54
-      collection: org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     all:
     - test: test-dconf-user-database-s-exist

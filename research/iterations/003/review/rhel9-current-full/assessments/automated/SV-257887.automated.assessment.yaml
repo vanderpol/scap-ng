@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    audit-tools-collection:
-      collection_title: audit tools
+  objects:
+    audit-tools-object:
       capability: unix.file
       select:
         filepath:
@@ -17,6 +16,7 @@ assessment:
           variable_check: at least one
           value:
             variable: audit-tools-variable
+      object_title: audit tools
   variables:
     audit-tools-variable:
       title: audit tools
@@ -31,52 +31,55 @@ assessment:
         - /sbin/auditd
         - /sbin/rsyslogd
         - /sbin/augenrules
+  states:
+    state-mode-0755-or-less-permissive:
+      state_title: mode 0755 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-audit-tools-have-mode-0755-or-less-permissive:
       test_title: audit tools have a mode of 0755 or less permissive.
       capability: unix.file
-      collection: audit-tools-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: mode 0755 or less permissive
-        state_capability: unix.file
-        state:
-          all:
-          - field: suid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sgid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sticky
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: gwrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: owrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: audit-tools-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-mode-0755-or-less-permissive
   evaluate:
     test: test-audit-tools-have-mode-0755-or-less-permissive

@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-picture-uri-writable-configuration-from-org-gnome-dekstop-screensaver-collection:
-      collection_title: Retrieve picture-uri 'writable' configuration from org.gnome.dekstop.screensaver.
+  objects:
+    retrieve-picture-uri-writable-configuration-from-org-gnome-dekstop-screensaver-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -21,31 +20,35 @@ assessment:
           datatype: string
           mask: false
           value: gsettings writable org.gnome.desktop.screensaver picture-uri
+      object_title: Retrieve picture-uri 'writable' configuration from org.gnome.dekstop.screensaver.
+  states:
+    state-confirm-configuration-does-not-show-true-and-no-stderr-i:
+      state_title: Confirm configuration does not show 'true' and no STDERR is produced.
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: stdout_line
+          value: 'true'
+          operation: not equal
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stderr_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
   tests:
     test-ensure-screensaver-configured-blank:
       test_title: Ensure the screensaver is configured to be blank.
       capability: independent.shellcommand
-      collection: retrieve-picture-uri-writable-configuration-from-org-gnome-dekstop-screensaver-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm configuration does not show 'true' and no STDERR is produced.
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: stdout_line
-            value: 'true'
-            operation: not equal
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stderr_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: retrieve-picture-uri-writable-configuration-from-org-gnome-dekstop-screensaver-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-configuration-does-not-show-true-and-no-stderr-i
   evaluate:
     test: test-ensure-screensaver-configured-blank

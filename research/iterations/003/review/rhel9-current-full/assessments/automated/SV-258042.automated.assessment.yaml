@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    interactive-non-anonymous-users-collection:
-      collection_title: interactive non-anonymous users
+  objects:
+    interactive-non-anonymous-users-object:
       capability: unix.password
       select:
         username:
@@ -18,30 +17,11 @@ assessment:
           value: .*
       filters:
       - action: include
-        match:
-          field: user_id
-          value: '1000'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        capability: unix.password
+        state: state-unix-password
       - action: include
-        match:
-          field: user_id
-          value:
-            variable: anonymous-uids-variable
-          operation: not equal
-          datatype: int
-          mask: false
-          variable_check: all
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: anonymous users
-        capability: unix.password
-    etc-shadow-max-password-ages-non-system-users-collection:
-      collection_title: /etc/shadow max password ages for non-system users
+        state: state-anonymous-users
+      object_title: interactive non-anonymous users
+    etc-shadow-max-password-ages-non-system-users-object:
       capability: unix.shadow
       select:
         username:
@@ -51,20 +31,9 @@ assessment:
           value: .+
       filters:
       - action: include
-        match:
-          field: username
-          value:
-            variable: pattern-match-lines-starting-usernames-system-users-variable
-          operation: pattern match
-          datatype: string
-          mask: false
-          variable_check: at least one
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: Lines starting with usernames of system users
-        capability: unix.shadow
-    etc-shadow-max-password-age-root-collection:
-      collection_title: /etc/shadow max password age for root
+        state: state-lines-starting-with-usernames-of-system-users
+      object_title: /etc/shadow max password ages for non-system users
+    etc-shadow-max-password-age-root-object:
       capability: unix.shadow
       select:
         username:
@@ -72,6 +41,7 @@ assessment:
           datatype: string
           mask: false
           value: root
+      object_title: /etc/shadow max password age for root
   variables:
     anonymous-uids-variable:
       title: anonymous UIDs
@@ -93,70 +63,92 @@ assessment:
             value: ^
             datatype: string
         - values:
-            collection: interactive-non-anonymous-users-collection
+            object: interactive-non-anonymous-users-object
             field: username
         - literal:
             value: $
             datatype: string
+  states:
+    state-greater-than-zero:
+      state_title: greater than zero
+      capability: unix.shadow
+      state:
+        field: chg_req
+        value: '0'
+        operation: greater than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-less-than-or-equal-to-sixty:
+      state_title: less than or equal to sixty
+      capability: unix.shadow
+      state:
+        field: chg_req
+        value: '60'
+        operation: less than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-unix-password:
+      state_title: null
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-anonymous-users:
+      state_title: anonymous users
+      capability: unix.password
+      state:
+        field: user_id
+        value:
+          variable: anonymous-uids-variable
+        operation: not equal
+        datatype: int
+        mask: false
+        variable_check: all
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-lines-starting-with-usernames-of-system-users:
+      state_title: Lines starting with usernames of system users
+      capability: unix.shadow
+      state:
+        field: username
+        value:
+          variable: pattern-match-lines-starting-usernames-system-users-variable
+        operation: pattern match
+        datatype: string
+        mask: false
+        variable_check: at least one
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-no-password-in-etc-shadow-has-maximum-password-age-0:
       test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
       capability: unix.shadow
-      collection: etc-shadow-max-password-ages-non-system-users-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_operator: AND
-        states:
-        - state_title: greater than zero
-          capability: unix.shadow
-          state:
-            field: chg_req
-            value: '0'
-            operation: greater than
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: less than or equal to sixty
-          capability: unix.shadow
-          state:
-            field: chg_req
-            value: '60'
-            operation: less than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: etc-shadow-max-password-ages-non-system-users-object
+      check_existence: any_exist
+      check: all
+      state_operator: AND
+      states:
+      - state-greater-than-zero
+      - state-less-than-or-equal-to-sixty
     test-root-password-in-etc-shadow-does-not-have-maximum-password:
       test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
       capability: unix.shadow
-      collection: etc-shadow-max-password-age-root-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_operator: AND
-        states:
-        - state_title: greater than zero
-          capability: unix.shadow
-          state:
-            field: chg_req
-            value: '0'
-            operation: greater than
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: less than or equal to sixty
-          capability: unix.shadow
-          state:
-            field: chg_req
-            value: '60'
-            operation: less than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: etc-shadow-max-password-age-root-object
+      check_existence: all_exist
+      check: all
+      state_operator: AND
+      states:
+      - state-greater-than-zero
+      - state-less-than-or-equal-to-sixty
   evaluate:
     all:
     - test: test-no-password-in-etc-shadow-has-maximum-password-age-0

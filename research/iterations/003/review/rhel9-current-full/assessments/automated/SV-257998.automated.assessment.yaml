@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    unix-file-collection:
-      collection_title: null
+  objects:
+    unix-file-object:
       capability: unix.file
       select:
         filepath:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: /etc/ssh/sshd_config
-    unix-file-collection-2:
-      collection_title: null
+      object_title: null
+    unix-file-object-2:
       capability: unix.file
       select:
         path:
@@ -33,8 +32,8 @@ assessment:
       behaviors:
         recurse: directories
         recurse_direction: down
-    unix-file-collection-3:
-      collection_title: null
+      object_title: null
+    unix-file-object-3:
       capability: unix.file
       select:
         path:
@@ -50,58 +49,44 @@ assessment:
       behaviors:
         recurse: directories
         recurse_direction: down
+      object_title: null
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-ssh-sshd-config-file-owned-by-root:
       test_title: The /etc/ssh/sshd_config file is owned by root.
       capability: unix.file
-      collection: unix-file-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: owned by root
-        state_capability: unix.file
-        state:
-          field: user_id
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
     test-etc-ssh-sshd-config-d-directory-sub-directories-owned-by:
       test_title: The /etc/ssh/sshd_config.d directory and sub-directories are owned by root.
       capability: unix.file
-      collection: unix-file-collection-2
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: owned by root
-        state_capability: unix.file
-        state:
-          field: user_id
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-file-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
     test-etc-ssh-sshd-config-d-files-owned-by-root:
       test_title: The /etc/ssh/sshd_config.d files are owned by root.
       capability: unix.file
-      collection: unix-file-collection-3
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: owned by root
-        state_capability: unix.file
-        state:
-          field: user_id
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-file-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
   evaluate:
     all:
     - test: test-etc-ssh-sshd-config-file-owned-by-root

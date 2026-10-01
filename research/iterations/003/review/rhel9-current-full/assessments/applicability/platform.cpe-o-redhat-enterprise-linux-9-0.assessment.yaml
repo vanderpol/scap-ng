@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: inventory
   purpose: applicability
-  collections:
-    linux-rpminfo-collection:
-      collection_title: null
+  objects:
+    linux-rpminfo-object:
       capability: linux.rpminfo
       select:
         name:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: redhat-release
-    linux-rpminfo-collection-2:
-      collection_title: null
+      object_title: null
+    linux-rpminfo-object-2:
       capability: linux.rpminfo
       select:
         name:
@@ -24,8 +23,8 @@ assessment:
           datatype: string
           mask: false
           value: toss-release
-    linux-rpminfo-collection-3:
-      collection_title: null
+      object_title: null
+    linux-rpminfo-object-3:
       capability: linux.rpminfo
       select:
         name:
@@ -33,40 +32,40 @@ assessment:
           datatype: string
           mask: false
           value: oraclelinux-release
+      object_title: null
+  states:
+    state-linux-rpminfo:
+      state_title: null
+      capability: linux.rpminfo
+      state:
+        field: version
+        value: ^9\.\d+$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-redhat-release-package-version-9:
       test_title: The redhat-release package is version 9.
       capability: linux.rpminfo
-      collection: linux-rpminfo-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.rpminfo
-        state:
-          field: version
-          value: ^9\.\d+$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: linux-rpminfo-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-linux-rpminfo
     test-toss-package-not-installed:
       test_title: The TOSS Package is not Installed
       capability: linux.rpminfo
-      collection: linux-rpminfo-collection-2
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: linux-rpminfo-object-2
+      check_existence: none_exist
+      check: all
     test-oracle-linux-package-not-installed:
       test_title: The Oracle Linux Package is not Installed
       capability: linux.rpminfo
-      collection: linux-rpminfo-collection-3
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state: null
+      object: linux-rpminfo-object-3
+      check_existence: none_exist
+      check: all
   evaluate:
     all:
     - test: test-redhat-release-package-version-9

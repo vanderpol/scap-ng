@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: applicability
-  collections:
-    retrieve-usbguard-rules-list-collection:
-      collection_title: Retrieve usbguard rules list.
+  objects:
+    retrieve-usbguard-rules-list-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: lscpu | grep -P '(?i)hypervisor\s+vendor:\s+\S'
+      object_title: Retrieve usbguard rules list.
+  states:
+    state-confirm-the-existence-of-hypervisor-line:
+      state_title: Confirm the existence of hypervisor line.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
   tests:
     test-query-lscpu-indication-hypervisor-vendor:
       test_title: Query lscpu for indication of a hypervisor vendor.
       capability: independent.shellcommand
-      collection: retrieve-usbguard-rules-list-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: Confirm the existence of hypervisor line.
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: none_exist
+      object: retrieve-usbguard-rules-list-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-confirm-the-existence-of-hypervisor-line
   evaluate:
     test: test-query-lscpu-indication-hypervisor-vendor

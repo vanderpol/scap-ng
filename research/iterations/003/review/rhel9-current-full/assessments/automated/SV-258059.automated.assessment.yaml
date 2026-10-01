@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    unix-password-collection:
-      collection_title: null
+  objects:
+    unix-password-object:
       capability: unix.password
       select:
         username:
@@ -16,23 +15,27 @@ assessment:
           datatype: string
           mask: false
           value: root
+      object_title: null
+  states:
+    state-unix-password:
+      state_title: null
+      capability: unix.password
+      state:
+        field: user_id
+        value: '0'
+        operation: not equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-only-root-account-has-uid-zero:
       test_title: Only the root account has a UID of zero.
       capability: unix.password
-      collection: unix-password-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: unix.password
-        state:
-          field: user_id
-          value: '0'
-          operation: not equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-password-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-unix-password
   evaluate:
     test: test-only-root-account-has-uid-zero

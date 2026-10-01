@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-ipsec-conf-includes-collection:
-      collection_title: /etc/ipsec.conf includes
+  objects:
+    etc-ipsec-conf-includes-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,8 +24,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-ipsec-d-conf-includes-collection:
-      collection_title: /etc/ipsec.d/*.conf includes
+      object_title: /etc/ipsec.conf includes
+    etc-ipsec-d-conf-includes-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -49,58 +48,55 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/ipsec.d/*.conf includes
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /etc/crypto-policies/back-ends/libreswan.config
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: /etc/ipsec.d/*.conf
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-ipsec-conf-includes-crypto-policy:
       test_title: ipsec.conf includes crypto-policy
       capability: independent.textfilecontent54
-      collection: etc-ipsec-conf-includes-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: /etc/crypto-policies/back-ends/libreswan.config
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-ipsec-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
     test-ipsec-conf-includes-etc-ipsec-d-conf:
       test_title: ipsec.conf includes /etc/ipsec.d/*.conf
       capability: independent.textfilecontent54
-      collection: etc-ipsec-conf-includes-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: /etc/ipsec.d/*.conf
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-ipsec-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54-2
     test-etc-ipsec-d-conf-includes-crypto-policy:
       test_title: /etc/ipsec.d/*.conf includes crypto-policy
       capability: independent.textfilecontent54
-      collection: etc-ipsec-d-conf-includes-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: /etc/crypto-policies/back-ends/libreswan.config
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-ipsec-d-conf-includes-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     any:
     - test: test-ipsec-conf-includes-crypto-policy

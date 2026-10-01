@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    proc-sys-crypto-fips-enabled-collection:
-      collection_title: /proc/sys/crypto/fips_enabled
+  objects:
+    proc-sys-crypto-fips-enabled-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,23 +24,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /proc/sys/crypto/fips_enabled
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-fips-enabled-1:
       test_title: fips_enabled == 1
       capability: independent.textfilecontent54
-      collection: proc-sys-crypto-fips-enabled-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: '1'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: proc-sys-crypto-fips-enabled-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     test: test-fips-enabled-1

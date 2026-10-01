@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    pull-value-etc-ssh-sshd-config-ignorerhosts-collection:
-      collection_title: Pull value of /etc/ssh/sshd_config:IgnoreRhosts
+  objects:
+    pull-value-etc-ssh-sshd-config-ignorerhosts-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,8 +24,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    pull-value-etc-ssh-sshd-config-d-ignorerhosts-collection:
-      collection_title: Pull value of /etc/ssh/sshd_config.d:IgnoreRhosts
+      object_title: Pull value of /etc/ssh/sshd_config:IgnoreRhosts
+    pull-value-etc-ssh-sshd-config-d-ignorerhosts-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -49,31 +48,35 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-collection:
-      collection_title: Ignore Rhosts is set to 'yes' in both /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+      object_title: Pull value of /etc/ssh/sshd_config.d:IgnoreRhosts
+    ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: pull-value-etc-ssh-sshd-config-ignorerhosts-collection
-        - collection: pull-value-etc-ssh-sshd-config-d-ignorerhosts-collection
+        - object: pull-value-etc-ssh-sshd-config-ignorerhosts-object
+        - object: pull-value-etc-ssh-sshd-config-d-ignorerhosts-object
+      object_title: Ignore Rhosts is set to 'yes' in both /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(yes|"yes")$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-ssh-sshd-config-ignorerhosts-yes:
       test_title: /etc/ssh/sshd_config:IgnoreRhosts == yes
       capability: independent.textfilecontent54
-      collection: ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: ^(yes|"yes")$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     test: test-etc-ssh-sshd-config-ignorerhosts-yes

@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-fstab-uncommented-nfs-capturing-options-collection:
-      collection_title: /etc/fstab, uncommented, nfs, capturing options
+  objects:
+    etc-fstab-uncommented-nfs-capturing-options-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,23 +25,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/fstab, uncommented, nfs, capturing options
+  states:
+    state-nodev-option:
+      state_title: nodev option
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (^|,)nodev(,|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-nfs-mounts-mounted-nodev:
       test_title: NFS mounts are mounted with nodev
       capability: independent.textfilecontent54
-      collection: etc-fstab-uncommented-nfs-capturing-options-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: nodev option
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (^|,)nodev(,|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-fstab-uncommented-nfs-capturing-options-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-nodev-option
   evaluate:
     test: test-nfs-mounts-mounted-nodev

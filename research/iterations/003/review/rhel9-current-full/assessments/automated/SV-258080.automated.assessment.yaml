@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-security-faillock-conf-dir-collection:
-      collection_title: /etc/security/faillock.conf dir
+  objects:
+    etc-security-faillock-conf-dir-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    configured-faillock-directory-selinux-context-collection:
-      collection_title: configured faillock directory selinux context
+      object_title: /etc/security/faillock.conf dir
+    configured-faillock-directory-selinux-context-object:
       capability: linux.selinuxsecuritycontext
       select:
         path:
@@ -43,6 +42,7 @@ assessment:
           mask: false
           nil: true
           value: ''
+      object_title: configured faillock directory selinux context
   variables:
     faillock-directory-variable:
       title: faillock directory
@@ -50,34 +50,35 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: etc-security-faillock-conf-dir-collection
+          object: etc-security-faillock-conf-dir-object
           field: subexpression
+  states:
+    state-configured-faillock-directory-selinux-context-correct:
+      state_title: configured faillock directory selinux context correct
+      capability: linux.selinuxsecuritycontext
+      state:
+        field: type
+        value: faillog_t
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-configured-faillock-directory-has-correct-selinux-context:
       test_title: configured faillock directory has correct selinux context
       capability: linux.selinuxsecuritycontext
-      collection: configured-faillock-directory-selinux-context-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: configured faillock directory selinux context correct
-        state_capability: linux.selinuxsecuritycontext
-        state:
-          field: type
-          value: faillog_t
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: configured-faillock-directory-selinux-context-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-configured-faillock-directory-selinux-context-correct
     test-etc-security-faillock-conf-dir-option-exists:
       test_title: /etc/security/faillock.conf dir option exists
       capability: independent.textfilecontent54
-      collection: etc-security-faillock-conf-dir-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-security-faillock-conf-dir-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     all:
     - test: test-configured-faillock-directory-has-correct-selinux-context

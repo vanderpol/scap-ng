@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-libuser-conf-defaults-section-crypt-style-collection:
-      collection_title: /etc/libuser.conf defaults section with crypt_style
+  objects:
+    etc-libuser-conf-defaults-section-crypt-style-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-libuser-conf-defaults-section-crypt-style-collection-2:
-      collection_title: /etc/libuser.conf defaults section with crypt_style
+      object_title: /etc/libuser.conf defaults section with crypt_style
+    etc-libuser-conf-defaults-section-crypt-style-object-2:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -45,41 +44,47 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/libuser.conf defaults section with crypt_style
+  states:
+    state-defaults-crypt-style:
+      state_title: defaults/crypt_style
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-sha512:
+      state_title: sha512
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: sha512
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-libuser-conf-defaults-crypt-style-exists:
       test_title: libuser.conf, defaults/crypt_style exists
       capability: independent.textfilecontent54
-      collection: etc-libuser-conf-defaults-section-crypt-style-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: defaults/crypt_style
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-libuser-conf-defaults-section-crypt-style-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-defaults-crypt-style
     test-libuser-conf-crypt-style-sha512:
       test_title: libuser.conf, crypt_style = sha512
       capability: independent.textfilecontent54
-      collection: etc-libuser-conf-defaults-section-crypt-style-collection-2
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: sha512
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: sha512
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-libuser-conf-defaults-section-crypt-style-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-sha512
   evaluate:
     all:
     - test: test-libuser-conf-defaults-crypt-style-exists

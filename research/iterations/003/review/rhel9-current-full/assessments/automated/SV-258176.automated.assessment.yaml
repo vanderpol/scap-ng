@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    32-bit-execve-syscall-uid-comparison-collection:
-      collection_title: 32-bit execve syscall uid comparison
+  objects:
+    32-bit-execve-syscall-uid-comparison-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,8 +24,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    64-bit-execve-syscall-uid-comparison-collection:
-      collection_title: 64-bit execve syscall uid comparison
+      object_title: 32-bit execve syscall uid comparison
+    64-bit-execve-syscall-uid-comparison-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -44,8 +43,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    32-bit-execve-syscall-gid-comparison-collection:
-      collection_title: 32-bit execve syscall gid comparison
+      object_title: 64-bit execve syscall uid comparison
+    32-bit-execve-syscall-gid-comparison-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -63,8 +62,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    64-bit-execve-syscall-gid-comparison-collection:
-      collection_title: 64-bit execve syscall gid comparison
+      object_title: 32-bit execve syscall gid comparison
+    64-bit-execve-syscall-gid-comparison-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -82,39 +81,33 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: 64-bit execve syscall gid comparison
+  states: {}
   tests:
     test-audit-32-bit-invocations-execve-syscall-comparing-uids:
       test_title: Audit 32-bit invocations of execve syscall comparing uids
       capability: independent.textfilecontent54
-      collection: 32-bit-execve-syscall-uid-comparison-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: 32-bit-execve-syscall-uid-comparison-object
+      check_existence: all_exist
+      check: all
     test-audit-64-bit-invocations-execve-syscall-comparing-uids:
       test_title: Audit 64-bit invocations of execve syscall comparing uids
       capability: independent.textfilecontent54
-      collection: 64-bit-execve-syscall-uid-comparison-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: 64-bit-execve-syscall-uid-comparison-object
+      check_existence: all_exist
+      check: all
     test-audit-32-bit-invocations-execve-syscall-comparing-gids:
       test_title: Audit 32-bit invocations of execve syscall comparing gids
       capability: independent.textfilecontent54
-      collection: 32-bit-execve-syscall-gid-comparison-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: 32-bit-execve-syscall-gid-comparison-object
+      check_existence: all_exist
+      check: all
     test-audit-64-bit-invocations-execve-syscall-comparing-gids:
       test_title: Audit 64-bit invocations of execve syscall comparing gids
       capability: independent.textfilecontent54
-      collection: 64-bit-execve-syscall-gid-comparison-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: 64-bit-execve-syscall-gid-comparison-object
+      check_existence: all_exist
+      check: all
   evaluate:
     all:
     - test: test-audit-32-bit-invocations-execve-syscall-comparing-uids

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    unix-sysctl-collection:
-      collection_title: null
+  objects:
+    unix-sysctl-object:
       capability: unix.sysctl
       select:
         name:
@@ -15,23 +14,27 @@ assessment:
           datatype: string
           mask: false
           value: net.ipv4.conf.all.rp_filter
+      object_title: null
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-net-ipv4-conf-all-rp-filter-setting-in-kernel-set:
       test_title: net.ipv4.conf.all.rp_filter setting in kernel is set to 1
       capability: unix.sysctl
-      collection: unix-sysctl-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: unix.sysctl
-        state:
-          field: value
-          value: '1'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
   evaluate:
     test: test-net-ipv4-conf-all-rp-filter-setting-in-kernel-set

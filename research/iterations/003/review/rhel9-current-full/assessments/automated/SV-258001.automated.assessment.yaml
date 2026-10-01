@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    unix-file-collection:
-      collection_title: null
+  objects:
+    unix-file-object:
       capability: unix.file
       select:
         path:
@@ -23,73 +22,77 @@ assessment:
       behaviors:
         max_depth: '-1'
         recurse_direction: down
+      object_title: null
+  states:
+    state-file-permissions-is-644-or-more-restrictive:
+      state_title: File permissions is 644 or more restrictive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: uexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
   tests:
     test-ssh-daemon-public-host-key-files-have-mode-0644-or:
       test_title: The SSH daemon public host key files have mode 0644 or less permissive
       capability: unix.file
-      collection: unix-file-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: File permissions is 644 or more restrictive
-        state_capability: unix.file
-        state:
-          all:
-          - field: suid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sgid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sticky
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: uexec
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: gwrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: gexec
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: owrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: oexec
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: unix-file-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-file-permissions-is-644-or-more-restrictive
   evaluate:
     test: test-ssh-daemon-public-host-key-files-have-mode-0644-or

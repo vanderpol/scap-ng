@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    system-auth-password-required-requisite-collection:
-      collection_title: system-auth password required, requisite
+  objects:
+    system-auth-password-required-requisite-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -28,23 +27,27 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
+      object_title: system-auth password required, requisite
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^pam_pwquality.so(\s|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-system-auth-pam-pwquality:
       test_title: system-auth pam_pwquality
       capability: independent.textfilecontent54
-      collection: system-auth-password-required-requisite-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: at least one
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: ^pam_pwquality.so(\s|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: system-auth-password-required-requisite-object
+      check_existence: at_least_one_exists
+      check: at least one
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     test: test-system-auth-pam-pwquality

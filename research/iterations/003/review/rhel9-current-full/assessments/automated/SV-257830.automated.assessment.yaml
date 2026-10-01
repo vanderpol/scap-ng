@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-dnf-repolist-filter-on-those-that-contain-epel-collection:
-      collection_title: Retrieve dnf repolist, filter on those that contain 'epel'
+  objects:
+    retrieve-dnf-repolist-filter-on-those-that-contain-epel-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -25,23 +24,27 @@ assessment:
           datatype: string
           mask: false
           value: epel
+      object_title: Retrieve dnf repolist, filter on those that contain 'epel'
+  states:
+    state-confirm-no-repositories-contain-the-word-epel:
+      state_title: Confirm no repositories contain the word 'epel'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: none_exist
   tests:
     test-os-not-install-packages-from-extra-packages-enterprise-linux-epel:
       test_title: The OS must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository.
       capability: independent.shellcommand
-      collection: retrieve-dnf-repolist-filter-on-those-that-contain-epel-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm no repositories contain the word 'epel'
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: none_exist
+      object: retrieve-dnf-repolist-filter-on-those-that-contain-epel-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-no-repositories-contain-the-word-epel
   evaluate:
     test: test-os-not-install-packages-from-extra-packages-enterprise-linux-epel

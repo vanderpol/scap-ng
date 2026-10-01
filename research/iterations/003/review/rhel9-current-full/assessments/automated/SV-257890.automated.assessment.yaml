@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    local-interactive-users-without-nologin-collection:
-      collection_title: Local interactive users without nologin
+  objects:
+    local-interactive-users-without-nologin-object:
       capability: unix.password
       select:
         username:
@@ -18,40 +17,13 @@ assessment:
           value: .*
       filters:
       - action: exclude
-        match:
-          field: login_shell
-          value: ^.*nologin.*$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: nologin shell
-        capability: unix.password
+        state: state-nologin-shell
       - action: exclude
-        match:
-          field: user_id
-          value: '1000'
-          operation: less than
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: uid < 1000
-        capability: unix.password
+        state: state-uid-1000
       - action: exclude
-        match:
-          field: user_id
-          value: '65534'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        state_title: uid = 65534 (nobody)
-        capability: unix.password
-    home-directories-local-interactive-users-without-nologin-collection:
-      collection_title: home directories of local interactive users without nologin
+        state: state-uid-65534-nobody
+      object_title: Local interactive users without nologin
+    home-directories-local-interactive-users-without-nologin-object:
       capability: unix.file
       select:
         path:
@@ -67,6 +39,7 @@ assessment:
           mask: false
           nil: true
           value: ''
+      object_title: home directories of local interactive users without nologin
   variables:
     home-directories-local-interactive-users-without-nologin-variable:
       title: home directories of local interactive users without nologin
@@ -74,68 +47,104 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: local-interactive-users-without-nologin-collection
+          object: local-interactive-users-without-nologin-object
           field: home_dir
+  states:
+    state-mode-0750-or-less-permissive:
+      state_title: mode 0750 or less permissive
+      capability: unix.file
+      state:
+        all:
+        - field: suid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sgid
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: sticky
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: gwrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oread
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: owrite
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: oexec
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-nologin-shell:
+      state_title: nologin shell
+      capability: unix.password
+      state:
+        field: login_shell
+        value: ^.*nologin.*$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-uid-1000:
+      state_title: uid < 1000
+      capability: unix.password
+      state:
+        field: user_id
+        value: '1000'
+        operation: less than
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-uid-65534-nobody:
+      state_title: uid = 65534 (nobody)
+      capability: unix.password
+      state:
+        field: user_id
+        value: '65534'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-all-local-interactive-user-home-directories-0750-or-less:
       test_title: All local interactive user home directories are 0750 or less
       capability: unix.file
-      collection: home-directories-local-interactive-users-without-nologin-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: mode 0750 or less permissive
-        state_capability: unix.file
-        state:
-          all:
-          - field: suid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sgid
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: sticky
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: gwrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: oread
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: owrite
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: oexec
-            value: 'false'
-            operation: equals
-            datatype: boolean
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: home-directories-local-interactive-users-without-nologin-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-mode-0750-or-less-permissive
   evaluate:
     test: test-all-local-interactive-user-home-directories-0750-or-less

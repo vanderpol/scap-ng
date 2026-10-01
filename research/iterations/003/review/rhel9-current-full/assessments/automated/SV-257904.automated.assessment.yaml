@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    unix-file-collection:
-      collection_title: null
+  objects:
+    unix-file-object:
       capability: unix.file
       select:
         path:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: gshadow-
+      object_title: null
+  states:
+    state-owned-by-root:
+      state_title: owned by root
+      capability: unix.file
+      state:
+        field: user_id
+        value: '0'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-gshadow-file-owned-by-root:
       test_title: /etc/gshadow- file is owned by root
       capability: unix.file
-      collection: unix-file-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: owned by root
-        state_capability: unix.file
-        state:
-          field: user_id
-          value: '0'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-file-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-owned-by-root
   evaluate:
     test: test-etc-gshadow-file-owned-by-root

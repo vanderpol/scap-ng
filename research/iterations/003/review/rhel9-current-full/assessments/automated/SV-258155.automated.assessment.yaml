@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    independent-textfilecontent54-collection:
-      collection_title: null
+  objects:
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -28,8 +27,8 @@ assessment:
           value: '1'
       behaviors:
         ignore_case: 'true'
-    linux-partition-collection:
-      collection_title: null
+      object_title: null
+    linux-partition-object:
       capability: linux.partition
       select:
         mount_point:
@@ -39,8 +38,8 @@ assessment:
           variable_check: at least one
           value:
             variable: audit-data-directory-from-etc-audit-auditd-conf-variable
-    independent-variable-collection:
-      collection_title: null
+      object_title: null
+    independent-variable-object:
       capability: independent.variable
       select:
         var_ref:
@@ -49,6 +48,7 @@ assessment:
           mask: false
           value:
             variable: audit-partition-total-size-in-bytes-variable
+      object_title: null
   variables:
     audit-data-directory-from-etc-audit-auditd-conf-variable:
       title: audit data directory from /etc/audit/auditd.conf
@@ -56,7 +56,7 @@ assessment:
       datatype: string
       expression:
         values:
-          collection: independent-textfilecontent54-collection
+          object: independent-textfilecontent54-object
           field: subexpression
     audit-partition-total-size-in-bytes-variable:
       title: audit partition total size in bytes
@@ -67,37 +67,38 @@ assessment:
           operation: multiply
           operands:
           - values:
-              collection: linux-partition-collection
+              object: linux-partition-object
               field: block_size
           - values:
-              collection: linux-partition-collection
+              object: linux-partition-object
               field: total_space
+  states:
+    state-10gib:
+      state_title: 10GiB
+      capability: independent.variable
+      state:
+        field: value
+        value: '10737418240'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-there-separate-file-system-audit-data-directory:
       test_title: There is a separate file system for audit data directory.
       capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: linux-partition-object
+      check_existence: all_exist
+      check: all
     test-audit-file-system-total-space-10gib:
       test_title: Audit file system total space >= 10GiB
       capability: independent.variable
-      collection: independent-variable-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: 10GiB
-        state_capability: independent.variable
-        state:
-          field: value
-          value: '10737418240'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: independent-variable-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-10gib
   evaluate:
     all:
     - test: test-there-separate-file-system-audit-data-directory

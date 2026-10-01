@@ -5,10 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    verify-all-local-files-directories-on-rhel-8-have-valid-collection:
-      collection_title: Verify all local files and directories on RHEL 8 have a valid owner.  Limit results to the
-        first 100 failures found.
+  objects:
+    verify-all-local-files-directories-on-rhel-8-have-valid-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -27,31 +25,36 @@ assessment:
           datatype: string
           mask: false
           value: .*
+      object_title: Verify all local files and directories on RHEL 8 have a valid owner.  Limit results to the first
+        100 failures found.
+  states:
+    state-verify-that-no-files-directories-are-found-to-be-non-com:
+      state_title: Verify that no files/directories are found to be non-compliant to the STIG
+      capability: independent.shellcommand
+      state:
+        all:
+        - field: exit_status
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
   tests:
     test-verify-all-local-files-directories-on-rhel-8-have-valid:
       test_title: Verify all local files and directories on RHEL 8 have a valid owner.
       capability: independent.shellcommand
-      collection: verify-all-local-files-directories-on-rhel-8-have-valid-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Verify that no files/directories are found to be non-compliant to the STIG
-        state_capability: independent.shellcommand
-        state:
-          all:
-          - field: exit_status
-            value: '0'
-            operation: equals
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-          - field: stdout_line
-            value: ''
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: none_exist
+      object: verify-all-local-files-directories-on-rhel-8-have-valid-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-that-no-files-directories-are-found-to-be-non-com
   evaluate:
     test: test-verify-all-local-files-directories-on-rhel-8-have-valid

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: inventory
   purpose: applicability
-  collections:
-    unix-sysctl-collection:
-      collection_title: null
+  objects:
+    unix-sysctl-object:
       capability: unix.sysctl
       select:
         name:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: net.ipv6.conf.all.disable_ipv6
-    etc-sysctl-conf-collection:
-      collection_title: /etc/sysctl.conf
+      object_title: null
+    etc-sysctl-conf-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -34,8 +33,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    other-sysctl-configuration-files-collection:
-      collection_title: other sysctl configuration files
+      object_title: /etc/sysctl.conf
+    other-sysctl-configuration-files-object:
       capability: independent.textfilecontent54
       select:
         path:
@@ -60,16 +59,16 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    all-sysctl-configuration-files-collection:
-      collection_title: all sysctl configuration files
+      object_title: other sysctl configuration files
+    all-sysctl-configuration-files-object:
       capability: independent.textfilecontent54
       set:
         operator: union
         members:
-        - collection: etc-sysctl-conf-collection
-        - collection: other-sysctl-configuration-files-collection
-    proc-cmdline-contains-ipv6-disable-1-collection:
-      collection_title: /proc/cmdline contains ipv6.disable=1
+        - object: etc-sysctl-conf-object
+        - object: other-sysctl-configuration-files-object
+      object_title: all sysctl configuration files
+    proc-cmdline-contains-ipv6-disable-1-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -87,6 +86,7 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /proc/cmdline contains ipv6.disable=1
   variables:
     directories-containing-sysctl-configuration-files-variable:
       title: Directories containing sysctl configuration files
@@ -99,50 +99,53 @@ assessment:
         - /lib/sysctl.d
         - /usr/lib/sysctl.d
         - /usr/local/lib/sysctl.d
+  states:
+    state-unix-sysctl:
+      state_title: null
+      capability: unix.sysctl
+      state:
+        field: value
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-net-ipv6-conf-all-disable-ipv6-setting-in-kernel-set:
       test_title: net.ipv6.conf.all.disable_ipv6 setting in kernel is set to 1
       capability: unix.sysctl
-      collection: unix-sysctl-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: unix.sysctl
-        state:
-          field: value
-          value: '1'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: unix-sysctl-object
+      check_existence: all_exist
+      check: all
+      states:
+      - state-unix-sysctl
     test-net-ipv6-conf-all-disable-ipv6-setting-in-sysctl-configuration:
       test_title: net.ipv6.conf.all.disable_ipv6 setting in sysctl configuration files is set to 1, and nothing
         else
       capability: independent.textfilecontent54
-      collection: all-sysctl-configuration-files-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: '1'
-          operation: equals
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: all-sysctl-configuration-files-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-textfilecontent54
     test-ipv6-disable-1-in-kernel-cmdline:
       test_title: ipv6.disable=1 in the kernel cmdline
       capability: independent.textfilecontent54
-      collection: proc-cmdline-contains-ipv6-disable-1-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: proc-cmdline-contains-ipv6-disable-1-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     not:
       any:

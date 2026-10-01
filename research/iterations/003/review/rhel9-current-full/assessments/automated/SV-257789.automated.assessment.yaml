@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-any-configuration-lines-containing-root-admin-or-administrator-collection:
-      collection_title: Retrieve any configuration lines containing root, admin, or administrator.
+  objects:
+    retrieve-any-configuration-lines-containing-root-admin-or-administrator-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -25,23 +24,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: Retrieve any configuration lines containing root, admin, or administrator.
+  states:
+    state-include-filter-to-capture-non-compliant-configuration-li:
+      state_title: Include filter to capture non-compliant configuration lines containing root, admin, or administrator.
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: ^(root|admin|administrator)$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-verify-boot-loader-password-not-set-root-admin-or-adminstrator:
       test_title: Verify the boot loader password is not set to root, admin, or adminstrator.
       capability: independent.textfilecontent54
-      collection: retrieve-any-configuration-lines-containing-root-admin-or-administrator-collection
-      assertion:
-        existence: none_exist
-        item_quantifier: all
-        state_title: Include filter to capture non-compliant configuration lines containing root, admin, or administrator.
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: ^(root|admin|administrator)$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: retrieve-any-configuration-lines-containing-root-admin-or-administrator-object
+      check_existence: none_exist
+      check: all
+      states:
+      - state-include-filter-to-capture-non-compliant-configuration-li
   evaluate:
     test: test-verify-boot-loader-password-not-set-root-admin-or-adminstrator

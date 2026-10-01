@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-nsswitch-conf-hosts-entry-collection:
-      collection_title: /etc/nsswitch.conf hosts entry
+  objects:
+    etc-nsswitch-conf-hosts-entry-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,8 +25,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    etc-resolv-conf-nameserver-entries-collection:
-      collection_title: /etc/resolv.conf nameserver entries
+      object_title: /etc/nsswitch.conf hosts entry
+    etc-resolv-conf-nameserver-entries-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -45,8 +44,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    count-unique-name-servers-collection:
-      collection_title: count of unique name servers
+      object_title: /etc/resolv.conf nameserver entries
+    count-unique-name-servers-object:
       capability: independent.variable
       select:
         var_ref:
@@ -55,6 +54,7 @@ assessment:
           mask: false
           value:
             variable: count-unique-name-servers-variable
+      object_title: count of unique name servers
   variables:
     count-unique-name-servers-variable:
       title: count of unique name servers
@@ -64,51 +64,54 @@ assessment:
         count:
           unique:
             values:
-              collection: etc-resolv-conf-nameserver-entries-collection
+              object: etc-resolv-conf-nameserver-entries-object
               field: subexpression
+  states:
+    state-hosts-entry-contains-dns:
+      state_title: hosts entry contains dns
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (^|\s)dns(\s|$)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-etc-resolv-conf-is-configured-with-at-least-two-name-ser:
+      state_title: /etc/resolv.conf is configured with at least two name servers
+      capability: independent.variable
+      state:
+        field: value
+        value: '2'
+        operation: greater than or equal
+        datatype: int
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-system-using-dns:
       test_title: The system is using DNS
       capability: independent.textfilecontent54
-      collection: etc-nsswitch-conf-hosts-entry-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: hosts entry contains dns
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (^|\s)dns(\s|$)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-nsswitch-conf-hosts-entry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-hosts-entry-contains-dns
     test-etc-resolv-conf-contains-at-least-one-nameserver-entry:
       test_title: /etc/resolv.conf contains at least one nameserver entry
       capability: independent.textfilecontent54
-      collection: etc-resolv-conf-nameserver-entries-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: etc-resolv-conf-nameserver-entries-object
+      check_existence: at_least_one_exists
+      check: all
     test-etc-resolv-conf-configured-at-least-two-name-servers:
       test_title: /etc/resolv.conf is configured with at least two name servers
       capability: independent.variable
-      collection: count-unique-name-servers-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: /etc/resolv.conf is configured with at least two name servers
-        state_capability: independent.variable
-        state:
-          field: value
-          value: '2'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: count-unique-name-servers-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-etc-resolv-conf-is-configured-with-at-least-two-name-ser
   evaluate:
     any:
     - not:

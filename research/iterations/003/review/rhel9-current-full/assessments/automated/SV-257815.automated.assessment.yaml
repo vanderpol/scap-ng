@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    systemd-coredump-socket-loadstate-collection:
-      collection_title: systemd-coredump.socket LoadState
+  objects:
+    systemd-coredump-socket-loadstate-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -20,8 +19,8 @@ assessment:
           datatype: string
           mask: false
           value: LoadState
-    systemd-coredump-socket-unitfilestate-collection:
-      collection_title: systemd-coredump.socket UnitFileState
+      object_title: systemd-coredump.socket LoadState
+    systemd-coredump-socket-unitfilestate-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -34,41 +33,36 @@ assessment:
           datatype: string
           mask: false
           value: UnitFileState
+      object_title: systemd-coredump.socket UnitFileState
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: masked
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-systemd-coredump-socket-loadstate-masked-if-exists:
       test_title: systemd-coredump.socket LoadState is masked if exists
       capability: linux.systemdunitproperty
-      collection: systemd-coredump-socket-loadstate-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: masked
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: systemd-coredump-socket-loadstate-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
     test-systemd-coredump-socket-unitfilestate-masked-if-exists:
       test_title: systemd-coredump.socket UnitFileState is masked if exists
       capability: linux.systemdunitproperty
-      collection: systemd-coredump-socket-unitfilestate-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: masked
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: systemd-coredump-socket-unitfilestate-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
   evaluate:
     all:
     - test: test-systemd-coredump-socket-loadstate-masked-if-exists

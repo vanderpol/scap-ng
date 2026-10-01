@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-usbguard-rules-list-collection:
-      collection_title: Retrieve usbguard rules list.
+  objects:
+    retrieve-usbguard-rules-list-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -20,23 +19,27 @@ assessment:
           datatype: string
           mask: false
           value: usbguard list-rules
+      object_title: Retrieve usbguard rules list.
+  states:
+    state-confirm-the-existence-of-usbguard-rules:
+      state_title: Confirm the existence of usbguard rules.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-verify-usbguard-has-policy-configured:
       test_title: Verify the USBGuard has a policy configured.
       capability: independent.shellcommand
-      collection: retrieve-usbguard-rules-list-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Confirm the existence of usbguard rules.
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: ''
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: retrieve-usbguard-rules-list-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-confirm-the-existence-of-usbguard-rules
   evaluate:
     test: test-verify-usbguard-has-policy-configured

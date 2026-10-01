@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-partition-collection:
-      collection_title: null
+  objects:
+    linux-partition-object:
       capability: linux.partition
       select:
         mount_point:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: /var/log/audit
-    independent-textfilecontent54-collection:
-      collection_title: null
+      object_title: null
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -34,8 +33,8 @@ assessment:
           datatype: int
           mask: false
           value: '1'
-    independent-variable-collection:
-      collection_title: null
+      object_title: null
+    independent-variable-object:
       capability: independent.variable
       select:
         var_ref:
@@ -44,6 +43,7 @@ assessment:
           mask: false
           value:
             variable: mount-options-var-log-audit-in-etc-fstab-variable
+      object_title: null
   variables:
     mount-options-var-log-audit-in-etc-fstab-variable:
       title: Mount options for /var/log/audit in /etc/fstab
@@ -53,52 +53,55 @@ assessment:
         split:
           value:
             values:
-              collection: independent-textfilecontent54-collection
+              object: independent-textfilecontent54-object
               field: subexpression
           delimiter: ','
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: nodev
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-variable:
+      state_title: null
+      capability: independent.variable
+      state:
+        field: value
+        value: nodev
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
   tests:
     test-var-log-audit-mounted-nodev-option:
       test_title: /var/log/audit is mounted with the nodev option
       capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.partition
-        state:
-          field: mount_options
-          value: nodev
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: linux-partition-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-linux-partition
     test-var-log-audit-configured-nodev-option-in-etc-fstab:
       test_title: /var/log/audit is configured with the nodev option in /etc/fstab
       capability: independent.variable
-      collection: independent-variable-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.variable
-        state:
-          field: value
-          value: nodev
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: independent-variable-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-independent-variable
     test-var-log-audit-configured-in-etc-fstab:
       test_title: /var/log/audit is configured in /etc/fstab
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
   evaluate:
     all:
     - test: test-var-log-audit-mounted-nodev-option

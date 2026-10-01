@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-collection:
-      collection_title: Retrieve gsettings writable org.gnome.desktop.media-handling autorun-never
+  objects:
+    retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-object:
       capability: independent.shellcommand
       select:
         shell:
@@ -26,23 +25,27 @@ assessment:
           datatype: string
           mask: false
           value: .+
+      object_title: Retrieve gsettings writable org.gnome.desktop.media-handling autorun-never
+  states:
+    state-verify-command-returns-false:
+      state_title: Verify command returns false
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'false'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-verify-gsettings-writable-org-gnome-desktop-media-handling-autorun-never:
       test_title: Verify gsettings writable org.gnome.desktop.media-handling autorun-never returns false
       capability: independent.shellcommand
-      collection: retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: Verify command returns false
-        state_capability: independent.shellcommand
-        state:
-          field: stdout_line
-          value: 'false'
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-verify-command-returns-false
   evaluate:
     test: test-verify-gsettings-writable-org-gnome-desktop-media-handling-autorun-never

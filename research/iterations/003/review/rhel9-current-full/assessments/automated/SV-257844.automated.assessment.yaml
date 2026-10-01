@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-partition-collection:
-      collection_title: null
+  objects:
+    linux-partition-object:
       capability: linux.partition
       select:
         mount_point:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: /tmp
-    independent-textfilecontent54-collection:
-      collection_title: null
+      object_title: null
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -34,23 +33,21 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: null
+  states: {}
   tests:
     test-there-separate-file-system-tmp:
       test_title: There is a separate file system for /tmp.
       capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: linux-partition-object
+      check_existence: all_exist
+      check: all
     test-there-separate-file-system-configured-tmp:
       test_title: There is a separate file system configured for /tmp.
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
+      object: independent-textfilecontent54-object
+      check_existence: all_exist
+      check: all
   evaluate:
     all:
     - test: test-there-separate-file-system-tmp

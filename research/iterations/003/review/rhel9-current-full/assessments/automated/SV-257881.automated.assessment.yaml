@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-partition-collection:
-      collection_title: null
+  objects:
+    linux-partition-object:
       capability: linux.partition
       select:
         mount_point:
@@ -17,17 +16,9 @@ assessment:
           value: ^/\S+$
       filters:
       - action: include
-        match:
-          field: device
-          value: ^/dev\S*$
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-        capability: linux.partition
-    independent-textfilecontent54-collection:
-      collection_title: null
+        state: state-linux-partition-2
+      object_title: null
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -45,41 +36,58 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: null
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: nodev
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-linux-partition-2:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: device
+        value: ^/dev\S*$
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-device-files-mounted-nodev-option-mounts-on-ignored:
       test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
       capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.partition
-        state:
-          field: mount_options
-          value: nodev
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: linux-partition-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-partition
     test-device-files-configured-in-etc-fstab-use-nodev-option-mounts:
       test_title: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: independent-textfilecontent54-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     all:
     - test: test-device-files-mounted-nodev-option-mounts-on-ignored

@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-partition-collection:
-      collection_title: null
+  objects:
+    linux-partition-object:
       capability: linux.partition
       select:
         mount_point:
@@ -15,8 +14,8 @@ assessment:
           datatype: string
           mask: false
           value: /dev/shm
-    independent-textfilecontent54-collection:
-      collection_title: null
+      object_title: null
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -34,41 +33,47 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: null
+  states:
+    state-linux-partition:
+      state_title: null
+      capability: linux.partition
+      state:
+        field: mount_options
+        value: noexec
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: at least one
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
+        operation: pattern match
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-if-dev-shm-mounted-it-mounted-noexec-option:
       test_title: If /dev/shm is mounted, it is mounted with the noexec option
       capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.partition
-        state:
-          field: mount_options
-          value: noexec
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: at least one
-          entity_existence: at_least_one_exists
+      object: linux-partition-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-partition
     test-if-dev-shm-configured-in-etc-fstab-it-configured-noexec:
       test_title: If /dev/shm is configured in /etc/fstab, it is configured with the noexec option
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
-          operation: pattern match
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: independent-textfilecontent54-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-independent-textfilecontent54
   evaluate:
     all:
     - test: test-if-dev-shm-mounted-it-mounted-noexec-option

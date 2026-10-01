@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    etc-dnf-dnf-conf-gpgcheck-collection:
-      collection_title: /etc/dnf/dnf.conf gpgcheck
+  objects:
+    etc-dnf-dnf-conf-gpgcheck-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,23 +25,27 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: /etc/dnf/dnf.conf gpgcheck
+  states:
+    state-etc-dnf-dnf-conf-gpgcheck-1:
+      state_title: /etc/dnf/dnf.conf gpgcheck=1
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-dnf-dnf-conf-gpgcheck-1:
       test_title: /etc/dnf/dnf.conf gpgcheck=1
       capability: independent.textfilecontent54
-      collection: etc-dnf-dnf-conf-gpgcheck-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_title: /etc/dnf/dnf.conf gpgcheck=1
-        state_capability: independent.textfilecontent54
-        state:
-          field: subexpression
-          value: '1'
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: etc-dnf-dnf-conf-gpgcheck-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-etc-dnf-dnf-conf-gpgcheck-1
   evaluate:
     test: test-etc-dnf-dnf-conf-gpgcheck-1

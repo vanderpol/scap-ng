@@ -5,9 +5,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    linux-systemdunitproperty-collection:
-      collection_title: null
+  objects:
+    linux-systemdunitproperty-object:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -20,8 +19,8 @@ assessment:
           datatype: string
           mask: false
           value: LoadState
-    linux-systemdunitproperty-collection-2:
-      collection_title: null
+      object_title: null
+    linux-systemdunitproperty-object-2:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -34,8 +33,8 @@ assessment:
           datatype: string
           mask: false
           value: UnitFileState
-    linux-systemdunitproperty-collection-3:
-      collection_title: null
+      object_title: null
+    linux-systemdunitproperty-object-3:
       capability: linux.systemdunitproperty
       select:
         unit:
@@ -48,58 +47,55 @@ assessment:
           datatype: string
           mask: false
           value: ActiveState
+      object_title: null
+  states:
+    state-linux-systemdunitproperty:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: masked
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-linux-systemdunitproperty-2:
+      state_title: null
+      capability: linux.systemdunitproperty
+      state:
+        field: value
+        value: inactive
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-kdump-service-loadstate-masked-if-it-exists:
       test_title: kdump.service LoadState is masked if it exists.
       capability: linux.systemdunitproperty
-      collection: linux-systemdunitproperty-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: masked
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: linux-systemdunitproperty-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
     test-kdump-service-unitfilestate-masked-if-it-exists:
       test_title: kdump.service UnitFileState is masked if it exists.
       capability: linux.systemdunitproperty
-      collection: linux-systemdunitproperty-collection-2
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: masked
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: linux-systemdunitproperty-object-2
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty
     test-kdump-service-activestate-inactive-if-it-exists:
       test_title: kdump.service ActiveState is inactive if it exists.
       capability: linux.systemdunitproperty
-      collection: linux-systemdunitproperty-collection-3
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_title: null
-        state_capability: linux.systemdunitproperty
-        state:
-          field: value
-          value: inactive
-          operation: equals
-          datatype: string
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
+      object: linux-systemdunitproperty-object-3
+      check_existence: any_exist
+      check: all
+      states:
+      - state-linux-systemdunitproperty-2
   evaluate:
     all:
     - test: test-kdump-service-loadstate-masked-if-it-exists

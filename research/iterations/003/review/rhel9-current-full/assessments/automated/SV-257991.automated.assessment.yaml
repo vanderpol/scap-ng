@@ -6,9 +6,8 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  collections:
-    independent-textfilecontent54-collection:
-      collection_title: null
+  objects:
+    independent-textfilecontent54-object:
       capability: independent.textfilecontent54
       select:
         filepath:
@@ -26,36 +25,41 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+      object_title: null
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-independent-textfilecontent54-2:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
+        operation: equals
+        datatype: string
+        mask: false
+        entity_check: all
+        entity_existence: at_least_one_exists
   tests:
     test-etc-crypto-policies-back-ends-openssh-config-macs-use-fips:
       test_title: '/etc/crypto-policies/back-ends/openssh.config: MACs use FIPS 140-3 validated cryptographic hash
         algorithms'
       capability: independent.textfilecontent54
-      collection: independent-textfilecontent54-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state_operator: OR
-        states:
-        - state_title: null
-          capability: independent.textfilecontent54
-          state:
-            field: subexpression
-            value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: null
-          capability: independent.textfilecontent54
-          state:
-            field: subexpression
-            value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
-            operation: equals
-            datatype: string
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
+      object: independent-textfilecontent54-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-independent-textfilecontent54
+      - state-independent-textfilecontent54-2
   evaluate:
     test: test-etc-crypto-policies-back-ends-openssh-config-macs-use-fips
