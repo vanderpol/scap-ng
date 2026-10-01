@@ -78,7 +78,17 @@ def platform_sources(package):
                 if kind=='platform' and node.get('id'):
                     key=node.get('id'); target=predicates
                 elif kind=='cpe-item':
-                    key=node.get('name'); target=dictionary
+                    keys=[node.get('name')]
+                    keys.extend(
+                        child.get('name') for child in node.iter()
+                        if source.local(child.tag)=='cpe23-item' and child.get('name')
+                    )
+                    target=dictionary
+                    for key in [value for value in keys if value]:
+                        if key in target and ET.tostring(target[key])!=ET.tostring(node):
+                            raise ValueError('Conflicting platform source: '+key)
+                        target[key]=node
+                    continue
                 else: continue
                 if key in target and ET.tostring(target[key])!=ET.tostring(node):
                     raise ValueError('Conflicting platform source: '+key)
@@ -253,6 +263,8 @@ def main(argv=None):
             definition_oval=app_oval
             definition_original_path=original_path
             inventory_row=split_inventory.get(ref)
+            if inventory_row is None and ref in dictionary:
+                inventory_row=split_inventory.get(dictionary[ref].get('name'))
             if inventory_row:
                 did=inventory_row.get('definition_id') or did
                 inventory_path=args.split_root/inventory_row['path']
