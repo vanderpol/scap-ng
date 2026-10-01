@@ -25,8 +25,8 @@ Tooling SHOULD generate reverse usage indexes when useful.
 
 ## Source presentation order
 
-Assessment source SHOULD present metadata first, followed by `collections`,
-`variables`, `tests`, and `evaluate`, omitting sections that are absent.
+Assessment source SHOULD present metadata first, followed by `objects`, `variables`, `states`, `tests`, and
+`evaluate`, omitting sections that are absent.
 This recommendation supports consistent reading and review.
 
 Mapping key order SHALL NOT affect Assessment semantics or reference resolution.
@@ -114,7 +114,7 @@ quantifier semantics explicit.
 SCAP-NG SHALL NOT rely on hidden OVAL-style defaults where omission can change
 evaluation behavior.
 
-Collection semantics and assertion semantics SHALL remain distinguishable.
+Object selection/collection semantics and State assertion semantics SHALL remain distinguishable.
 
 Assessment result/evidence limits SHALL NOT redefine compliance truth.
 
@@ -168,7 +168,9 @@ including OVAL `check_existence`, or SHALL fail explicitly.
 
 Assessment collection SHALL be expressed using defined capabilities.
 
-Each named or embedded Collection SHALL carry its own capability because a Collection is an independently meaningful acquisition node and MAY be referenced by more than one Test or Variable. A Test capability SHALL NOT substitute for, relocate, or implicitly define the capability of a referenced Collection. Test, Collection, and State/predicate capability identities SHALL be validated for compatibility without erasing their independent declarations.
+Each named or embedded Object SHALL carry its own capability because an Object is an independently meaningful authored selection node and MAY be referenced by more than one Test or Variable. A Test capability SHALL NOT substitute for, relocate, or implicitly define the capability of a referenced Object. Test, Object, and State capability identities SHALL be validated for compatibility without erasing their independent declarations.
+
+An **Object** describes what observations are selected. **Collection** is the runtime act of evaluating an Object against a target and producing zero or more Items plus collection status. Native authoring SHALL use Object for the authored construct; result/runtime documentation MAY describe Object collection execution.
 
 A capability identifies a portable collection/evaluation interface rather than
 a Benchmark-specific Rule.
@@ -177,6 +179,39 @@ The `independent.shellcommand` capability is platform-independent. An
 Assessment explicitly supplies the shell/interpreter it intends to use; use of
 Bash makes that Assessment operationally Unix/Linux-oriented without changing
 the capability family.
+
+## OVAL-aligned native vocabulary
+
+SCAP-NG SHALL use the established OVAL semantic terms **Test**, **Object**,
+**State**, **Variable**, and **Item** when the native construct retains the same
+substantive meaning. This is a vocabulary alignment decision, not a requirement
+to reproduce OVAL XML serialization.
+
+The following intentional native divergences remain:
+
+- OVAL Definition maps to an **Assessment**;
+- OVAL criteria/criterion maps to **evaluate** while preserving full nested
+  logical expressive power;
+- OVAL generic `comment` metadata maps to the typed descriptive fields
+  `test_title`, `object_title`, `state_title`, and `variable_title`.
+
+Tests SHALL retain the established behavior-affecting names `check_existence`,
+`check`, and `state_operator` when those inherited semantics are preserved.
+SCAP-NG SHALL NOT rename OVAL Test `check` to `item_quantifier` merely for
+stylistic clarity; instead, the specification SHALL define Item and Test
+aggregation precisely.
+
+Objects and States SHOULD be independently named in native Assessment source.
+Stable local identities support reuse, filters, result-to-source traceability,
+semantic comparison, and generated capability schemas.
+
+Filters are part of Object semantics. The Item population participating in a
+Test is the effective population after Object selection, set operations, and
+filters. A scanner MAY implement filtering during collection/query planning and
+is not required to materialize or count a pre-filter candidate population.
+
+The working vocabulary decision and migration crosswalk are recorded in
+[Assessment vocabulary alignment with OVAL](../../research/iterations/003/design/assessment-oval-vocabulary-alignment.md).
 
 ## 8. Inventory facts from Platform Assessments
 
@@ -377,8 +412,8 @@ an obligation to reproduce the OVAL XML object model.
 ### Typed components and compatible references
 
 An automated Assessment SHALL distinguish (a) Test/evaluation capability,
-(b) collected Object/Collection capability, and (c) expected State/predicate
-capability wherever all three concepts are present. A producer SHALL NOT
+(b) authored Object capability, and (c) expected State/predicate capability
+wherever all three concepts are present. A producer SHALL NOT
 silently change a referenced component's capability to match its caller.
 
 A semantic validator SHALL verify that a Test is compatible with the Object
@@ -391,7 +426,7 @@ valid native SCAP-NG.
 ### Typed dependency closure
 
 Assessment dependency resolution SHALL include every reachable Definition
-expression, Test, Collection/Object, State, set, filter, Variable, component,
+expression, Test, Object, State, set, filter, Variable, component,
 function operand, and nested reference required for evaluation. Validation,
 unsupported-feature detection, provenance accounting, and execution planning
 SHALL use equivalent graph-closure semantics and SHALL reject unresolved
