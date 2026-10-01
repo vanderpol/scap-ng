@@ -20,7 +20,25 @@ class ExtendedComponentTests(unittest.TestCase):
                 zf.writestr("inventory.xml",etree.tostring(oval))
             roots=oval_source_roots(package,{})
         self.assertEqual(len(roots),1)
-        self.assertEqual(roots[0][0],"zip-member:inventory.xml")
+        self.assertEqual(roots[0][0],"zip-member:inventory.xml#oval-1")
+        self.assertEqual(component_kind(roots[0][1]),"oval")
+
+    def test_nested_oval_document_is_discovered_from_datastream_xml(self):
+        ds=etree.fromstring(f"""
+        <ds:data-stream-collection xmlns:ds="{DS}">
+          <ds:component id="wrapper">
+            <wrapper>
+              <oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"/>
+            </wrapper>
+          </ds:component>
+        </ds:data-stream-collection>
+        """)
+        with tempfile.TemporaryDirectory() as td:
+            package=Path(td)/"sample.zip"
+            with zipfile.ZipFile(package,"w") as zf:
+                zf.writestr("source.xml",etree.tostring(ds))
+            roots=oval_source_roots(package,{})
+        self.assertEqual(len(roots),1)
         self.assertEqual(component_kind(roots[0][1]),"oval")
 
     def test_extended_component_is_preserved(self):
