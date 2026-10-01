@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/result-types.schema.json",
+  "title": "SCAP-NG reusable result types v0.1.0 strawman",
+  "description": "Reusable structural types for SCAP-NG result schemas. Runtime truth/aggregation semantics are defined by the specification and conformance tests, not by JSON Schema alone.",
+  "$defs": {
+    "technical_outcome": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ],
+      "description": "Six-state technical Assessment/Test outcome. Informational is deliberately not a seventh technical truth value."
+    },
+    "assessment_purpose": {
+      "type": "string",
+      "enum": [
+        "assessment",
+        "applicability"
+      ]
+    },
+    "assessment_class": {
+      "type": "string",
+      "enum": [
+        "compliance",
+        "vulnerability",
+        "patch",
+        "inventory",
+        "miscellaneous"
+      ],
+      "description": "Defines what technical truth means. Policy-facing pass/fail interpretation belongs to the consuming Rule."
+    },
+    "completeness": {
+      "type": "object",
+      "required": [
+        "logical_complete",
+        "population_complete",
+        "evidence_complete"
+      ],
+      "properties": {
+        "logical_complete": {
+          "type": "boolean"
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "stop_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "typed_value": {
+      "description": "A result value with explicit datatype. Record/multi-value refinement remains capability/schema work.",
+      "type": "object",
+      "required": [
+        "datatype"
+      ],
+      "properties": {
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {},
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "redacted": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
