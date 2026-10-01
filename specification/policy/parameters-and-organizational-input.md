@@ -96,6 +96,132 @@ Organizational Input SHALL NOT be used to override a concrete publisher
 requirement. If the publisher says X, supplying Y is not Organizational Input;
 it is a different policy.
 
+## Organizational Input Set
+
+An Organizational Input Set is an external, versioned artifact containing values
+for Parameters that the Benchmark publisher explicitly declares as
+organization-resolved.
+
+The Benchmark declares the contract; the organization supplies the values.
+These responsibilities SHALL remain separate.
+
+A Benchmark organization-resolved Parameter SHOULD declare at least:
+
+- stable Parameter identity;
+- `resolution: organization` or the final equivalent marker;
+- datatype;
+- cardinality;
+- human-readable prompt/description;
+- validation constraints;
+- whether the value is required for dependent Assessments.
+
+The Benchmark SHALL NOT embed an organization-specific value for an
+organization-resolved Parameter merely to avoid supplying Organizational Input.
+
+An Organizational Input Set SHALL identify:
+
+- its own stable identity and version;
+- purpose;
+- exact Benchmark identity/version;
+- supplied Parameter values;
+- organization/supplier provenance;
+- supply timestamp;
+- authorization status and available approval provenance.
+
+An Input Set MAY include intended-scope metadata, effective/expiration times,
+source-system metadata, and per-value provenance.
+
+### Explicit binding
+
+An Assessment Request SHALL explicitly bind any Organizational Input Set used by
+the run.
+
+A scanner SHALL NOT implicitly choose an Input Set based on filename,
+directory, hostname, target inventory, organization metadata, intended-scope
+metadata, environment variables, or implementation-local convention.
+
+Intended-scope metadata is descriptive/governance data. It SHALL NOT itself
+cause the Input Set to apply to a target.
+
+A persistent Input Set MAY be reused across multiple Assessment Requests, but
+each use SHALL result from an explicit binding or from an external orchestration
+system that constructs an explicit Assessment Request.
+
+### Value resolution and validation
+
+For every supplied value, the processor SHALL resolve the Parameter declaration
+from the exact bound Benchmark publication and validate datatype, cardinality,
+and constraints before executing a dependent Assessment.
+
+An Input Set SHALL fail policy resolution if it:
+
+- supplies a Parameter that does not exist;
+- supplies a Parameter whose publisher resolution is not organization-defined;
+- violates datatype/cardinality/constraints;
+- targets a different Benchmark identity/version;
+- contains conflicting effective values for the same Parameter after all
+  explicitly bound input layers are resolved.
+
+The processor SHALL freeze effective Organizational Input values as part of the
+immutable run policy context before applicability or compliance evaluation.
+
+### Missing values
+
+If an effectively selected/applicable Assessment depends on a required
+organization-resolved Parameter and no valid value is available, that Assessment
+SHALL NOT execute as though a value had been guessed.
+
+The resulting Assessment/Rule state SHALL be `not_evaluated` or the final
+standardized equivalent, with a structured reason such as
+`missing_organizational_input` identifying the unresolved Parameter.
+
+Missing Organizational Input SHALL NOT be converted to ordinary `fail`,
+`not_applicable`, or a fabricated default.
+
+### Provenance and authority
+
+Organizational Input provenance SHALL identify who or what supplied the value
+and when. It SHOULD identify the organization, source system, authorization
+status, authorizer/approval reference, and contact information when available.
+
+Supplier and authorizer are distinct roles. A later approval SHALL NOT erase the
+original supplier identity/timestamp.
+
+Where different Parameters originate from different authorities or source
+systems, an Input Set SHOULD support per-value provenance in addition to
+artifact-level provenance.
+
+Contact information is contextual metadata, not authoritative identity, and MAY
+be omitted or redacted for privacy, classification, or data-minimization
+requirements.
+
+### Runtime-supplied values
+
+Interactive entry and API/integration input MAY satisfy an
+organization-resolved Parameter without first persisting a standalone Input Set,
+provided the resulting Assessment Request records equivalent value,
+validation, and provenance information.
+
+A runtime-supplied value SHALL NOT receive weaker validation or provenance
+requirements solely because it was entered interactively or through an API.
+
+### Execution boundary
+
+Organizational Input is policy data only. It SHALL NOT:
+
+- select a Rule Assessment implementation;
+- enable or disable Rules;
+- select Tests;
+- alter Object targets, set/filter structure, or collection behavior;
+- alter comparison operations or quantifiers;
+- provide commands, scripts, queries, SQL, XPath, shell fragments, or
+  interpreter text;
+- alter execution privileges;
+- otherwise modify executable Assessment semantics.
+
+Its effect is limited to supplying typed expected-state/input values at
+explicitly declared bindings.
+
 ## Publisher Profile Parameter refinement
 
 A publisher Profile MAY resolve a publisher-defined Parameter differently from
