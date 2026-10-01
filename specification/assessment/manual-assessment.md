@@ -125,7 +125,9 @@ SHALL NOT be the only identity when a stronger identifier is available.
 
 A manual result SHOULD also support, when available:
 
-- organization/role of the evaluator;
+- organization and organizational unit of the evaluator;
+- role/title of the evaluator;
+- optional point-of-contact information, such as email address, telephone number, or other organization-approved contact method;
 - authentication/identity source;
 - start time and completion time;
 - reviewer comments distinct from factual observations;
@@ -139,6 +141,16 @@ If a second person verifies, approves, or adjudicates the manual result, that
 review action SHALL be represented separately from the original evaluator. The
 original evaluator identity and completion time SHALL NOT be overwritten by a
 later reviewer or approver.
+
+Evaluator organization and point-of-contact information are contextual metadata,
+not substitutes for evaluator identity. A contact address or telephone number
+SHOULD NOT be treated as the sole stable identity when a stronger authenticated
+identifier is available.
+
+POC data MAY be omitted or redacted when privacy, policy, classification, or
+data-minimization requirements apply. Redaction SHALL NOT remove the minimum
+identity and timestamp information required to establish who made the manual
+determination and when.
 
 Illustrative result metadata:
 
