@@ -281,10 +281,24 @@ class SetFlagPropagation(unittest.TestCase):
 
 
 class VariableReferenceSemantics(unittest.TestCase):
-    def test_zero_values_is_analysis_error(self):
+    def test_zero_values_remain_distinct_until_reference_context(self):
         self.assertEqual(
             resolve_variable_reference([]),
-            {"status": ERROR, "values": []},
+            {"status": NO_VALUES, "values": []},
+        )
+
+    def test_zero_values_object_reference_means_does_not_exist(self):
+        result = resolve_variable_reference([])
+        self.assertEqual(
+            apply_variable_reference_context(result, "object"),
+            "does_not_exist",
+        )
+
+    def test_zero_values_state_reference_means_error(self):
+        result = resolve_variable_reference([])
+        self.assertEqual(
+            apply_variable_reference_context(result, "state"),
+            ERROR,
         )
 
     def test_values_are_preserved(self):
@@ -299,10 +313,12 @@ class VariableReferenceSemantics(unittest.TestCase):
             {"status": TRUE, "values": [""]},
         )
 
-    def test_empty_variable_is_not_object_absence(self):
-        result = resolve_variable_reference([])
-        self.assertNotEqual(result["status"], FALSE)
-        self.assertEqual(result["status"], ERROR)
+    def test_empty_variable_is_not_empty_string(self):
+        zero = resolve_variable_reference([])
+        sentinel = resolve_variable_reference([""])
+        self.assertEqual(zero["status"], NO_VALUES)
+        self.assertEqual(sentinel["status"], TRUE)
+        self.assertNotEqual(zero["values"], sentinel["values"])
 
 
 class VariableStatusPropagation(unittest.TestCase):
