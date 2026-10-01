@@ -7,13 +7,13 @@ import sys
 import xml.etree.ElementTree as ET
 import yaml
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from scap_upconvert_v003.convert_collection_review import source_components
+from scap_upconvert_v003.convert_collection_review import source_benchmark
 from scap_upconvert_v003.build_rhel9_review_slice import NS, local
 from scap_upconvert_v003.audit_profile_selection import native_rule_id
 
 
 def audit(package, output):
-    xr,_=source_components(package)
+    xr=source_benchmark(package)
     evidence=json.loads((output/'evidence.json').read_text(encoding='utf-8'))
     bindings={r['rule_id']:r for r in evidence['rules']}
     issues=[]; comparisons=[]
