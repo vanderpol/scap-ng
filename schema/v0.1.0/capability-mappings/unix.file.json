@@ -1,0 +1,52 @@
+{
+  "format": "scap-ng-capability-mapping-0.1",
+  "capability": "unix.file",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/unix-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+    "test": "file_test",
+    "object": "file_object",
+    "state": "file_state",
+    "behavior_type": "FileBehaviors"
+  },
+  "native": {
+    "object_selector_alternatives": [
+      ["filepath"],
+      ["path", "filename"]
+    ],
+    "generic_object_members": ["set", "filters"],
+    "test_result_controls": {
+      "check_existence": ["all_exist", "any_exist", "at_least_one_exists", "none_exist", "only_one_exists"],
+      "check": ["all", "at least one", "only one", "none satisfy"],
+      "state_operator": ["AND", "OR"]
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "unix.file.filter_state_capability",
+      "source": "Schematron unix-def_file_object_verify_filter_state",
+      "rule": "Every Object filter State reference must resolve to capability unix.file."
+    },
+    {
+      "id": "unix.file.filepath_no_recursion_behaviors",
+      "source": "Schematron unix-def_fileobjfilepath",
+      "rule": "When filepath is used, max_depth, recurse, and recurse_direction behaviors are not permitted."
+    },
+    {
+      "id": "unix.file.path_pattern_no_recursion_behaviors",
+      "source": "Schematron unix-def_fileobjpath",
+      "rule": "When path operation is not equals, recurse_file_system=defined, max_depth, recurse_direction, and recurse are not permitted."
+    },
+    {
+      "id": "unix.file.filepath_pattern_defined_filesystem",
+      "source": "Schematron unix-def_fileobjfilepath2",
+      "rule": "When filepath operation is not equals, recurse_file_system=defined is not permitted."
+    },
+    {
+      "id": "unix.file.filename_empty",
+      "source": "Schematron unix-def_file_objectfilename",
+      "rule": "filename cannot be empty unless a Variable reference is used, the entity selects the directory itself, or pattern-match semantics explicitly permit the empty expression."
+    }
+  ]
+}
