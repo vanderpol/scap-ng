@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/variable-result.schema.json",
+  "title": "SCAP-NG Variable Result v0.1.0 strawman",
+  "description": "Resolved runtime Variable value set with explicit datatype, cardinality, status, and provenance.",
+  "type": "object",
+  "required": [
+    "id",
+    "datatype",
+    "status",
+    "cardinality",
+    "values"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "variable_title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "datatype": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable",
+        "zero_values"
+      ]
+    },
+    "cardinality": {
+      "type": "string",
+      "enum": [
+        "zero",
+        "one",
+        "many"
+      ]
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "$ref": "result-types.schema.json#/$defs/typed_value"
+      }
+    },
+    "source": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": true
+}
