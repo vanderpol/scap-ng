@@ -1036,7 +1036,7 @@ def unsupported_definition_features(oroot, definition_id):
                         pending.append(("object", descendant.get("object_ref")))
 
     return findings
-def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None):
+def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None, external_bindings=None):
     """Lower one OVAL Definition to native SCAP-NG assessment semantics."""
     definition = next(
         (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
@@ -1165,6 +1165,8 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
                 "required": True,
                 "cardinality": "one_or_more",
             }
+            if external_bindings and var_ref in external_bindings:
+                input_contract["parameter"] = external_bindings[var_ref]
             alternatives = []
             for child in variable:
                 child_kind = local(child.tag)
