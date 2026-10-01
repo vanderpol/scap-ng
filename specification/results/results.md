@@ -23,7 +23,55 @@ run and Rule-specific results for each evaluated Rule.
 The canonical result package need not use the same denormalized representation
 used by SIEM exports.
 
-## 3. Target identity
+## 3. Technical outcome versus reporting/scoring disposition
+
+Assessment evaluation SHALL preserve technical truth independently from
+Rule-level reporting and scoring policy.
+
+The native Assessment outcome domain SHALL NOT use `informational` as a
+replacement for an otherwise determinable technical result. When an Assessment
+can determine true/false (and therefore a compliance Rule can determine
+pass/fail), that technical outcome remains available even if policy says the
+Rule is excluded from scoring or primarily presented for information.
+
+A Rule Result MAY carry orthogonal disposition fields such as:
+
+- whether it contributes to a score;
+- whether it is informational/reporting-only;
+- why execution was intentionally suppressed;
+- legacy projection metadata needed to reproduce an imported format.
+
+This separation prevents scoring policy from destroying technical evidence.
+
+### XCCDF Rule role migration
+
+For legacy XCCDF 1.2 `role`:
+
+- **full** — execute normally; the Rule is scoring-eligible according to the
+  selected scoring model.
+- **unscored** — execute the selected Assessment normally and preserve its
+  technical result. Mark the Rule Result as excluded from scoring and with an
+  informational/reporting disposition. A legacy XCCDF projection MAY emit
+  XCCDF's required `informational` Rule status, but canonical NG results SHALL
+  retain the underlying technical outcome.
+- **unchecked** — do not execute the Rule's Assessment. Emit a Rule Result with
+  `not_evaluated` (or the final schema's equivalent technical non-execution
+  outcome), a stable reason such as `policy_unchecked`, and scoring excluded.
+
+Legacy `role` therefore SHALL NOT become an Assessment attribute that forces
+Assessment truth. It is Rule policy/result disposition.
+
+An Assessment whose intrinsic purpose is to collect descriptive information
+rather than determine a compliance assertion SHOULD express that purpose
+through its Assessment class/result payload. That is distinct from XCCDF
+`role=unscored`, which can wrap an otherwise ordinary compliance check.
+
+Missing or invalid required Organizational Input SHALL follow the
+Organizational Input evaluation contract (for example `not_evaluated` with a
+specific input reason); it SHALL NOT be converted to `informational` merely
+because older content used `unscored` as a workaround.
+
+## 4. Target identity
 
 Hostnames and IP addresses SHALL NOT be assumed to be globally unique or
 stable target identifiers.
