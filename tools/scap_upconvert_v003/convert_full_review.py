@@ -150,6 +150,10 @@ def render_profiles(xr, resolved, baseline, expected):
     return profiles
 
 
+def cpe_applicability_id(cpe_name):
+    return 'platform.'+source.semantic_id(cpe_name,'platform')
+
+
 def platform_sources(package):
     predicates={}; dictionary={}
     with zipfile.ZipFile(package) as archive:
@@ -346,7 +350,7 @@ def main(argv=None):
                 # CPE names are the stable source identity. Human titles are
                 # presentation metadata and are not unique (for example the
                 # Windows Server 2012 / 2012 R2 dictionary entries).
-                app_id='platform.'+source.semantic_id(ref,'platform')
+                app_id=cpe_applicability_id(ref)
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
             definition_oval=app_oval
