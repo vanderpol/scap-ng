@@ -52,7 +52,7 @@ class NamedCollections(unittest.TestCase):
         ref=var['expression']['values']['collection']
         self.assertIn(ref,[t['collection'] for t in a['tests'].values()])
         self.assertNotIn('collection_capabilities',var)
-        self.assertTrue(all('capability' not in c for c in a['collections'].values()))
+        self.assertTrue(all('capability' in c for c in a['collections'].values()))
         emitted=self.roundtrip(root,native)
         self.assertEqual(len(emitted.find(f'{{{OD}}}objects')),2)
 
@@ -62,10 +62,13 @@ class NamedCollections(unittest.TestCase):
         emitted=self.roundtrip(root,native)
         self.assertEqual(len(emitted.find(f'{{{OD}}}objects')),3)
 
-    def test_variable_only_source_typed_on_variable(self):
+    def test_variable_only_source_collection_keeps_own_type(self):
         root=self.linked_source();root.find(f'{{{OD}}}tests').remove(root.find(f'{{{OD}}}tests')[1]);criteria=root.find(f'.//{{{OD}}}criteria');criteria.remove(criteria[1])
-        native=self.lower(root);var=next(iter(native['assessment']['variables'].values()))
-        self.assertEqual(list(var['collection_capabilities'].values()),['unix.file'])
+        native=self.lower(root);a=native['assessment']
+        var=next(iter(a['variables'].values()))
+        ref=var['expression']['values']['collection']
+        self.assertNotIn('collection_capabilities',var)
+        self.assertEqual(a['collections'][ref]['capability'],'unix.file')
         self.roundtrip(root,native)
 
     def test_variable_chain_depth32_preserved(self):
@@ -105,24 +108,24 @@ class NamedCollections(unittest.TestCase):
         # Native authoring fixture: a one-use source can be private. The source
         # converter itself keeps original source Objects named.
         var['expression']['values']['collection']=a['collections'].pop(ref)
-        var['capability']=var.pop('collection_capabilities')[ref]
+        self.assertEqual(var['expression']['values']['collection']['capability'],'unix.file')
         self.roundtrip(root,native)
 
     def test_embedded_source_cannot_be_referenced_outside_variable(self):
         a={'collections':{},'tests':{},'variables':{
-            'a-variable':{'capability':'unix.file','expression':{'values':{'collection':{'select':{}},'field':'filename'}}},
+            'a-variable':{'expression':{'values':{'collection':{'capability':'unix.file','select':{}},'field':'filename'}}},
             'b-variable':{'expression':{'values':{'collection':'private-collection','field':'filename'}}}}}
         with self.assertRaisesRegex(ValueError,'Unknown Collection'): collection_types(a)
 
     def test_named_collection_cycles_rejected_by_consumer(self):
-        a={'collections':{'a-collection':{'set':{'members':[{'collection':'a-collection'}]}}},
+        a={'collections':{'a-collection':{'capability':'unix.file','set':{'members':[{'collection':'a-collection'}]}}},
            'tests':{'test-a':{'capability':'unix.file','collection':'a-collection'}},'variables':{}}
         with self.assertRaisesRegex(ValueError,'cycle'):collection_types(a)
 
     def test_graph_binding_resource_limit_is_explicit(self):
         from unittest.mock import patch
         root=source();variable(root,1,literal())
-        with patch('scap_upconvert_v003.collection_graph.place_capabilities',side_effect=RecursionError):
+        with patch('scap_upconvert_v003.collection_graph.validate_capabilities',side_effect=RecursionError):
             native,error=lower_definition(root,DID,'x',collection_graph=True)
         self.assertIsNone(native)
         self.assertEqual(error,'conversion_resource_limit:python_recursion')
@@ -146,10 +149,9 @@ class NamedCollections(unittest.TestCase):
             self.assertEqual(report['status'],'prototype_dataflow_and_roundtrip_checks_passed')
             self.assertTrue(report['rules'][0]['assessments'][0]['reverse_omni_schema_valid'])
 
-    def test_conflicting_variable_type_bindings_rejected(self):
-        a={'collections':{'x-collection':{}},'tests':{},'variables':{
-            'a-variable':{'collection_capabilities':{'x-collection':'unix.file'}},
-            'b-variable':{'collection_capabilities':{'x-collection':'unix.password'}}}}
-        with self.assertRaisesRegex(ValueError,'Conflicting'): collection_types(a)
+    def test_variable_side_type_binding_rejected(self):
+        a={'collections':{'x-collection':{'capability':'unix.file'}},'tests':{},'variables':{
+            'a-variable':{'collection_capabilities':{'x-collection':'unix.file'}}}}
+        with self.assertRaisesRegex(ValueError,'obsolete'): collection_types(a)
 
 if __name__=='__main__':unittest.main()
