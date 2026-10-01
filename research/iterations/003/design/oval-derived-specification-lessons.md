@@ -38,11 +38,11 @@ Each entry captures (a) discovery, (b) required normative direction or candidate
 
 ### 3. Variables are typed collections, not scalar placeholders
 
-**Discovery:** local variables can recursively call Objects or other Variables; function operands may carry zero/one/many values. The OVAL model requires `var_check` and `entity_check` as distinct quantifiers; an empty variable used in Object selection is not equivalent to an empty variable used in State comparison.
+**Discovery:** local variables can recursively call Objects or other Variables; function operands may carry zero/one/many values. The OVAL model requires `var_check` and `entity_check` as distinct quantifiers. A source review correction on 2026-10-01 confirmed that OVAL 5.12.3 `VariableType` documentation states that a variable returning no value is an analysis error generally; SCAP-NG SHALL NOT reinterpret an empty variable as Object absence or invent a separate Object-versus-State rule without stronger normative evidence.
 
 **Specification:** value-producing nodes SHALL carry datatype, cardinality, value set, evaluation status and provenance. Define zero-values, error, unknown and not-collected distinctly. The semantic model SHALL describe ordered/unordered combinations, Cartesian products, variable quantification and datatype validation where applicable. An input constrained to modify expected state SHALL NOT be able to change command text, selected collectors or execution privileges.
 
-**Proof:** multi-value constants, empty-variable Object versus State behavior, many-to-many quantifier truth tables, Cartesian-product function tests, record_field extraction, errors propagating across dependencies.
+**Proof:** multi-value constants, zero-value variable analysis-error fixtures at Object and State reference sites, many-to-many quantifier truth tables, Cartesian-product function tests, record_field extraction, errors propagating across dependencies.
 
 ### 4. External variable value constraints were genuinely missing
 
