@@ -86,6 +86,25 @@ def inspect(path):
             ],
             "sources":[text(x) for x in node.findall("x:source",NS)],
         })
+    check_exports=[]
+    for rule in root.findall(".//x:Rule",NS):
+        for check in rule.findall("x:check",NS):
+            ref=check.find("x:check-content-ref",NS)
+            exports=[
+                {
+                    "export_name":x.get("export-name"),
+                    "value_id":x.get("value-id"),
+                }
+                for x in check.findall("x:check-export",NS)
+            ]
+            if exports:
+                check_exports.append({
+                    "rule_id":rule.get("id"),
+                    "selector":check.get("selector"),
+                    "system":check.get("system"),
+                    "definition":ref.get("name") if ref is not None else None,
+                    "exports":exports,
+                })
     profiles=[]
     for profile in root.findall("x:Profile",NS):
         actions=[]
@@ -155,6 +174,8 @@ def inspect(path):
         "values":values,
         "profile_value_action_count":sum(len(x["actions"]) for x in profiles),
         "profiles_with_value_actions":profiles,
+        "check_export_count":sum(len(x["exports"]) for x in check_exports),
+        "checks_with_exports":check_exports,
         "benchmark_platforms":benchmark_platforms,
         "rule_platform_reference_count":sum(len(x["platforms"]) for x in rule_platforms),
         "direct_cpe_platforms":direct_cpe,
@@ -175,6 +196,7 @@ def main():
         "packages_with_values":sum(bool(r["value_count"]) for r in rows),
         "total_values":sum(r["value_count"] for r in rows),
         "profile_value_actions":sum(r["profile_value_action_count"] for r in rows),
+        "check_exports":sum(r["check_export_count"] for r in rows),
         "packages_with_direct_cpe":sum(bool(r["direct_cpe_platforms"]) for r in rows),
         "value_types":dict(Counter(v["type"] for r in rows for v in r["values"])),
         "value_operators":dict(Counter(v["operator"] for r in rows for v in r["values"])),
