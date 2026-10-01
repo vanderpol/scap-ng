@@ -103,6 +103,61 @@ Exact capability-specific Object and State payload grammar remains subject to
 generated schema work. The semantic node boundaries above are the important
 decision.
 
+## Inline private Objects and States
+
+Named top-level Objects and States are not required when a component is private
+to one Test.
+
+SCAP-NG permits an Object or State to be embedded directly in a Test when that
+node has no independent references. In that form, the containing Test provides
+its scope and identity; no authored Object/State ID is required.
+
+The design rule is:
+
+> **Containment implies private scope; IDs imply referenceable scope.**
+
+Illustrative private form:
+
+```yaml
+tests:
+  test-file-mode:
+    test_title: Configuration file has the required mode
+    capability: unix.file
+    object:
+      object_title: Configuration file
+      capability: unix.file
+      select:
+        filepath:
+          operation: equals
+          value: /etc/example.conf
+    check_existence: at_least_one_exists
+    check: all
+    states:
+      - state_title: Mode must be 0644
+        capability: unix.file
+        mode:
+          operation: equals
+          value: "0644"
+```
+
+If the Object or State must be referenced by another Test, Variable, set,
+filter, or other graph node, it is promoted to a named top-level component.
+
+This is particularly important for SCAP 1.4 conversion. A normalizer may safely
+collapse the common one-Test/one-Object/one-State graph into the private form
+when reference analysis proves that no sharing or external dependency would be
+lost. Conversely, repeated equivalent inline nodes may be promoted into named
+reusable components when semantic equivalence is established.
+
+Inlining is a source-presentation transformation only. Conversion and
+normalization evidence must retain the original source identities and
+provenance so that a source OVAL Object or State remains traceable even when it
+has no independent native authored ID.
+
+Assessment Results can identify an inline component through deterministic
+structural identity beneath its containing Test rather than requiring authors
+to manufacture IDs solely for result serialization.
+
 ## Object and collection are not synonyms
 
 An **Object** is authored content describing what observations are selected.
