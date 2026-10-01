@@ -34,6 +34,26 @@ def package_xml(path):
     return roots
 
 
+def definition_locations(roots, definition_id):
+    locations=[]
+    def walk(xml_name, node, ancestors):
+        current={
+            "tag":local(node.tag),
+            "id":node.get("id"),
+        }
+        chain=ancestors+[current]
+        if local(node.tag)=="definition" and node.get("id")==definition_id:
+            locations.append({
+                "xml":xml_name,
+                "ancestors":chain,
+            })
+        for child in list(node):
+            walk(xml_name,child,chain)
+    for xml_name,xml_root in roots:
+        walk(xml_name,xml_root,[])
+    return locations
+
+
 def benchmark_from_roots(path, roots):
     found=[]
     for _,root in roots:
@@ -175,6 +195,7 @@ def inspect(path):
                 {
                     "definition":check,
                     "definition_present":check in oval_definition_ids,
+                    "locations":definition_locations(roots,check),
                 }
                 for row in matches
                 for check in row["checks"]
