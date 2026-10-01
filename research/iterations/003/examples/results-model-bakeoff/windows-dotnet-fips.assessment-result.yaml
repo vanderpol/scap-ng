@@ -1,0 +1,169 @@
+assessment_result:
+  result_schema_version: 0.1.0-draft
+  execution_id: example-dotnet-fips-config-1
+
+  assessment:
+    source_oval_definition_id: oval:mil.disa.fso.dotnet:def:9
+    version: 3
+    assessment_title: APPNET0062 - The .NET CLR must be configured to use FIPS approved encryption modules.
+
+  class: compliance
+  purpose: assessment
+  mode: automated
+  outcome: true
+
+  evaluation:
+    logical_complete: true
+    population_complete: true
+    evidence_complete: true
+    stop_reason: complete
+    evaluated_items: 57
+
+  summary:
+    observed_failures: 0
+    actual_failures: 0
+
+  evidence:
+    failures:
+      maximum: 50
+      returned: 0
+      truncated_population: false
+
+  evaluate_result:
+    operator: all
+    outcome: true
+    children:
+      - test: test-application-config
+        outcome: true
+      - test: test-machine-config
+        outcome: true
+
+  tests:
+    - id: test-application-config
+      source_oval_test_id: oval:mil.disa.fso.dotnet:tst:900
+      test_title: Application configuration files are configured to use FIPS approved encryption modules.
+      capability: independent.xmlfilecontent
+      outcome: true
+      existence: any_exist
+      check: all
+      object_ref: object-application-config
+      state_refs: [state-fips-true]
+      item_count: 55
+      item_refs:
+        - item-242
+        - item-243
+        - item-244
+        - item-245
+        - item-246
+        - item-247
+        - item-248
+        - item-249
+        - "... 47 additional local item references ..."
+      decisive_explanation:
+        reason: all_items_satisfied
+        observed_items: 55
+        failing_items: 0
+        message: All 55 application configuration observations satisfied the FIPS requirement.
+
+    - id: test-machine-config
+      source_oval_test_id: oval:mil.disa.fso.dotnet:tst:901
+      test_title: Machine configuration files are configured to use FIPS approved encryption modules.
+      capability: independent.xmlfilecontent
+      outcome: true
+      item_count: 2
+      decisive_explanation:
+        reason: all_items_satisfied
+        observed_items: 2
+        failing_items: 0
+
+  objects:
+    - id: object-application-config
+      source_oval_object_id: oval:mil.disa.fso.dotnet:obj:900
+      object_title: "*.exe.config enforceFIPSPolicy/@enabled"
+      capability: independent.xmlfilecontent
+      collection_status: complete
+      item_count: 55
+      item_refs:
+        - item-242
+        - item-243
+        - item-244
+        - item-245
+        - item-246
+        - item-247
+        - item-248
+        - item-249
+        - "... 47 additional local item references ..."
+
+  states:
+    - id: state-fips-true
+      source_oval_state_id: oval:mil.disa.fso.dotnet:ste:900
+      expected:
+        value_of:
+          datatype: boolean
+          operation: equals
+          value: true
+
+  # Eight representative Items are expanded below. A canonical result would
+  # contain all 55 local Items; this research file abbreviates only for review.
+  items:
+    - id: item-242
+      source_item_id: "242"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filepath: C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe.config
+        value_of: true
+        windows_view: 64_bit
+    - id: item-243
+      source_item_id: "243"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filepath: C:\Windows\Microsoft.NET\Framework\v4.0.30319\ilasm.exe.config
+        value_of: true
+        windows_view: 64_bit
+    - id: item-244
+      source_item_id: "244"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filepath: C:\Windows\Microsoft.NET\assembly\GAC_32\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\msbuild.exe.config
+        value_of: true
+    - id: item-245
+      source_item_id: "245"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filepath: C:\Windows\Microsoft.NET\assembly\GAC_64\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\msbuild.exe.config
+        value_of: true
+    - id: item-246
+      source_item_id: "246"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filename: dfsvc.exe.config
+        value_of: true
+    - id: item-247
+      source_item_id: "247"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filename: cvtres.exe.config
+        value_of: true
+    - id: item-248
+      source_item_id: "248"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filename: vbc.exe.config
+        value_of: true
+    - id: item-249
+      source_item_id: "249"
+      capability: independent.xmlfilecontent
+      status: exists
+      fields:
+        filepath: C:\Windows\System32\AppV\AppVStreamingUX.exe.config
+        value_of: true
+
+  variables: []
+  diagnostics: []
