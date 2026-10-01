@@ -1,0 +1,221 @@
+name: Full NIWC current native normalize and compile experiment
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/scap_ng_repo_normalizer.py
+      - tools/scap_ng_content_compiler.py
+      - tools/generate_niwc_current_review.py
+      - tools/scap_upconvert_v003/**
+      - tools/check_current_authoring_contract.py
+      - .github/workflows/scap-ng-full-current-native-normalize-compile.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-niwc-current-native-normalize-compile
+  cancel-in-progress: true
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  generate:
+    name: Generate fresh native batch ${{ matrix.batch }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate source-only batch
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: |
+          python - <<'PY'
+          import json, os, re, shutil, subprocess, sys
+          from pathlib import Path
+          batch=int(os.environ["BATCH"])
+          revision=os.environ["NIWC_REVISION"]
+          files=sorted(p for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip") if "Consolidated" not in p.name)
+          if len(files)!=65:
+              raise SystemExit(f"Expected 65 pinned individual NIWC packages, found {len(files)}")
+          selected=[p for i,p in enumerate(files) if i % 4 == batch]
+          base=Path("work/result"); generated=base/"generated"; status_dir=base/"status"; logs=base/"logs"
+          generated.mkdir(parents=True,exist_ok=True); status_dir.mkdir(parents=True,exist_ok=True); logs.mkdir(parents=True,exist_ok=True)
+          for source in selected:
+              artifact=source.name
+              key=re.sub(r"[^A-Za-z0-9._-]+","_",source.stem)
+              out=generated/key; split=Path("work")/f"split-{key}"; log_path=logs/f"{key}.log"
+              shutil.rmtree(out,ignore_errors=True); shutil.rmtree(split,ignore_errors=True)
+              command=[sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+                       "--output",str(out),"--split-root",str(split),
+                       "--source-revision",revision,"--source-repository-path",f"Current/{artifact}",
+                       "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+                       "--summary",str(out/"source-generation.json")]
+              proc=subprocess.run(command,capture_output=True,text=True)
+              log_path.write_text(proc.stdout+"\n"+proc.stderr,encoding="utf-8")
+              status={"artifact":artifact,"key":key,"status":"generated" if proc.returncode==0 else "blocked",
+                      "returncode":proc.returncode,"log_tail":"\n".join((proc.stdout+"\n"+proc.stderr).splitlines()[-80:])}
+              (status_dir/f"{key}.json").write_text(json.dumps(status,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+              shutil.rmtree(split,ignore_errors=True)
+              print(json.dumps({k:v for k,v in status.items() if k!="log_tail"}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-current-batch-${{ matrix.batch }}
+          path: work/result
+          if-no-files-found: error
+          compression-level: 6
+
+  normalize_compile:
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 cryptography
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-current-batch-*
+          path: downloads
+          merge-multiple: false
+      - name: Assemble only same-run generated trees
+        run: |
+          python - <<'PY'
+          import json,shutil
+          from pathlib import Path
+          out=Path("work/fresh-current"); out.mkdir(parents=True,exist_ok=True); statuses=[]
+          for status_path in sorted(Path("downloads").rglob("status/*.json")):
+              status=json.loads(status_path.read_text()); statuses.append(status)
+              if status["status"]!="generated": continue
+              source=status_path.parent.parent/"generated"/status["key"]
+              if not (source/"benchmark.yaml").exists(): raise SystemExit(f"Generated status without Benchmark tree: {source}")
+              target=out/status["key"]
+              if target.exists(): raise SystemExit(f"Duplicate generated key: {status['key']}")
+              shutil.copytree(source,target)
+          if len(statuses)!=65: raise SystemExit(f"Expected 65 package status records, got {len(statuses)}")
+          summary={"source_policy":"fresh_same_run_only","niwc_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
+                   "packages":len(statuses),"generated":sum(x["status"]=="generated" for x in statuses),
+                   "blocked":sum(x["status"]!="generated" for x in statuses),
+                   "blocked_packages":[x for x in statuses if x["status"]!="generated"]}
+          Path("work/evidence").mkdir(parents=True,exist_ok=True)
+          Path("work/evidence/generation-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({k:v for k,v in summary.items() if k!="blocked_packages"},indent=2))
+          PY
+      - name: Refuse historical generated input
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path("work/fresh-current")
+          forbidden=("iterations/001","iterations/002","canonical-benchmark.json")
+          for p in root.rglob("*"):
+              if any(x in p.as_posix() for x in forbidden): raise SystemExit(f"Historical generated input detected: {p}")
+          summaries=list(root.rglob("source-generation.json"))
+          if not summaries: raise SystemExit("No fresh source-generation provenance found")
+          for p in summaries:
+              if '"generated_fresh": true' not in p.read_text(): raise SystemExit(f"Fresh-generation provenance missing: {p}")
+          print(f"fresh_generation_records={len(summaries)}")
+          PY
+      - name: Normalize exact duplicates and report near overlaps
+        run: |
+          python scap-ng/tools/scap_ng_repo_normalizer.py work/fresh-current             --output-root work/normalized-current --report work/evidence/normalizer-report.json --top-near 500
+      - name: Compile unnormalized corpus baseline
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/fresh-current             --output-dir work/packages-before --metrics work/evidence/compiler-before.json             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Compile normalized corpus
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-after --metrics work/evidence/compiler-after.json             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Compile normalized corpus with self-signed CMS test certificate
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-signed-test --metrics work/evidence/compiler-signed-test.json             --sign-self-signed-test-cert --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Build compact evidence report
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ev=Path("work/evidence")
+          generation=json.loads((ev/"generation-summary.json").read_text())
+          normalizer=json.loads((ev/"normalizer-report.json").read_text())
+          before=json.loads((ev/"compiler-before.json").read_text())
+          after=json.loads((ev/"compiler-after.json").read_text())
+          signed=json.loads((ev/"compiler-signed-test.json").read_text())
+          delta=before["total_bytes"]-after["total_bytes"]
+          pct=round(100.0*delta/before["total_bytes"],2) if before["total_bytes"] else 0.0
+          summary={"niwc_revision":generation["niwc_revision"],"source_packages":generation["packages"],
+                   "generated_native_benchmarks":generation["generated"],"blocked_source_packages":generation["blocked"],
+                   **normalizer["summary"],"compiled_bundles_before":before["bundles"],"compiled_bytes_before":before["total_bytes"],
+                   "compiled_bundles_after":after["bundles"],"compiled_bytes_after":after["total_bytes"],
+                   "compiled_byte_delta":delta,"compiled_byte_reduction_pct":pct,
+                   "signed_test_bundles":signed["signed_bundles"],"signing_trust":signed["signing_trust"]}
+          (ev/"experiment-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          lines=["# Full pinned NIWC Current native normalization/compiler experiment","",
+                 "All native input in this run was generated fresh from the pinned NIWC SCAP 1.4 Current ZIPs.",
+                 "No iteration-001/002 or pre-existing generated SCAP-NG tree was used as input.","",
+                 "## Generation",f"- Pinned NIWC revision: {summary['niwc_revision']}",
+                 f"- Source packages accounted for: **{summary['source_packages']}**",
+                 f"- Native Benchmarks generated: **{summary['generated_native_benchmarks']}**",
+                 f"- Source/conversion blockers: **{summary['blocked_source_packages']}**","",
+                 "## Exact normalization",f"- Referenced Assessment definitions before: **{summary['referenced_assessment_instances_before']}**",
+                 f"- Definitions after proven exact normalization: **{summary['assessment_definitions_after_exact_normalization']}**",
+                 f"- Duplicate definitions avoided: **{summary['duplicate_assessment_definitions_avoided']}**",
+                 f"- Definition reduction: **{summary['exact_definition_reduction_pct']}%**","",
+                 "## Manual-review candidates",f"- Near-duplicate Assessment groups: **{summary['near_duplicate_review_groups']}**",
+                 f"- Near-duplicate Rule candidates reported: **{summary['near_duplicate_rule_candidates_reported']}**","",
+                 "## Compiler experiment",f"- Unsigned bundles before: **{summary['compiled_bundles_before']}** / {summary['compiled_bytes_before']} bytes",
+                 f"- Unsigned bundles after: **{summary['compiled_bundles_after']}** / {summary['compiled_bytes_after']} bytes",
+                 f"- Aggregate standalone-bundle change: **{summary['compiled_byte_delta']} bytes ({summary['compiled_byte_reduction_pct']}%)**",
+                 f"- Self-signed CMS experimental bundles: **{summary['signed_test_bundles']}**",
+                 f"- Signature trust: {summary['signing_trust']}","",
+                 "Standalone benchmark bundles remain self-contained, so cross-benchmark repository sharing does not necessarily reduce total independently distributed bundle size.",
+                 "Repository-definition reduction is the primary normalization metric.",""]
+          (ev/"README.md").write_text("\n".join(lines),encoding="utf-8")
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-niwc-current-native-normalize-compile
+          path: |
+            work/fresh-current
+            work/normalized-current
+            work/packages-before
+            work/packages-after
+            work/packages-signed-test
+            work/evidence
+          if-no-files-found: error
+          compression-level: 6
+      - name: Publish compact evidence to main
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          dst="research/iterations/003/evidence/full-current-native-normalize-compile"
+          rm -rf "$dst"; mkdir -p "$dst"
+          cp ../work/evidence/*.json "$dst"/
+          cp ../work/evidence/README.md "$dst"/README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$dst"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Publish full NIWC native normalization experiment"
+          git pull --rebase origin main
+          git push
