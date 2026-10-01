@@ -176,13 +176,15 @@ def aggregate_operator(operator, values):
 
 
 def apply_filter_state_result(action, state_result):
-    """Apply only source-backed Boolean filter selection semantics.
+    """Apply native filter selection and explicit non-Boolean failure semantics.
 
-    OVAL 5.12.3 defines include/exclude behavior when an item matches or does
-    not match the referenced State, but the generic schema text does not fully
-    define how non-Boolean State outcomes should alter collection status.
-    Until that propagation is independently evidenced, reject non-Boolean
-    results rather than coercing them through host-language truthiness.
+    OVAL 5.12.3 defines include/exclude behavior for Boolean State matches but
+    is not explicit about every non-Boolean propagation path. SCAP-NG resolves
+    that ambiguity by treating any non-Boolean filter-State result as a
+    collection/evaluation error rather than guessing include/exclude behavior.
+    This matches the historical MITRE ovaldi reference-interpreter behavior for
+    core OVAL filters: Filter::DoFilter rejects non-Boolean State results and
+    the Object collector surfaces the exception as a collected-object error.
     """
     action = (action or "exclude").lower()
     if action not in {"include", "exclude"}:
@@ -192,9 +194,7 @@ def apply_filter_state_result(action, state_result):
     if state_result == FALSE:
         return action == "exclude"
     if state_result in {ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE}:
-        raise NotImplementedError(
-            f"filter State result propagation is unresolved for {state_result}"
-        )
+        return ERROR
     raise ValueError(f"unsupported filter State result: {state_result}")
 
 
