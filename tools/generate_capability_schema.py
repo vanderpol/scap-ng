@@ -110,7 +110,7 @@ def immediate_payload_elements(global_element):
     return result
 
 
-def behavior_contract(root, type_name):
+def behavior_contract(root, type_name, *, reject_deprecated_values=False):
     node = direct_global(root, "complexType", type_name)
     props = {}
     required = []
@@ -122,10 +122,17 @@ def behavior_contract(root, type_name):
         values = restriction_values(attr)
         if values:
             schema["type"] = "string"
-            schema["enum"] = values
             deprecated_values = deprecated_restriction_values(attr)
+            deprecated_set = {row["value"] for row in deprecated_values}
+            schema["enum"] = [
+                value for value in values
+                if not (reject_deprecated_values and value in deprecated_set)
+            ]
             if deprecated_values:
                 schema["x-oval-deprecated-enum-values"] = deprecated_values
+                schema["x-scap-ng-deprecated-enum-policy"] = (
+                    "reject" if reject_deprecated_values else "allow_with_warning"
+                )
         else:
             # FileBehaviors max_depth is the current integer case.
             has_integer = any(
@@ -232,7 +239,13 @@ def generate(mapping, repo_root):
     state_el = direct_global(root, "element", source["state"])
     object_fields = immediate_payload_elements(object_el)
     state_fields = immediate_payload_elements(state_el)
-    behavior = behavior_contract(root, source["behavior_type"])
+    behavior = behavior_contract(
+        root,
+        source["behavior_type"],
+        reject_deprecated_values=(
+            mapping.get("native", {}).get("deprecated_enum_policy") == "reject"
+        ),
+    )
 
     selector_props = {}
     selector_field_meta = {}
