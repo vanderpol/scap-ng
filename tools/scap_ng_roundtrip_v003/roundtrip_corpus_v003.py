@@ -30,6 +30,7 @@ from scap_upconvert_v003.build_rhel9_review_slice import (
 )
 from check_current_authoring_contract import violations
 from scap_upconvert_v003.cleanliness import assert_native_clean
+from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build as reverse_build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 
@@ -93,7 +94,7 @@ def main():
     ap.add_argument("--report",type=Path,required=True)
     ap.add_argument("--inventory-only",action="store_true")
     ap.add_argument("--layout", choices=("current", "historical"), default="current",
-                    help="Current named Collection/Test graph, or explicit historical baseline.")
+                    help="Current OVAL-aligned Test/Object/State/Variable graph, or explicit historical baseline.")
     ap.add_argument(
         "--include",
         default="*.xml",
@@ -142,6 +143,9 @@ def main():
                 row["error"]=error
                 rows.append(row)
                 continue
+
+            if args.layout == "current":
+                native = align_assessment_vocabulary(native)
 
             try:
                 assert_native_clean(native)
