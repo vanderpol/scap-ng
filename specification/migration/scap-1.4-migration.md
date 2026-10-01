@@ -188,6 +188,44 @@ pinned by digest in migration evidence.
 This fallback behavior is a migration/build concern, not a native SCAP-NG
 authoring or execution feature.
 
+### XCCDF cluster-id expansion
+
+XCCDF `cluster-id` is a Profile-authoring indirection used to address multiple
+related Rules/Groups or Values. SCAP-NG SHALL normalize this mechanism away
+during Stage-1 migration rather than introduce a native runtime cluster object.
+
+Before applying Profile semantics, a converter SHALL construct the effective
+legacy cluster membership from source items and expand each Profile operation
+whose `idref` targets a cluster into equivalent explicit operations on the
+cluster's members.
+
+Expansion SHALL preserve:
+
+- the original Profile operation's position relative to surrounding operations;
+- member source identity and source document order;
+- operation type and attributes (`select`, `refine-rule`, `set-value`,
+  `set-complex-value`, or `refine-value`);
+- source cluster identity in migration provenance.
+
+The converter SHALL apply the XCCDF type restrictions of the source operation.
+Rule/Group operations SHALL NOT accidentally target Value members, and
+Value-oriented operations SHALL NOT target Rules/Groups.
+
+After deterministic expansion, ordinary Profile inheritance/override/effective
+selection logic applies to the explicit member operations. A later explicit
+operation on one member therefore retains the same precedence it had in the
+legacy Profile.
+
+A cluster reference with no compatible members SHALL be a migration diagnostic
+and SHOULD fail Stage-1 conversion when it affects effective policy. If an
+`idref` is ambiguous between a direct item identity and a cluster identity and
+the legacy semantics cannot be proven unambiguously, the converter SHALL fail
+closed rather than choose one interpretation.
+
+Native Benchmark/Profile/Tailoring content need not retain `cluster-id`.
+Complete migration evidence SHOULD retain the source cluster-to-member
+crosswalk so reviewers can reconstruct why explicit NG operations were emitted.
+
 ## 12. CPE inventory migration
 
 SCAP 1.4 OVAL inventory definitions that map to CPE identifiers SHALL preserve
