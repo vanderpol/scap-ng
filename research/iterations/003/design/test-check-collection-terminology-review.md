@@ -1,3 +1,7 @@
+# SUPERSEDED TERMINOLOGY RESEARCH
+
+> **Superseded for authored vocabulary.** The adopted iteration-003 decision is recorded in `assessment-oval-vocabulary-alignment.md` and `CURRENT-DESIGN.md`: authored nodes use Test, Object, State, Variable, and Item; Collection is runtime execution of an Object. This file remains only as design history and evidence of the earlier debate.
+
 # Research: test / check and collection / object terminology
 
 **Status:** Candidate design, NON-NORMATIVE, not approved by the OVAL Board.  
