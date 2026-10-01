@@ -10,14 +10,14 @@ one-Rule failed scan population.
 | Representation | Bytes | Scope |
 | --- | ---: | --- |
 | Minimal schema-valid SCAP 1.4 ARF/XCCDF result | 1,223 | Run/target/Rule policy result only; no detailed OVAL Results/System Characteristics payload. |
-| SCAP-NG JSONL projection | 1,890 | Self-contained scan-summary event plus self-contained Rule event. |
+| SCAP-NG JSONL projection | 2,003 | Self-contained scan-summary event plus self-contained Rule event. |
 | SCAP-NG canonical scan index | 1,064 | Normalized run/target/result references. |
-| SCAP-NG canonical Benchmark result | 2,138 | Benchmark/Rule result and policy-facing context. |
+| SCAP-NG canonical Benchmark result | 2,324 | Benchmark/Rule result and policy-facing context. |
 | SCAP-NG detailed Assessment result | 2,345 | Detailed Test/Object/Item/State evidence for the failed Rule. |
-| SCAP-NG canonical package members above, total | 5,547 | Detailed logical result for the same Rule. |
+| SCAP-NG canonical package members above, total | 5,733 | Detailed logical result for the same Rule. |
 
-For this deliberately tiny one-Rule sample, the JSONL projection is 667 bytes
-(54.5%) larger than the minimal XCCDF-only ARF. The detailed NG members are
+For this deliberately tiny one-Rule sample, the JSONL projection is 780 bytes
+(about 63.8%) larger than the minimal XCCDF-only ARF. The detailed NG members are
 larger still because they contain detailed evidence that the minimal ARF fixture
 does not.
 
@@ -45,10 +45,10 @@ bits equivalent to mode `0666`, with the Test/Definition outcome false.
 | Detailed representation | Bytes |
 | --- | ---: |
 | SCAP 1.4 ARF + XCCDF + OVAL Results/System Characteristics | 6,025 |
-| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 5,547 |
+| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 5,733 |
 
 For this deliberately tiny one-Rule detailed case, the normalized NG package is
-478 bytes, or about **7.9%**, smaller than the matched detailed ARF.
+292 bytes, or about **4.8%**, smaller than the matched detailed ARF.
 
 This is a fixture result, not a general compression claim. Fixed overhead,
 number of Rules, amount of evidence, repeated context, projection choice, and
