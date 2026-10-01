@@ -34,6 +34,49 @@ Stable Benchmark identity and Benchmark version SHALL be distinct concepts.
 Revisions of the same logical Benchmark SHOULD retain the same logical
 Benchmark identity and change the version/revision.
 
+
+## Assessment specification dependencies
+
+A Benchmark SHALL declare the external assessment specification(s) required by
+its referenced automated Assessments.
+
+The declaration SHALL identify, at minimum:
+
+- a stable assessment-specification identifier; and
+- an exact supported/required specification version.
+
+Illustrative form:
+
+    benchmark:
+      assessment_specifications:
+        - id: <board-defined-assessment-specification>
+          version: "1.0"
+
+The Benchmark declaration is an execution/discoverability contract. It permits
+a scanner to determine whether it supports the technical assessment languages
+required by the Benchmark before deeply traversing every Rule and Assessment.
+
+Each independently executable automated Assessment SHALL also declare its own
+assessment specification identity/version. The Assessment declaration is
+authoritative for that Assessment. Benchmark compilation SHALL verify that every
+referenced automated Assessment is compatible with a Benchmark-declared
+assessment specification dependency.
+
+A Benchmark MAY declare more than one assessment specification when its Rules
+legitimately reference more than one standardized assessment language. SCAP-NG
+SHALL NOT assume that all possible assessment methods are implementations of
+the OVAL successor.
+
+Manual Assessment is a native SCAP-NG assessment method and SHALL NOT be listed
+as though it were an implementation of the OVAL-successor specification. A
+future separately standardized manual-assessment language MAY be represented as
+an additional assessment specification only if such a standard is explicitly
+adopted.
+
+The OVAL Board is expected to decide the name and identity of the standalone
+next-generation OVAL successor. SCAP-NG SHALL use the Board-defined identifier
+once ratified and SHALL NOT use the previously released `OVAL 6` designation.
+
 ## 2. Benchmark as the publisher baseline
 
 Benchmark Rule membership establishes the publisher baseline.
