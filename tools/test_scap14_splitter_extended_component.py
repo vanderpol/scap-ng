@@ -5,7 +5,10 @@ import zipfile
 from pathlib import Path
 from lxml import etree
 
-from scap14_rule_splitter import embedded_components, component_kind, oval_source_roots
+from scap14_rule_splitter import (
+    embedded_components, component_kind, oval_source_roots,
+    resolve_oval_components, OvalComponent,
+)
 
 DS="http://scap.nist.gov/schema/scap/source/1.2"
 CPE="http://cpe.mitre.org/dictionary/2.0"
@@ -40,6 +43,29 @@ class ExtendedComponentTests(unittest.TestCase):
             roots=oval_source_roots(package,{})
         self.assertEqual(len(roots),1)
         self.assertEqual(component_kind(roots[0][1]),"oval")
+
+    def test_duplicate_definition_ids_resolve_by_href(self):
+        ns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        def make_root():
+            root=etree.Element("{"+ns+"}oval_definitions")
+            defs=etree.SubElement(root,"{"+ns+"}definitions")
+            etree.SubElement(defs,"{"+ns+"}definition",{
+                "id":"oval:example:def:1","version":"1","class":"inventory",
+            })
+            return root
+        ordinary=OvalComponent(
+            "scap_example_comp_product-oval.xml",make_root()
+        )
+        inventory=OvalComponent(
+            "scap_example_comp_product-cpe-oval.xml",make_root()
+        )
+        matches=resolve_oval_components(
+            [ordinary,inventory],
+            "oval:example:def:1",
+            "product-cpe-oval.xml",
+            {},
+        )
+        self.assertEqual([x.component_id for x in matches],[inventory.component_id])
 
     def test_extended_component_is_preserved(self):
         root=etree.fromstring(f"""
