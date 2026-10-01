@@ -1593,11 +1593,10 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         collection, error = (ensure_collection(obj_ref) if collection_graph else lower_object(obj_ref))
         if error:
             return None, error
-        # A native Test owns the capability contract. Direct Object and State
-        # references SHALL be the corresponding type. XML XSD keyrefs alone
-        # cannot enforce this; OVAL generally relies on per-Test Schematron.
-        # Fail closed here so a source authoring defect cannot become an NG
-        # assessment with mixed execution semantics.
+        # Test, Collection, and State retain independent capability identities.
+        # Their current OVAL-derived contracts require compatible direct types.
+        # XML XSD keyrefs alone cannot enforce this; OVAL generally relies on
+        # per-Test Schematron. Fail closed rather than retagging a source defect.
         collection_payload = collections[collection] if collection_graph else collection
         if collection_payload.get("capability") != capability:
             return None, (
@@ -1744,9 +1743,9 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         assessment["variables"] = variables
     if collection_graph:
         assessment["collections"] = collections
-        from scap_upconvert_v003.collection_graph import place_capabilities
+        from scap_upconvert_v003.collection_graph import validate_capabilities
         try:
-            place_capabilities(assessment)
+            validate_capabilities(assessment)
         except RecursionError:
             return None, "conversion_resource_limit:python_recursion"
         except ValueError as exc:
