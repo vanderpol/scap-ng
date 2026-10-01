@@ -1,0 +1,132 @@
+assessment:
+  id: SV-268318.automated
+  version: 18
+  assessment_title: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM)
+    product to enforce STIG compliance.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    computer-gpo-s-applied-collection:
+      collection_title: Computer GPO's applied
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CimCmdlets
+        module_id:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          mask: false
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CimInstance
+        parameters:
+          operation: equals
+          datatype: record
+          mask: false
+          value:
+            record:
+            - name: classname
+              value: RSOP_GPLink
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+            - name: namespace
+              value: ROOT\RSOP\Computer
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          mask: false
+          value:
+            record:
+            - name: property
+              value: appliedOrder,enabled,GPO,SOM
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+    mdm-managing-device-collection:
+      collection_title: MDM is managing the device
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get-Service -name IntuneManagementExtension
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: IntuneManagementExtension
+  tests:
+    test-test-ensure-that-at-least-one-gpo-applied-enabled:
+      test_title: Test to ensure that at least one GPO applied is enabled
+      capability: windows.cmdlet
+      collection: computer-gpo-s-applied-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: At least one enabled must be True
+        state:
+          field: value
+          value:
+            record:
+            - name: enabled
+              value: 'True'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    test-run-powershell-command-determine-if-mobile-device-management-mdm-product:
+      test_title: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to
+        enforce STIG compliance
+      capability: independent.shellcommand
+      collection: mdm-managing-device-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: stdout_line must contain the output running
+        state:
+          field: stdout_line
+          value: Running
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-test-ensure-that-at-least-one-gpo-applied-enabled
+    - test: test-run-powershell-command-determine-if-mobile-device-management-mdm-product

@@ -1,0 +1,84 @@
+assessment:
+  id: SV-253256.automated
+  version: 18
+  assessment_title: Windows 11 systems must have Unified Extensible Firmware Interface (UEFI) firmware and be configured
+    to run in UEFI mode, not Legacy BIOS.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    secure-boot-state-setting-collection:
+      collection_title: Secure Boot State Setting
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Microsoft.Powershell.Management
+        module_id:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          mask: false
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ComputerInfo
+        parameters:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+        select:
+          operation: equals
+          datatype: record
+          mask: false
+          value:
+            record:
+            - name: property
+              value: biosfirmwaretype
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+  tests:
+    test-unified-extensible-firmware-interface-uefi-firmware-exist-configured-run-in:
+      test_title: Unified Extensible Firmware Interface (UEFI) firmware must exist and be configured to run in UEFI
+        mode, not Legacy BIOS.
+      capability: windows.cmdlet
+      collection: secure-boot-state-setting-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: BIOS Firmware Type must be equal to UEFI
+        state:
+          field: value
+          value:
+            record:
+            - name: biosfirmwaretype
+              value: UEFI
+              operation: case insensitive equals
+              datatype: string
+              mask: false
+              entity_check: all
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-unified-extensible-firmware-interface-uefi-firmware-exist-configured-run-in

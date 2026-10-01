@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253333.automated
+  version: 2
+  assessment_title: WN11-AU-000140 - The system must be configured to audit System - Security State Change successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-security-state-change-success-only:
+      test_title: Audit - Security State Change - Success only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Security State Change - Success only
+        state:
+          field: security_state_change
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-security-state-change-success-failure:
+      test_title: Audit - Security State Change - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Security State Change - Success and Failure
+        state:
+          field: security_state_change
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-security-state-change-success-only
+    - test: test-audit-security-state-change-success-failure

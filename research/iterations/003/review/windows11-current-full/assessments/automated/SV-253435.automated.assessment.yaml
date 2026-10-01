@@ -1,0 +1,61 @@
+assessment:
+  id: SV-253435.automated
+  version: 2
+  assessment_title: WN11-SO-000020 - The built-in administrator account must be renamed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    built-in-administrator-sid-collection:
+      collection_title: Built-in Administrator SID
+      select:
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^S-1-5-[0-9-]+-500$
+  variables:
+    localdomain-administrator-variable:
+      title: localdomain\Administrator
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            collection: built-in-administrator-sid-collection
+            field: trustee_domain
+        - literal:
+            value: \Administrator
+            datatype: string
+  tests:
+    test-accounts-rename-administrator-account-not-set-administrator-or-localdomain-administrator:
+      test_title: '''Accounts: Rename administrator account'' is not set to ''Administrator'' or ''localdomain\Administrator'''
+      capability: windows.sid_sid
+      collection: built-in-administrator-sid-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: Not Administrator
+          state:
+            field: trustee_name
+            value: Administrator
+            operation: case insensitive not equal
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: Not localdomain\Administrator
+          state:
+            field: trustee_name
+            value:
+              variable: localdomain-administrator-variable
+            operation: case insensitive not equal
+            datatype: string
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-accounts-rename-administrator-account-not-set-administrator-or-localdomain-administrator

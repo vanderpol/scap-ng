@@ -1,0 +1,40 @@
+assessment:
+  id: SV-253293.automated
+  version: 18
+  assessment_title: The system must notify the user when a Bluetooth device attempts to connect.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-collection:
+      collection_title: Retrieve AcceptIncomingRequests from BluetoothAuthenticationAgent
+      select:
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\BluetoothAuthenticationAgent
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AcceptIncomingRequests
+  tests:
+    test-system-notify-user-when-bluetooth-device-attempts-connect:
+      test_title: The system must notify the user when a Bluetooth device attempts to connect.
+      capability: windows.ntuser
+      collection: retrieve-acceptincomingrequests-from-bluetoothauthenticationagent-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: Value equal to 1
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-system-notify-user-when-bluetooth-device-attempts-connect

@@ -1,0 +1,121 @@
+assessment:
+  id: SV-253401.automated
+  version: 3
+  assessment_title: WN11-CC-000260 - Windows 11 must be configured to require a minimum PIN length of six characters
+    or greater
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    group-policy-registry-entry-minimumpinlength-collection:
+      collection_title: Group Policy registry entry for MinimumPINLength
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\PassportForWork\PINComplexity
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: MinimumPINLength
+    registry-object-tenant-id-account-currently-in-use-collection:
+      collection_title: Registry object for the Tenant ID of the account currently in use
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: (?i)SYSTEM\\CurrentControlSet\\Control\\CloudDomainJoin\\TenantInfo\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+    intune-registry-entry-minimumpinlength-collection:
+      collection_title: Intune registry entry for MinimumPINLength
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: guid-current-tenant-variable
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: MinimumPINLength
+    registry-entries-minimumpinlength-collection:
+      collection_title: Registry entries for MinimumPINLength
+      set:
+        operator: union
+        members:
+        - collection: group-policy-registry-entry-minimumpinlength-collection
+        - collection: intune-registry-entry-minimumpinlength-collection
+  variables:
+    guid-current-tenant-variable:
+      title: GUID of current Tenant
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: SOFTWARE\Microsoft\Policies\PassportForWork\
+            datatype: string
+        - regex_capture:
+            value:
+              values:
+                collection: registry-object-tenant-id-account-currently-in-use-collection
+                field: key
+            pattern: (?i)\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
+        - literal:
+            value: \device\policies\PINComplexity
+            datatype: string
+      collection_capabilities:
+        registry-object-tenant-id-account-currently-in-use-collection: windows.registry
+  tests:
+    test-minimum-pin-length-6-or-greater:
+      test_title: Minimum PIN length is 6 or greater
+      capability: windows.registry
+      collection: registry-entries-minimumpinlength-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '6'
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-minimum-pin-length-6-or-greater

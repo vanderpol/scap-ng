@@ -1,0 +1,54 @@
+assessment:
+  id: SV-253493.automated
+  version: 2
+  assessment_title: WN11-UR-000080 - The "Deny log on as a service" user right on Windows 11 domain-joined workstations
+    must be configured to prevent access from highly privileged domain accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_DENY_SERVICE_LOGON_NAME
+  tests:
+    test-deny-log-on-as-service-domain-admins:
+      test_title: Deny log on as a service - Domain Admins
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state:
+          field: trustee_name
+          value: ^(?i)(.+\\)?Domain Admins$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-deny-log-on-as-service-enterprise-admins:
+      test_title: Deny log on as a service - Enterprise Admins
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state:
+          field: trustee_name
+          value: ^(?i)(.+\\)?Enterprise Admins$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-deny-log-on-as-service-domain-admins
+    - test: test-deny-log-on-as-service-enterprise-admins

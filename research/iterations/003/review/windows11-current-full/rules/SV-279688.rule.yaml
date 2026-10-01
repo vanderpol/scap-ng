@@ -1,0 +1,63 @@
+rule:
+  id: SV-279688
+  version: r1256671
+  title: Windows 11 systems must block consumer account user authentication.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: It is detrimental for operating systems to provide, or install by default, functionality exceeding
+    requirements or mission objectives. These unnecessary capabilities or services are often overlooked and therefore,
+    may remain unsecured. They increase the risk to the platform by providing additional attack vectors. Operating
+    systems are capable of providing a wide variety of functions and services. Some of the functions and services,
+    provided by default, may not be necessary to support essential organizational operations (e.g., key missions,
+    functions). The Copilot Rewrite functionality within Notepad and Image Generation within Paint is dependent
+    upon the use of AI credits from a Microsoft 365 Personal or Family subscription. Organizational users must not
+    use personal accounts to login to applications on enterprise machines.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-00-000126
+  - scheme: vulnerability
+    value: V-279688
+  - scheme: cci
+    value: CCI-000381
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the following Group Policy: Computer Configuration >> Administrative Templates >> Windows
+      Components >> Microsoft Account "block all consumer Microsoft account user authentication" to "Enabled". For
+      systems managed by Intune, apply the DoW Windows 11 STIG Settings Catalog (or equivalent Intune policy) found
+      in the Intune policy package available on cyber.mil. Steps to create an Intune policy: 1. Sign in to the Intune
+      admin center >> Devices >> Configuration >> Create >> New Policy. 2. Platform: Windows 10 and later. Profile
+      type: Settings Catalog, then click "Create". 3. Basics: Provide a Name and Description of the profile, then
+      click "Next". 4. Configuration settings: Click "+ Add settings" and search for consumer under the Settings
+      picker. Under the Administrative Templates\Windows Components\Microsoft account category, check the box next
+      to "Block all consumer Microsoft account user authentication". Click the Enabled radio button, then click
+      "Next". 5. Scope tags: (optional), then click "Next". 6. Assignments: Assign the policy to Entra security
+      groups that contain the target users or devices, then click "Next". 7. Review + create: Review the deployment
+      summary, then click "Create".'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-279688.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-279688.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-279688.manual.assessment.yaml
+  default_assessment_choice: default

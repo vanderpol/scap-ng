@@ -1,0 +1,40 @@
+assessment:
+  id: SV-253301.automated
+  version: 2
+  assessment_title: WN11-AC-000025 - The maximum password age must be configured to 60 days or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-passwordpolicy-collection:
+      collection_title: null
+  tests:
+    test-maximum-password-age-set-60-days-or-less-but-greater:
+      test_title: Maximum Password Age is set to 60 days or less, but greater than 0.
+      capability: windows.passwordpolicy
+      collection: windows-passwordpolicy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: null
+          state:
+            field: max_passwd_age
+            value: '5184000'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: max_passwd_age
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-maximum-password-age-set-60-days-or-less-but-greater

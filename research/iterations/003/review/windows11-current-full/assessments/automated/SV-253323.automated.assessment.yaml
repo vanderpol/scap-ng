@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253323.automated
+  version: 2
+  assessment_title: WN11-AU-000085 - The system must be configured to audit Object Access - Removable Storage failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-object-access-removable-storage-failure-only:
+      test_title: Audit - Object Access - Removable Storage - Failure Only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Audit Removable Storage'' is set to ''Success'''
+        state:
+          field: removable_storage
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-object-access-removable-storage-success-failure:
+      test_title: Audit - Object Access - Removable Storage - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Audit Removable Storage'' is set to ''Success and Failure'''
+        state:
+          field: removable_storage
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-object-access-removable-storage-failure-only
+    - test: test-audit-object-access-removable-storage-success-failure

@@ -1,0 +1,47 @@
+assessment:
+  id: SV-278931.automated
+  version: 2
+  assessment_title: WN11-AU-000586 - Windows 11 must be configured to audit registry successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-registry-set-success:
+      test_title: '''Audit Registry'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Registry'' is set to ''Success'''
+        state:
+          field: registry
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-registry-set-success-failure:
+      test_title: '''Audit Registry'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Registry'' is set to ''Success'' and ''Failure'''
+        state:
+          field: registry
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-registry-set-success
+    - test: test-audit-registry-set-success-failure

@@ -1,0 +1,70 @@
+assessment:
+  id: SV-253363.automated
+  version: 18
+  assessment_title: Windows 11 must be configured to prioritize ECC Curves with longer key lengths first.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ssl-ecccurves-setting-collection:
+      collection_title: SSL - EccCurves Setting
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002\
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EccCurves
+    independent-variable-collection:
+      collection_title: null
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: merged-multi-string-ssl-ecccurves-setting-variable
+  variables:
+    merged-multi-string-ssl-ecccurves-setting-variable:
+      title: Merged Multi-String SSL - EccCurves Setting
+      kind: local
+      datatype: string
+      expression:
+        merge:
+          values:
+            values:
+              collection: ssl-ecccurves-setting-collection
+              field: value
+          delimiter: ''
+          sort: document
+          order: ascending
+      collection_capabilities:
+        ssl-ecccurves-setting-collection: windows.registry
+  tests:
+    test-prioritize-ecc-curves-longer-key-lengths-first-nistp384-requirement:
+      test_title: Prioritize ECC Curves with longer key lengths first. NistP384 Requirement
+      capability: independent.variable
+      collection: independent-variable-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: only one
+        state_title: null
+        state:
+          field: value
+          value: ^NistP384\s*NistP256$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-prioritize-ecc-curves-longer-key-lengths-first-nistp384-requirement

@@ -1,0 +1,268 @@
+assessment:
+  id: SV-256893.automated
+  version: 1
+  assessment_title: WN11-CC-000391 - Internet Explorer must be disabled for Windows 11.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-wmi57-collection:
+      collection_title: null
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
+    editionid-collection:
+      collection_title: EditionID
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: EditionId
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NotifyDisableIEOptions
+    64-bit-displayname-registry-value-collection:
+      collection_title: 64-bit DisplayName registry value
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisplayName
+      behaviors:
+        max_depth: '1'
+        recurse_direction: down
+    64-bit-displayname-equals-microsoft-edge-collection:
+      collection_title: 64-bit DisplayName equals Microsoft Edge
+      set:
+        operator: union
+        members:
+        - collection: 64-bit-displayname-registry-value-collection
+        filters:
+        - action: include
+          match:
+            field: value
+            value: Microsoft Edge
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: registry value equals Microsoft Edge
+    32-bit-displayname-registry-value-collection:
+      collection_title: 32-bit DisplayName registry value
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisplayName
+      behaviors:
+        max_depth: '1'
+        recurse_direction: down
+    32-bit-displayname-equals-microsoft-edge-collection:
+      collection_title: 32-bit DisplayName equals Microsoft Edge
+      set:
+        operator: union
+        members:
+        - collection: 32-bit-displayname-registry-value-collection
+        filters:
+        - action: include
+          match:
+            field: value
+            value: Microsoft Edge
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: registry value equals Microsoft Edge
+  tests:
+    test-internet-explorer-11-optional-feature-disabled-or-not-installed:
+      test_title: Internet Explorer 11 optional feature disabled or not installed
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-os-windows-enterprise-ltsc:
+      test_title: The OS is Windows Enterprise LTSC
+      capability: windows.registry
+      collection: editionid-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: EditionID = EnterpriseS (reg_sz)
+        state:
+          all:
+          - field: type
+            value: reg_sz
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: EnterpriseS
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-internet-explorer-11-disabled-as-standalone-browser:
+      test_title: Internet Explorer 11 is disabled as a standalone browser
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '1'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '2'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+    test-64-bit-microsoft-edge-installed:
+      test_title: 64-bit Microsoft Edge is installed
+      capability: windows.registry
+      collection: 64-bit-displayname-equals-microsoft-edge-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-32-bit-microsoft-edge-installed:
+      test_title: 32-bit Microsoft Edge is installed
+      capability: windows.registry
+      collection: 32-bit-displayname-equals-microsoft-edge-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - test: test-internet-explorer-11-optional-feature-disabled-or-not-installed
+    - test: test-os-windows-enterprise-ltsc
+    - all:
+      - test: test-internet-explorer-11-disabled-as-standalone-browser
+      - any:
+        - not:
+            test: test-64-bit-microsoft-edge-installed
+        - not:
+            test: test-32-bit-microsoft-edge-installed

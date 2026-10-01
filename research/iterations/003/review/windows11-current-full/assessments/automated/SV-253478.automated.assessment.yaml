@@ -1,0 +1,112 @@
+assessment:
+  id: SV-253478.automated
+  version: 2
+  assessment_title: WN11-UC-000020 - Zone information must be preserved when saving attachments.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-ntuser-collection:
+      collection_title: null
+      select:
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SaveZoneInformation
+      filters:
+      - action: exclude
+        match:
+          field: enabled
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      - action: exclude
+        match:
+          field: days_since_modified
+          value: '35'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_CURRENT_USER
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SaveZoneInformation
+  tests:
+    test-do-not-preserve-zone-information-in-file-attachments-set-not:
+      test_title: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
+      capability: windows.ntuser
+      collection: windows-ntuser-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '2'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-current-user-do-not-preserve-zone-information-in-file-attachments:
+      test_title: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
+        or 'Disabled'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '2'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-do-not-preserve-zone-information-in-file-attachments-set-not
+    - test: test-current-user-do-not-preserve-zone-information-in-file-attachments

@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253316.automated
+  version: 2
+  assessment_title: WN11-AU-000070 - The system must be configured to audit Logon/Logoff - Logon failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-logon-set-failure:
+      test_title: '''Audit Logon'' is set to ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Log On'' is set to ''Failure'''
+        state:
+          field: logon
+          value: AUDIT_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-logon-set-success-failure:
+      test_title: '''Audit Logon'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Log On'' is set to ''Success'' and ''Failure'''
+        state:
+          field: logon
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-logon-set-failure
+    - test: test-audit-logon-set-success-failure

@@ -1,0 +1,53 @@
+assessment:
+  id: SV-253396.automated
+  version: 2
+  assessment_title: WN11-CC-000215 - Explorer Data Execution Prevention must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\Explorer
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoDataExecutionPrevention
+  tests:
+    test-turn-off-data-execution-prevention-explorer-set-disabled-or-not:
+      test_title: '''Turn off Data Execution Prevention for Explorer'' is set to ''Disabled'' or ''Not Configured'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-turn-off-data-execution-prevention-explorer-set-disabled-or-not

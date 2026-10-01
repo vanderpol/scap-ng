@@ -1,0 +1,53 @@
+assessment:
+  id: SV-253405.automated
+  version: 2
+  assessment_title: WN11-CC-000285 - The Remote Desktop Session Host must require secure RPC communications.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows NT\Terminal Services
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fEncryptRPCTraffic
+  tests:
+    test-require-secure-rpc-communication-set-enabled:
+      test_title: '''Require secure RPC communication'' is set to ''Enabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-require-secure-rpc-communication-set-enabled

@@ -1,0 +1,53 @@
+rule:
+  id: SV-253393
+  version: r1256676
+  title: Windows Telemetry must not be configured to Full.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Some features may communicate with the vendor, sending system information or downloading data or components
+    for the feature. Limiting this capability will prevent potentially sensitive information from being sent outside
+    the enterprise. The "Security" option for Telemetry configures the lowest amount of data, effectively none outside
+    of the Malicious Software Removal Tool (MSRT), Defender, and telemetry client settings. "Basic" sends basic
+    diagnostic and usage data and may be required to support some Microsoft services. "Enhanced" includes additional
+    information on how Windows and apps are used and advanced reliability data. Windows Analytics can use a "limited
+    enhanced" level to provide information such as health data for devices.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-CC-000205
+  - scheme: vulnerability
+    value: V-253393
+  - scheme: cci
+    value: CCI-001312
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Configure the policy value for Computer Configuration >> Administrative Templates >> Windows Components
+      >> Data Collection and Preview Builds >> "Allow Diagnostic Data" to "Enabled" with "Send required diagnostic
+      data" selected in "Options:".
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253393.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253393.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253393.manual.assessment.yaml
+  default_assessment_choice: default

@@ -1,0 +1,85 @@
+assessment:
+  id: SV-253285.automated
+  version: 3
+  assessment_title: WN11-00-000155 - The Windows PowerShell 2.0 feature must be disabled on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-powershell-2-0-win32-optionalfeature-object-collection:
+      collection_title: Windows PowerShell 2.0 Win32_OptionalFeature object
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2Root'
+    windows-powershell-2-0-engine-win32-optionalfeature-object-collection:
+      collection_title: Windows PowerShell 2.0 Engine Win32_OptionalFeature object
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'
+  tests:
+    test-windows-powershell-2-0-optional-feature-disabled:
+      test_title: Windows PowerShell 2.0 optional feature is disabled
+      capability: windows.wmi57
+      collection: windows-powershell-2-0-win32-optionalfeature-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-windows-powershell-2-0-engine-optional-feature-disabled:
+      test_title: Windows PowerShell 2.0 Engine optional feature is disabled
+      capability: windows.wmi57
+      collection: windows-powershell-2-0-engine-win32-optionalfeature-object-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-windows-powershell-2-0-optional-feature-disabled
+    - test: test-windows-powershell-2-0-engine-optional-feature-disabled

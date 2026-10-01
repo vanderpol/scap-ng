@@ -1,0 +1,43 @@
+assessment:
+  id: condition.bluetooth-installation.assessment
+  version: 18
+  assessment_title: Bluetooth Installation
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    run-command-get-pnpdevice-class-bluetooth-status-ok-class-collection:
+      collection_title: 'Run command: (Get-PnpDevice -class bluetooth -status OK).class'
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: (Get-PnpDevice -class bluetooth -status OK).class
+      filters:
+      - action: include
+        match:
+          field: stdout_line
+          value: Bluetooth
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Check if Get-PnpDevice command returned any items with class 'Bluetooth'
+  tests:
+    test-report-true-if-bluetooth-installed:
+      test_title: Report true if bluetooth installed
+      capability: independent.shellcommand
+      collection: run-command-get-pnpdevice-class-bluetooth-status-ok-class-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-report-true-if-bluetooth-installed

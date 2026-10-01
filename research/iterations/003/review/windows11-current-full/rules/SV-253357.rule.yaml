@@ -1,0 +1,52 @@
+rule:
+  id: SV-253357
+  version: r958518
+  title: Local administrator accounts must have their privileged token filtered to prevent elevated privileges from
+    being used over the network on domain systems.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: A compromised local administrator account can provide means for an attacker to move laterally between
+    domain systems. With User Account Control enabled, filtering the privileged token for built-in administrator
+    accounts will prevent the elevated privileges of these accounts from being used over the network.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-CC-000037
+  - scheme: vulnerability
+    value: V-253357
+  - scheme: cci
+    value: CCI-001084
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.windows-domain-member-workstation
+  parameters: {}
+  remediation:
+    guidance: Configure the policy value for Computer Configuration >> Administrative Templates >> MS Security Guide
+      >> "Apply UAC restrictions to local accounts on network logons" to "Enabled". This policy setting requires
+      the installation of the SecGuide custom templates included with the STIG package. "SecGuide.admx" and "SecGuide.adml"
+      must be copied to the \Windows\PolicyDefinitions and \Windows\PolicyDefinitions\en-US directories respectively.
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253357.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253357.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253357.manual.assessment.yaml
+  default_assessment_choice: default

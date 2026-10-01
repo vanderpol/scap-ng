@@ -1,0 +1,36 @@
+assessment:
+  id: SV-253496.automated
+  version: 2
+  assessment_title: WN11-UR-000095 - The "Enable computer and user accounts to be trusted for delegation" user right
+    must not be assigned to any groups or accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_ENABLE_DELEGATION_NAME
+  tests:
+    test-enable-computer-user-accounts-trusted-delegation-none:
+      test_title: Enable computer and user accounts to be trusted for delegation - None
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: trustee_name
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-enable-computer-user-accounts-trusted-delegation-none

@@ -1,0 +1,40 @@
+assessment:
+  id: SV-253332.automated
+  version: 2
+  assessment_title: WN11-AU-000135 - The system must be configured to audit System - Other System Events failures.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-other-system-events-set-failure-or-success-failure:
+      test_title: '''Other System Events'' is set to ''Failure'' or ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            field: other_system_events
+            value: AUDIT_FAILURE
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: other_system_events
+            value: AUDIT_SUCCESS_FAILURE
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-other-system-events-set-failure-or-success-failure

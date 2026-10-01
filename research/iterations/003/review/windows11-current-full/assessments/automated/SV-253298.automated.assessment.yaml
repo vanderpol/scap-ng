@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253298.automated
+  version: 2
+  assessment_title: WN11-AC-000010 - The number of allowed bad logon attempts must be configured to three or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-lockoutpolicy-collection:
+      collection_title: null
+  tests:
+    test-account-lockout-threshold-set-3-or-less:
+      test_title: '''Account lockout threshold'' is set to ''3'' or less'
+      capability: windows.lockoutpolicy
+      collection: windows-lockoutpolicy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Lockout Threshold is less than or equal to 3
+        state:
+          field: lockout_threshold
+          value: '3'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-account-lockout-threshold-not-set-0:
+      test_title: '''Account lockout threshold'' is not set to ''0'''
+      capability: windows.lockoutpolicy
+      collection: windows-lockoutpolicy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Lockout Threshold is greater than 0
+        state:
+          field: lockout_threshold
+          value: '0'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-account-lockout-threshold-set-3-or-less
+    - test: test-account-lockout-threshold-not-set-0

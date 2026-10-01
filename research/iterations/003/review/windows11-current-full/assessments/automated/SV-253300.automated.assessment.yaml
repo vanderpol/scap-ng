@@ -1,0 +1,73 @@
+assessment:
+  id: SV-253300.automated
+  version: 4
+  assessment_title: WN11-AC-000020 - The password history must be configured to 24 passwords remembered.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-passwordpolicy-collection:
+      collection_title: null
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DevicePasswordHistory
+  tests:
+    test-enforce-password-history-set-24-passwords-or-more:
+      test_title: '''Enforce password history'' is set to ''24'' passwords or more'
+      capability: windows.passwordpolicy
+      collection: windows-passwordpolicy-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Password History Length is greater than or equal to variable
+        state:
+          field: password_hist_len
+          value: '24'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-enforce-password-history-set-24-passwords-or-more-through-intune:
+      test_title: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '24'
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-enforce-password-history-set-24-passwords-or-more
+    - test: test-enforce-password-history-set-24-passwords-or-more-through-intune

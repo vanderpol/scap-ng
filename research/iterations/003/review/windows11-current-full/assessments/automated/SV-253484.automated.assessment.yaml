@@ -1,0 +1,56 @@
+assessment:
+  id: SV-253484.automated
+  version: 3
+  assessment_title: WN11-UR-000035 - The "Change the system time" user right must only be assigned to Administrators
+    and Local Service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_SYSTEMTIME_NAME
+  tests:
+    test-change-system-time-administrators-local-service:
+      test_title: Change the system time - Administrators, LOCAL SERVICE
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            field: trustee_name
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: Administrators
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: LOCAL SERVICE
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-change-system-time-administrators-local-service

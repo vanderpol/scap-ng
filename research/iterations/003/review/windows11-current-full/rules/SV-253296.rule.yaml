@@ -1,0 +1,57 @@
+rule:
+  id: SV-253296
+  version: r1256651
+  title: The Windows 11 time service must synchronize with an appropriate DoW time source.
+  severity: low
+  role: full
+  weight: 10.0
+  discussion: The Windows Time Service controls time synchronization settings. Time synchronization is essential
+    for authentication and auditing purposes. If the Windows Time Service is used, it must synchronize with a secure,
+    authorized time source. Domain-joined systems are automatically configured to synchronize with domain controllers.
+    If an NTP server is configured, it must synchronize with a secure, authorized time source.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-00-000260
+  - scheme: vulnerability
+    value: V-253296
+  - scheme: cci
+    value: CCI-004923
+  - scheme: cci
+    value: CCI-001891
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Configure the system to synchronize time with an appropriate DoW time source. Domain-joined systems
+      use NT5DS to synchronize time from other systems in the domain by default. If the system needs to be configured
+      to an NTP server, configure the system to point to an authorized time server by setting the policy value for
+      Computer Configuration >> Administrative Templates >> System >> Windows Time Service >> Time Providers >>
+      "Configure Windows NTP Client" to "Enabled", and configure the "NtpServer" field to point to an appropriate
+      DoW time server. The US Naval Observatory operates stratum 1 time servers, identified at https://www.cnmoc.usff.navy.mil/Our-Commands/United-States-Naval-Observatory/Precise-Time-Department/Network-Time-Protocol-NTP/.
+      Time synchronization will occur through a hierarchy of time servers down to the local level. Clients and lower-level
+      servers will synchronize with an authorized time server in the hierarchy.
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253296.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253296.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253296.manual.assessment.yaml
+  default_assessment_choice: default

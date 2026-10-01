@@ -1,0 +1,48 @@
+assessment:
+  id: SV-253327.automated
+  version: 2
+  assessment_title: WN11-AU-000107 - The system must be configured to audit Policy Change - Authorization Policy
+    Change successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-audit-policy-change-success-only:
+      test_title: Audit - Audit Policy Change - Success only
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Audit Policy Change - Success only
+        state:
+          field: authorization_policy_change
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-audit-policy-change-success-failure:
+      test_title: Audit - Audit Policy Change - Success and Failure
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Audit - Audit Policy Change - Success and Failure
+        state:
+          field: authorization_policy_change
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-audit-policy-change-success-only
+    - test: test-audit-audit-policy-change-success-failure

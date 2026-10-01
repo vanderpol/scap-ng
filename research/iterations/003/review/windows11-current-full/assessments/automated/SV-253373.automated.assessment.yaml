@@ -1,0 +1,53 @@
+assessment:
+  id: SV-253373.automated
+  version: 2
+  assessment_title: WN11-CC-000090 - Group Policy objects must be reprocessed even if they have not changed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2}
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: NoGPOListChanges
+  tests:
+    test-nogpoistchanges-set-0:
+      test_title: NoGPOistChanges is set to 0.
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-nogpoistchanges-set-0

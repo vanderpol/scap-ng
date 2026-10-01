@@ -1,0 +1,51 @@
+rule:
+  id: SV-253457
+  version: r1081060
+  title: Remote calls to the Security Account Manager (SAM) must be restricted to Administrators.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: The Windows SAM stores users' passwords. Restricting remote rpc connections to the SAM to Administrators
+    helps protect those credentials.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-SO-000167
+  - scheme: vulnerability
+    value: V-253457
+  - scheme: cci
+    value: CCI-002235
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Navigate to the policy Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+      >> Security Options >> "Network access: Restrict clients allowed to make remote calls to SAM". Select "Edit
+      Security" to configure the "Security descriptor:". Add "Administrators" in "Group or user names:" if it is
+      not already listed (this is the default). Select "Administrators" in "Group or user names:". Select "Allow"
+      for "Remote Access" in "Permissions for "Administrators". Click "OK". The "Security descriptor:" must be populated
+      with "O:BAG:BAD:(A;;RC;;;BA) for the policy to be enforced.'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253457.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253457.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253457.manual.assessment.yaml
+  default_assessment_choice: default

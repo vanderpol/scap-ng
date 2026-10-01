@@ -1,0 +1,47 @@
+assessment:
+  id: SV-278932.automated
+  version: 2
+  assessment_title: WN11-AU-000587 - Windows 11 must be configured to audit sensitive privileged use successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-auditeventpolicysubcategories-collection:
+      collection_title: null
+  tests:
+    test-audit-sensitive-privilege-use-set-success:
+      test_title: '''Audit Sensitive Privilege Use'' is set to ''Success'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Sensitive Privilege Use'' is set to ''Success'''
+        state:
+          field: sensitive_privilege_use
+          value: AUDIT_SUCCESS
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-audit-sensitive-privilege-use-set-success-failure:
+      test_title: '''Audit Sensitive Privilege Use'' is set to ''Success'' and ''Failure'''
+      capability: windows.auditeventpolicysubcategories
+      collection: windows-auditeventpolicysubcategories-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: '''Sensitive Privilege Use'' is set to ''Success'' and ''Failure'''
+        state:
+          field: sensitive_privilege_use
+          value: AUDIT_SUCCESS_FAILURE
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-audit-sensitive-privilege-use-set-success
+    - test: test-audit-sensitive-privilege-use-set-success-failure

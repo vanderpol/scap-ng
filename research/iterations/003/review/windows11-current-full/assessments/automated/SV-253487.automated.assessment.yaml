@@ -1,0 +1,74 @@
+assessment:
+  id: SV-253487.automated
+  version: 2
+  assessment_title: WN11-UR-000050 - The "Create global objects" user right must only be assigned to Administrators,
+    Service, Local Service, and Network Service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_CREATE_GLOBAL_NAME
+  tests:
+    test-create-global-objects-administrators-local-service-network-service-service:
+      test_title: Create global objects - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            field: trustee_name
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: Administrators
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: LOCAL SERVICE
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: NETWORK SERVICE
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: SERVICE
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-create-global-objects-administrators-local-service-network-service-service

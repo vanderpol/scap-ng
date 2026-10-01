@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253278.automated
+  version: 2
+  assessment_title: WN11-00-000115 - The Telnet Client must not be installed on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-wmi57-collection:
+      collection_title: null
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'TelnetClient'
+  tests:
+    test-telnet-client-not-installed-on-system:
+      test_title: The Telnet Client is not installed on the system
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: result
+          value:
+            record:
+            - name: installstate
+              value: '2'
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: at least one
+          operation: equals
+          datatype: record
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-telnet-client-not-installed-on-system

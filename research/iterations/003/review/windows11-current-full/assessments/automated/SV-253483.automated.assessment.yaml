@@ -1,0 +1,47 @@
+assessment:
+  id: SV-253483.automated
+  version: 2
+  assessment_title: WN11-UR-000030 - The "Back up files and directories" user right must only be assigned to the
+    Administrators group.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-userright-collection:
+      collection_title: null
+      select:
+        userright:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SE_BACKUP_NAME
+  tests:
+    test-back-up-files-directories-administrators:
+      test_title: Back up files and directories - Administrators
+      capability: windows.userright
+      collection: windows-userright-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            field: trustee_name
+            value: ''
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: trustee_name
+            value: Administrators
+            operation: case insensitive equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-back-up-files-directories-administrators

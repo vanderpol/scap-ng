@@ -1,0 +1,51 @@
+rule:
+  id: SV-253356
+  version: r958902
+  title: The system must be configured to ignore NetBIOS name release requests except from WINS servers.
+  severity: low
+  role: full
+  weight: 10.0
+  discussion: Configuring the system to ignore name release requests, except from WINS servers, prevents a denial
+    of service (DoS) attack. The DoS consists of sending a NetBIOS name release request to the server for each entry
+    in the server's cache, causing a response delay in the normal operation of the servers WINS resolution capability.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-CC-000035
+  - scheme: vulnerability
+    value: V-253356
+  - scheme: cci
+    value: CCI-002385
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the policy value for Computer Configuration >> Administrative Templates >> MSS (Legacy)
+      >> "MSS: (NoNameReleaseOnDemand) Allow the computer to ignore NetBIOS name release requests except from WINS
+      servers" to "Enabled". This policy setting requires the installation of the MSS-Legacy custom templates included
+      with the STIG package. "MSS-Legacy.admx" and "MSS-Legacy.adml" must be copied to the \Windows\PolicyDefinitions
+      and \Windows\PolicyDefinitions\en-US directories respectively.'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253356.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253356.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253356.manual.assessment.yaml
+  default_assessment_choice: default

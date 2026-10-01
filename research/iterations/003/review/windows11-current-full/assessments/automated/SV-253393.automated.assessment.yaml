@@ -1,0 +1,73 @@
+assessment:
+  id: SV-253393.automated
+  version: 3
+  assessment_title: WN11-CC-000205 - Windows Telemetry must not be configured to Full.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\DataCollection
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowTelemetry
+  tests:
+    test-allow-diagnostic-data-set-enabled-diagnostic-data-off-not-recommended:
+      test_title: '''Allow Diagnostic Data'' is set to ''Enabled'' with ''Diagnostic Data Off (Not recommended)''
+        or ''Send Required Diagnostic Data'' selected in ''Options:'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '1'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+  evaluate:
+    test: test-allow-diagnostic-data-set-enabled-diagnostic-data-off-not-recommended

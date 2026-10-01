@@ -1,0 +1,100 @@
+assessment:
+  id: platform.microsoft-windows-11.assessment
+  version: 2
+  assessment_title: Microsoft Windows 11
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    os-family-collection:
+      collection_title: OS family
+    productname-registry-entry-collection:
+      collection_title: ProductName registry entry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ProductName
+    currentbuildnumber-registry-entry-collection:
+      collection_title: CurrentBuildNumber registry entry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CurrentBuildNumber
+  tests:
+    test-installed-operating-system-belongs-microsoft-windows-family:
+      test_title: The installed operating system belongs to the Microsoft Windows family
+      capability: independent.family
+      collection: os-family-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Microsoft Windows family
+        state:
+          field: family
+          value: windows
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-installed-operating-system-windows-10-or-11:
+      test_title: The installed operating system is Windows 10 or 11
+      capability: windows.registry
+      collection: productname-registry-entry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Windows 10 or Windows 11
+        state:
+          field: value
+          value: ^[Ww][Ii][Nn][Dd][Oo][Ww][Ss] 1[01].*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-current-build-number-22000-or-greater:
+      test_title: The current build number is 22000 or greater.
+      capability: windows.registry
+      collection: currentbuildnumber-registry-entry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: '22000'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-installed-operating-system-belongs-microsoft-windows-family
+    - test: test-installed-operating-system-windows-10-or-11
+    - test: test-current-build-number-22000-or-greater

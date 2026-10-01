@@ -1,0 +1,54 @@
+assessment:
+  id: SV-253338.automated
+  version: 3
+  assessment_title: WN11-AU-000505 - The security event log size must be configured to a value that holds at least
+    one week's worth of audit records.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\EventLog\Security
+        name:
+          operation: case insensitive equals
+          datatype: string
+          mask: false
+          value: MaxSize
+  tests:
+    test-security-event-log-size-configured-5120000-kb-or-greater:
+      test_title: The Security event log size is configured to 5120000 KB or greater
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '5120000'
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-security-event-log-size-configured-5120000-kb-or-greater

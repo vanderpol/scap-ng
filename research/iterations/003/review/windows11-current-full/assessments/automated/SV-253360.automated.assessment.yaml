@@ -1,0 +1,53 @@
+assessment:
+  id: SV-253360.automated
+  version: 2
+  assessment_title: WN11-CC-000040 - Insecure logons to an SMB server must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\LanmanWorkstation
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: AllowInsecureGuestAuth
+  tests:
+    test-enable-insecure-guest-logons-set-disabled:
+      test_title: '''Enable insecure guest logons'' is set to ''Disabled'''
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-enable-insecure-guest-logons-set-disabled

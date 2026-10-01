@@ -1,0 +1,54 @@
+assessment:
+  id: condition.windows-prior-v24h2.assessment
+  version: 1
+  assessment_title: Windows Prior to v24H2
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    currentbuildnumber-registry-entry-collection:
+      collection_title: CurrentBuildNumber registry entry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: CurrentBuildNumber
+  tests:
+    test-windows-system-build-26100-version-24h2-or-later:
+      test_title: Windows system is build 26100 (version 24H2) or later
+      capability: windows.registry
+      collection: currentbuildnumber-registry-entry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Build 26100 (version 24H2) or later
+        state:
+          all:
+          - field: type
+            value: reg_sz
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '26100'
+            operation: greater than or equal
+            datatype: version
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    not:
+      test: test-windows-system-build-26100-version-24h2-or-later

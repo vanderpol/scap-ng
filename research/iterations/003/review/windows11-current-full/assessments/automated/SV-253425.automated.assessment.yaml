@@ -1,0 +1,112 @@
+assessment:
+  id: SV-253425.automated
+  version: 2
+  assessment_title: WN11-CC-000390 - Windows 11 must be configured to prevent users from receiving suggestions for
+    third-party or additional applications.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-ntuser-collection:
+      collection_title: null
+      select:
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\CloudContent
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisableThirdPartySuggestions
+      filters:
+      - action: exclude
+        match:
+          field: enabled
+          value: 'false'
+          operation: equals
+          datatype: boolean
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      - action: exclude
+        match:
+          field: days_since_modified
+          value: '35'
+          operation: greater than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_CURRENT_USER
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Policies\Microsoft\Windows\CloudContent
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DisableThirdPartySuggestions
+  tests:
+    test-do-not-suggest-third-party-content-in-windows-spotlight-set:
+      test_title: '''Do not suggest third-party content in Windows spotlight'' is set to ''Enabled'''
+      capability: windows.ntuser
+      collection: windows-ntuser-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-current-user-do-not-suggest-third-party-content-in-windows:
+      test_title: For the current user, 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          all:
+          - field: type
+            value: reg_dword
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: value
+            value: '1'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-do-not-suggest-third-party-content-in-windows-spotlight-set
+    - test: test-current-user-do-not-suggest-third-party-content-in-windows

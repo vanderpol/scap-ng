@@ -1,0 +1,242 @@
+assessment:
+  id: SV-253394.automated
+  version: 2
+  assessment_title: WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    windows-registry-collection:
+      collection_title: null
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: Software\Policies\Microsoft\Windows\DeliveryOptimization
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DODownloadMode
+    windows-wmi57-collection:
+      collection_title: null
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          mask: false
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SELECT DomainRole FROM win32_computersystem
+    downloadmode-set-through-settings-app-collection:
+      collection_title: DownloadMode set through the Settings App
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          mask: false
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          mask: false
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: DODownloadMode
+  tests:
+    test-downloadmode-set-enabled-http-only-lan-group-simple-or-bypass:
+      test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
+      capability: windows.registry
+      collection: windows-registry-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '1'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '2'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: Reg_Dword type and value equals 99
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '99'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: Reg_Dword type and value equals 100
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '100'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+    test-system-windows-standalone-workstation-or-server:
+      test_title: The system is a Windows Standalone Workstation or Server
+      capability: windows.wmi57
+      collection: windows-wmi57-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: Standalone Workstation
+          state:
+            field: result
+            value:
+              record:
+              - name: domainrole
+                value: '0'
+                operation: equals
+                datatype: string
+                mask: false
+                entity_check: all
+            operation: equals
+            datatype: record
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: Standalone Server
+          state:
+            field: result
+            value:
+              record:
+              - name: domainrole
+                value: '2'
+                operation: equals
+                datatype: string
+                mask: false
+                entity_check: all
+            operation: equals
+            datatype: record
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-downloadmode-set-enabled-http-only-or-lan-selected:
+      test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
+      capability: windows.registry
+      collection: downloadmode-set-through-settings-app-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: OR
+        states:
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            all:
+            - field: type
+              value: reg_dword
+              operation: equals
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: value
+              value: '1'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - test: test-downloadmode-set-enabled-http-only-lan-group-simple-or-bypass
+    - all:
+      - test: test-system-windows-standalone-workstation-or-server
+      - test: test-downloadmode-set-enabled-http-only-or-lan-selected

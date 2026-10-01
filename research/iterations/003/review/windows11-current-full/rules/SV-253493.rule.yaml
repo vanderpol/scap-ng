@@ -1,0 +1,54 @@
+rule:
+  id: SV-253493
+  version: r1137691
+  title: The "Deny log on as a service" user right on Windows 11 domain-joined workstations must be configured to
+    prevent access from highly privileged domain accounts.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
+    The "Deny log on as a service" right defines accounts that are denied log on as a service. In an Active Directory
+    Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust systems helps mitigate
+    the risk of privilege escalation from credential theft attacks which could lead to the compromise of an entire
+    domain. Incorrect configurations could prevent services from starting and result in a DoS.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: WN11-UR-000080
+  - scheme: vulnerability
+    value: V-253493
+  - scheme: cci
+    value: CCI-000213
+  references:
+  - title: DPMS Target Microsoft Windows 11
+    publisher: DISA
+    type: DPMS Target
+    subject: Microsoft Windows 11
+    identifier: '5471'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.windows-domain-member-workstation
+  parameters: {}
+  remediation:
+    guidance: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA. Configure
+      the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >>
+      User Rights Assignment >> "Deny log on as a service" to include the following: Domain Systems Only: Enterprise
+      Admins Group Domain Admins Group'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-253493.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-253493.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-253493.manual.assessment.yaml
+  default_assessment_choice: default
