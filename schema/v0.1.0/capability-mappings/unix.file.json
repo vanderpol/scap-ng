@@ -1,5 +1,5 @@
 {
-  "format": "scap-ng-capability-mapping-0.1",
+  "format": "scap-ng-capability-mapping-0.2",
   "capability": "unix.file",
   "source": {
     "language": "OVAL 5.12.3",
@@ -7,70 +7,98 @@
     "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
     "test": "file_test",
     "object": "file_object",
-    "state": "file_state",
-    "behavior_type": "FileBehaviors"
+    "state": "file_state"
   },
   "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name"
+    },
     "object_selector_alternatives": [
       [
-        "filepath"
+        "full_path"
       ],
       [
-        "path",
-        "filename"
+        "directory",
+        "name"
       ]
     ],
-    "generic_object_members": [
-      "set",
-      "filters"
-    ],
-    "test_result_controls": {
-      "check_existence": [
-        "all_exist",
-        "any_exist",
-        "at_least_one_exists",
-        "none_exist",
-        "only_one_exists"
-      ],
-      "check": [
-        "all",
-        "at least one",
-        "only one",
-        "none satisfy"
-      ],
-      "state_operator": [
-        "AND",
-        "OR"
-      ]
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "user_id": "owner_uid",
+      "group_id": "owner_gid",
+      "suid": "setuid",
+      "sgid": "setgid"
     },
-    "deprecated_enum_policy": "reject",
-    "deprecated_enum_rationale": "Pinned corpus audit run 36935791611 scanned 212 files with 878 explicit unix.file behavior attributes and found zero occurrences of deprecated FileBehaviors enum values."
+    "traversal": {
+      "shared_definition": "capability-common.schema.json#/$defs/file_traversal",
+      "direction": "down-only"
+    }
+  },
+  "migration_crosswalk": {
+    "operation": {
+      "equals": "equal",
+      "not equal": "not_equal",
+      "case insensitive equals": "equal_ci",
+      "case insensitive not equal": "not_equal_ci",
+      "greater than": "greater_than",
+      "greater than or equal": "greater_or_equal",
+      "less than": "less_than",
+      "less than or equal": "less_or_equal",
+      "bitwise and": "bit_and",
+      "bitwise or": "bit_or",
+      "pattern match": "match",
+      "subset of": "subset",
+      "superset of": "superset"
+    },
+    "check": {
+      "all": "all",
+      "at least one": "any",
+      "only one": "one",
+      "none satisfy": "none"
+    },
+    "existence": {
+      "all_exist": "all",
+      "at_least_one_exists": "some",
+      "none_exist": "none",
+      "only_one_exists": "one",
+      "any_exist": "optional"
+    },
+    "datatype": {
+      "string": "string",
+      "boolean": "boolean",
+      "int": "integer",
+      "float": "float",
+      "binary": "binary",
+      "version": "version",
+      "ipv4_address": "ipv4",
+      "ipv6_address": "ipv6",
+      "evr_string": "rpm_evr",
+      "debian_evr_string": "debian_evr",
+      "fileset_revision": "fileset_revision",
+      "ios_version": "ios_version",
+      "record": "record"
+    },
+    "deprecated": {
+      "recurse_direction_up": "migration_error",
+      "check_none_exist": "migration_error"
+    }
   },
   "semantic_validator_rules": [
     {
       "id": "unix.file.filter_state_capability",
-      "source": "Schematron unix-def_file_object_verify_filter_state",
-      "rule": "Every Object filter State reference must resolve to capability unix.file."
+      "rule": "Every file-selection filter State reference must resolve to capability unix.file."
     },
     {
-      "id": "unix.file.filepath_no_recursion_behaviors",
-      "source": "Schematron unix-def_fileobjfilepath",
-      "rule": "When filepath is used, max_depth, recurse, and recurse_direction behaviors are not permitted."
+      "id": "unix.file.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
     },
     {
-      "id": "unix.file.path_pattern_no_recursion_behaviors",
-      "source": "Schematron unix-def_fileobjpath",
-      "rule": "When path operation is not equals, recurse_file_system=defined, max_depth, recurse_direction, and recurse are not permitted."
-    },
-    {
-      "id": "unix.file.filepath_pattern_defined_filesystem",
-      "source": "Schematron unix-def_fileobjfilepath2",
-      "rule": "When filepath operation is not equals, recurse_file_system=defined is not permitted."
-    },
-    {
-      "id": "unix.file.filename_empty",
-      "source": "Schematron unix-def_file_objectfilename",
-      "rule": "filename cannot be empty unless a Variable reference is used, the entity selects the directory itself, or pattern-match semantics explicitly permit the empty expression."
+      "id": "unix.file.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
     }
   ]
 }
