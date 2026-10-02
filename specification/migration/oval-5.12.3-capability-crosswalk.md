@@ -63,6 +63,9 @@ while the native capability name may differ from the source basename.
 | `windows:lockoutpolicy_test` | `windows.lockoutpolicy` | [windows.lockoutpolicy](../../schema/v0.1.0/capability-mappings/windows.lockoutpolicy.json) |
 | `windows:passwordpolicy_test` | `windows.passwordpolicy` | [windows.passwordpolicy](../../schema/v0.1.0/capability-mappings/windows.passwordpolicy.json) |
 | `unix:password_test` | `unix.password` | [unix.password](../../schema/v0.1.0/capability-mappings/unix.password.json) |
+| `unix:shadow_test` | `unix.shadow` | [unix.shadow](../../schema/v0.1.0/capability-mappings/unix.shadow.json) |
+| `linux:selinuxsecuritycontext_test` | `linux.selinuxsecuritycontext` | [linux.selinuxsecuritycontext](../../schema/v0.1.0/capability-mappings/linux.selinuxsecuritycontext.json) |
+| `unix:interface_test` | `unix.interface` | [unix.interface](../../schema/v0.1.0/capability-mappings/unix.interface.json) |
 
 Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
 in which the revised capability was introduced/fixed, for example `54` in
@@ -78,8 +81,7 @@ deprecated `textfilecontent`. See the pinned
 [Windows schema](../../third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd)
 and [independent schema](../../third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd).
 
-No reviewed clean native mapping for `textfilecontent54` is established by this
-table. Its historical candidate spelling below does not prove native coverage.
+`textfilecontent54` now has a reviewed native mapping in the table above. Historical candidate spellings below remain informational and do not independently prove native coverage.
 Every future mapping SHALL identify the exact source Test/Object/State family,
 field translation, preserved semantics, intentional divergences, unsupported
 cases and regression evidence. Name simplification alone is not conversion
@@ -302,6 +304,12 @@ this capability to `unix.command` merely because a common use invokes Bash.
 | `userright_test` | `windows.userright` | production:92, self-assertion:47 | candidate |
 | `wmi57_test` | `windows.wmi57` | production:55, self-assertion:5 | candidate; name-review |
 | `wuaupdatesearcher_test` | `windows.wuaupdatesearcher` | self-assertion:9 | candidate |
+
+### Windows publisher-extension provenance caveat
+
+Upstream OVAL-Community v5.12.3 verification shows that several Windows Item types exist in the system-characteristics schema without matching Test/Object/State families in the official Windows definitions schema. This includes at least `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig`.
+
+Accordingly, these names SHALL NOT be treated as standard OVAL 5.12.3 definition-side capabilities solely because a system-characteristics Item exists or because production SCC content uses a publisher extension. Their exact extension provenance must be established separately. Native SCAP-NG capability research may continue, but the migration crosswalk must keep standard OVAL and publisher extensions distinct.
 
 ## Excluded/deprecated Test types
 
