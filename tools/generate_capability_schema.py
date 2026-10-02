@@ -16,6 +16,8 @@ import xml.etree.ElementTree as ET
 
 XSD = "{http://www.w3.org/2001/XMLSchema}"
 COMMON_CAPABILITY_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/capability-common.schema.json"
+COLLECTED_ITEM_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/collected-item.schema.json"
+RESULT_TYPES_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/result-types.schema.json"
 
 
 def local(tag):
@@ -56,6 +58,13 @@ def source_datatypes(element):
         "EntityStateFloatType": ["float"],
         "EntityStateVersionType": ["version"],
         "EntityStateIPAddressStringType": ["string"],
+        "EntityItemStringType": ["string"],
+        "EntityItemIntType": ["integer"],
+        "EntityItemBoolType": ["boolean"],
+        "EntityItemFloatType": ["float"],
+        "EntityItemVersionType": ["version"],
+        "EntityItemIPAddressStringType": ["string"],
+        "EntityItemRecordType": ["record"],
         "EntityObjectStringType": ["string"],
         "EntityObjectIntType": ["integer"],
         "EntityObjectBoolType": ["boolean"],
@@ -102,6 +111,48 @@ def immediate_payload_elements(global_element):
     return result
 
 
+def infer_system_characteristics_schema(definitions_schema):
+    if "-definitions-schema.xsd" not in definitions_schema:
+        raise ValueError(
+            f"cannot infer system-characteristics schema from {definitions_schema}"
+        )
+    return definitions_schema.replace(
+        "-definitions-schema.xsd", "-system-characteristics-schema.xsd"
+    )
+
+
+def infer_item_name(source):
+    if source.get("item"):
+        return source["item"]
+    state = source.get("state")
+    if not state or not state.endswith("_state"):
+        raise ValueError("source.item is required when source.state does not end in _state")
+    return state[:-6] + "_item"
+
+
+def collected_value_schema(allowed_datatypes, *, multiple=False):
+    typed = {
+        "allOf": [
+            {"$ref": f"{RESULT_TYPES_SCHEMA_ID}#/$defs/typed_value"},
+            {
+                "type": "object",
+                "properties": {
+                    "datatype": {
+                        "type": "string",
+                        "enum": sorted(set(allowed_datatypes)),
+                    }
+                },
+            },
+        ]
+    }
+    if multiple:
+        return {
+            "type": "array",
+            "items": typed,
+        }
+    return typed
+
+
 def generic_entity_schema(allowed_datatypes, *, state=False):
     """Compose a capability entity from shared authored-Assessment primitives.
 
@@ -131,6 +182,11 @@ def generate(mapping, repo_root):
     source = mapping["source"]
     xsd_path = repo_root / source["definitions_schema"]
     root = ET.parse(xsd_path).getroot()
+    sc_rel = source.get("system_characteristics_schema") or infer_system_characteristics_schema(
+        source["definitions_schema"]
+    )
+    sc_root = ET.parse(repo_root / sc_rel).getroot()
+    item_name = infer_item_name(source)
 
     test_el = direct_global(root, "element", source["test"])
     object_el = (
@@ -138,8 +194,10 @@ def generate(mapping, repo_root):
         if source.get("object") else None
     )
     state_el = direct_global(root, "element", source["state"])
+    item_el = direct_global(sc_root, "element", item_name)
     object_fields = immediate_payload_elements(object_el) if object_el is not None else {}
     state_fields = immediate_payload_elements(state_el)
+    item_fields = immediate_payload_elements(item_el)
     traversal_definition = mapping.get("native", {}).get("traversal_definition")
     if traversal_definition is None and mapping.get("native", {}).get("uses_file_traversal", False):
         traversal_definition = "file_traversal"
@@ -250,15 +308,24 @@ def generate(mapping, repo_root):
     field_map = mapping["native"].get("state_field_map", {})
     datatype_overrides = mapping["native"].get("field_datatypes", {})
     for source_name, native_name in field_map.items():
-        field = state_fields.get(source_name)
-        if field is None:
+        state_field = state_fields.get(source_name)
+        if state_field is None:
             raise KeyError(
                 f"mapping references missing source State field {source_name!r}"
             )
-        dtypes = datatype_overrides.get(native_name) or source_datatypes(field)
+        item_field = item_fields.get(source_name)
+        if item_field is None:
+            raise KeyError(
+                f"mapping references State field {source_name!r} without collected Item field"
+            )
+        # Item is the canonical runtime datatype surface. Reviewed overrides may
+        # correct an upstream State/Item inconsistency, but they still describe
+        # the Item-backed native datatype.
+        dtypes = datatype_overrides.get(native_name) or source_datatypes(item_field)
         state_names.append(native_name)
         state_meta[native_name] = {
             "datatypes": dtypes,
+            "multiple": item_field.get("maxOccurs") not in (None, "1"),
         }
 
     state_value_enums = mapping["native"].get("state_value_enums", {})
@@ -326,7 +393,31 @@ def generate(mapping, repo_root):
         test_required.insert(2, test_source_field)
         test_properties[test_source_field] = {"type": "string", "minLength": 1}
 
+    collected_field_properties = {
+        name: collected_value_schema(
+            meta["datatypes"],
+            multiple=meta.get("multiple", False),
+        )
+        for name, meta in sorted(state_meta.items())
+    }
+
     defs = {
+        "collected_item": {
+            "allOf": [
+                {"$ref": COLLECTED_ITEM_SCHEMA_ID},
+                {
+                    "type": "object",
+                    "properties": {
+                        "capability": {"const": capability},
+                        "fields": {
+                            "type": "object",
+                            "properties": collected_field_properties,
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+            ],
+        },
         "test": {
             "type": "object",
             "required": test_required,
