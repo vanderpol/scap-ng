@@ -134,7 +134,7 @@ class VocabularyAlignmentTests(unittest.TestCase):
         state_ref=result["tests"]["test-config"]["states"][0]
         self.assertNotIn("mask", result["states"][state_ref]["state"])
 
-    def test_mask_true_fails_closed_until_redaction_mapping_exists(self):
+    def test_mask_true_maps_to_native_result_redaction(self):
         source = {
             "assessment": {
                 "id": "a", "version": 1, "assessment_title": None,
@@ -142,7 +142,7 @@ class VocabularyAlignmentTests(unittest.TestCase):
                 "collections": {
                     "secret-collection": {
                         "collection_title": None,
-                        "capability": "unix.file",
+                        "capability": "independent.textfilecontent54",
                         "select": {
                             "filepath": {
                                 "value": "/etc/shadow",
@@ -156,7 +156,7 @@ class VocabularyAlignmentTests(unittest.TestCase):
                 "tests": {
                     "test-secret": {
                         "test_title": None,
-                        "capability": "unix.file",
+                        "capability": "independent.textfilecontent54",
                         "collection": "secret-collection",
                         "assertion": {
                             "existence": "at_least_one_exists",
@@ -167,8 +167,14 @@ class VocabularyAlignmentTests(unittest.TestCase):
                 "evaluate": {"test": "test-secret"},
             }
         }
-        with self.assertRaisesRegex(ValueError, "redaction mapping"):
-            align_assessment_vocabulary(source)
+        aligned = align_assessment_vocabulary(source)
+        native = aligned["assessment"]["objects"]["secret-object"]["select"]["filepath"]
+        self.assertTrue(native["redact_result"])
+        self.assertNotIn("mask", native)
+        restored = legacy_intermediate_vocabulary(aligned)
+        legacy = restored["assessment"]["collections"]["secret-collection"]["select"]["filepath"]
+        self.assertTrue(legacy["mask"])
+        self.assertNotIn("redact_result", legacy)
 
     def test_alignment_round_trips_through_legacy_bridge(self):
         source = {
