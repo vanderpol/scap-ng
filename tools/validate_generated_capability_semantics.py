@@ -472,6 +472,9 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "linux.rpmverifyfile.materialized_behaviors",
     "linux.rpmverifypackage.materialized_behaviors",
     "linux.dpkginfo.debian_evr",
+    "unix.interface.type_literal",
+    "unix.shadow.encrypt_method_literal",
+    "unix.uname.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
@@ -486,6 +489,7 @@ RUNTIME_SEMANTIC_RULE_IDS={
     "linux.partition.mount_options_complete",
     "linux.rpminfo.filepaths_collection",
     "linux.rpmverifypackage.skipped_results",
+    "unix.symlink.canonical_resolution",
     # These require collection/evaluation behavior rather than static authored-content validation.
     "independent.xmlfilecontent.xpath_text_values",
 }
