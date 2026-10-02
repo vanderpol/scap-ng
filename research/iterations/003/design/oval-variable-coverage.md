@@ -20,28 +20,28 @@ Status values:
 
 | OVAL semantic area | Required semantics | Current v003 status | Required next proof |
 |---|---|---|---|
-| constant_variable | one or more typed literal values | prototype | multi-value constants, datatype validation |
-| external_variable | externally supplied typed value set plus optional allowed values/restrictions | prototype | focused mixed possible_value / possible_restriction round-trip now covered; runtime binding validation remains conformance work |
-| local_variable | one ComponentGroup member producing zero/one/many values | prototype | full recursive component coverage |
-| variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
-| object_component | object -> item field -> variable values, optional record_field | prototype | record_field is now losslessly round-tripped; 0/1/many collected-item and missing-field execution remains #26 |
-| literal_component | typed literal expression input | prototype | datatype/cast rules |
-| arithmetic | 2+ operands; int/float; Cartesian product for collections | prototype | exact-static success/error fixtures added; runtime collection/error propagation remains #26 |
-| begin | one string component plus required character/string | prototype | exact-static fixture added; collection-valued/runtime conformance remains #26 |
-| concat | 2+ components; Cartesian product; DNE/error flag propagation | prototype | exact flag/result semantics |
-| end | one string component plus required character/string | prototype | exact-static fixture added; collection-valued/runtime conformance remains #26 |
-| escape_regex | one string component mapped over collection | prototype | exact-static escaping fixture added; independent runtime comparison remains #26 |
-| split | one string component -> collection including empty values | prototype | empty-field delimiter fixture added; broader runtime edge cases remain #26 |
-| substring | one string component with start/length semantics | prototype | success and out-of-range error fixtures added |
-| time_difference | string/int date/time operands and format semantics | prototype | two-operand exact-static fixture added; one-operand current-time case remains runtime-dependent |
-| regex_capture | one string component; capture semantics | prototype | match/no-match fixtures added; collection runtime comparison remains #26 |
-| unique | de-duplicate collection values | prototype | exact-static duplicate fixture added; datatype equality cross-check remains #26 |
-| count | collection -> integer count | prototype | exact-static count fixture added; DNE/error runtime cases remain #26 |
-| glob_to_regex | glob conversion semantics | prototype | exact-static conversion + invalid-pattern fixtures added; differential execution remains #26 |
-| merge | merge component values with delimiter/sort/order semantics | prototype | lexical success + numeric-sort error fixtures added; record/runtime variants remain #26 |
+| constant_variable | one or more typed literal values | native | multi-value constant and explicit datatype round-trip fixtures covered |
+| external_variable | externally supplied typed value set plus optional allowed values/restrictions | native | focused mixed possible_value / possible_restriction round-trip now covered; runtime binding validation remains conformance work |
+| local_variable | one ComponentGroup member producing zero/one/many values | native | every schema ComponentGroup member is represented; mixed nested functions and deep chains covered |
+| variable_component | variable -> variable dependency | native | deep shared chains and cycle rejection covered |
+| object_component | object -> item field -> variable values, optional record_field | native | record_field is now losslessly round-tripped; 0/1/many collected-item and missing-field execution remains #26 |
+| literal_component | typed literal expression input | native | explicit datatype preservation covered; runtime cast behavior remains #26 |
+| arithmetic | 2+ operands; int/float; Cartesian product for collections | native | exact-static success/error fixtures added; runtime collection/error propagation remains #26 |
+| begin | one string component plus required character/string | native | exact-static fixture added; collection-valued/runtime conformance remains #26 |
+| concat | 2+ components; Cartesian product; DNE/error flag propagation | native | exact flag/result semantics |
+| end | one string component plus required character/string | native | exact-static fixture added; collection-valued/runtime conformance remains #26 |
+| escape_regex | one string component mapped over collection | native | exact-static escaping fixture added; independent runtime comparison remains #26 |
+| split | one string component -> collection including empty values | native | empty-field delimiter fixture added; broader runtime edge cases remain #26 |
+| substring | one string component with start/length semantics | native | success and out-of-range error fixtures added |
+| time_difference | string/int date/time operands and format semantics | native | two-operand exact-static fixture added; one-operand current-time case remains runtime-dependent |
+| regex_capture | one string component; capture semantics | native | match/no-match fixtures added; collection runtime comparison remains #26 |
+| unique | de-duplicate collection values | native | exact-static duplicate fixture added; datatype equality cross-check remains #26 |
+| count | collection -> integer count | native | exact-static count fixture added; DNE/error runtime cases remain #26 |
+| glob_to_regex | glob conversion semantics | native | exact-static conversion + invalid-pattern fixtures added; differential execution remains #26 |
+| merge | merge component values with delimiter/sort/order semantics | native | lexical success + numeric-sort error fixtures added; record/runtime variants remain #26 |
 | var_ref in object entities | variable supplies selector values | native | multi-valued Object var_check round-trip matrix covered; operation-specific collection execution remains #26 |
 | var_ref in state entities | variable supplies expected values | native | many-to-many var_check + entity_check truth-table ordering is covered; target execution remains #26 |
-| var_ref datatype matching | referenced variable datatype must match consuming entity rules | prototype | converter now diagnoses explicit/effective string mismatches and var_check-without-var_ref; schema-derived capability validators remain the long-term source |
+| var_ref datatype matching | referenced variable datatype must match consuming entity rules | native | converter now diagnoses explicit/effective string mismatches and var_check-without-var_ref; schema-derived capability validators remain the long-term source |
 | var_ref on record entity | prohibited | native | converter source audit rejects record entity var_ref |
 | empty variable consumed by Object | Object considered not to exist | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
 | empty variable consumed by State | State evaluation error | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
@@ -49,16 +49,16 @@ Status values:
 | var_check default | effective `all` when var_ref exists and var_check omitted | native | parser provenance and omitted/explicit-default regressions covered |
 | var_check aggregation | all / at least one / only one / none satisfy etc. per CheckEnumeration | native | exhaustive OVAL-derived truth-table coverage |
 | entity_check + var_check | two-level many-to-many state evaluation | native | ordering and non-commutative truth-table cases covered |
-| nested functions | arbitrary recursive FunctionGroup composition | prototype | depth and mixed-function tests |
+| nested functions | arbitrary recursive FunctionGroup composition | native | depth-32 and mixed-function round-trip fixtures covered |
 | dependency graph | arbitrary acyclic variable/object/state dependencies | native | deep shared chains and direct/indirect mixed cycles are regression-tested |
-| object set recursion | nested sets with schema-constrained arity | prototype | recursive set evaluation |
+| object set recursion | nested sets with schema-constrained arity | native | depth 4/10/32 round-trip and all-depth type validation covered; live evaluation remains #26 |
 | set object references | 1..2 refs; referenced objects same type as parent | native | all-depth namespace-aware validation + upstream Schematron candidate tracked in #37 |
-| set filters | zero..many state references applied before set operator | prototype | ordering/composition tests |
-| filter action | include/exclude; default exclude | prototype | multiple/conflicting filters |
+| set filters | zero..many state references applied before set operator | native | conversion/dependency ordering and #11 filter-before-set semantics covered; live collection remains #26 |
+| filter action | include/exclude; default exclude | native | default/include/exclude and conflicting filter semantics covered by #11; live collection remains #26 |
 | variables inside filter states | State var_ref participates in collection filtering | native | deep chained filter-State variable dependency round-trip covered |
 | variables inside objects used by sets | variable-dependent collection feeding set | native | nested depth-4 Set + variable-dependent referenced Object round-trip covered |
 | status/flag propagation | complete/incomplete/error/DNE/not-collected/not-applicable as defined per function | native | generic truth/flag charts covered; capability-specific execution remains #26 |
-| operation/datatype compatibility | operation set constrained by datatype | design | generated/static validation |
+| operation/datatype compatibility | operation set constrained by datatype | native | pinned XSD/Schematron validation is an M0 gate; converter adds var_ref/record diagnostics and capability schemas enforce narrowed native fields |
 | implicit defaults | schema defaults must be normalized without semantic loss | native | #8/#9 schema-backed provenance and fail-closed behavior-default separation |
 | deprecated constructs | deprecated source semantics SHALL trigger migration/update policy | native | deprecated tests/definitions are inventoried and diagnosed; native deprecated execution is not synthesized |
 

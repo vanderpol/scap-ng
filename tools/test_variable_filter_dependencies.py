@@ -54,8 +54,9 @@ def component(name, **attrs):
     return ET.Element(f"{{{OD}}}{name}", attrs)
 
 
-def literal(value="demo"):
-    node = component("literal_component")
+def literal(value="demo", datatype=None):
+    attrs = {"datatype": datatype} if datatype is not None else {}
+    node = component("literal_component", **attrs)
     node.text = value
     return node
 
@@ -219,6 +220,54 @@ class DependencyTests(unittest.TestCase):
             [row["value"] for row in group["conditions"]],
             ["prod.*", "stage.*"],
         )
+
+    def test_multivalue_constant_variable_roundtrip(self):
+        root = source()
+        constant = ET.SubElement(
+            root.find(f"{{{OD}}}variables"),
+            f"{{{OD}}}constant_variable",
+            id="oval:dependency:var:1",
+            version="1",
+            datatype="string",
+            comment="Multiple values",
+        )
+        for value in ("alpha", "beta", "gamma"):
+            ET.SubElement(constant, f"{{{OD}}}value").text = value
+        native = self.roundtrip(root)
+        entry = next(iter(native["assessment"]["variables"].values()))
+        self.assertEqual(
+            entry["expression"]["literal"],
+            ["alpha", "beta", "gamma"],
+        )
+
+    def test_literal_component_explicit_datatype_roundtrip(self):
+        root = source()
+        node = variable(root, 1, literal("5", "int"))
+        node.set("datatype", "int")
+        filename = root.find(f".//{{{UNIX}}}file_object/{{{UNIX}}}filename")
+        filename.set("datatype", "int")
+        native = self.roundtrip(root)
+        entry = next(iter(native["assessment"]["variables"].values()))
+        self.assertEqual(entry["datatype"], "int")
+        self.assertEqual(
+            entry["expression"]["literal"],
+            {"value": "5", "datatype": "int"},
+        )
+
+    def test_mixed_nested_function_roundtrip(self):
+        root = source()
+        escaped = component("escape_regex")
+        escaped.append(literal("x.y"))
+        prefixed = component("begin", character="/")
+        prefixed.append(literal("tmp"))
+        expression = component("concat")
+        expression.extend([prefixed, escaped])
+        variable(root, 1, expression)
+        native = self.roundtrip(root)
+        rendered = str(next(iter(native["assessment"]["variables"].values()))["expression"])
+        self.assertIn("concat", rendered)
+        self.assertIn("begin", rendered)
+        self.assertIn("escape_regex", rendered)
 
     def test_object_component_record_field_roundtrip(self):
         root = source()
@@ -632,7 +681,7 @@ class DependencyTests(unittest.TestCase):
             return node
 
         arithmetic = component("arithmetic", arithmetic_operation="add")
-        arithmetic.extend([literal("2"), literal("3")])
+        arithmetic.extend([literal("2", "int"), literal("3", "int")])
         self.assertEqual(evaluate(arithmetic)["values"], ["5"])
 
         escaped = evaluate(unary("escape_regex", "a.b*"))
@@ -693,7 +742,7 @@ class DependencyTests(unittest.TestCase):
             return ir.resolve_static_variables(nodes, kinds)["oval:dependency:var:1"]
 
         divide = component("arithmetic", arithmetic_operation="divide")
-        divide.extend([literal("1"), literal("0")])
+        divide.extend([literal("1", "int"), literal("0", "int")])
         result = evaluate(divide)
         self.assertEqual(result["status"], "static_evaluation_error")
         self.assertEqual(result["reason"], "arithmetic_input_or_operation_error")
