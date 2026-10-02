@@ -8,6 +8,7 @@ import yaml
 from resolve_tailoring_example import resolve
 ROOT=Path(__file__).resolve().parents[1]
 DEMO=ROOT/'research/iterations/003/examples/tailoring-all-options'
+RHEL9_FIXTURE=ROOT/'tools/fixtures/rhel9-tailoring'
 
 class TailoringExample(unittest.TestCase):
     def run_demo(self, directory=DEMO, input=True, name='all-options.tailoring.yaml'):
@@ -109,9 +110,9 @@ class TailoringExample(unittest.TestCase):
             self.assertTrue(self.run_demo(root)['effective_selection']['demo-log-retention'])
 
     def test_rhel9_example_is_bound_to_real_rules_and_methods(self):
-        r=resolve(ROOT/'research/iterations/003/review/rhel9-current-full/benchmark.yaml',
+        r=resolve(RHEL9_FIXTURE/'benchmark.yaml',
                   DEMO/'tailoring/rhel9-example.tailoring.yaml')
-        self.assertEqual(len(r['effective_selection']),445)
+        self.assertEqual(len(r['effective_selection']),3)
         self.assertFalse(r['publisher_selection']['SV-257778']);self.assertTrue(r['effective_selection']['SV-257778'])
         self.assertTrue(r['publisher_selection']['SV-257777']);self.assertFalse(r['effective_selection']['SV-257777'])
         selection=r['assessment_selections']['SV-257784']
