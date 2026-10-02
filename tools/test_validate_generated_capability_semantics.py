@@ -285,6 +285,12 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(mismatch)
         self.assertIn("object.set_object_capability",{r["code"] for r in rows})
 
+    def test_variable_value_source_must_exist(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{"objects":{},"states":{},"variables":{},"tests":{"t":{"capability":"variable.value","variable":"missing"}}}
+        })
+        self.assertIn("variable.value.source_exists",{row["code"] for row in rows})
+
     def test_test_object_state_capabilities_are_validated(self):
         doc={
             "assessment":{
