@@ -211,7 +211,7 @@ XSD names without semantic review.
 
 Approved Windows OVAL capabilities including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` are standard OVAL tests, not publisher extensions.
 
-The currently checked-in Windows definitions XSD snapshot does not expose several of these approved families even though approved OVAL documentation and validation/content evidence do. This SHALL be treated as a defective, incomplete, or mismatched schema snapshot that must be reconciled. Absence from this snapshot is not evidence of non-standard status.
+All relevant approved OVAL Test/Object/State families are part of the SCAP 1.4 schema/test-content surface. If a checked-in or inspected schema file appears to omit one, that indicates we inspected the wrong, incomplete, or mismatched schema artifact. It is not evidence that the capability is non-standard.
 
 The only currently known SCC/NIWC custom Test/Object/State family in this workstream is `independent:sqlext`.
 
