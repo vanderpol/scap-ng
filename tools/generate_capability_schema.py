@@ -137,10 +137,12 @@ def generate(mapping, repo_root):
     state_el = direct_global(root, "element", source["state"])
     object_fields = immediate_payload_elements(object_el)
     state_fields = immediate_payload_elements(state_el)
+    traversal_definition = mapping.get("native", {}).get("traversal_definition")
+    if traversal_definition is None and mapping.get("native", {}).get("uses_file_traversal", False):
+        traversal_definition = "file_traversal"
     traversal_schema = (
-        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/file_traversal"}
-        if mapping.get("native", {}).get("uses_file_traversal", False)
-        else None
+        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{traversal_definition}"}
+        if traversal_definition else None
     )
 
     selector_props = {}
@@ -151,8 +153,17 @@ def generate(mapping, repo_root):
             source_name = reverse_selector_map[name]
             field = object_fields[source_name]
             dtypes = source_datatypes(field)
-            selector_schema = generic_entity_schema(dtypes, state=False)
-            if name == "name":
+            enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
+            if enum_values:
+                selector_schema = {
+                    "oneOf": [
+                        {"type": "string", "enum": list(enum_values)},
+                        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                    ]
+                }
+            else:
+                selector_schema = generic_entity_schema(dtypes, state=False)
+            if name in mapping["native"].get("nullable_selectors", ["name"]):
                 selector_schema = {
                     "oneOf": [
                         selector_schema,
