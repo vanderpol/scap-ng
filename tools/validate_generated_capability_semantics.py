@@ -418,6 +418,7 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.wuaupdatesearcher.materialized_superseded_default",
     "windows.wuaupdatesearcher.source_path_repair",
     "windows.lockoutpolicy.singleton_source",
+    "iosxe.version.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
