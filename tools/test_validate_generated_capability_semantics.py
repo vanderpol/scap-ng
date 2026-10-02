@@ -354,7 +354,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                 self.assertIn(f"{capability}.{field}_equal",{row["code"] for row in rows})
 
     def test_singleton_source_capabilities_reject_objects(self):
-        for capability in ("independent.family","windows.lockoutpolicy","iosxe.version","panos.version","asa.version"):
+        for capability in ("independent.family","windows.lockoutpolicy","iosxe.version","panos.version","asa.version","macos.disabledservice","macos.gatekeeper","macos.softwareupdate"):
             with self.subTest(capability=capability):
                 rows=validate_assessment_capability_semantics({
                     "assessment":{
