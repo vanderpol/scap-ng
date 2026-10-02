@@ -343,6 +343,54 @@ class DependencyTests(unittest.TestCase):
         with self.assertRaisesRegex(ConversionBudgetExceeded, "elapsed_ms"):
             timed.check_elapsed()
 
+    def test_static_variable_budget_generated_values_preflights_concat(self):
+        root = source()
+        expr = component("concat")
+        for n in (2, 3):
+            expr.append(component("variable_component", var_ref=f"oval:dependency:var:{n}"))
+            constant = ET.SubElement(
+                root.find(f"{{{OD}}}variables"),
+                f"{{{OD}}}constant_variable",
+                id=f"oval:dependency:var:{n}",
+                version="1",
+                datatype="string",
+                comment="Operand",
+            )
+            for value in range(4):
+                ET.SubElement(constant, f"{{{OD}}}value").text = str(value)
+        variable(root, 1, expr)
+        nodes = {n.get("id"): n for n in root.iter() if n.get("id")}
+        kinds = {key: "variable" for key in nodes if ":var:" in key}
+        with patch.object(
+            ir.itertools,
+            "product",
+            side_effect=AssertionError("product must not be allocated after budget breach"),
+        ):
+            result = ir.resolve_static_variables(
+                nodes,
+                kinds,
+                budget=ConversionBudget(generated_values=8),
+            )
+        row = result["oval:dependency:var:1"]
+        self.assertEqual(row["status"], "resource_limit")
+        self.assertIn("generated_values", row["reason"])
+        self.assertEqual(row["candidate_values"], 16)
+
+    def test_static_variable_budget_value_bytes_drops_partial_values(self):
+        root = source()
+        variable(root, 1, literal("0123456789"))
+        nodes = {n.get("id"): n for n in root.iter() if n.get("id")}
+        kinds = {key: "variable" for key in nodes if ":var:" in key}
+        result = ir.resolve_static_variables(
+            nodes,
+            kinds,
+            budget=ConversionBudget(value_bytes=4),
+        )
+        row = result["oval:dependency:var:1"]
+        self.assertEqual(row["status"], "resource_limit")
+        self.assertIn("value_bytes", row["reason"])
+        self.assertNotIn("values", row)
+
     def test_static_object_set_cycle_reports_cycle(self):
         root = source()
         objects = root.find(f"{{{OD}}}objects")

@@ -34,10 +34,13 @@ The complete reachable-feature worklist accepts an optional budget and enforces
 dependency-node, dependency-edge, expression-depth and elapsed-work limits.
 With no supplied budget its behavior is unchanged.
 
-Static Variable evaluation retains its pre-existing candidate-value safeguard;
-`generated_values` and `value_bytes` are now named resources in the common
-budget contract but still require full wiring through that evaluator before
-#38 can close.
+Static Variable evaluation now accepts the same optional budget. `concat`
+preflights `generated_values` before Cartesian-product allocation when the
+candidate cardinality is known; all exact-static value results enforce both
+`generated_values` and UTF-8 `value_bytes`. A budget breach returns a
+`resource_limit` result without partial values. The older `max_values` safeguard
+remains a separate compatibility/default implementation ceiling for callers
+that have not yet moved to the explicit budget object.
 
 Native lowering still catches host Python recursion exhaustion as
 `conversion_resource_limit:python_recursion`. Replacing remaining recursive

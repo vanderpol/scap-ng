@@ -33,6 +33,7 @@ import re
 import sys
 
 from lxml import etree
+from scap_upconvert_v003.conversion_budget import ConversionBudget, ConversionBudgetExceeded, ConversionBudgetTracker
 
 OVAL_ID_RE = re.compile(r"^oval:[A-Za-z0-9_.-]+:(?:def|tst|obj|ste|var):[A-Za-z0-9_.-]+$")
 SECTION_KIND = {
@@ -805,7 +806,7 @@ def parse_variable(e):
 
 
 
-def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
+def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096, *, budget: ConversionBudget | None = None):
     """Resolve variable expressions only when their values are target-independent.
 
     Dynamic object components and external inputs remain explicit dependencies.
@@ -816,6 +817,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
     cache = {}
     resolving = set()
     collecting_objects = set()
+    tracker = ConversionBudgetTracker(budget)
 
     def result(status, **kwargs):
         return {"status": status, **kwargs}
@@ -825,6 +827,16 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             return result(
                 "bounded",
                 reason=f"{operation}_value_expansion_exceeds_{max_values}",
+                operation=operation,
+            )
+        try:
+            tracker.note_generated_values(len(values))
+            tracker.note_value_bytes(sum(len(str(v).encode("utf-8")) for v in values))
+            tracker.check_elapsed()
+        except ConversionBudgetExceeded as exc:
+            return result(
+                "resource_limit",
+                reason=exc.diagnostic,
                 operation=operation,
             )
         return result("exact_static", values=values, operation=operation)
@@ -1210,6 +1222,15 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                     operation=name,
                     candidate_values=candidate_values,
                 )
+            try:
+                tracker.note_generated_values(candidate_values)
+            except ConversionBudgetExceeded as exc:
+                return result(
+                    "resource_limit",
+                    reason=exc.diagnostic,
+                    operation=name,
+                    candidate_values=candidate_values,
+                )
             if candidate_values == 0:
                 return bounded([], name)
             values = [""]
@@ -1520,6 +1541,10 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
         )
 
     def variable_values(var_id):
+        try:
+            tracker.check_elapsed()
+        except ConversionBudgetExceeded as exc:
+            return result("resource_limit", reason=exc.diagnostic, operation="variable")
         if var_id in cache:
             return cache[var_id]
         if var_id in resolving:
