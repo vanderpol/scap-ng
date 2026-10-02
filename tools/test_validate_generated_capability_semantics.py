@@ -7,6 +7,7 @@ from validate_generated_capability_semantics import (
     EXECUTABLE_SEMANTIC_RULE_IDS,
     STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS,
     RUNTIME_SEMANTIC_RULE_IDS,
+    classify_declared_semantic_rules,
     validate_unix_file_object,
 )
 
@@ -38,6 +39,21 @@ class SemanticRuleCoverageTests(unittest.TestCase):
         self.assertIn("independent.yamlfilecontent.record_keys", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
         self.assertIn("independent.xmlfilecontent.xpath_text_values", RUNTIME_SEMANTIC_RULE_IDS)
         self.assertTrue(EXECUTABLE_SEMANTIC_RULE_IDS.isdisjoint(RUNTIME_SEMANTIC_RULE_IDS))
+
+    def test_rule_classification_reports_unclassified_declarations(self):
+        mapping={"semantic_validator_rules":[
+            {"id":"windows.file.filter_state_capability"},
+            {"id":"windows.cmdlet.module_guid"},
+            {"id":"independent.xmlfilecontent.xpath_text_values"},
+            {"id":"independent.shellcommand.trusted_content"},
+            {"id":"not.yet.classified"},
+        ]}
+        rows=classify_declared_semantic_rules(mapping)
+        self.assertIn("windows.file.filter_state_capability",rows["executable"])
+        self.assertIn("windows.cmdlet.module_guid",rows["executable"])
+        self.assertIn("independent.xmlfilecontent.xpath_text_values",rows["runtime"])
+        self.assertIn("independent.shellcommand.trusted_content",rows["policy"])
+        self.assertEqual(rows["unclassified"],["not.yet.classified"])
 
     def test_declared_rules_require_executable_coverage_accounting(self):
         mapping={"semantic_validator_rules":[{"id":"a"},{"id":"b"}]}
