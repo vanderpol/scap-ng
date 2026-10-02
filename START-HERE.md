@@ -6,12 +6,13 @@ The current model is **Benchmark → Rule → Assessment**. A Benchmark groups r
 
 ## A short reading path
 
-1. Read the [Board overview](board/README.md) for the working design, what is demonstrated, and what needs a decision.
-2. Browse the [RHEL 9 review guide](docs/rhel9-review.md) or [Windows 11 review guide](research/iterations/003/review/windows11-current-full/README.md) for complete source-generated examples. These are review candidates; their generation date and evidence matter.
-3. Read the [specification contents](specification/README.md) for the detailed model and its intentional differences from SCAP 1.4.
-4. Use the [voting proposal index](board/proposals/README.md) to respond to individual yes/no questions through GitHub Discussion reactions.
+1. Start with the [current review set](review/current/README.md). It is the single navigation surface for material we want external reviewers to examine together.
+2. Read the [Board overview](board/README.md) for what needs a decision.
+3. Browse the [RHEL 9 review guide](docs/rhel9-review.md) or [Windows 11 review guide](research/iterations/003/review/windows11-current-full/README.md) for complete source-generated examples. These are review candidates; their generation date and evidence matter.
+4. Read the [specification contents](specification/README.md) for the detailed model and its intentional differences from SCAP 1.4.
+5. Use the [voting proposal index](board/proposals/README.md) to respond to individual yes/no questions through GitHub Discussion reactions.
 
-You do not need to run a converter to review the work. If you do want to reproduce it, start with the [maintained converter instructions](tools/scap_upconvert_v003/README.md), using a pinned original SCAP package.
+You do not need to run a converter to review the work. Development and reproduction tools are intentionally outside the `review/` surface. If you do want to reproduce it, start with the [maintained converter instructions](tools/scap_upconvert_v003/README.md), using a pinned original SCAP package.
 
 ## How to interpret status
 
