@@ -37,11 +37,13 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
         self.validate_def("object",{
             "object_title":"xml direct","capability":"independent.xmlfilecontent",
             "select":{"full_path":self.entity("/etc/example.xml"),"xpath":self.entity("/a/b/text()")},
+            "filesystem":"any",
             "collect":self.behavior_defaults(),
         })
         self.validate_def("object",{
             "object_title":"xml split","capability":"independent.xmlfilecontent",
             "select":{"directory":self.entity("/etc"),"name":self.entity("example.xml"),"xpath":self.entity("/a/b/text()")},
+            "filesystem":"any",
             "collect":self.behavior_defaults(),
         })
 
@@ -53,6 +55,7 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
                 "full_path":{"value":"/etc/example.xml","operation":"equal","datatype":"string"},
                 "xpath":{"value":"/a/b/text()","operation":"equal","datatype":"string"},
             },
+            "filesystem":"any",
             "collect":{"item_creation":"all_object_elements_fullfilled"},
         }
         self.validate_def("object",base)
