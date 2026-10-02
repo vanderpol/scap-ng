@@ -112,12 +112,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "datatype": "string",
                     "mask": False,
                 },
-                "name": {
-                    "value": None,
-                    "operation": "equal",
-                    "datatype": "string",
-                    "mask": False,
-                },
+                "name": None,
             },
         })
 
