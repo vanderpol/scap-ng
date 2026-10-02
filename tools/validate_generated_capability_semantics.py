@@ -462,6 +462,10 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "asa.version.singleton_source",
     "macos.profiles.singleton_source",
     "macos.systemsetup.singleton_source",
+    "macos.disabledservice.implicit_population",
+    "macos.filevault.singleton_source",
+    "macos.firmwarepassword.singleton_source",
+    "macos.gatekeeper.implicit_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
