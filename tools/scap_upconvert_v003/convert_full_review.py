@@ -283,7 +283,9 @@ def main(argv=None):
                     for name in ('definitions','tests','objects','states','variables'):
                         ET.SubElement(original,'{'+review.OD+'}'+name)
                 result,failed_rule=review.convert_rule(
-                    rec,original,args.output,schema,temp,parameter_ids=parameter_ids
+                    rec,original,args.output,schema,temp,
+                    parameter_ids=parameter_ids,
+                    assessment_namespace=args.benchmark_id,
                 )
                 evidence['rules'].append(result); blocked=blocked or failed_rule
             quarantined=sum(
@@ -343,7 +345,7 @@ def main(argv=None):
                 logical=next(n for n in node if source.local(n.tag)=='logical-test')
                 negate=(logical.get('negate') or 'false') in ('true','1')
                 title=source.text(next((n for n in node if source.local(n.tag)=='title'),None))
-                app_id='condition.'+source.semantic_id(title,'applicability')
+                app_id=args.benchmark_id+'.condition.'+source.semantic_id(title,'applicability')
             elif ref in dictionary:
                 node=dictionary[ref];checks=[n for n in node if source.local(n.tag)=='check']
                 if len(checks)!=1: raise ValueError('Unsupported dictionary binding')
@@ -351,7 +353,7 @@ def main(argv=None):
                 # CPE names are the stable source identity. Human titles are
                 # presentation metadata and are not unique (for example the
                 # Windows Server 2012 / 2012 R2 dictionary entries).
-                app_id=cpe_applicability_id(ref)
+                app_id=args.benchmark_id+'.'+cpe_applicability_id(ref)
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
             definition_oval=app_oval
