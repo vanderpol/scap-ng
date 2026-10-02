@@ -550,7 +550,6 @@ def generate(mapping, repo_root):
             }
             direct_required = (
                 ["select"]
-                + (["filesystem"] if filesystem_schema else [])
                 + (["collect"] if collect_required else [])
             )
             object_alternatives.append({
@@ -578,6 +577,24 @@ def generate(mapping, repo_root):
             "additionalProperties": False,
             "oneOf": object_alternatives,
         }
+        if filesystem_schema and selector_props:
+            # Filesystem scope applies to file-backed selectors, including exact
+            # full_path selection, but not to alternate non-file sources such
+            # as PID or inline content in mixed capabilities.
+            defs["object"].setdefault("allOf", []).append({
+                "if": {
+                    "properties": {
+                        "select": {
+                            "anyOf": [
+                                {"required": ["full_path"]},
+                                {"required": ["directory"]},
+                            ]
+                        }
+                    },
+                    "required": ["select"],
+                },
+                "then": {"required": ["filesystem"]},
+            })
 
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
