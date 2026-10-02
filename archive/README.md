@@ -1,17 +1,25 @@
 # Preserved research history
 
-No historical payload has been deleted or relocated in this rebaseline. Existing links, source fixtures, evidence, feedback and generated experiments retain their original paths.
+Historical bulk is no longer required to remain in the active working tree. The exact before-cleanup repository is pinned at commit `9751ef0e5ae43ab728876969ff59dad538a101f0` and tag `pre-rebaseline-2026-10-02`.
 
-The exact before-cleanup tree is pinned at commit `9751ef0e5ae43ab728876969ff59dad538a101f0`. The preservation workflow establishes tag `pre-rebaseline-2026-10-02` and refuses to overwrite a different target. Check the [preservation workflow](https://github.com/vanderpol/scap-ng/actions/workflows/repository-boundaries.yml) before relying on the tag.
+## Removed historical trees
 
-| Historical area | What is retained | How to use it |
-| --- | --- | --- |
-| [Iteration 001](../research/iterations/001/README.md) | Combined/split/Ansible-inspired prototypes, source conversion, reuse evidence, lessons, original decision register and reviewer questions | Design history and pinned experiment evidence |
-| [Iteration 002](../research/iterations/002/README.md) | Source-model experiments, 19 decision notes and generated comparisons | Reconcile each decision with the latest working design |
-| [Iteration 003 source](../research/iterations/003/source/) and [packages](../research/iterations/003/packages/) | Superseded full-generation and separate-Policy experiments | Historical baseline; current review candidates are under iteration-003 `review/` |
-| [Earlier focused reviews](../research/iterations/003/review/) | Dataflow, terminology and diagnostic slices alongside current full reviews | Read the individual status; earlier slices are not latest-grammar acceptance evidence |
-| [Historical tools](../docs/audit/dependencies.json) | Older renderers, runners and workflow relationships | Explicit historical reproduction only; maintained shared helpers remain active |
+| Historical area | Tree SHA | Files | Bytes | Recovery |
+| --- | --- | ---: | ---: | --- |
+| Iteration 001 | `6650989132f8cdaefb30355e83e1546474bb5262` | 14,419 | 432,868,747 | checkout from `pre-rebaseline-2026-10-02` |
+| Iteration 002 | `b2debe70139467698bbed9f27d389e3c7a04ebea` | 10,816 | 424,276,360 | checkout from `pre-rebaseline-2026-10-02` |
 
-[Complete per-path inventory](../docs/audit/repository-inventory.tsv.gz) · [Decision reconciliation](../docs/decision-reconciliation.md) · [Lossless rebaseline procedure](../docs/lossless-rebaseline.md)
+Iteration 001 contained two inputs still required by current work. They were promoted byte-for-byte before removal:
 
-An archived location does not make every file obsolete. The OVAL support override ledger and corpus manifest at iteration-001 paths remain support inputs and are recorded as exceptions. The schema validator has been promoted byte-for-byte to root tools/ for current CI; its original remains archived. Neither those inputs nor source licenses may be removed merely because surrounding generated material is historical.
+- `data/oval-test-support-overrides.json`
+- `data/public-corpus-manifest.yaml`
+
+All other iteration-001/002 prototypes, generated comparisons, decision notes, lessons, and review artifacts remain preserved in Git history/tag rather than duplicated in the active tree.
+
+## Remaining historical material
+
+Iteration 003 still contains mixed current design, focused evidence, and historical source/package material. It is being reduced selectively because some current design records and regression dependencies still live there.
+
+The separate `vanderpol/scap-ng-evidence` repository is the durable home for migrated bulk evidence. The main repository retains compact summaries, provenance maps, and representative examples.
+
+[Decision reconciliation](../docs/decision-reconciliation.md) · [Lossless rebaseline procedure](../docs/lossless-rebaseline.md)
