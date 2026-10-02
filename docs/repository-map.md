@@ -27,7 +27,7 @@ The [dependency report](audit/dependencies.json) covers all workflow files, dire
 
 - Iteration-001 `oval-test-support-overrides.json`: current governance reinstatement input.
 - Iteration-001 `public-corpus-manifest.yaml`: pinned source/corpus evidence.
-- Iteration-001 vendored-schema validator: support CI utility, not a native content generator.
+- `tools/validate_scap14_schema_bundle.py`: byte-identical promotion of the old vendored-schema validator. Current CI uses this root entry point; the original remains archived.
 - Root `scap14_benchmark_ir.py` and `scap14_rule_splitter.py`: current helpers also used by historical pipelines.
 - `build_rhel9_review_slice.py`: current lowerer helper despite an older filename; its older generator entry point is not the novice full-review command.
 - Old fixture-driven semantic regressions can be useful evidence without making their generated layout current.

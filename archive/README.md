@@ -14,4 +14,4 @@ The exact before-cleanup tree is pinned at commit `9751ef0e5ae43ab728876969ff59d
 
 [Complete per-path inventory](../docs/audit/repository-inventory.tsv.gz) · [Decision reconciliation](../docs/decision-reconciliation.md) · [Lossless rebaseline procedure](../docs/lossless-rebaseline.md)
 
-An archived location does not make every file obsolete. The OVAL support override ledger, corpus manifest and vendored-schema validator at iteration-001 paths remain support inputs and are recorded as exceptions. Neither those inputs nor source licenses may be removed merely because surrounding generated material is historical.
+An archived location does not make every file obsolete. The OVAL support override ledger and corpus manifest at iteration-001 paths remain support inputs and are recorded as exceptions. The schema validator has been promoted byte-for-byte to root tools/ for current CI; its original remains archived. Neither those inputs nor source licenses may be removed merely because surrounding generated material is historical.

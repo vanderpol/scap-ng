@@ -173,6 +173,9 @@ def check(policy):
         doc = yaml.safe_load((ROOT / ".github/workflows" / name).read_text())
         if any(str(v.get("if", "")).strip() != "${{ false }}" for v in doc["jobs"].values()):
             failures.append(name + ": held workflow was reenabled")
+    for path in dependencies(policy)["current_import_closure"]:
+        if path.startswith(("research/iterations/001/", "research/iterations/002/")):
+            failures.append("Current CI executes archived iteration code: " + path)
     baseline = tracked_tree(policy["baseline_commit"])
     missing = [p for p in baseline if not (ROOT / p).exists()]
     failures.extend("Lost baseline path: " + p for p in missing)
