@@ -93,8 +93,8 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
                     "traversal":{
                         "max_depth":1,
                         "recurse":recurse,
-                        "filesystem":"same",
                     },
+                    "filesystem":"same",
                     "collect":self.defaults(),
                 })
 
@@ -112,8 +112,8 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
                 "traversal":{
                     "max_depth":1,
                     "recurse":"junctions",
-                    "filesystem":"local",
                 },
+                "filesystem":"local",
                 "collect":self.defaults(),
             })
 
