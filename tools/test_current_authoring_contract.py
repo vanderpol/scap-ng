@@ -21,8 +21,20 @@ class CurrentDesignGuards(unittest.TestCase):
         self.assertTrue(violations({'assessment':{'deprecated':False}}))
 
     def test_rejects_stale_pre_alignment_vocabulary(self):
-        a={'assessment':{'variables':{'v':{'expression':{'object_values':{'collect':{'collection_title':'x'}}}}}}}
+        a={'assessment':{'variables':{'v':{'expression':{'object_values':{'collection':{'collection_title':'x'}}}}}}}
         self.assertEqual(len(violations(a)),3)
+
+    def test_native_object_collect_is_allowed_but_test_collect_is_stale(self):
+        self.assertFalse(violations({'assessment':{
+            'objects':{'object-q':{
+                'capability':'windows.wmi.query',
+                'collect':{'namespace':'root\\cimv2','query':'SELECT Caption FROM Win32_OperatingSystem'},
+            }},
+            'tests':{'test-q':{'object':'object-q'}},
+        }}))
+        self.assertTrue(violations({'assessment':{
+            'tests':{'test-q':{'collect':'legacy-collection'}},
+        }}))
 
     def test_test_identity_and_unambiguous_current_vocabulary(self):
         self.assertTrue(violations({'assessment':{'tests':{'arbitrary':{}}}}))
