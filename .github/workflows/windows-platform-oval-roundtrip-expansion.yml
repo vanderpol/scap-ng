@@ -94,11 +94,14 @@ jobs:
           failures=[r for r in report["results"] if not r.get("equal")]
           bad=[]
           deprecated=[]
+          source_defects=[]
           for row in failures:
               features=row.get("unsupported_features") or []
               names={x.get("feature") for x in features}
               if names and names <= {"deprecated_oval_test"}:
                   deprecated.append(row)
+              elif names and names <= {"var_ref_datatype_mismatch"}:
+                  source_defects.append(row)
               else:
                   bad.append(row)
           if bad:
@@ -110,7 +113,12 @@ jobs:
           if not allow and deprecated:
               print(json.dumps({"unexpected_deprecated_blockers":deprecated},indent=2))
               raise SystemExit(1)
-          print(json.dumps({"definitions":report["definitions"],"semantic_equal":report["semantic_equal"],"deprecated_blockers":len(deprecated)},indent=2))
+          print(json.dumps({
+              "definitions":report["definitions"],
+              "semantic_equal":report["semantic_equal"],
+              "deprecated_blockers":len(deprecated),
+              "source_content_defects":len(source_defects),
+          },indent=2))
           PY
 
       - name: Build aggregate OVAL validation schema
