@@ -223,7 +223,6 @@ def generate(mapping, repo_root):
             field = object_fields[source_name]
             dtypes = source_datatypes(field)
             selector_props[name] = generic_entity_schema(dtypes, state=False)
-            selector_props[name]["description"] = docs(field)
             selector_field_meta[name] = {
                 "source_field": source_name,
                 "datatypes": dtypes,
@@ -263,7 +262,6 @@ def generate(mapping, repo_root):
         state_meta[native_name] = {
             "source_field": name,
             "datatypes": dtypes,
-            "description": docs(field),
         }
 
     state_field_branches = [
@@ -386,8 +384,12 @@ def main():
     print(json.dumps({
         "capability": mapping["capability"],
         "output": str(args.output),
-        "state_fields": len(generated["x-scap-ng-audit-crosswalk"]["state_fields"]),
-        "object_selectors": sorted(generated["x-source-field-catalog"]["object_selectors"]),
+        "state_fields": len(mapping.get("native", {}).get("state_field_map", {})),
+        "object_selectors": sorted({
+            name
+            for alternative in mapping.get("native", {}).get("object_selector_alternatives", [])
+            for name in alternative
+        }),
         "semantic_rules": len(generated["x-semantic-validator-rules"]),
     }, indent=2, sort_keys=True))
 
