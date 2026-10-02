@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 
-LOGICAL_OPERATOR = {"AND": "all", "OR": "any"}
+LOGICAL_OPERATOR = {"AND": "all", "OR": "any", "ONE": "one", "XOR": "odd"}
 
 COMMON_CROSSWALK = {
     "operation": {
@@ -131,10 +131,15 @@ def _transform_state_payload(value, mapping: dict):
     if not isinstance(value,dict):
         return copy.deepcopy(value)
 
-    if "all" in value or "any" in value:
+    if any(key in value for key in ("all","any","one","odd")):
         out={}
         for key,item in value.items():
-            native_key={"all":"all","any":"any"}.get(key,key)
+            native_key={
+                "all":"all",
+                "any":"any",
+                "one":"one",
+                "odd":"odd",
+            }.get(key,key)
             out[native_key]=_transform_state_payload(item,mapping)
         return out
 
