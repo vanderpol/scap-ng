@@ -55,7 +55,7 @@ rendering were outside this slice. Windows/Linux graph and local-ZIP regressions
 
 ## Full RHEL9 checkpoint
 
-[Current full-review summary](../../../review/current/examples/rhel9-full.md) uses the pinned original package, not old rendered YAML: 445 Rules, 11 Profiles, 418 automated and 445 manual Assessments, 18 source-driven applicability conditions. All 4,895 Rule/Profile selection comparisons match. Automated/applicability definition round trips and pinned omni-schema checks pass. Relative Rule paths, source selectors/defaults, shared manual questionnaire aliases, grouping and native presentation/cleanliness are checked. The exact research CLI is `tools/scap_upconvert_v003/convert_full_review.py`; Windows/Linux full-package CI evidence is recorded with the review. This is not finalized grammar, compiled packaging or runtime conformance.
+[Current full-review summary](../../../../review/current/examples/rhel9-full.md) uses the pinned original package, not old rendered YAML: 445 Rules, 11 Profiles, 418 automated and 445 manual Assessments, 18 source-driven applicability conditions. All 4,895 Rule/Profile selection comparisons match. Automated/applicability definition round trips and pinned omni-schema checks pass. Relative Rule paths, source selectors/defaults, shared manual questionnaire aliases, grouping and native presentation/cleanliness are checked. The exact research CLI is `tools/scap_upconvert_v003/convert_full_review.py`; Windows/Linux full-package CI evidence is recorded with the review. This is not finalized grammar, compiled packaging or runtime conformance.
 
 ## Current artifact status
 
@@ -89,7 +89,7 @@ Provenance: **Evidence/Audit** of owner decisions and observed regressions; no e
 
 ## Complete current-design corpus regression
 
-[2026-09-30 checkpoint summary](../../../review/current/evidence/full-current-normalization.md): all 65 pinned NIWC Current packages accounted for, 11,628 of 11,973 definition occurrences comparator-equal; 204 deprecated-Test, 132 publisher-extension and 9 confirmed source type-binding blockers. All regenerated package XSD and source-relative Schematron steps pass. Separate Self-Assertion has 165 of 167 equal with only 2 expected deprecated-Test blockers. Fresh full RHEL9 and current contract suites pass on Windows/Linux. The run fixed the historical-mode coverage gap, renamed Object terminology documentation guard, lexical QName diagnostic comparison and masked Schematron pipeline errors. This is conversion evidence, not target runtime equivalence; the complete census remains red for the explicitly documented source type errors.
+[2026-09-30 checkpoint summary](../../../../review/current/evidence/full-current-normalization.md): all 65 pinned NIWC Current packages accounted for, 11,628 of 11,973 definition occurrences comparator-equal; 204 deprecated-Test, 132 publisher-extension and 9 confirmed source type-binding blockers. All regenerated package XSD and source-relative Schematron steps pass. Separate Self-Assertion has 165 of 167 equal with only 2 expected deprecated-Test blockers. Fresh full RHEL9 and current contract suites pass on Windows/Linux. The run fixed the historical-mode coverage gap, renamed Object terminology documentation guard, lexical QName diagnostic comparison and masked Schematron pipeline errors. This is conversion evidence, not target runtime equivalence; the complete census remains red for the explicitly documented source type errors.
 
 
 ## OVAL-aligned vocabulary checkpoint — 2026-10-01
