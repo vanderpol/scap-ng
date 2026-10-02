@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import json
+import copy
 from pathlib import Path
 import unittest
+
+import jsonschema
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_DIR = ROOT / "schema" / "v0.1.0"
@@ -114,6 +117,29 @@ class ResultSchemaScopeTests(unittest.TestCase):
         assessment = properties("assessment.schema.json")["assessment"]["properties"]
         test_props = assessment["tests"]["additionalProperties"]["properties"]
         self.assertNotIn("result", test_props)
+
+    def test_runtime_result_is_rejected_even_on_extensible_authored_nodes(self):
+        document = {"assessment": {
+            "id": "scope.example", "version": 1, "assessment_title": None,
+            "mode": "automated", "class": "compliance", "purpose": "assessment",
+            "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.1.0"},
+            "objects": {"o": {"capability": "windows.wmi.query", "collect": {"query": "example"}}},
+            "variables": {"v": {"kind": "constant", "value": "example"}},
+            "states": {"s": {"capability": "windows.wmi.query", "state": {"field": "result"}}},
+            "tests": {"t": {"test_title": None, "capability": "windows.wmi.query", "object": "o"}},
+            "evaluate": {"test": "t"},
+        }}
+        validator = jsonschema.Draft202012Validator(schema("assessment.schema.json"))
+        # A collected field named result is legitimate authored WMI data.
+        validator.validate(document)
+        for family in ("objects", "variables", "states", "tests"):
+            for runtime_value in ("true", None, {"outcome": "false"}):
+                with self.subTest(family=family, runtime_value=runtime_value):
+                    leaked = copy.deepcopy(document)
+                    node = next(iter(leaked["assessment"][family].values()))
+                    node["result"] = runtime_value
+                    with self.assertRaises(jsonschema.ValidationError):
+                        validator.validate(leaked)
 
     def test_detailed_component_roots_are_closed(self):
         for name in (

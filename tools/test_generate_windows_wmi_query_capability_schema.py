@@ -174,8 +174,8 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
             "set":{
                 "operator":"union",
                 "operands":[
-                    {"object":"query-a"},
-                    {"object":"query-b"},
+                    {"object":"query-a", "filters":[]},
+                    {"object":"query-b", "filters":[]},
                 ],
             },
         })

@@ -142,3 +142,21 @@ maps whose vocabulary has not yet been standardized.
 
 The regression guard now tests both layer ownership and these canonical
 boundary decisions.
+
+## Executable source-boundary follow-up — 2026-10-02
+
+Removing `result` from the authored Test property list did not actually reject
+it: capability-specific named nodes deliberately allow additional properties.
+The previous guard checked property declarations rather than validating an
+instance containing a runtime result, so this residual scope leak passed.
+
+The structural Assessment schema now explicitly rejects a top-level `result`
+property on named Tests, Objects, States and Variables while keeping their
+capability payloads extensible. The instance regression covers scalar, null and
+object-shaped runtime results on all four node families. A WMI State selecting
+an observed field named `result` remains valid: that is an authored data-field
+selection inside the State payload, not an attached runtime outcome.
+
+This is an architectural boundary check, not deep capability validation or
+proof of evaluator equivalence. Provenance: **Evidence/Audit**, reproduced from
+the checked-in schema and corrected with failing-then-passing instance tests.
