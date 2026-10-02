@@ -58,8 +58,8 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             "traversal":{
                 "max_depth":1,
                 "recurse":"junctions_and_directories",
-                "filesystem":"same",
             },
+            "filesystem":"same",
         })
 
     def test_case_insensitive_equal_directory_allows_traversal(self):
@@ -76,7 +76,6 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
                     "traversal":{
                         "max_depth":None,
                         "recurse":"junctions_and_directories",
-                        "filesystem":"any",
                     },
                 }},
                 "states":{},
@@ -98,7 +97,7 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
                         "full_path":self.entity(r"C:\\\\Windows\\\\win.ini"),
                         "trustee_sid":self.entity("S-1-5-18"),
                     },
-                    "traversal":{"max_depth":1,"recurse":"junctions","filesystem":"same"},
+                    "traversal":{"max_depth":1,"recurse":"junctions"},
                 }},
                 "states":{},
                 "tests":{},
