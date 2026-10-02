@@ -14,8 +14,9 @@ Until the lossless repository rebaseline is complete, the current review set lin
 4. [Native schemas and mappings](../../schema/README.md)
 5. [OVAL Board review and voteable proposals](../../board/README.md)
 6. Current complete examples:
-   - [RHEL 9 review guide](../../docs/rhel9-review.md)
-   - [Windows 11 full review](../../research/iterations/003/review/windows11-current-full/README.md)
+   - [RHEL 9 full-review summary](examples/rhel9-full.md)
+   - [Windows 11 full-review summary](examples/windows11-full.md)
+7. [Full-current normalization evidence summary](evidence/full-current-normalization.md)
 
 ## Review boundary
 
