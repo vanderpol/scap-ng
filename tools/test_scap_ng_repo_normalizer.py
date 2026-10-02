@@ -280,5 +280,43 @@ class RepoNormalizerTests(unittest.TestCase):
             )
 
 
+    def test_fingerprint_cache_reuses_unchanged_assessments(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/example")
+            self.benchmark(root,"b","R2","/etc/example")
+            cache=Path(td)/"fingerprints.json"
+            report1=Path(td)/"first.json"
+            report2=Path(td)/"second.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--report",str(report1),
+                    "--fingerprint-cache",str(cache),"--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--report",str(report2),
+                    "--fingerprint-cache",str(cache),"--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            first=json.loads(report1.read_text())
+            second=json.loads(report2.read_text())
+            self.assertEqual(first["summary"]["fingerprint_cache_hits"],0)
+            self.assertEqual(first["summary"]["fingerprint_cache_misses"],2)
+            self.assertEqual(second["summary"]["fingerprint_cache_hits"],2)
+            self.assertEqual(second["summary"]["fingerprint_cache_misses"],0)
+            self.assertEqual(
+                first["summary"]["exact_duplicate_groups"],
+                second["summary"]["exact_duplicate_groups"],
+            )
+            self.assertEqual(
+                first["summary"]["duplicate_assessment_definitions_avoided"],
+                second["summary"]["duplicate_assessment_definitions_avoided"],
+            )
+
+
 if __name__=="__main__":
     unittest.main()
