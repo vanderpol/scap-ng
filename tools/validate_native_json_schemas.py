@@ -46,6 +46,23 @@ def validator(schema_dir: Path, filename: str, store):
     return Draft202012Validator(schema,resolver=resolver)
 
 
+
+def build_validators(schema_dir: Path):
+    """Build each document validator once over one shared reference store."""
+    store=schema_store(schema_dir)
+    validators={}
+    for _, schema_name in sorted(set(DOCUMENTS.values())):
+        if (schema_dir/schema_name).exists():
+            validators[schema_name]=validator(schema_dir,schema_name,store)
+    for schema_name in (
+        "rule.schema.json", "manual-assessment.schema.json",
+        "assessment-result.schema.json", "tailoring.schema.json",
+        "assessment.schema.json",
+    ):
+        if (schema_dir/schema_name).exists() and schema_name not in validators:
+            validators[schema_name]=validator(schema_dir,schema_name,store)
+    return validators
+
 def classify(path: Path):
     if path.name in DOCUMENTS:
         return DOCUMENTS[path.name]
@@ -72,8 +89,7 @@ def main():
     ap.add_argument("--report",type=Path)
     args=ap.parse_args()
 
-    validators={}
-    store=schema_store(args.schema_dir)
+    validators=build_validators(args.schema_dir)
     results=[]
     unclassified=[]
     for path in sorted(args.corpus_root.rglob("*.yaml")):
@@ -84,10 +100,7 @@ def main():
         kind,schema_name=info
         if not (args.schema_dir/schema_name).exists():
             continue
-        v=validators.get(schema_name)
-        if v is None:
-            v=validator(args.schema_dir,schema_name,store)
-            validators[schema_name]=v
+        v=validators[schema_name]
         doc=load_yaml(path)
         errors=sorted(v.iter_errors(doc),key=lambda e:list(e.absolute_path))
         results.append({
