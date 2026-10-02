@@ -1,5 +1,0 @@
-# Linux — combined-rule
-
-Seven policy rules live individually under `source/policy/rules/`. Seven automated-rule files live under `source/automated/rules/`; six include inline assessments and one remains manual-only.
-
-`dist/` contains policy-only and automated packages; `results/` contains full-scan examples.
