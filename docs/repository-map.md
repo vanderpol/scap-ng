@@ -11,8 +11,8 @@ Baseline: `9751ef0e5ae43ab728876969ff59dad538a101f0`, 34,242 tracked files. The 
 | Read working authority | [CURRENT-DESIGN](../research/iterations/003/design/CURRENT-DESIGN.md) | Latest owner corrections override historical proposals |
 | Read proposed standard | [Specification](../specification/README.md) | Draft; unresolved details remain explicit |
 | Inspect native schemas | [Schema](../schema/README.md) | Structural validation is not runtime equivalence |
-| Browse complete source candidates | [RHEL 9 guide](rhel9-review.md), [Windows 11 guide](../research/iterations/003/review/windows11-current-full/README.md) | Generated review candidates, not final grammar |
-| Browse latest normalization | [Corpus shared Assessments](../research/iterations/003/review/full-current-native-normalized/README.md) | Separate converter/normalizer evidence and handled errors |
+| Browse complete source candidates | [RHEL 9 summary](../review/current/examples/rhel9-full.md), [Windows 11 summary](../review/current/examples/windows11-full.md) | Generated review candidates, not final grammar |
+| Browse latest normalization | [Normalization evidence summary](../review/current/evidence/full-current-normalization.md) | Separate converter/normalizer evidence and handled errors |
 | Run current tooling | [Tools guide](../tools/README.md) | Maintained helper imports remain active; old renderers are historical |
 | Recover rationale/history | [Archives](../archive/README.md), [decision reconciliation](decision-reconciliation.md) | Preserve original decisions/questions and their dates |
 | Resume in another interface | [Transition](../transition/README.md) | Verify current commit/access; conversation recovery is partial |
