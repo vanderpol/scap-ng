@@ -182,6 +182,7 @@ cases rather than bulk generation:
 - `windows.registry` — hierarchical non-filesystem traversal and typed values;
 - `variable.value` — direct Test source with no fake Object;
 - `windows.wmi.query` — collector-driven query plus structured record State.
+- `linux.rpminfo` — package metadata selection with explicit materialization of the legacy `filepaths=false` collection behavior.
 
 Additional capabilities SHOULD be added only when they either validate the
 shared abstractions or introduce a genuinely new semantic shape.
