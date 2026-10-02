@@ -15,12 +15,10 @@ assessment:
         shell:
           operation: equals
           datatype: string
-          mask: false
           value: bash
         command:
           operation: equals
           datatype: string
-          mask: false
           value: update-crypto-policies --show
       object_title: Retrieve system wide crypto policy(ies).
     retrieve-current-minimum-crypto-policy-configuration-object:
@@ -29,17 +27,14 @@ assessment:
         filepath:
           operation: equals
           datatype: string
-          mask: false
           value: /etc/crypto-policies/state/CURRENT.pol
         pattern:
           operation: pattern match
           datatype: string
-          mask: false
           value: ^hash\s*=\s*.*$
         instance:
           operation: greater than or equal
           datatype: int
-          mask: false
           value: '1'
       object_title: Retrieve the current minimum crypto-policy configuration.
     retrieve-current-minimum-crypto-policy-configuration-hash-values-subexpression-object:
@@ -48,17 +43,14 @@ assessment:
         filepath:
           operation: equals
           datatype: string
-          mask: false
           value: /etc/crypto-policies/state/CURRENT.pol
         pattern:
           operation: pattern match
           datatype: string
-          mask: false
           value: ^hash\s*=\s*([^#\n]+)$
         instance:
           operation: greater than or equal
           datatype: int
-          mask: false
           value: '1'
       object_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
     retrieve-current-minimum-rsa-size-object:
@@ -67,17 +59,14 @@ assessment:
         filepath:
           operation: equals
           datatype: string
-          mask: false
           value: /etc/crypto-policies/state/CURRENT.pol
         pattern:
           operation: pattern match
           datatype: string
-          mask: false
           value: ^\s*min_rsa_size\s*=\s*(\d+)
         instance:
           operation: greater than or equal
           datatype: int
-          mask: false
           value: '1'
       object_title: Retrieve the current minimum rsa size.
   variables:
@@ -106,14 +95,12 @@ assessment:
           value: '0'
           operation: equals
           datatype: int
-          mask: false
           entity_check: all
           entity_existence: at_least_one_exists
         - field: stdout_line
           value: ^FIPS:*
           operation: pattern match
           datatype: string
-          mask: false
           entity_check: all
           entity_existence: at_least_one_exists
     state-confirm-correct-algorithms:
@@ -125,7 +112,6 @@ assessment:
           variable: allowed-fips-algorithms-variable
         operation: pattern match
         datatype: string
-        mask: false
         variable_check: all
         entity_check: all
         entity_existence: at_least_one_exists
@@ -137,7 +123,6 @@ assessment:
         value: SHA1-\d
         operation: pattern match
         datatype: string
-        mask: false
         entity_check: all
         entity_existence: at_least_one_exists
     state-confirm-minimum-hash-values-of-224:
@@ -148,7 +133,6 @@ assessment:
         value: \b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))
         operation: pattern match
         datatype: string
-        mask: false
         entity_check: all
         entity_existence: at_least_one_exists
     state-confirm-minimum-rsa-size-of-2048:
@@ -159,7 +143,6 @@ assessment:
         value: '2048'
         operation: greater than or equal
         datatype: int
-        mask: false
         entity_check: all
         entity_existence: at_least_one_exists
   tests:
