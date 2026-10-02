@@ -221,6 +221,106 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                     },
                 })
 
+    def test_exact_registry_type_constrains_value_datatype(self):
+        base_states={
+            "type-state":{
+                "capability":"windows.registry",
+                "state":{
+                    "field":"type",
+                    "value":"dword",
+                    "operation":"equal",
+                    "datatype":"string",
+                    "mask":False,
+                    "entity_check":"all",
+                    "entity_existence":"some",
+                },
+            },
+        }
+
+        good={
+            "assessment":{
+                "objects":{"o":{"capability":"windows.registry"}},
+                "states":{
+                    **base_states,
+                    "value-state":{
+                        "capability":"windows.registry",
+                        "state":{
+                            "field":"value",
+                            "value":1,
+                            "operation":"equal",
+                            "datatype":"integer",
+                            "mask":False,
+                            "entity_check":"all",
+                            "entity_existence":"some",
+                        },
+                    },
+                },
+                "tests":{
+                    "t":{
+                        "capability":"windows.registry",
+                        "object":"o",
+                        "states":["type-state","value-state"],
+                    }
+                },
+            }
+        }
+        self.assertNotIn(
+            "windows.registry.value_type_datatype",
+            {row["code"] for row in validate_assessment_capability_semantics(good)},
+        )
+
+        bad=json.loads(json.dumps(good))
+        bad["assessment"]["states"]["value-state"]["state"]["datatype"]="string"
+        bad["assessment"]["states"]["value-state"]["state"]["value"]="1"
+        self.assertIn(
+            "windows.registry.value_type_datatype",
+            {row["code"] for row in validate_assessment_capability_semantics(bad)},
+        )
+
+    def test_string_registry_type_allows_version_comparison(self):
+        doc={
+            "assessment":{
+                "objects":{"o":{"capability":"windows.registry"}},
+                "states":{
+                    "type-state":{
+                        "capability":"windows.registry",
+                        "state":{
+                            "field":"type",
+                            "value":"string",
+                            "operation":"equal",
+                            "datatype":"string",
+                            "mask":False,
+                            "entity_check":"all",
+                            "entity_existence":"some",
+                        },
+                    },
+                    "value-state":{
+                        "capability":"windows.registry",
+                        "state":{
+                            "field":"value",
+                            "value":"1.2.3",
+                            "operation":"greater_or_equal",
+                            "datatype":"version",
+                            "mask":False,
+                            "entity_check":"all",
+                            "entity_existence":"some",
+                        },
+                    },
+                },
+                "tests":{
+                    "t":{
+                        "capability":"windows.registry",
+                        "object":"o",
+                        "states":["type-state","value-state"],
+                    }
+                },
+            }
+        }
+        self.assertNotIn(
+            "windows.registry.value_type_datatype",
+            {row["code"] for row in validate_assessment_capability_semantics(doc)},
+        )
+
     def test_windows_view_is_not_native(self):
         self.assertNotIn("windows_view",json.dumps(self.schema))
 
