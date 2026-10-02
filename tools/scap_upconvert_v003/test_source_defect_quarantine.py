@@ -101,6 +101,17 @@ class SourceDefectQuarantineTests(unittest.TestCase):
             {"feature": "definition_not_found"},
         ]))
 
+        self.assertEqual(
+            review.source_defect_features_reason([
+                {
+                    "feature":"invalid_textfilecontent54_pattern_operation",
+                    "source_id":"oval:test:obj:2",
+                    "detail":"<default equals>",
+                }
+            ]),
+            "invalid_textfilecontent54_pattern_operation",
+        )
+
     def test_feature_level_source_defect_uses_verified_manual_fallback(self):
         findings=[{
             "feature":"var_ref_datatype_mismatch",
