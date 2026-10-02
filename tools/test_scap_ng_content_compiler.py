@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 import yaml
 
-from scap_ng_content_compiler import compile_benchmark, write_bundle
+from scap_ng_content_compiler import compile_benchmark, write_bundle, verify_bundle
 
 
 def dump(path, value):
@@ -31,7 +31,8 @@ class ContentCompilerTests(unittest.TestCase):
             })
             benchmark,members,index=compile_benchmark(root,b)
             self.assertIn("example.R1.automated",index)
-            rule_doc=json.loads(members["objects/rules/R1.json"])
+            rule_member=index["R1"]["path"]
+            rule_doc=json.loads(members[rule_member])
             self.assertEqual(
                 rule_doc["rule"]["assessment_choices"]["automated"]["assessment"],
                 "example.R1.automated",
@@ -88,11 +89,46 @@ class ContentCompilerTests(unittest.TestCase):
             })
             benchmark,members,index=compile_benchmark(root,b)
             self.assertIn("example.platform.assessment",index)
-            app=json.loads(members["objects/applicability.json"])
+            app_member=index["example.applicability"]["path"]
+            app=json.loads(members[app_member])
             self.assertEqual(
                 app["applicability"]["conditions"]["platform.example"]["assessment"],
                 "example.platform.assessment",
             )
+
+    def test_runtime_manifest_omits_authoring_source_paths_and_verifies_graph(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"corpus"
+            b=root/"example"
+            dump(b/"benchmark.yaml",{"benchmark":{"id":"example","version":{"value":"1"},"rules":["R1"],"profiles":[]}})
+            dump(b/"assessments"/"automated"/"R1.assessment.yaml",{
+                "assessment":{"id":"example.R1","version":1,"assessment_title":None,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
+            })
+            dump(b/"rules"/"R1.rule.yaml",{"rule":{"id":"R1","assessment_choices":{"default":{"assessment":"../assessments/automated/R1.assessment.yaml"}},"default_assessment_choice":"default"}})
+            benchmark,members,index=compile_benchmark(root,b)
+            out=Path(td)/"example.scapng"
+            write_bundle(out,benchmark,members,index,sign_self_signed=False,provenance={"generated_fresh_for_this_run":True})
+            result=verify_bundle(out)
+            self.assertEqual(result["benchmark_id"],"example")
+            import zipfile
+            with zipfile.ZipFile(out) as zf:
+                manifest=json.loads(zf.read("META-INF/manifest.json"))
+            self.assertTrue(all("source" not in row for row in manifest["objects"].values()))
+            self.assertTrue(all(len(row["path"]) < 80 for row in manifest["objects"].values()))
+
+    def test_verifier_rejects_unexpected_member(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"corpus"
+            b=root/"example"
+            dump(b/"benchmark.yaml",{"benchmark":{"id":"example","version":{"value":"1"},"rules":[],"profiles":[]}})
+            benchmark,members,index=compile_benchmark(root,b)
+            out=Path(td)/"example.scapng"
+            write_bundle(out,benchmark,members,index,sign_self_signed=False,provenance={"generated_fresh_for_this_run":True})
+            import zipfile
+            with zipfile.ZipFile(out,"a") as zf:
+                zf.writestr("extra.txt",b"x")
+            with self.assertRaisesRegex(ValueError,"unexpected ZIP members"):
+                verify_bundle(out)
 
 
 if __name__=="__main__":
