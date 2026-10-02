@@ -303,6 +303,37 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
+    def test_native_numeric_fields_are_integer_only(self):
+        for field in ("owner_uid","owner_gid","access_time","change_time","modify_time","size"):
+            with self.subTest(field=field):
+                self.validate_def("state", {
+                    "state_title": None,
+                    "capability": "unix.file",
+                    "state": {
+                        "field": field,
+                        "value": 1,
+                        "operation": "equal",
+                        "datatype": "integer",
+                        "mask": False,
+                        "entity_check": "all",
+                        "entity_existence": "some",
+                    },
+                })
+                with self.assertRaises(jsonschema.ValidationError):
+                    self.validate_def("state", {
+                        "state_title": None,
+                        "capability": "unix.file",
+                        "state": {
+                            "field": field,
+                            "value": "1",
+                            "operation": "equal",
+                            "datatype": "string",
+                            "mask": False,
+                            "entity_check": "all",
+                            "entity_existence": "some",
+                        },
+                    })
+
     def test_semantic_validator_rules_are_not_lost(self):
         rules = {
             row["id"]: row
