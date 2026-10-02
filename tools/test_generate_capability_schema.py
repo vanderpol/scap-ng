@@ -38,113 +38,65 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertIn("capability-common.schema.json#/$defs/state_filter", encoded)
         self.assertNotIn('"variable_reference":', encoded)
 
+    def test_generated_schema_uses_clean_native_vocabulary(self):
+        encoded = json.dumps(self.schema)
+        self.assertNotIn('"behaviors"', encoded)
+        self.assertNotIn('"recurse_direction"', encoded)
+        self.assertNotIn('"filepath"', encoded)
+        self.assertNotIn('"user_id"', encoded)
+        self.assertIn('"full_path"', encoded)
+        self.assertIn('"owner_uid"', encoded)
+        self.assertIn('"traversal"', encoded)
+
     def test_source_inventory_is_extracted_from_pinned_xsd(self):
         catalog = self.schema["x-source-field-catalog"]
         self.assertEqual(
             set(catalog["object_selectors"]),
-            {"filepath", "path", "filename"},
+            {"full_path", "directory", "name"},
         )
-        self.assertIn("filepath", catalog["state_fields"])
-        self.assertIn("path", catalog["state_fields"])
-        self.assertIn("filename", catalog["state_fields"])
+        self.assertIn("full_path", catalog["state_fields"])
+        self.assertIn("directory", catalog["state_fields"])
+        self.assertIn("name", catalog["state_fields"])
         self.assertIn("size", catalog["state_fields"])
-        self.assertIn("suid", catalog["state_fields"])
+        self.assertIn("setuid", catalog["state_fields"])
         self.assertIn("has_extended_acl", catalog["state_fields"])
-
-    def test_behavior_defaults_and_enums_are_source_backed(self):
-        behaviors = self.schema["$defs"]["object"]["properties"]["behaviors"]
-        props = behaviors["properties"]
-        self.assertEqual(props["max_depth"]["default"], -1)
-        self.assertEqual(props["recurse_direction"]["default"], "none")
-        self.assertEqual(props["recurse_file_system"]["default"], "all")
-        self.assertIn("down", props["recurse_direction"]["enum"])
-        self.assertIn("local", props["recurse_file_system"]["enum"])
-
-    def test_deprecated_behavior_values_are_annotated_not_hidden(self):
-        props=self.schema["$defs"]["object"]["properties"]["behaviors"]["properties"]
-        recurse_deprecated={
-            row["value"]
-            for row in props["recurse"]["x-oval-deprecated-enum-values"]
-        }
-        direction_deprecated={
-            row["value"]
-            for row in props["recurse_direction"]["x-oval-deprecated-enum-values"]
-        }
-        self.assertEqual(
-            recurse_deprecated,
-            {"none","files","files and directories"},
-        )
-        self.assertEqual(direction_deprecated,{"up"})
-        self.assertNotIn("up",props["recurse_direction"]["enum"])
-        self.assertNotIn("none",props["recurse"]["enum"])
-        self.assertNotIn("files",props["recurse"]["enum"])
-        self.assertNotIn("files and directories",props["recurse"]["enum"])
-        self.assertEqual(
-            props["recurse_direction"]["x-scap-ng-deprecated-enum-policy"],
-            "reject",
-        )
 
     def test_valid_filepath_object(self):
         self.validate_def("object", {
             "object_title": "passwd",
             "capability": "unix.file",
             "select": {
-                "filepath": {
+                "full_path": {
                     "value": "/etc/passwd",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 }
             },
         })
-
-    def test_deprecated_behavior_values_are_rejected(self):
-        for key,value in (
-            ("recurse_direction","up"),
-            ("recurse","none"),
-            ("recurse","files"),
-            ("recurse","files and directories"),
-        ):
-            with self.subTest(key=key,value=value):
-                with self.assertRaises(jsonschema.ValidationError):
-                    self.validate_def("object", {
-                        "object_title": None,
-                        "capability": "unix.file",
-                        "select": {
-                            "path": {
-                                "value": "/etc",
-                                "operation": "equals",
-                                "datatype": "string",
-                            },
-                            "filename": {
-                                "value": "passwd",
-                                "operation": "equals",
-                                "datatype": "string",
-                            },
-                        },
-                        "behaviors": {key:value},
-                    })
 
     def test_valid_path_filename_object(self):
         self.validate_def("object", {
             "object_title": "config files",
             "capability": "unix.file",
             "select": {
-                "path": {
+                "directory": {
                     "value": "/etc",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
-                "filename": {
+                "name": {
                     "value": "passwd",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
             },
-            "behaviors": {
+            "traversal": {
                 "max_depth": 0,
-                "recurse": "symlinks and directories",
-                "recurse_direction": "none",
-                "recurse_file_system": "local",
+                "follow_symlinks": True,
+                "filesystem": "local",
             },
         })
 
@@ -153,16 +105,17 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "object_title": "directory itself",
             "capability": "unix.file",
             "select": {
-                "path": {
+                "directory": {
                     "value": "/etc",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
-                "filename": {
-                    "value": "",
-                    "operation": "equals",
+                "name": {
+                    "value": None,
+                    "operation": "equal",
                     "datatype": "string",
-                    "nil": True,
+                    "mask": False,
                 },
             },
         })
@@ -172,20 +125,23 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "object_title": None,
             "capability": "unix.file",
             "select": {
-                "filepath": {
+                "full_path": {
                     "value": "/etc/passwd",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
-                "path": {
+                "directory": {
                     "value": "/etc",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
-                "filename": {
+                "name": {
                     "value": "passwd",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
             },
         }
@@ -198,11 +154,12 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "object_title": None,
                 "capability": "unix.file",
                 "select": {
-                    "filepath": {
+                    "full_path": {
                         "value": "/etc/passwd",
-                        "operation": "equals",
+                        "operation": "equal",
                         "datatype": "string",
-                        "entity_existence": "none_exist",
+                    "mask": False,
+                        "entity_existence": "none",
                     }
                 },
             })
@@ -213,12 +170,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "state_title": None,
                 "capability": "unix.file",
                 "state": {
-                    "field": "filename",
+                    "field": "name",
                     "value": "passwd",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                     "entity_check": "all",
-                    "entity_existence": "at_least_one_exists",
+                    "entity_existence": "some",
                     "var_check": "all",
                 },
             })
@@ -227,12 +185,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "state_title": None,
             "capability": "unix.file",
             "state": {
-                "field": "filename",
+                "field": "name",
                 "value": {"variable": "approved-name"},
-                "operation": "equals",
+                "operation": "equal",
                 "datatype": "string",
+                    "mask": False,
                 "entity_check": "all",
-                "entity_existence": "at_least_one_exists",
+                "entity_existence": "some",
                 "var_check": "all",
             },
         })
@@ -243,7 +202,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "test_title": None,
                 "capability": "linux.rpminfo",
                 "object": "passwd-object",
-                "check_existence": "at_least_one_exists",
+                "check_existence": "some",
                 "check": "all",
             })
 
@@ -252,12 +211,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "state_title": "owner is root",
             "capability": "unix.file",
             "state": {
-                "field": "user_id",
+                "field": "owner_uid",
                 "value": 0,
-                "operation": "equals",
-                "datatype": "int",
+                "operation": "equal",
+                "datatype": "integer",
+                    "mask": False,
                 "entity_check": "all",
-                "entity_existence": "at_least_one_exists",
+                "entity_existence": "some",
             },
         })
 
@@ -269,8 +229,9 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "state": {
                     "field": "made_up_field",
                     "value": "x",
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "string",
+                    "mask": False,
                 },
             })
 
@@ -280,12 +241,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "state_title": None,
                 "capability": "unix.file",
                 "state": {
-                    "field": "suid",
+                    "field": "setuid",
                     "value": 1,
-                    "operation": "equals",
-                    "datatype": "int",
+                    "operation": "equal",
+                    "datatype": "integer",
+                    "mask": False,
                     "entity_check": "all",
-                    "entity_existence": "at_least_one_exists",
+                    "entity_existence": "some",
                 },
             })
 
@@ -293,12 +255,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "state_title": None,
             "capability": "unix.file",
             "state": {
-                "field": "suid",
+                "field": "setuid",
                 "value": True,
-                "operation": "equals",
+                "operation": "equal",
                 "datatype": "boolean",
+                    "mask": False,
                 "entity_check": "all",
-                "entity_existence": "at_least_one_exists",
+                "entity_existence": "some",
             },
         })
 
@@ -308,12 +271,13 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "state_title": None,
                 "capability": "unix.file",
                 "state": {
-                    "field": "user_id",
+                    "field": "owner_uid",
                     "value": True,
-                    "operation": "equals",
+                    "operation": "equal",
                     "datatype": "boolean",
+                    "mask": False,
                     "entity_check": "all",
-                    "entity_existence": "at_least_one_exists",
+                    "entity_existence": "some",
                 },
             })
 
@@ -323,9 +287,9 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             for row in self.schema["x-semantic-validator-rules"]
         }
         self.assertIn("unix.file.filter_state_capability", rules)
-        self.assertIn("unix.file.filepath_no_recursion_behaviors", rules)
-        self.assertIn("unix.file.path_pattern_no_recursion_behaviors", rules)
-        self.assertIn("unix.file.filename_empty", rules)
+        self.assertIn("unix.file.full_path_no_traversal", rules)
+        self.assertIn("unix.file.pattern_directory_no_traversal", rules)
+        self.assertIn("unix.file.full_path_no_traversal", rules)
 
 
 if __name__ == "__main__":
