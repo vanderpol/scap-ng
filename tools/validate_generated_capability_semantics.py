@@ -413,6 +413,8 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.yamlfilecontent.record_keys",
     "windows.cmdlet.record_fields",
     "windows.ntuser.materialized_collection_defaults",
+    "windows.sid.materialized_behaviors",
+    "windows.sid_sid.materialized_behaviors",
     "windows.wuaupdatesearcher.materialized_superseded_default",
     "windows.wuaupdatesearcher.source_path_repair",
     "windows.lockoutpolicy.singleton_source",
