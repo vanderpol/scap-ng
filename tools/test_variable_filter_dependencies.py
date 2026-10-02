@@ -146,6 +146,80 @@ class DependencyTests(unittest.TestCase):
         variable(root, 1, expr)
         self.roundtrip(root)
 
+    def test_external_variable_constraints_roundtrip(self):
+        root = source()
+        variables = root.find(f"{{{OD}}}variables")
+        external = ET.SubElement(
+            variables,
+            f"{{{OD}}}external_variable",
+            id="oval:dependency:var:1",
+            version="1",
+            datatype="int",
+            comment="Organization supplied threshold",
+        )
+        value = ET.SubElement(external, f"{{{OD}}}possible_value", hint="Preferred")
+        value.text = "10"
+        group = ET.SubElement(
+            external,
+            f"{{{OD}}}possible_restriction",
+            hint="Approved range",
+        )
+        low = ET.SubElement(group, f"{{{OD}}}restriction", operation="greater than or equal")
+        low.text = "5"
+        high = ET.SubElement(group, f"{{{OD}}}restriction", operation="less than or equal")
+        high.text = "20"
+
+        native = self.roundtrip(root)
+        variable_entry = next(iter(native["assessment"]["variables"].values()))
+        validation = variable_entry["input"]["validation"]["alternatives"]
+        self.assertEqual(validation[0], {"literal": "10", "hint": "Preferred"})
+        self.assertEqual(
+            validation[1]["restriction_group"],
+            {
+                "operator": "AND",
+                "hint": "Approved range",
+                "conditions": [
+                    {"operation": "greater than or equal", "value": "5"},
+                    {"operation": "less than or equal", "value": "20"},
+                ],
+            },
+        )
+
+    def test_external_variable_explicit_or_restrictions_roundtrip(self):
+        root = source()
+        variables = root.find(f"{{{OD}}}variables")
+        external = ET.SubElement(
+            variables,
+            f"{{{OD}}}external_variable",
+            id="oval:dependency:var:1",
+            version="1",
+            datatype="string",
+            comment="Allowed environment",
+        )
+        group = ET.SubElement(
+            external,
+            f"{{{OD}}}possible_restriction",
+            operator="OR",
+            hint="Approved names",
+        )
+        for value in ("prod.*", "stage.*"):
+            restriction = ET.SubElement(
+                group,
+                f"{{{OD}}}restriction",
+                operation="pattern match",
+            )
+            restriction.text = value
+
+        native = self.roundtrip(root)
+        variable_entry = next(iter(native["assessment"]["variables"].values()))
+        group = variable_entry["input"]["validation"]["alternatives"][0]["restriction_group"]
+        self.assertEqual(group["operator"], "OR")
+        self.assertEqual(group["hint"], "Approved names")
+        self.assertEqual(
+            [row["value"] for row in group["conditions"]],
+            ["prod.*", "stage.*"],
+        )
+
     def test_filter_dependencies_roundtrip(self):
         root = source()
         add_filter(root, "oval:dependency:var:1")

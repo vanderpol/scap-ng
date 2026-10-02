@@ -21,7 +21,7 @@ Status values:
 | OVAL semantic area | Required semantics | Current v003 status | Required next proof |
 |---|---|---|---|
 | constant_variable | one or more typed literal values | prototype | multi-value constants, datatype validation |
-| external_variable | externally supplied typed value set plus optional allowed values/restrictions | design | possible_value / possible_restriction mapping |
+| external_variable | externally supplied typed value set plus optional allowed values/restrictions | prototype | focused mixed possible_value / possible_restriction round-trip now covered; runtime binding validation remains conformance work |
 | local_variable | one ComponentGroup member producing zero/one/many values | prototype | full recursive component coverage |
 | variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
 | object_component | object -> item field -> variable values, optional record_field | prototype | 0/1/many items and repeated item entities; record_field |
@@ -40,15 +40,15 @@ Status values:
 | glob_to_regex | glob conversion semantics | design | exact OVAL conversion rules |
 | merge | merge record-valued/component data | design | exact MergeFunctionType structure/semantics |
 | var_ref in object entities | variable supplies selector values | prototype | all operations, multi-valued var_check |
-| var_ref in state entities | variable supplies expected values | prototype | many-to-many var_check + entity_check |
+| var_ref in state entities | variable supplies expected values | native | many-to-many var_check + entity_check truth-table ordering is covered; target execution remains #26 |
 | var_ref datatype matching | referenced variable datatype must match consuming entity rules | design | validator generated from schema constraints |
 | var_ref on record entity | prohibited | design | static rejection |
-| empty variable consumed by Object | Object considered not to exist | design | execution/result conformance |
-| empty variable consumed by State | State evaluation error | design | execution/result conformance |
-| variable evaluation error propagation | error propagates to consuming entity | design | result-state tests |
-| var_check default | effective `all` when var_ref exists and var_check omitted | design | parser normalization |
-| var_check aggregation | all / at least one / only one / none satisfy etc. per CheckEnumeration | design | evaluation truth tables |
-| entity_check + var_check | two-level many-to-many state evaluation | design | exhaustive truth-table tests |
+| empty variable consumed by Object | Object considered not to exist | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
+| empty variable consumed by State | State evaluation error | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
+| variable evaluation error propagation | error propagates to consuming entity | native | result-state propagation tests are covered; differential execution remains #26 |
+| var_check default | effective `all` when var_ref exists and var_check omitted | native | parser provenance and omitted/explicit-default regressions covered |
+| var_check aggregation | all / at least one / only one / none satisfy etc. per CheckEnumeration | native | exhaustive OVAL-derived truth-table coverage |
+| entity_check + var_check | two-level many-to-many state evaluation | native | ordering and non-commutative truth-table cases covered |
 | nested functions | arbitrary recursive FunctionGroup composition | prototype | depth and mixed-function tests |
 | dependency graph | arbitrary acyclic variable/object/state dependencies | design | DAG planner + cycle diagnostics |
 | object set recursion | nested sets with schema-constrained arity | prototype | recursive set evaluation |
@@ -57,9 +57,9 @@ Status values:
 | filter action | include/exclude; default exclude | prototype | multiple/conflicting filters |
 | variables inside filter states | State var_ref participates in collection filtering | prototype | chained dependency test |
 | variables inside objects used by sets | variable-dependent collection feeding set | prototype | chained dependency test |
-| status/flag propagation | complete/incomplete/error/DNE/not-collected/not-applicable as defined per function | design | schema evaluation-chart tests |
+| status/flag propagation | complete/incomplete/error/DNE/not-collected/not-applicable as defined per function | native | generic truth/flag charts covered; capability-specific execution remains #26 |
 | operation/datatype compatibility | operation set constrained by datatype | design | generated/static validation |
-| implicit defaults | schema defaults must be normalized without semantic loss | design | default-value inventory |
+| implicit defaults | schema defaults must be normalized without semantic loss | native | #8/#9 schema-backed provenance and fail-closed behavior-default separation |
 | deprecated constructs | deprecated source semantics SHALL trigger migration/update policy | design | deprecated inventory and diagnostics |
 
 ## Important structural conclusion
