@@ -226,6 +226,10 @@ jobs:
           ev=Path("work/evidence")
           generation=json.loads((ev/"generation-summary.json").read_text())
           normalizer=json.loads((ev/"normalizer-report.json").read_text())
+          schema_before=json.loads((ev/"schema-validation-before-normalization.json").read_text())
+          schema_after=json.loads((ev/"schema-validation-after-normalization.json").read_text())
+          semantic_before=json.loads((ev/"semantic-validation-before-normalization.json").read_text())
+          semantic_after=json.loads((ev/"semantic-validation-after-normalization.json").read_text())
           before=json.loads((ev/"compiler-before.json").read_text())
           after=json.loads((ev/"compiler-after.json").read_text())
           signed=json.loads((ev/"compiler-signed-test.json").read_text())
@@ -233,7 +237,16 @@ jobs:
           pct=round(100.0*delta/before["total_bytes"],2) if before["total_bytes"] else 0.0
           summary={"niwc_revision":generation["niwc_revision"],"source_packages":generation["packages"],
                    "generated_native_benchmarks":generation["generated"],"blocked_source_packages":generation["blocked"],
-                   **normalizer["summary"],"compiled_bundles_before":before["bundles"],"compiled_bytes_before":before["total_bytes"],
+                   **normalizer["summary"],
+                   "schema_documents_before":schema_before["documents_checked"],
+                   "schema_invalid_before":schema_before["invalid"],
+                   "schema_documents_after":schema_after["documents_checked"],
+                   "schema_invalid_after":schema_after["invalid"],
+                   "semantic_assessments_before":semantic_before["assessment_documents_checked"],
+                   "semantic_invalid_before":semantic_before["invalid"],
+                   "semantic_assessments_after":semantic_after["assessment_documents_checked"],
+                   "semantic_invalid_after":semantic_after["invalid"],
+                   "compiled_bundles_before":before["bundles"],"compiled_bytes_before":before["total_bytes"],
                    "compiled_bundles_after":after["bundles"],"compiled_bytes_after":after["total_bytes"],
                    "compiled_byte_delta":delta,"compiled_byte_reduction_pct":pct,
                    "signed_test_bundles":signed["signed_bundles"],"signing_trust":signed["signing_trust"]}
@@ -245,6 +258,11 @@ jobs:
                  f"- Source packages accounted for: **{summary['source_packages']}**",
                  f"- Native Benchmarks generated: **{summary['generated_native_benchmarks']}**",
                  f"- Source/conversion blockers: **{summary['blocked_source_packages']}**","",
+                 "## Validation",
+                 f"- Schema documents before normalization: **{summary['schema_documents_before']}** / invalid **{summary['schema_invalid_before']}**",
+                 f"- Schema documents after normalization: **{summary['schema_documents_after']}** / invalid **{summary['schema_invalid_after']}**",
+                 f"- Assessment semantics before normalization: **{summary['semantic_assessments_before']}** / invalid **{summary['semantic_invalid_before']}**",
+                 f"- Assessment semantics after normalization: **{summary['semantic_assessments_after']}** / invalid **{summary['semantic_invalid_after']}**","",
                  "## Exact normalization",f"- Referenced Assessment definitions before: **{summary['referenced_assessment_instances_before']}**",
                  f"- Definitions after proven exact normalization: **{summary['assessment_definitions_after_exact_normalization']}**",
                  f"- Duplicate definitions avoided: **{summary['duplicate_assessment_definitions_avoided']}**",
