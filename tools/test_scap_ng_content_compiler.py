@@ -20,7 +20,7 @@ class ContentCompilerTests(unittest.TestCase):
             b=root/"example"
             dump(b/"benchmark.yaml",{"benchmark":{"id":"example","version":{"value":"1"},"rules":["R1"],"profiles":[]}})
             dump(b/"assessments"/"automated"/"R1.automated.assessment.yaml",{
-                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":null,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
+                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":None,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"rules"/"R1.rule.yaml",{
                 "rule":{
@@ -63,10 +63,10 @@ class ContentCompilerTests(unittest.TestCase):
                 }
             })
             dump(b/"assessments"/"automated"/"R1.automated.assessment.yaml",{
-                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":null,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
+                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":None,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"assessments"/"applicability"/"platform.assessment.yaml",{
-                "assessment":{"id":"example.platform.assessment","version":1,"assessment_title":null,"mode":"automated","class":"inventory","purpose":"applicability","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},
+                "assessment":{"id":"example.platform.assessment","version":1,"assessment_title":None,"mode":"automated","class":"inventory","purpose":"applicability","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},
                               "objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"rules"/"R1.rule.yaml",{
