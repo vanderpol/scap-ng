@@ -239,6 +239,71 @@ def validate_assessment_capability_semantics(document):
                     "message":"Test and State capabilities must match",
                 })
 
+        diagnostics.extend(
+            _validate_registry_test_value_datatypes(test_id,test,states)
+        )
+
+    return diagnostics
+
+
+REGISTRY_TYPE_VALUE_DATATYPES={
+    "binary":{"binary"},
+    "dword":{"integer"},
+    "dword_big_endian":{"integer"},
+    "qword":{"integer"},
+    "expand_string":{"string"},
+    "link":{"string"},
+    "multi_string":{"string"},
+    "string":{"string","version"},
+}
+
+
+def _validate_registry_test_value_datatypes(test_id,test,states):
+    """Validate value datatypes when one exact literal registry type is asserted."""
+    if test.get("capability") != "windows.registry":
+        return []
+
+    referenced=[
+        states.get(state_id)
+        for state_id in (test.get("states") or [])
+        if isinstance(states.get(state_id),dict)
+    ]
+    exact_types=[]
+    for state in referenced:
+        payload=state.get("state") or {}
+        if (
+            payload.get("field")=="type"
+            and payload.get("operation")=="equal"
+            and isinstance(payload.get("value"),str)
+        ):
+            exact_types.append(payload["value"])
+    if len(set(exact_types)) != 1:
+        return []
+
+    registry_type=exact_types[0]
+    allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
+    if not allowed:
+        return []
+
+    diagnostics=[]
+    for state_id in test.get("states") or []:
+        state=states.get(state_id)
+        if not isinstance(state,dict):
+            continue
+        payload=state.get("state") or {}
+        if payload.get("field") != "value":
+            continue
+        datatype=payload.get("datatype")
+        if datatype not in allowed:
+            diagnostics.append({
+                "test":test_id,
+                "state":state_id,
+                "code":"windows.registry.value_type_datatype",
+                "registry_type":registry_type,
+                "datatype":datatype,
+                "allowed_datatypes":sorted(allowed),
+                "message":"registry value datatype is incompatible with exact asserted registry type",
+            })
     return diagnostics
 
 
