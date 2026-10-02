@@ -435,6 +435,11 @@ def main() -> int:
     ap.add_argument("--output-root", type=Path,
                     help="Destination for --rewrite. Required only when --rewrite is used.")
     ap.add_argument("--report", type=Path, required=True)
+    ap.add_argument(
+        "--change-manifest",
+        type=Path,
+        help="Optional standalone machine-readable rewrite/change manifest.",
+    )
     ap.add_argument("--top-near", type=int, default=250,
                     help="Maximum near-duplicate Assessment groups retained")
     ap.add_argument("--max-rule-candidates", type=int, default=0,
@@ -647,6 +652,25 @@ def main() -> int:
         output.rename(destination)
         output = destination
 
+
+    change_manifest = {
+        "format": "scap-ng-repository-normalizer-change-manifest-0.1",
+        "rewrite_requested": args.rewrite,
+        "shared_assessments": [
+            {
+                "shared_assessment": group["shared_assessment"],
+                "fingerprint": group["fingerprint"],
+                "sources_replaced": [member["source"] for member in group["members"]],
+                "consumers": [
+                    consumer
+                    for member in group["members"]
+                    for consumer in member["consumers"]
+                ],
+            }
+            for group in exact_report
+        ],
+    }
+
     report = {
         "format": "scap-ng-repository-normalizer-report-0.1",
         "mode": (
@@ -669,6 +693,7 @@ def main() -> int:
             "near_duplicate_rule_candidates_reported": len(rule_candidates),
         },
         "repository_validation": repository_validation,
+        "change_manifest": change_manifest,
         "planned_changes": {
             "shared_assessments_to_create": len(exact_report),
             "local_assessment_instances_to_replace": sum(x["instance_count"] for x in exact_report),
@@ -686,6 +711,13 @@ def main() -> int:
             "advisory_similarity_changes_exact_merge_decisions": False,
         },
     }
+
+    if args.change_manifest is not None:
+        args.change_manifest.parent.mkdir(parents=True, exist_ok=True)
+        args.change_manifest.write_text(
+            json.dumps(change_manifest, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
 
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(
