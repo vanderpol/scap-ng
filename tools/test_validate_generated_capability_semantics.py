@@ -296,6 +296,12 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(doc)
         self.assertIn("windows.ntuser.value_type_datatype",{r["code"] for r in rows})
 
+    def test_panos_config_xpath_requires_equality(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{"objects":{"o":{"capability":"panos.config","select":{"xpath":entity("/config/.*",operation="match")}}},"states":{},"tests":{}}
+        })
+        self.assertIn("panos.config.xpath_equal",{row["code"] for row in rows})
+
     def test_pwpolicy_auth_pair_and_equal_only_fields(self):
         rows=validate_assessment_capability_semantics({
             "assessment":{
