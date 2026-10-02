@@ -386,12 +386,14 @@ def main(argv=None):
                     continue
                 defect=review.source_defect_features_reason(unsupported)
                 if defect:
+                    defect_error=defect+":"+json.dumps(unsupported,sort_keys=True,separators=(",",":"))
                     blocked_applicability[ref]={
                         'native_condition':app_id,
                         'source_definition':did,
                         'unsupported':unsupported,
                         'classification':'source_content_defect',
                         'reason':defect,
+                        'error':defect_error,
                     }
                     app_ids[ref]=None
                     app_evidence.append({
