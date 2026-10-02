@@ -9,8 +9,9 @@ Files:
 - `scan-result.json` — run-level canonical result index.
 - `benchmark-result.json` — policy-facing Benchmark/Rule result with selected
   Assessment identity/version, effective check selector, weight, applicability,
-  expected state, decisive observed state, bounded evidence, and instance
-  reference.
+  policy outcome/reason, evidence references, and instance reference. Detailed
+  expected/observed State, bounded-evidence, and input-execution data remain in
+  the referenced Assessment Result.
 - `expected.jsonl` — deterministic derived projection produced by
   `tools/project_results_jsonl.py`.
 - `matched-scap14.arf.xml` — minimal matched XCCDF-only ARF result for the
@@ -34,9 +35,10 @@ The regression suite:
 - validates the ARF container against the vendored SCAP 1.4 ARF/XCCDF schemas;
 - separately validates the nested OVAL Results/System Characteristics/source
   Definitions with the vendored OVAL 5.12.3 schemas;
-- checks that compact observed state matches the authoritative detailed
-  Assessment Item and deterministic Rule message;
-- covers non-Boolean Rule outcomes and bounded-evidence/early-stop projection.
+- checks that the deterministic Rule message is consistent with the referenced
+  authoritative detailed Assessment result;
+- covers non-Boolean Rule outcomes while bounded-evidence/early-stop detail stays
+  at Assessment-result scope.
 
 ## Size comparison interpretation
 
