@@ -558,6 +558,32 @@ class DependencyTests(unittest.TestCase):
         with self.assertRaisesRegex(ConversionBudgetExceeded, "output_nodes"):
             tracker.note_output_nodes(5)
 
+    def test_wide_shared_variable_dag_preserves_shared_dependency(self):
+        root = source()
+        expr = component("concat")
+        for number in range(2, 26):
+            expr.append(component("variable_component", var_ref=f"oval:dependency:var:{number}"))
+            variable(
+                root,
+                number,
+                component("variable_component", var_ref="oval:dependency:var:100"),
+            )
+        variable(root, 1, expr)
+        variable(root, 100, literal("shared"))
+
+        rows = converter.unsupported_definition_features(
+            root,
+            DID,
+            budget=ConversionBudget(dependency_nodes=30, dependency_edges=60),
+        )
+        self.assertFalse(
+            [row for row in rows if row["feature"] == "conversion_resource_limit"],
+            rows,
+        )
+        native, error = converter.lower_definition(root, DID, "wide-shared-dag")
+        self.assertIsNone(error)
+        self.assertIsNotNone(native)
+
     def test_static_object_set_cycle_reports_cycle(self):
         root = source()
         objects = root.find(f"{{{OD}}}objects")
