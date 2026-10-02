@@ -290,13 +290,12 @@ def generate(mapping, repo_root):
 
     capability = mapping["capability"]
     test_required = [
-        "test_title", "capability", test_source_field,
+        "test_title", "capability",
         "existence", "match",
     ]
     test_properties = {
         "test_title": {"type": ["string", "null"]},
         "capability": {"const": capability},
-        test_source_field: {"type": "string", "minLength": 1},
         "existence": {
             "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
         },
@@ -310,6 +309,9 @@ def generate(mapping, repo_root):
             "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
         },
     }
+    if test_source_kind != "none":
+        test_required.insert(2, test_source_field)
+        test_properties[test_source_field] = {"type": "string", "minLength": 1}
 
     defs = {
         "test": {
