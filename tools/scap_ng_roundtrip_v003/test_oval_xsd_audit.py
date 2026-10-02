@@ -21,6 +21,14 @@ SCHEMA = """<?xml version="1.0"?>
  <xs:complexType name="base">
   <xs:attributeGroup ref="t:attrs"/>
  </xs:complexType>
+ <xs:complexType name="FileBehaviors">
+  <xs:attribute name="recurse_direction" type="xs:string" default="none"/>
+ </xs:complexType>
+ <xs:complexType name="FileObjectType">
+  <xs:sequence>
+   <xs:element name="behaviors" type="t:FileBehaviors" minOccurs="0"/>
+  </xs:sequence>
+ </xs:complexType>
  <xs:complexType name="derived">
   <xs:complexContent><xs:extension base="t:base">
    <xs:attribute name="fixedFlag" type="xs:string" fixed="set"/>
@@ -53,7 +61,7 @@ class SchemaAuditTests(unittest.TestCase):
             summary = json.loads((target / "summary.json").read_text())
             counts = summary["named_reference_resolution"]
             self.assertEqual(summary["upstream_xsd_files"], 45)
-            self.assertEqual(summary["explicit_defaults"], 1)
+            self.assertEqual(summary["explicit_defaults"], 2)
             self.assertEqual(summary["fixed_values"], 1)
             self.assertEqual(counts["resolved_global"], 2)
             self.assertEqual(counts["builtin_xsd"], 1)
@@ -68,6 +76,20 @@ class SchemaAuditTests(unittest.TestCase):
             self.assertTrue(any(b["reason"] == "not_found"
                                 for b in by_type["broken"]["blockers"]))
             self.assertEqual(by_type["builtin"]["status"], "resolved")
+            behavior = json.loads((target / "behavior-default-inventory.json").read_text())
+            self.assertEqual(behavior["summary"]["named_behavior_type_count"], 1)
+            self.assertEqual(behavior["summary"]["resolved_named_behavior_types"], 1)
+            self.assertEqual(behavior["summary"]["named_behavior_types_with_defaults"], 1)
+            self.assertEqual(behavior["summary"]["behavior_element_declarations"], 1)
+            self.assertEqual(behavior["summary"]["optional_behavior_elements"], 1)
+            self.assertEqual(
+                behavior["named_behavior_types"][0]["defaults"]["recurse_direction"]["value"],
+                "none",
+            )
+            self.assertEqual(
+                behavior["behavior_element_declarations"][0]["owner_complex_type"],
+                "FileObjectType",
+            )
             rows = json.loads((target / "named-reference-resolution.json").read_text())
             self.assertTrue(any(row["status"] == "unresolved_global"
                                 and row["reference"] == "t:missing" for row in rows))

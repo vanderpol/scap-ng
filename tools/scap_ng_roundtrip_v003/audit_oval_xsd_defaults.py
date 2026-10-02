@@ -36,7 +36,7 @@ def main():
     args=ap.parse_args()
     paths=sorted(args.schemas.glob("*.xsd"))
     if len(paths)<45: raise SystemExit(f"Expected upstream complete OVAL 5.12.3 schema set, found {len(paths)}")
-    defaults=[]; fixed=[]; inherited=[]; attribute_groups=[]; optional=[]; annotations=[]; rules=[]
+    defaults=[]; fixed=[]; inherited=[]; attribute_groups=[]; optional=[]; annotations=[]; rules=[]; behavior_elements=[]
     source_hashes={}
     # Resolve references to named global types/groups only; do not infer inherited defaults.
     named_declarations=collections.defaultdict(list)
@@ -81,6 +81,29 @@ def main():
             if tag=="element" and node.get("minOccurs")=="0":
                 optional.append({**location(path,node),"name":node.get("name") or node.get("ref"),
                     "maxOccurs":node.get("maxOccurs")})
+            if tag=="element" and (node.get("name")=="behaviors" or node.get("ref","").endswith(":behaviors")):
+                owner_type=None
+                owner_element=None
+                for ancestor in node.iterancestors():
+                    if not isinstance(ancestor.tag,str):
+                        continue
+                    akind=local(ancestor)
+                    if owner_type is None and akind=="complexType" and ancestor.get("name"):
+                        owner_type=ancestor.get("name")
+                    if owner_element is None and akind=="element" and ancestor.get("name"):
+                        owner_element=ancestor.get("name")
+                behavior_elements.append({
+                    **location(path,node),
+                    "targetNamespace":target,
+                    "owner_complex_type":owner_type,
+                    "owner_element":owner_element,
+                    "name":node.get("name"),
+                    "ref":node.get("ref"),
+                    "type":node.get("type"),
+                    "minOccurs":node.get("minOccurs","1"),
+                    "maxOccurs":node.get("maxOccurs","1"),
+                    "documentation":txt(node)[:2600],
+                })
             if tag in ("documentation","evaluation_documentation"):
                 value=txt(node)
                 if DEFAULT_TERMS.search(value) or SEMANTIC_TERMS.search(value):
@@ -127,6 +150,25 @@ def main():
     save("named-reference-resolution.json",resolved_references)
     transitive=transitive_default_inventory(args.schemas)
     save("transitive-type-defaults.json",transitive)
+    behavior_types=[
+        row for row in transitive["types"]
+        if "behavior" in row["type"].lower()
+    ]
+    behavior_inventory={
+        "scope":"schema-declared behavior-bearing types/elements; structural defaults only",
+        "named_behavior_types":behavior_types,
+        "behavior_element_declarations":behavior_elements,
+        "summary":{
+            "named_behavior_type_count":len(behavior_types),
+            "resolved_named_behavior_types":sum(x["status"]=="resolved" for x in behavior_types),
+            "incomplete_named_behavior_types":sum(x["status"]!="resolved" for x in behavior_types),
+            "named_behavior_types_with_defaults":sum(bool(x["defaults"]) for x in behavior_types),
+            "behavior_element_declarations":len(behavior_elements),
+            "optional_behavior_elements":sum(x["minOccurs"]=="0" for x in behavior_elements),
+            "anonymous_or_untyped_behavior_elements":sum(not x["type"] and not x["ref"] for x in behavior_elements),
+        },
+    }
+    save("behavior-default-inventory.json",behavior_inventory)
     save("type-inheritance.json",inherited)
     save("optional-elements.json",optional)
     save("semantic-documentation.json",annotations)
@@ -138,6 +180,7 @@ def main():
        "attribute_group_declarations":sum(bool(x["name"]) for x in attribute_groups),
        "inheritance_relations":len(inherited),
        "transitive_type_defaults":transitive["summary"],
+       "behavior_default_inventory":behavior_inventory["summary"],
        "named_reference_resolution":dict(sorted(collections.Counter(
            row["status"] for row in resolved_references).items())),
        "optional_elements":len(optional),"semantic_annotation_passages":len(annotations),
@@ -166,6 +209,15 @@ def main():
       "attribute defaults on named complex types; each unresolved inheritance",
       "or wildcard appears as a blocker, rather than a guessed value.",
       "This remains a structural audit, not runtime collector semantics.",
+      "", "## Object behavior default inventory", "",
+      "See `behavior-default-inventory.json` for every named complex type whose",
+      "type name contains `Behavior` plus every schema element declaration named",
+      "`behaviors`. Named types include transitively inherited default/fixed",
+      "attributes and blockers from the conservative resolver. Element rows retain",
+      "their owner type/element, optionality, declared type/ref and source anchor.",
+      "This inventory deliberately does NOT claim that an omitted optional",
+      "`behaviors` parent is equivalent to a present empty element; collector",
+      "prose/conditional semantics still require capability review.",
       "", "## Implicit behavioral defaults and existence checks", "",
       "Review all entries in `semantic-documentation.json`, including the",
       "embedded ExistenceEnumeration evaluation tables and records whose prose",
