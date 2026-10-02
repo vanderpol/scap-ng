@@ -70,22 +70,22 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
             {"traversal"},
         )
 
-    def test_empty_filename_requires_defined_special_semantics(self):
+    def test_empty_name_and_directory_itself_semantics(self):
         literal=validate_unix_file_object({
             "capability":"unix.file",
             "select":{"directory":entity("/etc"),"name":entity("")},
         })
-        self.assertEqual([r["code"] for r in literal],["unix.file.filename_empty"])
+        self.assertEqual([r["code"] for r in literal],["unix.file.name_empty"])
 
-        for filename in (
-            entity("",nil=True),
+        for name in (
+            None,
             entity("",operation="match"),
             entity({"variable":"filename-var"}),
         ):
-            with self.subTest(filename=filename):
+            with self.subTest(name=name):
                 rows=validate_unix_file_object({
                     "capability":"unix.file",
-                    "select":{"directory":entity("/etc"),"name":filename},
+                    "select":{"directory":entity("/etc"),"name":name},
                 })
                 self.assertEqual(rows,[])
 
@@ -113,6 +113,38 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         }
         rows=validate_assessment_capability_semantics(doc)
         self.assertIn("object.filter_state_capability",{r["code"] for r in rows})
+
+    def test_set_object_reference_and_capability_are_validated(self):
+        missing={
+            "assessment":{
+                "objects":{
+                    "o":{"capability":"unix.file","set":{
+                        "operator":"union",
+                        "operands":[{"object":"missing","filters":[]}]
+                    }}
+                },
+                "states":{},
+                "tests":{},
+            }
+        }
+        rows=validate_assessment_capability_semantics(missing)
+        self.assertIn("object.set_object_missing",{r["code"] for r in rows})
+
+        mismatch={
+            "assessment":{
+                "objects":{
+                    "other":{"capability":"linux.rpminfo"},
+                    "o":{"capability":"unix.file","set":{
+                        "operator":"union",
+                        "operands":[{"object":"other","filters":[]}]
+                    }}
+                },
+                "states":{},
+                "tests":{},
+            }
+        }
+        rows=validate_assessment_capability_semantics(mismatch)
+        self.assertIn("object.set_object_capability",{r["code"] for r in rows})
 
     def test_test_object_state_capabilities_are_validated(self):
         doc={
