@@ -30,14 +30,18 @@ def load_yaml(path: Path):
     return value
 
 
-def validator(schema_dir: Path, filename: str):
-    schema=json.loads((schema_dir/filename).read_text(encoding="utf-8"))
-    Draft202012Validator.check_schema(schema)
+def schema_store(schema_dir: Path):
     store={}
     for path in schema_dir.glob("*.schema.json"):
         doc=json.loads(path.read_text(encoding="utf-8"))
         if "$id" in doc:
             store[doc["$id"]]=doc
+    return store
+
+
+def validator(schema_dir: Path, filename: str, store):
+    schema=json.loads((schema_dir/filename).read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
     resolver=RefResolver.from_schema(schema,store=store)
     return Draft202012Validator(schema,resolver=resolver)
 
@@ -69,6 +73,7 @@ def main():
     args=ap.parse_args()
 
     validators={}
+    store=schema_store(args.schema_dir)
     results=[]
     unclassified=[]
     for path in sorted(args.corpus_root.rglob("*.yaml")):
@@ -79,7 +84,10 @@ def main():
         kind,schema_name=info
         if not (args.schema_dir/schema_name).exists():
             continue
-        v=validators.setdefault(schema_name,validator(args.schema_dir,schema_name))
+        v=validators.get(schema_name)
+        if v is None:
+            v=validator(args.schema_dir,schema_name,store)
+            validators[schema_name]=v
         doc=load_yaml(path)
         errors=sorted(v.iter_errors(doc),key=lambda e:list(e.absolute_path))
         results.append({
