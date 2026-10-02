@@ -45,7 +45,7 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
     def test_reuses_shared_file_primitives(self):
         encoded=json.dumps(self.schema)
         self.assertIn("capability-common.schema.json#/$defs/object_entity_base",encoded)
-        self.assertIn("capability-common.schema.json#/$defs/file_traversal",encoded)
+        self.assertIn("capability-common.schema.json#/$defs/windows_file_traversal",encoded)
         self.assertIn("capability-common.schema.json#/$defs/set_expression",encoded)
         self.assertNotIn("windows_view",encoded)
         self.assertNotIn("recurse_direction",encoded)
@@ -60,7 +60,7 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
             },
             "traversal":{
                 "max_depth":1,
-                "follow_links":False,
+                "recurse":"junctions",
                 "filesystem":"same",
             },
         })
