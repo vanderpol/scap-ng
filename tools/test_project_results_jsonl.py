@@ -48,17 +48,8 @@ def benchmark_doc():
             "run_id": "run-1",
             "started_at": "2026-10-01T22:00:00Z",
             "completed_at": "2026-10-01T22:01:00Z",
-            "scanner": {
-                "name": "scanner",
-                "version": "1",
-                "capabilities": {"organizational_input": True},
-            },
-            "target": {
-                "identifiers": [{"scheme": "asset_uuid", "value": "asset-1"}],
-                "hostname": "host.example",
-                "addresses": ["192.0.2.1"],
-            },
             "benchmark": {"id": "benchmark-1", "version": "1", "package_digest": "sha256:abc"},
+            "target_ref": "target-1",
             "effective_policy": {
                 "profile": "stig",
                 "tailoring": None,
@@ -85,13 +76,6 @@ def benchmark_doc():
                 "assessment": {"id": "assessment-1", "version": 1, "mode": "automated"},
                 "message": "Observed mode 0666; expected 0644.",
                 "reason": {"code": "value_mismatch"},
-                "expected_state": [{
-                    "state_slot": "mode",
-                    "datatype": "string",
-                    "operation": "equals",
-                    "value": "0644",
-                    "source": "publisher",
-                }],
                 "instances": [{
                     "id": "instance-1",
                     "outcome": "fail",
@@ -153,15 +137,10 @@ class ProjectionTests(unittest.TestCase):
         self.assertEqual("automated", event["assessment"]["mode"])
         self.assertEqual({"example_parameter": 42}, event["parameters"])
         self.assertEqual("applicable", event["applicability"]["outcome"])
-        rule["observed_state"]=[{
-            "item_ref":"item-1",
-            "state_slot":"mode",
-            "datatype":"string",
-            "value":"0666",
-            "status":"exists",
-        }]
-        event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
-        self.assertEqual("0666", event["observed_state"][0]["value"])
+        self.assertNotIn("observed_state", event)
+        self.assertNotIn("expected_state", event)
+        self.assertNotIn("evidence_summary", event)
+        self.assertNotIn("organizational_inputs", event)
 
     def test_non_boolean_rule_outcomes_are_preserved(self):
         for outcome in ("error", "unknown", "not_evaluated", "not_applicable"):
@@ -179,24 +158,23 @@ class ProjectionTests(unittest.TestCase):
                 self.assertEqual(outcome, event["instances"][0]["outcome"])
 
 
-    def test_bounded_evidence_and_early_stop_are_preserved(self):
-        scan=scan_doc()
-        benchmark=benchmark_doc()
-        rule=benchmark["benchmark_result"]["rule_results"][0]
-        rule["evidence_summary"]={
-            "observed_failures":20,
-            "actual_failures":"unknown",
-            "maximum":20,
-            "returned":2,
-            "truncated_population":True,
-            "stop_reason":"evidence_maximum_reached",
-        }
-        event=project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
-        summary=event["evidence_summary"]
-        self.assertEqual(20, summary["observed_failures"])
-        self.assertEqual("unknown", summary["actual_failures"])
-        self.assertTrue(summary["truncated_population"])
-        self.assertEqual("evidence_maximum_reached", summary["stop_reason"])
+    def test_assessment_detail_is_not_projected_from_rule_scope(self):
+        event=project_scan(
+            scan_doc(),
+            {"benchmark-results/example.json": benchmark_doc()},
+        )[1]
+        for field in (
+            "expected_state",
+            "observed_state",
+            "evidence_summary",
+            "organizational_inputs",
+            "tests",
+            "objects",
+            "items",
+            "variables",
+        ):
+            with self.subTest(field=field):
+                self.assertNotIn(field, event)
 
     def test_missing_benchmark_result_is_rejected(self):
         with self.assertRaises(KeyError):
@@ -351,14 +329,11 @@ class ProjectionTests(unittest.TestCase):
         )
         rule=benchmark["benchmark_result"]["rule_results"][0]
         observed=assessment["assessment_result"]["items"][0]["fields"]["mode"]["value"]
-        expected=rule["expected_state"][0]["value"]
-        compact_observed=rule["observed_state"][0]["value"]
         self.assertEqual("0666", observed)
-        self.assertEqual(observed, compact_observed)
-        self.assertEqual("0644", expected)
         self.assertIn(observed, rule["message"])
-        self.assertIn(expected, rule["message"])
-        self.assertNotEqual(observed, expected)
+        self.assertIn("0644", rule["message"])
+        self.assertNotIn("expected_state", rule)
+        self.assertNotIn("observed_state", rule)
 
 
 if __name__=="__main__":
