@@ -77,6 +77,9 @@ class SemanticRuleCoverageTests(unittest.TestCase):
         self.assertIn("independent.xmlfilecontent.xpath_text_values", RUNTIME_SEMANTIC_RULE_IDS)
         self.assertIn("independent.family.literal_vocabulary", POLICY_SEMANTIC_RULE_IDS)
         self.assertIn("linux.dpkginfo.debian_evr", POLICY_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.wmi.query.source_fields", RUNTIME_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.wmi.query.structured_results", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.userright.trustee_name_case", POLICY_SEMANTIC_RULE_IDS)
         self.assertTrue(EXECUTABLE_SEMANTIC_RULE_IDS.isdisjoint(RUNTIME_SEMANTIC_RULE_IDS))
         layers=[
             EXECUTABLE_SEMANTIC_RULE_IDS,
