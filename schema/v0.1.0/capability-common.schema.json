@@ -38,25 +38,26 @@
       "required": [
         "value",
         "operation",
-        "datatype"
+        "datatype",
+        "mask"
       ],
       "properties": {
         "value": {
           "$ref": "#/$defs/entity_value"
         },
         "operation": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/comparison_operation"
         },
         "datatype": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/native_datatype"
         },
         "var_check": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/match_quantifier"
         },
         "nil": {
+          "type": "boolean"
+        },
+        "mask": {
           "type": "boolean"
         }
       },
@@ -83,6 +84,7 @@
         "value",
         "operation",
         "datatype",
+        "mask",
         "entity_check",
         "entity_existence"
       ],
@@ -91,27 +93,25 @@
           "$ref": "#/$defs/entity_value"
         },
         "operation": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/comparison_operation"
         },
         "datatype": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/native_datatype"
         },
         "var_check": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/match_quantifier"
         },
         "nil": {
           "type": "boolean"
         },
         "entity_check": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/match_quantifier"
         },
         "entity_existence": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "mask": {
+          "type": "boolean"
         }
       },
       "allOf": [
@@ -159,6 +159,154 @@
         "minLength": 1
       },
       "uniqueItems": true
+    },
+    "comparison_operation": {
+      "type": "string",
+      "enum": [
+        "equal",
+        "not_equal",
+        "equal_ci",
+        "not_equal_ci",
+        "greater_than",
+        "greater_or_equal",
+        "less_than",
+        "less_or_equal",
+        "bit_and",
+        "bit_or",
+        "match",
+        "subset",
+        "superset"
+      ]
+    },
+    "match_quantifier": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any",
+        "one",
+        "none"
+      ]
+    },
+    "existence_requirement": {
+      "type": "string",
+      "enum": [
+        "all",
+        "some",
+        "none",
+        "one",
+        "optional"
+      ]
+    },
+    "logical_operator": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any",
+        "one",
+        "odd"
+      ]
+    },
+    "native_datatype": {
+      "type": "string",
+      "enum": [
+        "string",
+        "boolean",
+        "integer",
+        "float",
+        "binary",
+        "version",
+        "ipv4",
+        "ipv6",
+        "rpm_evr",
+        "debian_evr",
+        "fileset_revision",
+        "ios_version",
+        "record"
+      ]
+    },
+    "file_traversal": {
+      "type": "object",
+      "required": [
+        "max_depth",
+        "follow_symlinks",
+        "filesystem"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "follow_symlinks": {
+          "type": "boolean"
+        },
+        "filesystem": {
+          "type": "string",
+          "enum": [
+            "any",
+            "local",
+            "same"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "file_selection": {
+      "type": "object",
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "directory": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "name": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "traversal": {
+          "$ref": "#/$defs/file_traversal"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "full_path"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "directory"
+                ]
+              },
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "traversal"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "directory",
+            "name"
+          ],
+          "not": {
+            "required": [
+              "full_path"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false
     }
   }
 }
