@@ -91,6 +91,37 @@ def validate_unix_file_object(obj):
     return validate_file_selection_object(obj)
 
 
+def validate_windows_registry_object(obj):
+    """Return semantic diagnostics for one native windows.registry Object."""
+    if obj.get("capability") != "windows.registry":
+        return []
+
+    diagnostics=[]
+    select=obj.get("select") or {}
+    key=select.get("key", ...)
+    name=select.get("name", ...)
+
+    if key is None and name is not None:
+        diagnostics.append({
+            "code":"windows.registry.key_null_requires_name_null",
+            "fields":["key","name"],
+            "message":"name must be null when key is null",
+        })
+
+    if (
+        isinstance(key,dict)
+        and key.get("operation") != "equal"
+        and obj.get("traversal") is not None
+    ):
+        diagnostics.append({
+            "code":"windows.registry.pattern_key_no_traversal",
+            "fields":["traversal"],
+            "message":"non-equality registry key selection cannot use traversal",
+        })
+
+    return diagnostics
+
+
 def _iter_set_filters(expression):
     """Yield State filters from a native recursive Set expression."""
     if not isinstance(expression, dict):
@@ -133,6 +164,8 @@ def validate_assessment_capability_semantics(document):
 
     for object_id,obj in objects.items():
         for row in validate_file_selection_object(obj):
+            diagnostics.append({"object":object_id,**row})
+        for row in validate_windows_registry_object(obj):
             diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
