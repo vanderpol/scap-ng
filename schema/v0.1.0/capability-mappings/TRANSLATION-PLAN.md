@@ -31,6 +31,9 @@ Generated JSON Schema alone is not capability completion.
 - `variable.value` (source: `independent:variable_test`)
 - `windows.wmi.query` (source: `windows:wmi57_test`)
 - `linux.rpminfo` (first post-rebaseline expansion)
+- `unix.shadow`
+- `linux.selinuxsecuritycontext`
+- `unix.interface`
 
 ## Translation ordering
 
@@ -62,6 +65,16 @@ Counts are evidence for prioritization only; they do not define normative suppor
 All listed production-first capabilities at or above 10 observed production occurrences now have reviewed mapping files and focused generated-schema regressions. `windows.cmdlet` additionally established the shared authored record-Object input primitive; singleton Windows policy capabilities established the no-fake-Object Test source pattern; file-oriented capabilities share the corrected traversal base while preserving Unix/Independent `symlinks` versus Windows `junctions` terminology.
 
 The next gate is a green maintained smoke/current-design regression on the combined tranche, followed by lower-frequency production and Self-Assertion language-conformance coverage.
+
+### Lower-frequency production tranche
+
+Reviewed after the production-first checkpoint:
+
+- `unix.shadow` — production:4 — **reviewed mapping complete**
+- `linux.selinuxsecuritycontext` — production:2 — **reviewed mapping complete**
+- `unix.interface` — production:2 — **reviewed mapping complete**
+
+Windows candidates such as `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` currently have Item definitions in the pinned system-characteristics schema but no corresponding Test/Object/State family in the official OVAL-Community v5.12.3 Windows definitions schema. Treat them as source-governance/provenance work, not standard 5.12.3 mappings, until their publisher-extension source is identified.
 
 ### Conformance-completion tranche
 
