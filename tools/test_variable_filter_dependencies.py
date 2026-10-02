@@ -246,6 +246,43 @@ class DependencyTests(unittest.TestCase):
         self.assertEqual(values["field"], "record_entity")
         self.assertEqual(values["record_field"], "member")
 
+    def test_object_var_check_multivalue_roundtrip(self):
+        for var_check in ("all", "at least one", "none satisfy", "only one"):
+            with self.subTest(var_check=var_check):
+                root = source()
+                filename = root.find(f".//{{{UNIX}}}file_object/{{{UNIX}}}filename")
+                filename.set("var_check", var_check)
+                constant = ET.SubElement(
+                    root.find(f"{{{OD}}}variables"),
+                    f"{{{OD}}}constant_variable",
+                    id="oval:dependency:var:1",
+                    version="1",
+                    datatype="string",
+                    comment="Multiple selector values",
+                )
+                for value in ("demo", "other"):
+                    ET.SubElement(constant, f"{{{OD}}}value").text = value
+                native = self.roundtrip(root)
+                collection = next(iter(native["assessment"]["collections"].values()))
+                selector = collection["select"]["filename"]
+                self.assertEqual(selector["variable_check"], var_check)
+
+    def test_variable_dependent_object_inside_set_roundtrip(self):
+        root = set_source(4)
+        leaf = root.find(f".//{{{UNIX}}}file_object[@id='oval:dependency:obj:2']")
+        filename = leaf.find(f"{{{UNIX}}}filename")
+        filename.text = None
+        filename.set("var_ref", "oval:dependency:var:1")
+        filename.set("var_check", "at least one")
+        variable(root, 1, literal("demo"))
+        native = self.roundtrip(root)
+        self.assertEqual(len(native["assessment"]["variables"]), 1)
+        set_collection = next(
+            value for value in native["assessment"]["collections"].values()
+            if "set" in value
+        )
+        self.assertIsNotNone(set_collection["set"])
+
     def test_filter_dependencies_roundtrip(self):
         root = source()
         add_filter(root, "oval:dependency:var:1")
