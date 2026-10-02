@@ -47,6 +47,10 @@ def digest(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
 
 
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def load_yaml(path: Path) -> dict:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -445,6 +449,11 @@ def main() -> int:
     ap.add_argument("--max-rule-candidates", type=int, default=0,
                     help="Maximum similar-Rule candidates; 0 retains all")
     ap.add_argument(
+        "--fingerprint-cache",
+        type=Path,
+        help="Optional persistent cache for exact/shape fingerprints of unchanged Assessment files.",
+    )
+    ap.add_argument(
         "--advisory",
         choices=("all","assessments","rules","none"),
         default="all",
@@ -470,9 +479,38 @@ def main() -> int:
         output = staging
 
     benchmarks, uses = collect_corpus(source)
+
+    prior_cache = {}
+    if args.fingerprint_cache is not None and args.fingerprint_cache.exists():
+        loaded=json.loads(args.fingerprint_cache.read_text(encoding="utf-8"))
+        if loaded.get("format")=="scap-ng-normalizer-fingerprint-cache-0.1":
+            prior_cache=loaded.get("entries") or {}
+    next_cache={}
+    cache_hits=0
+    cache_misses=0
+
     rows = []
     for path, consumers in sorted(uses.items(), key=lambda x: x[0].as_posix()):
-        exact, shape = assessment_fingerprints(path)
+        rel=path.relative_to(source).as_posix()
+        source_sha=file_sha256(path)
+        cached=prior_cache.get(rel)
+        if (
+            isinstance(cached,dict)
+            and cached.get("file_sha256")==source_sha
+            and isinstance(cached.get("exact"),str)
+            and isinstance(cached.get("shape"),str)
+        ):
+            exact=cached["exact"]
+            shape=cached["shape"]
+            cache_hits += 1
+        else:
+            exact, shape = assessment_fingerprints(path)
+            cache_misses += 1
+        next_cache[rel]={
+            "file_sha256":source_sha,
+            "exact":exact,
+            "shape":shape,
+        }
         rows.append(
             {
                 "path": path,
@@ -691,6 +729,8 @@ def main() -> int:
             "local_assessment_files_removed": removed_local_assessments,
             "near_duplicate_review_groups": len(near_groups),
             "near_duplicate_rule_candidates_reported": len(rule_candidates),
+            "fingerprint_cache_hits": cache_hits,
+            "fingerprint_cache_misses": cache_misses,
         },
         "repository_validation": repository_validation,
         "change_manifest": change_manifest,
@@ -711,6 +751,20 @@ def main() -> int:
             "advisory_similarity_changes_exact_merge_decisions": False,
         },
     }
+
+    if args.fingerprint_cache is not None:
+        args.fingerprint_cache.parent.mkdir(parents=True, exist_ok=True)
+        args.fingerprint_cache.write_text(
+            json.dumps(
+                {
+                    "format":"scap-ng-normalizer-fingerprint-cache-0.1",
+                    "entries":next_cache,
+                },
+                indent=2,
+                sort_keys=True,
+            ) + "\n",
+            encoding="utf-8",
+        )
 
     if args.change_manifest is not None:
         args.change_manifest.parent.mkdir(parents=True, exist_ok=True)
