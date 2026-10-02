@@ -296,6 +296,14 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(doc)
         self.assertIn("windows.ntuser.value_type_datatype",{r["code"] for r in rows})
 
+    def test_macos_equality_only_selectors(self):
+        for capability, field in (("macos.plist511","full_path"),("macos.plist511","xpath"),("macos.systemprofiler","xpath")):
+            with self.subTest(capability=capability,field=field):
+                rows=validate_assessment_capability_semantics({
+                    "assessment":{"objects":{"o":{"capability":capability,"select":{field:entity("x",operation="match")}}},"states":{},"tests":{}}
+                })
+                self.assertIn(f"{capability}.{field}_equal",{row["code"] for row in rows})
+
     def test_panos_config_xpath_requires_equality(self):
         rows=validate_assessment_capability_semantics({
             "assessment":{"objects":{"o":{"capability":"panos.config","select":{"xpath":entity("/config/.*",operation="match")}}},"states":{},"tests":{}}
