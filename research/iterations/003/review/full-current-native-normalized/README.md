@@ -10,8 +10,8 @@ No iteration-001/002 or pre-existing generated SCAP-NG tree was used as input.
 - Source/conversion blockers: **0**
 
 ## Exact normalization
-- Referenced Assessment definitions before: **15873**
-- Definitions after proven exact normalization: **10484**
+- Referenced Assessment definitions before: **15872**
+- Definitions after proven exact normalization: **10483**
 - Duplicate definitions avoided: **5389**
 - Definition reduction: **33.95%**
 
@@ -20,9 +20,9 @@ No iteration-001/002 or pre-existing generated SCAP-NG tree was used as input.
 - Near-duplicate Rule candidates reported: **45794**
 
 ## Compiler experiment
-- Unsigned bundles before: **65** / 22134574 bytes
-- Unsigned bundles after: **65** / 22678625 bytes
-- Aggregate standalone-bundle change: **-544051 bytes (-2.46%)**
+- Unsigned bundles before: **65** / 25637578 bytes
+- Unsigned bundles after: **65** / 24450092 bytes
+- Aggregate standalone-bundle change: **1187486 bytes (4.63%)**
 - Self-signed CMS experimental bundles: **65**
 - Signature trust: self-signed-experimental-no-publisher-trust
 
