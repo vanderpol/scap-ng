@@ -566,7 +566,7 @@ class Builder:
             ET.SubElement(parent, q(OD, "criterion"), attrs)
             return
 
-        op_map = {"all": "AND", "any": "OR", "one": "ONE", "xor": "XOR"}
+        op_map = {"all": "AND", "any": "OR", "one": "ONE", "odd": "XOR", "xor": "XOR"}
         if isinstance(expr, dict) and len(expr) == 1 and next(iter(expr)) in op_map:
             key = next(iter(expr))
             terms = expr[key]
