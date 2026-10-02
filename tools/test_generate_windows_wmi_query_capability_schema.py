@@ -111,6 +111,46 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
+    def test_complex_wmi_result_can_be_nested_without_flattening(self):
+        self.validate_def("state",{
+            "state_title":"nested result",
+            "capability":"windows.wmi.query",
+            "state":{
+                "field":"result",
+                "record":{
+                    "mask":False,
+                    "match":"all",
+                    "existence":"some",
+                    "fields":{
+                        "Adapters":{
+                            "list":{
+                                "mask":False,
+                                "match":"any",
+                                "existence":"some",
+                                "item":{
+                                    "record":{
+                                        "mask":False,
+                                        "match":"all",
+                                        "existence":"some",
+                                        "fields":{
+                                            "Name":{
+                                                "value":"Ethernet",
+                                                "operation":"equal",
+                                                "datatype":"string",
+                                                "mask":False,
+                                                "match":"all",
+                                                "existence":"some",
+                                            }
+                                        },
+                                    }
+                                },
+                            }
+                        }
+                    },
+                },
+            },
+        })
+
     def test_record_does_not_use_scalar_datatype_wrapper(self):
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("state",{
