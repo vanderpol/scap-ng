@@ -670,6 +670,7 @@ def main() -> int:
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
         mode = assessment.get("mode")
+        # Preserve the document-kind suffix because schema selection is intentionally filename-based.
         suffix = ".manual.assessment.yaml" if mode == "manual" else ".assessment.yaml"
         shared_rel_path = shared_rel_dir / f"{safe_name(shared_id)}{suffix}"
         shared_path = (output / shared_rel_path) if output is not None else None
