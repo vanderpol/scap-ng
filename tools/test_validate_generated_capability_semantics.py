@@ -5,6 +5,8 @@ from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
     validate_declared_semantic_rules,
     EXECUTABLE_SEMANTIC_RULE_IDS,
+    STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS,
+    RUNTIME_SEMANTIC_RULE_IDS,
     validate_unix_file_object,
 )
 
@@ -29,6 +31,13 @@ class SemanticRuleCoverageTests(unittest.TestCase):
         ):
             with self.subTest(rule_id=rule_id):
                 self.assertIn(rule_id, EXECUTABLE_SEMANTIC_RULE_IDS)
+
+    def test_non_static_obligations_are_explicitly_classified(self):
+        self.assertIn("windows.wuaupdatesearcher.materialized_superseded_default", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.wuaupdatesearcher.source_path_repair", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
+        self.assertIn("independent.yamlfilecontent.record_keys", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
+        self.assertIn("independent.xmlfilecontent.xpath_text_values", RUNTIME_SEMANTIC_RULE_IDS)
+        self.assertTrue(EXECUTABLE_SEMANTIC_RULE_IDS.isdisjoint(RUNTIME_SEMANTIC_RULE_IDS))
 
     def test_declared_rules_require_executable_coverage_accounting(self):
         mapping={"semantic_validator_rules":[{"id":"a"},{"id":"b"}]}
