@@ -86,6 +86,7 @@ SOURCE_DEFECT_ERROR_PREFIXES = (
     "test_collection_capability_mismatch:",
     "test_state_capability_mismatch:",
     "Filter capability mismatch:",
+    "var_ref_datatype_mismatch:",
 )
 
 
@@ -110,6 +111,8 @@ def source_defect_reason(error):
         return "test_state_capability_mismatch"
     if detail.startswith("Filter capability mismatch:"):
         return "filter_collection_capability_mismatch"
+    if detail.startswith("var_ref_datatype_mismatch:"):
+        return "var_ref_datatype_mismatch"
     return None
 
 
