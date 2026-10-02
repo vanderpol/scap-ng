@@ -1030,8 +1030,23 @@ def unsupported_definition_features(oroot, definition_id, *, budget: ConversionB
             elif kind in ("object", "state"):
                 for descendant in node.iter():
                     var_ref = descendant.get("var_ref")
+                    var_check = descendant.get("var_check")
+                    if var_check is not None and not var_ref:
+                        add("var_check_without_var_ref", ref, local(descendant.tag))
                     if var_ref:
                         enqueue("variable", var_ref)
+                        variable = index.get(var_ref)
+                        if variable is not None and local(variable.tag).endswith("_variable"):
+                            entity_datatype = descendant.get("datatype") or "string"
+                            variable_datatype = variable.get("datatype")
+                            if variable_datatype is not None and entity_datatype != variable_datatype:
+                                add(
+                                    "var_ref_datatype_mismatch",
+                                    ref,
+                                    f"{local(descendant.tag)}:{entity_datatype}!={var_ref}:{variable_datatype}",
+                                )
+                        if any(local(child.tag) == "field" for child in descendant):
+                            add("record_entity_var_ref_not_permitted", ref, local(descendant.tag))
                     child_kind = local(descendant.tag)
                     if kind == "object" and child_kind == "var_ref" and text(descendant):
                         enqueue("variable", text(descendant))

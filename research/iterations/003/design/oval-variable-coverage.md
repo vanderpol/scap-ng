@@ -41,7 +41,7 @@ Status values:
 | merge | merge component values with delimiter/sort/order semantics | prototype | lexical success + numeric-sort error fixtures added; record/runtime variants remain #26 |
 | var_ref in object entities | variable supplies selector values | prototype | all operations, multi-valued var_check |
 | var_ref in state entities | variable supplies expected values | native | many-to-many var_check + entity_check truth-table ordering is covered; target execution remains #26 |
-| var_ref datatype matching | referenced variable datatype must match consuming entity rules | design | validator generated from schema constraints |
+| var_ref datatype matching | referenced variable datatype must match consuming entity rules | prototype | converter now diagnoses explicit/effective string mismatches and var_check-without-var_ref; schema-derived capability validators remain the long-term source |
 | var_ref on record entity | prohibited | design | static rejection |
 | empty variable consumed by Object | Object considered not to exist | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
 | empty variable consumed by State | State evaluation error | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |

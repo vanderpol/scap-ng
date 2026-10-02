@@ -229,6 +229,35 @@ class DependencyTests(unittest.TestCase):
         variable(root, 10, literal())
         self.roundtrip(root)
 
+    def test_var_ref_datatype_mismatch_is_diagnosed(self):
+        root = source()
+        variable(
+            root,
+            1,
+            literal("5"),
+        ).set("datatype", "int")
+        findings = converter.unsupported_definition_features(root, DID)
+        row = next(x for x in findings if x["feature"] == "var_ref_datatype_mismatch")
+        self.assertEqual(row["source_id"], "oval:dependency:obj:1")
+        self.assertIn("filename:string", row["detail"])
+        self.assertIn("oval:dependency:var:1:int", row["detail"])
+
+    def test_var_check_without_reference_is_diagnosed(self):
+        root = source()
+        filename = root.find(f".//{{{UNIX}}}file_object/{{{UNIX}}}filename")
+        filename.attrib.clear()
+        filename.set("var_check", "all")
+        filename.text = "demo"
+        findings = converter.unsupported_definition_features(root, DID)
+        self.assertIn(
+            {
+                "feature": "var_check_without_var_ref",
+                "source_id": "oval:dependency:obj:1",
+                "detail": "filename",
+            },
+            findings,
+        )
+
     def test_missing_variable_behind_filter_is_accounted(self):
         root = source()
         add_filter(root, "oval:dependency:var:99")
