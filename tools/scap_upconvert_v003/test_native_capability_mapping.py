@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+import json
+from pathlib import Path
+import unittest
+
+from native_capability_mapping import apply_capability_mapping, source_capability
+
+
+ROOT=Path(__file__).resolve().parents[2]
+MAPPING=ROOT/"schema/v0.1.0/capability-mappings/windows.wmi.query.json"
+
+
+class NativeCapabilityMappingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mapping=json.loads(MAPPING.read_text(encoding="utf-8"))
+
+    def aligned_wmi_document(self):
+        return {
+            "assessment":{
+                "objects":{
+                    "query-object":{
+                        "object_title":"OS query",
+                        "capability":"windows.wmi57",
+                        "select":{
+                            "namespace":{
+                                "value":"root\\cimv2",
+                                "operation":"equals",
+                                "datatype":"string",
+                                "mask":False,
+                            },
+                            "wql":{
+                                "value":"SELECT Caption, Version FROM Win32_OperatingSystem",
+                                "operation":"equals",
+                                "datatype":"string",
+                                "mask":False,
+                            },
+                        },
+                    }
+                },
+                "states":{
+                    "state-result":{
+                        "state_title":"expected OS",
+                        "capability":"windows.wmi57",
+                        "state":{
+                            "field":"result",
+                            "value":{
+                                "record":[
+                                    {
+                                        "name":"caption",
+                                        "value":"Microsoft Windows 11 Enterprise",
+                                        "operation":"equals",
+                                        "datatype":"string",
+                                        "mask":False,
+                                        "entity_check":"all",
+                                    },
+                                    {
+                                        "name":"version",
+                                        "value":"10.0",
+                                        "operation":"greater than or equal",
+                                        "datatype":"version",
+                                        "mask":False,
+                                        "entity_check":"all",
+                                    },
+                                ]
+                            },
+                            "operation":"equals",
+                            "datatype":"record",
+                            "mask":False,
+                            "entity_check":"all",
+                            "entity_existence":"at_least_one_exists",
+                        },
+                    }
+                },
+                "tests":{
+                    "test-query":{
+                        "test_title":"OS query",
+                        "capability":"windows.wmi57",
+                        "object":"query-object",
+                        "check_existence":"at_least_one_exists",
+                        "check":"all",
+                        "states":["state-result"],
+                    }
+                },
+            }
+        }
+
+    def test_source_capability_is_derived_from_pinned_family(self):
+        self.assertEqual(source_capability(self.mapping),"windows.wmi57")
+
+    def test_wmi_object_becomes_collector_driven(self):
+        out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
+        obj=out["assessment"]["objects"]["query-object"]
+        self.assertEqual(obj["capability"],"windows.wmi.query")
+        self.assertNotIn("select",obj)
+        self.assertEqual(obj["collect"],{
+            "namespace":"root\\cimv2",
+            "query":"SELECT Caption, Version FROM Win32_OperatingSystem",
+        })
+
+    def test_wmi_record_state_becomes_native_record_predicate(self):
+        out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
+        state=out["assessment"]["states"]["state-result"]
+        self.assertEqual(state["capability"],"windows.wmi.query")
+        payload=state["state"]
+        self.assertEqual(payload["field"],"result")
+        self.assertNotIn("datatype",payload)
+        self.assertNotIn("operation",payload)
+        record=payload["record"]
+        self.assertEqual(record["match"],"all")
+        self.assertEqual(record["existence"],"some")
+        self.assertFalse(record["mask"])
+        self.assertEqual(record["fields"]["caption"]["operation"],"equal")
+        self.assertEqual(record["fields"]["caption"]["datatype"],"string")
+        self.assertEqual(record["fields"]["caption"]["existence"],"some")
+        self.assertEqual(record["fields"]["version"]["operation"],"greater_or_equal")
+        self.assertEqual(record["fields"]["version"]["datatype"],"version")
+
+    def test_wmi_test_controls_use_native_shared_vocabulary(self):
+        out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
+        test=out["assessment"]["tests"]["test-query"]
+        self.assertEqual(test["capability"],"windows.wmi.query")
+        self.assertEqual(test["check_existence"],"some")
+        self.assertEqual(test["check"],"all")
+
+    def test_collector_comparison_semantics_fail_closed(self):
+        doc=self.aligned_wmi_document()
+        doc["assessment"]["objects"]["query-object"]["select"]["wql"]["operation"]="pattern match"
+        with self.assertRaisesRegex(ValueError,"collector input cannot use comparison semantics"):
+            apply_capability_mapping(doc,self.mapping)
+
+
+if __name__=="__main__":
+    unittest.main()
