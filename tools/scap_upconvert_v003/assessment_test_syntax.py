@@ -1,9 +1,41 @@
 """Review-candidate Test vocabulary; no full-source generation until owner review."""
-import copy
+def _clone_json_tree(value):
+    """Clone JSON/YAML data iteratively so deep valid trees do not hit recursion."""
+    if not isinstance(value,(dict,list)):
+        return value
+    root={} if isinstance(value,dict) else [None]*len(value)
+    stack=[(value,root)]
+    while stack:
+        source,target=stack.pop()
+        if isinstance(source,dict):
+            for key,item in source.items():
+                if isinstance(item,dict):
+                    child={}
+                    target[key]=child
+                    stack.append((item,child))
+                elif isinstance(item,list):
+                    child=[None]*len(item)
+                    target[key]=child
+                    stack.append((item,child))
+                else:
+                    target[key]=item
+        else:
+            for index,item in enumerate(source):
+                if isinstance(item,dict):
+                    child={}
+                    target[index]=child
+                    stack.append((item,child))
+                elif isinstance(item,list):
+                    child=[None]*len(item)
+                    target[index]=child
+                    stack.append((item,child))
+                else:
+                    target[index]=item
+    return root
 
 def assessment_test_syntax(document):
     """Rename authoring vocabulary without changing evaluation semantics."""
-    result = copy.deepcopy(document)
+    result = _clone_json_tree(document)
     assessment = result["assessment"]
     if "deprecated" in assessment:
         if assessment["deprecated"] is not False:
