@@ -1106,6 +1106,11 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
                 return None, finding.get("detail") or "conversion_resource_limit"
     lower_tracker = ConversionBudgetTracker(budget)
 
+    def budget_checkpoint():
+        if budget is not None:
+            lower_tracker.check_elapsed()
+
+
     assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
     checks = {}
@@ -1274,6 +1279,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return native_id, None
 
     def lower_component(node):
+        budget_checkpoint()
         name = local(node.tag)
 
         if name == "literal_component":
@@ -1439,6 +1445,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return ("" if value is None else value), None
 
     def lower_state(state_ref):
+        budget_checkpoint()
         state = find_by_id(oroot, state_ref, "_state")
         if state is None:
             return None, None, None, f"state_not_found:{state_ref}"
@@ -1485,6 +1492,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return condition, node_title(state), capability_for_state(state), None
 
     def lower_filter(filter_node):
+        budget_checkpoint()
         state_ref = filter_node.get("state_ref") or text(filter_node)
         if not state_ref:
             return None, "filter_missing_state"
@@ -1502,6 +1510,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return item, None
 
     def lower_set(set_node):
+        budget_checkpoint()
         operator = (set_node.get("set_operator") or "UNION").lower()
         members = []
         filters = []
@@ -1530,6 +1539,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return result, None
 
     def lower_object(obj_ref):
+        budget_checkpoint()
         if not obj_ref:
             return None, "object_ref_missing"
         if obj_ref in active_objects:
@@ -1611,6 +1621,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return result, None
 
     def lower_test(test_ref):
+        budget_checkpoint()
         if test_ref in test_to_check:
             return {("test" if collection_graph else "check"): test_to_check[test_ref]}, None
 
@@ -1717,6 +1728,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         return {("test" if collection_graph else "check"): check_id}, None
 
     def lower_criteria(node):
+        budget_checkpoint()
         operator = (node.get("operator") or "AND").upper()
         terms = []
         for child in node:
@@ -1782,6 +1794,8 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
     active_definitions.add(definition_id)
     try:
         expression, error = lower_criteria(root_criteria)
+    except ConversionBudgetExceeded as exc:
+        return None, exc.diagnostic
     except RecursionError:
         # A host implementation limit is not an OVAL language-depth restriction
         # or proof that the source is invalid. Do not emit a partial Assessment.
