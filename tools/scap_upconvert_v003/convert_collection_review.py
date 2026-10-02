@@ -341,7 +341,7 @@ def main(argv=None):
                     ref='assessments/manual/'+aid+'.assessment.yaml'
                     write_yaml(args.output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
                         'purpose':'assessment','class':'compliance','procedure':procedure,
-                        'inputs':{},'evidence':[]}})
+                        'response':{'type':'compliance','choices':[{'value':'pass','label':'Pass','outcome':'true'},{'value':'fail','label':'Fail','outcome':'false'},{'value':'unknown','label':'Unknown','outcome':'unknown'},{'value':'not_applicable','label':'Not applicable','outcome':'not_applicable'}],'allow_comment':True,'allow_evidence':True}}})
                     manual_done[key]=ref
                     result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
                         'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
