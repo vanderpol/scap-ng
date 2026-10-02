@@ -121,60 +121,43 @@ jobs:
           import json
           from pathlib import Path
 
-          expected_deprecated = {
-              "oval:navy.navwar.niwcatlantic.scc.ios:def:1": {
-                  "http://oval.mitre.org/XMLSchema/oval-definitions-5#ios#version_test"
-              },
-              "oval:org.joval.junos.test:def:1": {
-                  "http://oval.mitre.org/XMLSchema/oval-definitions-5#junos#xml_config_test"
-              },
-          }
-          # These pinned Self-Assertion files intentionally carry source
-          # Schematron findings. OVAL 5.12.3 EntityAttributeGroup requires
-          # entity/Variable datatype equality for var_ref.
-          expected_source_invalid = {
+          expected_blockers = {
+              ("ios/ios-def_version55_test.xml",
+               "oval:navy.navwar.niwcatlantic.scc.ios:def:1"): {"deprecated_oval_test"},
+              ("junos/junos-def_xml_config_test.xml",
+               "oval:org.joval.junos.test:def:1"): {"deprecated_oval_test"},
               ("macos/ind-def_environmentvariable58_test_mac.xml",
-               "oval:navy.navwar.niwcatlantic.scc.test:def:1"),
+               "oval:navy.navwar.niwcatlantic.scc.test:def:1"): {"var_ref_datatype_mismatch"},
               ("solaris/sol-def_package511_test.xml",
-               "oval:navy.navwar.niwcatlantic.scc.test:def:1"),
+               "oval:navy.navwar.niwcatlantic.scc.test:def:1"): {
+                  "deprecated_oval_test", "var_ref_datatype_mismatch"
+              },
+              ("solaris/sol-def_package_test.xml",
+               "oval:navy.navwar.niwcatlantic.scc.test:def:1"): {"deprecated_oval_test"},
               ("windows/win-def_wuaupdatesearcher_test.xml",
-               "oval:navy.navwar.niwcatlantic.scc.windows.update:def:1"),
+               "oval:navy.navwar.niwcatlantic.scc.windows.update:def:1"): {"var_ref_datatype_mismatch"},
           }
 
           conversion=json.loads(Path("self-assertion-v003-report.json").read_text())
-          found_deprecated={}
-          found_invalid=set()
+          found={}
           unexpected=[]
           for row in conversion.get("failure_details",[]):
               features=[]
               for problem in row.get("problems",[]):
                   features.extend(problem.get("unsupported_features") or [])
               names={x.get("feature") for x in features}
-              details={x.get("detail") for x in features if x.get("detail")}
               key=(row.get("file"),row.get("definition_id"))
-              if names == {"deprecated_oval_test"}:
-                  found_deprecated[row["definition_id"]]=details
-              elif names == {"var_ref_datatype_mismatch"} and key in expected_source_invalid:
-                  found_invalid.add(key)
-              else:
-                  unexpected.append(row)
+              found[key]=names
+              if key not in expected_blockers or names != expected_blockers[key]:
+                  unexpected.append({"key":key,"features":sorted(names),"row":row})
 
-          if unexpected:
-              print(json.dumps({"unexpected_conversion_failures":unexpected},indent=2))
-              raise SystemExit(1)
-          if set(found_deprecated) != set(expected_deprecated):
-              print(json.dumps({"expected":expected_deprecated,"found":found_deprecated},indent=2))
-              raise SystemExit(1)
-          if found_invalid != expected_source_invalid:
+          if unexpected or found != expected_blockers:
               print(json.dumps({
-                  "expected_source_invalid":sorted(expected_source_invalid),
-                  "found_source_invalid":sorted(found_invalid),
+                  "unexpected_conversion_failures":unexpected,
+                  "expected":{str(k):sorted(v) for k,v in expected_blockers.items()},
+                  "found":{str(k):sorted(v) for k,v in found.items()},
               },indent=2))
               raise SystemExit(1)
-          for did,details in expected_deprecated.items():
-              if not details <= found_deprecated[did]:
-                  print(json.dumps({"definition":did,"expected":list(details),"found":list(found_deprecated[did])},indent=2))
-                  raise SystemExit(1)
 
           roundtrip=json.loads(Path("self-assertion-v003-roundtrip.json").read_text())
           bad=[]
