@@ -78,7 +78,7 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
             },
             "traversal":{
                 "max_depth":1,
-                "follow_symlinks":False,
+                "follow_links":False,
                 "filesystem":"local",
             },
             "collect":{"algorithm":"sha512"},
