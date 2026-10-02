@@ -141,6 +141,113 @@ def validate_unix_file_object(obj):
     return validate_file_selection_object(obj)
 
 
+
+
+def validate_macos_pwpolicy512_object(obj):
+    if obj.get("capability") != "macos.pwpolicy512":
+        return []
+    diagnostics=[]
+    select=obj.get("select") or {}
+    auth=select.get("authenticator", ...)
+    password=select.get("authenticator_password", ...)
+    if (auth is None) != (password is None):
+        diagnostics.append({
+            "code":"macos.pwpolicy512.auth_pair",
+            "fields":["authenticator","authenticator_password"],
+            "message":"authenticator and authenticator_password must both be null or both provide values",
+        })
+    for field in ("authenticator_password","directory_node","xpath"):
+        value=select.get(field)
+        if isinstance(value,dict) and value.get("operation") != "equal":
+            diagnostics.append({
+                "code":f"macos.pwpolicy512.{field}_equal",
+                "fields":[field],
+                "message":f"{field} supports equality semantics only",
+            })
+    return diagnostics
+
+
+def _literal_state_values(states, state_ids, field):
+    for state_id in state_ids or []:
+        state=states.get(state_id)
+        if not isinstance(state,dict):
+            continue
+        payload=state.get("state") or {}
+        if payload.get("field") != field:
+            continue
+        value=payload.get("value")
+        if isinstance(value,dict) and set(value)=={"variable"}:
+            continue
+        yield state_id,payload
+
+
+def _validate_windows_registry_like_value_datatypes(test_id,test,states):
+    if test.get("capability") not in {"windows.registry","windows.ntuser"}:
+        return []
+    referenced=[
+        states.get(state_id)
+        for state_id in (test.get("states") or [])
+        if isinstance(states.get(state_id),dict)
+    ]
+    exact_types=[]
+    for state in referenced:
+        payload=state.get("state") or {}
+        if (
+            payload.get("field")=="type"
+            and payload.get("operation")=="equal"
+            and isinstance(payload.get("value"),str)
+        ):
+            exact_types.append(payload["value"])
+    if len(set(exact_types)) != 1:
+        return []
+    registry_type=exact_types[0]
+    allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
+    if not allowed:
+        return []
+    diagnostics=[]
+    for state_id,payload in _literal_state_values(states,test.get("states"),"value"):
+        datatype=payload.get("datatype")
+        if datatype not in allowed:
+            diagnostics.append({
+                "test":test_id,
+                "state":state_id,
+                "code":f"{test.get('capability')}.value_type_datatype",
+                "registry_type":registry_type,
+                "datatype":datatype,
+                "allowed_datatypes":sorted(allowed),
+                "message":"registry value datatype is incompatible with exact asserted registry type",
+            })
+    return diagnostics
+
+
+def _valid_xml_date_literal(value):
+    if not isinstance(value,str):
+        return False
+    import datetime as _dt
+    try:
+        _dt.date.fromisoformat(value)
+        return len(value)==10
+    except ValueError:
+        return False
+
+
+def validate_windows_wuaupdatesearcher_states(test_id,test,states):
+    if test.get("capability") != "windows.wuaupdatesearcher":
+        return []
+    diagnostics=[]
+    for state_id,payload in _literal_state_values(states,test.get("states"),"last_deployment_change_time"):
+        value=payload.get("value")
+        if not _valid_xml_date_literal(value):
+            diagnostics.append({
+                "test":test_id,
+                "state":state_id,
+                "code":"windows.wuaupdatesearcher.date_lexical_form",
+                "value":value,
+                "message":"last_deployment_change_time must preserve XML date lexical form YYYY-MM-DD",
+            })
+    return diagnostics
+
+
 HIERARCHY_KEY_CAPABILITIES={
     "windows.registry",
     "windows.ntuser",
@@ -226,6 +333,8 @@ def validate_assessment_capability_semantics(document):
             diagnostics.append({"object":object_id,**row})
         for row in validate_windows_registry_object(obj):
             diagnostics.append({"object":object_id,**row})
+        for row in validate_macos_pwpolicy512_object(obj):
+            diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
             referenced_object=objects.get(referenced_object_id)
@@ -310,7 +419,10 @@ def validate_assessment_capability_semantics(document):
                 })
 
         diagnostics.extend(
-            _validate_registry_test_value_datatypes(test_id,test,states)
+            _validate_windows_registry_like_value_datatypes(test_id,test,states)
+        )
+        diagnostics.extend(
+            validate_windows_wuaupdatesearcher_states(test_id,test,states)
         )
 
     return diagnostics
@@ -326,55 +438,6 @@ REGISTRY_TYPE_VALUE_DATATYPES={
     "multi_string":{"string"},
     "string":{"string","version"},
 }
-
-
-def _validate_registry_test_value_datatypes(test_id,test,states):
-    """Validate value datatypes when one exact literal registry type is asserted."""
-    if test.get("capability") != "windows.registry":
-        return []
-
-    referenced=[
-        states.get(state_id)
-        for state_id in (test.get("states") or [])
-        if isinstance(states.get(state_id),dict)
-    ]
-    exact_types=[]
-    for state in referenced:
-        payload=state.get("state") or {}
-        if (
-            payload.get("field")=="type"
-            and payload.get("operation")=="equal"
-            and isinstance(payload.get("value"),str)
-        ):
-            exact_types.append(payload["value"])
-    if len(set(exact_types)) != 1:
-        return []
-
-    registry_type=exact_types[0]
-    allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
-    if not allowed:
-        return []
-
-    diagnostics=[]
-    for state_id in test.get("states") or []:
-        state=states.get(state_id)
-        if not isinstance(state,dict):
-            continue
-        payload=state.get("state") or {}
-        if payload.get("field") != "value":
-            continue
-        datatype=payload.get("datatype")
-        if datatype not in allowed:
-            diagnostics.append({
-                "test":test_id,
-                "state":state_id,
-                "code":"windows.registry.value_type_datatype",
-                "registry_type":registry_type,
-                "datatype":datatype,
-                "allowed_datatypes":sorted(allowed),
-                "message":"registry value datatype is incompatible with exact asserted registry type",
-            })
-    return diagnostics
 
 
 def assert_assessment_capability_semantics(document):
