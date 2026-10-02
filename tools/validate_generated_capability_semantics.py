@@ -467,6 +467,8 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "macos.firmwarepassword.singleton_source",
     "macos.gatekeeper.implicit_source",
     "macos.softwareupdate.implicit_population",
+    "linux.apparmorstatus.singleton_source",
+    "linux.sestatus.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
@@ -478,6 +480,7 @@ POLICY_SEMANTIC_RULE_IDS={
 
 RUNTIME_SEMANTIC_RULE_IDS={
     "independent.shellcommand.pattern_semantics",
+    "linux.partition.mount_options_complete",
     # These require collection/evaluation behavior rather than static authored-content validation.
     "independent.xmlfilecontent.xpath_text_values",
 }
