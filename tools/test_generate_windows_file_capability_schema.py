@@ -117,6 +117,7 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                 "directory":self.entity(r"C:\Windows"),
                 "name":None,
             },
+            "filesystem":"any",
         })
 
     def test_native_file_type_values(self):
