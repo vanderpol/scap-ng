@@ -143,23 +143,120 @@ def _coerce_collection_parameter(value, spec: dict):
     return copy.deepcopy(value)
 
 
+def _materialize_file_traversal(obj: dict, mapping: dict):
+    """Translate reviewed OVAL file behaviors into one shared downward traversal."""
+    native_cfg=mapping.get("native") or {}
+    traversal_definition=native_cfg.get("traversal_definition")
+    if traversal_definition is None and native_cfg.get("uses_file_traversal",False):
+        traversal_definition="file_traversal"
+    if traversal_definition not in {"file_traversal","windows_file_traversal"}:
+        return
+
+    behaviors=obj.get("behaviors") or {}
+    traversal_keys={"max_depth","recurse","recurse_direction","recurse_file_system"}
+    if not (traversal_keys & set(behaviors)):
+        return
+
+    direction=str(behaviors.get("recurse_direction","none"))
+    if direction=="up":
+        raise ValueError("unsupported deprecated OVAL recurse_direction value: up")
+    if direction not in {"none","down"}:
+        raise ValueError(f"unsupported OVAL recurse_direction value: {direction!r}")
+
+    filesystem_source=str(behaviors.get("recurse_file_system","all"))
+    filesystem={
+        "all":"any",
+        "local":"local",
+        "defined":"same",
+    }.get(filesystem_source)
+    if filesystem is None:
+        raise ValueError(
+            f"unsupported OVAL recurse_file_system value: {filesystem_source!r}"
+        )
+
+    recurse_source=str(
+        behaviors.get(
+            "recurse",
+            "junctions and directories"
+            if traversal_definition=="windows_file_traversal"
+            else "symlinks and directories",
+        )
+    )
+    recurse_map={
+        "directories":"directories",
+        "symlinks":"symlinks",
+        "symlinks and directories":"symlinks_and_directories",
+        "junctions":"junctions",
+        "junctions and directories":"junctions_and_directories",
+    }
+    recurse=recurse_map.get(recurse_source)
+    if recurse is None:
+        raise ValueError(f"unsupported or deprecated OVAL recurse value: {recurse_source!r}")
+
+    try:
+        raw_depth=int(behaviors.get("max_depth",-1))
+    except (TypeError,ValueError) as exc:
+        raise ValueError(
+            f"invalid OVAL max_depth value: {behaviors.get('max_depth')!r}"
+        ) from exc
+    if raw_depth < -1:
+        raise ValueError(f"invalid OVAL max_depth value: {raw_depth}")
+
+    select=obj.get("select") or {}
+    has_full_path="full_path" in select or "filepath" in select
+    needs_scope=(filesystem!="any")
+    if has_full_path:
+        if direction=="down":
+            raise ValueError("OVAL file recursion is not valid with full_path selection")
+        if needs_scope:
+            raise ValueError(
+                "full_path recurse_file_system scope has no reviewed native representation"
+            )
+        # max_depth/recurse are semantically inactive when direction is none.
+    elif direction=="down" or needs_scope:
+        obj["traversal"]={
+            "max_depth":None if raw_depth==-1 else raw_depth,
+            "recurse":recurse,
+            "filesystem":filesystem,
+        }
+
+    for key in traversal_keys:
+        behaviors.pop(key,None)
+    if behaviors:
+        obj["behaviors"]=behaviors
+    else:
+        obj.pop("behaviors",None)
+
+
 def _materialize_behavior_collection_parameters(obj: dict, mapping: dict):
     """Move reviewed OVAL behavior inputs into explicit native collection parameters."""
     native_cfg=mapping.get("native") or {}
     specs=native_cfg.get("collection_parameters") or {}
     if not specs:
         return
-    defaults=(mapping.get("migration_crosswalk") or {}).get("materialized_defaults") or {}
+    crosswalk=mapping.get("migration_crosswalk") or {}
+    defaults=crosswalk.get("materialized_defaults") or {}
+    behavior_map=crosswalk.get("behaviors") or {}
+    source_for_collect={}
+    for source_name,target in behavior_map.items():
+        if isinstance(target,str) and target.startswith("collect."):
+            source_for_collect[target.split(".",1)[1]]=source_name
+
     behaviors=obj.get("behaviors") or {}
     collect=copy.deepcopy(obj.get("collect") or {})
     consumed=set()
     for name,spec in specs.items():
         default_key=f"behaviors.{name}"
-        if name in behaviors:
-            collect[name]=_coerce_collection_parameter(behaviors[name],spec)
-            consumed.add(name)
+        source_name=source_for_collect.get(name,name)
+        if source_name in behaviors:
+            collect[name]=_coerce_collection_parameter(behaviors[source_name],spec)
+            consumed.add(source_name)
         elif default_key in defaults:
             collect[name]=_coerce_collection_parameter(defaults[default_key],spec)
+        elif name in source_for_collect and spec.get("required") and spec.get("type")=="boolean":
+            # Reviewed OVAL behavior mappings are XSD-defaulted false unless the
+            # mapping explicitly supplies a different materialized default.
+            collect[name]=False
     if collect:
         obj["collect"]=collect
     remaining={k:v for k,v in behaviors.items() if k not in consumed}
@@ -317,7 +414,8 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             for key,value in obj["select"].items():
                 native_key=selector_map.get(key,key)
                 if isinstance(value,dict) and bool(value.get("nil",False)):
-                    if native_key != "name":
+                    nullable=set(native_cfg.get("nullable_selectors",["name"]))
+                    if native_key not in nullable:
                         raise ValueError(
                             f"legacy nil Object entity has no reviewed native mapping: {key}"
                         )
@@ -326,6 +424,7 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
                 renamed[native_key]=_native_object_predicate(value,mapping)
             obj["select"]=renamed
 
+        _materialize_file_traversal(obj,mapping)
         _materialize_behavior_collection_parameters(obj,mapping)
 
         if isinstance(obj.get("set"),dict):
