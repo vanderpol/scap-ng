@@ -11,6 +11,7 @@ from copy import deepcopy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import scap_upconvert_v003.build_rhel9_review_slice as converter
+from scap_upconvert_v003.conversion_budget import ConversionBudget, ConversionBudgetExceeded, ConversionBudgetTracker
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from scap_ng_roundtrip_v003.audit_test_object_state_types import audit_set_references
@@ -217,6 +218,56 @@ class DependencyTests(unittest.TestCase):
         native, error = converter.lower_definition(root, DID, "deep")
         self.assertIsNone(native)
         self.assertEqual(error, "conversion_resource_limit:python_recursion")
+
+    def test_feature_accounting_dependency_node_budget_is_explicit(self):
+        root = source()
+        for n in range(1, 20):
+            variable(root, n, component("variable_component",
+                                       var_ref=f"oval:dependency:var:{n+1}"))
+        variable(root, 20, literal())
+        rows = converter.unsupported_definition_features(
+            root, DID, budget=ConversionBudget(dependency_nodes=6)
+        )
+        limit = next(row for row in rows if row["feature"] == "conversion_resource_limit")
+        self.assertIn("dependency_nodes", limit["detail"])
+        self.assertIn("limit=6", limit["detail"])
+        self.assertIn("observed=7", limit["detail"])
+
+    def test_feature_accounting_dependency_edge_budget_is_explicit(self):
+        root = source()
+        variable(root, 1, literal())
+        rows = converter.unsupported_definition_features(
+            root, DID, budget=ConversionBudget(dependency_edges=1)
+        )
+        limit = next(row for row in rows if row["feature"] == "conversion_resource_limit")
+        self.assertIn("dependency_edges", limit["detail"])
+
+    def test_feature_accounting_expression_depth_budget_is_explicit(self):
+        root = source()
+        criteria = root.find(f"{{{OD}}}definitions/{{{OD}}}definition/{{{OD}}}criteria")
+        criterion = list(criteria)[0]
+        criteria.remove(criterion)
+        current = criteria
+        for _ in range(6):
+            current = ET.SubElement(current, f"{{{OD}}}criteria", operator="AND")
+        current.append(criterion)
+        rows = converter.unsupported_definition_features(
+            root, DID, budget=ConversionBudget(expression_depth=4)
+        )
+        limit = next(row for row in rows if row["feature"] == "conversion_resource_limit")
+        self.assertIn("expression_depth", limit["detail"])
+
+    def test_budget_tracker_distinguishes_value_and_time_resources(self):
+        tracker = ConversionBudgetTracker(ConversionBudget(generated_values=2))
+        with self.assertRaisesRegex(ConversionBudgetExceeded, "generated_values"):
+            tracker.note_generated_values(3)
+
+        ticks = iter((0.0, 0.010))
+        timed = ConversionBudgetTracker(
+            ConversionBudget(elapsed_ms=5), clock=lambda: next(ticks)
+        )
+        with self.assertRaisesRegex(ConversionBudgetExceeded, "elapsed_ms"):
+            timed.check_elapsed()
 
     def test_static_object_set_cycle_reports_cycle(self):
         root = source()

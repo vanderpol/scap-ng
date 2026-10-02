@@ -11,6 +11,7 @@ from copy import deepcopy
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import yaml
+from scap_upconvert_v003.conversion_budget import ConversionBudget, ConversionBudgetExceeded, ConversionBudgetTracker
 
 # Share the source revision with pinned NIWC corpus regression workflows.
 # Never generate review artifacts from a moving 'main' archive.
@@ -908,21 +909,20 @@ def oval_semantic_inventory(oroot):
         },
     }
 
-def unsupported_definition_features(oroot, definition_id):
+def unsupported_definition_features(oroot, definition_id, *, budget: ConversionBudget | None = None):
     """Account for the complete reachable source graph without recursive walks.
 
-    Filters reference States, and those States can introduce further Variables
-    and Objects. Visited nodes terminate cyclic source graphs for diagnostics;
-    this pass does not decide the Board's general cycle policy or repair source.
-    Native lowering separately refuses cycles it cannot finitely represent.
+    Optional budgets are implementation safeguards, not OVAL language limits.
+    A breach is reported as conversion_resource_limit and never as invalid
+    content. With no budget, behavior is unchanged.
     """
     findings = []
     seen = set()
     visited = set()
+    tracker = ConversionBudgetTracker(budget)
     index = {}
     duplicates = set()
-    # Whole-benchmark ingestion wraps OVAL documents in assessment-bundle;
-    # focused conversion also accepts a single oval_definitions root.
+
     for section in oroot.iter():
         if local(section.tag) not in ("definitions", "tests", "objects", "states", "variables"):
             continue
@@ -952,96 +952,119 @@ def unsupported_definition_features(oroot, definition_id):
             item["detail"] = detail
         findings.append(item)
 
+    def depth(node):
+        best = 0
+        stack = [(node, 1)]
+        while stack:
+            current, current_depth = stack.pop()
+            best = max(best, current_depth)
+            for child in current:
+                if isinstance(child.tag, str):
+                    stack.append((child, current_depth + 1))
+        return best
+
     pending = [("definition", definition_id)]
-    while pending:
-        kind, ref = pending.pop()
-        if (kind, ref) in visited:
-            continue
-        visited.add((kind, ref))
-        node = index.get(ref)
-        name = local(node.tag) if node is not None else None
-        expected = name == "definition" if kind == "definition" else bool(
-            name and name.endswith("_" + kind)
-        )
-        if not ref or node is None or not expected:
-            add(kind + "_not_found", ref)
-            continue
-        if ref in duplicates:
-            add("duplicate_oval_id", ref)
-            continue
 
-        if kind in ("test", "object", "state"):
-            namespace = node.tag.split("}", 1)[0].strip("{") if "}" in node.tag else ""
-            if (namespace, name) not in oval_definition_elements():
-                add("nonstandard_oval_element", ref, f"{namespace}#{name}")
-            if kind == "test" and (namespace, name) in deprecated_test_types():
-                add("deprecated_oval_test", ref, f"{namespace}#{name}")
+    def enqueue(kind, ref):
+        tracker.note_edge()
+        pending.append((kind, ref))
 
-        if kind == "definition":
-            criteria = next((n for n in node if local(n.tag) == "criteria"), None)
-            if criteria is None:
-                add("missing_criteria", ref)
+    try:
+        while pending:
+            tracker.check_elapsed()
+            kind, ref = pending.pop()
+            if (kind, ref) in visited:
                 continue
-            for descendant in criteria.iter():
-                child_kind = local(descendant.tag)
-                if child_kind == "criteria":
-                    operator = (descendant.get("operator") or "AND").upper()
-                    if operator not in ("AND", "OR", "ONE", "XOR"):
-                        add("criteria_operator", detail=operator)
-                elif child_kind == "criterion":
-                    pending.append(("test", descendant.get("test_ref")))
-                elif child_kind == "extend_definition":
-                    pending.append(("definition", descendant.get("definition_ref")))
+            visited.add((kind, ref))
+            tracker.note_node()
 
-        elif kind == "test":
-            state_refs = []
-            for part in node:
-                part_kind = local(part.tag)
-                if part_kind == "object":
-                    pending.append(("object", part.get("object_ref")))
-                elif part_kind == "state":
-                    state_refs.append(part.get("state_ref"))
-                    pending.append(("state", part.get("state_ref")))
-            operator = (node.get("state_operator") or "AND").upper()
-            if len(state_refs) > 1 and operator not in ("AND", "OR"):
-                add("state_operator", ref, operator)
-
-        elif kind in ("object", "state"):
-            for descendant in node.iter():
-                var_ref = descendant.get("var_ref")
-                if var_ref:
-                    pending.append(("variable", var_ref))
-                child_kind = local(descendant.tag)
-                if kind == "object" and child_kind == "var_ref" and text(descendant):
-                    pending.append(("variable", text(descendant)))
-                elif kind == "object" and child_kind == "object_reference":
-                    pending.append(("object", text(descendant)))
-                elif kind == "object" and child_kind == "filter":
-                    state_ref = descendant.get("state_ref") or text(descendant)
-                    state = index.get(state_ref)
-                    if state is None or not local(state.tag).endswith("_state"):
-                        add("filter_state_not_found", ref, state_ref)
-                    else:
-                        pending.append(("state", state_ref))
-
-        elif kind == "variable":
-            if name not in ("constant_variable", "local_variable", "external_variable"):
-                add("variable_kind", ref, name)
+            node = index.get(ref)
+            name = local(node.tag) if node is not None else None
+            expected = name == "definition" if kind == "definition" else bool(
+                name and name.endswith("_" + kind)
+            )
+            if not ref or node is None or not expected:
+                add(kind + "_not_found", ref)
                 continue
-            # External constraints are not ComponentGroup expressions.
-            if name == "external_variable":
+            if ref in duplicates:
+                add("duplicate_oval_id", ref)
                 continue
-            for component in node:
-                if local(component.tag) in ("notes", "Signature"):
+
+            if kind in ("test", "object", "state"):
+                namespace = node.tag.split("}", 1)[0].strip("{") if "}" in node.tag else ""
+                if (namespace, name) not in oval_definition_elements():
+                    add("nonstandard_oval_element", ref, f"{namespace}#{name}")
+                if kind == "test" and (namespace, name) in deprecated_test_types():
+                    add("deprecated_oval_test", ref, f"{namespace}#{name}")
+
+            if kind == "definition":
+                criteria = next((n for n in node if local(n.tag) == "criteria"), None)
+                if criteria is None:
+                    add("missing_criteria", ref)
                     continue
-                for descendant in component.iter():
+                tracker.note_expression_depth(depth(criteria))
+                for descendant in criteria.iter():
                     child_kind = local(descendant.tag)
-                    if child_kind != "value" and child_kind not in supported_components:
-                        add("variable_component", ref, child_kind)
-                    if descendant.get("var_ref"):
-                        pending.append(("variable", descendant.get("var_ref")))
-                    if child_kind == "object_component":
-                        pending.append(("object", descendant.get("object_ref")))
+                    if child_kind == "criteria":
+                        operator = (descendant.get("operator") or "AND").upper()
+                        if operator not in ("AND", "OR", "ONE", "XOR"):
+                            add("criteria_operator", detail=operator)
+                    elif child_kind == "criterion":
+                        enqueue("test", descendant.get("test_ref"))
+                    elif child_kind == "extend_definition":
+                        enqueue("definition", descendant.get("definition_ref"))
+
+            elif kind == "test":
+                state_refs = []
+                for part in node:
+                    part_kind = local(part.tag)
+                    if part_kind == "object":
+                        enqueue("object", part.get("object_ref"))
+                    elif part_kind == "state":
+                        state_refs.append(part.get("state_ref"))
+                        enqueue("state", part.get("state_ref"))
+                operator = (node.get("state_operator") or "AND").upper()
+                if len(state_refs) > 1 and operator not in ("AND", "OR"):
+                    add("state_operator", ref, operator)
+
+            elif kind in ("object", "state"):
+                for descendant in node.iter():
+                    var_ref = descendant.get("var_ref")
+                    if var_ref:
+                        enqueue("variable", var_ref)
+                    child_kind = local(descendant.tag)
+                    if kind == "object" and child_kind == "var_ref" and text(descendant):
+                        enqueue("variable", text(descendant))
+                    elif kind == "object" and child_kind == "object_reference":
+                        enqueue("object", text(descendant))
+                    elif kind == "object" and child_kind == "filter":
+                        state_ref = descendant.get("state_ref") or text(descendant)
+                        state = index.get(state_ref)
+                        if state is None or not local(state.tag).endswith("_state"):
+                            add("filter_state_not_found", ref, state_ref)
+                        else:
+                            enqueue("state", state_ref)
+
+            elif kind == "variable":
+                if name not in ("constant_variable", "local_variable", "external_variable"):
+                    add("variable_kind", ref, name)
+                    continue
+                if name == "external_variable":
+                    continue
+                for component in node:
+                    if local(component.tag) in ("notes", "Signature"):
+                        continue
+                    tracker.note_expression_depth(depth(component))
+                    for descendant in component.iter():
+                        child_kind = local(descendant.tag)
+                        if child_kind != "value" and child_kind not in supported_components:
+                            add("variable_component", ref, child_kind)
+                        if descendant.get("var_ref"):
+                            enqueue("variable", descendant.get("var_ref"))
+                        if child_kind == "object_component":
+                            enqueue("object", descendant.get("object_ref"))
+    except ConversionBudgetExceeded as exc:
+        add("conversion_resource_limit", definition_id, exc.diagnostic)
 
     return findings
 def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None, external_bindings=None):
