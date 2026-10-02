@@ -113,6 +113,21 @@ def source_defect_reason(error):
     return None
 
 
+def source_defect_features_reason(features):
+    """Classify positively identified source-invalid feature findings.
+
+    Feature-level quarantine stays deliberately narrower than ordinary
+    unsupported-feature handling.  OVAL 5.12.3 Schematron explicitly requires
+    an entity var_ref datatype to match its referenced Variable datatype.
+    """
+    if not features:
+        return None
+    names={item.get("feature") for item in features}
+    if names == {"var_ref_datatype_mismatch"}:
+        return "var_ref_datatype_mismatch"
+    return None
+
+
 def source_defect_fallback(selector, did, error):
     return {
         "selector": selector,
@@ -160,6 +175,18 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None):
                 deprecated_selector_fallbacks.append({'selector':selector,'source_definition':did,'unsupported':unsupported})
                 result['assessments'].append({'status':'skipped_deprecated_oval_test_manual_fallback',
                                               'source_definition':did,'unsupported':unsupported})
+                continue
+            defect=source_defect_features_reason(unsupported)
+            if defect and has_manual:
+                error=defect+":"+json.dumps(unsupported,sort_keys=True,separators=(",",":"))
+                source_defect_selector_fallbacks.append(source_defect_fallback(selector,did,error))
+                result['assessments'].append({
+                    'status':'skipped_source_defect_manual_fallback',
+                    'source_definition':did,
+                    'classification':'source_content_defect',
+                    'reason':defect,
+                    'unsupported':unsupported,
+                })
                 continue
             failed=True; result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported}); continue
         external_bindings={}
