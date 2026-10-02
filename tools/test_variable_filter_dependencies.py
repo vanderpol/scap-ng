@@ -155,7 +155,7 @@ class DependencyTests(unittest.TestCase):
             f"{{{OD}}}external_variable",
             id="oval:dependency:var:1",
             version="1",
-            datatype="int",
+            datatype="string",
             comment="Organization supplied threshold",
         )
         value = ET.SubElement(external, f"{{{OD}}}possible_value", hint="Preferred")
@@ -165,10 +165,10 @@ class DependencyTests(unittest.TestCase):
             f"{{{OD}}}possible_restriction",
             hint="Approved range",
         )
-        low = ET.SubElement(group, f"{{{OD}}}restriction", operation="greater than or equal")
-        low.text = "5"
-        high = ET.SubElement(group, f"{{{OD}}}restriction", operation="less than or equal")
-        high.text = "20"
+        low = ET.SubElement(group, f"{{{OD}}}restriction", operation="pattern match")
+        low.text = "^[0-9]+$"
+        high = ET.SubElement(group, f"{{{OD}}}restriction", operation="not equal")
+        high.text = "0"
 
         native = self.roundtrip(root)
         variable_entry = next(iter(native["assessment"]["variables"].values()))
@@ -180,8 +180,8 @@ class DependencyTests(unittest.TestCase):
                 "operator": "AND",
                 "hint": "Approved range",
                 "conditions": [
-                    {"operation": "greater than or equal", "value": "5"},
-                    {"operation": "less than or equal", "value": "20"},
+                    {"operation": "pattern match", "value": "^[0-9]+$"},
+                    {"operation": "not equal", "value": "0"},
                 ],
             },
         )
@@ -312,8 +312,8 @@ class DependencyTests(unittest.TestCase):
                 for value in ("demo", "other"):
                     ET.SubElement(constant, f"{{{OD}}}value").text = value
                 native = self.roundtrip(root)
-                collection = next(iter(native["assessment"]["collections"].values()))
-                selector = collection["select"]["filename"]
+                check = next(iter(native["assessment"]["checks"].values()))
+                selector = check["collect"]["select"]["filename"]
                 self.assertEqual(selector["variable_check"], var_check)
 
     def test_variable_dependent_object_inside_set_roundtrip(self):
@@ -326,11 +326,8 @@ class DependencyTests(unittest.TestCase):
         variable(root, 1, literal("demo"))
         native = self.roundtrip(root)
         self.assertEqual(len(native["assessment"]["variables"]), 1)
-        set_collection = next(
-            value for value in native["assessment"]["collections"].values()
-            if "set" in value
-        )
-        self.assertIsNotNone(set_collection["set"])
+        check = next(iter(native["assessment"]["checks"].values()))
+        self.assertIsNotNone(check["collect"]["set"])
 
     def test_filter_dependencies_roundtrip(self):
         root = source()
