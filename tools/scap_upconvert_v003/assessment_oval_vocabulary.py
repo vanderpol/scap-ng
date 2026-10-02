@@ -31,11 +31,12 @@ def _fingerprint(value) -> str:
 
 
 def _normalize_generic_mask(value):
-    """Remove effective mask=false from executable native entity payloads.
+    """Translate legacy OVAL result masking into native result redaction.
 
     Source/default explicitness remains migration evidence in the semantic IR.
-    mask=true requires the pending narrow sensitive-result redaction mapping and
-    therefore fails closed instead of reintroducing OVAL's generic mask surface.
+    Effective mask=false disappears from native authoring. Explicit/effective
+    mask=true becomes redact_result=true, which affects result disclosure only
+    and SHALL NOT change collection, comparison, or technical truth.
     """
     if isinstance(value, list):
         return [_normalize_generic_mask(item) for item in value]
@@ -51,11 +52,28 @@ def _normalize_generic_mask(value):
             if normalized in (False, 0, "false", "0"):
                 continue
             if normalized in (True, 1, "true", "1"):
-                raise ValueError(
-                    "OVAL mask=true requires sensitive-result redaction mapping"
-                )
+                out["redact_result"]=True
+                continue
             raise ValueError(f"unsupported OVAL mask value: {item!r}")
         out[key]=_normalize_generic_mask(item)
+    return out
+
+
+def _restore_legacy_mask(value):
+    """Translate native result redaction back to legacy OVAL mask semantics."""
+    if isinstance(value, list):
+        return [_restore_legacy_mask(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    out={}
+    for key,item in value.items():
+        if key=="redact_result":
+            if item is True:
+                out["mask"]=True
+            elif item not in (False, None):
+                raise ValueError(f"unsupported redact_result value: {item!r}")
+            continue
+        out[key]=_restore_legacy_mask(item)
     return out
 
 
@@ -304,7 +322,8 @@ def legacy_intermediate_vocabulary(document: dict) -> dict:
             return out
         return {k: expand_filters(v) for k, v in value.items()}
 
-    collections = expand_filters(collections)
+    collections = _restore_legacy_mask(expand_filters(collections))
+    states = _restore_legacy_mask(states)
     if "variables" in assessment:
         assessment["variables"] = remap_refs(assessment["variables"])
 
