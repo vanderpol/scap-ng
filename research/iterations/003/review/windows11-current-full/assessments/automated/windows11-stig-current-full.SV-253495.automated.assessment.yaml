@@ -12,17 +12,11 @@ assessment:
     version: 0.1.0
   objects:
     windows-wmi57-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT DomainRole FROM win32_computersystem
+      capability: windows.wmi.query
       object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
     windows-userright-object:
       capability: windows.userright
       select:
@@ -34,36 +28,38 @@ assessment:
   states:
     state-domain-member-workstation:
       state_title: Domain Member Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '1'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '1'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-domain-member-server:
       state_title: Domain Member Server
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '3'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '3'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-windows-userright:
       state_title: null
       capability: windows.userright
@@ -106,36 +102,38 @@ assessment:
         entity_existence: at_least_one_exists
     state-standalone-workstation:
       state_title: Standalone Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '0'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '0'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-standalone-server:
       state_title: Standalone Server
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '2'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '2'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-windows-userright-5:
       state_title: null
       capability: windows.userright
@@ -149,14 +147,14 @@ assessment:
   tests:
     test-system-non-dc-domain-joined-windows-server-or-workstation:
       test_title: The system is a non-DC domain-joined Windows server or workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: at_least_one_exists
-      check: all
-      state_operator: OR
       states:
       - state-domain-member-workstation
       - state-domain-member-server
+      existence: some
+      match: all
+      states_match: any
     test-deny-log-on-through-remote-desktop-services-local-account:
       test_title: Deny log on through Remote Desktop Services - Local account
       capability: windows.userright
@@ -191,14 +189,14 @@ assessment:
       - state-windows-userright-4
     test-system-standalone-windows-server-or-workstation:
       test_title: The system is a standalone Windows server or workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: at_least_one_exists
-      check: all
-      state_operator: OR
       states:
       - state-standalone-workstation
       - state-standalone-server
+      existence: some
+      match: all
+      states_match: any
     test-deny-log-on-through-remote-desktop-services-everyone:
       test_title: Deny log on through Remote Desktop Services - Everyone
       capability: windows.userright

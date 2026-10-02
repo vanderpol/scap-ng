@@ -11,42 +11,37 @@ assessment:
     version: 0.1.0
   objects:
     bitlocker-status-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2\security\microsoftvolumeencryption
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT protectionstatus FROM win32_encryptablevolume
+      capability: windows.wmi.query
       object_title: BitLocker status
+      collect:
+        namespace: root\cimv2\security\microsoftvolumeencryption
+        query: SELECT protectionstatus FROM win32_encryptablevolume
   states:
     state-bitlocker-status-is-protected:
       state_title: BitLocker status is Protected
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: protectionstatus
-            value: '1'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            protectionstatus:
+              value: '1'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
   tests:
     test-bitlocker-enabled-on-all-fixed-drives:
       test_title: BitLocker must be enabled on all fixed drives.
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: bitlocker-status-object
-      check_existence: all_exist
-      check: all
       states:
       - state-bitlocker-status-is-protected
+      existence: all
+      match: all
   evaluate:
     test: test-bitlocker-enabled-on-all-fixed-drives

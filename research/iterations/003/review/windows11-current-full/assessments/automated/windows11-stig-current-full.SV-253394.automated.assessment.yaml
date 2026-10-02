@@ -26,17 +26,11 @@ assessment:
           value: DODownloadMode
       object_title: null
     windows-wmi57-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT DomainRole FROM win32_computersystem
+      capability: windows.wmi.query
       object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
     downloadmode-set-through-settings-app-object:
       capability: windows.registry
       select:
@@ -141,36 +135,38 @@ assessment:
           entity_existence: at_least_one_exists
     state-standalone-workstation:
       state_title: Standalone Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '0'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '0'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-standalone-server:
       state_title: Standalone Server
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '2'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '2'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
   tests:
     test-downloadmode-set-enabled-http-only-lan-group-simple-or-bypass:
       test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
@@ -187,14 +183,14 @@ assessment:
       - state-reg-dword-type-and-value-equals-100
     test-system-windows-standalone-workstation-or-server:
       test_title: The system is a Windows Standalone Workstation or Server
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: at_least_one_exists
-      check: all
-      state_operator: OR
       states:
       - state-standalone-workstation
       - state-standalone-server
+      existence: some
+      match: all
+      states_match: any
     test-downloadmode-set-enabled-http-only-or-lan-selected:
       test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
       capability: windows.registry

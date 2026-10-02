@@ -12,17 +12,11 @@ assessment:
     version: 0.1.0
   objects:
     windows-wmi57-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT DomainRole FROM win32_computersystem
+      capability: windows.wmi.query
       object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
     windows-userright-object:
       capability: windows.userright
       select:
@@ -34,20 +28,21 @@ assessment:
   states:
     state-domain-member-workstation:
       state_title: Domain Member Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '1'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '1'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
     state-windows-userright:
       state_title: null
       capability: windows.userright
@@ -90,29 +85,30 @@ assessment:
         entity_existence: at_least_one_exists
     state-standalone-workstation:
       state_title: Standalone Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: domainrole
-            value: '0'
-            operation: equals
-            datatype: string
-            entity_check: all
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '0'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
   tests:
     test-system-windows-domain-member-workstation:
       test_title: The system is a Windows Domain Member Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: at_least_one_exists
-      check: all
       states:
       - state-domain-member-workstation
+      existence: some
+      match: all
     test-deny-access-this-computer-from-network-local-account:
       test_title: Deny access to this computer from the network - Local account
       capability: windows.userright
@@ -147,12 +143,12 @@ assessment:
       - state-windows-userright-4
     test-system-windows-standalone-workstation:
       test_title: The system is a Windows Standalone Workstation
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: at_least_one_exists
-      check: all
       states:
       - state-standalone-workstation
+      existence: some
+      match: all
   evaluate:
     any:
     - all:

@@ -10,17 +10,11 @@ assessment:
     version: 0.1.0
   objects:
     windows-wmi57-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
+      capability: windows.wmi.query
       object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
     editionid-object:
       capability: windows.registry
       select:
@@ -114,20 +108,21 @@ assessment:
   states:
     state-windows-wmi57:
       state_title: null
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: installstate
-            value: '2'
-            operation: equals
-            datatype: string
-            entity_check: at least one
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            installstate:
+              value: '2'
+              operation: equal
+              datatype: string
+              mask: false
+              match: any
+              existence: some
     state-editionid-enterprises-reg-sz:
       state_title: EditionID = EnterpriseS (reg_sz)
       capability: windows.registry
@@ -209,12 +204,12 @@ assessment:
   tests:
     test-internet-explorer-11-optional-feature-disabled-or-not-installed:
       test_title: Internet Explorer 11 optional feature disabled or not installed
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: any_exist
-      check: all
       states:
       - state-windows-wmi57
+      existence: optional
+      match: all
     test-os-windows-enterprise-ltsc:
       test_title: The OS is Windows Enterprise LTSC
       capability: windows.registry

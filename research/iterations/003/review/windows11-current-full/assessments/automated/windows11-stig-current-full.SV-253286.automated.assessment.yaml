@@ -10,17 +10,11 @@ assessment:
     version: 0.1.0
   objects:
     windows-wmi57-object:
-      capability: windows.wmi57
-      select:
-        namespace:
-          operation: equals
-          datatype: string
-          value: root\cimv2
-        wql:
-          operation: equals
-          datatype: string
-          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
+      capability: windows.wmi.query
       object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
     windows-registry-object:
       capability: windows.registry
       select:
@@ -56,20 +50,21 @@ assessment:
   states:
     state-check-smb-v1-protocol-win32-optionalfeature-object-insta:
       state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
-      capability: windows.wmi57
+      capability: windows.wmi.query
       state:
         field: result
-        value:
-          record:
-          - name: installstate
-            value: '2'
-            operation: equals
-            datatype: string
-            entity_check: at least one
-        operation: equals
-        datatype: record
-        entity_check: all
-        entity_existence: at_least_one_exists
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            installstate:
+              value: '2'
+              operation: equal
+              datatype: string
+              mask: false
+              match: any
+              existence: some
     state-windows-registry:
       state_title: null
       capability: windows.registry
@@ -107,12 +102,12 @@ assessment:
   tests:
     test-smb-1-0-cifs-file-sharing-support-feature-not-installed:
       test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
-      capability: windows.wmi57
+      capability: windows.wmi.query
       object: windows-wmi57-object
-      check_existence: all_exist
-      check: all
       states:
       - state-check-smb-v1-protocol-win32-optionalfeature-object-insta
+      existence: all
+      match: all
     test-configure-smbv1-server-set-disabled:
       test_title: '''Configure SMBv1 Server'' is set to ''Disabled'''
       capability: windows.registry
