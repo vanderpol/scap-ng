@@ -17,6 +17,10 @@ def load_yaml(path: Path):
 
 
 def validate_package(root: Path):
+    # Normalize the package root once. References and discovered document keys
+    # are resolved below; using the same canonical root avoids platform-specific
+    # relative_to() failures (notably on Windows temporary-directory paths).
+    root = root.resolve()
     diagnostics=[]
     documents={}
     identities={}
