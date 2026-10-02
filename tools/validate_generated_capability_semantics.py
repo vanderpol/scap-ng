@@ -371,6 +371,43 @@ def _iter_set_object_refs(expression):
             yield from _iter_set_object_refs(nested)
 
 
+EXECUTABLE_SEMANTIC_RULE_IDS={
+    # Cross-reference capability checks are generic and recurse through Sets.
+    "object.filter_state_capability",
+    # File-selection families share the same native semantic implementation.
+    *{f"{cap}.full_path_no_traversal" for cap in FILE_SELECTION_CAPABILITIES},
+    *{f"{cap}.pattern_directory_no_traversal" for cap in FILE_SELECTION_CAPABILITIES},
+    *{f"{cap}.name_empty" for cap in FILE_SELECTION_CAPABILITIES},
+    "independent.textfilecontent54.pattern_operation",
+    "independent.xmlfilecontent.xpath_equal",
+    "independent.yamlfilecontent.content_equal",
+    "independent.yamlfilecontent.yamlpath_equal",
+    "independent.yamlfilecontent.inline_content_no_traversal",
+    "linux.selinuxsecuritycontext.pid_no_file_traversal",
+    "macos.pwpolicy512.auth_pair",
+    "macos.pwpolicy512.password_equal",
+    "macos.pwpolicy512.directory_node_equal",
+    "macos.pwpolicy512.xpath_equal",
+    "windows.cmdlet.module_guid",
+    "windows.cmdlet.select_no_wildcard",
+    "windows.file.literal_name_characters",
+    "windows.registry.key_null_requires_name_null",
+    "windows.registry.pattern_key_no_traversal",
+    "windows.ntuser.pattern_key_no_traversal",
+    "windows.regkeyeffectiverights53.pattern_key_no_traversal",
+    "windows.registry.value_type_datatype",
+    "windows.ntuser.value_type_datatype",
+    "windows.lockoutpolicy.nonnegative_time_values",
+    "windows.wuaupdatesearcher.date_lexical_form",
+}
+
+
+def executable_rule_id_for_diagnostic(code):
+    if code == "object.filter_state_capability":
+        return code
+    return code
+
+
 def validate_declared_semantic_rules(mapping, implemented_rule_ids):
     """Report reviewed semantic rules that lack executable validation coverage.
 
