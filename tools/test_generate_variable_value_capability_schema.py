@@ -110,12 +110,12 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
             }
         }
         rows=validate_assessment_capability_semantics(missing)
-        self.assertIn("test.variable_missing",{row["code"] for row in rows})
+        self.assertIn("variable.value.source_exists",{row["code"] for row in rows})
 
         present=json.loads(json.dumps(missing))
         present["assessment"]["variables"]["missing"]={"datatype":"integer"}
         rows=validate_assessment_capability_semantics(present)
-        self.assertNotIn("test.variable_missing",{row["code"] for row in rows})
+        self.assertNotIn("variable.value.source_exists",{row["code"] for row in rows})
 
     def test_legacy_variable_object_is_not_runtime_schema(self):
         encoded=json.dumps(self.schema)
