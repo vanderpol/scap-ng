@@ -64,6 +64,7 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
             "select":{
                 "full_path":self.entity("/etc/passwd"),
             },
+            "filesystem":"any",
             "collect":{"algorithm":"sha256"},
         })
 
@@ -78,8 +79,8 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
             "traversal":{
                 "max_depth":1,
                 "recurse":"directories",
-                "filesystem":"local",
             },
+            "filesystem":"local",
             "collect":{"algorithm":"sha512"},
         })
 
