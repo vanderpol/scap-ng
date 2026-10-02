@@ -84,3 +84,17 @@ The schema-validation milestone is green only when:
 - capability State/Item parity remains green;
 - maintained current fixtures validate;
 - all remaining failures are explicitly classified as deferred historical/example migration work or semantic-layer checks.
+
+
+## Prior fresh-current baseline evidence
+
+The previously committed full-current native validation evidence records:
+
+- freshly generated native documents checked before normalization: **25,147**;
+- valid before normalization: **25,147**;
+- invalid before normalization: **0**;
+- normalized corpus invalid documents: **0**.
+
+This is strong evidence that the current generator/schema contract was internally consistent across the 65-package NIWC Current corpus at that checkpoint. The current rerun remains authoritative for the latest commit because capability/schema work has continued since that evidence was produced.
+
+This baseline also confirms that failures from committed historical review trees and bakeoff examples should not be generalized into schema defects without reproducing them in freshly generated current content.
