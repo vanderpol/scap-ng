@@ -101,7 +101,7 @@ Scalar predicates use shared native entity semantics:
 
 - explicit comparison operation;
 - explicit native datatype;
-- explicit mask/redaction intent;
+- optional explicit `redact_result: true` when emitted result/evidence values must be redacted;
 - match quantifier;
 - existence requirement;
 - Variable references where permitted.
@@ -170,6 +170,14 @@ A mapping change SHOULD state whether it:
 
 Removal of a legacy feature that could affect supported content SHALL also be
 tracked in the migration disposition documentation.
+
+## Schema 0.1.0 baseline
+
+The current structural baseline and its validation evidence are recorded in
+[SCAP-NG JSON Schema 0.1.0 stability checkpoint](../STABILITY-CHECKPOINT.md).
+That checkpoint freezes the current schema structure as a stable candidate while
+keeping runtime/evaluator equivalence, converter policy, and deferred schema-only
+capabilities explicitly outside the claim.
 
 ## Current reviewed capability status
 
