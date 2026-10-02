@@ -196,8 +196,15 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
             )
         data = canonical_json(obj)
         members[member] = data
+        payload = obj.get(kind) if isinstance(obj.get(kind), dict) else None
+        if payload is None:
+            root_key = {
+                "applicability_catalog": "applicability",
+            }.get(kind, kind)
+            payload = obj.get(root_key) if isinstance(obj.get(root_key), dict) else {}
         object_index[object_id] = {
             "type": kind,
+            "version": payload.get("version"),
             "path": member,
             "source": _relative_member_path(source_path, source_root),
             "sha256": hashlib.sha256(data).hexdigest(),
@@ -321,6 +328,7 @@ def write_bundle(
         "objects": {
             oid: {
                 "type": row["type"],
+                "version": row.get("version"),
                 "path": row["path"],
                 "sha256": row["sha256"],
                 "size": row["size"],
