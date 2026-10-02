@@ -49,10 +49,6 @@
       "oexec": "other_execute",
       "has_extended_acl": "has_extended_acl"
     },
-    "traversal": {
-      "shared_definition": "capability-common.schema.json#/$defs/file_traversal",
-      "direction": "down-only"
-    },
     "field_datatypes": {
       "full_path": [
         "string"
@@ -124,7 +120,8 @@
         "boolean"
       ]
     },
-    "uses_file_traversal": true
+    "uses_file_traversal": true,
+    "traversal_definition": "file_traversal"
   },
   "migration_crosswalk": {
     "operation": {
@@ -173,6 +170,18 @@
     "deprecated": {
       "recurse_direction_up": "migration_error",
       "check_none_exist": "migration_error"
+    },
+    "traversal": {
+      "max_depth_-1": "max_depth_null",
+      "recurse.directories": "directories",
+      "recurse.symlinks": "symlinks",
+      "recurse.symlinks and directories": "symlinks_and_directories",
+      "recurse_direction.none": "no_traversal",
+      "recurse_direction.down": "implicit_downward_traversal",
+      "recurse_direction.up": "migration_error_deprecated",
+      "recurse_file_system.all": "any",
+      "recurse_file_system.local": "local",
+      "recurse_file_system.defined": "same"
     }
   },
   "semantic_validator_rules": [
