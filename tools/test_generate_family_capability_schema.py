@@ -40,14 +40,12 @@ class FamilyCapabilitySchemaTests(unittest.TestCase):
     def test_family_vocabulary(self):
         self.validate_def("state",{
             "state_title":None,"capability":"independent.family",
-            "state":{"field":"family","value":"unix","operation":"equal","datatype":"string",
-                     "mask":False,"match":"all","existence":"some"},
+            "state":{"field":"family","value":"unix","operation":"equal","datatype":"string","match":"all","existence":"some"},
         })
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("state",{
                 "state_title":None,"capability":"independent.family",
-                "state":{"field":"family","value":"linux","operation":"equal","datatype":"string",
-                         "mask":False,"match":"all","existence":"some"},
+                "state":{"field":"family","value":"linux","operation":"equal","datatype":"string","match":"all","existence":"some"},
             })
 
     def test_collected_family_uses_same_field(self):

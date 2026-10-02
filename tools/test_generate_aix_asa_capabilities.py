@@ -24,7 +24,7 @@ class AixAsaCapabilityTests(unittest.TestCase):
     def validate(self,cap,kind,value):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_aix_fileset(self):
         self.validate("aix.fileset","object",{"object_title":"bos","capability":"aix.fileset","select":{"flstinst":self.e("bos.rte")}})

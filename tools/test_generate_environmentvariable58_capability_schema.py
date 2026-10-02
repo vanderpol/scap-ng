@@ -28,7 +28,7 @@ class EnvironmentVariable58CapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,datatype):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_pid_and_name_selectors(self):
         self.validate_def("object",{
@@ -43,8 +43,7 @@ class EnvironmentVariable58CapabilitySchemaTests(unittest.TestCase):
     def test_any_simple_value_is_shared_by_state_and_item(self):
         self.validate_def("state",{
             "state_title":None,"capability":"independent.environmentvariable58",
-            "state":{"field":"value","value":42,"operation":"equal","datatype":"integer",
-                     "mask":False,"match":"all","existence":"some"},
+            "state":{"field":"value","value":42,"operation":"equal","datatype":"integer","match":"all","existence":"some"},
         })
         self.validate_def("collected_item",{
             "id":"env-1","capability":"independent.environmentvariable58","status":"exists",

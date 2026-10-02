@@ -24,7 +24,7 @@ class CiscoIosCapabilityTests(unittest.TestCase):
     def validate(self,cap,kind,value):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_shared_bgp_model(self):
         for fam in ("ios","iosxe"):
@@ -52,20 +52,19 @@ class CiscoIosCapabilityTests(unittest.TestCase):
         for fam in ("ios","iosxe"):
             self.validate(f"{fam}.routingprotocolauthintf","state",{
                 "state_title":None,"capability":f"{fam}.routingprotocolauthintf",
-                "state":{"field":"ospf_area","value":0,"operation":"equal","datatype":"integer",
-                         "mask":False,"match":"all","existence":"some"}
+                "state":{"field":"ospf_area","value":0,"operation":"equal","datatype":"integer","match":"all","existence":"some"}
             })
 
     def test_interface_platform_difference_is_preserved(self):
         self.validate("ios.interface","state",{
             "state_title":None,"capability":"ios.interface",
             "state":{"field":"ip_directed_broadcast_command","value":"ip directed-broadcast",
-                     "operation":"equal","datatype":"string","mask":False,"match":"all","existence":"some"}
+                     "operation":"equal","datatype":"string","match":"all","existence":"some"}
         })
         self.validate("iosxe.interface","state",{
             "state_title":None,"capability":"iosxe.interface",
             "state":{"field":"ip_directed_broadcast","value":False,
-                     "operation":"equal","datatype":"boolean","mask":False,"match":"all","existence":"some"}
+                     "operation":"equal","datatype":"boolean","match":"all","existence":"some"}
         })
 
     def test_iosxe_version_singleton(self):

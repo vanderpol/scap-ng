@@ -30,7 +30,7 @@ class AdditionalConformanceCapabilitiesTests(unittest.TestCase):
         jsonschema.Draft202012Validator(schema["$defs"][kind],registry=self.registry).validate(value)
 
     def entity(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_uname_singleton_and_item(self):
         self.validate("unix.uname","test",{
@@ -86,8 +86,7 @@ class AdditionalConformanceCapabilitiesTests(unittest.TestCase):
     def test_selinuxboolean_boolean_types(self):
         self.validate("linux.selinuxboolean","state",{
             "state_title":None,"capability":"linux.selinuxboolean",
-            "state":{"field":"current_status","value":True,"operation":"equal","datatype":"boolean",
-                     "mask":False,"match":"all","existence":"some"},
+            "state":{"field":"current_status","value":True,"operation":"equal","datatype":"boolean","match":"all","existence":"some"},
         })
         with self.assertRaises(jsonschema.ValidationError):
             self.validate("linux.selinuxboolean","collected_item",{
