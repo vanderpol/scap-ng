@@ -7,6 +7,7 @@ import jsonschema
 from referencing import Registry, Resource
 
 from generate_capability_schema import generate
+from validate_generated_capability_semantics import validate_assessment_capability_semantics
 
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -130,6 +131,24 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
                 },
                 "collect":bad,
             })
+
+    def test_pattern_selector_requires_match_semantics(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{"o":{
+                    "capability":"independent.textfilecontent54",
+                    "select":{
+                        "full_path":self.entity("/etc/example"),
+                        "pattern":self.entity("enabled=true",operation="equal"),
+                        "instance":self.entity(1,datatype="integer"),
+                    },
+                    "collect":self.defaults(),
+                }},
+                "states":{},
+                "tests":{},
+            }
+        })
+        self.assertIn("independent.textfilecontent54.pattern_operation",{row["code"] for row in rows})
 
     def test_state_retains_text_and_subexpression(self):
         for field in ("text","subexpression"):
