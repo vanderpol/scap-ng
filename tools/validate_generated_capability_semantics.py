@@ -167,6 +167,35 @@ def validate_macos_pwpolicy512_object(obj):
     return diagnostics
 
 
+
+def validate_windows_cmdlet_object(obj):
+    if obj.get("capability") != "windows.cmdlet":
+        return []
+    diagnostics=[]
+    collect=obj.get("collect") or {}
+    module_id=collect.get("module_id")
+    if isinstance(module_id,str):
+        import uuid
+        try:
+            uuid.UUID(module_id.strip("{}"))
+        except (ValueError, AttributeError):
+            diagnostics.append({
+                "code":"windows.cmdlet.module_guid",
+                "fields":["module_id"],
+                "message":"literal module_id must be a valid GUID representation",
+            })
+    selected=collect.get("select")
+    if isinstance(selected,dict):
+        fields=selected.get("fields") or {}
+        if "*" in fields:
+            diagnostics.append({
+                "code":"windows.cmdlet.select_no_wildcard",
+                "fields":["select"],
+                "message":"cmdlet selected output fields must be explicit; '*' is not permitted",
+            })
+    return diagnostics
+
+
 def _literal_state_values(states, state_ids, field):
     for state_id in state_ids or []:
         state=states.get(state_id)
@@ -334,6 +363,8 @@ def validate_assessment_capability_semantics(document):
         for row in validate_windows_registry_object(obj):
             diagnostics.append({"object":object_id,**row})
         for row in validate_macos_pwpolicy512_object(obj):
+            diagnostics.append({"object":object_id,**row})
+        for row in validate_windows_cmdlet_object(obj):
             diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
