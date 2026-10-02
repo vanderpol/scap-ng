@@ -176,7 +176,7 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
             aid=scoped_assessment_id(assessment_namespace, rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1)))
             ref='assessments/manual/'+aid+'.assessment.yaml'
             write_yaml(output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
-                'purpose':'assessment','class':'compliance','procedure':procedure,'inputs':{},'evidence':[]}})
+                'purpose':'assessment','class':'compliance','procedure':procedure,'response':{'type':'compliance','choices':[{'value':'pass','label':'Pass','outcome':'true'},{'value':'fail','label':'Fail','outcome':'false'},{'value':'unknown','label':'Unknown','outcome':'unknown'},{'value':'not_applicable','label':'Not applicable','outcome':'not_applicable'}],'allow_comment':True,'allow_evidence':True}}})
             manual_done[key]=ref
             result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
                 'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
