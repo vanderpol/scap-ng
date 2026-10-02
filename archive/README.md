@@ -11,8 +11,8 @@ Historical bulk is no longer required to remain in the active working tree. The 
 
 Iteration 001 contained two inputs still required by current work. They were promoted byte-for-byte before removal:
 
-- `data/oval-test-support-overrides.json`
-- `data/public-corpus-manifest.yaml`
+- `specification/migration/oval-test-support-overrides.json`
+- `tests/corpus-manifest.yaml`
 
 All other iteration-001/002 prototypes, generated comparisons, decision notes, lessons, and review artifacts remain preserved in Git history/tag rather than duplicated in the active tree.
 
