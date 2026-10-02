@@ -249,5 +249,36 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertEqual(none_report["near_duplicate_rule_candidates"],[])
 
 
+    def test_standalone_change_manifest_matches_report(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/example")
+            self.benchmark(root,"b","R2","/etc/example")
+            report_path=Path(td)/"report.json"
+            manifest_path=Path(td)/"changes.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),
+                    "--report",str(report_path),
+                    "--change-manifest",str(manifest_path),
+                    "--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            report=json.loads(report_path.read_text())
+            manifest=json.loads(manifest_path.read_text())
+            self.assertEqual(report["change_manifest"],manifest)
+            self.assertEqual(len(manifest["shared_assessments"]),1)
+            self.assertEqual(
+                set(manifest["shared_assessments"][0]["sources_replaced"]),
+                {
+                    "a/assessments/automated/R1.automated.assessment.yaml",
+                    "b/assessments/automated/R2.automated.assessment.yaml",
+                },
+            )
+
+
 if __name__=="__main__":
     unittest.main()
