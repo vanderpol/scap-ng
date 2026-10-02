@@ -210,3 +210,14 @@ XSD names without semantic review.
 ## Source-governance caveat for Windows extension families
 
 Some current Windows-native mappings were prototyped from production/SCC semantics and system-characteristics Item shapes even though the corresponding Test/Object/State family is absent from the official OVAL-Community v5.12.3 Windows definitions schema. These mappings SHALL NOT be described as standard OVAL 5.12.3 migration mappings until their exact publisher-extension provenance is identified and recorded. Native SCAP-NG design work may continue, but the standard migration crosswalk must distinguish standard OVAL from publisher extensions.
+
+
+## Content-backed standard checkpoint — 2026-10-02
+
+The reviewed mapping directory now covers every currently inventoried **standard OVAL 5.12.3 capability candidate with concrete production, Self-Assertion, validation, or other checked-in content evidence**.
+
+This checkpoint intentionally does not bulk-complete schema-only candidates. Those remain inventoried and deferred until concrete usage evidence or a higher-priority standards requirement appears.
+
+Remaining Windows content-backed names that lack official OVAL-Community v5.12.3 Test/Object/State definitions are tracked as publisher-extension provenance work rather than mislabeled as standard OVAL mappings.
+
+The mapping files in this directory are the authoritative reviewed capability registry; historical crosswalk tables may lag while documentation is regenerated.
