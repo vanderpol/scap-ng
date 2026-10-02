@@ -26,6 +26,17 @@ def safe(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "-", value).strip("-").lower() or "benchmark"
 
 
+def native_artifact_base(stem: str) -> str:
+    """Return a stable native product identity from a NIWC artifact stem.
+
+    Source STIG version/release and enhancement/signing suffixes are provenance,
+    not logical Benchmark identity.
+    """
+    artifact_base = re.sub(r"^U_", "", stem)
+    artifact_base = re.sub(r"_V\d+R\d+.*$", "", artifact_base)
+    return safe(artifact_base)
+
+
 def source_identity(path: Path):
     with zipfile.ZipFile(path) as zf:
         for name in sorted(zf.namelist()):
@@ -49,9 +60,7 @@ def source_identity(path: Path):
             # Native identities must not inherit XCCDF serialization names.
             # Derive a stable clean identity from the published artifact name,
             # while retaining the original XCCDF Benchmark ID in provenance.
-            artifact_base = re.sub(r"^U_", "", path.stem)
-            artifact_base = re.sub(r"_V\\d+R\\d+.*$", "", artifact_base)
-            native_base = safe(artifact_base)
+            native_base = native_artifact_base(path.stem)
             return {
                 "source_benchmark_id": source_id,
                 "benchmark_id": "niwc." + native_base,
