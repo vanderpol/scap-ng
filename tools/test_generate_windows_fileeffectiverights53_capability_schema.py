@@ -60,6 +60,31 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             },
         })
 
+    def test_case_insensitive_equal_directory_allows_traversal(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{"o":{
+                    "capability":"windows.fileeffectiverights53",
+                    "select":{
+                        "directory":self.entity(r"C:\\ProgramData",operation="equal_ci"),
+                        "name":self.entity(".*",operation="match"),
+                        "trustee_sid":self.entity("S-1-5-18"),
+                    },
+                    "traversal":{
+                        "max_depth":None,
+                        "recurse":"junctions_and_directories",
+                        "filesystem":"any",
+                    },
+                }},
+                "states":{},
+                "tests":{},
+            }
+        })
+        self.assertNotIn(
+            "windows.fileeffectiverights53.pattern_directory_no_traversal",
+            {row["code"] for row in rows},
+        )
+
     def test_full_path_with_traversal_is_semantic_error(self):
         rows=validate_assessment_capability_semantics({
             "assessment":{
