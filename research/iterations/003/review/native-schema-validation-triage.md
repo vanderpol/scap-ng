@@ -98,3 +98,33 @@ The previously committed full-current native validation evidence records:
 This is strong evidence that the current generator/schema contract was internally consistent across the 65-package NIWC Current corpus at that checkpoint. The current rerun remains authoritative for the latest commit because capability/schema work has continued since that evidence was produced.
 
 This baseline also confirms that failures from committed historical review trees and bakeoff examples should not be generalized into schema defects without reproducing them in freshly generated current content.
+
+
+## First triage outcome — 2026-10-02
+
+The first broad repository validation failures did **not** establish defects in the current SCAP-NG JSON Schemas.
+
+Classifications:
+
+- committed RHEL9 review tree: **generator/content-version drift**;
+- compact RHEL9 tailoring fixture: **historical/example drift**;
+- results-model-bakeoff examples: **historical result-model drift**;
+- tailoring-all-options example: **historical/example drift with useful semantic coverage**.
+
+The current schema meta-validation gate is green. The current-only schema-validation workflow is also green after historical/review artifacts were separated into an advisory audit rather than treated as normative current content.
+
+No schema was weakened merely to make stale examples validate.
+
+## Semantic-validation phase
+
+With structural schema validation green for fresh/current content, the next required layer is Assessment graph validation. The full-current workflow now validates both fresh generated and normalized corpora for:
+
+- Test → Object existence;
+- Test → State existence;
+- Test/Object/State capability agreement;
+- Test → Variable existence for direct Variable-backed tests;
+- Set → Object existence and capability agreement;
+- Set filter → State existence and capability agreement;
+- capability-specific cross-field semantics currently implemented by the native semantic validator.
+
+Semantic failures SHALL receive the same triage treatment as schema failures: classify as content/generator defect, semantic-validator defect, schema/design defect, or source migration issue before changing either content or validation rules.
