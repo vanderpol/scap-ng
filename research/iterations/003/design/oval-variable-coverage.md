@@ -41,7 +41,7 @@ Status values:
 | merge | merge component values with delimiter/sort/order semantics | native | lexical success + numeric-sort error fixtures added; record/runtime variants remain #26 |
 | var_ref in object entities | variable supplies selector values | native | multi-valued Object var_check round-trip matrix covered; operation-specific collection execution remains #26 |
 | var_ref in state entities | variable supplies expected values | native | many-to-many var_check + entity_check truth-table ordering is covered; target execution remains #26 |
-| var_ref datatype matching | referenced variable datatype must match consuming entity rules | native | converter now diagnoses explicit/effective string mismatches and var_check-without-var_ref; schema-derived capability validators remain the long-term source |
+| var_ref datatype matching | referenced variable datatype must match consuming entity rules | native | pinned OVAL 5.12.3 EntityAttributeGroup Schematron requires exact entity/Variable datatype equality; converter diagnoses mismatches, and source-invalid Self-Assertion/NIWC cases are quarantined as source defects rather than treated as missing NG capability |
 | var_ref on record entity | prohibited | native | converter source audit rejects record entity var_ref |
 | empty variable consumed by Object | Object considered not to exist | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
 | empty variable consumed by State | State evaluation error | native | source-backed reference-context semantics and regression covered; differential execution remains #26 |
@@ -113,3 +113,31 @@ until:
 6. datatype and operation constraints derived from XSD/Schematron are enforced;
 7. Self-Assertion tests cover language primitives; and
 8. production RHEL 9 / Windows 11 examples cover realistic deep combinations.
+
+
+### Source-invalid var_ref datatype fixtures
+
+The pinned OVAL 5.12.3 `EntityAttributeGroup` Schematron explicitly asserts
+that an entity using `var_ref` has the same effective `datatype` as the
+referenced Variable.  If the entity omits `datatype`, its effective datatype
+is `string`, so the referenced Variable must also be `string`.
+
+The SCAP Self-Assertion corpus contains a small number of intentional or
+historical Schematron-invalid examples that violate this rule, including
+cross-datatype `pid`, package `version`, and `is_installed` references.
+Published NIWC IIS content also contains such a mismatch.  These cases are
+valuable validation evidence, but they are not valid automated OVAL semantics
+to synthesize into native NG.
+
+Migration behavior is therefore fail-closed and evidence-preserving:
+
+- diagnose `var_ref_datatype_mismatch` from the reachable source graph;
+- classify it as `source_content_defect` only when that exact positive
+  semantic finding is present;
+- omit the invalid automated Assessment;
+- retain exact source IDs/detail in conversion evidence;
+- use a verified source manual Assessment only where the source provides one;
+- keep mixed or unknown unsupported findings as hard blockers.
+
+This correction does **not** weaken the datatype rule.  It separates valid
+language coverage from intentionally/actually invalid source content.
