@@ -25,8 +25,8 @@ The [dependency report](audit/dependencies.json) covers all workflow files, dire
 
 ## Historical dependencies retained deliberately
 
-- Iteration-001 `oval-test-support-overrides.json`: current governance reinstatement input.
-- Iteration-001 `public-corpus-manifest.yaml`: pinned source/corpus evidence.
+- `data/oval-test-support-overrides.json`: current governance reinstatement input, promoted byte-for-byte from iteration 001.
+- `data/public-corpus-manifest.yaml`: pinned source/corpus evidence, promoted byte-for-byte from iteration 001.
 - `tools/validate_scap14_schema_bundle.py`: byte-identical promotion of the old vendored-schema validator. Current CI uses this root entry point; the original remains archived.
 - Root `scap14_benchmark_ir.py` and `scap14_rule_splitter.py`: current helpers also used by historical pipelines.
 - `build_rhel9_review_slice.py`: current lowerer helper despite an older filename; its older generator entry point is not the novice full-review command.
@@ -34,7 +34,7 @@ The [dependency report](audit/dependencies.json) covers all workflow files, dire
 
 ## Implemented cleanup and future design
 
-The front door is now README → START-HERE → Board/current specification/tools, with archive and transition routes visibly separate. Original payloads remain in place, preserving external URLs and fixture paths. Twelve historical reproduction workflows have no automatic triggers and require a false-by-default manual opt-in. Three superseded v003 jobs remain held. A new boundary/preservation workflow validates the baseline and creates the preserved tag.
+The front door is now README → START-HERE → Board/current specification/tools, with archive and transition routes visibly separate. Generated review payloads have been removed from `main` after preservation/tagging and replacement with stable summaries; historical iterations 001/002 are preserved through the pre-rebaseline tag and indexed archive records. Twelve historical reproduction workflows have no automatic triggers and require a false-by-default manual opt-in. Three superseded v003 jobs remain held. A new boundary/preservation workflow validates the baseline and creates the preserved tag.
 
 A later physical promotion to top-level `design/`, `examples/` and `evidence/` should use a verified relocation map and compatibility layer, then remove old aliases after consumers move. Bulk moving now would break recorded paths and risks losing active data hidden in old trees. The present rebaseline establishes that relocation/deletion evidence before any such action.
 
