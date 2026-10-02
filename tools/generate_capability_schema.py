@@ -234,7 +234,7 @@ def generate(mapping, repo_root):
     )
     filesystem_schema = (
         {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/filesystem_scope"}
-        if traversal_definition else None
+        if traversal_definition in {"file_traversal", "windows_file_traversal"} else None
     )
 
     test_source = mapping.get("native", {}).get(
