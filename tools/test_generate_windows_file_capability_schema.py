@@ -60,8 +60,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
             "traversal":{
                 "max_depth":1,
                 "recurse":"junctions",
-                "filesystem":"same",
             },
+            "filesystem":"same",
         })
 
     def test_windows_traversal_preserves_junction_terminology(self):
@@ -75,8 +75,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
             "traversal":{
                 "max_depth":2,
                 "recurse":"junctions_and_directories",
-                "filesystem":"same",
             },
+            "filesystem":"same",
         })
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("object",{
