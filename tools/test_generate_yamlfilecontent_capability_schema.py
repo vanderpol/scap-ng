@@ -34,6 +34,7 @@ class YAMLFileContentCapabilitySchemaTests(unittest.TestCase):
         self.validate_def("object",{
             "object_title":"yaml file","capability":"independent.yamlfilecontent",
             "select":{"full_path":self.entity("/etc/example.yaml"),"yamlpath":self.entity("$.a")},
+            "filesystem":"any",
         })
         self.validate_def("object",{
             "object_title":"inline yaml","capability":"independent.yamlfilecontent",
