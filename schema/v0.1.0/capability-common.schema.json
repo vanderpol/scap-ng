@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.1.0/capability-common.schema.json",
+  "title": "SCAP-NG shared capability schema primitives v0.1.0",
+  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them.",
+  "$defs": {
+    "variable_reference": {
+      "type": "object",
+      "required": [
+        "variable"
+      ],
+      "properties": {
+        "variable": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "entity_value": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "$ref": "#/$defs/variable_reference"
+        }
+      ]
+    },
+    "object_entity_base": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "var_check": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nil": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "var_check"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state_entity_base": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype",
+        "entity_check",
+        "entity_existence"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "var_check": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nil": {
+          "type": "boolean"
+        },
+        "entity_check": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_existence": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "var_check"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state_filter": {
+      "type": "object",
+      "required": [
+        "state",
+        "action"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "include",
+            "exclude"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "test_reference_set": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}
