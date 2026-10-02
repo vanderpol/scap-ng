@@ -196,13 +196,40 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
     object_names.discard("behaviors")
 
     only_state = sorted(state_names - item_names)
-    only_item = sorted(item_names - state_names)
+    raw_only_item = sorted(item_names - state_names)
+    declared_item_only = mapping.get("native", {}).get("item_only_complex_fields", {})
+    if isinstance(declared_item_only, list):
+        declared_item_only = {name: "explicitly declared complex Item-only field" for name in declared_item_only}
+    allowed_item_only = []
+    unexpected_item_only = []
+    for name in raw_only_item:
+        if name not in declared_item_only:
+            unexpected_item_only.append(name)
+            continue
+        dtypes = field_datatypes(item_fields[name])
+        if "record" not in dtypes and not any(v.startswith("xsd-type:") for v in dtypes):
+            errors.append(
+                f"Item-only field {name!r} is declared as a complex exception but "
+                f"its source datatype is scalar: {sorted(dtypes)}"
+            )
+            continue
+        allowed_item_only.append({
+            "field": name,
+            "item_datatypes": sorted(dtypes),
+            "reason": declared_item_only[name],
+        })
+    undeclared_exceptions = sorted(set(declared_item_only) - set(raw_only_item))
+    if undeclared_exceptions:
+        errors.append(
+            "Declared Item-only complex fields are not actually Item-only: "
+            + ", ".join(undeclared_exceptions)
+        )
     object_not_state = sorted(object_names - state_names)
 
     if only_state:
         errors.append("State-only fields: " + ", ".join(only_state))
-    if only_item:
-        errors.append("Item-only fields: " + ", ".join(only_item))
+    if unexpected_item_only:
+        errors.append("Unexpected Item-only fields: " + ", ".join(unexpected_item_only))
     if object_not_state:
         errors.append("Object fields absent from State: " + ", ".join(object_not_state))
 
@@ -252,6 +279,7 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         "object_fields": sorted(object_names),
         "state_fields": sorted(state_names),
         "item_fields": sorted(item_names),
+        "allowed_item_only_complex_fields": allowed_item_only,
         "datatype_mismatches": datatype_mismatches,
         "corrected_source_defects": corrected_source_defects,
     })
@@ -293,7 +321,7 @@ def main():
 
     if args.json:
         print(json.dumps({
-            "invariant": "Object fields subset State fields; State fields equal Item fields",
+            "invariant": "Object scalar fields subset State fields; scalar State/Item fields align, with only explicitly justified complex Item-only exceptions",
             "checked": len(results),
             "failures": len(failures),
             "results": results,
