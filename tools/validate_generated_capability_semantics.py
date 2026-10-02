@@ -431,6 +431,7 @@ EXECUTABLE_SEMANTIC_RULE_IDS={
     "windows.ntuser.value_type_datatype",
     "windows.lockoutpolicy.nonnegative_time_values",
     "windows.wuaupdatesearcher.date_lexical_form",
+    "variable.value.source_exists",
     "windows.lockoutpolicy.singleton_source",
     "iosxe.version.singleton_source",
     "independent.family.singleton_source",
