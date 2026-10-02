@@ -190,6 +190,15 @@ The project has now entered the repository-wide validation phase. Current fresh 
 
 Historical/example artifacts are audited separately from the normative current-content gate and are triaged before any schema or content change.
 
+Semantic obligations declared by a mapping are also required to have an explicit enforcement owner. Current enforcement layers are:
+
+- **executable/static** — checked directly against authored native Assessment content;
+- **structural/import** — guaranteed by generated schema shape or lossless importer materialization;
+- **runtime** — scanner collection/evaluation behavior that cannot be proven from authored content alone;
+- **policy** — normative trust/authoring/deployment requirements rather than data-shape predicates.
+
+The maintained all-mappings regression fails if a declared semantic rule is unclassified or if enforcement-layer inventories overlap. Classification is not itself proof that a runtime implementation is conformant; runtime obligations still require independent evaluator/conformance evidence.
+
 ## Windows schema verification note
 
 The approved Windows OVAL families are present in the authoritative OVAL-Community v5.12.3 Windows definitions schema and in the checked-in SCAP-NG copy. During review, the GitHub connector's normal file-content endpoint returned an empty payload for the large (~1.17 MB) XSD, which initially created a false appearance that these definitions were missing.
