@@ -106,6 +106,14 @@ class WindowsCmdletCapabilitySchemaTests(unittest.TestCase):
             }}},"states":{},"tests":{}}})
         self.assertIn("windows.cmdlet.module_guid",{row["code"] for row in rows})
 
+    def test_valid_literal_module_guid_is_accepted(self):
+        rows=validate_assessment_capability_semantics({"assessment":{"objects":{"o":{
+            "capability":"windows.cmdlet","collect":{
+                "module_name":None,"module_id":"{6F9619FF-8B86-D011-B42D-00C04FC964FF}","module_version":None,
+                "verb":"Get","noun":"Process","parameters":None,"select":None,
+            }}},"states":{},"tests":{}}})
+        self.assertNotIn("windows.cmdlet.module_guid",{row["code"] for row in rows})
+
     def test_select_wildcard_is_rejected(self):
         selected=self.object_record()
         selected["fields"]["*"]=selected["fields"].pop("name")
