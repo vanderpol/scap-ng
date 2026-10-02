@@ -65,3 +65,16 @@ Before calling something a SCAP 1.4 content bug, verify it against:
 5. any documented OVAL Board decision or deprecation/reinstatement record.
 
 When confidence is high, create or link a GitHub Issue for the content owner and retain this page as the durable project index.
+
+
+## SCAP14-CONTENT-002 — Windows Update Searcher Item exposes unfilterable scalar source_path
+
+**Status:** confirmed schema/content-surface mismatch  
+**Source:** OVAL 5.12.3 Windows `wuaupdatesearcher_item` / `wuaupdatesearcher_state`  
+**Observed:** `wuaupdatesearcher_item` collects scalar `source_path` (Windows Update Server URL or offline CAB filepath), but `wuaupdatesearcher_state` exposes no matching `source_path` entity. The field is not deprecated and is documented as normal collected data.
+
+**Impact:** authors can receive `source_path` in collected results but cannot test or filter it with a State. This violates the intended scalar Item/State symmetry used by Set filters.
+
+**SCAP-NG disposition:** include `source_path` in the native canonical Item/State model so it is filterable. Preserve migration provenance noting that legacy OVAL 5.12.3 State could not express the predicate.
+
+**Upstream recommendation:** add matching `source_path` to `wuaupdatesearcher_state` in a future OVAL maintenance release (candidate 5.12.4) if the Board agrees.
