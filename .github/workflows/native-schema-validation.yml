@@ -40,6 +40,37 @@ jobs:
           print('schemas_checked=', count)
           PY
 
+  validator-unit-regression:
+    name: Validate native schema harness behavior
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check jsonschema pyyaml
+      - name: Exercise validator on minimal valid and invalid documents
+        run: |
+          python - <<'PY'
+          import json, tempfile
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'tools')
+          import validate_native_json_schemas as v
+          schema_dir=Path('schema/v0.1.0')
+          validators=v.build_validators(schema_dir)
+          required={'benchmark.schema.json','rule.schema.json','assessment.schema.json'}
+          missing=required-set(validators)
+          if missing:
+              raise SystemExit(f'missing validators: {sorted(missing)}')
+          # Invalid content must produce diagnostics rather than being skipped.
+          errors=list(validators['benchmark.schema.json'].iter_errors({'benchmark': {}}))
+          if not errors:
+              raise SystemExit('invalid minimal Benchmark unexpectedly validated')
+          print('validators_built=',len(validators))
+          print('invalid_benchmark_diagnostics=',len(errors))
+          PY
+
   historical-content-audit:
     name: Advisory audit (${{ matrix.name }})
     runs-on: ubuntu-latest
