@@ -101,6 +101,55 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
+    def test_unix_traversal_preserves_symlink_terminology(self):
+        self.validate_def("object", {
+            "object_title": "symlink traversal",
+            "capability": "unix.file",
+            "select": {
+                "directory": {
+                    "value": "/etc",
+                    "operation": "equal",
+                    "datatype": "string",
+                    "mask": False,
+                },
+                "name": {
+                    "value": ".*",
+                    "operation": "match",
+                    "datatype": "string",
+                    "mask": False,
+                },
+            },
+            "traversal": {
+                "max_depth": 2,
+                "recurse": "symlinks",
+                "filesystem": "local",
+            },
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object", {
+                "object_title": "Windows terminology is not Unix traversal syntax",
+                "capability": "unix.file",
+                "select": {
+                    "directory": {
+                        "value": "/etc",
+                        "operation": "equal",
+                        "datatype": "string",
+                        "mask": False,
+                    },
+                    "name": {
+                        "value": ".*",
+                        "operation": "match",
+                        "datatype": "string",
+                        "mask": False,
+                    },
+                },
+                "traversal": {
+                    "max_depth": 2,
+                    "recurse": "junctions",
+                    "filesystem": "local",
+                },
+            })
+
     def test_directory_selection_uses_native_null_name(self):
         self.validate_def("object", {
             "object_title": "directory itself",
