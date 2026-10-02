@@ -558,6 +558,16 @@ SINGLETON_SOURCE_CAPABILITIES={
     "macos.softwareupdate",
 }
 
+NO_OBJECT_RULE_IDS={
+    "macos.disabledservice":"macos.disabledservice.implicit_population",
+    "macos.gatekeeper":"macos.gatekeeper.implicit_source",
+    "macos.softwareupdate":"macos.softwareupdate.implicit_population",
+}
+
+
+def _no_object_rule_id(capability):
+    return NO_OBJECT_RULE_IDS.get(capability, f"{capability}.singleton_source")
+
 
 def validate_singleton_source_document(document):
     assessment=document.get("assessment",document)
@@ -567,7 +577,7 @@ def validate_singleton_source_document(document):
         if capability in SINGLETON_SOURCE_CAPABILITIES and "object" in test:
             diagnostics.append({
                 "test":test_id,
-                "code":f"{capability}.singleton_source",
+                "code":_no_object_rule_id(capability),
                 "fields":["object"],
                 "message":"singleton-source capability Test must not reference an Object",
             })
@@ -576,7 +586,7 @@ def validate_singleton_source_document(document):
         if capability in SINGLETON_SOURCE_CAPABILITIES:
             diagnostics.append({
                 "object":object_id,
-                "code":f"{capability}.singleton_source",
+                "code":_no_object_rule_id(capability),
                 "message":"singleton-source capability must not define an Object",
             })
     return diagnostics
