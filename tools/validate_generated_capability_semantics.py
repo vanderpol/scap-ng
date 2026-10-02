@@ -126,7 +126,7 @@ def validate_file_selection_object(obj):
             and any(ch in value for ch in '\\/:*?>|<"')
         ):
             diagnostics.append({
-                "code":"windows.file.literal_name_characters",
+                "code":f"{capability}.literal_name_characters",
                 "fields":["name"],
                 "message":"literal Windows file name contains path separator or reserved filename characters",
             })
@@ -423,6 +423,7 @@ EXECUTABLE_SEMANTIC_RULE_IDS={
     "windows.cmdlet.module_guid",
     "windows.cmdlet.select_no_wildcard",
     "windows.file.literal_name_characters",
+    "windows.fileeffectiverights53.literal_name_characters",
     "windows.registry.key_null_requires_name_null",
     "windows.registry.pattern_key_no_traversal",
     "windows.ntuser.pattern_key_no_traversal",
@@ -460,6 +461,8 @@ def executable_rule_id_for_diagnostic(code):
 
 STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.wmi.query.structured_results",
+    "windows.fileeffectiverights53.trustee_sid",
+    "windows.regkeyeffectiverights53.deprecated_group_behaviors",
     # Enforced by generated schema structure or lossless importer materialization.
     "independent.yamlfilecontent.record_keys",
     "windows.cmdlet.record_fields",
