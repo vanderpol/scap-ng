@@ -184,5 +184,128 @@ class NativeCapabilityMappingTests(unittest.TestCase):
             apply_capability_mapping(doc,self.mapping)
 
 
+
+class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
+    def mapping(self,name):
+        return json.loads(
+            (ROOT/"schema/v0.1.0/capability-mappings"/name).read_text(encoding="utf-8")
+        )
+
+    def test_textfilecontent54_object_predicates_and_defaults_become_native(self):
+        mapping=self.mapping("independent.textfilecontent54.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"sudoers",
+                "capability":"independent.textfilecontent54",
+                "select":{
+                    "filepath":{
+                        "value":"/etc/sudoers",
+                        "operation":"equals",
+                        "datatype":"string",
+                        "mask":False,
+                    },
+                    "pattern":{
+                        "value":"^Defaults",
+                        "operation":"pattern match",
+                        "datatype":"string",
+                        "mask":False,
+                    },
+                    "instance":{
+                        "value":"1",
+                        "operation":"greater than or equal",
+                        "datatype":"int",
+                        "mask":False,
+                    },
+                },
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["o"]
+        self.assertEqual(obj["capability"],"independent.textfilecontent54")
+        self.assertEqual(obj["select"]["full_path"]["operation"],"equal")
+        self.assertEqual(obj["select"]["pattern"]["operation"],"match")
+        self.assertEqual(obj["select"]["instance"]["operation"],"greater_or_equal")
+        self.assertEqual(obj["select"]["instance"]["datatype"],"integer")
+        self.assertEqual(obj["collect"],{
+            "ignore_case":False,
+            "multiline":True,
+            "singleline":False,
+            "item_creation":"all_object_elements_fullfilled",
+        })
+
+    def test_file_nil_name_becomes_native_directory_selection(self):
+        mapping=self.mapping("independent.textfilecontent54.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"directory",
+                "capability":"independent.textfilecontent54",
+                "select":{
+                    "path":{"value":"/etc","operation":"equals","datatype":"string"},
+                    "filename":{"value":"","operation":"equals","datatype":"string","nil":True},
+                    "pattern":{"value":"x","operation":"pattern match","datatype":"string"},
+                    "instance":{"value":"1","operation":"equals","datatype":"int"},
+                },
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        self.assertIsNone(out["assessment"]["objects"]["o"]["select"]["name"])
+
+    def test_singleton_source_removes_meaningless_object_and_test_reference(self):
+        mapping=self.mapping("windows.auditeventpolicysubcategories.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"singleton",
+                "capability":"windows.auditeventpolicysubcategories",
+            }},
+            "states":{"s":{
+                "state_title":"audit",
+                "capability":"windows.auditeventpolicysubcategories",
+                "state":{
+                    "field":"logon",
+                    "value":"AUDIT_SUCCESS",
+                    "operation":"equals",
+                    "datatype":"string",
+                    "entity_check":"all",
+                    "entity_existence":"at_least_one_exists",
+                },
+            }},
+            "tests":{"t":{
+                "test_title":"audit",
+                "capability":"windows.auditeventpolicysubcategories",
+                "object":"o",
+                "check_existence":"at_least_one_exists",
+                "check":"all",
+                "states":["s"],
+            }},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        self.assertNotIn("o",out["assessment"]["objects"])
+        self.assertNotIn("object",out["assessment"]["tests"]["t"])
+        self.assertEqual(out["assessment"]["tests"]["t"]["existence"],"some")
+        self.assertEqual(out["assessment"]["tests"]["t"]["match"],"all")
+
+    def test_singleton_source_fails_closed_on_meaningful_object(self):
+        mapping=self.mapping("windows.auditeventpolicysubcategories.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"not actually singleton",
+                "capability":"windows.auditeventpolicysubcategories",
+                "select":{"unexpected":{"value":"x","operation":"equals","datatype":"string"}},
+            }},
+            "states":{},
+            "tests":{"t":{
+                "test_title":"audit",
+                "capability":"windows.auditeventpolicysubcategories",
+                "object":"o",
+            }},
+        }}
+        with self.assertRaisesRegex(ValueError,"unexpected semantics"):
+            apply_capability_mapping(doc,mapping)
+
+
 if __name__=="__main__":
     unittest.main()
