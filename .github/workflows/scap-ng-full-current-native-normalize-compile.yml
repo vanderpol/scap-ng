@@ -200,11 +200,15 @@ jobs:
 
       - name: Normalize exact duplicates and report near overlaps
         run: |
+          # Draft-stability gate: exact semantic normalization only.
+          # Advisory near-duplicate/rule-similarity analysis is intentionally
+          # separate because it does not affect exact merge decisions and is
+          # substantially more expensive across the full corpus.
           python scap-ng/tools/scap_ng_repo_normalizer.py work/fresh-current \
             --rewrite \
             --output-root work/normalized-current \
             --report work/evidence/normalizer-report.json \
-            --top-near 500
+            --advisory none
       - name: Validate normalized native corpus against v0.1.0 schemas
         timeout-minutes: 45
         run: |
