@@ -475,6 +475,9 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "unix.interface.type_literal",
     "unix.shadow.encrypt_method_literal",
     "unix.uname.singleton_source",
+    "windows.passwordpolicy.singleton_source",
+    "windows.auditeventpolicysubcategories.singleton_source",
+    "windows.auditeventpolicysubcategories.supported_fields",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
@@ -490,6 +493,7 @@ RUNTIME_SEMANTIC_RULE_IDS={
     "linux.rpminfo.filepaths_collection",
     "linux.rpmverifypackage.skipped_results",
     "unix.symlink.canonical_resolution",
+    "windows.passwordpolicy.source_ranges",
     # These require collection/evaluation behavior rather than static authored-content validation.
     "independent.xmlfilecontent.xpath_text_values",
 }
