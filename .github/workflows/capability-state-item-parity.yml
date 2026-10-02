@@ -20,17 +20,48 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install schema validation dependency
+        run: python -m pip install --disable-pip-version-check jsonschema
       - name: Audit Object subset and State Item parity
         id: audit
         continue-on-error: true
         run: |
           python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json
+      - name: Generate and meta-validate every reviewed capability schema
+        run: |
+          PYTHONPATH=tools python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from generate_capability_schema import generate
+
+          root=Path('.').resolve()
+          mapping_dir=root/'schema/v0.1.0/capability-mappings'
+          checked=0
+          failures=[]
+          for path in sorted(mapping_dir.glob('*.json')):
+              try:
+                  mapping=json.loads(path.read_text(encoding='utf-8'))
+                  schema=generate(mapping,root)
+                  Draft202012Validator.check_schema(schema)
+                  checked += 1
+              except Exception as exc:
+                  failures.append({'mapping':path.name,'error':repr(exc)})
+          report={'checked':checked,'failures':failures}
+          Path('generated-capability-schema-validation.json').write_text(
+              json.dumps(report,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print(json.dumps(report,indent=2,sort_keys=True))
+          if failures:
+              raise SystemExit(1)
+          PY
       - name: Upload parity report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: capability-state-item-parity
-          path: capability-state-item-parity.json
+          path: |
+            capability-state-item-parity.json
+            generated-capability-schema-validation.json
       - name: Enforce parity
         if: steps.audit.outcome != 'success'
         run: |
