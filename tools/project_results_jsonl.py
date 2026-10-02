@@ -65,7 +65,7 @@ def project_scan(
             "run_id": scan["run_id"],
             "started_at": benchmark_doc.get("started_at", scan.get("started_at")),
             "completed_at": benchmark_doc.get("completed_at", scan.get("completed_at")),
-            "scanner": benchmark_doc.get("scanner", scan.get("scanner", {})),
+            "scanner": scan.get("scanner", {}),
             "target_ref": target_ref,
             "target": target,
             "benchmark": canonical_benchmark,
@@ -93,12 +93,8 @@ def project_scan(
                 "message": rule.get("message"),
                 "reason": rule.get("reason"),
                 "assessment": rule.get("assessment"),
-                "expected_state": rule.get("expected_state", []),
-                "observed_state": rule.get("observed_state", []),
                 "instances": rule.get("instances", []),
                 "evidence_refs": rule.get("evidence_refs", []),
-                "evidence_summary": rule.get("evidence_summary"),
-                "organizational_inputs": rule.get("organizational_inputs", []),
             }
             events.append(event)
 
