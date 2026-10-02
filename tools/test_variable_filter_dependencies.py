@@ -300,6 +300,59 @@ class DependencyTests(unittest.TestCase):
             self.assertEqual(audit_set_references(document)["mismatches"][0]["set_depth"],
                              depth)
 
+    def test_candidate_recursive_set_schematron_covers_all_depths_and_namespaces(self):
+        """Candidate upstream rule covers recursive depth and qualified type identity."""
+        sch = "http://purl.oclc.org/dsdl/schematron"
+        focused = etree.Element(
+            f"{{{sch}}}schema", nsmap={"sch": sch}, queryBinding="xslt"
+        )
+        etree.SubElement(focused, f"{{{sch}}}ns", prefix="oval-def", uri=OD)
+        pattern = etree.SubElement(
+            focused, f"{{{sch}}}pattern", id="oval-def_setobjref_recursive_candidate"
+        )
+        rule = etree.SubElement(
+            pattern,
+            f"{{{sch}}}rule",
+            context=(
+                "oval-def:oval_definitions/oval-def:objects/*/"
+                "oval-def:set//oval-def:object_reference"
+            ),
+        )
+        assertion = etree.SubElement(
+            rule,
+            f"{{{sch}}}assert",
+            test=(
+                "local-name(ancestor::*[parent::oval-def:objects][1]) = "
+                "local-name(ancestor::oval-def:oval_definitions/"
+                "oval-def:objects/*[@id=current()]) and "
+                "namespace-uri(ancestor::*[parent::oval-def:objects][1]) = "
+                "namespace-uri(ancestor::oval-def:oval_definitions/"
+                "oval-def:objects/*[@id=current()])"
+            ),
+        )
+        assertion.text = (
+            "Each object referenced by the set must be of the same qualified "
+            "type as the parent object"
+        )
+        validator = isoschematron.Schematron(focused, store_report=True)
+
+        for depth in (1, 3, 4, 32):
+            with self.subTest(depth=depth, case="valid"):
+                valid = etree.fromstring(ET.tostring(set_source(depth)))
+                self.assertTrue(validator.validate(valid))
+
+            with self.subTest(depth=depth, case="same_namespace_mismatch"):
+                mismatch = etree.fromstring(ET.tostring(
+                    set_source(depth, target_name="fileextendedattribute_object")
+                ))
+                self.assertFalse(validator.validate(mismatch))
+
+            with self.subTest(depth=depth, case="same_local_name_other_namespace"):
+                mismatch = etree.fromstring(ET.tostring(
+                    set_source(depth, OD + "#windows", "file_object")
+                ))
+                self.assertFalse(validator.validate(mismatch))
+
     def test_concat_limit_is_checked_before_product_allocation(self):
         root = source()
         expr = component("concat")
