@@ -22,7 +22,12 @@ from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare, OD
 from check_current_authoring_contract import violations
 from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
+from scap_upconvert_v003.native_capability_mapping import apply_ready_capability_mappings
 import yaml
+
+NATIVE_CAPABILITY_MAPPING_DIR = (
+    Path(__file__).resolve().parents[2] / "schema/v0.1.0/capability-mappings"
+)
 
 def source_benchmark(package):
     benchmarks=[]
@@ -251,6 +256,7 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         if not parity['equal']:
             failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
         native=align_assessment_vocabulary(native)
+        native=apply_ready_capability_mappings(native,NATIVE_CAPABILITY_MAPPING_DIR)
         errors=violations(native)
         if errors: raise ValueError('Current vocabulary guard: '+str(errors))
         ref='assessments/automated/'+aid+'.assessment.yaml'
