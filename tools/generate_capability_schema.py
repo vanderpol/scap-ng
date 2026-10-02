@@ -232,6 +232,10 @@ def generate(mapping, repo_root):
         {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{traversal_definition}"}
         if traversal_definition else None
     )
+    filesystem_schema = (
+        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/filesystem_scope"}
+        if traversal_definition else None
+    )
 
     test_source = mapping.get("native", {}).get(
         "test_source", {"kind": "object", "field": "object"}
@@ -529,6 +533,7 @@ def generate(mapping, repo_root):
         object_properties = {
             "object_title": {"type": ["string", "null"]},
             "capability": {"const": capability},
+            **({"filesystem": filesystem_schema} if filesystem_schema else {}),
             **({"traversal": traversal_schema} if traversal_schema else {}),
             **({"collect": collect_schema} if collect_schema else {}),
             "set": {
@@ -543,7 +548,11 @@ def generate(mapping, repo_root):
                 "additionalProperties": False,
                 "oneOf": selector_alternatives,
             }
-            direct_required = ["select"] + (["collect"] if collect_required else [])
+            direct_required = (
+                ["select"]
+                + (["filesystem"] if filesystem_schema else [])
+                + (["collect"] if collect_required else [])
+            )
             object_alternatives.append({
                 "required": direct_required,
                 "not": {"required": ["set"]},
