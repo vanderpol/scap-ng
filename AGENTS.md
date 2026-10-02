@@ -209,3 +209,7 @@ semantically significant sequence order (for example, function arguments).
 Run `tools/check_current_authoring_contract.py` on generated review source; keep
 the presentation-order guard in the converter and CI. See `CURRENT-DESIGN.md`
 under `research/iterations/003/design/` for the authoritative contract.
+
+## Cross-interface continuity
+
+For ChatGPT/web Codex handoffs, read transition/README.md and transition/decisions.md after CURRENT-DESIGN. Treat archived issue/conversation summaries and pinned historical documents as evidence, not current implementation proof. Recover latest owner corrections before restoring an older feature. Owner Oct 1 correction: Tailoring cannot override publisher Parameter values; delegated values use Organizational Input and changed requirements need distinct policy identity. Preserve Rule role as the working informational policy control pending an agreed replacement. Update the handoff with exact commit, validation evidence, blockers and next step when changing interfaces.

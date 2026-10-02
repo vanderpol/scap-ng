@@ -40,6 +40,14 @@ For each supported capability:
 6. A capability is not considered covered merely because a JSON Schema exists;
    focused semantic fixtures and corpus validation are also required.
 
+Exact source names include historical OVAL version suffixes. Owner
+clarification, 2026-10-02: `wmi57` identifies the OVAL 5.7 revision and
+`textfilecontent54` the OVAL 5.4 revision. A native name may be simplified only
+with an explicit mapping; do not silently strip suffixes across the inventory
+or accept a deprecated predecessor. The
+[reviewed crosswalk](../../../specification/migration/oval-5.12.3-capability-crosswalk.md#reviewed-native-mappings-override-the-provisional-inventory)
+links each current mapping and distinguishes unmapped candidates.
+
 ## Supported native mapping patterns
 
 ### Selector-driven Object

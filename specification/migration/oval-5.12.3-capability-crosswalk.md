@@ -34,6 +34,43 @@ an XML Test element.
 Historical numeric suffixes remain provisional until the specification proves
 that collapsing them would preserve semantics.
 
+### Reviewed native mappings override the provisional inventory
+
+The inventory below is historical naming research, not the current converter
+registry. For reviewed clean native capabilities, the exact source family is
+retained in [capability mappings](../../schema/v0.1.0/capability-mappings/README.md)
+while the native capability name may differ from the source basename.
+
+| Exact OVAL source Test | Current native capability | Mapping |
+| --- | --- | --- |
+| `unix:file_test` | `unix.file` | [unix.file](../../schema/v0.1.0/capability-mappings/unix.file.json) |
+| `independent:filehash58_test` | `file.hash` | [file.hash](../../schema/v0.1.0/capability-mappings/file.hash.json) |
+| `windows:file_test` | `windows.file` | [windows.file](../../schema/v0.1.0/capability-mappings/windows.file.json) |
+| `windows:registry_test` | `windows.registry` | [windows.registry](../../schema/v0.1.0/capability-mappings/windows.registry.json) |
+| `independent:variable_test` | `variable.value` | [variable.value](../../schema/v0.1.0/capability-mappings/variable.value.json) |
+| `windows:wmi57_test` | `windows.wmi.query` | [windows.wmi.query](../../schema/v0.1.0/capability-mappings/windows.wmi.query.json) |
+
+Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
+in which the revised capability was introduced/fixed, for example `54` in
+`textfilecontent54` means OVAL 5.4 and `57` in `wmi57` means OVAL 5.7. They are
+not WMI product versions or evidence that the older unsuffixed Test is
+interchangeable. Preserve the exact versioned source names in importer mappings
+and provenance even when native names omit the suffix.
+
+Pinned source documentation distinguishes the replacements: `wmi57` supports
+multiple selected WMI fields where deprecated `wmi` permitted a single field;
+`textfilecontent54` adds multi-line and multi-instance matching compared with
+deprecated `textfilecontent`. See the pinned
+[Windows schema](../../third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd)
+and [independent schema](../../third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd).
+
+No reviewed clean native mapping for `textfilecontent54` is established by this
+table. Its historical candidate spelling below does not prove native coverage.
+Every future mapping SHALL identify the exact source Test/Object/State family,
+field translation, preserved semantics, intentional divergences, unsupported
+cases and regression evidence. Name simplification alone is not conversion
+equivalence and SHALL NOT bypass effective deprecation checks.
+
 ## Inventory summary
 
 | Family | OVAL tests | NG candidates | Effective deprecated/excluded |

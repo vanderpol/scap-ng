@@ -11,8 +11,7 @@ from pathlib import Path
 import yaml
 
 ALLOWED={'id','version','title','purpose','description','benchmark','profile','extends','enabled_rules','disabled_rules',
-         'enabled_groups','disabled_groups','parameters','check_selectors','selection_justifications',
-         'parameter_justifications','provenance'}
+         'enabled_groups','disabled_groups','check_selectors','selection_justifications','provenance'}
 
 
 def load(path, kind):
@@ -87,6 +86,8 @@ def resolve(benchmark_path, tailoring_path, input_path=None):
         path=path.resolve()
         if path in stack: raise ValueError('Tailoring inheritance cycle')
         stack.append(path);t=load(path,'tailoring')
+        if 'parameters' in t or 'parameter_justifications' in t:
+            raise ValueError('Tailoring cannot override publisher Parameters; use Organizational Input for delegated values or a distinct policy identity')
         if set(t)-ALLOWED: raise ValueError('Unsupported Tailoring mutation: '+str(sorted(set(t)-ALLOWED)))
         if t['benchmark']!=binding or t.get('profile')!=profile_id: raise ValueError('Benchmark/version/Profile binding mismatch')
         parent=t.get('extends')
@@ -106,10 +107,6 @@ def resolve(benchmark_path, tailoring_path, input_path=None):
         origin='tailoring:'+t['id']
         for rid in enables: selections[rid]=True;selection_source[rid]=origin
         for rid in disables: selections[rid]=False;selection_source[rid]=origin
-        for key,value in t.get('parameters',{}).items():
-            if key not in parameters or not parameters[key].get('tailorable') or parameters[key]['source']!='publisher':
-                raise ValueError('Unknown, non-tailorable or organization-defined Parameter: '+key)
-            validate_value(parameters[key],value);values[key]=deepcopy(value);value_source[key]=origin
         for rid,selector in t.get('check_selectors',{}).items():
             if rid not in rules or selector not in rules[rid]['assessment_choices']: raise ValueError('Unknown Rule/Assessment selector')
             selectors[rid]=selector;selector_source[rid]=origin
@@ -117,8 +114,7 @@ def resolve(benchmark_path, tailoring_path, input_path=None):
                         'selection':dict(selections),
                         'parameter_values':deepcopy(values),'check_selectors':dict(selectors),
                         'provenance':deepcopy(t.get('provenance',{})),
-                        'selection_justifications':deepcopy(t.get('selection_justifications',{})),
-                        'parameter_justifications':deepcopy(t.get('parameter_justifications',{}))})
+                        'selection_justifications':deepcopy(t.get('selection_justifications',{}))})
         stack.pop()
     apply_layer(tailoring_path)
     organizational_input={}

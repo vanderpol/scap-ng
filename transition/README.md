@@ -14,7 +14,7 @@ This directory preserves project continuity in either interface. Moving to web C
 4. [Retrieved conversation evidence](recovered-notes.md).
 5. [Earlier decision reconciliation](../research/iterations/003/evidence/decision-recovery-2026-09-30.md).
 6. [Specification index](../specification/README.md) and [requirements index](../specification/requirements-index.md).
-7. Relevant open issues, pinned original sources, and actual validation evidence.
+7. [Pinned source index](source-index.json), [issue/comment snapshot](issues-2026-10-02.json), relevant live issues, pinned original sources, and actual validation evidence.
 
 Latest explicit owner instructions take precedence. Historical generated source, earlier assistant summaries, proposals, implementation behavior, and passing narrow tests SHALL NOT override accepted current decisions. Owner working acceptance, Board ratification, implementation, schema validation, round-trip equivalence, and runtime conformance are distinct statuses.
 

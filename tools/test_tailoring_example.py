@@ -25,8 +25,8 @@ class TailoringExample(unittest.TestCase):
         self.assertEqual(r['effective_selection'],{'demo-password-length':True,'demo-password-history':True,
                          'demo-log-retention':True,'demo-session-timeout':False,'demo-time-sources':False})
         self.assertFalse(r['tailoring_layers'][0]['selection']['demo-password-length'])
-        self.assertEqual([layer['parameter_values']['password_minimum_length'] for layer in r['tailoring_layers']],[16,18])
-        self.assertEqual(r['parameter_source']['password_minimum_length'],'tailoring:example.site-tailoring')
+        self.assertEqual([layer['parameter_values']['password_minimum_length'] for layer in r['tailoring_layers']],[14,14])
+        self.assertEqual(r['parameter_source']['password_minimum_length'],'profile:site-baseline')
         self.assertEqual(r['assessment_selections']['demo-log-retention']['selector'],'document-review')
         self.assertNotIn('approved_time_sources',r['parameters'])
         self.assertEqual(r['organizational_input']['approved_time_sources']['source'],'example.site-input')
@@ -68,15 +68,27 @@ class TailoringExample(unittest.TestCase):
         root=self.modified(lambda d:d['tailoring']['check_selectors'].update({'demo-log-retention':'unknown'}))
         with self.assertRaisesRegex(ValueError,'Unknown Rule/Assessment selector'):self.run_demo(root)
 
-    def test_parameter_type_and_constraints_are_enforced(self):
+    def test_publisher_profile_parameter_type_and_constraints_are_enforced(self):
         for value in (True,7,129,'18'):
             with self.subTest(value=value):
-                root=self.modified(lambda d:d['tailoring']['parameters'].update(password_minimum_length=value))
+                root=self.modified(lambda d:d['benchmark']['profiles'][0]['parameters'].update(password_minimum_length=value), file='benchmark.yaml')
                 with self.assertRaises(ValueError):self.run_demo(root)
 
+    def test_tailoring_parameter_overrides_are_rejected_in_every_layer(self):
+        for file in ('tailoring/all-options.tailoring.yaml', 'tailoring/organization-baseline.tailoring.yaml'):
+            for values in ({}, {'password_minimum_length':18}):
+                with self.subTest(file=file, values=values):
+                    root=self.modified(lambda d:d['tailoring'].update(parameters=values), file=file)
+                    with self.assertRaisesRegex(ValueError,'Tailoring cannot override publisher Parameters'):
+                        self.run_demo(root)
+
     def test_organizational_input_is_not_a_tailoring_override(self):
-        root=self.modified(lambda d:d['tailoring']['parameters'].update(approved_time_sources=['ntp.example.test']))
-        with self.assertRaisesRegex(ValueError,'organization-defined'):self.run_demo(root)
+        root=self.modified(lambda d:d['tailoring'].update(parameters={'approved_time_sources':['ntp.example.test']}))
+        with self.assertRaisesRegex(ValueError,'Tailoring cannot override publisher Parameters'):self.run_demo(root)
+
+    def test_organizational_input_cannot_override_publisher_parameter(self):
+        root=self.modified(lambda d:d['organizational_input']['values'].update(password_minimum_length=18), file='organizational-input.yaml')
+        with self.assertRaisesRegex(ValueError,'Input cannot override publisher Parameter'):self.run_demo(root)
 
     def test_execution_mutations_are_rejected(self):
         root=self.modified(lambda d:d['tailoring'].update(commands=['unexpected']))

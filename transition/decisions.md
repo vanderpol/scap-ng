@@ -28,7 +28,7 @@ Authority order: latest explicit owner instruction → maintained current design
 | Sets/filters | Preserve nesting, relative complement, flags and filter-before-enclosing-set semantics. | AGENTS; assessment-evaluation-semantics.md. |
 | Records | Record data used by WMI, cmdlet and other tests must be captured and tested. | Visible Oct 1 owner message; recent WMI implementation still needs current validation. |
 | Publisher Profiles | Every member Rule enabled; publisher Profiles subtractive only; disabled_rules includes [] when empty; no enabled_rules/re-enabling ancestor-disabled Rules. | CURRENT-DESIGN and specification/policy/profiles-and-tailoring.md. |
-| External Tailoring | May enable/disable existing Rules, restore publisher-disabled Rules, refine permitted parameters and select existing named assessments; cannot replace implementations/bindings. | CURRENT-DESIGN; supersedes generic statements that all profile layers are subtractive. |
+| External Tailoring | May enable/disable existing Rules, restore publisher-disabled Rules and select existing named assessments; SHALL NOT override publisher Parameter values or replace implementations/bindings. | Oct 1 recovered owner correction supersedes Sept 30 value-refinement acceptance; current specification and corrected resolver enforce the restriction. |
 | Tailoring provenance | Human-readable purpose; creator, modifier, authorizer, dates, organization, authorization reference/status; preserve draft nulls and result provenance. | CURRENT-DESIGN; visible Sept 30 owner request. |
 | Organizational Input | Distinct from Tailoring; restricted typed state/value input; cannot choose Tests or inject commands. | CURRENT-DESIGN plus supplied project history; parameters-and-organizational-input.md. |
 | Applicability | Ordinary content-authored assessment logic; no scanner-side os_info magic. CPE names alone never decide applicability. | AGENTS; platform-and-applicability.md. |
@@ -46,7 +46,7 @@ Authority order: latest explicit owner instruction → maintained current design
 | Reference scanner | Build after source format stabilizes; compare old/new execution on same targets. Downstream of format/conversion work. | AGENTS. |
 | Converter | Reusable general-purpose tools under tools; clean-room 003 under tools/scap_upconvert_v003 without importing old full converters; stable Windows delivery and instructions required. | AGENTS and CURRENT-DESIGN. |
 | Signing | Simple vendor-friendly signed Benchmark Results required research; support non-AD Linux/Mac/Solaris deployments. Original XML signatures cannot authenticate converted bytes. | Visible Oct 1 discussion and retrieved signing note; exact trust/signature choices require current spec. |
-| Scale/results | Enterprise scale 100k+ targets; smaller human-readable results retaining policy context; cap evidence records and support early termination. | Supplied project memory; not fully corroborated by history retrieval in this pass. |
+| Scale/results | Enterprise scale 100k+ targets; smaller human-readable results retaining policy context; cap evidence records and support early termination. | Sept 27 retrieved owner scale requirement; iteration001 decision register and iteration002 result/evidence decision corroborate caps/termination. |
 | Evidence cap example | First 50 failure records from potentially millions was illustrative, not a universal hard-coded limit. | Supplied project memory. |
 | Four anchors | RHEL9, Oracle Linux9, Windows11, Windows Server2025; historical first demonstrations exclude Server2012, RHEL10 prototypes and experimental PostgreSQL. | Supplied history and partial Sept 28 retrieval; broader corpus research is distinct. |
 | Reuse | Separate Check Text alignment from exact complete assessment-semantic equivalence; literal-abstracted shapes are parameterization candidates, not proven reuse. | AGENTS. |
@@ -66,6 +66,15 @@ Authority order: latest explicit owner instruction → maintained current design
 - Initial strict deprecated-test rule was refined to use effective governance status, preserving explicit reinstatements.
 - Earlier relative-path authoring decisions coexist with logical-ID/manifest compiled resolution; neither implies scanner filename guessing.
 - Earlier green census/schema/round-trip claims describe their pinned commits, not future changes. Preserve failed runs and corrected conclusions as lessons.
+
+## Reconciliation additions — 2026-10-02
+
+- Sept 30 Tailoring value-refinement acceptance was superseded by the Oct 1 instruction: evaluate publisher requirement X or use a distinct policy for Y. The worked resolver/examples were stale although the current Tailoring schema/spec already rejected values; both are now aligned. Publisher Profile values and delegated Organizational Input remain distinct.
+- The source-boundary audit previously removed result from the property list but additionalProperties still accepted it. Actual instance rejection now guards Tests, Objects, States and Variables while allowing a WMI field named result inside a State payload.
+- Rule role remains the working informational policy control; a future replacement must not be confused with approval to remove it.
+- Owner Oct 2 clarification: suffix 54 means the OVAL 5.4 revision and 57 the OVAL 5.7 revision. Exact source families stay in mapping/provenance; reviewed native names may be simpler. The specification crosswalk now links all six reviewed mappings and does not claim textfilecontent54 has a reviewed native mapping.
+- Original iteration001 decisions D-007/D-008 corroborate bounded evidence and invariant-verdict early termination; D-027 requires deterministic effective scoring weights. Exact mappings/denominators remain separately reviewed.
+- Preserve stable identity separate from revision; typed generic identifiers, constrained publisher extensions and title-independent internal node IDs. See iteration002 identity-and-publisher-extensions.md and current specification.
 
 ## Deferred / unresolved decisions to keep visible
 
@@ -96,3 +105,7 @@ Retrieved targeted summaries: project-wide recovery; earliest-through-Sept28; Se
 Next passes: inspect iteration001/002 decision registers and lessons; read all current specification sections and relevant Board records; retrieve focused missing decisions (scale, cap/termination, signing, applicability, tailoring, runtime results); reconcile open/closed issues and test evidence; build a traceable requirement-to-record-to-test matrix; record irrecoverable gaps. Source exports, if supplied later, must be compared with this register rather than assumed redundant.
 
 Provenance: Evidence/Audit. Memory-summary entries are explicitly weaker than inspected authoritative current records. This initial register must not be used to claim every conversation or key decision has been recovered.
+
+## Preserved repository evidence
+
+[source-index.json](source-index.json) inventories 68 committed design/specification/Board/instruction records at exact commit and blob hashes. This is a navigable historical pin, not a claim all entries have been independently reconciled. [issues-2026-10-02.json](issues-2026-10-02.json) preserves 47 non-PR issues and 191 comments as returned by the GitHub connector, including closed/superseded work. Discussion voting data and complete original conversation transcripts remain outside this archive.

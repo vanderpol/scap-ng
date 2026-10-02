@@ -123,8 +123,15 @@ disposition (or a future standardized informational Assessment class, if that
 candidate is adopted). Likewise, legacy `unchecked` remains a policy decision
 not to execute the Assessment and maps to an explicit non-execution result.
 
-The preferred native direction is therefore to eliminate the overloaded
-single `role` switch and represent its distinct concerns separately:
+Owner working decision, 2026-10-01: retain `role` on the Rule for now so
+informational/reporting-only content remains expressible. It is policy metadata,
+not an Assessment truth value. The current Rule schema and converted source
+retain this control; the migration helper preserves technical truth separately.
+An assessment-native informational model remains deferred research and SHALL
+NOT be treated as permission to remove the working Rule control.
+
+The earlier proposed replacement of the single `role` switch remains a future
+design candidate that would represent its distinct concerns separately:
 
 - Assessment technical truth;
 - Organizational Input dependencies;
@@ -1002,4 +1009,3 @@ packages to reproduce XML Signature structures.
 A migration tool MAY verify and record the status of a legacy source signature.
 The authoritative integrity mechanism for a native completed SCAP-NG result
 package is the SCAP-NG result-package signature defined above.
-

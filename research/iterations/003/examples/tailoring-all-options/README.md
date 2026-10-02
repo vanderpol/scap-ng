@@ -31,10 +31,9 @@ and approvals in these examples are fictional.
 | Disable a publisher-selected Rule | `disabled_rules: demo-time-sources` |
 | Enable a Group and reverse a parent Tailoring exclusion | `enabled_groups: authentication` |
 | Disable a Group | `disabled_groups: sessions` |
-| Refine permitted publisher values | `parameters`; integers, a boolean, string, list and record |
-| Override a parent value | Password length progresses 12 → 14 → 16 → 18 |
+| Publisher Profile values remain authoritative | Base length 12 → publisher Profile length 14; Tailoring cannot change values |
 | Select existing named Assessment alternatives | `check_selectors`: `manual` and `document-review` |
-| Justify selection and value changes | `selection_justifications`, `parameter_justifications` |
+| Justify selection changes | `selection_justifications` |
 | Purpose: why the Tailoring exists | `purpose`, near the top |
 | Who created/modified it, and when | `provenance.created_by`, `created_at`, `modified_by`, `modified_at` |
 | Who authorized it, and when | `provenance.authorized_by`, `authorized_at`, `authorization_reference`, `authorization_status` |
@@ -49,9 +48,9 @@ and approvals in these examples are fictional.
 
 Supported selection lists and mappings remain visible when empty. Publisher Profiles show `disabled_rules: []` when appropriate; they never expose `enabled_rules`. Tailoring can show both because it can reverse inherited deselections. Group operations expand against the exact Benchmark version. Contradictory Group/Rule changes in the same layer fail; parent-to-child overrides are deliberate layering.
 
-These examples express value refinement as typed Parameter overrides. They do not add a direct XCCDF `refine-value` structure or permit changing constraints, operators, collector targets or execution semantics. Unknown selectors fail rather than falling back to a default.
+Owner correction, 2026-10-01: Tailoring SHALL NOT override publisher Parameter values. A different requirement needs a distinct policy identity; a value intentionally delegated by the publisher uses Organizational Input. The resolver rejects even an empty Tailoring `parameters` field. Unknown selectors fail rather than falling back to a default.
 
-The Group field names, parent reference mapping, Parameter definition/constraint shapes, request/input shapes and detailed provenance/justification layout are **source grammar proposals** illustrating already documented behavior. They are not a newly approved standard. The current draft already illustrates `benchmark`, `profile`, `enabled_rules`, `disabled_rules`, `parameters` and `check_selectors`.
+The Group field names, parent reference mapping, Parameter definition/constraint shapes, request/input shapes and detailed provenance/justification layout are **source grammar proposals** illustrating already documented behavior. They are not a newly approved standard. The current draft already illustrates `benchmark`, `profile`, `enabled_rules`, `disabled_rules` and `check_selectors`.
 
 ## Expected effective selection
 
@@ -65,7 +64,7 @@ The Group field names, parent reference mapping, Parameter definition/constraint
 
 Organizational Input supplies the approved time-source list separately. In the comprehensive scenario the time-source Rule is excluded; supplying that value does not re-enable it, choose a method or mark it tailored. The no-Profile scenario illustrates a separate selection starting with all five member Rules enabled.
 
-The real RHEL9 example restores `SV-257778`, excludes `SV-257777`, and selects the published manual method for enabled Rule `SV-257784`. It has `parameters: {}` because the pinned RHEL9 source exposes no publisher Parameters. Its resolved selection contains 28 of 445 Rules; the restored/excluded Rules offset each other.
+The real RHEL9 example restores `SV-257778`, excludes `SV-257777`, and selects the published manual method for enabled Rule `SV-257784`. It has no Tailoring Parameter mutation field; the pinned RHEL9 source exposes no publisher Parameters. Its resolved selection contains 28 of 445 Rules; the restored/excluded Rules offset each other.
 
 ## Reproduce the worked resolution
 
@@ -83,7 +82,7 @@ python tools/test_tailoring_example.py
 
 The small resolver validates the examples' bindings and policy boundaries and records per-layer provenance. It does not execute Assessment Requests, evaluate targets, enforce a finalized NG schema, or implement complete missing-input result semantics. Assessment identities come from document contents; Rule filenames do not establish identity. Parent source paths and Assessment paths are explicit and bounded.
 
-Thirteen regressions cover the expected five-Rule outcome, no-Profile behavior, actual RHEL9 bindings, mismatched publication, same-layer conflicts, unknown selectors, invalid Parameter values, Organizational Input separation, prohibited execution mutations, parent identity/cycles and filename-independent Rule lookup, preservation of purpose/creator/authorizer, and explicit null authorization in drafts. The original eleven passed on Windows/Linux in [CI run 36783808173](https://github.com/vanderpol/scap-ng/actions/runs/36783808173); all thirteen passed locally after the metadata update. See [validation.json](validation.json).
+Fifteen regressions cover selection, provenance, inputs and fail-closed boundaries, including rejection of Parameter overrides in parent and child Tailoring and rejection of Organizational Input replacing publisher values. Publisher Profile type/constraint validation remains covered. All fifteen pass locally after this correction; earlier CI links validate only their earlier revisions. See [validation.json](validation.json).
 
 ## Rebase is a workflow
 
