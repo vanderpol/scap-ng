@@ -7,6 +7,7 @@ import jsonschema
 from referencing import Registry, Resource
 
 from generate_capability_schema import generate
+from validate_generated_capability_semantics import validate_assessment_capability_semantics
 
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -58,6 +59,23 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
                 "filesystem":"same",
             },
         })
+
+    def test_full_path_with_traversal_is_semantic_error(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{"o":{
+                    "capability":"windows.fileeffectiverights53",
+                    "select":{
+                        "full_path":self.entity(r"C:\\\\Windows\\\\win.ini"),
+                        "trustee_sid":self.entity("S-1-5-18"),
+                    },
+                    "traversal":{"max_depth":1,"recurse":"junctions","filesystem":"same"},
+                }},
+                "states":{},
+                "tests":{},
+            }
+        })
+        self.assertIn("windows.fileeffectiverights53.full_path_no_traversal",{row["code"] for row in rows})
 
     def test_effective_right_boolean_state(self):
         self.validate_def("state",{
