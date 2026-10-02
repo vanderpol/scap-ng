@@ -408,6 +408,22 @@ def executable_rule_id_for_diagnostic(code):
     return code
 
 
+STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
+    # Enforced by generated schema structure or lossless importer materialization.
+    "independent.yamlfilecontent.record_keys",
+    "windows.cmdlet.record_fields",
+    "windows.ntuser.materialized_collection_defaults",
+    "windows.wuaupdatesearcher.materialized_superseded_default",
+    "windows.wuaupdatesearcher.source_path_repair",
+    "windows.lockoutpolicy.singleton_source",
+    "linux.selinuxsecuritycontext.null_pid",
+}
+
+RUNTIME_SEMANTIC_RULE_IDS={
+    # These require collection/evaluation behavior rather than static authored-content validation.
+    "independent.xmlfilecontent.xpath_text_values",
+}
+
 def validate_declared_semantic_rules(mapping, implemented_rule_ids):
     """Report reviewed semantic rules that lack executable validation coverage.
 
