@@ -3,6 +3,7 @@ import unittest
 
 from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
+    validate_declared_semantic_rules,
     validate_unix_file_object,
 )
 
@@ -14,6 +15,13 @@ def entity(value, operation="equal", datatype="string", **extra):
         "datatype":datatype,
         **extra,
     }
+
+
+class SemanticRuleCoverageTests(unittest.TestCase):
+    def test_declared_rules_require_executable_coverage_accounting(self):
+        mapping={"semantic_validator_rules":[{"id":"a"},{"id":"b"}]}
+        self.assertEqual(validate_declared_semantic_rules(mapping,{"a"}),["b"])
+        self.assertEqual(validate_declared_semantic_rules(mapping,{"a","b"}),[])
 
 
 class UnixFileSemanticValidationTests(unittest.TestCase):
