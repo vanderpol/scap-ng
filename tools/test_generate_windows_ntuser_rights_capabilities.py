@@ -8,7 +8,7 @@ from generate_capability_schema import generate
 
 ROOT=Path(__file__).resolve().parents[1]
 
-class WindowsNtuserRightsTests(unittest.TestCase):
+class CapabilityDefaultsAndRightsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         common=json.loads((ROOT/"schema/v0.1.0/capability-common.schema.json").read_text())
