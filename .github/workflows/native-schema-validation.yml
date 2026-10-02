@@ -67,8 +67,13 @@ jobs:
           errors=list(validators['benchmark.schema.json'].iter_errors({'benchmark': {}}))
           if not errors:
               raise SystemExit('invalid minimal Benchmark unexpectedly validated')
+          # Reusing one validator repeatedly must not mutate or exhaust its resolver.
+          repeated=[len(list(validators['benchmark.schema.json'].iter_errors({'benchmark': {}}))) for _ in range(20)]
+          if len(set(repeated)) != 1 or repeated[0] == 0:
+              raise SystemExit(f'validator reuse changed diagnostics: {repeated}')
           print('validators_built=',len(validators))
           print('invalid_benchmark_diagnostics=',len(errors))
+          print('repeated_validator_diagnostics=',repeated[0])
           PY
 
   historical-content-audit:
