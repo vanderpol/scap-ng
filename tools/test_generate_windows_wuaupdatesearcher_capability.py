@@ -35,6 +35,17 @@ class WuaUpdateSearcherCapabilityTests(unittest.TestCase):
             "collect":{"include_superseded_updates":True}
         })
 
+    def test_superseded_behavior_is_required_and_boolean(self):
+        base={
+            "object_title":"updates","capability":"windows.wuaupdatesearcher",
+            "select":{"search_criteria":self.e("IsInstalled=0")},
+        }
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate("object",base)
+        bad={**base,"collect":{"include_superseded_updates":"true"}}
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate("object",bad)
+
     def test_source_path_is_filterable_native_state(self):
         self.validate("state",{
             "state_title":None,"capability":"windows.wuaupdatesearcher",
