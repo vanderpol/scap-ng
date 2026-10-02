@@ -380,6 +380,7 @@ EXECUTABLE_SEMANTIC_RULE_IDS={
     *{f"{cap}.name_empty" for cap in FILE_SELECTION_CAPABILITIES},
     "independent.textfilecontent54.pattern_operation",
     "independent.xmlfilecontent.xpath_equal",
+    "panos.config.xpath_equal",
     "independent.yamlfilecontent.content_equal",
     "independent.yamlfilecontent.yamlpath_equal",
     "independent.yamlfilecontent.inline_content_no_traversal",
@@ -425,6 +426,7 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.sql512.result_record",
     "independent.sql512.engine_filterability",
     "independent.unknown.fixed_result",
+    "panos.version.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
