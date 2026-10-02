@@ -240,6 +240,10 @@ def generate(mapping, repo_root):
             "required": ["field"],
         })
 
+    object_required = ["object_title", "capability"]
+    if collect_required:
+        object_required.append("collect")
+
     capability = mapping["capability"]
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -275,7 +279,7 @@ def generate(mapping, repo_root):
             },
             "object": {
                 "type": "object",
-                "required": ["object_title", "capability"],
+                "required": object_required,
                 "properties": {
                     "object_title": {"type": ["string", "null"]},
                     "capability": {"const": capability},
