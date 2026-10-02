@@ -62,3 +62,26 @@ Example dry run:
 Explicit rewrite:
 
     python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --rewrite --output-root NORMALIZED_ROOT --report normalizer-report.json
+
+For a fast exact-equivalence CI gate that skips advisory similarity work:
+
+    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --report normalizer-report.json --advisory none
+
+Advisory review can be limited to Assessment or Rule candidates with
+`--advisory assessments` or `--advisory rules`. The default is `all`.
+
+Large repositories may persist exact/shape fingerprints for unchanged Assessment
+files:
+
+    --fingerprint-cache .cache/scap-ng-normalizer-fingerprints.json
+
+The cache is keyed by source-file SHA-256 and cannot change equivalence
+decisions; changed files are recomputed.
+
+A standalone machine-readable change manifest may be emitted with:
+
+    --change-manifest normalizer-changes.json
+
+Rewrite mode stages the complete output tree, validates Rule-to-Assessment
+references and Assessment logical-ID consistency, and publishes the destination
+only after validation succeeds.
