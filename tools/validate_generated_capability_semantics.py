@@ -453,7 +453,6 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "iosxe.version.singleton_source",
     "independent.family.singleton_source",
     "independent.family.literal_vocabulary",
-    "independent.environmentvariable58.null_pid",
     "independent.sql512.result_record",
     "independent.sql512.engine_filterability",
     "independent.unknown.fixed_result",
@@ -477,7 +476,6 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.passwordpolicy.singleton_source",
     "windows.auditeventpolicysubcategories.singleton_source",
     "windows.auditeventpolicysubcategories.supported_fields",
-    "linux.selinuxsecuritycontext.null_pid",
 }
 
 POLICY_SEMANTIC_RULE_IDS={
@@ -487,6 +485,8 @@ POLICY_SEMANTIC_RULE_IDS={
 }
 
 RUNTIME_SEMANTIC_RULE_IDS={
+    "independent.environmentvariable58.null_pid",
+    "linux.selinuxsecuritycontext.null_pid",
     "independent.shellcommand.pattern_semantics",
     "linux.partition.mount_options_complete",
     "linux.rpminfo.filepaths_collection",
