@@ -159,40 +159,48 @@ def generate(mapping, repo_root):
     if test_source_kind == "object" and mapping["native"].get("selector_map"):
         selector_map = mapping["native"]["selector_map"]
         reverse_selector_map = {native: source for source, native in selector_map.items()}
-        for alternative in mapping["native"].get("object_selector_alternatives", []):
-            for name in alternative:
-                source_name = reverse_selector_map[name]
-                field = object_fields[source_name]
-                dtypes = source_datatypes(field)
-                enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
-                if enum_values:
-                    selector_schema = {
-                        "oneOf": [
-                            {"type": "string", "enum": list(enum_values)},
-                            {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
-                        ]
-                    }
-                else:
-                    selector_schema = generic_entity_schema(dtypes, state=False)
-                if name in mapping["native"].get("nullable_selectors", ["name"]):
-                    selector_schema = {
-                        "oneOf": [
-                            selector_schema,
-                            {"type": "null"},
-                        ]
-                    }
-                selector_props[name] = selector_schema
+        optional_selectors = set(mapping["native"].get("optional_selectors", []))
+        selected_names = {
+            name
+            for alternative in mapping["native"].get("object_selector_alternatives", [])
+            for name in alternative
+        } | optional_selectors
+        for name in selected_names:
+            source_name = reverse_selector_map[name]
+            field = object_fields[source_name]
+            dtypes = source_datatypes(field)
+            enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
+            if enum_values:
+                selector_schema = {
+                    "oneOf": [
+                        {"type": "string", "enum": list(enum_values)},
+                        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                    ]
+                }
+            else:
+                selector_schema = generic_entity_schema(dtypes, state=False)
+            if name in mapping["native"].get("nullable_selectors", ["name"]):
+                selector_schema = {
+                    "oneOf": [
+                        selector_schema,
+                        {"type": "null"},
+                    ]
+                }
+            selector_props[name] = selector_schema
 
         for alternative in mapping["native"].get("object_selector_alternatives", []):
+            disallowed = [
+                other for other in selector_props
+                if other not in alternative and other not in optional_selectors
+            ]
             selector_alternatives.append({
                 "required": list(alternative),
                 "not": {
                     "anyOf": [
                         {"required": [other]}
-                        for other in selector_props
-                        if other not in alternative
+                        for other in disallowed
                     ]
-                } if any(other not in alternative for other in selector_props) else {},
+                } if disallowed else {},
             })
         for alt in selector_alternatives:
             if alt.get("not") == {}:
