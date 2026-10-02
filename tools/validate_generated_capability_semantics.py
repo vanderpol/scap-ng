@@ -29,57 +29,60 @@ def validate_unix_file_object(obj):
 
     diagnostics=[]
     select=obj.get("select") or {}
-    behaviors=obj.get("behaviors") or {}
+    traversal=obj.get("traversal")
 
-    filepath=select.get("filepath")
-    if isinstance(filepath, dict):
-        forbidden=[key for key in ("max_depth","recurse","recurse_direction")
-                   if key in behaviors]
-        if forbidden:
-            diagnostics.append({
-                "code":"unix.file.filepath_no_recursion_behaviors",
-                "fields":forbidden,
-                "message":"filepath selection does not permit recursion depth/type/direction behaviors",
-            })
-        if (
-            filepath.get("operation") != "equals"
-            and behaviors.get("recurse_file_system") == "defined"
-        ):
-            diagnostics.append({
-                "code":"unix.file.filepath_pattern_defined_filesystem",
-                "fields":["recurse_file_system"],
-                "message":"filepath non-equality selection cannot use recurse_file_system=defined",
-            })
+    full_path=select.get("full_path")
+    if full_path is not None and traversal is not None:
+        diagnostics.append({
+            "code":"unix.file.full_path_no_traversal",
+            "fields":["traversal"],
+            "message":"full_path selection does not permit directory traversal",
+        })
 
-    path=select.get("path")
-    if isinstance(path, dict) and path.get("operation") != "equals":
-        forbidden=[]
-        for key in ("max_depth","recurse_direction","recurse"):
-            if key in behaviors:
-                forbidden.append(key)
-        if behaviors.get("recurse_file_system") == "defined":
-            forbidden.append("recurse_file_system")
-        if forbidden:
-            diagnostics.append({
-                "code":"unix.file.path_pattern_no_recursion_behaviors",
-                "fields":forbidden,
-                "message":"path non-equality selection cannot use recursion behaviors or recurse_file_system=defined",
-            })
+    directory=select.get("directory")
+    if (
+        isinstance(directory, dict)
+        and directory.get("operation") != "equal"
+        and traversal is not None
+    ):
+        diagnostics.append({
+            "code":"unix.file.pattern_directory_no_traversal",
+            "fields":["traversal"],
+            "message":"non-equality directory selection cannot use traversal",
+        })
 
-    filename=select.get("filename")
-    if isinstance(filename, dict):
-        value=filename.get("value")
+    name=select.get("name", ...)
+    if name is None:
+        # null intentionally selects the directory itself.
+        pass
+    elif isinstance(name, dict):
+        value=name.get("value")
         variable=_is_variable_value(value)
-        nil=filename.get("nil") is True
-        pattern=filename.get("operation") == "pattern match"
-        if value == "" and not (variable or nil or pattern):
+        pattern=name.get("operation") == "match"
+        if value == "" and not (variable or pattern):
             diagnostics.append({
-                "code":"unix.file.filename_empty",
-                "fields":["filename"],
-                "message":"empty filename requires Variable, nil directory selection, or pattern-match semantics",
+                "code":"unix.file.name_empty",
+                "fields":["name"],
+                "message":"empty name requires a Variable reference or match semantics; use null to select the directory itself",
             })
 
     return diagnostics
+
+
+def _iter_set_filters(expression):
+    """Yield State filters from a native recursive Set expression."""
+    if not isinstance(expression, dict):
+        return
+    for operand in expression.get("operands") or []:
+        if not isinstance(operand, dict):
+            continue
+        if isinstance(operand.get("object"), str):
+            for flt in operand.get("filters") or []:
+                if isinstance(flt, dict):
+                    yield flt
+        nested=operand.get("set")
+        if isinstance(nested, dict):
+            yield from _iter_set_filters(nested)
 
 
 def validate_assessment_capability_semantics(document):
@@ -95,7 +98,7 @@ def validate_assessment_capability_semantics(document):
         for row in validate_unix_file_object(obj):
             diagnostics.append({"object":object_id,**row})
 
-        for flt in obj.get("filters") or []:
+        for flt in _iter_set_filters(obj.get("set")):
             state_id=flt.get("state")
             state=states.get(state_id)
             if state is None:
