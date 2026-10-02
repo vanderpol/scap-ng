@@ -466,6 +466,7 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "macos.filevault.singleton_source",
     "macos.firmwarepassword.singleton_source",
     "macos.gatekeeper.implicit_source",
+    "macos.softwareupdate.implicit_population",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
