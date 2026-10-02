@@ -61,8 +61,23 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
 
     def test_state_has_only_native_value_field(self):
         state_schema=self.schema["$defs"]["state"]
-        fields=state_schema["properties"]["state"]["properties"]["field"]["enum"]
-        self.assertEqual(fields,["value"])
+        def field_consts(node):
+            values=set()
+            if isinstance(node,dict):
+                field=(node.get("properties") or {}).get("field")
+                if isinstance(field,dict):
+                    if isinstance(field.get("const"),str):
+                        values.add(field["const"])
+                    for value in field.get("enum") or []:
+                        if isinstance(value,str):
+                            values.add(value)
+                for value in node.values():
+                    values.update(field_consts(value))
+            elif isinstance(node,list):
+                for value in node:
+                    values.update(field_consts(value))
+            return values
+        self.assertEqual(field_consts(state_schema),{"value"})
         encoded=json.dumps(self.schema)
         self.assertNotIn('"var_ref"',encoded)
 
