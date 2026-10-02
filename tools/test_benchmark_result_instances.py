@@ -33,9 +33,8 @@ def base_result():
             "run_id": "run-1",
             "started_at": "2026-10-01T22:00:00Z",
             "completed_at": "2026-10-01T22:00:01Z",
-            "scanner": {"capabilities": {"organizational_input": True}},
-            "target": {"identifiers": []},
             "benchmark": {"id": "example", "version": "1"},
+            "target_ref": "target-1",
             "effective_policy": {
                 "profile": None,
                 "tailoring": None,
@@ -59,7 +58,6 @@ def base_result():
                 "outcome": "pass",
                 "assessment": {"id": "assessment-1", "version": 1, "mode": "automated"},
                 "message": "compliant",
-                "expected_state": [],
                 "instances": [{
                     "id": "instance-1",
                     "outcome": "pass",
