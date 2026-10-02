@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 import yaml
 
-from scap_ng_content_compiler import compile_benchmark, write_bundle, verify_bundle
+from scap_ng_content_compiler import compile_benchmark, readable_member_name, write_bundle, verify_bundle
 
 
 def dump(path, value):
@@ -14,6 +14,39 @@ def dump(path, value):
 
 
 class ContentCompilerTests(unittest.TestCase):
+    def test_readable_bundle_member_layout_and_path_limit(self):
+        self.assertEqual(
+            readable_member_name(
+                Path("bench/assessments/automated/SV-123.automated.assessment.yaml"),
+                "SV-123.automated",
+                "assessment",
+            ),
+            "assessments/automated/SV-123.automated.assessment.json",
+        )
+        self.assertEqual(
+            readable_member_name(
+                Path("bench/assessments/manual/SV-123.manual.assessment.yaml"),
+                "SV-123.manual",
+                "assessment",
+            ),
+            "assessments/manual/SV-123.manual.assessment.json",
+        )
+        self.assertEqual(
+            readable_member_name(Path("bench/rules/SV-123.rule.yaml"),"SV-123","rule"),
+            "rules/SV-123.rule.json",
+        )
+
+        long_name="SV-" + ("1234567890" * 30) + ".automated.assessment.yaml"
+        shortened=readable_member_name(
+            Path("bench/assessments/automated")/long_name,
+            "very.long.logical.assessment.id",
+            "assessment",
+        )
+        self.assertLessEqual(len(shortened),160)
+        self.assertTrue(shortened.startswith("assessments/automated/"))
+        self.assertTrue(shortened.endswith(".json"))
+
+
     def test_current_rule_path_compiles_to_logical_assessment_id(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"corpus"
