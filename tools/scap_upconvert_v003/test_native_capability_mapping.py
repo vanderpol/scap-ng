@@ -109,12 +109,31 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         record=payload["record"]
         self.assertEqual(record["match"],"all")
         self.assertEqual(record["existence"],"some")
-        self.assertFalse(record["mask"])
+        self.assertNotIn("mask",record)
+        self.assertNotIn("redact_result",record)
         self.assertEqual(record["fields"]["caption"]["operation"],"equal")
         self.assertEqual(record["fields"]["caption"]["datatype"],"string")
         self.assertEqual(record["fields"]["caption"]["existence"],"some")
         self.assertEqual(record["fields"]["version"]["operation"],"greater_or_equal")
         self.assertEqual(record["fields"]["version"]["datatype"],"version")
+
+    def test_legacy_mask_true_becomes_native_result_redaction(self):
+        doc=self.aligned_wmi_document()
+        state=doc["assessment"]["states"]["state-result"]["state"]
+        state["mask"]=True
+        state["value"]["record"][0]["mask"]=True
+        out=apply_capability_mapping(doc,self.mapping)
+        record=out["assessment"]["states"]["state-result"]["state"]["record"]
+        self.assertTrue(record["redact_result"])
+        self.assertTrue(record["fields"]["caption"]["redact_result"])
+        self.assertNotIn("mask",record)
+        self.assertNotIn("mask",record["fields"]["caption"])
+
+    def test_collector_mask_true_fails_closed_until_output_binding_is_explicit(self):
+        doc=self.aligned_wmi_document()
+        doc["assessment"]["objects"]["query-object"]["select"]["namespace"]["mask"]=True
+        with self.assertRaisesRegex(ValueError,"collector input cannot be masked"):
+            apply_capability_mapping(doc,self.mapping)
 
     def test_wmi_test_controls_use_native_shared_vocabulary(self):
         out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
