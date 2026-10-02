@@ -159,6 +159,7 @@ def validate_assessment_capability_semantics(document):
     diagnostics=[]
 
     objects=assessment.get("objects") or {}
+    variables=assessment.get("variables") or {}
     states=assessment.get("states") or {}
     tests=assessment.get("tests") or {}
 
@@ -205,22 +206,33 @@ def validate_assessment_capability_semantics(document):
                 })
 
     for test_id,test in tests.items():
-        object_id=test.get("object")
-        obj=objects.get(object_id)
-        if obj is None:
-            diagnostics.append({
-                "test":test_id,
-                "code":"test.object_missing",
-                "object":object_id,
-                "message":"Test references an unknown Object",
-            })
-        elif obj.get("capability") != test.get("capability"):
-            diagnostics.append({
-                "test":test_id,
-                "code":"test.object_capability",
-                "object":object_id,
-                "message":"Test and Object capabilities must match",
-            })
+        if "object" in test:
+            object_id=test.get("object")
+            obj=objects.get(object_id)
+            if obj is None:
+                diagnostics.append({
+                    "test":test_id,
+                    "code":"test.object_missing",
+                    "object":object_id,
+                    "message":"Test references an unknown Object",
+                })
+            elif obj.get("capability") != test.get("capability"):
+                diagnostics.append({
+                    "test":test_id,
+                    "code":"test.object_capability",
+                    "object":object_id,
+                    "message":"Test and Object capabilities must match",
+                })
+
+        if "variable" in test:
+            variable_id=test.get("variable")
+            if variable_id not in variables:
+                diagnostics.append({
+                    "test":test_id,
+                    "code":"test.variable_missing",
+                    "variable":variable_id,
+                    "message":"Test references an unknown Variable",
+                })
 
         for state_id in test.get("states") or []:
             state=states.get(state_id)
