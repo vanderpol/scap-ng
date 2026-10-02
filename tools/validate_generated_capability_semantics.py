@@ -196,6 +196,30 @@ def validate_windows_cmdlet_object(obj):
     return diagnostics
 
 
+
+WINDOWS_NONNEGATIVE_STATE_FIELDS={
+    "windows.lockoutpolicy":{"force_logoff","lockout_duration"},
+}
+
+
+def validate_windows_policy_state_ranges(test_id,test,states):
+    fields=WINDOWS_NONNEGATIVE_STATE_FIELDS.get(test.get("capability"))
+    if not fields:
+        return []
+    diagnostics=[]
+    for field in fields:
+        for state_id,payload in _literal_state_values(states,test.get("states"),field):
+            value=payload.get("value")
+            if isinstance(value,int) and not isinstance(value,bool) and value < 0:
+                diagnostics.append({
+                    "test":test_id,"state":state_id,
+                    "code":f"{test.get('capability')}.nonnegative_time_values",
+                    "field":field,"value":value,
+                    "message":"literal policy time value must be non-negative",
+                })
+    return diagnostics
+
+
 def _literal_state_values(states, state_ids, field):
     for state_id in state_ids or []:
         state=states.get(state_id)
@@ -454,6 +478,9 @@ def validate_assessment_capability_semantics(document):
         )
         diagnostics.extend(
             validate_windows_wuaupdatesearcher_states(test_id,test,states)
+        )
+        diagnostics.extend(
+            validate_windows_policy_state_ranges(test_id,test,states)
         )
 
     return diagnostics
