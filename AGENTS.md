@@ -1,3 +1,11 @@
+## Repository boundary and preservation preflight
+
+Read START-HERE.md, docs/repository-policy.json, docs/repository-map.md and the current design below. Only current entry points/workflows are current generation authority. Do not select a tool merely because it is under tools/ or contains v003 in its name. Historical generation requires an explicit reproduction task and allow_historical workflow opt-in; held workflows remain held.
+
+The rebaseline preserves every baseline path. Do not delete or move historical payloads, rewrite Git history or transfer ownership under navigation/cleanup authorization. Before future removal, follow docs/lossless-rebaseline.md with an explicit reviewed removal set and verified restoration evidence. Preserve all lessons and original Board questions. Board decision candidates belong in separate versioned yes/no GitHub Discussions with reactions; do not silently rewrite a published vote or infer ratification from public counts.
+
+Historical sections titled Iteration 002 source-only checkpoint, OVAL-aligned NG capability taxonomy and Native source design checkpoint below record earlier phase restrictions. They do not override current fresh-source corpus authorization, reviewed native mappings, authored Object vocabulary or latest CURRENT-DESIGN. Maintain shared parser/data dependencies even where their paths look historical; exceptions are in docs/repository-policy.json.
+
 ## Mandatory current-design preflight
 
 Before selecting or running authoring generation tools, read
@@ -5,7 +13,7 @@ Before selecting or running authoring generation tools, read
 decisions, implementation gaps and pending Board ratification. Older generated
 trees are evidence, not architecture authority. Do not interpret a pending Board
 vote as permission to drop owner-agreed working features. Variables support both
-existing named Collections and private embedded Collections. Before describing
+existing named Objects and private embedded Objects. Before describing
 review output as ready, run `tools/check_current_authoring_contract.py` and
 feature-specific regressions. A vocabulary pass is not semantic equivalence.
 
@@ -202,7 +210,7 @@ metadata belongs in provenance, never a native runtime flag.
 
 ## Assessment presentation order
 
-For current native output, put metadata first, then `collections`, `variables`,
+For current native output, put metadata first, then `objects`, `variables`, `states`,
 `tests`, `evaluate`; omit absent sections. This is presentation, not execution
 order. Resolve forward references independently of mapping key order, and retain
 semantically significant sequence order (for example, function arguments).
@@ -228,3 +236,4 @@ GitHub is the durable system of record for work performed through ChatGPT and Co
 ## Cross-interface continuity
 
 For ChatGPT/web Codex handoffs, read transition/README.md and transition/decisions.md after CURRENT-DESIGN. Treat archived issue/conversation summaries and pinned historical documents as evidence, not current implementation proof. Recover latest owner corrections before restoring an older feature. Owner Oct 1 correction: Tailoring cannot override publisher Parameter values; delegated values use Organizational Input and changed requirements need distinct policy identity. Preserve Rule role as the working informational policy control pending an agreed replacement. Update the handoff with exact commit, validation evidence, blockers and next step when changing interfaces.
+

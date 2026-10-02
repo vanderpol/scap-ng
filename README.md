@@ -1,22 +1,30 @@
-# scap-ng
+# SCAP-NG
 
-Repository for researching the future of SCAP.
+Research toward a simpler successor to SCAP 1.4, with faithful migration of existing content, clearer authoring, and useful results.
 
-## Repository structure
+**Status: pre-alpha working design.** This is material for source/design review, not a released standard or a production scanner. Board ratification and target-runtime equivalence remain separate work.
 
-- `research/` — numbered architecture/research iterations, prototypes, results, feedback, and design evidence.
-- `specification/` — pre-alpha normative SCAP-NG specification text promoted from settled research decisions.
-- `schema/` — experimental and eventually normative SCAP-NG schemas.
-- `tools/` — reusable schema-analysis, migration, validation, packaging, and research utilities.
+## Start here
 
-The current work is preliminary research rather than a published specification. Current clean-native development is in `research/iterations/003/`; iterations 001 and 002 preserve research history.
+- **First visit:** [What SCAP-NG is and how to browse it](START-HERE.md).
+- **OVAL Board:** [Current review packet and yes/no voting proposals](board/README.md).
+- **Implementers:** [Current design contract](research/iterations/003/design/CURRENT-DESIGN.md), [draft specification](specification/README.md), [schemas and mappings](schema/README.md), and [maintained tools](tools/README.md).
+- **Project history:** [Preserved archives and original decisions](archive/README.md).
+- **ChatGPT / web Codex:** [Continuity records](transition/README.md).
 
-Current review: [full RHEL9 source-generated Benchmark, Rules and Assessments](research/iterations/003/review/rhel9-current-full/README.md), including all 445 Rules, comparative evidence and the local Windows conversion command. Start with the [current design contract](research/iterations/003/design/CURRENT-DESIGN.md); historical generated trees are not current authoring guidance.
+## Repository map
 
-## Development tracking
+| Location | What belongs here |
+| --- | --- |
+| `board/` | Current review guide, individual reaction-vote proposals and published Discussion links |
+| `specification/` | Working specification, terminology and SCAP 1.4 crosswalks |
+| `schema/` | Pre-alpha schemas and reviewed native capability mapping inputs |
+| `tools/` | Maintained conversion/validation utilities plus explicitly classified historical tooling |
+| `docs/` | Repository map, decision reconciliation, lossless rebaseline procedure and complete path inventory |
+| `research/` | Current design records and dated research/review evidence; numbered iterations are not interchangeable |
+| `archive/` | Index into preserved historical material; original payloads remain at their existing paths |
+| `transition/` | Decisions, history coverage, validation checkpoints and next tasks for either interface |
 
-- [Detailed roadmap and proposed milestones](ROADMAP.md) — work remaining, completed issue history, dependencies, and beta/1.0 gates.
-- [Open GitHub Issues](https://github.com/vanderpol/scap-ng/issues?q=is%3Aissue+is%3Aopen) and [completed issues](https://github.com/vanderpol/scap-ng/issues?q=is%3Aissue+is%3Aclosed).
-- [Actions status](https://github.com/vanderpol/scap-ng/actions) and [full-benchmark handoff requirements](research/iterations/003/review/FULL-BENCHMARK-READINESS.md).
+The [audited repository map](docs/repository-map.md) distinguishes active dependencies, generated review candidates and archived artifacts. Historical source trees are evidence, not input for current generation.
 
-Proposed M0–M3 issue prefixes are roadmap groups, not yet native GitHub milestones. A future move to the OVAL Community organization is planned only after a stable beta or 1.0 and explicit approval from the repository owner and receiving organization.
+[Roadmap](ROADMAP.md) · [Issues](https://github.com/vanderpol/scap-ng/issues) · [Actions](https://github.com/vanderpol/scap-ng/actions) · [Discussions](https://github.com/vanderpol/scap-ng/discussions)

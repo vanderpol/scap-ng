@@ -1,19 +1,14 @@
-name: Four-anchor SCAP-NG reuse analysis
+name: "[HISTORICAL] Four-anchor SCAP-NG reuse analysis"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/four-anchor-reuse-analysis.yml"
-      - "tools/scap14_rule_splitter.py"
-      - "tools/scap14_benchmark_ir.py"
-      - "tools/scap14_to_scapng.py"
-      - "tools/verify_scap14_to_scapng_conversion.py"
-      - "tools/test_xccdf_check_selector_conversion.py"
-      - "tools/test_xccdf_profile_resolution.py"
-      - "tools/promote_exact_shared_assessments.py"
-      - "research/iterations/002/four-anchor-reuse-methodology.md"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -24,6 +19,7 @@ concurrency:
 
 jobs:
   convert:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -189,6 +185,7 @@ jobs:
           compression-level: 0
 
   reuse:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     needs: convert
     runs-on: ubuntu-latest
     steps:

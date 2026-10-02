@@ -1,3 +1,26 @@
+# Iteration 003 status and current entry points
+
+This directory contains both active records and older experiments. It is not one uniformly current source tree.
+
+| Area | Current interpretation |
+| --- | --- |
+| `design/CURRENT-DESIGN.md` | Authoritative working-design checkpoint; latest owner corrections take precedence |
+| `design/` | Current decision and semantic records; historical terminology within older notes needs reconciliation |
+| `review/rhel9-current-full/` | Generated full RHEL 9 review candidate; [maintained guide](../../../docs/rhel9-review.md) |
+| `review/windows11-current-full/` | Generated full Windows 11 review candidate; [guide](review/windows11-current-full/README.md) |
+| `review/full-current-native-normalized/` | Latest pinned-corpus normalization review snapshot; provenance and handled errors are separate |
+| Other `review/` slices | Dated focused evidence, not automatic latest-grammar approval |
+| `source/`, `packages/` | Historical generated baseline and superseded Policy experiments |
+| `examples/`, `results/` | Focused working demonstrations; validate their individual grammar/status |
+| `evidence/` | Dated evidence valid only for its recorded source/commit and gate |
+| `board-review/` | Original questions, reconciled into [individual yes/no proposals](../../../board/proposals/README.md) |
+
+Use the [maintained tools](../../../tools/README.md). Historical generation workflows require explicit opt-in; held publishing jobs stay held. [Lossless rebaseline](../../../docs/lossless-rebaseline.md).
+
+## Preserved original iteration plan
+
+The following original plan is historical. Its directions toward `source/split-rule-assessment/` and earlier terminology are superseded by the status table above and CURRENT-DESIGN.
+
 # SCAP-NG Research Iteration 003
 
 **Status:** active clean-room conversion redesign  

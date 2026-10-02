@@ -1,26 +1,14 @@
-name: Convert Windows 11 SCAP 1.4 to SCAP-NG
+name: "[HISTORICAL] Convert Windows 11 SCAP 1.4 to SCAP-NG"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/convert-windows11-scap14-to-ng.yml"
-      - "tools/oval_semantic_ir.py"
-      - "tools/scap14_rule_splitter.py"
-      - "tools/scap14_benchmark_ir.py"
-      - "tools/test_xccdf_profile_resolution.py"
-      - "tools/test_xccdf_applicability.py"
-      - "tools/test_xccdf_complex_check.py"
-      - "tools/test_xccdf_processing_plan.py"
-      - "tools/scap14_to_scapng.py"
-      - "tools/render_ansible_inspired_benchmark.py"
-      - "tools/verify_scap14_to_scapng_conversion.py"
-      - "tools/build_scapng_from_converted_source.py"
-      - "tools/verify_scapng_prototype_bundle.py"
-      - "tools/build_oval_schema_semantic_catalog.py"
-      - "research/iterations/001/oval-test-support-overrides.json"
-      - "third_party/scap-1.4-schemas/**"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -31,6 +19,7 @@ concurrency:
 
 jobs:
   convert:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out SCAP-NG

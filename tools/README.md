@@ -1,87 +1,26 @@
-# SCAP Next Gen Tools
+# SCAP-NG tooling
 
-This directory stores reusable tooling related to SCAP-NG research, schema analysis, conversion, validation, packaging, and reproducibility.
+Start with the [current design](../research/iterations/003/design/CURRENT-DESIGN.md). Tool location or an old passing test does not establish current native syntax.
 
-Iteration-specific data and conclusions belong under `research/iterations/<NNN>/`; utilities that should survive multiple iterations belong here.
+## Maintained entry points
 
-## Current tools
+| Task | Entry point | Status |
+| --- | --- | --- |
+| Convert a pinned SCAP package for full source review | `scap_upconvert_v003/convert_full_review.py` | Current research CLI; [Windows/local instructions](scap_upconvert_v003/README.md) |
+| Generate current corpus review content | `generate_niwc_current_review.py` | Fresh original SCAP input; retained source accounting |
+| Current native round-trip census | `scap_ng_roundtrip_v003/roundtrip_corpus_v003.py` | Representation evidence; runtime equivalence unproven |
+| Validate native schemas | `validate_native_json_schemas.py` | Structural validation |
+| Audit generated authoring vocabulary | `check_current_authoring_contract.py` | Naming/structure guard; not semantic equivalence |
+| Normalize exact Assessment duplicates | `scap_ng_repo_normalizer.py` | Dry run by default; explicit rewrite to a separate output tree |
+| Compile resolved content bundles | `scap_ng_content_compiler.py` | Packaging/signing experiment; not a released scanner |
+| Verify repository preservation/boundaries | `audit_repository_layout.py --check` | Baseline paths, historical bytes and workflow gates |
 
-### SCAP 1.4 migration toolchain
+Reusable OVAL/SCAP semantic inputs include `oval_semantic_ir.py`, `scap14_rule_splitter.py`, `scap14_benchmark_ir.py`, result truth tables, source-default/catalog helpers and validation utilities. Current code still uses these helpers. Preserve them when reviewing older renderers that also import them.
 
-- `oval_semantic_ir.py` — faithful OVAL 5.12.3 semantic importer, dependency graph, variable/function evaluation planning, set/filter/result algebra, and source accounting.
-- `scap14_rule_splitter.py` — extracts one schema-valid standalone OVAL document per XCCDF rule with fixed-point dependency closure.
-- `scap14_corpus_convert.py` — broad SCAP 1.4 corpus ingestion/accounting and deprecated-test remediation reporting.
-- `scap14_benchmark_ir.py` — joins XCCDF policy/profile/value/check semantics to the per-rule OVAL IR into one benchmark conversion model.
-- `scap14_to_scapng.py` — generic benchmark compiler that renders the same migrated semantics into combined-rule and split policy/assessment/binding candidate layouts.
-- `verify_scap14_to_scapng_conversion.py` — checks rule accounting and semantic equivalence between the candidate renderings.
-- `build_oval_schema_semantic_catalog.py` — schema-derived OVAL construct/deprecation catalog with checked-in OVAL governance reinstatement overrides.
-- `analyze_scapng_assessment_reuse.py` — maps rules across converted benchmarks using normalized Check Text and full OVAL semantic equivalence, measures exact reuse and parameterization candidates, and reports maintenance-unit savings.
-- `render_scapng_reuse_views.py` — renders measured exact reuse groups as combined shared-rule overlays, split shared assessments/bindings, and Ansible-inspired shared assessments/bindings.
-- `test_scapng_assessment_reuse.py` — regression tests for exact semantic fingerprints, literal-only parameterization candidates, and rule-alignment evidence.
-- `scap14_benchmark_reuse_inventory.py` — compact per-benchmark Check Text / exact semantic / parameterization-shape / deprecated-test inventory for corpus-scale analysis without rendering full YAML.
-- `aggregate_scapng_reuse_inventories.py` — aggregates compact benchmark inventories into corpus-wide exact reuse, fan-out, mapping, source-remediation debt, and maintenance-unit metrics.
+## Historical reproduction
 
-The migration tools are shared infrastructure rather than iteration-001-only experiments. Iteration-specific workflows and evidence may invoke them, but later iterations should reuse the same implementations rather than fork them.
+`scap14_to_scapng.py`, `build_scapng_from_converted_source.py`, older combined/split-policy renderers, Ansible-inspired renderers, and the original `scap_upconvert_v003/run_local.py` reproduce earlier experiments. They are retained, but are not the novice entry point or the current native generator. Historical CI generation requires a manual `allow_historical` opt-in; three superseded v003 publishing jobs remain held.
 
-### inventory_xsd_semantics.py
+The [dependency report](../docs/audit/dependencies.json) lists every workflow, its status, direct script paths and the static current import closure. [Inventory classifications](../docs/audit/repository-inventory.tsv.gz) are conservative: unreferenced tooling is retained for review, not declared safe to delete.
 
-Recursively inventories XSD files, named elements/types, imports/includes, target namespaces, and documentation containing deprecation language.
-
-This is intentionally an **inventory tool**, not an XSD-to-NG converter. Existing XSD structure is a migration input, not the desired NG architecture.
-
-### analyze_result_bundle.py
-
-Produces a sanitized structural/size summary of an SCC/SCAP result ZIP without preserving result contents.
-
-Useful for measuring result bloat and element populations while avoiding committing endpoint-specific evidence.
-
-### scaffold_research_iteration.py
-
-Creates the stable directory skeleton for a future numbered research iteration.
-
-Some migration tools require `lxml` and/or `PyYAML`; smaller inventory/scaffolding utilities remain standard-library-only.
-
-
-### scap_ng_repo_normalizer.py
-
-Normalizes native SCAP-NG authoring repositories by proven Assessment semantic equivalence.
-
-Safety contract:
-
-- default invocation is **dry-run/report-only** and does not create or modify an output repository;
-- `--rewrite --output-root <path>` is required to materialize a normalized repository copy;
-- automatic sharing uses exact semantic fingerprints only;
-- near-duplicate Assessment and Rule analysis is advisory and never authorizes a merge;
-- the report includes exact groups, source/consumer lineage, planned-change counts, and advisory review candidates;
-- a second rewrite over an already-normalized repository is expected to produce zero additional rewrites.
-
-Example dry run:
-
-    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --report normalizer-report.json
-
-Explicit rewrite:
-
-    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --rewrite --output-root NORMALIZED_ROOT --report normalizer-report.json
-
-For a fast exact-equivalence CI gate that skips advisory similarity work:
-
-    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --report normalizer-report.json --advisory none
-
-Advisory review can be limited to Assessment or Rule candidates with
-`--advisory assessments` or `--advisory rules`. The default is `all`.
-
-Large repositories may persist exact/shape fingerprints for unchanged Assessment
-files:
-
-    --fingerprint-cache .cache/scap-ng-normalizer-fingerprints.json
-
-The cache is keyed by source-file SHA-256 and cannot change equivalence
-decisions; changed files are recomputed.
-
-A standalone machine-readable change manifest may be emitted with:
-
-    --change-manifest normalizer-changes.json
-
-Rewrite mode stages the complete output tree, validates Rule-to-Assessment
-references and Assessment logical-ID consistency, and publishes the destination
-only after validation succeeds.
+Historical tool instructions can be recovered verbatim from the [before-cleanup commit](https://github.com/vanderpol/scap-ng/blob/9751ef0e5ae43ab728876969ff59dad538a101f0/tools/README.md). [Lossless rebaseline and future relocation procedure](../docs/lossless-rebaseline.md).

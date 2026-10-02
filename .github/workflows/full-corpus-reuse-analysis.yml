@@ -1,21 +1,14 @@
-name: Full NIWC corpus SCAP-NG reuse analysis
+name: "[HISTORICAL] Full NIWC corpus SCAP-NG reuse analysis"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/full-corpus-reuse-analysis.yml"
-      - "tools/oval_semantic_ir.py"
-      - "tools/scap14_rule_splitter.py"
-      - "tools/scap14_benchmark_ir.py"
-      - "tools/scap14_to_scapng.py"
-      - "tools/analyze_scapng_assessment_reuse.py"
-      - "tools/scap14_benchmark_reuse_inventory.py"
-      - "tools/aggregate_scapng_reuse_inventories.py"
-      - "tools/build_oval_schema_semantic_catalog.py"
-      - "research/iterations/001/oval-test-support-overrides.json"
-      - "third_party/scap-1.4-schemas/**"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -26,6 +19,7 @@ concurrency:
 
 jobs:
   inventory:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -123,6 +117,7 @@ jobs:
           compression-level: 6
 
   aggregate:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     needs: inventory
     runs-on: ubuntu-latest
     steps:

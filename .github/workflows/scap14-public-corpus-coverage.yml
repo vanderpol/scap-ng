@@ -1,22 +1,21 @@
-name: SCAP 1.4 public corpus conversion coverage
+name: "[HISTORICAL] SCAP 1.4 public corpus conversion coverage"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/scap14-public-corpus-coverage.yml"
-      - "research/iterations/001/tools/scap14_corpus_convert.py"
-      - "research/iterations/001/tools/test_deprecated_oval_conversion_block.py"
-      - "research/iterations/001/public-corpus-manifest.yaml"
-      - "research/iterations/001/oval-test-support-overrides.json"
-      - "research/iterations/001/scap14-public-corpus-conversion-requirement.md"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   niwc-current-ingestion:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out SCAP-NG

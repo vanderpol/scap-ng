@@ -1,25 +1,21 @@
-name: Audit native RHEL9 explicit variable and entity defaults
+name: "[HISTORICAL] Audit native RHEL9 explicit variable and entity defaults"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
   workflow_dispatch:
-  # CI-generated commits do not fire ordinary push workflows.
-  workflow_run:
-    workflows: ["Build SCAP-NG 003 full RHEL9 benchmark"]
-    types: [completed]
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/audit-rhel9-explicit-defaults.yml"
-      - "tools/audit_v003_explicit_defaults.py"
-      - "tools/test_native_default_explicitness.py"
-      - "research/iterations/003/source/split-rule-assessment/rhel9-full/assessments/**"
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   audit:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

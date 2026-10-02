@@ -1,3 +1,9 @@
+# Current task checkpoint — repository rebaseline and Board votes
+
+2026-10-02: schema validation is resolved at technical commit `564d1ed8924f3265da5601874d6429f4b7db3572`; full fresh corpus run 37004465863 passed. The next active task is a lossless repository rebaseline, novice/Board navigation, complete path/dependency inventory, historical workflow gating, and publication of individual versioned yes/no Board Discussions. Follow docs/repository-map.md, docs/lossless-rebaseline.md and board/README.md. No historical payload deletion or ownership transfer is authorized. Read the latest repository-audit/publication Actions and board/discussion-index.json before claiming publication or preservation complete.
+
+The owner is switching back to the phone ChatGPT app and requested uninterrupted work; a new chat should recover this task from GitHub, not start a competing architecture or generator. Original history coverage limits below still apply. Web Codex handoff remains preparation until a final checkpoint and receiving-session access/test acceptance.
+
 # ChatGPT ↔ web Codex transition
 
 Status: **PREPARATION ONLY — NOT A STABLE HANDOFF OR AN EXHAUSTIVE HISTORY ARCHIVE.**
@@ -67,3 +73,4 @@ Primary repository: vanderpol/scap-ng. Previously authorized related repositorie
 ## Provenance and coverage
 
 Classification: **Evidence/Audit**. Prepared from directly visible owner instructions, supplied conversation summaries, targeted history retrieval and inspected repository files. No external redesign draft establishes owner acceptance. This directory is not a verbatim archive, and complete conversation enumeration is unavailable through the retrieval used so far. See decisions.md and recovered-notes.md for limits. No completeness guarantee or transition-ready claim is made.
+

@@ -1,3 +1,31 @@
+# Current local conversion for SCAP-NG review
+
+Use `convert_full_review.py` with a pinned original SCAP 1.4 ZIP. The original `run_local.py` below reproduces an earlier generation path and is historical.
+
+From the repository root, using Python 3.12:
+
+```powershell
+python -m pip install PyYAML==6.0.3 lxml==6.1.1
+python tools/scap_upconvert_v003/convert_full_review.py --input "PATH_TO_PINNED_SCAP.zip" --sha256 "EXPECTED_SHA256" --output work/review --schema third_party/scap-1.4-schemas/omni-schema.xsd
+```
+
+Replace the two input placeholders with the package path and independently recorded checksum. `work/review` is a short local output path. This source/design review command does not publish or modify the original package. Read the emitted evidence, source warnings/exclusions and validation results before accepting the output.
+
+[RHEL 9 full guide](../../docs/rhel9-review.md) · [Windows 11 guide](../../research/iterations/003/review/windows11-current-full/README.md) · [Converter delivery requirements](../../research/iterations/003/design/converter-stability-and-windows.md).
+
+Structural validation can be repeated with:
+
+```powershell
+python -m pip install jsonschema
+python tools/validate_native_json_schemas.py work/review --schema-dir schema/v0.1.0 --report work/schema-validation.json
+```
+
+This is a maintained research command, not a finalized language implementation or proof of target-runtime equivalence. Native capability normalization is still incomplete outside the reviewed slices.
+
+## Preserved historical instructions
+
+The following section is retained verbatim as historical reproduction documentation. Its output paths and package mode SHALL NOT be used as the current handoff baseline.
+
 # SCAP-NG v003 local conversion tools
 
 The v003 conversion tooling can be run directly from a local checkout. GitHub

@@ -1,21 +1,21 @@
-name: Audit pinned RHEL9 XCCDF profile-selection parity
+name: "[HISTORICAL] Audit pinned RHEL9 XCCDF profile-selection parity"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/audit-rhel9-profile-selection.yml"
-      - "tools/scap_upconvert_v003/audit_profile_selection.py"
-      - "tools/scap_upconvert_v003/test_profile_selection_audit.py"
-      - "tools/scap14_benchmark_ir.py"
-      - "research/iterations/003/source/split-rule-assessment/rhel9-full/benchmark.yaml"
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   compare:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out SCAP-NG

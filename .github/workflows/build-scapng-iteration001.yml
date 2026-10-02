@@ -1,22 +1,21 @@
-name: Build SCAP-NG iteration 001 prototypes
+name: "[HISTORICAL] Build SCAP-NG iteration 001 prototypes"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/build-scapng-iteration001.yml"
-      - "research/iterations/001/tools/build_full_benchmarks.py"
-      - "research/iterations/001/prototypes/full-benchmarks/**/source/**"
-      - "research/iterations/001/prototypes/full-benchmarks/**/shared-assessments/**"
-      - "research/iterations/001/prototypes/full-benchmarks/combined-rule/shared-rules/**"
-      - "tools/verify_scapng_prototype_bundle.py"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 jobs:
   build-and-verify:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

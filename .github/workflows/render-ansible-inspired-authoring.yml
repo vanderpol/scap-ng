@@ -1,19 +1,21 @@
-name: Render Ansible-inspired SCAP-NG authoring experiment
+name: "[HISTORICAL] Render Ansible-inspired SCAP-NG authoring experiment"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/render-ansible-inspired-authoring.yml"
-      - "research/iterations/001/prototypes/oval-migration-cases/**/split/**"
-      - "research/iterations/001/tools/render_ansible_inspired.py"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 jobs:
   render:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

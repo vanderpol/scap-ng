@@ -1,31 +1,14 @@
-name: OVAL 5.12.3 Self-Assertion conformance
+name: "[HISTORICAL] OVAL 5.12.3 Self-Assertion conformance"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/oval-self-assertion-conformance.yml"
-      - "AGENTS.md"
-      - "research/iterations/001/public-corpus-manifest.yaml"
-      - "research/iterations/001/oval-test-support-overrides.json"
-      - "research/iterations/001/tools/oval_semantic_ir.py"
-      - "research/iterations/001/tools/analyze_oval_self_assertion.py"
-      - "research/iterations/001/tools/compare_self_assertion_schema_coverage.py"
-      - "research/iterations/001/tools/verify_oval_self_assertion_static.py"
-      - "research/iterations/001/tools/test_oval_dependency_graph.py"
-      - "research/iterations/001/tools/test_oval_variable_evaluation_plans.py"
-      - "research/iterations/001/tools/test_oval_static_variable_functions.py"
-      - "research/iterations/001/tools/test_oval_set_filter_semantics.py"
-      - "research/iterations/001/tools/test_oval_set_filter_algebra.py"
-      - "research/iterations/001/tools/test_oval_result_algebra.py"
-      - "research/iterations/001/tools/test_oval_synthetic_object_component.py"
-      - "research/iterations/001/tools/test_oval_regex_capture.py"
-      - "research/iterations/001/tools/test_oval_glob_and_natural_merge.py"
-      - "research/iterations/001/tools/test_oval_time_difference.py"
-      - "research/iterations/001/tools/test_oval_decimal_and_escape.py"
-      - "research/iterations/001/tools/test_oval_self_assertion_sets.py"
-      - "third_party/scap-1.4-schemas/**"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -36,6 +19,7 @@ concurrency:
 
 jobs:
   agnostic-core-language:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out SCAP-NG

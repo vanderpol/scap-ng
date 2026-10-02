@@ -1,20 +1,21 @@
-name: Validate SCAP-NG iteration 001 research YAML
+name: "[HISTORICAL] Validate SCAP-NG iteration 001 research YAML"
 
+# Archived reproduction only. This workflow does not validate current native authoring.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/validate-iteration001-migration-cases.yml"
-      - "research/iterations/001/prototypes/oval-migration-cases/**"
-      - "research/iterations/001/prototypes/full-benchmarks/**"
-      - "research/iterations/001/tools/validate_migration_cases.py"
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly reproduce archived research (not current NG output)'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   validate:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
