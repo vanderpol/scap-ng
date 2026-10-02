@@ -156,12 +156,16 @@ class Builder:
         self.emitted_states.add(sid)
         ns = family_ns(family)
 
-        if isinstance(expr, dict) and set(expr) == {"all"}:
-            operator = "AND"
-            predicates = expr["all"]
-        elif isinstance(expr, dict) and set(expr) == {"any"}:
-            operator = "OR"
-            predicates = expr["any"]
+        state_operator_map = {
+            "all": "AND",
+            "any": "OR",
+            "one": "ONE",
+            "odd": "XOR",
+        }
+        if isinstance(expr, dict) and len(expr) == 1 and next(iter(expr)) in state_operator_map:
+            key = next(iter(expr))
+            operator = state_operator_map[key]
+            predicates = expr[key]
         else:
             operator = "AND"
             predicates = [expr]
@@ -196,11 +200,22 @@ class Builder:
     def split_test_states(self, expr):
         if expr is None:
             return "AND", []
-        if isinstance(expr, dict) and set(expr) in ({"all"}, {"any"}):
+        operator_map = {
+            "all": "AND",
+            "any": "OR",
+            "one": "ONE",
+            "odd": "XOR",
+        }
+        if isinstance(expr, dict) and len(expr) == 1:
             key = next(iter(expr))
-            terms = expr[key]
-            if any(isinstance(x, dict) and ("all" in x or "any" in x) for x in terms):
-                return ("AND" if key == "all" else "OR"), terms
+            if key in operator_map:
+                terms = expr[key]
+                if any(
+                    isinstance(x, dict)
+                    and any(k in x for k in operator_map)
+                    for x in terms
+                ):
+                    return operator_map[key], terms
         return "AND", [expr]
 
     def emit_filter(self, parent, capability, item):
