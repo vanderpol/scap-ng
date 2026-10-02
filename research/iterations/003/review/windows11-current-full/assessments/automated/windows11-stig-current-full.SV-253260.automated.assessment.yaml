@@ -1,0 +1,174 @@
+assessment:
+  id: windows11-stig-current-full.SV-253260.automated
+  version: 2
+  assessment_title: WN11-00-000031 - Windows 11 systems must use a BitLocker PIN for pre-boot authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\FVE
+        name:
+          operation: case insensitive equals
+          datatype: string
+          value: UseAdvancedStartup
+      object_title: null
+    windows-registry-object-2:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\FVE
+        name:
+          operation: case insensitive equals
+          datatype: string
+          value: OSManageNKP
+      object_title: null
+    windows-registry-object-3:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\FVE
+        name:
+          operation: case insensitive equals
+          datatype: string
+          value: UseTPMPIN
+      object_title: null
+    windows-registry-object-4:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\FVE
+        name:
+          operation: case insensitive equals
+          datatype: string
+          value: UseTPMKeyPIN
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-windows-registry-2:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-require-additional-authentication-at-startup-enabled:
+      test_title: '''Require additional authentication at startup'' is Enabled.'
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+    test-allow-network-unlock-at-startup-enabled:
+      test_title: '''Allow network unlock at startup'' is Enabled.'
+      capability: windows.registry
+      object: windows-registry-object-2
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+    test-configure-tpm-startup-pin-set-require-startup-pin-tpm:
+      test_title: '''Configure TPM startup PIN'' is set to ''Require startup PIN with TPM''.'
+      capability: windows.registry
+      object: windows-registry-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+    test-configure-tpm-startup-key-pin-set-require-startup-key-pin:
+      test_title: '''Configure TPM startup key and PIN'' is set to ''Require startup key and PIN with TPM''.'
+      capability: windows.registry
+      object: windows-registry-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+    test-configure-tpm-startup-pin-set-allow-startup-pin-tpm:
+      test_title: '''Configure TPM startup PIN'' is set to ''Allow startup PIN with TPM''.'
+      capability: windows.registry
+      object: windows-registry-object-3
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry-2
+    test-configure-tpm-startup-key-pin-set-allow-startup-key-pin:
+      test_title: '''Configure TPM startup key and PIN'' is set to ''Allow startup key and PIN with TPM''.'
+      capability: windows.registry
+      object: windows-registry-object-4
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry-2
+  evaluate:
+    all:
+    - test: test-require-additional-authentication-at-startup-enabled
+    - any:
+      - all:
+        - not:
+            test: test-allow-network-unlock-at-startup-enabled
+        - any:
+          - test: test-configure-tpm-startup-pin-set-require-startup-pin-tpm
+          - test: test-configure-tpm-startup-key-pin-set-require-startup-key-pin
+      - all:
+        - test: test-allow-network-unlock-at-startup-enabled
+        - any:
+          - test: test-configure-tpm-startup-pin-set-allow-startup-pin-tpm
+          - test: test-configure-tpm-startup-key-pin-set-allow-startup-key-pin

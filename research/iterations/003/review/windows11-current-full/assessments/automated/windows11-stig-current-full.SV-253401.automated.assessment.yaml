@@ -1,0 +1,119 @@
+assessment:
+  id: windows11-stig-current-full.SV-253401.automated
+  version: 3
+  assessment_title: WN11-CC-000260 - Windows 11 must be configured to require a minimum PIN length of six characters
+    or greater
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    group-policy-registry-entry-minimumpinlength-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\PassportForWork\PINComplexity
+        name:
+          operation: equals
+          datatype: string
+          value: MinimumPINLength
+      object_title: Group Policy registry entry for MinimumPINLength
+    registry-object-tenant-id-account-currently-in-use-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: pattern match
+          datatype: string
+          value: (?i)SYSTEM\\CurrentControlSet\\Control\\CloudDomainJoin\\TenantInfo\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+        name:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: Registry object for the Tenant ID of the account currently in use
+    intune-registry-entry-minimumpinlength-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: guid-current-tenant-variable
+        name:
+          operation: equals
+          datatype: string
+          value: MinimumPINLength
+      object_title: Intune registry entry for MinimumPINLength
+    registry-entries-minimumpinlength-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: group-policy-registry-entry-minimumpinlength-object
+        - object: intune-registry-entry-minimumpinlength-object
+      object_title: Registry entries for MinimumPINLength
+  variables:
+    guid-current-tenant-variable:
+      title: GUID of current Tenant
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: SOFTWARE\Microsoft\Policies\PassportForWork\
+            datatype: string
+        - regex_capture:
+            value:
+              values:
+                object: registry-object-tenant-id-account-currently-in-use-object
+                field: key
+            pattern: (?i)\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
+        - literal:
+            value: \device\policies\PINComplexity
+            datatype: string
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '6'
+          operation: greater than or equal
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-minimum-pin-length-6-or-greater:
+      test_title: Minimum PIN length is 6 or greater
+      capability: windows.registry
+      object: registry-entries-minimumpinlength-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-minimum-pin-length-6-or-greater

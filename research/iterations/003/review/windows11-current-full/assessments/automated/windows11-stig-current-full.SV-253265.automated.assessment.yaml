@@ -1,0 +1,33 @@
+assessment:
+  id: windows11-stig-current-full.SV-253265.automated
+  version: 2
+  assessment_title: WN11-00-000050 - Local volumes must be formatted using NTFS.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    all-local-disk-file-systems-not-using-ntfs-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!="NTFS"
+      object_title: All 'Local Disk' File systems not using NTFS
+  states: {}
+  tests:
+    test-local-volumes-use-ntfs:
+      test_title: Local volumes use NTFS
+      capability: windows.wmi57
+      object: all-local-disk-file-systems-not-using-ntfs-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    test: test-local-volumes-use-ntfs

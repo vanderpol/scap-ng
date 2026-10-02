@@ -1,0 +1,226 @@
+assessment:
+  id: windows11-stig-current-full.SV-253340.automated
+  version: 2
+  assessment_title: WN11-AU-000515 - Windows 11 permissions for the Application event log must prevent access by
+    non-privileged accounts.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    path-application-evtx-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Services\EventLog\Application
+        name:
+          operation: equals
+          datatype: string
+          value: file
+      object_title: path Application.evtx
+    application-event-log-strict-filepath-as-listed-object:
+      capability: windows.fileeffectiverights53
+      select:
+        filepath:
+          operation: case insensitive equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: strict-path-application-evtx-variable
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: The Application event log. Strict filepath, as listed.
+    permissions-application-event-log-minus-those-allowed-strict-filepath-as-object:
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: application-event-log-strict-filepath-as-listed-object
+        filters:
+        - action: exclude
+          state: state-event-log-process-account-deterministically-built-with-r
+        - action: exclude
+          state: state-system-account
+        - action: exclude
+          state: state-administrators-account
+        - action: exclude
+          state: state-local-service-account-the-owner
+        - action: exclude
+          state: state-application-package-authority-all-application-packages-a
+      object_title: Permissions of Application event log, minus those allowed. Strict filepath, as listed.
+    system-root-directory-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          value: SystemRoot
+      object_title: System Root Directory
+    application-event-log-built-filepath-object:
+      capability: windows.fileeffectiverights53
+      select:
+        filepath:
+          operation: case insensitive equals
+          datatype: string
+          variable_check: at least one
+          value:
+            variable: path-application-evtx-systemroot-environment-variable-replaced-its-value-variable
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: The Application event log. Built filepath.
+    permissions-application-event-log-minus-those-allowed-built-filepath-object:
+      capability: windows.fileeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: application-event-log-built-filepath-object
+        filters:
+        - action: exclude
+          state: state-event-log-process-account-deterministically-built-with-r
+        - action: exclude
+          state: state-system-account
+        - action: exclude
+          state: state-administrators-account
+        - action: exclude
+          state: state-local-service-account-the-owner
+        - action: exclude
+          state: state-application-package-authority-all-application-packages-a
+      object_title: Permissions of Application event log, minus those allowed. Built filepath.
+  variables:
+    strict-path-application-evtx-variable:
+      title: Strict path to Application.evtx.
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: path-application-evtx-object
+              field: value
+          pattern: ^(.*)$
+    path-application-evtx-systemroot-environment-variable-replaced-its-value-variable:
+      title: Path to Application.evtx with the SystemRoot environment variable replaced with its value.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: system-root-directory-object
+            field: value
+        - regex_capture:
+            value:
+              values:
+                object: path-application-evtx-object
+                field: value
+            pattern: ^%.*%(.*)$
+  states:
+    state-systemroot-environment-variable:
+      state_title: '%SystemRoot% environment variable.'
+      capability: windows.registry
+      state:
+        field: value
+        value: ^(?i)%SystemRoot%.*$
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-event-log-process-account-deterministically-built-with-r:
+      state_title: Event Log process account. Deterministically built with respect to service name.
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system-account:
+      state_title: SYSTEM account.
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-18
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-administrators-account:
+      state_title: Administrators account.
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-544
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-local-service-account-the-owner:
+      state_title: LOCAL SERVICE account, the owner.
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-19
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-application-package-authority-all-application-packages-a:
+      state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+      capability: windows.fileeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-15-2-1
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-application-event-log-have-at-least-default-permissions-strict-path:
+      test_title: The Application event log must have at least default permissions. Strict Path
+      capability: windows.fileeffectiverights53
+      object: permissions-application-event-log-minus-those-allowed-strict-filepath-as-object
+      check_existence: none_exist
+      check: all
+    test-application-event-log-registry-specified-location-have-systemroot-environment-variable:
+      test_title: The Application event log registry specified location must have the %SystemRoot% environment variable.
+      capability: windows.registry
+      object: path-application-evtx-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-systemroot-environment-variable
+    test-application-event-log-have-at-least-default-permissions-built-path:
+      test_title: The Application event log must have at least default permissions. Built Path
+      capability: windows.fileeffectiverights53
+      object: permissions-application-event-log-minus-those-allowed-built-filepath-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    any:
+    - all:
+      - test: test-application-event-log-have-at-least-default-permissions-strict-path
+      - not:
+          test: test-application-event-log-registry-specified-location-have-systemroot-environment-variable
+    - all:
+      - test: test-application-event-log-have-at-least-default-permissions-built-path
+      - test: test-application-event-log-registry-specified-location-have-systemroot-environment-variable

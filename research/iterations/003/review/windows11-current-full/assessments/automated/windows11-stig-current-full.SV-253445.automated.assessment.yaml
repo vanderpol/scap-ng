@@ -1,0 +1,189 @@
+assessment:
+  id: windows11-stig-current-full.SV-253445.automated
+  version: 18
+  assessment_title: The required legal notice must be configured to display before console logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    legal-notice-text-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        name:
+          operation: equals
+          datatype: string
+          value: LegalNoticeText
+      object_title: Legal notice text
+  states:
+    state-warning-banner-you-are-accessing-a-u-s-government-usg-in:
+      state_title: Warning Banner - You are accessing a U.S. Government (USG) Information System (IS) that is provided
+        for USG-authorized use only.
+      capability: windows.registry
+      state:
+        field: value
+        value: You are accessing a U.S. Government \(USG\) Information System \(IS\) that is provided for USG-authorized
+          use only.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-by-using-this-is-which-includes-any-devic:
+      state_title: 'Warning Banner - By using this IS (which includes any device attached to this IS), you consent
+        to the following conditions:'
+      capability: windows.registry
+      state:
+        field: value
+        value: 'By using this IS \(which includes any device attached to this IS\), you consent to the following
+          conditions:'
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-the-usg-routinely-intercepts-and-monitors:
+      state_title: Warning Banner - -The USG routinely intercepts and monitors communications on this IS for purposes
+        including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel
+        misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
+      capability: windows.registry
+      state:
+        field: value
+        value: -The USG routinely intercepts and monitors communications on this IS for purposes including, but
+          not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct
+          \(PM\), law enforcement \(LE\), and counterintelligence \(CI\) investigations.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-at-any-time-the-usg-may-inspect-and-seize:
+      state_title: Warning Banner - -At any time, the USG may inspect and seize data stored on this IS.
+      capability: windows.registry
+      state:
+        field: value
+        value: -At any time, the USG may inspect and seize data stored on this IS.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-communications-using-or-data-stored-on-th:
+      state_title: Warning Banner - -Communications using, or data stored on, this IS are not private, are subject
+        to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
+      capability: windows.registry
+      state:
+        field: value
+        value: -Communications using, or data stored on, this IS are not private, are subject to routine monitoring,
+          interception, and search, and may be disclosed or used for any USG-authorized purpose.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-this-is-includes-security-measures-e-g-au:
+      state_title: Warning Banner - -This IS includes security measures (e.g., authentication and access controls)
+        to protect USG interests--not for your personal benefit or privacy.
+      capability: windows.registry
+      state:
+        field: value
+        value: -This IS includes security measures \(e.g., authentication and access controls\) to protect USG interests--not
+          for your personal benefit or privacy.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-warning-banner-notwithstanding-the-above-using-this-is-d:
+      state_title: Warning Banner - -Notwithstanding the above, using this IS does not constitute consent to PM,
+        LE or CI investigative searching or monitoring of the content of privileged communications, or work product,
+        related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants.
+        Such communications and work product are private and confidential. See User Agreement for details.
+      capability: windows.registry
+      state:
+        field: value
+        value: -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative
+          searching or monitoring of the content of privileged communications, or work product, related to personal
+          representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications
+          and work product are private and confidential. See User Agreement for details.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-required-legal-notice-configured-display-before-console-logon-message-content:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        1
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-you-are-accessing-a-u-s-government-usg-in
+    test-required-legal-notice-configured-display-before-console-logon-message-content-2:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        2
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-by-using-this-is-which-includes-any-devic
+    test-required-legal-notice-configured-display-before-console-logon-message-content-3:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        3
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-the-usg-routinely-intercepts-and-monitors
+    test-required-legal-notice-configured-display-before-console-logon-message-content-4:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        4
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-at-any-time-the-usg-may-inspect-and-seize
+    test-required-legal-notice-configured-display-before-console-logon-message-content-5:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        5
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-communications-using-or-data-stored-on-th
+    test-required-legal-notice-configured-display-before-console-logon-message-content-6:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        6
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-this-is-includes-security-measures-e-g-au
+    test-required-legal-notice-configured-display-before-console-logon-message-content-7:
+      test_title: The required legal notice must be configured to display before console logon - Message Content
+        7
+      capability: windows.registry
+      object: legal-notice-text-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-warning-banner-notwithstanding-the-above-using-this-is-d
+  evaluate:
+    all:
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-2
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-3
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-4
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-5
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-6
+    - test: test-required-legal-notice-configured-display-before-console-logon-message-content-7

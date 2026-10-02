@@ -1,0 +1,56 @@
+assessment:
+  id: windows11-stig-current-full.SV-253391.automated
+  version: 2
+  assessment_title: WN11-CC-000200 - Administrator accounts must not be enumerated during elevation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI
+        name:
+          operation: equals
+          datatype: string
+          value: EnumerateAdministrators
+      object_title: null
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-enumerate-administrator-accounts-on-elevation-set-disabled:
+      test_title: '''Enumerate administrator accounts on elevation'' is set to ''Disabled'''
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-enumerate-administrator-accounts-on-elevation-set-disabled

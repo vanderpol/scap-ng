@@ -1,0 +1,49 @@
+assessment:
+  id: windows11-stig-current-full.SV-253308.automated
+  version: 2
+  assessment_title: WN11-AU-000030 - The system must be configured to audit Account Management - Security Group
+    Management successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-auditeventpolicysubcategories-object:
+      capability: windows.auditeventpolicysubcategories
+      object_title: null
+  states:
+    state-windows-auditeventpolicysubcategories:
+      state_title: null
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_group_management
+        value: AUDIT_SUCCESS
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-windows-auditeventpolicysubcategories-2:
+      state_title: null
+      capability: windows.auditeventpolicysubcategories
+      state:
+        field: security_group_management
+        value: AUDIT_SUCCESS_FAILURE
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-audit-security-group-management-set-success-or-success-failure:
+      test_title: '''Audit Security Group Management'' is set to ''Success'' or ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      object: windows-auditeventpolicysubcategories-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-windows-auditeventpolicysubcategories
+      - state-windows-auditeventpolicysubcategories-2
+  evaluate:
+    test: test-audit-security-group-management-set-success-or-success-failure

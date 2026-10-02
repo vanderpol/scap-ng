@@ -1,0 +1,57 @@
+assessment:
+  id: windows11-stig-current-full.condition.windows-prior-v24h2.assessment
+  version: 1
+  assessment_title: Windows Prior to v24H2
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    currentbuildnumber-registry-entry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          operation: equals
+          datatype: string
+          value: CurrentBuildNumber
+      object_title: CurrentBuildNumber registry entry
+  states:
+    state-build-26100-version-24h2-or-later:
+      state_title: Build 26100 (version 24H2) or later
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_sz
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '26100'
+          operation: greater than or equal
+          datatype: version
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-windows-system-build-26100-version-24h2-or-later:
+      test_title: Windows system is build 26100 (version 24H2) or later
+      capability: windows.registry
+      object: currentbuildnumber-registry-entry-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-build-26100-version-24h2-or-later
+  evaluate:
+    not:
+      test: test-windows-system-build-26100-version-24h2-or-later

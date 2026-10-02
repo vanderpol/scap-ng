@@ -1,0 +1,57 @@
+assessment:
+  id: windows11-stig-current-full.SV-253459.automated
+  version: 2
+  assessment_title: WN11-SO-000185 - PKU2U authentication using online identities must be prevented.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-registry-value-at-hkey-local-machine-system-currentcontrolset-control-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SYSTEM\CurrentControlSet\Control\LSA\pku2u
+        name:
+          operation: equals
+          datatype: string
+          value: AllowOnlineID
+      object_title: Check the registry value at HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\LSA\pku2u\AllowOnlineID
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-network-security-allow-pku2u-authentication-requests-this-computer-use-online:
+      test_title: '''Network Security: Allow PKU2U authentication requests to this computer to use online identities''
+        is set to ''Disabled'''
+      capability: windows.registry
+      object: check-registry-value-at-hkey-local-machine-system-currentcontrolset-control-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-network-security-allow-pku2u-authentication-requests-this-computer-use-online

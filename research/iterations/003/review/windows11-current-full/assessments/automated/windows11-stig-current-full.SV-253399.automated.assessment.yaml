@@ -1,0 +1,80 @@
+assessment:
+  id: windows11-stig-current-full.SV-253399.automated
+  version: 3
+  assessment_title: WN11-CC-000252 - Windows 11 must be configured to disable Windows Game Recording and Broadcasting.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    group-policy-registry-entry-allowgamedvr-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Policies\Microsoft\Windows\GameDVR
+        name:
+          operation: equals
+          datatype: string
+          value: AllowGameDVR
+      object_title: Group Policy registry entry for AllowGameDVR
+    intune-registry-entry-allowgamedvr-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\PolicyManager\current\device\ApplicationManagement
+        name:
+          operation: equals
+          datatype: string
+          value: AllowGameDVR
+      object_title: Intune registry entry for AllowGameDVR
+    registry-entries-allowgamedvr-object:
+      capability: windows.registry
+      set:
+        operator: union
+        members:
+        - object: group-policy-registry-entry-allowgamedvr-object
+        - object: intune-registry-entry-allowgamedvr-object
+      object_title: Registry entries for AllowGameDVR
+  states:
+    state-windows-registry:
+      state_title: null
+      capability: windows.registry
+      state:
+        all:
+        - field: type
+          value: reg_dword
+          operation: equals
+          datatype: string
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          entity_check: all
+          entity_existence: at_least_one_exists
+  tests:
+    test-allowgamedvr-disabled:
+      test_title: AllowGameDVR is disabled
+      capability: windows.registry
+      object: registry-entries-allowgamedvr-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-registry
+  evaluate:
+    test: test-allowgamedvr-disabled

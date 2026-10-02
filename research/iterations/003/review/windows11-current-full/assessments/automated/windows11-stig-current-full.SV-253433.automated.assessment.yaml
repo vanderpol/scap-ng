@@ -1,0 +1,60 @@
+assessment:
+  id: windows11-stig-current-full.SV-253433.automated
+  version: 2
+  assessment_title: WN11-SO-000010 - The built-in guest account must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    built-in-guest-sid-object:
+      capability: windows.sid_sid
+      select:
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: ^S-1-5-[0-9-]+-501$
+      object_title: Built-in Guest SID
+    built-in-guest-account-object:
+      capability: windows.user_sid55
+      select:
+        user_sid:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: built-in-guest-variable
+      object_title: Built-in Guest account
+  variables:
+    built-in-guest-variable:
+      title: Built-in Guest
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: built-in-guest-sid-object
+          field: trustee_sid
+  states:
+    state-windows-user_sid55:
+      state_title: null
+      capability: windows.user_sid55
+      state:
+        field: enabled
+        value: '0'
+        operation: equals
+        datatype: boolean
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-built-in-guest-account-disabled:
+      test_title: The built-in guest account is disabled.
+      capability: windows.user_sid55
+      object: built-in-guest-account-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-windows-user_sid55
+  evaluate:
+    test: test-built-in-guest-account-disabled

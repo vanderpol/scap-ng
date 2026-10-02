@@ -1,0 +1,49 @@
+assessment:
+  id: windows11-stig-current-full.SV-253291.automated
+  version: 18
+  assessment_title: Bluetooth must be turned off unless approved by the organization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    verify-bluetooth-radio-turned-off-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\PolicyManager\current\device\Connectivity
+        name:
+          operation: equals
+          datatype: string
+          value: AllowBluetooth
+      object_title: Verify the Bluetooth radio is turned off
+  states:
+    state-value-equal-to-0:
+      state_title: Value Equal To 0
+      capability: windows.registry
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-bluetooth-radio-turned-off:
+      test_title: Bluetooth radio must be turned off.
+      capability: windows.registry
+      object: verify-bluetooth-radio-turned-off-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-value-equal-to-0
+  evaluate:
+    test: test-bluetooth-radio-turned-off
