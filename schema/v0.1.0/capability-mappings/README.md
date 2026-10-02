@@ -171,18 +171,35 @@ A mapping change SHOULD state whether it:
 Removal of a legacy feature that could affect supported content SHALL also be
 tracked in the migration disposition documentation.
 
-## Current proof capabilities
+## Current reviewed capabilities
 
-The current capability-schema design is being proven with deliberately diverse
-cases rather than bulk generation:
+The capability-schema design now includes the original diverse proof cases plus
+the production-first translation tranche. Each listed capability has a reviewed
+mapping; focused regression coverage is maintained in `tools/test_generate_*.py`
+or a grouped capability regression.
 
-- `unix.file` — native file metadata and shared file traversal;
+- `unix.file` — native file metadata and shared Unix/Independent file traversal;
 - `file.hash` — shared file selection plus required collection parameter;
-- `windows.file` — cross-platform reuse of file-selection semantics;
+- `windows.file` — Windows file selection with junction-aware traversal;
 - `windows.registry` — hierarchical non-filesystem traversal and typed values;
 - `variable.value` — direct Test source with no fake Object;
-- `windows.wmi.query` — collector-driven query plus structured record State.
-- `linux.rpminfo` — package metadata selection with explicit materialization of the legacy `filepaths=false` collection behavior.
+- `windows.wmi.query` — collector-driven query plus structured record State;
+- `linux.rpminfo` — package metadata and explicit source-default materialization;
+- `independent.textfilecontent54` — file traversal, regex match/instance selection, and explicit regex/item-creation behaviors;
+- `windows.auditeventpolicysubcategories` — singleton system source with deprecated state entity excluded;
+- `windows.userright` — user-right enumeration with trustee name/SID state;
+- `independent.shellcommand` — command-oriented collection with trust/security guardrails;
+- `unix.sysctl` — kernel parameter collection;
+- `linux.partition` — mounted partition metadata and effective mount options;
+- `linux.systemdunitproperty` — unit/property collection;
+- `windows.fileeffectiverights53` — trustee-SID effective rights with shared Windows traversal;
+- `windows.cmdlet` — structured record-valued PowerShell invocation and result predicates;
+- `unix.symlink` — canonical symbolic-link target resolution;
+- `windows.lockoutpolicy` — singleton system lockout policy;
+- `windows.passwordpolicy` — singleton system password policy;
+- `unix.password` — UNIX passwd account metadata with existing OVAL field terminology preserved.
 
-Additional capabilities SHOULD be added only when they either validate the
-shared abstractions or introduce a genuinely new semantic shape.
+The next tranche covers lower-frequency production candidates and then the
+remaining supported Self-Assertion language-conformance surface. Capabilities
+SHOULD continue to reuse shared primitives and SHALL NOT be bulk-generated from
+XSD names without semantic review.
