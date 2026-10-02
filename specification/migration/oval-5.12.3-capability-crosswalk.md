@@ -307,9 +307,9 @@ this capability to `unix.command` merely because a common use invokes Bash.
 
 ### Windows approved-test schema snapshot caveat
 
-Approved Windows OVAL tests including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` SHALL be treated as standard OVAL capabilities. The currently checked-in Windows definitions XSD omits several approved families and therefore SHALL NOT be used to reclassify those tests as publisher extensions.
+Approved Windows OVAL tests including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` SHALL be treated as standard OVAL capabilities. Approved Windows families are part of the SCAP 1.4 schema/test-content surface; an apparent omission in one inspected XSD SHALL be treated as a source-file mismatch, not as an extension boundary.
 
-The schema snapshot must be reconciled against the proper approved OVAL schema distribution. The only currently known SCC/NIWC custom Test/Object/State family is `independent:sqlext`.
+The schema source used by the audit must be reconciled against the complete SCAP 1.4 schema/test-content distribution. The only currently known SCC/NIWC custom Test/Object/State family is `independent:sqlext`.
 
 
 ## Excluded/deprecated Test types
