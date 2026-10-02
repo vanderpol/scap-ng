@@ -9,6 +9,7 @@ from validate_generated_capability_semantics import (
     EXECUTABLE_SEMANTIC_RULE_IDS,
     STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS,
     RUNTIME_SEMANTIC_RULE_IDS,
+    POLICY_SEMANTIC_RULE_IDS,
     classify_declared_semantic_rules,
     validate_unix_file_object,
 )
@@ -52,7 +53,7 @@ class SemanticRuleCoverageTests(unittest.TestCase):
         self.assertIn("independent.yamlfilecontent.record_keys", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
         self.assertIn("independent.xmlfilecontent.xpath_text_values", RUNTIME_SEMANTIC_RULE_IDS)
         self.assertTrue(EXECUTABLE_SEMANTIC_RULE_IDS.isdisjoint(RUNTIME_SEMANTIC_RULE_IDS))
-
+        layers=[EXECUTABLE_SEMANTIC_RULE_IDS,STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS,RUNTIME_SEMANTIC_RULE_IDS,POLICY_SEMANTIC_RULE_IDS]\n        for i,left in enumerate(layers):\n            for right in layers[i+1:]:\n                self.assertTrue(left.isdisjoint(right), left & right)\n
     def test_rule_classification_reports_unclassified_declarations(self):
         mapping={"semantic_validator_rules":[
             {"id":"windows.file.filter_state_capability"},
