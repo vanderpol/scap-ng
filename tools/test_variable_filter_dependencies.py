@@ -220,6 +220,32 @@ class DependencyTests(unittest.TestCase):
             ["prod.*", "stage.*"],
         )
 
+    def test_object_component_record_field_roundtrip(self):
+        root = source()
+        objects = root.find(f"{{{OD}}}objects")
+        extra = ET.SubElement(
+            objects,
+            f"{{{UNIX}}}file_object",
+            id="oval:dependency:obj:2",
+            version="1",
+        )
+        ET.SubElement(extra, f"{{{UNIX}}}path").text = "/tmp"
+        ET.SubElement(extra, f"{{{UNIX}}}filename").text = "demo"
+
+        expr = component(
+            "object_component",
+            object_ref="oval:dependency:obj:2",
+            item_field="record_entity",
+            record_field="member",
+        )
+        variable(root, 1, expr)
+
+        native = self.roundtrip(root)
+        entry = next(iter(native["assessment"]["variables"].values()))
+        values = entry["expression"]["object_values"]
+        self.assertEqual(values["field"], "record_entity")
+        self.assertEqual(values["record_field"], "member")
+
     def test_filter_dependencies_roundtrip(self):
         root = source()
         add_filter(root, "oval:dependency:var:1")

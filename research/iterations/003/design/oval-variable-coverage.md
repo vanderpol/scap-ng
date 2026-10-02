@@ -24,7 +24,7 @@ Status values:
 | external_variable | externally supplied typed value set plus optional allowed values/restrictions | prototype | focused mixed possible_value / possible_restriction round-trip now covered; runtime binding validation remains conformance work |
 | local_variable | one ComponentGroup member producing zero/one/many values | prototype | full recursive component coverage |
 | variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
-| object_component | object -> item field -> variable values, optional record_field | prototype | 0/1/many items and repeated item entities; record_field |
+| object_component | object -> item field -> variable values, optional record_field | prototype | record_field is now losslessly round-tripped; 0/1/many collected-item and missing-field execution remains #26 |
 | literal_component | typed literal expression input | prototype | datatype/cast rules |
 | arithmetic | 2+ operands; int/float; Cartesian product for collections | prototype | exact-static success/error fixtures added; runtime collection/error propagation remains #26 |
 | begin | one string component plus required character/string | prototype | exact-static fixture added; collection-valued/runtime conformance remains #26 |
