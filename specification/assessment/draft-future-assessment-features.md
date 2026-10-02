@@ -73,10 +73,12 @@ Only a concrete legacy construct that cannot otherwise be represented
 losslessly may justify converter emission of the future conditional construct.
 Such a case must be backed by source evidence and regression tests.
 
-## 2. Assessment composition and shared collection execution
+## 2. Shared collection execution
 
-SCAP-NG is also considering first-class Assessment dependencies and shared
-runtime collection execution.
+**Partial promotion note:** first-class Assessment-result dependencies are no
+longer deferred; they are part of the current Assessment Method and executable
+schema. This section now tracks only the still-deferred problem of sharing
+runtime collection execution and materializing reused Items.
 
 The design must distinguish:
 
@@ -117,20 +119,15 @@ Open decisions include:
 
 ## 3. Terminology note
 
-The project is reconsidering the current authored term `Collection`.
+This decision has been promoted into the current design: native authoring uses
+**Object**, **Test**, **State**, **Variable**, and **Item** where those concepts
+retain the corresponding OVAL semantics. **Collection execution** describes the
+runtime act of evaluating an Object; `Collection` is not the authored node
+name.
 
-If the construct remains semantically equivalent to the established OVAL
-Object, the preferred direction is:
-
-- **Object**: authored declarative description of system data to obtain;
-- **collection execution**: runtime act of evaluating an Object against a
-  target;
-- **Item**: observed runtime result;
-- **Test**, **State**, and **Variable**: retain established OVAL terminology
-  while their semantics remain recognizably equivalent.
-
-No terminology rename is normative yet and v0.1.0 continues to validate the
-current `collections` serialization.
+The current v0.1.0 Assessment schema therefore validates `objects`,
+`states`, `tests`, and `variables`. Older iteration artifacts that use
+authored `collections` are historical baselines, not current schema examples.
 
 ## 4. Promotion rule
 
