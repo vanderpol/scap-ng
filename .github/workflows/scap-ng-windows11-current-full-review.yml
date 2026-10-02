@@ -18,7 +18,7 @@ on:
       - .github/workflows/scap-ng-windows11-current-full-review.yml
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: windows11-current-full-review-main
@@ -132,21 +132,3 @@ jobs:
           name: windows11-current-full-review
           path: work/windows11-current-full
           if-no-files-found: error
-      - name: Publish review tree to main
-        working-directory: scap-ng
-        run: |
-          set -euo pipefail
-          dst="research/iterations/003/review/windows11-current-full"
-          rm -rf "$dst"
-          mkdir -p "$(dirname "$dst")"
-          cp -R ../work/windows11-current-full "$dst"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$dst"
-          if git diff --cached --quiet; then
-            echo "Windows 11 current review already matches."
-            exit 0
-          fi
-          git commit -m "Publish current Windows 11 full review benchmark"
-          git pull --rebase origin main
-          git push
