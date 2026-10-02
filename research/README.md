@@ -2,8 +2,7 @@
 
 Start with the [visitor guide](../START-HERE.md), [current design](iterations/003/design/CURRENT-DESIGN.md) or [Board review packet](../board/README.md).
 
-- Iteration 001: archived architecture prototypes, generated comparisons and original lessons/decision registers.
-- Iteration 002: archived source-design experiments and 19 decision notes; some directions were superseded.
+- Iterations 001 and 002 were removed from the active working tree during the lossless rebaseline. Their exact trees remain available from tag `pre-rebaseline-2026-10-02` and are indexed in `archive/README.md`.
 - Iteration 003: mixed current design, current generated review candidates, earlier slices and historical source/package snapshots. Read its [status guide](iterations/003/README.md) before selecting content.
 - Datastream/vulnerability directories: retained topic research, not current implementation or source-generation acceptance evidence.
 
@@ -21,7 +20,7 @@ Research is organized into numbered iterations so the directory root remains sta
 
 ## Iterations
 
-- `iterations/001/` — preliminary architecture discussion, controlled combined-vs-split prototypes, initial Windows/Linux result examples, stakeholder questionnaire, and decision register.
+- Historical iterations 001/002 are no longer carried in the active working tree; use the preserved tag and archive index for those materials.
 
 Each iteration should preserve:
 
