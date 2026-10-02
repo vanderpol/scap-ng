@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate cross-document graph semantics for native SCAP-NG benchmark packages."""
+"""Validate cross-document graph semantics for native SCAP-NG benchmark packages, including corpus-level shared Assessment references."""
 from __future__ import annotations
 
 import argparse
