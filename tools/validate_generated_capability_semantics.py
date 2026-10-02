@@ -440,6 +440,7 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.sql512.engine_filterability",
     "independent.unknown.fixed_result",
     "panos.version.singleton_source",
+    "asa.version.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
