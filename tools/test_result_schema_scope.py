@@ -84,6 +84,31 @@ class ResultSchemaScopeTests(unittest.TestCase):
         }
         self.assertTrue(expected.issubset(props), expected - set(props))
         self.assertFalse(root.get("additionalProperties", True))
+        self.assertNotIn("selected_branch", props)
+        self.assertFalse(
+            props["consumed_organizational_inputs"]["items"].get("additionalProperties", True)
+        )
+        self.assertFalse(
+            props["input_bindings"]["items"].get("additionalProperties", True)
+        )
+        self.assertFalse(
+            props["reason"]["oneOf"][2].get("additionalProperties", True)
+        )
+
+    def test_scan_index_records_are_closed(self):
+        props = properties("scan-result.schema.json")["scan_result"]["properties"]
+        self.assertFalse(props["targets"]["items"].get("additionalProperties", True))
+        self.assertFalse(props["benchmark_results"]["items"].get("additionalProperties", True))
+
+    def test_source_policy_records_with_complete_shapes_are_closed(self):
+        benchmark = properties("benchmark.schema.json")["benchmark"]["properties"]
+        self.assertFalse(benchmark["platform"].get("additionalProperties", True))
+        org = properties("organizational-input.schema.json")["organizational_input"]["properties"]
+        self.assertFalse(org["intended_scope"].get("additionalProperties", True))
+
+    def test_typed_values_are_closed(self):
+        typed = schema("result-types.schema.json")["$defs"]["typed_value"]
+        self.assertFalse(typed.get("additionalProperties", True))
 
     def test_detailed_component_roots_are_closed(self):
         for name in (
