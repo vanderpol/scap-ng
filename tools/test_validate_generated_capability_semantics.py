@@ -46,6 +46,19 @@ class SemanticRuleCoverageTests(unittest.TestCase):
             classified_total+=len(accounted)
         self.assertEqual(classified_total,declared_total)
 
+    def test_all_filter_rules_are_classified_by_generic_recursive_validator(self):
+        root=Path(__file__).resolve().parents[1]
+        mapping_dir=root/"schema/v0.1.0/capability-mappings"
+        seen=0
+        for path in sorted(mapping_dir.glob("*.json")):
+            mapping=json.loads(path.read_text(encoding="utf-8"))
+            for row in mapping.get("semantic_validator_rules",[]):
+                rule_id=row.get("id","")
+                if rule_id.endswith(".filter_state_capability"):
+                    seen+=1
+                    self.assertIn(rule_id,classify_declared_semantic_rules(mapping)["executable"])
+        self.assertGreater(seen,0)
+
     def test_known_executable_inventory_covers_representative_capabilities(self):
         for rule_id in (
             "unix.file.full_path_no_traversal",
