@@ -124,3 +124,19 @@ XSD/round-trip evidence, not scanner runtime proof.
 For any proposed upstream correction, record: exact original source tag/commit, file and line/element, reproducer valid under current XSD/Schematron, expected versus actual semantic result, impact, minimum fix, backward-compatibility assessment, and a regression test. Avoid proposing an XSD change on intuition alone: interpret annotations, constraint inheritance, formal OVAL documentation and any governing OVAL Board decision first.
 
 This ledger is an upstream-defect *candidate register* and does not assert all listed items are bugs. Maintain it alongside the complete machine-readable XSD inventory and SCAP-NG conformance research.
+
+
+## OV-XSD-008 — `wuaupdatesearcher_state` omits collected `source_path`
+
+**Classification:** Confirmed schema-language surface mismatch.  
+**Source:** OVAL 5.12.3 Windows definitions/system-characteristics schemas.
+
+**Observed:** `wuaupdatesearcher_item` includes scalar `source_path`, documented as the Windows Update Server URL or offline CAB filepath used as the update source. `wuaupdatesearcher_state` has no corresponding `source_path` entity. The Item field is not deprecated.
+
+**Impact:** OVAL content can collect `source_path` but cannot test/filter it through a State, including Set-filter use. This breaks the otherwise expected scalar State/Item symmetry.
+
+**SCAP-NG treatment:** native `windows.wuaupdatesearcher` includes `source_path` in the canonical State/Item model. Migration retains provenance that OVAL 5.12.3 could not express a State predicate for this field.
+
+**Candidate OVAL 5.12.4 change:** add `source_path` to `wuaupdatesearcher_state` with the same string semantics as the Item field, subject to OVAL Board review and backward-compatibility confirmation.
+
+**Regression:** require State/Item parity for `source_path` in NG and retain a source fixture proving its absence from the 5.12.3 State schema.
