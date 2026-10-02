@@ -105,13 +105,13 @@ jobs:
             xsd-validation.failed
             schematron-baseline.json
 
-      - name: Enforce only pinned deprecated-test blockers
+      - name: Enforce only pinned deprecated or source-invalid blockers
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          expected = {
+          expected_deprecated = {
               "oval:navy.navwar.niwcatlantic.scc.ios:def:1": {
                   "http://oval.mitre.org/XMLSchema/oval-definitions-5#ios#version_test"
               },
@@ -119,9 +119,21 @@ jobs:
                   "http://oval.mitre.org/XMLSchema/oval-definitions-5#junos#xml_config_test"
               },
           }
+          # These pinned Self-Assertion files intentionally carry source
+          # Schematron findings. OVAL 5.12.3 EntityAttributeGroup requires
+          # entity/Variable datatype equality for var_ref.
+          expected_source_invalid = {
+              ("macos/ind-def_environmentvariable58_test_mac.xml",
+               "oval:navy.navwar.niwcatlantic.scc.test:def:1"),
+              ("solaris/sol-def_package511_test.xml",
+               "oval:navy.navwar.niwcatlantic.scc.test:def:1"),
+              ("windows/win-def_wuaupdatesearcher_test.xml",
+               "oval:navy.navwar.niwcatlantic.scc.windows.update:def:1"),
+          }
 
           conversion=json.loads(Path("self-assertion-v003-report.json").read_text())
-          found={}
+          found_deprecated={}
+          found_invalid=set()
           unexpected=[]
           for row in conversion.get("failure_details",[]):
               features=[]
@@ -129,46 +141,71 @@ jobs:
                   features.extend(problem.get("unsupported_features") or [])
               names={x.get("feature") for x in features}
               details={x.get("detail") for x in features if x.get("detail")}
+              key=(row.get("file"),row.get("definition_id"))
               if names == {"deprecated_oval_test"}:
-                  found[row["definition_id"]]=details
+                  found_deprecated[row["definition_id"]]=details
+              elif names == {"var_ref_datatype_mismatch"} and key in expected_source_invalid:
+                  found_invalid.add(key)
               else:
                   unexpected.append(row)
 
           if unexpected:
               print(json.dumps({"unexpected_conversion_failures":unexpected},indent=2))
               raise SystemExit(1)
-          if set(found) != set(expected):
-              print(json.dumps({"expected":expected,"found":found},indent=2))
+          if set(found_deprecated) != set(expected_deprecated):
+              print(json.dumps({"expected":expected_deprecated,"found":found_deprecated},indent=2))
               raise SystemExit(1)
-          for did,details in expected.items():
-              if not details <= found[did]:
-                  print(json.dumps({"definition":did,"expected":list(details),"found":list(found[did])},indent=2))
+          if found_invalid != expected_source_invalid:
+              print(json.dumps({
+                  "expected_source_invalid":sorted(expected_source_invalid),
+                  "found_source_invalid":sorted(found_invalid),
+              },indent=2))
+              raise SystemExit(1)
+          for did,details in expected_deprecated.items():
+              if not details <= found_deprecated[did]:
+                  print(json.dumps({"definition":did,"expected":list(details),"found":list(found_deprecated[did])},indent=2))
                   raise SystemExit(1)
 
           roundtrip=json.loads(Path("self-assertion-v003-roundtrip.json").read_text())
           bad=[]
-          blocked=set()
+          blocked_deprecated=set()
+          blocked_invalid=set()
           for row in roundtrip.get("results",[]):
               if row.get("equal"):
                   continue
               features=row.get("unsupported_features") or []
               names={x.get("feature") for x in features}
-              if names == {"deprecated_oval_test"} and row.get("definition_id") in expected:
-                  blocked.add(row["definition_id"])
+              key=(row.get("file"),row.get("definition_id"))
+              if names == {"deprecated_oval_test"} and row.get("definition_id") in expected_deprecated:
+                  blocked_deprecated.add(row["definition_id"])
+              elif names == {"var_ref_datatype_mismatch"} and key in expected_source_invalid:
+                  blocked_invalid.add(key)
               else:
                   bad.append(row)
-          if bad or blocked != set(expected):
-              print(json.dumps({"unexpected_roundtrip_failures":bad,"blocked":sorted(blocked)},indent=2))
+          if (bad or blocked_deprecated != set(expected_deprecated)
+                  or blocked_invalid != expected_source_invalid):
+              print(json.dumps({
+                  "unexpected_roundtrip_failures":bad,
+                  "deprecated":sorted(blocked_deprecated),
+                  "source_invalid":sorted(blocked_invalid),
+              },indent=2))
               raise SystemExit(1)
 
-          if roundtrip.get("semantic_equal") != roundtrip.get("definitions") - len(expected):
+          expected_equal=(
+              roundtrip.get("definitions")
+              - len(expected_deprecated)
+              - len(expected_source_invalid)
+          )
+          if roundtrip.get("semantic_equal") != expected_equal:
               raise SystemExit(
-                  f"semantic count mismatch: {roundtrip.get('semantic_equal')} of {roundtrip.get('definitions')}"
+                  f"semantic count mismatch: {roundtrip.get('semantic_equal')} "
+                  f"of {roundtrip.get('definitions')}; expected {expected_equal}"
               )
           print(json.dumps({
               "definitions":roundtrip["definitions"],
               "semantic_equal":roundtrip["semantic_equal"],
-              "deprecated_blockers":sorted(blocked),
+              "deprecated_blockers":sorted(blocked_deprecated),
+              "source_invalid_var_ref_datatype":sorted(blocked_invalid),
           },indent=2))
           PY
 
