@@ -406,6 +406,75 @@
         }
       },
       "additionalProperties": false
+    },
+    "record_field_predicate": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype",
+        "mask",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "$ref": "#/$defs/comparison_operation"
+        },
+        "datatype": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/native_datatype"
+            },
+            {
+              "not": {
+                "const": "record"
+              }
+            }
+          ]
+        },
+        "mask": {
+          "type": "boolean"
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        }
+      },
+      "additionalProperties": false
+    },
+    "record_predicate": {
+      "type": "object",
+      "required": [
+        "fields",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/record_field_predicate"
+          }
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }
