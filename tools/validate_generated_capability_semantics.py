@@ -143,6 +143,19 @@ def validate_unix_file_object(obj):
 
 
 
+def validate_panos_config_object(obj):
+    if obj.get("capability") != "panos.config":
+        return []
+    xpath=(obj.get("select") or {}).get("xpath")
+    if isinstance(xpath,dict) and xpath.get("operation") != "equal":
+        return [{
+            "code":"panos.config.xpath_equal",
+            "fields":["xpath"],
+            "message":"PAN-OS configuration xpath selector must use equal operation",
+        }]
+    return []
+
+
 def validate_macos_pwpolicy512_object(obj):
     if obj.get("capability") != "macos.pwpolicy512":
         return []
@@ -472,6 +485,8 @@ def validate_assessment_capability_semantics(document):
         for row in validate_macos_pwpolicy512_object(obj):
             diagnostics.append({"object":object_id,**row})
         for row in validate_windows_cmdlet_object(obj):
+            diagnostics.append({"object":object_id,**row})
+        for row in validate_panos_config_object(obj):
             diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
