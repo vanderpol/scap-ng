@@ -289,6 +289,34 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         }
         self.assertEqual(validate_assessment_capability_semantics(good),[])
 
+    def test_wuaupdatesearcher_source_path_repair_is_filterable_state(self):
+        document = {
+            "assessment": {
+                "objects": {},
+                "variables": {},
+                "states": {
+                    "source-path": {
+                        "capability": "windows.wuaupdatesearcher",
+                        "state_title": "offline catalog path",
+                        "state": {
+                            "field": "source_path",
+                            "value": "C:\\\\wsusscn2.cab",
+                            "datatype": "string",
+                            "operation": "equal",
+                        },
+                    }
+                },
+                "tests": {
+                    "update-source": {
+                        "capability": "windows.wuaupdatesearcher",
+                        "test_title": "offline source path",
+                        "states": ["source-path"],
+                    }
+                },
+            }
+        }
+        self.assertEqual(validate_assessment_capability_semantics(document), [])
+
     def test_valid_graph_is_clean(self):
         doc={
             "assessment":{
