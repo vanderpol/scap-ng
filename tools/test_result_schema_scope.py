@@ -110,6 +110,11 @@ class ResultSchemaScopeTests(unittest.TestCase):
         typed = schema("result-types.schema.json")["$defs"]["typed_value"]
         self.assertFalse(typed.get("additionalProperties", True))
 
+    def test_authored_assessment_does_not_embed_runtime_results(self):
+        assessment = properties("assessment.schema.json")["assessment"]["properties"]
+        test_props = assessment["tests"]["additionalProperties"]["properties"]
+        self.assertNotIn("result", test_props)
+
     def test_detailed_component_roots_are_closed(self):
         for name in (
             "test-result.schema.json",
