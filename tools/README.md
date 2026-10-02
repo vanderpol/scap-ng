@@ -40,3 +40,25 @@ Useful for measuring result bloat and element populations while avoiding committ
 Creates the stable directory skeleton for a future numbered research iteration.
 
 Some migration tools require `lxml` and/or `PyYAML`; smaller inventory/scaffolding utilities remain standard-library-only.
+
+
+### scap_ng_repo_normalizer.py
+
+Normalizes native SCAP-NG authoring repositories by proven Assessment semantic equivalence.
+
+Safety contract:
+
+- default invocation is **dry-run/report-only** and does not create or modify an output repository;
+- `--rewrite --output-root <path>` is required to materialize a normalized repository copy;
+- automatic sharing uses exact semantic fingerprints only;
+- near-duplicate Assessment and Rule analysis is advisory and never authorizes a merge;
+- the report includes exact groups, source/consumer lineage, planned-change counts, and advisory review candidates;
+- a second rewrite over an already-normalized repository is expected to produce zero additional rewrites.
+
+Example dry run:
+
+    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --report normalizer-report.json
+
+Explicit rewrite:
+
+    python tools/scap_ng_repo_normalizer.py CONTENT_ROOT --rewrite --output-root NORMALIZED_ROOT --report normalizer-report.json
