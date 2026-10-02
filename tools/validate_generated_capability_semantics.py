@@ -402,7 +402,6 @@ def _iter_set_object_refs(expression):
 
 EXECUTABLE_SEMANTIC_RULE_IDS={
     # Cross-reference capability checks are generic and recurse through Sets.
-    "object.filter_state_capability",
     # File-selection families share the same native semantic implementation.
     *{f"{cap}.full_path_no_traversal" for cap in FILE_SELECTION_CAPABILITIES},
     *{f"{cap}.pattern_directory_no_traversal" for cap in FILE_SELECTION_CAPABILITIES},
