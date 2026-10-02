@@ -170,7 +170,7 @@ def collect_corpus(root: Path) -> tuple[list[dict], dict[Path, list[dict]]]:
 def validate_normalized_repository(root: Path) -> dict:
     """Validate rewritten Rule references and logical Assessment-ID consistency."""
     unresolved=[]
-    assessment_ids: dict[str, set[str]] = defaultdict(set)
+    assessment_ids: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     assessment_files=0
 
     for path in sorted(root.rglob("*.assessment.yaml")):
@@ -182,7 +182,10 @@ def validate_normalized_repository(root: Path) -> dict:
         assessment_id=assessment.get("id")
         if isinstance(assessment_id,str) and assessment_id:
             normalized=normalize_value(copy.deepcopy(assessment))
-            assessment_ids[assessment_id].add(digest(normalized))
+            fingerprint=digest(normalized)
+            assessment_ids[assessment_id][fingerprint].append(
+                path.relative_to(root).as_posix()
+            )
 
     for rule_path in sorted(root.rglob("*.rule.yaml")):
         try:
@@ -202,15 +205,23 @@ def validate_normalized_repository(root: Path) -> dict:
                 })
 
     identity_conflicts={
-        assessment_id:sorted(fingerprints)
-        for assessment_id,fingerprints in assessment_ids.items()
-        if len(fingerprints)>1
+        assessment_id: {
+            fingerprint: sorted(paths)
+            for fingerprint,paths in sorted(variants.items())
+        }
+        for assessment_id,variants in sorted(assessment_ids.items())
+        if len(variants)>1
     }
     if unresolved or identity_conflicts:
+        details={
+            "unresolved_rule_references": unresolved,
+            "assessment_identity_conflicts": identity_conflicts,
+        }
         raise ValueError(
             "normalized repository validation failed: "
             f"{len(unresolved)} unresolved reference(s), "
-            f"{len(identity_conflicts)} Assessment identity conflict(s)"
+            f"{len(identity_conflicts)} Assessment identity conflict(s)\n"
+            + json.dumps(details, indent=2, sort_keys=True)
         )
     return {
         "assessment_files":assessment_files,
