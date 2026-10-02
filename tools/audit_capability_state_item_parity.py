@@ -207,15 +207,35 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         errors.append("Object fields absent from State: " + ", ".join(object_not_state))
 
     datatype_mismatches = []
+    corrected_source_defects = []
+    state_field_map = mapping.get("native", {}).get("state_field_map", {})
+    datatype_overrides = mapping.get("native", {}).get("field_datatypes", {})
     for name in sorted(state_names & item_names):
         sdt = field_datatypes(state_fields[name])
         idt = field_datatypes(item_fields[name])
-        if sdt != idt:
-            datatype_mismatches.append({
+        if sdt == idt:
+            continue
+
+        native_name = state_field_map.get(name, name)
+        override = set(datatype_overrides.get(native_name, []))
+        # A reviewed mapping may correct a source-schema defect, but only by
+        # narrowing to the collected Item datatype. This keeps runtime evidence
+        # and State predicates on one canonical field type.
+        if override and override == idt:
+            corrected_source_defects.append({
                 "field": name,
                 "state": sorted(sdt),
                 "item": sorted(idt),
+                "native": sorted(override),
             })
+            continue
+
+        datatype_mismatches.append({
+            "field": name,
+            "state": sorted(sdt),
+            "item": sorted(idt),
+            "native_override": sorted(override),
+        })
 
     if datatype_mismatches:
         errors.append(
@@ -233,6 +253,7 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         "state_fields": sorted(state_names),
         "item_fields": sorted(item_names),
         "datatype_mismatches": datatype_mismatches,
+        "corrected_source_defects": corrected_source_defects,
     })
 
     return {
