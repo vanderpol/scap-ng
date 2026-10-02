@@ -54,9 +54,6 @@
         "var_check": {
           "$ref": "#/$defs/match_quantifier"
         },
-        "nil": {
-          "type": "boolean"
-        },
         "mask": {
           "type": "boolean"
         }
@@ -100,9 +97,6 @@
         },
         "var_check": {
           "$ref": "#/$defs/match_quantifier"
-        },
-        "nil": {
-          "type": "boolean"
         },
         "entity_check": {
           "$ref": "#/$defs/match_quantifier"
@@ -303,6 +297,95 @@
             "required": [
               "full_path"
             ]
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "set_object_operand": {
+      "type": "object",
+      "required": [
+        "object",
+        "filters"
+      ],
+      "properties": {
+        "object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state_filter"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_nested_operand": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "set": {
+          "$ref": "#/$defs/set_expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_operand": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/set_object_operand"
+        },
+        {
+          "$ref": "#/$defs/set_nested_operand"
+        }
+      ]
+    },
+    "set_expression": {
+      "type": "object",
+      "required": [
+        "operator",
+        "operands"
+      ],
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": [
+            "union",
+            "intersection",
+            "difference"
+          ]
+        },
+        "operands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/set_operand"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operator": {
+                "const": "difference"
+              }
+            },
+            "required": [
+              "operator"
+            ]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
           }
         }
       ],
