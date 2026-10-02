@@ -62,6 +62,7 @@ while the native capability name may differ from the source basename.
 | `unix:symlink_test` | `unix.symlink` | [unix.symlink](../../schema/v0.1.0/capability-mappings/unix.symlink.json) |
 | `windows:lockoutpolicy_test` | `windows.lockoutpolicy` | [windows.lockoutpolicy](../../schema/v0.1.0/capability-mappings/windows.lockoutpolicy.json) |
 | `windows:passwordpolicy_test` | `windows.passwordpolicy` | [windows.passwordpolicy](../../schema/v0.1.0/capability-mappings/windows.passwordpolicy.json) |
+| `unix:password_test` | `unix.password` | [unix.password](../../schema/v0.1.0/capability-mappings/unix.password.json) |
 
 Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
 in which the revised capability was introduced/fixed, for example `54` in
