@@ -35,6 +35,16 @@ class SemanticRuleCoverageTests(unittest.TestCase):
             if unclassified:
                 missing[path.name]=unclassified
         self.assertEqual(missing,{})
+        classified_total=0
+        declared_total=0
+        for path in sorted(mapping_dir.glob("*.json")):
+            mapping=json.loads(path.read_text(encoding="utf-8"))
+            rows=classify_declared_semantic_rules(mapping)
+            declared={row.get("id") for row in mapping.get("semantic_validator_rules",[]) if row.get("id")}
+            accounted=set(rows["executable"])|set(rows["structural_or_import"])|set(rows["runtime"])|set(rows["policy"])
+            declared_total+=len(declared)
+            classified_total+=len(accounted)
+        self.assertEqual(classified_total,declared_total)
 
     def test_known_executable_inventory_covers_representative_capabilities(self):
         for rule_id in (
