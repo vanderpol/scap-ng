@@ -81,6 +81,10 @@ def field_datatypes(element):
     return {"unknown"}
 
 
+def is_deprecated(node):
+    return any(child.tag.rsplit("}", 1)[-1] == "deprecated_info" for child in node.iter())
+
+
 def payload_fields(global_element):
     if global_element is None:
         return {}
@@ -91,6 +95,11 @@ def payload_fields(global_element):
         name = node.get("name")
         # Skip the root global element itself.
         if node is global_element:
+            continue
+        # SCAP-NG makes a clean break from explicitly deprecated OVAL entities.
+        # They are outside the supported parity surface and must not force a
+        # State/Item field into the native capability model.
+        if is_deprecated(node):
             continue
         fields.setdefault(name, node)
     return fields
