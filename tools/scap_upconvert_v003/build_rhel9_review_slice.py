@@ -1472,12 +1472,16 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
             condition = conditions[0]
         else:
             state_operator = (state.get("operator") or "AND").upper()
-            if state_operator == "AND":
-                condition = {"all": conditions}
-            elif state_operator == "OR":
-                condition = {"any": conditions}
-            else:
+            operator_map = {
+                "AND": "all",
+                "OR": "any",
+                "ONE": "one",
+                "XOR": "odd",
+            }
+            key = operator_map.get(state_operator)
+            if key is None:
                 return None, node_title(state), capability_for_state(state), f"unsupported_state_operator:{state_operator}"
+            condition = {key: conditions}
         return condition, node_title(state), capability_for_state(state), None
 
     def lower_filter(filter_node):
@@ -1687,7 +1691,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         }
         if states:
             state_operator = (test.get("state_operator") or "AND").upper()
-            if state_operator not in ("AND", "OR"):
+            if state_operator not in ("AND", "OR", "ONE", "XOR"):
                 return None, f"unsupported_state_operator:{state_operator}"
             if len(states) == 1:
                 # Identify the State before exposing its predicates, including
