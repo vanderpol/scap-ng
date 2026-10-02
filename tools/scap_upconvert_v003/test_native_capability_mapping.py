@@ -120,8 +120,8 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
         test=out["assessment"]["tests"]["test-query"]
         self.assertEqual(test["capability"],"windows.wmi.query")
-        self.assertEqual(test["check_existence"],"some")
-        self.assertEqual(test["check"],"all")
+        self.assertEqual(test["existence"],"some")
+        self.assertEqual(test["match"],"all")
 
     def test_legacy_set_shape_becomes_native_operands(self):
         doc=self.aligned_wmi_document()
