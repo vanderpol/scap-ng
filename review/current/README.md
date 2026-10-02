@@ -24,6 +24,14 @@ Reviewers should judge the design from the material above, not from old generato
 
 Reproduction tooling remains available under `../../tools/`, but tooling is deliberately outside the review surface. A tool's location, age, or passing tests do not make its emitted syntax normative.
 
+## Generated review products
+
+Complete converted Benchmarks, compiled `.scapng` packages, corpus-wide reports, and other large generated review products are **CI artifacts**, not repository source. Each review entry SHALL include the **full HTTPS URL** to the exact GitHub Actions workflow run/artifact, plus the artifact name, source commit, pinned inputs, and a compact validation summary. Do not use only a relative repository link or artifact name.
+
+Small representative source/examples belong in Git. Large generated products do not. A completed review iteration freezes the full artifact URL and provenance rather than copying the artifact back into Git.
+
+Example current full-corpus run: https://github.com/vanderpol/scap-ng/actions/runs/37004465863
+
 ## Iterations
 
 Previous review/design states belong under [`../iterations/`](../iterations/). They are preserved for traceability and comparison. The `current/` directory always identifies the single review set we presently want external reviewers to examine.
