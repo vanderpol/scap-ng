@@ -150,6 +150,44 @@ def _transform_state_payload(value, mapping: dict):
     return {"field":native_field,**predicate}
 
 
+def _transform_set(expression):
+    if not isinstance(expression,dict):
+        return copy.deepcopy(expression)
+    if "operands" in expression:
+        return copy.deepcopy(expression)
+
+    operator={
+        "union":"union",
+        "intersection":"intersection",
+        "complement":"difference",
+    }.get(str(expression.get("operator","union")).lower())
+    if operator is None:
+        raise ValueError(f"unsupported legacy Set operator: {expression.get('operator')!r}")
+
+    members=expression.get("members") or []
+    filters=copy.deepcopy(expression.get("filters") or [])
+    operands=[]
+    for member in members:
+        if not isinstance(member,dict):
+            raise ValueError("invalid legacy Set member")
+        if isinstance(member.get("object"),str):
+            operands.append({
+                "object":member["object"],
+                "filters":copy.deepcopy(filters),
+            })
+        elif isinstance(member.get("set"),dict):
+            if filters:
+                raise ValueError(
+                    "legacy nested Set unexpectedly carries object filters"
+                )
+            operands.append({"set":_transform_set(member["set"])})
+        else:
+            raise ValueError("unsupported legacy Set member")
+    if not operands:
+        raise ValueError("legacy Set has no operands")
+    return {"operator":operator,"operands":operands}
+
+
 def _extract_collector_value(source_value, mapping: dict):
     if isinstance(source_value,dict) and "value" in source_value:
         op=source_value.get("operation","equals")
@@ -197,6 +235,11 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             for key,value in obj["select"].items():
                 renamed[selector_map.get(key,key)]=value
             obj["select"]=renamed
+
+        if isinstance(obj.get("set"),dict):
+            obj["set"]=_transform_set(obj["set"])
+        obj.pop("filters",None)
+        obj.pop("behaviors",None)
 
     states=assessment.get("states") or {}
     for state in states.values():
