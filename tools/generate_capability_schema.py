@@ -68,6 +68,9 @@ def source_datatypes(element):
         "EntityObjectStringType": ["string"],
         "EntityObjectIntType": ["integer"],
         "EntityObjectBoolType": ["boolean"],
+        "EntityObjectFloatType": ["float"],
+        "EntityObjectVersionType": ["version"],
+        "EntityObjectIPAddressStringType": ["string"],
     }
     short = typed.split(":")[-1]
     if short in suffix_map:
