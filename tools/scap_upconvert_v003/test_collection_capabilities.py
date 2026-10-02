@@ -76,6 +76,34 @@ class CollectionCapabilityTests(unittest.TestCase):
         self.assertNotIn("collection_capabilities", variable)
         validate_capabilities(document["assessment"])
 
+    def test_deep_collection_dependency_chain_is_stack_safe(self):
+        assessment={"collections":{},"tests":{},"variables":{}}
+        count=1500
+        for index in range(count):
+            payload={"capability":"unix.file"}
+            if index+1 < count:
+                payload["set"]={
+                    "operator":"union",
+                    "members":[{"collection":f"c{index+1}"}],
+                }
+            assessment["collections"][f"c{index}"]=payload
+        types=collection_types(assessment)
+        self.assertEqual(len(types),count)
+        self.assertEqual(types["c0"],"unix.file")
+        self.assertEqual(types[f"c{count-1}"],"unix.file")
+
+    def test_deep_collection_cycle_is_reported_without_recursion_error(self):
+        assessment={"collections":{},"tests":{},"variables":{}}
+        count=1500
+        for index in range(count):
+            target=f"c{index+1}" if index+1 < count else "c0"
+            assessment["collections"][f"c{index}"]={
+                "capability":"unix.file",
+                "set":{"operator":"union","members":[{"collection":target}]},
+            }
+        with self.assertRaisesRegex(ValueError,"Collection dependency cycle"):
+            collection_types(assessment)
+
     def test_missing_collection_capability_rejected(self):
         document = self.source()
         del document["assessment"]["collections"]["accounts"]["capability"]
