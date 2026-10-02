@@ -7,6 +7,7 @@ import jsonschema
 from referencing import Registry, Resource
 
 from generate_capability_schema import generate
+from validate_generated_capability_semantics import validate_assessment_capability_semantics
 
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -96,6 +97,24 @@ class WindowsCmdletCapabilitySchemaTests(unittest.TestCase):
         encoded=json.dumps(self.schema)
         self.assertIn("object_record",encoded)
         self.assertNotIn('"record_operation"',encoded)
+
+    def test_literal_module_guid_is_validated(self):
+        rows=validate_assessment_capability_semantics({"assessment":{"objects":{"o":{
+            "capability":"windows.cmdlet","collect":{
+                "module_name":None,"module_id":"not-a-guid","module_version":None,
+                "verb":"Get","noun":"Process","parameters":None,"select":None,
+            }}},"states":{},"tests":{}}})
+        self.assertIn("windows.cmdlet.module_guid",{row["code"] for row in rows})
+
+    def test_select_wildcard_is_rejected(self):
+        selected=self.object_record()
+        selected["fields"]["*"]=selected["fields"].pop("name")
+        rows=validate_assessment_capability_semantics({"assessment":{"objects":{"o":{
+            "capability":"windows.cmdlet","collect":{
+                "module_name":None,"module_id":None,"module_version":None,
+                "verb":"Get","noun":"Process","parameters":None,"select":selected,
+            }}},"states":{},"tests":{}}})
+        self.assertIn("windows.cmdlet.select_no_wildcard",{row["code"] for row in rows})
 
     def test_guardrails_preserved(self):
         ids={row["id"] for row in self.schema["x-semantic-validator-rules"]}
