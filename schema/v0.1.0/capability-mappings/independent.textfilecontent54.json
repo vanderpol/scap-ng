@@ -1,0 +1,120 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "independent.textfilecontent54",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+    "test": "textfilecontent54_test",
+    "object": "textfilecontent54_object",
+    "state": "textfilecontent54_state"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "pattern": "pattern",
+      "instance": "instance"
+    },
+    "object_selector_alternatives": [
+      ["full_path", "pattern", "instance"],
+      ["directory", "name", "pattern", "instance"]
+    ],
+    "traversal_definition": "file_traversal",
+    "collection_parameters": {
+      "ignore_case": {
+        "type": "boolean",
+        "required": true,
+        "description": "OVAL textfilecontent54 ignore_case behavior; importers materialize the default false."
+      },
+      "multiline": {
+        "type": "boolean",
+        "required": true,
+        "description": "OVAL textfilecontent54 multiline behavior; importers materialize the default true."
+      },
+      "singleline": {
+        "type": "boolean",
+        "required": true,
+        "description": "OVAL textfilecontent54 singleline behavior; importers materialize the default false."
+      },
+      "item_creation": {
+        "type": "string",
+        "enum": ["all_object_elements_fullfilled", "filepath_exists"],
+        "required": true,
+        "description": "OVAL textfilecontent54 item_creation behavior, preserving the source vocabulary."
+      }
+    },
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "pattern": "pattern",
+      "instance": "instance",
+      "text": "text",
+      "subexpression": "subexpression"
+    },
+    "field_datatypes": {
+      "full_path": ["string"],
+      "directory": ["string"],
+      "name": ["string"],
+      "pattern": ["string"],
+      "instance": ["integer"],
+      "text": ["string", "boolean", "integer", "float", "binary", "version", "ipv4", "ipv6", "rpm_evr", "debian_evr", "fileset_revision", "ios_version"],
+      "subexpression": ["string", "boolean", "integer", "float", "binary", "version", "ipv4", "ipv6", "rpm_evr", "debian_evr", "fileset_revision", "ios_version"]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "textfilecontent54": "independent.textfilecontent54",
+      "textfilecontent": "migration_error_deprecated"
+    },
+    "object": {
+      "filepath": "select.full_path",
+      "path": "select.directory",
+      "filename": "select.name",
+      "pattern": "select.pattern",
+      "instance": "select.instance"
+    },
+    "traversal": {
+      "max_depth_-1": "max_depth_null",
+      "recurse.directories": "directories",
+      "recurse.symlinks": "symlinks",
+      "recurse.symlinks and directories": "symlinks_and_directories",
+      "recurse_direction.none": "no_traversal",
+      "recurse_direction.down": "implicit_downward_traversal",
+      "recurse_direction.up": "migration_error_deprecated",
+      "recurse_file_system.all": "any",
+      "recurse_file_system.local": "local",
+      "recurse_file_system.defined": "same"
+    },
+    "materialized_defaults": {
+      "behaviors.ignore_case": false,
+      "behaviors.multiline": true,
+      "behaviors.singleline": false,
+      "behaviors.item_creation": "all_object_elements_fullfilled"
+    },
+    "removed_source_fields": {
+      "windows_view": "deprecated_not_native"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "independent.textfilecontent54.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability independent.textfilecontent54."
+    },
+    {
+      "id": "independent.textfilecontent54.pattern_operation",
+      "rule": "The Object pattern selector must use the match comparison operation."
+    },
+    {
+      "id": "independent.textfilecontent54.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "independent.textfilecontent54.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    }
+  ]
+}
