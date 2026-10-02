@@ -3,7 +3,7 @@
 import copy
 import unittest
 
-from collection_graph import collection_types, validate_capabilities
+from collection_graph import collection_types, nodes, validate_capabilities
 
 
 class CollectionCapabilityTests(unittest.TestCase):
@@ -50,6 +50,13 @@ class CollectionCapabilityTests(unittest.TestCase):
                 "evaluate": {"test": "test-account"},
             }
         }
+
+    def test_deep_generic_graph_walk_is_stack_safe(self):
+        value={"leaf":True}
+        for _ in range(1500):
+            value={"nested":value}
+        seen=sum(1 for _ in nodes(value))
+        self.assertEqual(seen,1501)
 
     def test_collection_keeps_own_capability(self):
         document = self.source()
