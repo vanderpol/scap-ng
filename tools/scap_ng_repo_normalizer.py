@@ -162,6 +162,59 @@ def collect_corpus(root: Path) -> tuple[list[dict], dict[Path, list[dict]]]:
 
 
 
+
+def validate_normalized_repository(root: Path) -> dict:
+    """Validate rewritten Rule references and logical Assessment-ID consistency."""
+    unresolved=[]
+    assessment_ids: dict[str, set[str]] = defaultdict(set)
+    assessment_files=0
+
+    for path in sorted(root.rglob("*.assessment.yaml")):
+        doc=load_yaml(path)
+        assessment=doc.get("assessment")
+        if not isinstance(assessment,dict):
+            continue
+        assessment_files += 1
+        assessment_id=assessment.get("id")
+        if isinstance(assessment_id,str) and assessment_id:
+            normalized=normalize_value(copy.deepcopy(assessment))
+            assessment_ids[assessment_id].add(digest(normalized))
+
+    for rule_path in sorted(root.rglob("*.rule.yaml")):
+        try:
+            refs=rule_refs(rule_path)
+        except Exception as exc:
+            unresolved.append({
+                "rule":rule_path.relative_to(root).as_posix(),
+                "error":str(exc),
+            })
+            continue
+        for selector,target in refs:
+            if not target.exists():
+                unresolved.append({
+                    "rule":rule_path.relative_to(root).as_posix(),
+                    "selector":selector,
+                    "missing_assessment":str(target),
+                })
+
+    identity_conflicts={
+        assessment_id:sorted(fingerprints)
+        for assessment_id,fingerprints in assessment_ids.items()
+        if len(fingerprints)>1
+    }
+    if unresolved or identity_conflicts:
+        raise ValueError(
+            "normalized repository validation failed: "
+            f"{len(unresolved)} unresolved reference(s), "
+            f"{len(identity_conflicts)} Assessment identity conflict(s)"
+        )
+    return {
+        "assessment_files":assessment_files,
+        "assessment_ids":len(assessment_ids),
+        "unresolved_rule_references":0,
+        "assessment_identity_conflicts":0,
+    }
+
 def report_consumer(consumer: dict, source: Path) -> dict:
     return {
         "benchmark": consumer.get("benchmark"),
@@ -393,13 +446,17 @@ def main() -> int:
         ap.error("--output-root is required with --rewrite")
     if not args.rewrite and args.output_root is not None:
         ap.error("--output-root is only valid with --rewrite")
-    output = args.output_root.resolve() if args.output_root is not None else None
-    if output is not None:
-        if output == source:
+    destination = args.output_root.resolve() if args.output_root is not None else None
+    output = None
+    staging = None
+    if destination is not None:
+        if destination == source:
             ap.error("--output-root must differ from corpus_root")
-        if output.exists():
-            shutil.rmtree(output)
-        shutil.copytree(source, output)
+        staging = destination.with_name(destination.name + ".normalizer-tmp")
+        if staging.exists():
+            shutil.rmtree(staging)
+        shutil.copytree(source, staging)
+        output = staging
 
     benchmarks, uses = collect_corpus(source)
     rows = []
@@ -569,6 +626,16 @@ def main() -> int:
         if before_assessment_instances else 0.0
     )
 
+    repository_validation = None
+    if output is not None:
+        repository_validation = validate_normalized_repository(output)
+        # Publish only after the staged repository passes validation.  An
+        # existing destination remains untouched if normalization/validation fails.
+        if destination.exists():
+            shutil.rmtree(destination)
+        output.rename(destination)
+        output = destination
+
     report = {
         "format": "scap-ng-repository-normalizer-report-0.1",
         "mode": (
@@ -589,6 +656,7 @@ def main() -> int:
             "near_duplicate_review_groups": len(near_groups),
             "near_duplicate_rule_candidates_reported": len(rule_candidates),
         },
+        "repository_validation": repository_validation,
         "planned_changes": {
             "shared_assessments_to_create": len(exact_report),
             "local_assessment_instances_to_replace": sum(x["instance_count"] for x in exact_report),
