@@ -529,6 +529,35 @@ class DependencyTests(unittest.TestCase):
         self.assertIn("value_bytes", row["reason"])
         self.assertNotIn("values", row)
 
+    def test_lowering_budget_preflights_recursive_set_depth(self):
+        root = set_source(10)
+        native, error = converter.lower_definition(
+            root,
+            DID,
+            "budgeted-set",
+            budget=ConversionBudget(expression_depth=4),
+        )
+        self.assertIsNone(native)
+        self.assertIn("conversion_resource_limit:expression_depth", error)
+
+    def test_lowering_output_budget_returns_no_partial_assessment(self):
+        root = source()
+        variable(root, 1, literal("demo"))
+        native, error = converter.lower_definition(
+            root,
+            DID,
+            "budgeted-output",
+            budget=ConversionBudget(output_nodes=5),
+        )
+        self.assertIsNone(native)
+        self.assertIn("conversion_resource_limit:output_nodes", error)
+
+    def test_output_node_counter_is_structure_based(self):
+        tracker = ConversionBudgetTracker(ConversionBudget(output_nodes=4))
+        tracker.note_output_nodes(4)
+        with self.assertRaisesRegex(ConversionBudgetExceeded, "output_nodes"):
+            tracker.note_output_nodes(5)
+
     def test_static_object_set_cycle_reports_cycle(self):
         root = source()
         objects = root.find(f"{{{OD}}}objects")

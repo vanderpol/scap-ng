@@ -11,7 +11,7 @@ from copy import deepcopy
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import yaml
-from scap_upconvert_v003.conversion_budget import ConversionBudget, ConversionBudgetExceeded, ConversionBudgetTracker
+from scap_upconvert_v003.conversion_budget import ConversionBudget, ConversionBudgetExceeded, ConversionBudgetTracker, count_output_nodes
 
 # Share the source revision with pinned NIWC corpus regression workflows.
 # Never generate review artifacts from a moving 'main' archive.
@@ -1048,6 +1048,8 @@ def unsupported_definition_features(oroot, definition_id, *, budget: ConversionB
                         if any(local(child.tag) == "field" for child in descendant):
                             add("record_entity_var_ref_not_permitted", ref, local(descendant.tag))
                     child_kind = local(descendant.tag)
+                    if kind == "object" and child_kind == "set":
+                        tracker.note_expression_depth(depth(descendant))
                     if kind == "object" and child_kind == "var_ref" and text(descendant):
                         enqueue("variable", text(descendant))
                     elif kind == "object" and child_kind == "object_reference":
@@ -1082,7 +1084,7 @@ def unsupported_definition_features(oroot, definition_id, *, budget: ConversionB
         add("conversion_resource_limit", definition_id, exc.diagnostic)
 
     return findings
-def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None, external_bindings=None):
+def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None, external_bindings=None, budget: ConversionBudget | None = None):
     """Lower one OVAL Definition to native SCAP-NG assessment semantics."""
     definition = next(
         (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
@@ -1095,6 +1097,14 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
     # cannot be emitted as ordinary executable NG assessments.
     if (definition.get("deprecated") or "false").strip().lower() in ("true", "1"):
         return None, "deprecated_oval_definition"
+
+    if budget is not None:
+        for finding in unsupported_definition_features(
+            oroot, definition_id, budget=budget
+        ):
+            if finding.get("feature") == "conversion_resource_limit":
+                return None, finding.get("detail") or "conversion_resource_limit"
+    lower_tracker = ConversionBudgetTracker(budget)
 
     assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
@@ -1804,12 +1814,19 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
                          if k not in ASSESSMENT_SECTION_ORDER},
                       **{k: assessment[k] for k in ASSESSMENT_SECTION_ORDER
                          if k in assessment}}
+    native = {"assessment": assessment}
+    if budget is not None:
+        try:
+            lower_tracker.note_output_nodes(count_output_nodes(native))
+            lower_tracker.check_elapsed()
+        except ConversionBudgetExceeded as exc:
+            return None, exc.diagnostic
     if provenance is not None:
         provenance.update({"source_definition": definition_id,
                            "source_collection_bindings": dict(collection_names),
                            "source_variable_bindings": dict(variable_names),
                            "source_test_bindings": dict(test_to_check)})
-    return {"assessment": assessment}, None
+    return native, None
 
 def automated_refs(rec):
     refs = []

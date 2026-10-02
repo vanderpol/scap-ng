@@ -15,6 +15,7 @@ The converter budget surface is represented by
 - `expression_depth`
 - `generated_values`
 - `value_bytes`
+- `output_nodes`
 - `elapsed_ms`
 
 A `None` value means that resource is not bounded by this budget instance.
@@ -42,10 +43,14 @@ candidate cardinality is known; all exact-static value results enforce both
 remains a separate compatibility/default implementation ceiling for callers
 that have not yet moved to the explicit budget object.
 
-Native lowering still catches host Python recursion exhaustion as
-`conversion_resource_limit:python_recursion`. Replacing remaining recursive
-paths or routing them through explicit `expression_depth` policy is still
-required.
+Native lowering accepts the same optional budget. Before recursive lowering,
+the iterative feature/dependency walk enforces dependency and expression-depth
+limits, including nested Object Sets. After a complete native Assessment is
+constructed, `output_nodes` is checked before the result is returned; a breach
+returns no partial Assessment. The lowering tracker also checks elapsed work at
+completion. Host Python recursion exhaustion remains a fail-closed fallback as
+`conversion_resource_limit:python_recursion` when callers choose no explicit
+expression-depth budget.
 
 ## Non-goals
 
@@ -55,6 +60,6 @@ required.
 - They do not establish a language maximum graph depth.
 - They do not repair cycles or unsupported content.
 
-Focused adversarial fixtures cover deep dependency chains, node/edge/depth
-limits, elapsed-work diagnostics, and the existing pre-allocation Cartesian
-product safeguard.
+Focused adversarial fixtures cover deep dependency chains, recursive Set depth,
+node/edge/depth limits, generated-value and byte limits, generated output size,
+elapsed-work diagnostics, and pre-allocation Cartesian-product safeguards.

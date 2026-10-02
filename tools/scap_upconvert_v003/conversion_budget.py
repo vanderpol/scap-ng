@@ -16,6 +16,7 @@ class ConversionBudget:
     expression_depth: int | None = None
     generated_values: int | None = None
     value_bytes: int | None = None
+    output_nodes: int | None = None
     elapsed_ms: int | None = None
 
     def __post_init__(self):
@@ -68,8 +69,25 @@ class ConversionBudgetTracker:
     def note_value_bytes(self, count):
         self._check("value_bytes", count)
 
+    def note_output_nodes(self, count):
+        self._check("output_nodes", count)
+
     def check_elapsed(self):
         if self.budget.elapsed_ms is None:
             return
         elapsed_ms = int((self._clock() - self._start) * 1000)
         self._check("elapsed_ms", elapsed_ms)
+
+
+def count_output_nodes(value):
+    """Count generated native structural/value nodes iteratively."""
+    count = 0
+    stack = [value]
+    while stack:
+        current = stack.pop()
+        count += 1
+        if isinstance(current, dict):
+            stack.extend(current.values())
+        elif isinstance(current, (list, tuple)):
+            stack.extend(current)
+    return count
