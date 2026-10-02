@@ -11,6 +11,52 @@ import copy
 
 LOGICAL_OPERATOR = {"AND": "all", "OR": "any"}
 
+COMMON_CROSSWALK = {
+    "operation": {
+        "equals": "equal",
+        "not equal": "not_equal",
+        "case insensitive equals": "equal_ci",
+        "case insensitive not equal": "not_equal_ci",
+        "greater than": "greater_than",
+        "greater than or equal": "greater_or_equal",
+        "less than": "less_than",
+        "less than or equal": "less_or_equal",
+        "bitwise and": "bit_and",
+        "bitwise or": "bit_or",
+        "pattern match": "match",
+        "subset of": "subset",
+        "superset of": "superset",
+    },
+    "check": {
+        "all": "all",
+        "at least one": "any",
+        "only one": "one",
+        "none satisfy": "none",
+    },
+    "existence": {
+        "all_exist": "all",
+        "at_least_one_exists": "some",
+        "none_exist": "none",
+        "only_one_exists": "one",
+        "any_exist": "optional",
+    },
+    "datatype": {
+        "string": "string",
+        "boolean": "boolean",
+        "int": "integer",
+        "float": "float",
+        "binary": "binary",
+        "version": "version",
+        "ipv4_address": "ipv4",
+        "ipv6_address": "ipv6",
+        "evr_string": "rpm_evr",
+        "debian_evr_string": "debian_evr",
+        "fileset_revision": "fileset_revision",
+        "ios_version": "ios_version",
+        "record": "record",
+    },
+}
+
 
 def source_capability(mapping: dict) -> str:
     source=mapping["source"]
@@ -22,7 +68,8 @@ def source_capability(mapping: dict) -> str:
 
 
 def _translate(mapping: dict, group: str, value):
-    table=(mapping.get("migration_crosswalk") or {}).get(group) or {}
+    table=dict(COMMON_CROSSWALK.get(group) or {})
+    table.update((mapping.get("migration_crosswalk") or {}).get(group) or {})
     if value in table:
         translated=table[value]
         if isinstance(translated,str) and translated.startswith("migration_error"):
