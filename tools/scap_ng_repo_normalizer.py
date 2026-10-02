@@ -129,6 +129,29 @@ def rule_refs(rule_path: Path) -> list[tuple[str, Path]]:
     return out
 
 
+def applicability_refs(applicability_path: Path) -> list[tuple[str, Path]]:
+    """Return condition -> Assessment references from a native applicability catalog."""
+    doc = load_yaml(applicability_path)
+    root = doc.get("applicability") or {}
+    conditions = root.get("conditions") or {}
+    out = []
+    if isinstance(conditions, dict):
+        iterator = conditions.items()
+    elif isinstance(conditions, list):
+        iterator = (
+            (str(index), row)
+            for index, row in enumerate(conditions)
+        )
+    else:
+        raise ValueError(f"{applicability_path}: applicability conditions must be mapping or list")
+    for condition_id, row in iterator:
+        if not isinstance(row, dict) or not isinstance(row.get("assessment"), str):
+            continue
+        target = (applicability_path.parent / row["assessment"]).resolve()
+        out.append((str(condition_id), target))
+    return out
+
+
 def collect_corpus(root: Path) -> tuple[list[dict], dict[Path, list[dict]]]:
     benchmarks = []
     uses: dict[Path, list[dict]] = defaultdict(list)
@@ -153,7 +176,24 @@ def collect_corpus(root: Path) -> tuple[list[dict], dict[Path, list[dict]]]:
             rules.append(row)
             for selector, target in rule_refs(rule_path):
                 if target.exists():
-                    uses[target].append({**row, "selector": selector})
+                    uses[target].append({
+                        **row,
+                        "consumer_kind": "rule",
+                        "selector": selector,
+                    })
+
+        applicability_path = benchmark_dir / "applicability.yaml"
+        if applicability_path.is_file():
+            for condition_id, target in applicability_refs(applicability_path):
+                if target.exists():
+                    uses[target].append({
+                        "consumer_kind": "applicability",
+                        "benchmark": label,
+                        "benchmark_id": benchmark_doc.get("id"),
+                        "condition_id": condition_id,
+                        "applicability_path": applicability_path,
+                    })
+
         benchmarks.append(
             {
                 "label": label,
@@ -192,15 +232,36 @@ def validate_normalized_repository(root: Path) -> dict:
             refs=rule_refs(rule_path)
         except Exception as exc:
             unresolved.append({
-                "rule":rule_path.relative_to(root).as_posix(),
+                "consumer_kind":"rule",
+                "source":rule_path.relative_to(root).as_posix(),
                 "error":str(exc),
             })
             continue
         for selector,target in refs:
             if not target.exists():
                 unresolved.append({
-                    "rule":rule_path.relative_to(root).as_posix(),
+                    "consumer_kind":"rule",
+                    "source":rule_path.relative_to(root).as_posix(),
                     "selector":selector,
+                    "missing_assessment":str(target),
+                })
+
+    for applicability_path in sorted(root.rglob("applicability.yaml")):
+        try:
+            refs=applicability_refs(applicability_path)
+        except Exception as exc:
+            unresolved.append({
+                "consumer_kind":"applicability",
+                "source":applicability_path.relative_to(root).as_posix(),
+                "error":str(exc),
+            })
+            continue
+        for condition_id,target in refs:
+            if not target.exists():
+                unresolved.append({
+                    "consumer_kind":"applicability",
+                    "source":applicability_path.relative_to(root).as_posix(),
+                    "condition_id":condition_id,
                     "missing_assessment":str(target),
                 })
 
@@ -231,14 +292,24 @@ def validate_normalized_repository(root: Path) -> dict:
     }
 
 def report_consumer(consumer: dict, source: Path) -> dict:
-    return {
+    row = {
+        "consumer_kind": consumer.get("consumer_kind"),
         "benchmark": consumer.get("benchmark"),
         "benchmark_id": consumer.get("benchmark_id"),
-        "rule_id": consumer.get("rule_id"),
-        "title": consumer.get("title"),
-        "selector": consumer.get("selector"),
-        "rule_path": consumer["rule_path"].relative_to(source).as_posix(),
     }
+    if consumer.get("consumer_kind") == "applicability":
+        row.update({
+            "condition_id": consumer.get("condition_id"),
+            "applicability_path": consumer["applicability_path"].relative_to(source).as_posix(),
+        })
+    else:
+        row.update({
+            "rule_id": consumer.get("rule_id"),
+            "title": consumer.get("title"),
+            "selector": consumer.get("selector"),
+            "rule_path": consumer["rule_path"].relative_to(source).as_posix(),
+        })
+    return row
 
 def rewrite_rules(
     output_root: Path,
@@ -250,6 +321,8 @@ def rewrite_rules(
     for original_target, shared_target in replacements.items():
         by_rule: dict[Path, list[str]] = defaultdict(list)
         for consumer in uses.get(original_target, []):
+            if consumer.get("consumer_kind") != "rule":
+                continue
             by_rule[consumer["rule_path"]].append(consumer["selector"])
         for rule_path, selectors in by_rule.items():
             out_rule = output_root / rule_path.relative_to(input_root)
@@ -264,6 +337,46 @@ def rewrite_rules(
             if changed:
                 dump_yaml(out_rule, doc)
                 rewritten_paths.add(out_rule)
+    return len(rewritten_paths)
+
+
+def rewrite_applicability(
+    output_root: Path,
+    input_root: Path,
+    replacements: dict[Path, Path],
+    uses: dict[Path, list[dict]],
+) -> int:
+    rewritten_paths=set()
+    for original_target, shared_target in replacements.items():
+        by_catalog: dict[Path, list[str]] = defaultdict(list)
+        for consumer in uses.get(original_target, []):
+            if consumer.get("consumer_kind") != "applicability":
+                continue
+            by_catalog[consumer["applicability_path"]].append(consumer["condition_id"])
+        for applicability_path, condition_ids in by_catalog.items():
+            out_path = output_root / applicability_path.relative_to(input_root)
+            doc = load_yaml(out_path)
+            conditions = (doc.get("applicability") or {}).get("conditions") or {}
+            rel = Path(os.path.relpath(shared_target, out_path.parent)).as_posix()
+            changed=False
+            if isinstance(conditions, dict):
+                for condition_id in condition_ids:
+                    row=conditions.get(condition_id)
+                    if isinstance(row,dict) and row.get("assessment") != rel:
+                        row["assessment"]=rel
+                        changed=True
+            elif isinstance(conditions, list):
+                for condition_id in condition_ids:
+                    try:
+                        row=conditions[int(condition_id)]
+                    except (ValueError,IndexError):
+                        continue
+                    if isinstance(row,dict) and row.get("assessment") != rel:
+                        row["assessment"]=rel
+                        changed=True
+            if changed:
+                dump_yaml(out_path,doc)
+                rewritten_paths.add(out_path)
     return len(rewritten_paths)
 
 
@@ -601,6 +714,10 @@ def main() -> int:
         rewrite_rules(output, source, replacements, uses)
         if output is not None else 0
     )
+    rewritten_applicability_files = (
+        rewrite_applicability(output, source, replacements, uses)
+        if output is not None else 0
+    )
 
     # Remove promoted local duplicates only in explicit rewrite mode, after all
     # copied Rule references point to the shared canonical Assessment.
@@ -737,6 +854,7 @@ def main() -> int:
             "duplicate_assessment_definitions_avoided": duplicate_instances_avoided,
             "exact_definition_reduction_pct": reduction_pct,
             "rule_files_rewritten": rewritten_rule_files,
+            "applicability_files_rewritten": rewritten_applicability_files,
             "local_assessment_files_removed": removed_local_assessments,
             "near_duplicate_review_groups": len(near_groups),
             "near_duplicate_rule_candidates_reported": len(rule_candidates),
