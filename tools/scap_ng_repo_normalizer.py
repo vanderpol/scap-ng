@@ -439,6 +439,12 @@ def main() -> int:
                     help="Maximum near-duplicate Assessment groups retained")
     ap.add_argument("--max-rule-candidates", type=int, default=0,
                     help="Maximum similar-Rule candidates; 0 retains all")
+    ap.add_argument(
+        "--advisory",
+        choices=("all","assessments","rules","none"),
+        default="all",
+        help="Advisory similarity analysis to run. Exact equivalence is always computed.",
+    )
     args = ap.parse_args()
 
     source = args.corpus_root.resolve()
@@ -555,58 +561,59 @@ def main() -> int:
     # Near duplicates are same semantic shape after only literal values are
     # abstracted, but have >1 exact semantic fingerprint.  They are advisory.
     near_groups = []
-    for shape, group in shape_groups.items():
-        exacts = {row["exact"] for row in group}
-        if len(group) < 2 or len(exacts) < 2:
-            continue
-        consumers = [
-            {
-                "source": str(row["path"].relative_to(source)),
-                "exact_fingerprint": row["exact"],
-                "consumers": [
-                    report_consumer(consumer, source)
-                    for consumer in row["consumers"]
-                ],
-            }
-            for row in group
-        ]
-        benchmark_count = len(
-            {
-                c["benchmark"]
+    if args.advisory in {"all","assessments"}:
+        for shape, group in shape_groups.items():
+            exacts = {row["exact"] for row in group}
+            if len(group) < 2 or len(exacts) < 2:
+                continue
+            consumers = [
+                {
+                    "source": str(row["path"].relative_to(source)),
+                    "exact_fingerprint": row["exact"],
+                    "consumers": [
+                        report_consumer(consumer, source)
+                        for consumer in row["consumers"]
+                    ],
+                }
                 for row in group
-                for c in row["consumers"]
-            }
-        )
-        variants={}
-        for row in group:
-            variants.setdefault(row["exact"], row)
-        ordered_variants=sorted(variants.items(), key=lambda item:item[0])
-        baseline_fp,baseline_row=ordered_variants[0]
-        baseline_doc=normalize_value(
-            copy.deepcopy((load_yaml(baseline_row["path"]).get("assessment") or {}))
-        )
-        variant_differences=[]
-        for variant_fp,variant_row in ordered_variants[1:]:
-            variant_doc=normalize_value(
-                copy.deepcopy((load_yaml(variant_row["path"]).get("assessment") or {}))
+            ]
+            benchmark_count = len(
+                {
+                    c["benchmark"]
+                    for row in group
+                    for c in row["consumers"]
+                }
             )
-            variant_differences.append({
-                "baseline_exact_fingerprint":baseline_fp,
-                "variant_exact_fingerprint":variant_fp,
-                "baseline_source":str(baseline_row["path"].relative_to(source)),
-                "variant_source":str(variant_row["path"].relative_to(source)),
-                "differences":semantic_differences(baseline_doc,variant_doc,limit=20),
-            })
-        near_groups.append(
-            {
-                "shape_fingerprint": shape,
-                "assessment_instances": len(group),
-                "exact_variants": len(exacts),
-                "benchmark_count": benchmark_count,
-                "members": consumers,
-                "variant_differences": variant_differences,
-            }
-        )
+            variants={}
+            for row in group:
+                variants.setdefault(row["exact"], row)
+            ordered_variants=sorted(variants.items(), key=lambda item:item[0])
+            baseline_fp,baseline_row=ordered_variants[0]
+            baseline_doc=normalize_value(
+                copy.deepcopy((load_yaml(baseline_row["path"]).get("assessment") or {}))
+            )
+            variant_differences=[]
+            for variant_fp,variant_row in ordered_variants[1:]:
+                variant_doc=normalize_value(
+                    copy.deepcopy((load_yaml(variant_row["path"]).get("assessment") or {}))
+                )
+                variant_differences.append({
+                    "baseline_exact_fingerprint":baseline_fp,
+                    "variant_exact_fingerprint":variant_fp,
+                    "baseline_source":str(baseline_row["path"].relative_to(source)),
+                    "variant_source":str(variant_row["path"].relative_to(source)),
+                    "differences":semantic_differences(baseline_doc,variant_doc,limit=20),
+                })
+            near_groups.append(
+                {
+                    "shape_fingerprint": shape,
+                    "assessment_instances": len(group),
+                    "exact_variants": len(exacts),
+                    "benchmark_count": benchmark_count,
+                    "members": consumers,
+                    "variant_differences": variant_differences,
+                }
+            )
     near_groups.sort(
         key=lambda x: (
             -x["assessment_instances"],
@@ -614,9 +621,13 @@ def main() -> int:
             x["shape_fingerprint"],
         )
     )
-    rule_candidates = near_rule_candidates(
-        benchmarks,
-        limit=(args.max_rule_candidates or None),
+    rule_candidates = (
+        near_rule_candidates(
+            benchmarks,
+            limit=(args.max_rule_candidates or None),
+        )
+        if args.advisory in {"all","rules"}
+        else []
     )
 
     before_assessment_instances = len(rows)
@@ -639,10 +650,11 @@ def main() -> int:
     report = {
         "format": "scap-ng-repository-normalizer-report-0.1",
         "mode": (
-            "exact-rewrite-plus-near-duplicate-review"
+            "exact-rewrite"
             if args.rewrite else
-            "dry-run-exact-plan-plus-near-duplicate-review"
+            "dry-run-exact-plan"
         ),
+        "advisory_mode": args.advisory,
         "summary": {
             "benchmarks": len(benchmarks),
             "rules": sum(len(x["rules"]) for x in benchmarks),
@@ -671,6 +683,7 @@ def main() -> int:
             "automatic_merge_basis": "exact normalized Assessment semantics only",
             "near_duplicates_merged": False,
             "literal_abstraction_used_only_for_review_candidates": True,
+            "advisory_similarity_changes_exact_merge_decisions": False,
         },
     }
 
