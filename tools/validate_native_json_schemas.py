@@ -32,6 +32,7 @@ def load_yaml(path: Path):
 
 def validator(schema_dir: Path, filename: str):
     schema=json.loads((schema_dir/filename).read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
     store={}
     for path in schema_dir.glob("*.schema.json"):
         doc=json.loads(path.read_text(encoding="utf-8"))
@@ -87,7 +88,10 @@ def main():
             "valid":not errors,
             "errors":[{
                 "path":"/".join(map(str,e.absolute_path)),
+                "schema_path":"/".join(map(str,e.absolute_schema_path)),
+                "validator":e.validator,
                 "message":e.message,
+                "classification":"untriaged",
             } for e in errors[:50]],
         })
 
