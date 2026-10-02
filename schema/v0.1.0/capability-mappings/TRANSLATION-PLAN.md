@@ -11,7 +11,7 @@ Translate the supported OVAL 5.12.3 assessment capability surface into reviewed 
 A capability is complete only when all of the following exist:
 
 1. Exact pinned OVAL Test/Object/State source family.
-2. Reviewed native Object/Test/State/Item shape, with Object data fields a subset of State fields and State fields aligned 1:1 with collected Item fields.
+2. Reviewed native Object/Test/State/Item shape. Scalar Object data fields are a subset of State fields and scalar State/Item fields align 1:1. A complex/record Item field MAY lack a State counterpart only when the source language actually does so; the mapping must declare and justify that exception, and the field remains present in collected results.
 3. Explicit treatment of behavior-affecting OVAL defaults.
 4. Migration crosswalk and intentional divergences.
 5. Semantic-validator rules for constraints that do not belong in JSON Schema.
@@ -115,7 +115,7 @@ This is a future design/authoring simplification topic and is not a reason to ch
 
 ## Working method
 
-Translate one semantic family at a time. For every Object/State/Item family, enforce the invariant `Object data fields ⊆ State fields = Item fields`; collection controls such as OVAL behaviors are not Item fields. State/Item field identity and datatype semantics SHALL come from one canonical capability entity model so authored State predicates and runtime collected evidence cannot drift.
+Translate one semantic family at a time. For scalar entities, enforce `Object data fields ⊆ State fields = Item fields`; collection controls such as OVAL behaviors are not Item fields. Complex/record Item-only structures are permitted only as explicit source-backed exceptions and SHALL remain available in collected results without fabricating a State entity. State/Item field identity and datatype semantics SHALL otherwise come from one canonical capability entity model so authored State predicates and runtime collected evidence cannot drift.
 
 Translate one semantic family at a time. When several OVAL tests share a native abstraction (file traversal, hierarchical traversal, record predicates, command/query result records, package metadata), update the shared primitive first and keep capability mappings narrow.
 
