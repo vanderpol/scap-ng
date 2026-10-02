@@ -132,6 +132,45 @@ class AssessmentResultComponentTests(unittest.TestCase):
         with self.assertRaises(jsonschema.ValidationError):
             validate(doc, ASSESSMENT_SCHEMA)
 
+    def test_redacted_typed_value_omits_sensitive_value(self):
+        doc=base_assessment_result()
+        doc["assessment_result"]["items"].append({
+            "id":"item-secret",
+            "capability":"independent.textfilecontent54",
+            "status":"exists",
+            "fields":{
+                "text":{"datatype":"string","redacted":True}
+            },
+            "provenance":{"object_ref":"object-secret"},
+        })
+        validate(doc, ASSESSMENT_SCHEMA)
+
+        leaked=base_assessment_result()
+        leaked["assessment_result"]["items"].append({
+            "id":"item-secret",
+            "capability":"independent.textfilecontent54",
+            "status":"exists",
+            "fields":{
+                "text":{"datatype":"string","redacted":True,"value":"secret"}
+            },
+            "provenance":{"object_ref":"object-secret"},
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            validate(leaked, ASSESSMENT_SCHEMA)
+
+    def test_redacted_record_omits_record_payload(self):
+        doc=base_assessment_result()
+        doc["assessment_result"]["items"].append({
+            "id":"item-record",
+            "capability":"windows.wmi.query",
+            "status":"exists",
+            "fields":{
+                "result":{"datatype":"record","redacted":True}
+            },
+            "provenance":{"object_ref":"object-record"},
+        })
+        validate(doc, ASSESSMENT_SCHEMA)
+
     def test_collected_item_uses_reusable_schema(self):
         doc=base_assessment_result()
         doc["assessment_result"]["items"].append({
