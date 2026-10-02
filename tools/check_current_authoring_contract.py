@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import yaml
 
-OLD_KEYS={'collect','collections','collection','collection_title','assert','assertion','item_quantifier','object_values'}
+OLD_KEYS={'collections','collection','collection_title','assert','assertion','item_quantifier','object_values'}
 ASSESSMENT_SECTION_ORDER=('objects','variables','states','tests','evaluate')
 
 def violations(document):
@@ -38,6 +38,9 @@ def violations(document):
     for name,payload in a.get('objects',{}).items():
         if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
             errors.append(f'assessment.objects.{name}: Object must declare capability')
+    for name,payload in a.get('tests',{}).items():
+        if isinstance(payload,dict) and 'collect' in payload:
+            errors.append(f'assessment.tests.{name}.collect: stale pre-alignment Collection reference; use object or direct native source')
     for name,payload in a.get('states',{}).items():
         if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
             errors.append(f'assessment.states.{name}: State must declare capability')
