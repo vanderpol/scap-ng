@@ -195,6 +195,8 @@ supporting observed evidence.
 Product inventory is descriptive target data. It SHALL NOT be interpreted as a
 Rule result, compliance finding, or implicit applicability decision.
 
+For the current ownership audit and architectural guard rationale, see [Result schema scope audit](result-schema-scope-audit.md).
+
 ## 6. Rule result self-description
 
 A Rule Result SHOULD be compact, policy-facing, and independently useful for
