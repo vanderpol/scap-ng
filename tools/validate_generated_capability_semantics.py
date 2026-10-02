@@ -422,6 +422,9 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.family.singleton_source",
     "independent.family.literal_vocabulary",
     "independent.environmentvariable58.null_pid",
+    "independent.sql512.result_record",
+    "independent.sql512.engine_filterability",
+    "independent.unknown.fixed_result",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
