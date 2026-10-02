@@ -91,9 +91,17 @@ def validate_unix_file_object(obj):
     return validate_file_selection_object(obj)
 
 
+HIERARCHY_KEY_CAPABILITIES={
+    "windows.registry",
+    "windows.ntuser",
+    "windows.regkeyeffectiverights53",
+}
+
+
 def validate_windows_registry_object(obj):
-    """Return semantic diagnostics for one native windows.registry Object."""
-    if obj.get("capability") != "windows.registry":
+    """Return semantic diagnostics for registry-like Windows hierarchy Objects."""
+    capability=obj.get("capability")
+    if capability not in HIERARCHY_KEY_CAPABILITIES:
         return []
 
     diagnostics=[]
@@ -101,7 +109,7 @@ def validate_windows_registry_object(obj):
     key=select.get("key", ...)
     name=select.get("name", ...)
 
-    if key is None and name is not None:
+    if capability == "windows.registry" and key is None and name is not None:
         diagnostics.append({
             "code":"windows.registry.key_null_requires_name_null",
             "fields":["key","name"],
@@ -114,9 +122,9 @@ def validate_windows_registry_object(obj):
         and obj.get("traversal") is not None
     ):
         diagnostics.append({
-            "code":"windows.registry.pattern_key_no_traversal",
+            "code":f"{capability}.pattern_key_no_traversal",
             "fields":["traversal"],
-            "message":"non-equality registry key selection cannot use traversal",
+            "message":"non-equality hierarchy key selection cannot use traversal",
         })
 
     return diagnostics
