@@ -182,5 +182,34 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertEqual(tree_bytes(first),tree_bytes(second))
 
 
+    def test_failed_validation_does_not_replace_existing_destination(self):
+        with tempfile.TemporaryDirectory() as td:
+            source=Path(td)/"source"
+            self.benchmark(source,"a","R1","/etc/example")
+            rule_path=source/"a"/"rules"/"R1.rule.yaml"
+            doc=yaml.safe_load(rule_path.read_text())
+            doc["rule"]["assessment_choices"]["default"]["assessment"]="../assessments/automated/missing.assessment.yaml"
+            doc["rule"]["assessment_choices"]["automated"]["assessment"]="../assessments/automated/missing.assessment.yaml"
+            dump(rule_path,doc)
+
+            destination=Path(td)/"normalized"
+            destination.mkdir()
+            sentinel=destination/"sentinel.txt"
+            sentinel.write_text("original destination",encoding="utf-8")
+            report=Path(td)/"report.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(source),"--rewrite","--output-root",str(destination),
+                    "--report",str(report),
+                ]
+                with self.assertRaises(ValueError):
+                    normalizer.main()
+            finally:
+                __import__("sys").argv=old_argv
+            self.assertTrue(sentinel.exists())
+            self.assertEqual(sentinel.read_text(encoding="utf-8"),"original destination")
+
+
 if __name__=="__main__":
     unittest.main()
