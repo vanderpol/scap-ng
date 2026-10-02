@@ -52,6 +52,56 @@ def safe_name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("_") or "scapng"
 
 
+def readable_member_name(source_path: Path, logical_id: str, kind: str) -> str:
+    """Return a stable, human-readable package member name.
+
+    Preserve familiar SCAP-NG authoring structure inside compiled bundles. Only
+    shorten an individual filename when needed to satisfy the package's 160
+    character member-path ceiling.
+    """
+    source_path = Path(source_path)
+    suffix = ".json"
+
+    if kind == "benchmark":
+        return "benchmark.json"
+    if kind == "applicability_catalog":
+        return "applicability.json"
+
+    parts = list(source_path.parts)
+    if kind == "rule":
+        base = safe_name(source_path.stem)
+        member = f"rules/{base}{suffix}"
+    elif kind == "assessment":
+        rel_parts = None
+        # Preserve everything below the nearest authoring 'assessments' directory,
+        # including automated/manual/applicability categorization.
+        for i in range(len(parts) - 1, -1, -1):
+            if parts[i] == "assessments":
+                rel_parts = parts[i + 1 :]
+                break
+        if not rel_parts:
+            rel_parts = [source_path.name]
+        clean = [safe_name(p) for p in rel_parts[:-1]]
+        clean.append(safe_name(Path(rel_parts[-1]).stem) + suffix)
+        member = Path("assessments", *clean).as_posix()
+    else:
+        member = f"{safe_name(kind)}/{safe_name(source_path.stem)}{suffix}"
+
+    if len(member) <= 160:
+        return member
+
+    # Targeted fallback for pathological source names: keep the directory and a
+    # readable prefix, adding a short digest solely to avoid extraction failures.
+    p = Path(member)
+    digest = hashlib.sha256(logical_id.encode("utf-8")).hexdigest()[:10]
+    prefix_budget = max(12, 159 - len(p.parent.as_posix()) - len(digest) - len(suffix) - 2)
+    stem = safe_name(p.stem)[:prefix_budget].rstrip("._-") or safe_name(kind)
+    shortened = (p.parent / f"{stem}-{digest}{suffix}").as_posix()
+    if len(shortened) > 160:
+        raise ValueError(f"unable to produce readable package path <=160 characters: {member}")
+    return shortened
+
+
 def deterministic_zip_add(zf: zipfile.ZipFile, name: str, data: bytes) -> None:
     info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
     info.compress_type = zipfile.ZIP_DEFLATED
@@ -262,7 +312,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             app_id,
             "applicability_catalog",
-            "o/p.json",
+            readable_member_name(applicability_path, app_id, "applicability_catalog"),
             compiled_applicability,
             applicability_path,
         )
@@ -288,7 +338,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             rid,
             "rule",
-            f"o/r/{hashlib.sha256(rid.encode('utf-8')).hexdigest()[:16]}.json",
+            readable_member_name(rule_path, rid, "rule"),
             compiled,
             rule_path,
         )
@@ -297,7 +347,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             aid,
             "assessment",
-            f"o/a/{hashlib.sha256(aid.encode('utf-8')).hexdigest()[:16]}.json",
+            readable_member_name(source_path, aid, "assessment"),
             doc,
             source_path,
         )
@@ -305,7 +355,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
     add_object(
         benchmark["id"],
         "benchmark",
-        "o/b.json",
+        readable_member_name(benchmark_path, benchmark["id"], "benchmark"),
         compiled_benchmark,
         benchmark_path,
     )
