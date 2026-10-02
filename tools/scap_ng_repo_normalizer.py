@@ -667,11 +667,13 @@ def main() -> int:
     ):
         fingerprint = group[0]["exact"]
         shared_id = f"ng.shared.{fingerprint[:24]}"
-        shared_rel_path = shared_rel_dir / f"{safe_name(shared_id)}.assessment.yaml"
-        shared_path = (output / shared_rel_path) if output is not None else None
-
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
+        mode = assessment.get("mode")
+        suffix = ".manual.assessment.yaml" if mode == "manual" else ".assessment.yaml"
+        shared_rel_path = shared_rel_dir / f"{safe_name(shared_id)}{suffix}"
+        shared_path = (output / shared_rel_path) if output is not None else None
+
         assessment["id"] = shared_id
         # This is a new canonical Assessment identity, not a continuation of
         # whichever source file sorts first.
