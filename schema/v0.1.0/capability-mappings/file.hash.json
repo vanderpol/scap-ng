@@ -1,0 +1,110 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "file.hash",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+    "test": "filehash58_test",
+    "object": "filehash58_object",
+    "state": "filehash58_state"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "full_path"
+      ],
+      [
+        "directory",
+        "name"
+      ]
+    ],
+    "uses_file_traversal": true,
+    "collection_parameters": {
+      "algorithm": {
+        "type": "string",
+        "enum": [
+          "md5",
+          "sha1",
+          "sha224",
+          "sha256",
+          "sha384",
+          "sha512"
+        ],
+        "required": true,
+        "description": "Digest algorithm to compute for each selected file."
+      }
+    },
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "hash_type": "algorithm",
+      "hash": "digest"
+    },
+    "field_datatypes": {
+      "full_path": [
+        "string"
+      ],
+      "directory": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "algorithm": [
+        "string"
+      ],
+      "digest": [
+        "string"
+      ]
+    },
+    "state_value_enums": {
+      "algorithm": [
+        "md5",
+        "sha1",
+        "sha224",
+        "sha256",
+        "sha384",
+        "sha512"
+      ]
+    }
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "filehash58": "file.hash",
+      "filehash": "migration_error_deprecated"
+    },
+    "hash_algorithm": {
+      "MD5": "md5",
+      "SHA-1": "sha1",
+      "SHA-224": "sha224",
+      "SHA-256": "sha256",
+      "SHA-384": "sha384",
+      "SHA-512": "sha512",
+      "": "variable_reference_artifact_not_native_value"
+    },
+    "removed_source_fields": {
+      "windows_view": "deprecated_not_native"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "file.hash.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability file.hash."
+    },
+    {
+      "id": "file.hash.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "file.hash.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    }
+  ]
+}
