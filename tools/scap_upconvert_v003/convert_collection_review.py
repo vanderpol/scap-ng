@@ -140,6 +140,11 @@ def source_defect_fallback(selector, did, error):
         "error": error,
     }
 
+def scoped_assessment_id(namespace, local_id):
+    """Return a repository-safe generated Assessment ID."""
+    return f"{namespace}.{local_id}" if namespace else local_id
+
+
 def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, assessment_namespace=None):
     """Convert one Rule while keeping generated Assessment identities repository-safe.
 
@@ -148,8 +153,6 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
     normalization intentionally ignores Assessment IDs, so exact cross-Benchmark
     reuse remains discoverable.
     """
-    def scoped(local_id):
-        return f"{assessment_namespace}.{local_id}" if assessment_namespace else local_id
     from lxml import etree
     rid=rec['id']
     result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
@@ -165,7 +168,7 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
             key=binding or ('inline',procedure)
             if key in manual_done:
                 result['selectors'][selector]=manual_done[key]; continue
-            aid=scoped(rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1)))
+            aid=scoped_assessment_id(assessment_namespace, rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1)))
             ref='assessments/manual/'+aid+'.assessment.yaml'
             write_yaml(output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
                 'purpose':'assessment','class':'compliance','procedure':procedure,'inputs':{},'evidence':[]}})
@@ -178,7 +181,7 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         did=source_ref.get('name')
         if did in done:
             result['selectors'][selector]=done[did]; continue
-        aid=scoped(rid+'.automated'+('' if not done else '-'+str(len(done)+1)))
+        aid=scoped_assessment_id(assessment_namespace, rid+'.automated'+('' if not done else '-'+str(len(done)+1)))
         provenance={}
         unsupported=unsupported_definition_features(original,did)
         if unsupported:
