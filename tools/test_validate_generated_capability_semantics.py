@@ -404,7 +404,17 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                 self.assertIn(f"{capability}.{field}_equal",{row["code"] for row in rows})
 
     def test_singleton_source_capabilities_reject_objects(self):
-        for capability in ("independent.family","windows.lockoutpolicy","iosxe.version","panos.version","asa.version","macos.disabledservice","macos.gatekeeper","macos.softwareupdate"):
+        expected={
+            "independent.family":"independent.family.singleton_source",
+            "windows.lockoutpolicy":"windows.lockoutpolicy.singleton_source",
+            "iosxe.version":"iosxe.version.singleton_source",
+            "panos.version":"panos.version.singleton_source",
+            "asa.version":"asa.version.singleton_source",
+            "macos.disabledservice":"macos.disabledservice.implicit_population",
+            "macos.gatekeeper":"macos.gatekeeper.implicit_source",
+            "macos.softwareupdate":"macos.softwareupdate.implicit_population",
+        }
+        for capability,rule_id in expected.items():
             with self.subTest(capability=capability):
                 rows=validate_assessment_capability_semantics({
                     "assessment":{
@@ -413,7 +423,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                         "tests":{"t":{"capability":capability,"object":"o"}},
                     }
                 })
-                self.assertIn(f"{capability}.singleton_source",{row["code"] for row in rows})
+                self.assertIn(rule_id,{row["code"] for row in rows})
 
     def test_panos_config_xpath_requires_equality(self):
         rows=validate_assessment_capability_semantics({
