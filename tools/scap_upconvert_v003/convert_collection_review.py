@@ -107,6 +107,7 @@ SOURCE_DEFECT_ERROR_PREFIXES = (
     "test_state_capability_mismatch:",
     "Filter capability mismatch:",
     "var_ref_datatype_mismatch:",
+    "invalid_textfilecontent54_pattern_operation:",
 )
 
 
@@ -133,6 +134,8 @@ def source_defect_reason(error):
         return "filter_collection_capability_mismatch"
     if detail.startswith("var_ref_datatype_mismatch:"):
         return "var_ref_datatype_mismatch"
+    if detail.startswith("invalid_textfilecontent54_pattern_operation:"):
+        return "invalid_textfilecontent54_pattern_operation"
     return None
 
 
@@ -148,6 +151,8 @@ def source_defect_features_reason(features):
     names={item.get("feature") for item in features}
     if names == {"var_ref_datatype_mismatch"}:
         return "var_ref_datatype_mismatch"
+    if names == {"invalid_textfilecontent54_pattern_operation"}:
+        return "invalid_textfilecontent54_pattern_operation"
     return None
 
 
