@@ -1,0 +1,43 @@
+assessment:
+  id: ng.shared.9b3d0b42b26dfbb8a228acac
+  version: 1
+  assessment_title: The impact of CPCON changes on the cross-directory authentication configuration must be considered and
+    procedures documented.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    run-powershell-command-get-adtrust-manual-review-required-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-ADTrust -Filter *
+        pattern:
+          operation: equals
+          datatype: string
+          value: \w
+      object_title: Run Powershell command Get-ADTrust. (Manual Review Required)
+  states: {}
+  tests:
+    test-unknown-test-results-auditor-review-results-gathered-stig-requirements:
+      test_title: Unknown Test Results - An auditor must review results gathered and STIG requirements.
+      capability: independent.unknown
+    test-run-powershell-command-get-adtrust-manual-review-required:
+      test_title: Run PowerShell command Get-ADTrust. (Manual Review Required)
+      capability: independent.shellcommand
+      object: run-powershell-command-get-adtrust-manual-review-required-object
+      check_existence: any_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-unknown-test-results-auditor-review-results-gathered-stig-requirements
+    - test: test-run-powershell-command-get-adtrust-manual-review-required

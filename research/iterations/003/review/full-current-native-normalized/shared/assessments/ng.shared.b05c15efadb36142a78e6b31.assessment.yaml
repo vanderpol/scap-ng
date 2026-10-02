@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.b05c15efadb36142a78e6b31
+  version: 1
+  assessment_title: WN12-00-000220
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    select-ids-from-get-windowsfeature-where-installed-object:
+      capability: windows.wmi.query
+      object_title: Select the ids from 'Get-WindowsFeature | Where Installed'
+      collect:
+        namespace: root\cimv2
+        query: SELECT id FROM win32_serverfeature
+  states:
+    state-id-411-windows-powershell-2-0-engine-is-not-in-the-resul:
+      state_title: ID 411 (Windows PowerShell 2.0 Engine) is NOT in the result set
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            id:
+              value: '411'
+              operation: equal
+              datatype: integer
+              mask: false
+              match: none
+              existence: some
+  tests:
+    test-windows-powershell-2-0-engine-server-feature-not-installed:
+      test_title: Windows PowerShell 2.0 Engine server feature is not installed
+      capability: windows.wmi.query
+      object: select-ids-from-get-windowsfeature-where-installed-object
+      states:
+      - state-id-411-windows-powershell-2-0-engine-is-not-in-the-resul
+      existence: all
+      match: all
+  evaluate:
+    test: test-windows-powershell-2-0-engine-server-feature-not-installed

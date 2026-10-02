@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.971449779ef58931d3821010
+  version: 1
+  assessment_title: WN19-DC-000050 - Windows Server 2019 Kerberos policy user ticket renewal maximum lifetime must be limited
+    to seven days or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    kerberos-policy-maximum-lifetime-user-ticket-renewal-7-days-or-object:
+      capability: windows.wmi.query
+      object_title: Kerberos Policy - Maximum lifetime for user ticket renewal must be 7 days or less
+      collect:
+        namespace: root\rsop\computer
+        query: SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxRenewAge'
+  states:
+    state-maximum-lifetime-for-user-ticket-renewal-lte-7:
+      state_title: Maximum lifetime for user ticket renewal lte 7
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            setting:
+              value: '7'
+              operation: less_or_equal
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+  tests:
+    test-kerberos-policy-maximum-lifetime-user-ticket-renewal-7-days-or:
+      test_title: Kerberos Policy - Maximum lifetime for user ticket renewal - 7 days or less
+      capability: windows.wmi.query
+      object: kerberos-policy-maximum-lifetime-user-ticket-renewal-7-days-or-object
+      states:
+      - state-maximum-lifetime-for-user-ticket-renewal-lte-7
+      existence: some
+      match: all
+  evaluate:
+    test: test-kerberos-policy-maximum-lifetime-user-ticket-renewal-7-days-or

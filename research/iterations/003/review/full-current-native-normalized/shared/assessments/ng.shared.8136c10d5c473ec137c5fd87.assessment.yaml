@@ -1,0 +1,47 @@
+assessment:
+  id: ng.shared.8136c10d5c473ec137c5fd87
+  version: 1
+  assessment_title: WN10-00-000030 - Windows 10 information systems must use BitLocker to encrypt all disks to protect the
+    confidentiality and integrity of all information at rest.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    bitlocker-status-object:
+      capability: windows.wmi.query
+      object_title: BitLocker status
+      collect:
+        namespace: root\cimv2\security\microsoftvolumeencryption
+        query: SELECT protectionstatus FROM win32_encryptablevolume
+  states:
+    state-bitlocker-status-is-protected:
+      state_title: BitLocker status is Protected
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            protectionstatus:
+              value: '1'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
+  tests:
+    test-bitlocker-enabled-on-all-fixed-drives:
+      test_title: BitLocker must be enabled on all fixed drives.
+      capability: windows.wmi.query
+      object: bitlocker-status-object
+      states:
+      - state-bitlocker-status-is-protected
+      existence: all
+      match: all
+  evaluate:
+    test: test-bitlocker-enabled-on-all-fixed-drives

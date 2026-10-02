@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.041796eebbfa0323829c4ccc
+  version: 1
+  assessment_title: WN10-00-000120 - The TFTP Client must not be installed on the system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT installstate FROM win32_optionalfeature WHERE name = 'TFTP'
+  states:
+    state-windows-wmi57:
+      state_title: null
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            installstate:
+              value: '2'
+              operation: equal
+              datatype: string
+              mask: false
+              match: all
+              existence: some
+  tests:
+    test-tftp-client-not-installed-on-system:
+      test_title: The TFTP Client is not installed on the system
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-windows-wmi57
+      existence: optional
+      match: all
+  evaluate:
+    test: test-tftp-client-not-installed-on-system

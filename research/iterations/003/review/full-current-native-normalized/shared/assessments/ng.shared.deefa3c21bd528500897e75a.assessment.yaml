@@ -1,0 +1,66 @@
+assessment:
+  id: ng.shared.deefa3c21bd528500897e75a
+  version: 1
+  assessment_title: WN19-DC-000030 - Windows Server 2019 Kerberos service ticket maximum lifetime must be limited to 600 minutes
+    or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    kerberos-policy-maximum-lifetime-service-ticket-600-or-less-object:
+      capability: windows.wmi.query
+      object_title: Kerberos Policy - Maximum lifetime for service ticket must be 600 or less
+      collect:
+        namespace: root\rsop\computer
+        query: SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxServiceAge'
+  states:
+    state-maximum-lifetime-for-service-ticket-is-less-than-or-eequ:
+      state_title: Maximum lifetime for service ticket is less than or eequal to 600
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            setting:
+              value: '600'
+              operation: less_or_equal
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+    state-maximum-lifetime-for-service-ticket-policy-is-greater-th:
+      state_title: Maximum lifetime for service ticket policy is greater than 0.
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            setting:
+              value: '0'
+              operation: greater_than
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+  tests:
+    test-kerberos-policy-maximum-lifetime-service-ticket-600-minutes-or-less:
+      test_title: Kerberos Policy - Maximum lifetime for service ticket - 600 minutes or less and greater than 0
+      capability: windows.wmi.query
+      object: kerberos-policy-maximum-lifetime-service-ticket-600-or-less-object
+      states:
+      - state-maximum-lifetime-for-service-ticket-is-less-than-or-eequ
+      - state-maximum-lifetime-for-service-ticket-policy-is-greater-th
+      existence: some
+      match: all
+      states_match: all
+  evaluate:
+    test: test-kerberos-policy-maximum-lifetime-service-ticket-600-minutes-or-less

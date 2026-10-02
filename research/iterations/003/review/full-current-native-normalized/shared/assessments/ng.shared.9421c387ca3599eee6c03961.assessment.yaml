@@ -1,0 +1,46 @@
+assessment:
+  id: ng.shared.9421c387ca3599eee6c03961
+  version: 1
+  assessment_title: WN22-00-000410 - Windows Server 2022 must not have Windows PowerShell 2.0 installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT ID FROM Win32_ServerFeature
+  states:
+    state-powershell-2-0-is-not-in-the-result-set:
+      state_title: PowerShell 2.0 is NOT in the result set
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            id:
+              value: '411'
+              operation: equal
+              datatype: integer
+              mask: false
+              match: none
+              existence: some
+  tests:
+    test-windows-powershell-2-0-feature-not-installed:
+      test_title: Windows PowerShell 2.0 feature is not installed
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-powershell-2-0-is-not-in-the-result-set
+      existence: all
+      match: all
+  evaluate:
+    test: test-windows-powershell-2-0-feature-not-installed

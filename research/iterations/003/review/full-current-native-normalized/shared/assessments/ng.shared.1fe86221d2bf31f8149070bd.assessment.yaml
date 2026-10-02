@@ -1,0 +1,65 @@
+assessment:
+  id: ng.shared.1fe86221d2bf31f8149070bd
+  version: 1
+  assessment_title: WN19-DC-000040 - Windows Server 2019 Kerberos user ticket lifetime must be limited to 10 hours or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      object_title: null
+      collect:
+        namespace: root\rsop\computer
+        query: SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxTicketAge'
+  states:
+    state-windows-wmi57:
+      state_title: null
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            setting:
+              value: '10'
+              operation: less_or_equal
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+    state-windows-wmi57-2:
+      state_title: null
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            setting:
+              value: '0'
+              operation: greater_than
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+  tests:
+    test-kerberos-policy-maximum-lifetime-user-ticket-10-hours-or-less:
+      test_title: Kerberos Policy - Maximum lifetime for user ticket - 10 hours or less, but greater than 0
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-windows-wmi57
+      - state-windows-wmi57-2
+      existence: some
+      match: all
+      states_match: all
+  evaluate:
+    test: test-kerberos-policy-maximum-lifetime-user-ticket-10-hours-or-less

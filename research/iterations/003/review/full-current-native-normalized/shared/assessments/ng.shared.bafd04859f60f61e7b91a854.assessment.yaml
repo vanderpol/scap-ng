@@ -1,0 +1,515 @@
+assessment:
+  id: ng.shared.bafd04859f60f61e7b91a854
+  version: 1
+  assessment_title: Active Setup\Installed Components Registry Permissions
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    hkey-local-machine-software-microsoft-active-setup-installed-components-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Active Setup\Installed Components
+        name:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components
+    hkey-local-machine-software-microsoft-active-setup-installed-components-rights-object:
+      capability: windows.regkeyeffectiverights53
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Microsoft\Active Setup\Installed Components
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components rights
+    32-bit-installed-components-rights-except-administrators-users-system-creator-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-microsoft-active-setup-installed-components-rights-object
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-users-group
+        - action: exclude
+          state: state-system
+        - action: exclude
+          state: state-creator-owner
+        - action: exclude
+          state: state-all-application-packages
+      object_title: 32-bit Installed Components rights, except for administrators, users, system, creator owner, and all application
+        packages
+    32-bit-installed-components-rights-except-adminstrators-system-creator-owner-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-microsoft-active-setup-installed-components-rights-object
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-system
+        - action: exclude
+          state: state-creator-owner
+      object_title: 32-bit Installed Components rights, except for Adminstrators, SYSTEM, and CREATOR OWNER
+    check-win32-processor-address-width-used-by-operating-system-object:
+      capability: windows.wmi.query
+      object_title: Check the Win32_Processor for the address width used by the operating system.
+      collect:
+        namespace: root\cimv2
+        query: SELECT AddressWidth FROM win32_processor
+    hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components
+        name:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components
+    hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components-object-2:
+      capability: windows.regkeyeffectiverights53
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components
+        trustee_sid:
+          operation: pattern match
+          datatype: string
+          value: .*
+      object_title: HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components rights
+    64-bit-only-installed-components-rights-except-administrators-users-system-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components-object-2
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-users-group
+        - action: exclude
+          state: state-system
+        - action: exclude
+          state: state-creator-owner
+        - action: exclude
+          state: state-all-application-packages
+      object_title: 64-bit only Installed Components rights, except for administrators, users, system, creator owner, and
+        all application packages
+    64-bit-only-installed-components-rights-except-adminstrators-system-creator-object:
+      capability: windows.regkeyeffectiverights53
+      set:
+        operator: union
+        members:
+        - object: hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components-object-2
+        filters:
+        - action: exclude
+          state: state-administrators-group
+        - action: exclude
+          state: state-system
+        - action: exclude
+          state: state-creator-owner
+      object_title: 64-bit only Installed Components rights, except for Adminstrators, SYSTEM, and CREATOR OWNER
+  states:
+    state-no-registry-rights:
+      state_title: No registry rights
+      capability: windows.regkeyeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_read_control
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: access_system_security
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_read
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_all
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_query_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_set_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_sub_key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_enumerate_sub_keys
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_notify
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_link
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_64key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_32key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_res
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-qenr-registry-rights:
+      state_title: QENR registry rights
+      capability: windows.regkeyeffectiverights53
+      state:
+        all:
+        - field: standard_delete
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_dac
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: standard_write_owner
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: access_system_security
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_write
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_execute
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: generic_all
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_set_value
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_sub_key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_create_link
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_64key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_32key
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: key_wow64_res
+          value: '0'
+          operation: equals
+          datatype: boolean
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-operating-system-or-address-width-is-64-bit:
+      state_title: Operating System or Address Width is 64-bit
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          mask: false
+          match: all
+          existence: some
+          fields:
+            addresswidth:
+              value: '64'
+              operation: equal
+              datatype: integer
+              mask: false
+              match: all
+              existence: some
+    state-administrators-group:
+      state_title: Administrators Group
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-544
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-users-group:
+      state_title: Users Group
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-32-545
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-system:
+      state_title: SYSTEM
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-5-18
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-creator-owner:
+      state_title: CREATOR OWNER
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-3-0
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-all-application-packages:
+      state_title: ALL APPLICATION PACKAGES
+      capability: windows.regkeyeffectiverights53
+      state:
+        field: trustee_sid
+        value: S-1-15-2-1
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-hkey-local-machine-software-microsoft-active-setup-installed-components-exists:
+      test_title: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components exists
+      capability: windows.registry
+      object: hkey-local-machine-software-microsoft-active-setup-installed-components-object
+      check_existence: at_least_one_exists
+      check: all
+    test-32-bit-installed-components-key-has-no-bad-rights-non:
+      test_title: 32-bit Installed Components key has no bad rights for non-(users, adminstrator, system, creator owner, all
+        application packages)
+      capability: windows.regkeyeffectiverights53
+      object: 32-bit-installed-components-rights-except-administrators-users-system-creator-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-no-registry-rights
+    test-32-bit-installed-components-key-has-no-non-users-adminstrator:
+      test_title: 32-bit Installed Components key has no non-(users, adminstrator, system, creator owner, all application
+        packages) rights to check
+      capability: windows.regkeyeffectiverights53
+      object: 32-bit-installed-components-rights-except-administrators-users-system-creator-object
+      check_existence: none_exist
+      check: all
+    test-32-bit-installed-components-key-has-no-bad-rights-non-2:
+      test_title: 32-bit Installed Components key has no bad rights for non-(Adminstrators, SYSTEM, CREATOR OWNERS)
+      capability: windows.regkeyeffectiverights53
+      object: 32-bit-installed-components-rights-except-adminstrators-system-creator-owner-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-qenr-registry-rights
+    test-32-bit-installed-components-key-has-no-non-adminstrators-system:
+      test_title: 32-bit Installed Components key has no non-(Adminstrators, SYSTEM, CREATOR OWNERS) rights to check
+      capability: windows.regkeyeffectiverights53
+      object: 32-bit-installed-components-rights-except-adminstrators-system-creator-owner-object
+      check_existence: none_exist
+      check: all
+    test-check-system-settings-see-if-this-ia-64-bit-os:
+      test_title: Check the system settings to see if this ia a 64-bit OS
+      capability: windows.wmi.query
+      object: check-win32-processor-address-width-used-by-operating-system-object
+      states:
+      - state-operating-system-or-address-width-is-64-bit
+      existence: some
+      match: all
+    test-hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components:
+      test_title: HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components exists
+      capability: windows.registry
+      object: hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components-object
+      check_existence: at_least_one_exists
+      check: all
+    test-64-bit-installed-components-key-has-no-bad-rights-non:
+      test_title: 64-Bit Installed Components key has no bad rights for non-(users, adminstrator, system, creator owner, all
+        application packages)
+      capability: windows.regkeyeffectiverights53
+      object: 64-bit-only-installed-components-rights-except-administrators-users-system-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-no-registry-rights
+    test-64-bit-installed-components-key-has-no-non-users-adminstrator:
+      test_title: 64-Bit Installed Components key has no non-(users, adminstrator, system, creator owner, all application
+        packages) rights to check
+      capability: windows.regkeyeffectiverights53
+      object: 64-bit-only-installed-components-rights-except-administrators-users-system-object
+      check_existence: none_exist
+      check: all
+    test-64-bit-installed-components-key-has-no-bad-rights-non-2:
+      test_title: 64-Bit Installed Components key has no bad rights for non-(Adminstrators, SYSTEM, CREATOR OWNERS)
+      capability: windows.regkeyeffectiverights53
+      object: 64-bit-only-installed-components-rights-except-adminstrators-system-creator-object
+      check_existence: any_exist
+      check: all
+      states:
+      - state-qenr-registry-rights
+    test-64-bit-installed-components-key-has-no-non-adminstrators-system:
+      test_title: 64-Bit Installed Components key has no non-(Adminstrators, SYSTEM, CREATOR OWNERS) rights to check
+      capability: windows.regkeyeffectiverights53
+      object: 64-bit-only-installed-components-rights-except-adminstrators-system-creator-object
+      check_existence: none_exist
+      check: all
+  evaluate:
+    all:
+    - test: test-hkey-local-machine-software-microsoft-active-setup-installed-components-exists
+    - any:
+      - test: test-32-bit-installed-components-key-has-no-bad-rights-non
+      - test: test-32-bit-installed-components-key-has-no-non-users-adminstrator
+    - any:
+      - test: test-32-bit-installed-components-key-has-no-bad-rights-non-2
+      - test: test-32-bit-installed-components-key-has-no-non-adminstrators-system
+    - any:
+      - not:
+          test: test-check-system-settings-see-if-this-ia-64-bit-os
+      - all:
+        - test: test-check-system-settings-see-if-this-ia-64-bit-os
+        - test: test-hkey-local-machine-software-wow6432node-microsoft-active-setup-installed-components
+        - any:
+          - test: test-64-bit-installed-components-key-has-no-bad-rights-non
+          - test: test-64-bit-installed-components-key-has-no-non-users-adminstrator
+        - any:
+          - test: test-64-bit-installed-components-key-has-no-bad-rights-non-2
+          - test: test-64-bit-installed-components-key-has-no-non-adminstrators-system
