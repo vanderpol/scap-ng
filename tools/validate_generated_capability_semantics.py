@@ -22,7 +22,16 @@ def _is_variable_value(value):
     )
 
 
-FILE_SELECTION_CAPABILITIES={"unix.file","file.hash","windows.file"}
+FILE_SELECTION_CAPABILITIES={
+    "unix.file",
+    "file.hash",
+    "windows.file",
+    "windows.fileeffectiverights53",
+    "independent.textfilecontent54",
+    "independent.xmlfilecontent",
+    "independent.yamlfilecontent",
+    "linux.selinuxsecuritycontext",
+}
 
 
 def validate_file_selection_object(obj):
@@ -55,6 +64,47 @@ def validate_file_selection_object(obj):
             "message":"non-equality directory selection cannot use traversal",
         })
 
+    if capability == "independent.textfilecontent54":
+        pattern=select.get("pattern")
+        if isinstance(pattern,dict) and pattern.get("operation") != "match":
+            diagnostics.append({
+                "code":"independent.textfilecontent54.pattern_operation",
+                "fields":["pattern"],
+                "message":"textfilecontent54 pattern selector must use match operation",
+            })
+
+    if capability == "independent.xmlfilecontent":
+        xpath=select.get("xpath")
+        if isinstance(xpath,dict) and xpath.get("operation") != "equal":
+            diagnostics.append({
+                "code":"independent.xmlfilecontent.xpath_equal",
+                "fields":["xpath"],
+                "message":"xmlfilecontent xpath selector must use equal operation",
+            })
+
+    if capability == "independent.yamlfilecontent":
+        for field in ("content","yamlpath"):
+            value=select.get(field)
+            if isinstance(value,dict) and value.get("operation") != "equal":
+                diagnostics.append({
+                    "code":f"independent.yamlfilecontent.{field}_equal",
+                    "fields":[field],
+                    "message":f"yamlfilecontent {field} selector must use equal operation",
+                })
+        if "content" in select and traversal is not None:
+            diagnostics.append({
+                "code":"independent.yamlfilecontent.inline_content_no_traversal",
+                "fields":["traversal"],
+                "message":"inline YAML content selection cannot use file traversal",
+            })
+
+    if capability == "linux.selinuxsecuritycontext" and "pid" in select and traversal is not None:
+        diagnostics.append({
+            "code":"linux.selinuxsecuritycontext.pid_no_file_traversal",
+            "fields":["traversal"],
+            "message":"pid selection cannot use file traversal",
+        })
+
     name=select.get("name", ...)
     if name is None:
         # null intentionally selects the directory itself.
@@ -70,7 +120,7 @@ def validate_file_selection_object(obj):
                 "message":"empty name requires a Variable reference or match semantics; use null to select the directory itself",
             })
         if (
-            capability == "windows.file"
+            capability in {"windows.file","windows.fileeffectiverights53"}
             and isinstance(value, str)
             and not pattern
             and any(ch in value for ch in '\\/:*?>|<"')
