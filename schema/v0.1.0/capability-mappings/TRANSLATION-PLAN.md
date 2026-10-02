@@ -96,7 +96,7 @@ All currently inventoried **standard OVAL 5.12.3 capability candidates with prod
 The remaining candidate inventory is intentionally split into two deferred workstreams:
 
 - **schema-only standard candidates** with no concrete content examples; these are deferred until after higher-value SCAP-NG design work or until concrete content evidence appears;
-- **Windows schema-snapshot reconciliation** for approved OVAL tests that are absent from the currently checked-in Windows definitions XSD. These remain standard capability work; the only known custom Test/Object/State family is `independent:sqlext`.
+- **Windows content-backed capability completion** using the authoritative v5.12.3 Windows definitions/system-characteristics schemas and SCAP Self-Assertion content.
 
 Reviewed native renames such as `filehash58 → file.hash`, `variable → variable.value`, and `wmi57 → windows.wmi.query` count as covered migration surface rather than unmapped candidates.
 
