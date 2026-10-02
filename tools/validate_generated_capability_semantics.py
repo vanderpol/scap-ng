@@ -22,9 +22,13 @@ def _is_variable_value(value):
     )
 
 
-def validate_unix_file_object(obj):
-    """Return deterministic semantic diagnostics for one native unix.file Object."""
-    if obj.get("capability") != "unix.file":
+FILE_SELECTION_CAPABILITIES={"unix.file","file.hash"}
+
+
+def validate_file_selection_object(obj):
+    """Return semantic diagnostics for native capabilities using file selection."""
+    capability=obj.get("capability")
+    if capability not in FILE_SELECTION_CAPABILITIES:
         return []
 
     diagnostics=[]
@@ -34,7 +38,7 @@ def validate_unix_file_object(obj):
     full_path=select.get("full_path")
     if full_path is not None and traversal is not None:
         diagnostics.append({
-            "code":"unix.file.full_path_no_traversal",
+            "code":f"{capability}.full_path_no_traversal",
             "fields":["traversal"],
             "message":"full_path selection does not permit directory traversal",
         })
@@ -46,7 +50,7 @@ def validate_unix_file_object(obj):
         and traversal is not None
     ):
         diagnostics.append({
-            "code":"unix.file.pattern_directory_no_traversal",
+            "code":f"{capability}.pattern_directory_no_traversal",
             "fields":["traversal"],
             "message":"non-equality directory selection cannot use traversal",
         })
@@ -61,12 +65,19 @@ def validate_unix_file_object(obj):
         pattern=name.get("operation") == "match"
         if value == "" and not (variable or pattern):
             diagnostics.append({
-                "code":"unix.file.name_empty",
+                "code":f"{capability}.name_empty",
                 "fields":["name"],
                 "message":"empty name requires a Variable reference or match semantics; use null to select the directory itself",
             })
 
     return diagnostics
+
+
+def validate_unix_file_object(obj):
+    """Backward-compatible focused helper for unix.file tests."""
+    if obj.get("capability") != "unix.file":
+        return []
+    return validate_file_selection_object(obj)
 
 
 def _iter_set_filters(expression):
@@ -110,7 +121,7 @@ def validate_assessment_capability_semantics(document):
     tests=assessment.get("tests") or {}
 
     for object_id,obj in objects.items():
-        for row in validate_unix_file_object(obj):
+        for row in validate_file_selection_object(obj):
             diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
