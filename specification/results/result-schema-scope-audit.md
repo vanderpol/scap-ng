@@ -1,0 +1,116 @@
+# Result schema scope audit
+
+Status: current-design architectural audit after the Rule Result scope defect.
+
+## Ownership model
+
+The canonical result hierarchy is:
+
+```text
+Scan Result
+  -> Benchmark Result
+       -> Rule Results
+            -> Assessment Result references
+                 -> Test/Object collection/Item/State/Entity/Variable detail
+```
+
+Each layer has one primary responsibility:
+
+| Layer | Owns | Does not own |
+| --- | --- | --- |
+| Scan Result | run identity, scanner identity, targets, package/index references, signature status | effective Benchmark policy, Rule outcomes, Assessment execution graphs |
+| Benchmark Result | Benchmark identity, target reference, effective policy, summary, collection of Rule Results | full scanner/target records, detailed Assessment execution |
+| Rule Result | effective Rule policy context, Rule outcome/reason, selected Assessment identity, invocation references, compact applicability disposition | collected Items, State/entity values, Variables, Test/Object graphs, bounded-evidence accounting, consumed Organizational Input execution detail |
+| Assessment Result | one Assessment invocation, technical truth, Test/Object/Item/State/Entity/Variable graph, effective bindings, consumed Organizational Inputs, completeness and detailed evidence accounting | Benchmark policy aggregation or run-wide scanner/target inventory |
+| Test Result | one Test's aggregation and per-Item State results | Rule policy or run/Benchmark metadata |
+| Object Collection Result | one Object collection execution and Item references | State comparison or Rule policy |
+| Collected Item | one observed Item and provenance | policy interpretation |
+| State Result | one State evaluation for one Item | Rule policy |
+| Entity Result | one State-entity comparison/aggregation | run/Benchmark/Rule policy |
+| Variable Result | one resolved runtime Variable value set and provenance | run/Benchmark/Rule policy |
+
+A derived SIEM/JSONL projection may intentionally denormalize these layers for
+query convenience. That projection is not authoritative schema ownership and
+must not drive duplication back into canonical results.
+
+## What went wrong
+
+The Rule Result defect was introduced structurally rather than by JSON Schema
+generation.
+
+1. The first Benchmark Result schema defined Rule Results inline.
+2. Organizational Input execution detail and mandatory expected-State detail
+   were added to that inline Rule shape while the ownership boundary was still
+   unclear.
+3. The inline Rule shape was later extracted wholesale into
+   `rule-result.schema.json`. Extraction made the shape look like an
+   independent, authoritative contract even though it had already crossed the
+   policy/execution boundary.
+4. Later work added observed State and bounded-evidence summary fields to make
+   Rule Results more "self describing." That interpreted self-description as
+   duplication of Assessment detail rather than references to the authoritative
+   Assessment Result.
+5. Fixtures and regression tests then copied the same fields, turning the design
+   mistake into a regression expectation.
+
+JSON Schema validation could not catch this because every duplicated field was
+syntactically valid. This was an architectural ownership error, not a structural
+validation error.
+
+## Corrective changes
+
+The audit made these corrections:
+
+- Rule Result is now a compact policy-facing child of Benchmark Result.
+  `expected_state`, `observed_state`, `organizational_inputs`, and
+  `evidence_summary` were removed from Rule scope.
+- Benchmark Result now references the Scan-level target with `target_ref`;
+  run-wide `scanner` and full `target` records are no longer duplicated.
+- Detailed Test/Object/Item/State/Entity/Variable schemas are explicitly closed
+  at their top-level object boundaries so undocumented cross-layer fields cannot
+  silently validate.
+- Regression fixtures and JSONL projection tests were aligned with the normalized
+  ownership model.
+- `tools/test_result_schema_scope.py` provides an architectural guard that
+  fails if known cross-layer fields return to the wrong canonical schema.
+
+## Deliberate duplication that remains
+
+Some repeated information is intentional and has a different role rather than a
+competing source of truth:
+
+- Scan Result Benchmark entries may retain compact Benchmark/profile/summary
+  information because they are an index.
+- Benchmark Result keeps `run_id` for correlation with the owning Scan Result.
+- Benchmark Result owns the effective Organizational Input registry/provenance;
+  an Assessment Result records only the bindings/inputs actually consumed by
+  that invocation.
+- Rule Result may retain effective weight, selector, parameters, applicability
+  disposition, and Assessment identity because those are policy context needed
+  to interpret the Rule outcome.
+- Entity comparison results may repeat typed operands needed to explain the
+  comparison. They remain inside the same Assessment execution layer and do not
+  create a competing policy-level source of truth.
+
+## Audit findings that are not scope defects
+
+The following deserve continued schema-quality review but are not the same
+cross-layer ownership problem:
+
+- `assessment_result.selected_branch` is a reserved future field. Whether to
+  keep or remove speculative conditional-result syntax is a separate design
+  decision.
+- Several diagnostic/provenance payloads are intentionally open objects pending
+  their final schemas.
+- `manual-assessment-result.schema.json` remains a design/probe schema while
+  canonical Assessment Result also supports manual execution provenance. Its
+  eventual disposition should be handled as manual-result consolidation, not as
+  Rule/Assessment scope leakage.
+
+## Prevention rule
+
+For canonical result schemas, a parent may reference or summarize a child but
+SHOULD NOT duplicate the child's authoritative execution graph. Any intentional
+denormalization must be documented as an index, projection, or compact policy
+context. New canonical result properties should be checked against the ownership
+table before being accepted.
