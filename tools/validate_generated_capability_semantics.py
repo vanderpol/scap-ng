@@ -475,6 +475,7 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
 }
 
 POLICY_SEMANTIC_RULE_IDS={
+    "windows.userright.trustee_name_case",
     "independent.family.literal_vocabulary",
     "linux.dpkginfo.debian_evr",
     "unix.interface.type_literal",
@@ -486,6 +487,7 @@ POLICY_SEMANTIC_RULE_IDS={
 }
 
 RUNTIME_SEMANTIC_RULE_IDS={
+    "linux.inetlisteningservers.protocol",
     "independent.environmentvariable58.null_pid",
     "linux.selinuxsecuritycontext.null_pid",
     "independent.shellcommand.pattern_semantics",
