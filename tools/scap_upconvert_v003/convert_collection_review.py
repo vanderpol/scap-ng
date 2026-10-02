@@ -70,6 +70,21 @@ def write_yaml(path,doc):
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(yaml.safe_dump(doc,sort_keys=False,allow_unicode=True,width=110),encoding='utf-8')
 
+def manual_response_contract():
+    """Return the native human response vocabulary for migrated compliance checks."""
+    return {
+        'type':'compliance',
+        'choices':[
+            {'value':'pass','label':'Pass','outcome':'true'},
+            {'value':'fail','label':'Fail','outcome':'false'},
+            {'value':'unknown','label':'Unknown','outcome':'unknown'},
+            {'value':'not_applicable','label':'Not applicable','outcome':'not_applicable'},
+        ],
+        'allow_comment':True,
+        'allow_evidence':True,
+    }
+
+
 def manual_procedure(rec, c):
     source_ref=c.find('x:check-content-ref',NS)
     binding=(c.get('system'),source_ref.get('href'),source_ref.get('name')) if source_ref is not None else None
@@ -176,7 +191,7 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
             aid=scoped_assessment_id(assessment_namespace, rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1)))
             ref='assessments/manual/'+aid+'.assessment.yaml'
             write_yaml(output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
-                'purpose':'assessment','class':'compliance','procedure':procedure,'response':{'type':'compliance','choices':[{'value':'pass','label':'Pass','outcome':'true'},{'value':'fail','label':'Fail','outcome':'false'},{'value':'unknown','label':'Unknown','outcome':'unknown'},{'value':'not_applicable','label':'Not applicable','outcome':'not_applicable'}],'allow_comment':True,'allow_evidence':True}}})
+                'purpose':'assessment','class':'compliance','procedure':procedure,'response':manual_response_contract()}})
             manual_done[key]=ref
             result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
                 'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
@@ -341,7 +356,7 @@ def main(argv=None):
                     ref='assessments/manual/'+aid+'.assessment.yaml'
                     write_yaml(args.output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
                         'purpose':'assessment','class':'compliance','procedure':procedure,
-                        'response':{'type':'compliance','choices':[{'value':'pass','label':'Pass','outcome':'true'},{'value':'fail','label':'Fail','outcome':'false'},{'value':'unknown','label':'Unknown','outcome':'unknown'},{'value':'not_applicable','label':'Not applicable','outcome':'not_applicable'}],'allow_comment':True,'allow_evidence':True}}})
+                        'response':manual_response_contract()}})
                     manual_done[key]=ref
                     result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
                         'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
