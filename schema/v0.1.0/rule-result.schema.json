@@ -2,14 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.1.0/rule-result.schema.json",
   "title": "SCAP-NG Rule Result v0.1.0 strawman",
-  "description": "One policy-facing Rule Result per effectively selected Rule. Every Rule Result has a non-empty instances array; per-invocation Assessment references live only in instances.",
+  "description": "Compact policy-facing result for one effectively selected Rule. Detailed Assessment execution data remains in referenced Assessment Results.",
   "type": "object",
   "required": [
     "rule_id",
     "outcome",
     "assessment",
     "message",
-    "expected_state",
     "instances"
   ],
   "properties": {
@@ -81,10 +80,10 @@
               ]
             }
           },
-          "additionalProperties": true
+          "additionalProperties": false
         }
       ],
-      "description": "Effective selected Assessment identity/version for this Rule; per-invocation details live in instances and referenced Assessment Results."
+      "description": "Identity of the effective selected Assessment for this Rule. Execution details live only in referenced Assessment Results."
     },
     "message": {
       "type": [
@@ -126,12 +125,6 @@
                 "null"
               ]
             },
-            "state_slot": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
             "message": {
               "type": [
                 "string",
@@ -139,7 +132,7 @@
               ]
             }
           },
-          "additionalProperties": true
+          "additionalProperties": false
         }
       ]
     },
@@ -147,158 +140,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
-    },
-    "organizational_inputs": {
-      "type": "array",
-      "description": "Effective organization-defined values that directly affected evaluation of this Rule.",
-      "items": {
-        "type": "object",
-        "required": [
-          "input",
-          "value",
-          "organizational_input_ref"
-        ],
-        "properties": {
-          "input": {
-            "type": "string",
-            "minLength": 1
-          },
-          "state_slot": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "value": {},
-          "redacted": {
-            "type": "boolean"
-          },
-          "organizational_input_ref": {
-            "type": "string",
-            "minLength": 1
-          },
-          "provenance_summary": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "properties": {
-              "organization": {
-                "type": [
-                  "string",
-                  "object",
-                  "null"
-                ]
-              },
-              "authority_basis": {
-                "type": [
-                  "string",
-                  "object",
-                  "null"
-                ]
-              },
-              "authorization_reference": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "effective_from": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              },
-              "expires_at": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": true
-          }
-        },
-        "additionalProperties": true
-      }
-    },
-    "expected_state": {
-      "type": "array",
-      "description": "Effective expected state used to evaluate this Rule. Always present; empty when no materialized expected State applies.",
-      "items": {
-        "type": "object",
-        "required": [
-          "source"
-        ],
-        "properties": {
-          "state": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state_slot": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "datatype": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "operation": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "entity_check": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "var_check": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "value": {},
-          "redacted": {
-            "type": "boolean"
-          },
-          "source": {
-            "type": "string",
-            "enum": [
-              "publisher",
-              "publisher_profile",
-              "organizational_input",
-              "runtime_input",
-              "other"
-            ]
-          },
-          "source_ref": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "provenance_summary": {
-            "type": [
-              "object",
-              "null"
-            ]
-          }
-        },
-        "additionalProperties": true
-      }
+      },
+      "description": "Optional references to decisive evidence or Assessment-result evidence members; evidence is not embedded here."
     },
     "instances": {
       "type": "array",
@@ -371,7 +214,8 @@
             }
           }
         },
-        "additionalProperties": true
+        "additionalProperties": false,
+        "description": "One policy-facing invocation/check/target instance. It references, but does not duplicate, the detailed Assessment Result."
       }
     },
     "weight": {
@@ -398,7 +242,7 @@
         "object",
         "null"
       ],
-      "description": "Aggregate Rule applicability plus the named applicability Assessment results that produced it.",
+      "description": "Rule-level applicability disposition plus references to the applicability Assessment Results that produced it; detailed execution data is not embedded here.",
       "properties": {
         "outcome": {
           "type": "string",
@@ -453,7 +297,7 @@
                 ]
               }
             },
-            "additionalProperties": true
+            "additionalProperties": false
           }
         }
       },
@@ -461,93 +305,8 @@
         "outcome",
         "conditions"
       ],
-      "additionalProperties": true
-    },
-    "observed_state": {
-      "type": "array",
-      "description": "Bounded decisive observations needed to understand the Rule outcome without parsing prose. Detailed evidence remains in the referenced Assessment Result.",
-      "items": {
-        "type": "object",
-        "required": [
-          "state_slot"
-        ],
-        "properties": {
-          "item_ref": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state_slot": {
-            "type": "string",
-            "minLength": 1
-          },
-          "datatype": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "value": {},
-          "status": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "redacted": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": true
-      }
-    },
-    "evidence_summary": {
-      "$ref": "result-types.schema.json#/$defs/bounded_evidence"
+      "additionalProperties": false
     }
   },
-  "additionalProperties": true,
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "outcome": {
-            "const": "not_evaluated"
-          },
-          "reason": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "enum": [
-                  "unsupported_organizational_input",
-                  "missing_organizational_input",
-                  "invalid_organizational_input"
-                ]
-              }
-            },
-            "required": [
-              "code"
-            ]
-          }
-        },
-        "required": [
-          "outcome",
-          "reason"
-        ]
-      },
-      "then": {
-        "properties": {
-          "expected_state": {
-            "type": "array"
-          }
-        }
-      }
-    }
-  ]
+  "additionalProperties": false
 }
