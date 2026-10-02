@@ -40,6 +40,20 @@ Before transition, record a new exact technical commit, source pins, commands, c
 - Verify Codex's repository access, source availability, dependencies and baseline tests before allowing it to continue implementation.
 - Supply a ready-to-paste starting prompt and a completed checkpoint report.
 
+## Hybrid ChatGPT / Codex operating model
+
+Use the two interfaces as complementary tools rather than treating transition as one-way migration.
+
+- ChatGPT is normally the better venue for architecture, standards interpretation, semantic analysis, requirements, specification work, and decisions whose rationale must be discussed.
+- Codex is normally the better venue for bounded repository execution once the intended behavior is defined, including implementation, refactoring, regression tests, CI repair, and focused GitHub issues.
+- Broad open-ended Codex tasks should be decomposed when practical to limit repeated large-context loading and preserve agentic usage for work that benefits from repository execution.
+- Before sending work to Codex, label the expected usage qualitatively as small, moderate, or potentially expensive. No interface should infer or claim the user's live remaining allowance unless it is explicitly exposed or supplied by the user.
+- If available Codex allowance becomes constrained, checkpoint coherent work to GitHub and continue appropriate design/reasoning work in ChatGPT. The project should not stall solely because one interface's agentic allowance is low.
+- GitHub remains authoritative across switches. Record material requirement/architecture changes, validation evidence, blockers, and next steps before treating a conversational decision as settled.
+- Only one interface/session should own an overlapping technical workstream at a time.
+
+The detailed normative rule is in [AGENTS.md](../AGENTS.md) under **ChatGPT / Codex task-routing and usage-continuity rule**.
+
 ## Receiving-session acceptance task
 
 Read AGENTS.md, CURRENT-DESIGN.md and transition/. Do not change code yet. Report the exact checkout commit, current architecture, superseded designs, constraints, Board questions, proven tests versus unproven runtime semantics, history coverage limits and next task. Verify source input and required repository/service access. Reproduce the documented baseline check at the pinned checkpoint. Report discrepancies before continuing; do not reinterpret missing records as permission to change architecture.
