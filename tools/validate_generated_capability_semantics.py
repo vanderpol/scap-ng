@@ -419,10 +419,14 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.wuaupdatesearcher.source_path_repair",
     "windows.lockoutpolicy.singleton_source",
     "iosxe.version.singleton_source",
+    "independent.family.singleton_source",
+    "independent.family.literal_vocabulary",
+    "independent.environmentvariable58.null_pid",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
 RUNTIME_SEMANTIC_RULE_IDS={
+    "independent.shellcommand.pattern_semantics",
     # These require collection/evaluation behavior rather than static authored-content validation.
     "independent.xmlfilecontent.xpath_text_values",
 }
