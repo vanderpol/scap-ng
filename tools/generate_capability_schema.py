@@ -358,6 +358,23 @@ def generate(mapping, repo_root):
         state_meta[native_name] = meta
         item_meta[native_name] = meta
 
+    native_added_state_fields = mapping["native"].get("native_added_state_fields", {})
+    for source_name, spec in native_added_state_fields.items():
+        item_field = item_fields.get(source_name)
+        if item_field is None:
+            raise KeyError(
+                f"native-added State field {source_name!r} has no collected Item field"
+            )
+        native_name = spec.get("native_name", source_name)
+        dtypes = datatype_overrides.get(native_name) or source_datatypes(item_field)
+        meta = {
+            "datatypes": dtypes,
+            "multiple": item_field.get("maxOccurs") not in (None, "1"),
+        }
+        state_names.append(native_name)
+        state_meta[native_name] = meta
+        item_meta[native_name] = meta
+
     item_only_map = mapping["native"].get("item_only_field_map", {})
     item_only_exceptions = mapping["native"].get("item_only_complex_fields", {})
     for source_name, native_name in item_only_map.items():
