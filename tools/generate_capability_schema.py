@@ -156,10 +156,10 @@ def generate(mapping, repo_root):
 
     selector_props = {}
     selector_alternatives = []
-    if test_source_kind == "object":
+    if test_source_kind == "object" and mapping["native"].get("selector_map"):
         selector_map = mapping["native"]["selector_map"]
         reverse_selector_map = {native: source for source, native in selector_map.items()}
-        for alternative in mapping["native"]["object_selector_alternatives"]:
+        for alternative in mapping["native"].get("object_selector_alternatives", []):
             for name in alternative:
                 source_name = reverse_selector_map[name]
                 field = object_fields[source_name]
@@ -183,7 +183,7 @@ def generate(mapping, repo_root):
                     }
                 selector_props[name] = selector_schema
 
-        for alternative in mapping["native"]["object_selector_alternatives"]:
+        for alternative in mapping["native"].get("object_selector_alternatives", []):
             selector_alternatives.append({
                 "required": list(alternative),
                 "not": {
@@ -201,13 +201,23 @@ def generate(mapping, repo_root):
     collect_properties = {}
     collect_required = []
     for name, spec in mapping.get("native", {}).get("collection_parameters", {}).items():
-        prop = {
+        literal = {
             "type": spec.get("type", "string"),
         }
         if spec.get("enum"):
-            prop["enum"] = list(spec["enum"])
+            literal["enum"] = list(spec["enum"])
         if spec.get("description"):
-            prop["description"] = spec["description"]
+            literal["description"] = spec["description"]
+        prop = (
+            {
+                "oneOf": [
+                    literal,
+                    {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                ]
+            }
+            if spec.get("allow_variable", False)
+            else literal
+        )
         collect_properties[name] = prop
         if spec.get("required", False):
             collect_required.append(name)
@@ -277,8 +287,6 @@ def generate(mapping, repo_root):
         })
 
     object_required = ["object_title", "capability"]
-    if collect_required:
-        object_required.append("collect")
 
     capability = mapping["capability"]
     test_required = [
@@ -348,29 +356,48 @@ def generate(mapping, repo_root):
     }
 
     if test_source_kind == "object":
+        object_properties = {
+            "object_title": {"type": ["string", "null"]},
+            "capability": {"const": capability},
+            **({"traversal": traversal_schema} if traversal_schema else {}),
+            **({"collect": collect_schema} if collect_schema else {}),
+            "set": {
+                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
+            },
+        }
+        object_alternatives = []
+        if selector_props:
+            object_properties["select"] = {
+                "type": "object",
+                "properties": selector_props,
+                "additionalProperties": False,
+                "oneOf": selector_alternatives,
+            }
+            direct_required = ["select"] + (["collect"] if collect_required else [])
+            object_alternatives.append({
+                "required": direct_required,
+                "not": {"required": ["set"]},
+            })
+        elif collect_schema:
+            object_alternatives.append({
+                "required": ["collect"],
+                "not": {"required": ["set"]},
+            })
+        object_alternatives.append({
+            "required": ["set"],
+            "not": {
+                "anyOf": [
+                    {"required": ["select"]},
+                    {"required": ["collect"]},
+                ]
+            },
+        })
         defs["object"] = {
             "type": "object",
             "required": object_required,
-            "properties": {
-                "object_title": {"type": ["string", "null"]},
-                "capability": {"const": capability},
-                "select": {
-                    "type": "object",
-                    "properties": selector_props,
-                    "additionalProperties": False,
-                    "oneOf": selector_alternatives,
-                },
-                **({"traversal": traversal_schema} if traversal_schema else {}),
-                **({"collect": collect_schema} if collect_schema else {}),
-                "set": {
-                    "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
-                },
-            },
+            "properties": object_properties,
             "additionalProperties": False,
-            "oneOf": [
-                {"required": ["select"], "not": {"required": ["set"]}},
-                {"required": ["set"], "not": {"required": ["select"]}},
-            ],
+            "oneOf": object_alternatives,
         }
 
     generated = {
