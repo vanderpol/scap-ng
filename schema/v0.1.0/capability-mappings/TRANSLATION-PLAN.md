@@ -40,22 +40,28 @@ Use observed production use as the primary implementation order, then use OVAL S
 
 The current crosswalk identifies these high-value unmapped candidates:
 
-- `independent.textfilecontent54` — production: 797
-- `windows.auditeventpolicysubcategories` — production: 143
-- `windows.userright` — production: 92
-- `independent.shellcommand` — production: 80
+- `independent.textfilecontent54` — production: 797 — **reviewed mapping complete**
+- `windows.auditeventpolicysubcategories` — production: 143 — **reviewed mapping complete**
+- `windows.userright` — production: 92 — **reviewed mapping complete**
+- `independent.shellcommand` — production: 80 — **reviewed mapping complete**
 - `linux.rpminfo` — production: 68 — **mapping started/completed after baseline**
-- `unix.sysctl` — production: 66
-- `linux.partition` — production: 64
-- `linux.systemdunitproperty` — production: 40
-- `windows.fileeffectiverights53` — production: 32
-- `windows.cmdlet` — production: 22
-- `unix.symlink` — production: 15
-- `windows.lockoutpolicy` — production: 14
-- `windows.passwordpolicy` — production: 14
-- `unix.password` — production: 10
+- `unix.sysctl` — production: 66 — **reviewed mapping complete**
+- `linux.partition` — production: 64 — **reviewed mapping complete**
+- `linux.systemdunitproperty` — production: 40 — **reviewed mapping complete**
+- `windows.fileeffectiverights53` — production: 32 — **reviewed mapping complete**
+- `windows.cmdlet` — production: 22 — **reviewed mapping complete**
+- `unix.symlink` — production: 15 — **reviewed mapping complete**
+- `windows.lockoutpolicy` — production: 14 — **reviewed mapping complete**
+- `windows.passwordpolicy` — production: 14 — **reviewed mapping complete**
+- `unix.password` — production: 10 — **reviewed mapping complete**
 
 Counts are evidence for prioritization only; they do not define normative support.
+
+### Production-first checkpoint — 2026-10-02
+
+All listed production-first capabilities at or above 10 observed production occurrences now have reviewed mapping files and focused generated-schema regressions. `windows.cmdlet` additionally established the shared authored record-Object input primitive; singleton Windows policy capabilities established the no-fake-Object Test source pattern; file-oriented capabilities share the corrected traversal base while preserving Unix/Independent `symlinks` versus Windows `junctions` terminology.
+
+The next gate is a green maintained smoke/current-design regression on the combined tranche, followed by lower-frequency production and Self-Assertion language-conformance coverage.
 
 ### Conformance-completion tranche
 
