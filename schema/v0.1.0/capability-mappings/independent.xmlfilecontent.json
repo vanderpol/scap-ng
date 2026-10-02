@@ -64,7 +64,18 @@
         "ios_version"
       ]
     },
-    "post_alignment_ready": true
+    "post_alignment_ready": true,
+    "collection_parameters": {
+      "item_creation": {
+        "type": "string",
+        "enum": [
+          "all_object_elements_fullfilled",
+          "filepath_exists"
+        ],
+        "required": true,
+        "description": "Controls XML item creation. Importers materialize the OVAL default all_object_elements_fullfilled."
+      }
+    }
   },
   "migration_crosswalk": {
     "capability": {
@@ -90,6 +101,9 @@
     },
     "removed_source_fields": {
       "windows_view": "deprecated_not_native"
+    },
+    "behaviors": {
+      "item_creation": "collect.item_creation"
     }
   },
   "semantic_validator_rules": [
@@ -112,6 +126,10 @@
     {
       "id": "independent.xmlfilecontent.pattern_directory_no_traversal",
       "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    },
+    {
+      "id": "independent.xmlfilecontent.materialized_item_creation",
+      "rule": "Direct native Objects explicitly carry item_creation; importers SHALL materialize the OVAL default all_object_elements_fullfilled."
     }
   ]
 }
