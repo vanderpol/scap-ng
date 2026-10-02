@@ -6,6 +6,7 @@ Research toward a simpler successor to SCAP 1.4, with faithful migration of exis
 
 ## Start here
 
+- **External review:** [Current SCAP-NG review set](review/current/README.md) — the single review surface.
 - **First visit:** [What SCAP-NG is and how to browse it](START-HERE.md).
 - **OVAL Board:** [Current review packet and yes/no voting proposals](board/README.md).
 - **Implementers:** [Current design contract](research/iterations/003/design/CURRENT-DESIGN.md), [draft specification](specification/README.md), [schemas and mappings](schema/README.md), and [maintained tools](tools/README.md).
@@ -16,10 +17,11 @@ Research toward a simpler successor to SCAP 1.4, with faithful migration of exis
 
 | Location | What belongs here |
 | --- | --- |
-| `board/` | Current review guide, individual reaction-vote proposals and published Discussion links |
+| `review/` | **Single external review surface**: current coherent review set plus preserved review iterations |
+| `board/` | Board decision source material, reaction-vote proposals and published Discussion links |
 | `specification/` | Working specification, terminology and SCAP 1.4 crosswalks |
 | `schema/` | Pre-alpha schemas and reviewed native capability mapping inputs |
-| `tools/` | Maintained conversion/validation utilities plus explicitly classified historical tooling |
+| `tools/` | Development/reproduction infrastructure; intentionally outside the external review surface |
 | `docs/` | Repository map, decision reconciliation, lossless rebaseline procedure and complete path inventory |
 | `research/` | Current design records and dated research/review evidence; numbered iterations are not interchangeable |
 | `archive/` | Index into preserved historical material; original payloads remain at their existing paths |
