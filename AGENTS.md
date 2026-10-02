@@ -2,7 +2,7 @@
 
 Read START-HERE.md, docs/repository-policy.json, docs/repository-map.md and the current design below. Only current entry points/workflows are current generation authority. Do not select a tool merely because it is under tools/ or contains v003 in its name. Historical generation requires an explicit reproduction task and allow_historical workflow opt-in; held workflows remain held.
 
-The rebaseline preserves every baseline path. Do not delete or move historical payloads, rewrite Git history or transfer ownership under navigation/cleanup authorization. Before future removal, follow docs/lossless-rebaseline.md with an explicit reviewed removal set and verified restoration evidence. Preserve all lessons and original Board questions. Board decision candidates belong in separate versioned yes/no GitHub Discussions with reactions; do not silently rewrite a published vote or infer ratification from public counts.
+The rebaseline preserves every removed baseline payload through the pinned pre-rebaseline tag/history and explicit removal manifests. Do not rewrite Git history or transfer ownership under cleanup authorization. Before future removal, follow docs/lossless-rebaseline.md with an explicit reviewed removal set and verified restoration evidence. Preserve all lessons and original Board questions. Board decision candidates belong in separate versioned yes/no GitHub Discussions with reactions; do not silently rewrite a published vote or infer ratification from public counts.
 
 Historical sections titled Iteration 002 source-only checkpoint, OVAL-aligned NG capability taxonomy and Native source design checkpoint below record earlier phase restrictions. They do not override current fresh-source corpus authorization, reviewed native mappings, authored Object vocabulary or latest CURRENT-DESIGN. Maintain shared parser/data dependencies even where their paths look historical; exceptions are in docs/repository-policy.json.
 
@@ -136,7 +136,7 @@ Iteration 002 uses OVAL's supported platform-family/test vocabulary as the defau
 Broad benchmark expansion is paused while the native SCAP-NG authoring model is reviewed.
 
 - Treat current fidelity-first YAML as migration evidence, not normative native syntax.
-- Before adding more benchmark families, agree on concise native source using the review corpus in `research/iterations/001/native-source-design-review.md`.
+- Before adding more benchmark families, use the current review surface and current design; the historical iteration-001 native-source review remains recoverable from tag `pre-rebaseline-2026-10-02`.
 - Keep XCCDF/OVAL/OCIL/CPE XML identifiers, namespaces, hrefs, and source trees in migration provenance rather than executable native source.
 - Prefer meaningful NG-local names and concise typed collect/derive/evaluate syntax.
 - Preserve established OVAL platform-family boundaries when collected data or evaluation semantics materially differ; for example, keep `unix.file` distinct from `windows.file` unless evidence supports a lossless common model.
@@ -155,7 +155,7 @@ The SCAP 1.4 conversion tooling is expected to evolve into a standalone open-sou
 - Preserve complete provenance, migration status, blocker diagnostics, and loss accounting; never silently drop or repair source semantics.
 - Keep the semantic IR versioned independently from external SCAP-NG source syntax so future format changes do not require rewriting SCAP 1.4 ingestion.
 - New converter functionality should be designed so it can eventually live under an installable `scap_upconvert` package and be exercised locally without GitHub Actions.
-- The roadmap is documented in `research/iterations/001/upconversion-tool-roadmap.md`.
+- The historical up-conversion roadmap remains recoverable from tag `pre-rebaseline-2026-10-02`; current direction is recorded in the maintained tools/docs and roadmap.
 
 ## Reference scanner sequencing
 
