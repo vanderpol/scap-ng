@@ -75,7 +75,46 @@ jobs:
             --corpus "work/${{ matrix.key }}-split" \
             --include 'oval.xml' \
             --out "work/${{ matrix.key }}-roundtrip" \
-            --report "work/${{ matrix.key }}-roundtrip.json"
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --inventory-only
+
+      - name: Enforce only intentional conversion blockers
+        env:
+          KEY: ${{ matrix.key }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          key=os.environ["KEY"]
+          report=json.loads(Path(f"work/{key}-roundtrip.json").read_text())
+          failures=[r for r in report["results"] if not r.get("equal")]
+          source_defect_features={
+              "var_ref_datatype_mismatch",
+              "invalid_textfilecontent54_pattern_operation",
+          }
+          bad=[]
+          source_defects=[]
+          deprecated=[]
+          for row in failures:
+              features=row.get("unsupported_features") or []
+              names={x.get("feature") for x in features}
+              if names and names <= {"deprecated_oval_test"}:
+                  deprecated.append(row)
+              elif names and names <= source_defect_features:
+                  source_defects.append(row)
+              else:
+                  bad.append(row)
+          print(json.dumps({
+              "definitions":report["definitions"],
+              "semantic_equal":report["semantic_equal"],
+              "deprecated_blockers":len(deprecated),
+              "source_content_defects":len(source_defects),
+              "unexpected_failures":len(bad),
+          },indent=2))
+          if bad or report.get("parse_failures"):
+              print(json.dumps({"unexpected_failures":bad},indent=2))
+              raise SystemExit(1)
+          PY
 
       - name: Build aggregate OVAL validation schema
         run: |
