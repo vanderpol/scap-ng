@@ -1,6 +1,6 @@
 # OVAL Object behaviors: required semantic audit before SCAP-NG assessor freeze
 
-**Status:** OPEN, blocking full behavioral-compatibility claims (2026-09-30).  
+**Status:** STRUCTURAL INVENTORY COMPLETE; runtime behavioral-equivalence work remains open (updated 2026-10-02).  
 **Authority:** pinned *upstream* OVAL 5.12.3 XSD, embedded Schematron and normative Object/collector documentation. The SCC/NIWC augmented schemas are not authoritative for standard vocabulary.  
 **Scope:** *all non-deprecated, supported* standard OVAL Object families, including behavior types inherited through XSD extensions and Object elements that define inline behavior types. SCC-specific `sqlext` remains out of scope.
 
@@ -79,13 +79,13 @@ behavior documentation also distinguishes `filepath` from `path` +
 
 ## Required work sequence
 
-- [ ] Extract behavior types for every upstream OVAL 5.12.3 Definition XSD:
+- [x] Extract behavior types for every upstream OVAL 5.12.3 Definition XSD:
   Object→behaviors element mapping, type inheritance, local attributes, defaults,
   ranges/enums, deprecation and Schematron rules, prose/doc anchor.
-- [ ] Produce per-Capability inventory and coverage matrix, explicitly listing
+- [x] Produce per-Capability inventory and coverage matrix, explicitly listing
   Objects without a behavior element, missing defaults, family overrides, and
   ambiguous omission/conditional behavior.
-- [ ] Define a vetted behavior-default resolver and canonical signature,
+- [x] Define a conservative structural behavior-default resolver and inventory,
   independent of both the NG lowerer and reverse OVAL generator.
 - [ ] Normalize each supported behavior into explicit human-readable native
   Collection fields; preserve source-explicit versus default provenance
@@ -102,6 +102,14 @@ behavior documentation also distinguishes `filepath` from `path` +
 - [ ] Require behavior coverage summary in full-corpus census and complete
   Benchmark review artifacts; do not claim the RHEL9 assessment set is fully
   executable based only on schema/semantic-graph gates.
+
+## 2026-10-02 checkpoint
+
+A fresh authoritative audit at commit `4021072` completed successfully against the pinned upstream OVAL 5.12.3 schema set. It resolved **36/36 named behavior types**, found **44 behavior-element declarations**, all optional, and reported no transitive inheritance blockers. The complete Object-level disposition is maintained in [oval-object-behavior-disposition.md](oval-object-behavior-disposition.md).
+
+This closes the structural-discovery portion of the work. It does **not** prove runtime collector equivalence. The remaining open work is execution/behavior validation and any future mapping work for Object families not currently claimed as reviewed native 0.1.0 capabilities.
+
+During the 0.1.0 review, `independent.xmlfilecontent` was corrected to materialize the behavior-affecting `item_creation` default explicitly; `redact_result` was also separated from Object behavior/comparison semantics as a results-disclosure directive.
 
 ## Review distinction
 
