@@ -144,7 +144,7 @@ def _coerce_collection_parameter(value, spec: dict):
 
 
 def _materialize_file_traversal(obj: dict, mapping: dict):
-    """Translate reviewed OVAL file behaviors into one shared downward traversal."""
+    """Translate OVAL file scope and downward recursion into separate native fields."""
     native_cfg=mapping.get("native") or {}
     traversal_definition=native_cfg.get("traversal_definition")
     if traversal_definition is None and native_cfg.get("uses_file_traversal",False):
@@ -152,10 +152,13 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
     if traversal_definition not in {"file_traversal","windows_file_traversal"}:
         return
 
+    # Set-only Objects inherit the scope of their operand Objects. Direct file
+    # selectors materialize the OVAL recurse_file_system default explicitly.
+    if not isinstance(obj.get("select"),dict):
+        return
+
     behaviors=obj.get("behaviors") or {}
     traversal_keys={"max_depth","recurse","recurse_direction","recurse_file_system"}
-    if not (traversal_keys & set(behaviors)):
-        return
 
     direction=str(behaviors.get("recurse_direction","none"))
     if direction=="up":
@@ -173,6 +176,7 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
         raise ValueError(
             f"unsupported OVAL recurse_file_system value: {filesystem_source!r}"
         )
+    obj["filesystem"]=filesystem
 
     recurse_source=str(
         behaviors.get(
@@ -204,20 +208,12 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
 
     select=obj.get("select") or {}
     has_full_path="full_path" in select or "filepath" in select
-    needs_scope=(filesystem!="any")
-    if has_full_path:
-        if direction=="down":
-            raise ValueError("OVAL file recursion is not valid with full_path selection")
-        if needs_scope:
-            raise ValueError(
-                "full_path recurse_file_system scope has no reviewed native representation"
-            )
-        # max_depth/recurse are semantically inactive when direction is none.
-    elif direction=="down" or needs_scope:
+    if has_full_path and direction=="down":
+        raise ValueError("OVAL file recursion is not valid with full_path selection")
+    if not has_full_path and direction=="down":
         obj["traversal"]={
             "max_depth":None if raw_depth==-1 else raw_depth,
             "recurse":recurse,
-            "filesystem":filesystem,
         }
 
     for key in traversal_keys:
