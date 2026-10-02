@@ -91,14 +91,14 @@ A native traversal object is intentionally small:
 ```yaml
 traversal:
   max_depth: null       # null = unlimited; 0 = starting directory only
-  follow_symlinks: true
+  follow_links: true
   filesystem: local     # any | local | same
 ```
 
 Requirements:
 
 - `max_depth` is a non-negative integer or null; no magic `-1`.
-- `follow_symlinks` is boolean.
+- `follow_links` is boolean.
 - `filesystem` is `any`, `local`, or `same`.
 - traversal is invalid with `full_path`.
 - traversal fields are explicit; there are no hidden behavior defaults.
