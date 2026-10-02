@@ -378,6 +378,63 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertTrue(native_item_only.issubset(set(collected)))
         self.assertTrue(item_only.isdisjoint(source_names))
 
+    def test_mapped_behavior_families_have_explicit_native_contracts(self):
+        behavior_contracts = {
+            "file.hash": {"traversal": "file_traversal"},
+            "independent.shellcommand": {
+                "required_collect": {"error_if_exit_status_not_0", "error_if_stderr_exists"},
+            },
+            "independent.textfilecontent54": {
+                "traversal": "file_traversal",
+                "required_collect": {"ignore_case", "multiline", "singleline", "item_creation"},
+            },
+            "independent.xmlfilecontent": {
+                "traversal": "file_traversal",
+                "required_collect": {"item_creation"},
+            },
+            "independent.yamlfilecontent": {"traversal": "file_traversal"},
+            "linux.rpminfo": {"required_collect": {"include_file_paths"}},
+            "linux.rpmverifyfile": {
+                "required_collect": {
+                    "skip_link_target", "skip_size", "skip_owner", "skip_group",
+                    "skip_mtime", "skip_mode", "skip_rdev", "skip_config_files",
+                    "skip_ghost_files", "skip_file_digest", "skip_capabilities",
+                },
+            },
+            "linux.rpmverifypackage": {
+                "required_collect": {"skip_dependencies", "skip_scripts"},
+            },
+            "linux.selinuxsecuritycontext": {"traversal": "file_traversal"},
+            "unix.file": {"traversal": "file_traversal"},
+            "windows.file": {"traversal": "windows_file_traversal"},
+            "windows.fileeffectiverights53": {"traversal": "windows_file_traversal"},
+            "windows.ntuser": {
+                "traversal": "hierarchy_traversal",
+                "required_collect": {"include_default", "item_creation"},
+            },
+            "windows.registry": {"traversal": "hierarchy_traversal"},
+            "windows.regkeyeffectiverights53": {"traversal": "hierarchy_traversal"},
+            "windows.sid": {"required_collect": {"include_group", "resolve_group"}},
+            "windows.sid_sid": {"required_collect": {"include_group", "resolve_group"}},
+            "windows.wuaupdatesearcher": {
+                "required_collect": {"include_superseded_updates"},
+            },
+        }
+        mapping_dir = ROOT / "schema/v0.1.0/capability-mappings"
+        for capability, expected in behavior_contracts.items():
+            with self.subTest(capability=capability):
+                mapping = json.loads(
+                    (mapping_dir / f"{capability}.json").read_text(encoding="utf-8")
+                )
+                native = mapping["native"]
+                if "traversal" in expected:
+                    self.assertEqual(native.get("traversal_definition"), expected["traversal"])
+                required = expected.get("required_collect", set())
+                parameters = native.get("collection_parameters") or {}
+                self.assertTrue(required.issubset(parameters), required - set(parameters))
+                for name in required:
+                    self.assertIs(parameters[name].get("required"), True)
+
     def test_semantic_validator_rules_are_not_lost(self):
         rules = {
             row["id"]: row
