@@ -31,6 +31,25 @@ class ManualResponseContractTests(unittest.TestCase):
         errors = list(Draft202012Validator(schema).iter_errors(doc))
         self.assertEqual([], [error.message for error in errors])
 
+    def test_response_behavior_must_be_explicit(self):
+        schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+        response = manual_response_contract()
+        for field in ("allow_comment","allow_evidence"):
+            with self.subTest(field=field):
+                candidate = dict(response)
+                candidate.pop(field)
+                doc = {
+                    "assessment": {
+                        "id":"example.manual","version":1,
+                        "assessment_title":"Example manual check",
+                        "mode":"manual","class":"compliance","purpose":"assessment",
+                        "procedure":"Inspect the configured value.",
+                        "response":candidate,
+                    }
+                }
+                errors=list(Draft202012Validator(schema).iter_errors(doc))
+                self.assertTrue(errors)
+
     def test_contract_has_unambiguous_compliance_outcomes(self):
         choices = {row["value"]: row["outcome"] for row in manual_response_contract()["choices"]}
         self.assertEqual("true", choices["pass"])
