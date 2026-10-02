@@ -210,6 +210,21 @@ Run `tools/check_current_authoring_contract.py` on generated review source; keep
 the presentation-order guard in the converter and CI. See `CURRENT-DESIGN.md`
 under `research/iterations/003/design/` for the authoritative contract.
 
+## ChatGPT / Codex task-routing and usage-continuity rule
+
+GitHub is the durable system of record for work performed through ChatGPT and Codex. Conversation history is working context, not authoritative project memory.
+
+- Prefer ChatGPT for architectural reasoning, standards interpretation, SCAP/OVAL semantics, specification decisions, competing design choices, and work where discussion/rationale is itself a material project artifact.
+- Prefer Codex for bounded repository implementation after the intended behavior is sufficiently defined: schema/code changes, converter updates, refactors, regression tests, CI fixes, and well-scoped GitHub issues.
+- Avoid assigning Codex broad open-ended work when the same goal can be decomposed into bounded tasks, especially when it would require repeatedly loading large repository/history context.
+- When recommending a Codex task, characterize expected usage qualitatively as **small**, **moderate**, or **potentially expensive** based on scope, context size, tool use, and expected iteration. This is guidance, not a claim to know the account's live usage meter.
+- Neither ChatGPT nor Codex should claim visibility into the user's live remaining allowance unless the active product explicitly exposes it. If the user supplies the current usage/allowance state, use it when deciding where to continue work.
+- When Codex allowance is becoming constrained, checkpoint coherent Codex work to GitHub and continue suitable reasoning/design work in ChatGPT rather than pausing the project. Reserve remaining Codex capacity for repository-execution tasks where it adds the most value.
+- Switching interfaces is a change of tool, not a change of project authority. Before switching, commit or otherwise durably record current decisions, implementation state, validation evidence, blockers, and the next bounded task.
+- Any conversation that materially changes a requirement, invariant, architecture decision, semantic mapping, or accepted workflow should result in a GitHub update before that decision is treated as settled.
+- One interface/session should own a technical workstream at a time. Do not make concurrent overlapping edits from ChatGPT and Codex without an explicit coordination plan.
+- These routing rules optimize continuity and efficient use of agentic allowance; they do not weaken validation, provenance, testing, or current-design requirements.
+
 ## Cross-interface continuity
 
 For ChatGPT/web Codex handoffs, read transition/README.md and transition/decisions.md after CURRENT-DESIGN. Treat archived issue/conversation summaries and pinned historical documents as evidence, not current implementation proof. Recover latest owner corrections before restoring an older feature. Owner Oct 1 correction: Tailoring cannot override publisher Parameter values; delegated values use Organizational Input and changed requirements need distinct policy identity. Preserve Rule role as the working informational policy control pending an agreed replacement. Update the handoff with exact commit, validation evidence, blockers and next step when changing interfaces.
