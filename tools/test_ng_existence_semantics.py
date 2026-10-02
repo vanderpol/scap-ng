@@ -9,15 +9,7 @@ import yaml
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-CASES = (
-    ROOT
-    / "research"
-    / "iterations"
-    / "002"
-    / "examples"
-    / "conformance"
-    / "existence-state-cases.yaml"
-)
+CASES = HERE / "fixtures" / "existence-state-cases.yaml"
 
 spec = importlib.util.spec_from_file_location("converter", HERE / "scap14_to_scapng.py")
 mod = importlib.util.module_from_spec(spec)
