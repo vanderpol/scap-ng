@@ -661,7 +661,7 @@ def validate_assessment_capability_semantics(document):
             if variable_id not in variables:
                 diagnostics.append({
                     "test":test_id,
-                    "code":"test.variable_missing",
+                    "code":"variable.value.source_exists" if test.get("capability")=="variable.value" else "test.variable_missing",
                     "variable":variable_id,
                     "message":"Test references an unknown Variable",
                 })
