@@ -18,6 +18,8 @@ from jsonschema import Draft202012Validator, RefResolver
 DOCUMENTS = {
     "benchmark.yaml": ("benchmark", "benchmark.schema.json"),
     "applicability.yaml": ("applicability", "applicability.schema.json"),
+    "organizational-input.yaml": ("organizational-input", "organizational-input.schema.json"),
+    "package-manifest.yaml": ("package-manifest", "package-manifest.schema.json"),
 }
 
 
@@ -42,9 +44,18 @@ def validator(schema_dir: Path, filename: str):
 def classify(path: Path):
     if path.name in DOCUMENTS:
         return DOCUMENTS[path.name]
-    if path.parent.name=="rules" and path.suffix==".yaml":
+    name=path.name
+    if name.endswith(".rule.yaml") or (path.parent.name=="rules" and path.suffix==".yaml"):
         return "rule","rule.schema.json"
-    if "assessments" in path.parts and path.suffix==".yaml":
+    if name.endswith(".manual.assessment.yaml") or name.endswith(".document-review.assessment.yaml"):
+        return "manual-assessment","manual-assessment.schema.json"
+    if name.endswith(".assessment-result.yaml"):
+        return "assessment-result","assessment-result.schema.json"
+    if name.endswith(".tailoring.yaml"):
+        return "tailoring","tailoring.schema.json"
+    if name.endswith(".organizational-input.yaml"):
+        return "organizational-input","organizational-input.schema.json"
+    if name.endswith(".assessment.yaml") or ("assessments" in path.parts and path.suffix==".yaml"):
         return "assessment","assessment.schema.json"
     return None
 
@@ -58,9 +69,11 @@ def main():
 
     validators={}
     results=[]
+    unclassified=[]
     for path in sorted(args.corpus_root.rglob("*.yaml")):
         info=classify(path)
         if not info:
+            unclassified.append(path.relative_to(args.corpus_root).as_posix())
             continue
         kind,schema_name=info
         if not (args.schema_dir/schema_name).exists():
@@ -82,6 +95,8 @@ def main():
         "documents_checked":len(results),
         "valid":sum(x["valid"] for x in results),
         "invalid":sum(not x["valid"] for x in results),
+        "unclassified_yaml":len(unclassified),
+        "unclassified_paths":unclassified,
         "results":results,
     }
     if args.report:
