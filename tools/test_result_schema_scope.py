@@ -109,6 +109,12 @@ class ResultSchemaScopeTests(unittest.TestCase):
         org = properties("organizational-input.schema.json")["organizational_input"]["properties"]
         self.assertFalse(org["intended_scope"].get("additionalProperties", True))
 
+    def test_rule_organizational_input_requiredness_is_explicit(self):
+        rule = properties("rule.schema.json")["rule"]["properties"]
+        item = rule["organizational_input_requirements"]["additionalProperties"]["items"]
+        self.assertIn("required", item["required"])
+        self.assertNotIn("default", item["properties"]["required"])
+
     def test_typed_values_are_closed(self):
         typed = schema("result-types.schema.json")["$defs"]["typed_value"]
         self.assertFalse(typed.get("additionalProperties", True))
