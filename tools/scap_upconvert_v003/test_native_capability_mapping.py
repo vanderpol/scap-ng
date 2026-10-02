@@ -307,5 +307,105 @@ class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
             apply_capability_mapping(doc,mapping)
 
 
+    def test_nullable_pid_preserves_source_nil_semantics(self):
+        mapping=self.mapping("independent.environmentvariable58.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"current process",
+                "capability":"independent.environmentvariable58",
+                "select":{
+                    "pid":{"value":"","operation":"equals","datatype":"int","nil":True},
+                    "name":{"value":"PATH","operation":"equals","datatype":"string"},
+                },
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["o"]
+        self.assertIsNone(obj["select"]["pid"])
+        self.assertEqual(obj["select"]["name"]["operation"],"equal")
+
+    def test_file_traversal_behaviors_become_shared_native_traversal(self):
+        mapping=self.mapping("independent.textfilecontent54.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"recursive configs",
+                "capability":"independent.textfilecontent54",
+                "select":{
+                    "path":{"value":"/etc","operation":"equals","datatype":"string"},
+                    "filename":{"value":".*\\.conf$","operation":"pattern match","datatype":"string"},
+                    "pattern":{"value":"enabled","operation":"pattern match","datatype":"string"},
+                    "instance":{"value":"1","operation":"equals","datatype":"int"},
+                },
+                "behaviors":{
+                    "max_depth":"-1",
+                    "recurse":"symlinks and directories",
+                    "recurse_direction":"down",
+                    "recurse_file_system":"local",
+                },
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["o"]
+        self.assertEqual(obj["traversal"],{
+            "max_depth":None,
+            "recurse":"symlinks_and_directories",
+            "filesystem":"local",
+        })
+        self.assertNotIn("behaviors",obj)
+
+    def test_rpmverifyfile_behaviors_become_explicit_collect_flags(self):
+        mapping=self.mapping("linux.rpmverifyfile.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"rpm file",
+                "capability":"linux.rpmverifyfile",
+                "select":{
+                    "name":{"value":"bash","operation":"equals","datatype":"string"},
+                    "epoch":{"value":"0","operation":"equals","datatype":"string"},
+                    "version":{"value":"5","operation":"equals","datatype":"string"},
+                    "release":{"value":"1","operation":"equals","datatype":"string"},
+                    "arch":{"value":"x86_64","operation":"equals","datatype":"string"},
+                    "filepath":{"value":"/bin/bash","operation":"equals","datatype":"string"},
+                },
+                "behaviors":{"noconfigfiles":"true","noghostfiles":"false"},
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        collect=out["assessment"]["objects"]["o"]["collect"]
+        self.assertTrue(collect["skip_config_files"])
+        self.assertFalse(collect["skip_ghost_files"])
+        self.assertFalse(collect["skip_link_target"])
+        self.assertFalse(collect["skip_file_digest"])
+        self.assertNotIn("behaviors",out["assessment"]["objects"]["o"])
+
+    def test_deprecated_rpm_nomd5_remains_a_conversion_error(self):
+        mapping=self.mapping("linux.rpmverifyfile.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"legacy rpm file",
+                "capability":"linux.rpmverifyfile",
+                "select":{
+                    "name":{"value":"bash","operation":"equals","datatype":"string"},
+                    "epoch":{"value":"0","operation":"equals","datatype":"string"},
+                    "version":{"value":"5","operation":"equals","datatype":"string"},
+                    "release":{"value":"1","operation":"equals","datatype":"string"},
+                    "arch":{"value":"x86_64","operation":"equals","datatype":"string"},
+                    "filepath":{"value":"/bin/bash","operation":"equals","datatype":"string"},
+                },
+                "behaviors":{"nomd5":"true"},
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        with self.assertRaisesRegex(ValueError,"nomd5"):
+            apply_capability_mapping(doc,mapping)
+
+
 if __name__=="__main__":
     unittest.main()
