@@ -563,7 +563,7 @@ def main() -> int:
                 replacements[row["path"]] = shared_path
             members.append(
                 {
-                    "source": str(row["path"].relative_to(source)),
+                    "source": row["path"].relative_to(source).as_posix(),
                     "source_assessment": {
                         "id": (load_yaml(row["path"]).get("assessment") or {}).get("id"),
                         "version": (load_yaml(row["path"]).get("assessment") or {}).get("version"),
@@ -611,7 +611,7 @@ def main() -> int:
                 continue
             consumers = [
                 {
-                    "source": str(row["path"].relative_to(source)),
+                    "source": row["path"].relative_to(source).as_posix(),
                     "exact_fingerprint": row["exact"],
                     "consumers": [
                         report_consumer(consumer, source)
@@ -643,8 +643,8 @@ def main() -> int:
                 variant_differences.append({
                     "baseline_exact_fingerprint":baseline_fp,
                     "variant_exact_fingerprint":variant_fp,
-                    "baseline_source":str(baseline_row["path"].relative_to(source)),
-                    "variant_source":str(variant_row["path"].relative_to(source)),
+                    "baseline_source":baseline_row["path"].relative_to(source).as_posix(),
+                    "variant_source":variant_row["path"].relative_to(source).as_posix(),
                     "differences":semantic_differences(baseline_doc,variant_doc,limit=20),
                 })
             near_groups.append(
