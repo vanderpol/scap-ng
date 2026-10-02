@@ -64,6 +64,22 @@ class WindowsNtuserRightsTests(unittest.TestCase):
             },"provenance":{}
         })
 
+    def test_linux_rpmverify_behavior_defaults_are_explicit(self):
+        expected={
+            "linux.rpmverifyfile":{
+                "skip_link_target","skip_size","skip_owner","skip_group","skip_mtime","skip_mode",
+                "skip_rdev","skip_config_files","skip_ghost_files","skip_file_digest","skip_capabilities",
+            },
+            "linux.rpmverifypackage":{"skip_dependencies","skip_scripts"},
+        }
+        for cap,names in expected.items():
+            with self.subTest(cap=cap):
+                schema=self.schema(cap)
+                collect=schema["$defs"]["object"]["properties"]["collect"]
+                self.assertEqual(set(collect["required"]),names)
+                for name in names:
+                    self.assertEqual(collect["properties"][name]["type"],"boolean")
+
     def test_sid_behavior_defaults_are_explicit(self):
         for cap in ("windows.sid","windows.sid_sid"):
             with self.subTest(cap=cap):
