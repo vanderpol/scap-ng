@@ -123,6 +123,31 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         self.assertEqual(test["check_existence"],"some")
         self.assertEqual(test["check"],"all")
 
+    def test_legacy_set_shape_becomes_native_operands(self):
+        doc=self.aligned_wmi_document()
+        doc["assessment"]["objects"]["query-object"]={
+            "object_title":"combined",
+            "capability":"windows.wmi57",
+            "set":{
+                "operator":"complement",
+                "members":[
+                    {"object":"query-a"},
+                    {"object":"query-b"},
+                ],
+                "filters":[
+                    {"action":"exclude","state":"state-result"},
+                ],
+            },
+        }
+        out=apply_capability_mapping(doc,self.mapping)
+        expr=out["assessment"]["objects"]["query-object"]["set"]
+        self.assertEqual(expr["operator"],"difference")
+        self.assertEqual(len(expr["operands"]),2)
+        self.assertEqual(expr["operands"][0],{
+            "object":"query-a",
+            "filters":[{"action":"exclude","state":"state-result"}],
+        })
+
     def test_collector_comparison_semantics_fail_closed(self):
         doc=self.aligned_wmi_document()
         doc["assessment"]["objects"]["query-object"]["select"]["wql"]["operation"]="pattern match"
