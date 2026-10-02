@@ -540,6 +540,25 @@ class DependencyTests(unittest.TestCase):
         self.assertIsNone(native)
         self.assertIn("conversion_resource_limit:expression_depth", error)
 
+    def test_lowering_elapsed_budget_stops_inside_recursive_work(self):
+        root = source()
+        variable(root, 1, literal("demo"))
+        ticks = iter((0.0, 0.010))
+        def tracker_factory(budget):
+            return ConversionBudgetTracker(budget, clock=lambda: next(ticks))
+        # Isolate the lowering-stage timer from the separately tested preflight
+        # feature walk so this proves recursive lowering itself has checkpoints.
+        with patch.object(converter, "unsupported_definition_features", return_value=[]), \
+             patch.object(converter, "ConversionBudgetTracker", side_effect=tracker_factory):
+            native, error = converter.lower_definition(
+                root,
+                DID,
+                "budgeted-elapsed-lowering",
+                budget=ConversionBudget(elapsed_ms=5),
+            )
+        self.assertIsNone(native)
+        self.assertIn("conversion_resource_limit:elapsed_ms", error)
+
     def test_lowering_output_budget_returns_no_partial_assessment(self):
         root = source()
         variable(root, 1, literal("demo"))
