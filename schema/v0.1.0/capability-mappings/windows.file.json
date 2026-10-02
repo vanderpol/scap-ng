@@ -1,0 +1,191 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "windows.file",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "file_test",
+    "object": "file_object",
+    "state": "file_state"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "full_path"
+      ],
+      [
+        "directory",
+        "name"
+      ]
+    ],
+    "uses_file_traversal": true,
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "owner": "owner",
+      "size": "size",
+      "a_time": "access_time",
+      "c_time": "creation_time",
+      "m_time": "modify_time",
+      "ms_checksum": "microsoft_checksum",
+      "version": "version",
+      "type": "type",
+      "attribute": "attribute",
+      "development_class": "development_class",
+      "company": "company",
+      "internal_name": "internal_name",
+      "language": "language",
+      "original_filename": "original_name",
+      "product_name": "product_name",
+      "product_version": "product_version"
+    },
+    "field_datatypes": {
+      "full_path": [
+        "string"
+      ],
+      "directory": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "owner": [
+        "string"
+      ],
+      "size": [
+        "integer"
+      ],
+      "access_time": [
+        "integer"
+      ],
+      "creation_time": [
+        "integer"
+      ],
+      "modify_time": [
+        "integer"
+      ],
+      "microsoft_checksum": [
+        "string"
+      ],
+      "version": [
+        "version"
+      ],
+      "type": [
+        "string"
+      ],
+      "attribute": [
+        "string"
+      ],
+      "development_class": [
+        "string"
+      ],
+      "company": [
+        "string"
+      ],
+      "internal_name": [
+        "string"
+      ],
+      "language": [
+        "string"
+      ],
+      "original_name": [
+        "string"
+      ],
+      "product_name": [
+        "string"
+      ],
+      "product_version": [
+        "string",
+        "version"
+      ]
+    },
+    "state_value_enums": {
+      "type": [
+        "directory",
+        "char",
+        "disk",
+        "pipe",
+        "remote",
+        "unknown"
+      ],
+      "attribute": [
+        "archive",
+        "compressed",
+        "device",
+        "directory",
+        "encrypted",
+        "hidden",
+        "integrity_stream",
+        "normal",
+        "not_content_indexed",
+        "no_scrub_data",
+        "offline",
+        "readonly",
+        "reparse_point",
+        "sparse_file",
+        "system",
+        "temporary",
+        "virtual"
+      ]
+    }
+  },
+  "migration_crosswalk": {
+    "file_type": {
+      "FILE_ATTRIBUTE_DIRECTORY": "directory",
+      "FILE_TYPE_CHAR": "char",
+      "FILE_TYPE_DISK": "disk",
+      "FILE_TYPE_PIPE": "pipe",
+      "FILE_TYPE_REMOTE": "remote",
+      "FILE_TYPE_UNKNOWN": "unknown",
+      "": "variable_reference_artifact_not_native_value"
+    },
+    "file_attribute": {
+      "FILE_ATTRIBUTE_ARCHIVE": "archive",
+      "FILE_ATTRIBUTE_COMPRESSED": "compressed",
+      "FILE_ATTRIBUTE_DEVICE": "device",
+      "FILE_ATTRIBUTE_DIRECTORY": "directory",
+      "FILE_ATTRIBUTE_ENCRYPTED": "encrypted",
+      "FILE_ATTRIBUTE_HIDDEN": "hidden",
+      "FILE_ATTRIBUTE_INTEGRITY_STREAM": "integrity_stream",
+      "FILE_ATTRIBUTE_NORMAL": "normal",
+      "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED": "not_content_indexed",
+      "FILE_ATTRIBUTE_NO_SCRUB_DATA": "no_scrub_data",
+      "FILE_ATTRIBUTE_OFFLINE": "offline",
+      "FILE_ATTRIBUTE_READONLY": "readonly",
+      "FILE_ATTRIBUTE_REPARSE_POINT": "reparse_point",
+      "FILE_ATTRIBUTE_SPARSE_FILE": "sparse_file",
+      "FILE_ATTRIBUTE_SYSTEM": "system",
+      "FILE_ATTRIBUTE_TEMPORARY": "temporary",
+      "FILE_ATTRIBUTE_VIRTUAL": "virtual",
+      "": "variable_reference_artifact_not_native_value"
+    },
+    "removed_source_fields": {
+      "windows_view": "deprecated_not_native"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.file.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability windows.file."
+    },
+    {
+      "id": "windows.file.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "windows.file.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    },
+    {
+      "id": "windows.file.literal_name_characters",
+      "rule": "Literal file names must not contain Windows path separator or reserved filename characters; match expressions are exempt."
+    }
+  ]
+}
