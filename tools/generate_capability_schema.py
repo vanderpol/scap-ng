@@ -255,20 +255,17 @@ def generate(mapping, repo_root):
 
     state_names = []
     state_meta = {}
-    for name, field in state_fields.items():
-        if name in {"signature"}:
-            continue
-        # The direct inline traversal may see helper elements in nested custom
-        # types; only fields whose nearest semantic owner is the State sequence
-        # are retained by the mapping's source State. For the first vertical
-        # slice, drop known XML helper names.
-        if name in {"value"}:
-            continue
-        dtypes = source_datatypes(field)
-        native_name = mapping["native"].get("state_field_map", {}).get(name, name)
+    field_map = mapping["native"].get("state_field_map", {})
+    datatype_overrides = mapping["native"].get("field_datatypes", {})
+    for source_name, native_name in field_map.items():
+        field = state_fields.get(source_name)
+        if field is None:
+            raise KeyError(
+                f"mapping references missing source State field {source_name!r}"
+            )
+        dtypes = datatype_overrides.get(native_name) or source_datatypes(field)
         state_names.append(native_name)
         state_meta[native_name] = {
-            "source_field": name,
             "datatypes": dtypes,
         }
 
