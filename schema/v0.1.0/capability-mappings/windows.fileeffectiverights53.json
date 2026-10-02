@@ -1,0 +1,187 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "windows.fileeffectiverights53",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "fileeffectiverights53_test",
+    "object": "fileeffectiverights53_object",
+    "state": "fileeffectiverights53_state"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "trustee_sid": "trustee_sid"
+    },
+    "object_selector_alternatives": [
+      [
+        "full_path",
+        "trustee_sid"
+      ],
+      [
+        "directory",
+        "name",
+        "trustee_sid"
+      ]
+    ],
+    "nullable_selectors": [
+      "name"
+    ],
+    "traversal_definition": "windows_file_traversal",
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "trustee_sid": "trustee_sid",
+      "trustee_name": "trustee_name",
+      "standard_delete": "standard_delete",
+      "standard_read_control": "standard_read_control",
+      "standard_write_dac": "standard_write_dac",
+      "standard_write_owner": "standard_write_owner",
+      "standard_synchronize": "standard_synchronize",
+      "access_system_security": "access_system_security",
+      "generic_read": "generic_read",
+      "generic_write": "generic_write",
+      "generic_execute": "generic_execute",
+      "generic_all": "generic_all",
+      "file_read_data": "file_read_data",
+      "file_write_data": "file_write_data",
+      "file_append_data": "file_append_data",
+      "file_read_ea": "file_read_ea",
+      "file_write_ea": "file_write_ea",
+      "file_execute": "file_execute",
+      "file_delete_child": "file_delete_child",
+      "file_read_attributes": "file_read_attributes",
+      "file_write_attributes": "file_write_attributes"
+    },
+    "field_datatypes": {
+      "full_path": [
+        "string"
+      ],
+      "directory": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "trustee_sid": [
+        "string"
+      ],
+      "trustee_name": [
+        "string"
+      ],
+      "standard_delete": [
+        "boolean"
+      ],
+      "standard_read_control": [
+        "boolean"
+      ],
+      "standard_write_dac": [
+        "boolean"
+      ],
+      "standard_write_owner": [
+        "boolean"
+      ],
+      "standard_synchronize": [
+        "boolean"
+      ],
+      "access_system_security": [
+        "boolean"
+      ],
+      "generic_read": [
+        "boolean"
+      ],
+      "generic_write": [
+        "boolean"
+      ],
+      "generic_execute": [
+        "boolean"
+      ],
+      "generic_all": [
+        "boolean"
+      ],
+      "file_read_data": [
+        "boolean"
+      ],
+      "file_write_data": [
+        "boolean"
+      ],
+      "file_append_data": [
+        "boolean"
+      ],
+      "file_read_ea": [
+        "boolean"
+      ],
+      "file_write_ea": [
+        "boolean"
+      ],
+      "file_execute": [
+        "boolean"
+      ],
+      "file_delete_child": [
+        "boolean"
+      ],
+      "file_read_attributes": [
+        "boolean"
+      ],
+      "file_write_attributes": [
+        "boolean"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "fileeffectiverights53": "windows.fileeffectiverights53",
+      "fileeffectiverights": "migration_error_deprecated"
+    },
+    "object": {
+      "filepath": "select.full_path",
+      "path": "select.directory",
+      "filename": "select.name",
+      "trustee_sid": "select.trustee_sid"
+    },
+    "traversal": {
+      "max_depth_-1": "max_depth_null",
+      "recurse.directories": "directories",
+      "recurse.junctions": "junctions",
+      "recurse.junctions and directories": "junctions_and_directories",
+      "recurse_direction.none": "no_traversal",
+      "recurse_direction.down": "implicit_downward_traversal",
+      "recurse_direction.up": "migration_error_deprecated",
+      "recurse_file_system.all": "any",
+      "recurse_file_system.local": "local",
+      "recurse_file_system.defined": "same"
+    },
+    "removed_source_fields": {
+      "behaviors.include_group": "deprecated_not_native",
+      "behaviors.resolve_group": "deprecated_not_native",
+      "windows_view": "deprecated_not_native"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.fileeffectiverights53.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability windows.fileeffectiverights53."
+    },
+    {
+      "id": "windows.fileeffectiverights53.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "windows.fileeffectiverights53.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    },
+    {
+      "id": "windows.fileeffectiverights53.literal_name_characters",
+      "rule": "Literal file names must not contain Windows path separator or reserved filename characters; match expressions are exempt."
+    },
+    {
+      "id": "windows.fileeffectiverights53.trustee_sid",
+      "rule": "The Object identifies trustees by SID; deprecated trustee-name-based fileeffectiverights is not imported as this capability."
+    }
+  ]
+}
