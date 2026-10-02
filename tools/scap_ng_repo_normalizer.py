@@ -377,7 +377,10 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int | None = None) ->
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus_root", type=Path)
-    ap.add_argument("--output-root", type=Path, required=True)
+    ap.add_argument("--rewrite", action="store_true",
+                    help="Write a normalized repository copy. Default is dry-run/report-only.")
+    ap.add_argument("--output-root", type=Path,
+                    help="Destination for --rewrite. Required only when --rewrite is used.")
     ap.add_argument("--report", type=Path, required=True)
     ap.add_argument("--top-near", type=int, default=250,
                     help="Maximum near-duplicate Assessment groups retained")
@@ -386,10 +389,17 @@ def main() -> int:
     args = ap.parse_args()
 
     source = args.corpus_root.resolve()
-    output = args.output_root.resolve()
-    if output.exists():
-        shutil.rmtree(output)
-    shutil.copytree(source, output)
+    if args.rewrite and args.output_root is None:
+        ap.error("--output-root is required with --rewrite")
+    if not args.rewrite and args.output_root is not None:
+        ap.error("--output-root is only valid with --rewrite")
+    output = args.output_root.resolve() if args.output_root is not None else None
+    if output is not None:
+        if output == source:
+            ap.error("--output-root must differ from corpus_root")
+        if output.exists():
+            shutil.rmtree(output)
+        shutil.copytree(source, output)
 
     benchmarks, uses = collect_corpus(source)
     rows = []
@@ -415,7 +425,8 @@ def main() -> int:
         if len(group) > 1
     ]
 
-    shared_dir = output / "shared" / "assessments"
+    shared_rel_dir = Path("shared") / "assessments"
+    shared_dir = (output / shared_rel_dir) if output is not None else None
     replacements: dict[Path, Path] = {}
     exact_report = []
     duplicate_instances_avoided = 0
@@ -426,7 +437,8 @@ def main() -> int:
     ):
         fingerprint = group[0]["exact"]
         shared_id = f"ng.shared.{fingerprint[:24]}"
-        shared_path = shared_dir / f"{safe_name(shared_id)}.assessment.yaml"
+        shared_rel_path = shared_rel_dir / f"{safe_name(shared_id)}.assessment.yaml"
+        shared_path = (output / shared_rel_path) if output is not None else None
 
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
@@ -436,11 +448,13 @@ def main() -> int:
         assessment["version"] = 1
         # Complete source/consumer lineage is emitted only in the separate
         # normalizer report below; it is intentionally not native Assessment data.
-        dump_yaml(shared_path, {"assessment": assessment})
+        if shared_path is not None:
+            dump_yaml(shared_path, {"assessment": assessment})
 
         members = []
         for row in group:
-            replacements[row["path"]] = shared_path
+            if shared_path is not None:
+                replacements[row["path"]] = shared_path
             members.append(
                 {
                     "source": str(row["path"].relative_to(source)),
@@ -460,20 +474,26 @@ def main() -> int:
         exact_report.append(
             {
                 "fingerprint": fingerprint,
-                "shared_assessment": str(shared_path.relative_to(output)),
+                "shared_assessment": shared_rel_path.as_posix(),
                 "instance_count": len(group),
                 "members": members,
             }
         )
 
-    rewritten_rule_files = rewrite_rules(output, source, replacements, uses)
+    rewritten_rule_files = (
+        rewrite_rules(output, source, replacements, uses)
+        if output is not None else 0
+    )
 
-    # Remove promoted local duplicates after references in the copied tree point
-    # to the shared canonical Assessment.
-    for source_path in replacements:
-        copied = output / source_path.relative_to(source)
-        if copied.exists():
-            copied.unlink()
+    # Remove promoted local duplicates only in explicit rewrite mode, after all
+    # copied Rule references point to the shared canonical Assessment.
+    removed_local_assessments = 0
+    if output is not None:
+        for source_path in replacements:
+            copied = output / source_path.relative_to(source)
+            if copied.exists():
+                copied.unlink()
+                removed_local_assessments += 1
 
     # Near duplicates are same semantic shape after only literal values are
     # abstracted, but have >1 exact semantic fingerprint.  They are advisory.
@@ -551,7 +571,11 @@ def main() -> int:
 
     report = {
         "format": "scap-ng-repository-normalizer-report-0.1",
-        "mode": "exact-rewrite-plus-near-duplicate-review",
+        "mode": (
+            "exact-rewrite-plus-near-duplicate-review"
+            if args.rewrite else
+            "dry-run-exact-plan-plus-near-duplicate-review"
+        ),
         "summary": {
             "benchmarks": len(benchmarks),
             "rules": sum(len(x["rules"]) for x in benchmarks),
@@ -561,8 +585,15 @@ def main() -> int:
             "duplicate_assessment_definitions_avoided": duplicate_instances_avoided,
             "exact_definition_reduction_pct": reduction_pct,
             "rule_files_rewritten": rewritten_rule_files,
+            "local_assessment_files_removed": removed_local_assessments,
             "near_duplicate_review_groups": len(near_groups),
             "near_duplicate_rule_candidates_reported": len(rule_candidates),
+        },
+        "planned_changes": {
+            "shared_assessments_to_create": len(exact_report),
+            "local_assessment_instances_to_replace": sum(x["instance_count"] for x in exact_report),
+            "duplicate_assessment_definitions_to_remove": duplicate_instances_avoided,
+            "rewrite_requested": args.rewrite,
         },
         "exact_groups": exact_report,
         "near_duplicate_review_groups": near_groups[: args.top_near],
