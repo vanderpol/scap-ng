@@ -182,6 +182,30 @@ def generate(mapping, repo_root):
     source = mapping["source"]
     xsd_path = repo_root / source["definitions_schema"]
     root = ET.parse(xsd_path).getroot()
+    capability = mapping["capability"]
+    fixed_result = mapping.get("native", {}).get("fixed_result")
+    if fixed_result is not None:
+        direct_global(root, "element", source["test"])
+        return {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": f"https://scap-ng.dev/schema/v0.1.0/generated/capabilities/{capability}.schema.json",
+            "title": f"Generated SCAP-NG capability fragment: {capability}",
+            "description": f"Native SCAP-NG fixed-result capability schema for {capability}.",
+            "x-fixed-result": fixed_result,
+            "x-semantic-validator-rules": mapping.get("semantic_validator_rules", []),
+            "$defs": {
+                "test": {
+                    "type": "object",
+                    "required": ["test_title", "capability"],
+                    "properties": {
+                        "test_title": {"type": ["string", "null"]},
+                        "capability": {"const": capability},
+                    },
+                    "additionalProperties": False,
+                },
+            },
+        }
+
     sc_rel = source.get("system_characteristics_schema") or infer_system_characteristics_schema(
         source["definitions_schema"]
     )
@@ -389,7 +413,6 @@ def generate(mapping, repo_root):
 
     object_required = ["object_title", "capability"]
 
-    capability = mapping["capability"]
     test_required = [
         "test_title", "capability",
         "existence", "match",
