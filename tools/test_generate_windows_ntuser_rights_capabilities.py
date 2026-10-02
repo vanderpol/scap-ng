@@ -36,6 +36,16 @@ class WindowsNtuserRightsTests(unittest.TestCase):
             "collect":{"include_default":False,"item_creation":"key_and_name_exist"}
         })
 
+    def test_ntuser_collection_defaults_are_required(self):
+        base={
+            "object_title":"user policy","capability":"windows.ntuser",
+            "select":{"key":self.e("Software\\\\Policies"),"name":None},
+        }
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate("windows.ntuser","object",base)
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate("windows.ntuser","object",{**base,"collect":{"include_default":False}})
+
     def test_ntuser_downward_traversal(self):
         self.validate("windows.ntuser","object",{
             "object_title":"recursive policy","capability":"windows.ntuser",
