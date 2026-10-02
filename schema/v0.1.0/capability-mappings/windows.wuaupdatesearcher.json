@@ -1,0 +1,120 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "windows.wuaupdatesearcher",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "wuaupdatesearcher_test",
+    "object": "wuaupdatesearcher_object",
+    "state": "wuaupdatesearcher_state",
+    "item": "wuaupdatesearcher_item"
+  },
+  "native": {
+    "selector_map": {
+      "search_criteria": "search_criteria"
+    },
+    "object_selector_alternatives": [
+      [
+        "search_criteria"
+      ]
+    ],
+    "collection_parameters": {
+      "include_superseded_updates": {
+        "type": "boolean",
+        "required": true,
+        "description": "Whether updates superseded by other matching updates are included. OVAL default true is materialized explicitly by importers."
+      }
+    },
+    "state_field_map": {
+      "search_criteria": "search_criteria",
+      "update_id": "update_id",
+      "title": "title",
+      "support_url": "support_url",
+      "is_installed": "is_installed",
+      "is_hidden": "is_hidden",
+      "msrc_severity": "msrc_severity",
+      "last_deployment_change_time": "last_deployment_change_time",
+      "source": "source",
+      "days_since_source_modified": "days_since_source_modified"
+    },
+    "native_added_state_fields": {
+      "source_path": {
+        "native_name": "source_path",
+        "reason": "OVAL 5.12.3 wuaupdatesearcher_item collects scalar source_path but wuaupdatesearcher_state omits it. NG repairs the omission so all collected scalar data remains filterable."
+      }
+    },
+    "field_datatypes": {
+      "search_criteria": [
+        "string"
+      ],
+      "update_id": [
+        "string"
+      ],
+      "title": [
+        "string"
+      ],
+      "support_url": [
+        "string"
+      ],
+      "is_installed": [
+        "boolean"
+      ],
+      "is_hidden": [
+        "boolean"
+      ],
+      "msrc_severity": [
+        "string"
+      ],
+      "last_deployment_change_time": [
+        "string"
+      ],
+      "source": [
+        "string"
+      ],
+      "source_path": [
+        "string"
+      ],
+      "days_since_source_modified": [
+        "integer"
+      ]
+    },
+    "state_value_enums": {
+      "source": [
+        "Windows_Update",
+        "WSUS",
+        "Offline_Cab_File"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "wuaupdatesearcher": "windows.wuaupdatesearcher"
+    },
+    "behaviors": {
+      "include_superseded_updates": "collect.include_superseded_updates"
+    },
+    "source_defect_corrections": {
+      "source_path": "Added to native State surface from wuaupdatesearcher_item because OVAL 5.12.3 State omits this non-deprecated scalar field."
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.wuaupdatesearcher.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability windows.wuaupdatesearcher."
+    },
+    {
+      "id": "windows.wuaupdatesearcher.materialized_superseded_default",
+      "rule": "Direct native Objects explicitly carry include_superseded_updates; importers materialize the OVAL default true."
+    },
+    {
+      "id": "windows.wuaupdatesearcher.date_lexical_form",
+      "rule": "last_deployment_change_time preserves the source XML-date lexical semantics even though OVAL exposes its comparison datatype as string."
+    },
+    {
+      "id": "windows.wuaupdatesearcher.source_path_repair",
+      "rule": "source_path is a native State predicate as well as a collected Item field; this intentionally repairs the OVAL 5.12.3 State omission."
+    }
+  ]
+}
