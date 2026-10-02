@@ -84,6 +84,14 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
             "collect":{"algorithm":"sha512"},
         })
 
+    def test_collect_block_is_required(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":"missing collect",
+                "capability":"file.hash",
+                "select":{"full_path":self.entity("/etc/passwd")},
+            })
+
     def test_hash_algorithm_is_required(self):
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("object",{
