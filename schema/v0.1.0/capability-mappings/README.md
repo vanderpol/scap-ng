@@ -1,54 +1,179 @@
 # Capability Schema Mapping Sources
 
-These files are the maintained, reviewed inputs for generated deep SCAP-NG
-Assessment capability schemas.
+These files are the reviewed source-to-native design inputs for generated
+SCAP-NG Assessment capability schemas.
 
-They are **not** generated JSON Schemas themselves.
+They are **not** runtime schemas and they are **not** mechanical OVAL-to-JSON
+translations.
+
+## Clean-break rule
+
+SCAP-NG capability mappings preserve legacy **semantics**, not legacy schema
+shape.
+
+Pinned OVAL 5.12.3 XSD/Schematron is used to prove migration coverage and to
+identify source behavior, hidden defaults, deprecated constructs and source
+defects. Native names, structure, enums and validation rules are designed
+independently.
+
+A native capability SHOULD answer:
+
+> Would we design it this way if the OVAL XML schema had never existed?
+
+If not, the mapping translates the source construct into a clearer native form
+or records an explicit migration error.
 
 ## Ownership model
 
 For each supported capability:
 
-1. A mapping file identifies the pinned OVAL 5.12.3 source Test/Object/State
-   family and the intended native capability identity.
-2. `tools/generate_capability_schema.py` extracts source-backed structural
-   details from the pinned XSD.
-3. Cross-field or context-sensitive OVAL Schematron behavior that JSON Schema
-   cannot express safely is retained explicitly as semantic-validator rules.
-4. Generated capability schema fragments are disposable build artifacts. They
-   SHALL be regenerated from the mapping + pinned source rather than hand-edited.
-5. A capability is not considered covered merely because a generated JSON
-   Schema exists; semantic-validator fixtures and corpus validation are also
-   required.
+1. `source` identifies the pinned legacy Test/Object/State family used as
+   migration evidence.
+2. `native` defines the native capability shape consumed by
+   `tools/generate_capability_schema.py`.
+3. `migration_crosswalk` records how source constructs map into native NG and
+   which legacy constructs are deliberately removed.
+4. `semantic_validator_rules` records graph/cross-field requirements that do
+   not belong in local JSON Schema.
+5. Generated capability schemas are disposable build artifacts. They SHALL be
+   regenerated from the mapping + shared native schema primitives.
+6. A capability is not considered covered merely because a JSON Schema exists;
+   focused semantic fixtures and corpus validation are also required.
+
+## Supported native mapping patterns
+
+### Selector-driven Object
+
+Use `selector_map` and `object_selector_alternatives` when the Object is
+defined by predicates over system identity fields.
+
+Examples:
+
+- `unix.file`
+- `windows.file`
+- `windows.registry`
+
+Selectors use shared comparison/entity semantics. Capability mappings SHOULD
+not duplicate operation, datatype, Variable or quantifier definitions.
+
+### Collector-driven Object
+
+Use `collection_parameters` when values are inputs to collection rather than
+predicates over an already collected object.
+
+Examples:
+
+- `file.hash.collect.algorithm`
+- `windows.wmi.query.collect.namespace`
+- `windows.wmi.query.collect.query`
+
+A required collection parameter applies to direct collection only. A Set-based
+Object combines referenced Objects and SHALL NOT inherit unrelated direct
+collector parameters.
+
+Collection parameters MAY allow named Variable references when the source
+semantics permit a runtime-supplied value.
+
+### Direct Test source
+
+A Test MAY reference a non-Object source directly when an Object adds no native
+meaning.
+
+Example:
+
+- `variable.value` references a named Variable directly and does not create a
+  fake `variable_object`.
+
+Automated Assessments therefore do not require empty Object or State sections
+when a capability does not use them.
+
+### Scalar State
+
+Scalar predicates use shared native entity semantics:
+
+- explicit comparison operation;
+- explicit native datatype;
+- explicit mask/redaction intent;
+- match quantifier;
+- existence requirement;
+- Variable references where permitted.
+
+Behavior-affecting legacy defaults are materialized by importers rather than
+hidden in authored native content.
+
+### Record State
+
+Record-producing capabilities use the shared native record predicate.
+
+A record is a map keyed by field name, which makes field uniqueness structural
+instead of an external XML uniqueness constraint.
+
+Record fields may contain:
+
+- scalar predicates;
+- nested record predicates;
+- list predicates.
+
+This intentionally removes the OVAL record limitation that forced WMI57 and
+similar capabilities to simple datatypes only.
+
+Example:
+
+- `windows.wmi.query`
+
+SQL, cmdlet and other record-producing capabilities SHOULD reuse the same
+record model unless they have a genuinely different semantic need.
+
+### Shared traversal
+
+File-family capabilities use the shared downward-only file traversal primitive.
+
+It replaces legacy `max_depth=-1`, `recurse`,
+`recurse_direction=none/down/up` and duplicated file-system-scope behavior
+with:
+
+- explicit non-negative/null depth;
+- explicit symlink following;
+- explicit filesystem scope.
+
+Upward recursion is intentionally absent.
+
+Registry and other hierarchical stores use a separate shared hierarchy
+traversal primitive when filesystem semantics do not apply.
+
+### Sets and filters
+
+Set expression, operands and State filters are shared native concepts.
+Capability mappings SHALL NOT redefine them.
+
+Direct collection and Set composition are separate Object modes.
 
 ## Review rules
 
-A mapping change SHOULD explain whether it:
+A mapping change SHOULD state whether it:
 
-- preserves an OVAL semantic construct directly;
-- intentionally simplifies or replaces a legacy construct;
-- moves a constraint from JSON Schema to semantic validation;
-- excludes a deprecated/unsupported feature;
-- changes native terminology or structure.
+- preserves source semantics;
+- fixes a legacy design flaw;
+- simplifies/removes a legacy serialization artifact;
+- changes native terminology;
+- moves a rule to shared schema or semantic validation;
+- rejects a deprecated construct;
+- introduces a migration diagnostic.
 
-Any removal or simplification of a legacy construct SHALL also be represented
-in `specification/migration/legacy-feature-disposition.md` when applicable.
+Removal of a legacy feature that could affect supported content SHALL also be
+tracked in the migration disposition documentation.
 
-## First vertical slice
+## Current proof capabilities
 
-`unix.file.json` is the first vertical slice. It is intentionally limited to
-proving the generator architecture before scaling across the OVAL capability
-catalog.
+The current capability-schema design is being proven with deliberately diverse
+cases rather than bulk generation:
 
-The slice currently covers:
+- `unix.file` — native file metadata and shared file traversal;
+- `file.hash` — shared file selection plus required collection parameter;
+- `windows.file` — cross-platform reuse of file-selection semantics;
+- `windows.registry` — hierarchical non-filesystem traversal and typed values;
+- `variable.value` — direct Test source with no fake Object;
+- `windows.wmi.query` — collector-driven query plus structured record State.
 
-- Test/Object/State family identity;
-- Object selector alternatives (`filepath` vs `path` + `filename`);
-- FileBehaviors defaults and enumerations;
-- State field inventory and source datatype hints;
-- Test result-control vocabularies;
-- Schematron-derived semantic-validator obligations.
-
-Shared operation legality, Variable binding legality, quantifier semantics and
-other cross-capability entity rules belong in reusable common schemas/semantic
-validation rather than being duplicated in every capability fragment.
+Additional capabilities SHOULD be added only when they either validate the
+shared abstractions or introduce a genuinely new semantic shape.
