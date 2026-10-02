@@ -190,6 +190,10 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
             raise ValueError(
                 f"duplicate logical object id {object_id}: {prior} vs {source_path}"
             )
+        if member in members:
+            raise ValueError(
+                f"duplicate package member path {member}: logical object {object_id}"
+            )
         data = canonical_json(obj)
         members[member] = data
         object_index[object_id] = {
@@ -377,7 +381,10 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
         names = [x.filename for x in infos]
         if len(names) != len(set(names)):
             raise ValueError(f"{package}: duplicate ZIP member names")
-        for name in names:
+        if zf.comment:
+            raise ValueError(f"{package}: ZIP archive comment is not permitted")
+        for info in infos:
+            name = info.filename
             p = Path(name)
             if (
                 name.startswith("/")
@@ -386,6 +393,16 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
                 or (p.parts and re.match(r"^[A-Za-z]:$", p.parts[0]))
             ):
                 raise ValueError(f"{package}: unsafe ZIP member path {name!r}")
+            if info.date_time != (1980, 1, 1, 0, 0, 0):
+                raise ValueError(f"{package}: non-deterministic timestamp on {name}")
+            if info.compress_type != zipfile.ZIP_DEFLATED:
+                raise ValueError(f"{package}: unsupported compression method on {name}")
+            if info.extra:
+                raise ValueError(f"{package}: ZIP extra fields are not permitted on {name}")
+            if info.comment:
+                raise ValueError(f"{package}: ZIP member comments are not permitted on {name}")
+            if len(name) > 160:
+                raise ValueError(f"{package}: ZIP member path too long ({len(name)}): {name}")
 
         try:
             manifest_bytes = zf.read("META-INF/manifest.json")
