@@ -10,14 +10,14 @@ one-Rule failed scan population.
 | Representation | Bytes | Scope |
 | --- | ---: | --- |
 | Minimal schema-valid SCAP 1.4 ARF/XCCDF result | 1,223 | Run/target/Rule policy result only; no detailed OVAL Results/System Characteristics payload. |
-| SCAP-NG JSONL projection | 2,312 | Self-contained scan-summary event plus self-contained Rule event. |
+| SCAP-NG JSONL projection | 1,823 | Self-contained scan-summary event plus self-contained Rule event. |
 | SCAP-NG canonical scan index | 1,064 | Normalized run/target/result references. |
-| SCAP-NG canonical Benchmark result | 2,873 | Benchmark/Rule result and policy-facing context. |
+| SCAP-NG canonical Benchmark result | 1,764 | Benchmark/Rule result and policy-facing context. |
 | SCAP-NG detailed Assessment result | 2,345 | Detailed Test/Object/Item/State evidence for the failed Rule. |
-| SCAP-NG canonical package members above, total | 6,282 | Detailed logical result for the same Rule. |
+| SCAP-NG canonical package members above, total | 5,173 | Detailed logical result for the same Rule. |
 
-For this deliberately tiny one-Rule sample, the JSONL projection is 1,089 bytes
-(about 89.0%) larger than the minimal XCCDF-only ARF. The detailed NG members are
+For this deliberately tiny one-Rule sample, the JSONL projection is 600 bytes
+(about 49.1%) larger than the minimal XCCDF-only ARF. The detailed NG members are
 larger still because they contain detailed evidence that the minimal ARF fixture
 does not.
 
@@ -52,10 +52,10 @@ required root-cause question exposed by the NG Rule + Assessment results.
 | Detailed representation | Bytes |
 | --- | ---: |
 | Self-contained SCAP 1.4 ARF + XCCDF + OVAL source/Results/System Characteristics | 9,316 |
-| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 6,282 |
+| SCAP-NG canonical scan + Benchmark + detailed Assessment members | 5,173 |
 
 For this deliberately tiny one-Rule self-contained detailed case, the normalized
-NG package is 3,034 bytes, or about **32.6%**, smaller than the matched ARF.
+NG package is 4,143 bytes, or about **44.5%**, smaller than the matched ARF.
 
 The ratio is a controlled fixture result, not a general compression claim.
 Fixed overhead, Rule count, evidence volume, repeated context, projection choice,
