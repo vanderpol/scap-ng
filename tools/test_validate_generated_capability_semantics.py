@@ -4,6 +4,7 @@ import unittest
 from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
     validate_declared_semantic_rules,
+    EXECUTABLE_SEMANTIC_RULE_IDS,
     validate_unix_file_object,
 )
 
@@ -18,6 +19,17 @@ def entity(value, operation="equal", datatype="string", **extra):
 
 
 class SemanticRuleCoverageTests(unittest.TestCase):
+    def test_known_executable_inventory_covers_representative_capabilities(self):
+        for rule_id in (
+            "unix.file.full_path_no_traversal",
+            "independent.xmlfilecontent.xpath_equal",
+            "windows.cmdlet.module_guid",
+            "windows.lockoutpolicy.nonnegative_time_values",
+            "windows.wuaupdatesearcher.date_lexical_form",
+        ):
+            with self.subTest(rule_id=rule_id):
+                self.assertIn(rule_id, EXECUTABLE_SEMANTIC_RULE_IDS)
+
     def test_declared_rules_require_executable_coverage_accounting(self):
         mapping={"semantic_validator_rules":[{"id":"a"},{"id":"b"}]}
         self.assertEqual(validate_declared_semantic_rules(mapping,{"a"}),["b"])
