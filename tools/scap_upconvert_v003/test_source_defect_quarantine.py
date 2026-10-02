@@ -78,6 +78,12 @@ class SourceDefectQuarantineTests(unittest.TestCase):
         self.assertIsNone(review.source_defect_reason("roundtrip_mismatch"))
 
         self.assertEqual(
+            review.source_defect_reason(
+                "var_ref_datatype_mismatch:[{\"feature\":\"var_ref_datatype_mismatch\"}]"
+            ),
+            "var_ref_datatype_mismatch",
+        )
+        self.assertEqual(
             review.source_defect_features_reason([
                 {
                     "feature": "var_ref_datatype_mismatch",
