@@ -492,6 +492,19 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
                 raise ValueError(f"{package}: object {object_id} missing path")
             if path in physical_paths:
                 raise ValueError(f"{package}: multiple logical objects share member path {path}")
+
+            kind = row.get("type")
+            if kind == "benchmark" and path != "benchmark.json":
+                raise ValueError(f"{package}: Benchmark must use readable path benchmark.json, got {path}")
+            if kind == "applicability_catalog" and path != "applicability.json":
+                raise ValueError(f"{package}: applicability catalog must use readable path applicability.json, got {path}")
+            if kind == "rule" and not path.startswith("rules/"):
+                raise ValueError(f"{package}: Rule {object_id} must be under rules/, got {path}")
+            if kind == "assessment" and not path.startswith("assessments/"):
+                raise ValueError(f"{package}: Assessment {object_id} must be under assessments/, got {path}")
+            if kind in {"rule", "assessment"} and re.fullmatch(r"[0-9a-f]{16}\\.json", Path(path).name):
+                raise ValueError(f"{package}: opaque hash-only member name is not permitted: {path}")
+
             physical_paths.add(path)
             expected.add(path)
             try:
