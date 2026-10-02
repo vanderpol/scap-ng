@@ -80,6 +80,8 @@ class SemanticRuleCoverageTests(unittest.TestCase):
         self.assertIn("windows.wmi.query.source_fields", RUNTIME_SEMANTIC_RULE_IDS)
         self.assertIn("windows.wmi.query.structured_results", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
         self.assertIn("windows.userright.trustee_name_case", POLICY_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.fileeffectiverights53.trustee_sid", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
+        self.assertIn("windows.regkeyeffectiverights53.deprecated_group_behaviors", STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS)
         self.assertTrue(EXECUTABLE_SEMANTIC_RULE_IDS.isdisjoint(RUNTIME_SEMANTIC_RULE_IDS))
         layers=[
             EXECUTABLE_SEMANTIC_RULE_IDS,
@@ -184,6 +186,30 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                     "select":{"directory":entity("/etc"),"name":name},
                 })
                 self.assertEqual(rows,[])
+
+    def test_windows_file_name_diagnostic_is_capability_specific(self):
+        for capability in ("windows.file","windows.fileeffectiverights53"):
+            with self.subTest(capability=capability):
+                rows=validate_assessment_capability_semantics({
+                    "assessment":{
+                        "objects":{
+                            "o":{
+                                "capability":capability,
+                                "select":{
+                                    "directory":entity("C:\\Windows"),
+                                    "name":entity("bad:name"),
+                                    **({"trustee_sid":entity("S-1-5-18")} if capability=="windows.fileeffectiverights53" else {}),
+                                },
+                            }
+                        },
+                        "states":{},
+                        "tests":{},
+                    }
+                })
+                self.assertIn(
+                    f"{capability}.literal_name_characters",
+                    {row["code"] for row in rows},
+                )
 
     def test_file_hash_reuses_file_selection_semantics(self):
         rows=validate_assessment_capability_semantics({
