@@ -27,44 +27,62 @@ def _require_capability(value, label):
 def collection_types(assessment):
     """Return declared Collection capabilities after validating references.
 
-    The returned mapping is derived from the Collections themselves.  Consumers
-    may constrain compatibility, but they do not provide or overwrite a
-    Collection's type.
+    Resolution is iterative so valid deep Collection DAGs do not depend on
+    Python recursion depth. Consumers constrain compatibility but never provide
+    or overwrite a Collection's declared capability.
     """
     registry = assessment.get("collections", {})
     types = {}
-    active = set()
+    adjacency = {}
 
-    def bind(name):
-        if name not in registry:
-            raise ValueError(f"Unknown Collection reference: {name}")
-        if name in active:
-            raise ValueError(f"Collection dependency cycle: {name}")
-        if name in types:
-            return types[name]
-
-        payload = registry[name]
-        capability = _require_capability(
+    for name, payload in registry.items():
+        types[name] = _require_capability(
             payload.get("capability"), f"Collection {name}"
         )
-        types[name] = capability
-        active.add(name)
 
-        # OVAL set members are type-compatible with the parent Object/Collection.
+    def require_collection(name):
+        if name not in registry:
+            raise ValueError(f"Unknown Collection reference: {name}")
+        return types[name]
+
+    # Validate set-member references/types and build the dependency graph.
+    for name, payload in registry.items():
+        capability = types[name]
+        members = []
         for item in nodes(payload.get("set", {})):
             member = item.get("collection")
-            if isinstance(member, str):
-                member_capability = bind(member)
-                if member_capability != capability:
-                    raise ValueError(
-                        "Collection set capability mismatch: "
-                        f"{name}({capability})!={member}({member_capability})"
-                    )
-        active.remove(name)
-        return capability
+            if not isinstance(member, str):
+                continue
+            member_capability = require_collection(member)
+            if member_capability != capability:
+                raise ValueError(
+                    "Collection set capability mismatch: "
+                    f"{name}({capability})!={member}({member_capability})"
+                )
+            members.append(member)
+        adjacency[name] = members
 
-    for name in registry:
-        bind(name)
+    # Iterative DFS cycle detection. A deep but acyclic graph is valid.
+    color = {name: 0 for name in registry}  # 0=unseen, 1=active, 2=done
+    for root in registry:
+        if color[root]:
+            continue
+        color[root] = 1
+        stack = [(root, 0)]
+        while stack:
+            name, index = stack[-1]
+            members = adjacency[name]
+            if index >= len(members):
+                color[name] = 2
+                stack.pop()
+                continue
+            member = members[index]
+            stack[-1] = (name, index + 1)
+            if color[member] == 1:
+                raise ValueError(f"Collection dependency cycle: {member}")
+            if color[member] == 0:
+                color[member] = 1
+                stack.append((member, 0))
 
     for test_name, test in assessment.get("tests", {}).items():
         test_capability = _require_capability(
@@ -72,7 +90,7 @@ def collection_types(assessment):
         )
         collection = test.get("collection")
         if isinstance(collection, str):
-            collection_capability = bind(collection)
+            collection_capability = require_collection(collection)
             if collection_capability != test_capability:
                 raise ValueError(
                     "Test/Collection capability mismatch: "
@@ -96,8 +114,6 @@ def collection_types(assessment):
                 )
 
     for variable_name, var in assessment.get("variables", {}).items():
-        # Named Collection references are self-describing; Variables do not
-        # redeclare their capabilities.
         if "collection_capabilities" in var:
             raise ValueError(
                 "Variable-side Collection capability declarations are obsolete: "
@@ -111,10 +127,8 @@ def collection_types(assessment):
 
             collection = values.get("collection")
             if isinstance(collection, str):
-                bind(collection)
+                require_collection(collection)
             elif isinstance(collection, dict):
-                # An embedded/private Collection must also remain independently
-                # typed; Variable capability is not a substitute.
                 _require_capability(
                     collection.get("capability"),
                     f"embedded Collection in Variable {variable_name}",
@@ -123,7 +137,7 @@ def collection_types(assessment):
                 for member in nodes(collection.get("set", {})):
                     member_name = member.get("collection")
                     if isinstance(member_name, str):
-                        member_capability = bind(member_name)
+                        member_capability = require_collection(member_name)
                         if member_capability != parent_capability:
                             raise ValueError(
                                 "Embedded Collection set capability mismatch: "
