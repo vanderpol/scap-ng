@@ -5,7 +5,7 @@
 ## Review in about 20 minutes
 
 1. Read the [visitor overview](../START-HERE.md) and [current working design](../research/iterations/003/design/CURRENT-DESIGN.md).
-2. Browse a [RHEL 9 Rule and its manual/automated Assessments](../docs/rhel9-review.md), then the [Windows 11 guide](../research/iterations/003/review/windows11-current-full/README.md).
+2. Browse a [RHEL 9 full-review summary](../review/current/examples/rhel9-full.md), then the [Windows 11 full-review summary](../review/current/examples/windows11-full.md).
 3. Compare the [draft specification](../specification/README.md) and [OVAL-to-NG crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md). Reviewed mappings take precedence over provisional suffix-preserving inventory rows.
 4. Read the [individual yes/no proposals](proposals/README.md) and use the [published Discussion links](VOTES.md) to vote with reactions.
 5. Consult [decision reconciliation](../docs/decision-reconciliation.md) for original questions and [archives](../archive/README.md) for evidence behind earlier experiments.
