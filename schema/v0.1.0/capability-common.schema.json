@@ -255,6 +255,9 @@
         },
         "traversal": {
           "$ref": "#/$defs/file_traversal"
+        },
+        "filesystem": {
+          "$ref": "#/$defs/filesystem_scope"
         }
       },
       "oneOf": [
@@ -539,8 +542,7 @@
       "type": "object",
       "required": [
         "max_depth",
-        "recurse",
-        "filesystem"
+        "recurse"
       ],
       "properties": {
         "max_depth": {
@@ -554,19 +556,10 @@
         "recurse": {
           "type": "string",
           "minLength": 1
-        },
-        "filesystem": {
-          "type": "string",
-          "enum": [
-            "any",
-            "local",
-            "same"
-          ],
-          "description": "OVAL recurse_file_system all/local/defined maps to any/local/same."
         }
       },
       "additionalProperties": false,
-      "description": "Shared non-deprecated file traversal structure. Downward traversal is implicit; deprecated OVAL recurse_direction=up is not representable."
+      "description": "Shared non-deprecated downward file recursion structure. Downward traversal is implicit; deprecated OVAL recurse_direction=up is not representable."
     },
     "windows_file_traversal": {
       "allOf": [
@@ -634,6 +627,15 @@
       },
       "additionalProperties": false,
       "description": "Authored record-valued Object input. Record field names are structurally unique. Parent record datatype=record and operation=equals are implicit because no other native values are meaningful."
+    },
+    "filesystem_scope": {
+      "type": "string",
+      "enum": [
+        "any",
+        "local",
+        "same"
+      ],
+      "description": "Filesystem search scope independent of recursion. OVAL recurse_file_system all/local/defined maps to any/local/same and applies to exact full_path as well as directory/name selection."
     }
   }
 }
