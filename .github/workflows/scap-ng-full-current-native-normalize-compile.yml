@@ -15,6 +15,8 @@ on:
       - tools/scap_upconvert_v003/**
       - tools/check_current_authoring_contract.py
       - tools/validate_native_json_schemas.py
+      - tools/validate_native_semantics.py
+      - tools/validate_generated_capability_semantics.py
       - schema/v0.1.0/**
       - .github/workflows/scap-ng-full-current-native-normalize-compile.yml
 
@@ -185,6 +187,10 @@ jobs:
           python scap-ng/tools/validate_native_json_schemas.py work/fresh-current \
             --schema-dir scap-ng/schema/v0.1.0 \
             --report work/evidence/schema-validation-before-normalization.json
+      - name: Validate fresh native Assessment graph semantics
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/fresh-current \
+            --report work/evidence/semantic-validation-before-normalization.json
 
       - name: Normalize exact duplicates and report near overlaps
         run: |
@@ -198,6 +204,10 @@ jobs:
           python scap-ng/tools/validate_native_json_schemas.py work/normalized-current \
             --schema-dir scap-ng/schema/v0.1.0 \
             --report work/evidence/schema-validation-after-normalization.json
+      - name: Validate normalized native Assessment graph semantics
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/normalized-current \
+            --report work/evidence/semantic-validation-after-normalization.json
 
       - name: Compile unnormalized corpus baseline
         run: |
