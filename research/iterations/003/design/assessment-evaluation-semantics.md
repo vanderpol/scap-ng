@@ -254,9 +254,11 @@ A pinned corpus census on 2026-10-01 scanned 212 source files across NIWC Curren
 
 SCAP-NG therefore SHALL NOT expose a generic OVAL-compatible `mask` property on every native Object/State entity merely because the legacy base type carried that attribute.
 
-Where a capability can collect sensitive values, SCAP-NG SHOULD provide an explicit **sensitive-result/evidence redaction** mechanism tied to disclosure of collected evidence rather than to generic comparison syntax. Such a mechanism SHALL NOT alter collection, comparison, or Assessment truth semantics.
+Native authored predicates MAY instead use `redact_result: true` when the corresponding collected value is sensitive. This directive is intentionally generic across capabilities because sensitivity depends on what is collected, not only on the capability family; for example, a general text-file collector can target password-bearing files. `redact_result` is results/evidence policy only: it SHALL NOT alter collection, comparison, State/Test aggregation, or technical truth.
 
-Migration tooling SHALL preserve source provenance if explicit legacy `mask` usage is encountered outside the pinned corpus and SHALL diagnose unsupported semantics rather than silently dropping it.
+When any applicable Object/State predicate requests redaction for a collected value, emitted result/evidence representations SHALL redact that value. The runtime typed-value representation records this with `redacted: true`. A processor MAY retain the unredacted value internally as needed to evaluate truth, but SHALL NOT disclose it in the emitted result/evidence payload.
+
+Migration tooling SHALL map effective legacy `mask=true` to native `redact_result: true`, omit inherited/default `mask=false` from native authoring, preserve source explicit/default provenance in migration evidence, and map `redact_result: true` back to `mask=true` when generating legacy OVAL.
 
 Evidence: GitHub Actions run 36931308817, source-explicit mask census; 212 files scanned, 0 explicit occurrences, 0 scan failures.
 
