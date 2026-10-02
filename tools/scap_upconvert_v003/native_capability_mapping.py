@@ -84,9 +84,12 @@ def _native_scalar_predicate(payload: dict, mapping: dict, *, record_field=False
         "operation": _translate(mapping,"operation",payload.get("operation","equals")),
         "datatype": _translate(mapping,"datatype",payload.get("datatype","string")),
         "mask": bool(payload.get("mask",False)),
+        "match": _translate(mapping,"check",payload.get("entity_check","all")),
     }
-    match=payload.get("entity_check",payload.get("variable_check","all"))
-    out["match"]=_translate(mapping,"check",match)
+    if "variable_check" in payload:
+        out["variable_match"]=_translate(
+            mapping,"check",payload.get("variable_check","all")
+        )
     # OVAL record fields have no independent check_existence attribute. A State
     # field named in a record is required to have at least one corresponding
     # collected occurrence; duplicate occurrences are handled by match.
@@ -254,14 +257,15 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             continue
         test["capability"]=native
         if "check_existence" in test:
-            test["check_existence"]=_translate(
-                mapping,"existence",test["check_existence"]
+            test["existence"]=_translate(
+                mapping,"existence",test.pop("check_existence")
             )
         if "check" in test:
-            test["check"]=_translate(mapping,"check",test["check"])
+            test["match"]=_translate(mapping,"check",test.pop("check"))
         if "state_operator" in test:
-            test["state_operator"]=LOGICAL_OPERATOR.get(
-                test["state_operator"],test["state_operator"]
+            legacy_operator=test.pop("state_operator")
+            test["states_match"]=LOGICAL_OPERATOR.get(
+                legacy_operator,legacy_operator
             )
 
     return result
