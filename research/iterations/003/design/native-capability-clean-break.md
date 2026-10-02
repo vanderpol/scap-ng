@@ -136,3 +136,27 @@ This is pre-alpha. Common definitions are centralized, capability mappings are
 small reviewed inputs, generated schemas are disposable, and semantic
 conversion tests are the safety net. Current OVAL schema structure is not a
 compatibility commitment.
+
+
+## unix.file permission representation decision
+
+For the first stabilized native `unix.file` capability, permissions remain
+individually addressable boolean State fields, using descriptive native names:
+
+- `owner_read`, `owner_write`, `owner_execute`
+- `group_read`, `group_write`, `group_execute`
+- `other_read`, `other_write`, `other_execute`
+- `setuid`, `setgid`, and `sticky`
+
+SCAP-NG deliberately does **not** carry forward the terse OVAL names
+(`uread`, `gwrite`, etc.).
+
+A single octal mode/bitmask was considered but is not the current design. It
+would combine independently testable policy facts into one encoded value and
+would complicate partial comparison, Variables, and human-readable result
+evidence. The explicit booleans are therefore the simpler semantic model even
+though they use more field names.
+
+This decision MAY be revisited based on real author/scanner experience, but any
+future grouping SHALL preserve independently addressable permission semantics
+and lossless conversion.
