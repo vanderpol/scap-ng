@@ -324,12 +324,8 @@ def generate(mapping, repo_root):
                         "oneOf": selector_alternatives,
                     },
                     "traversal": behavior,
-                    "set": {"type": "object"},
-                    "filters": {
-                        "type": "array",
-                        "items": {
-                            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_filter"
-                        },
+                    "set": {
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
                     },
                 },
                 "additionalProperties": False,
