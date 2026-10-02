@@ -461,6 +461,7 @@ def executable_rule_id_for_diagnostic(code):
 
 STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.wmi.query.structured_results",
+    "independent.xmlfilecontent.materialized_item_creation",
     "windows.fileeffectiverights53.trustee_sid",
     "windows.regkeyeffectiverights53.deprecated_group_behaviors",
     # Enforced by generated schema structure or lossless importer materialization.
