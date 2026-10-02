@@ -6,6 +6,20 @@ The rebaseline preserves every baseline path. Do not delete or move historical p
 
 Historical sections titled Iteration 002 source-only checkpoint, OVAL-aligned NG capability taxonomy and Native source design checkpoint below record earlier phase restrictions. They do not override current fresh-source corpus authorization, reviewed native mappings, authored Object vocabulary or latest CURRENT-DESIGN. Maintain shared parser/data dependencies even where their paths look historical; exceptions are in docs/repository-policy.json.
 
+
+
+## Review-surface lifecycle invariant
+
+This is a hard repository rule.
+
+- `review/current/` is the only active external review target.
+- Completed review cycles are frozen immutably as `review/iterations/NNN/`.
+- Never revise a frozen iteration to reflect later design work; start a new current review cycle instead.
+- Review iteration numbers are provenance checkpoints and are independent of product/release version numbers.
+- Alpha, beta, RC, and stable releases must be promoted from a specific completed review iteration and record that source iteration plus commit/tag.
+- Do not create parallel active review trees under `research/`, `docs/`, `board/`, or another directory.
+- Development infrastructure such as tools, tests, CI, conversion scratch data, transition notes, and bulk source corpora stays outside `review/`.
+
 ## Mandatory current-design preflight
 
 Before selecting or running authoring generation tools, read
