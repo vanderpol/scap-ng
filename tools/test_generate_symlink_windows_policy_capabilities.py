@@ -24,7 +24,7 @@ def validate(schema,name,value):
 
 
 def entity(value,operation="equal",datatype="string"):
-    return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+    return {"value":value,"operation":operation,"datatype":datatype}
 
 
 class UnixSymlinkTests(unittest.TestCase):
@@ -43,7 +43,7 @@ class UnixSymlinkTests(unittest.TestCase):
             "capability":"unix.symlink",
             "state":{
                 "field":"canonical_path","value":"/proc/mounts","operation":"equal",
-                "datatype":"string","mask":False,"match":"all","existence":"some",
+                "datatype":"string","match":"all","existence":"some",
             },
         })
 
@@ -64,8 +64,7 @@ class WindowsLockoutPolicyTests(unittest.TestCase):
         validate(self.schema,"state",{
             "state_title":None,"capability":"windows.lockoutpolicy",
             "state":{
-                "field":"lockout_threshold","value":5,"operation":"equal","datatype":"integer",
-                "mask":False,"match":"all","existence":"some",
+                "field":"lockout_threshold","value":5,"operation":"equal","datatype":"integer","match":"all","existence":"some",
             },
         })
 
@@ -82,15 +81,13 @@ class WindowsPasswordPolicyTests(unittest.TestCase):
         validate(self.schema,"state",{
             "state_title":None,"capability":"windows.passwordpolicy",
             "state":{
-                "field":"min_passwd_len","value":14,"operation":"greater_or_equal","datatype":"integer",
-                "mask":False,"match":"all","existence":"some",
+                "field":"min_passwd_len","value":14,"operation":"greater_or_equal","datatype":"integer","match":"all","existence":"some",
             },
         })
         validate(self.schema,"state",{
             "state_title":None,"capability":"windows.passwordpolicy",
             "state":{
-                "field":"password_complexity","value":True,"operation":"equal","datatype":"boolean",
-                "mask":False,"match":"all","existence":"some",
+                "field":"password_complexity","value":True,"operation":"equal","datatype":"boolean","match":"all","existence":"some",
             },
         })
 

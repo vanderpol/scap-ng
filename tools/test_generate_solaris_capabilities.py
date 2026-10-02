@@ -24,7 +24,7 @@ class SolarisCapabilityTests(unittest.TestCase):
     def validate(self,cap,kind,value):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_package511(self):
         self.validate("solaris.package511","object",{
@@ -52,7 +52,7 @@ class SolarisCapabilityTests(unittest.TestCase):
     def test_smfproperty_anysimple_value(self):
         self.validate("solaris.smfproperty","state",{
             "state_title":None,"capability":"solaris.smfproperty",
-            "state":{"field":"value","value":22,"operation":"equal","datatype":"integer","mask":False,"match":"all","existence":"some"}
+            "state":{"field":"value","value":22,"operation":"equal","datatype":"integer","match":"all","existence":"some"}
         })
 
 if __name__=="__main__":

@@ -37,8 +37,7 @@ class SQL512CapabilityTests(unittest.TestCase):
         self.validate("state",{
             "state_title":None,"capability":"independent.sql512",
             "state":{
-                "field":"engine","value":"aurora","operation":"equal","datatype":"string",
-                "mask":False,"match":"all","existence":"some"
+                "field":"engine","value":"aurora","operation":"equal","datatype":"string","match":"all","existence":"some"
             }
         })
 

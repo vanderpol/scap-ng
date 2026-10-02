@@ -28,7 +28,7 @@ class PwPolicy512CapabilityTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][kind],registry=self.registry).validate(value)
 
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_global_policy_null_username(self):
         self.validate("object",{
@@ -57,8 +57,7 @@ class PwPolicy512CapabilityTests(unittest.TestCase):
     def test_state_uses_same_value_surface(self):
         self.validate("state",{
             "state_title":None,"capability":"macos.pwpolicy512",
-            "state":{"field":"value_of","value":15,"operation":"equal","datatype":"integer",
-                     "mask":False,"match":"all","existence":"some"}
+            "state":{"field":"value_of","value":15,"operation":"equal","datatype":"integer","match":"all","existence":"some"}
         })
 
 if __name__=="__main__":
