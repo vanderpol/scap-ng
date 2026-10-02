@@ -85,9 +85,10 @@ def _native_scalar_predicate(payload: dict, mapping: dict, *, record_field=False
         "value": copy.deepcopy(payload.get("value")),
         "operation": _translate(mapping,"operation",payload.get("operation","equals")),
         "datatype": _translate(mapping,"datatype",payload.get("datatype","string")),
-        "mask": bool(payload.get("mask",False)),
         "match": _translate(mapping,"check",payload.get("entity_check","all")),
     }
+    if bool(payload.get("mask",False)):
+        out["redact_result"]=True
     if "variable_check" in payload:
         out["variable_match"]=_translate(
             mapping,"check",payload.get("variable_check","all")
@@ -114,8 +115,7 @@ def _native_record(record_value, parent_payload: dict, mapping: dict):
                 "native field maps require a deliberate multiplicity translation"
             )
         fields[name]=_native_scalar_predicate(field,mapping,record_field=True)
-    return {
-        "mask":bool(parent_payload.get("mask",False)),
+    out={
         "match":_translate(mapping,"check",parent_payload.get("entity_check","all")),
         "existence":_translate(
             mapping,"existence",
@@ -123,6 +123,9 @@ def _native_record(record_value, parent_payload: dict, mapping: dict):
         ),
         "fields":fields,
     }
+    if bool(parent_payload.get("mask",False)):
+        out["redact_result"]=True
+    return out
 
 
 def _transform_state_payload(value, mapping: dict):
