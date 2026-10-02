@@ -89,6 +89,17 @@ Reviewed after the production-first checkpoint:
 
 Windows candidates such as `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` currently have Item definitions in the pinned system-characteristics schema but no corresponding Test/Object/State family in the official OVAL-Community v5.12.3 Windows definitions schema. Treat them as source-governance/provenance work, not standard 5.12.3 mappings, until their publisher-extension source is identified.
 
+### Content-backed standard capability checkpoint — 2026-10-02
+
+All currently inventoried **standard OVAL 5.12.3 capability candidates with production, Self-Assertion, validation, or other concrete content evidence** now have reviewed native SCAP-NG mappings, subject to the maintained parity/regression gates.
+
+The remaining candidate inventory is intentionally split into two deferred workstreams:
+
+- **schema-only standard candidates** with no concrete content examples; these are deferred until after higher-value SCAP-NG design work or until concrete content evidence appears;
+- **Windows publisher-extension families** whose system-characteristics Items exist and whose SCC/NIWC content may exercise them, but whose Test/Object/State families are absent from official OVAL-Community v5.12.3 definitions. These require exact extension provenance before they are described as migration mappings.
+
+Reviewed native renames such as `filehash58 → file.hash`, `variable → variable.value`, and `wmi57 → windows.wmi.query` count as covered migration surface rather than unmapped candidates.
+
 ### Conformance-completion tranche
 
 After the production-heavy capabilities are stable, cover remaining supported OVAL 5.12.3 candidates exercised only or primarily by Self-Assertion. Reinstated tests remain supported according to the checked-in governance override record. Effectively deprecated tests remain migration blockers and SHALL NOT gain native capability schemas.
