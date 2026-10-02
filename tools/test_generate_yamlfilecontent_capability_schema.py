@@ -28,7 +28,7 @@ class YAMLFileContentCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value):
-        return {"value":value,"operation":"equal","datatype":"string","mask":False}
+        return {"value":value,"operation":"equal","datatype":"string"}
 
     def test_file_and_inline_content_modes(self):
         self.validate_def("object",{
@@ -48,11 +48,10 @@ class YAMLFileContentCapabilitySchemaTests(unittest.TestCase):
                 "record":{
                     "fields":{
                         "myCamelCase^Key":{
-                            "value":"enabled","operation":"equal","datatype":"string",
-                            "mask":False,"match":"all","existence":"some"
+                            "value":"enabled","operation":"equal","datatype":"string","match":"all","existence":"some"
                         }
                     },
-                    "match":"all","existence":"some","mask":False
+                    "match":"all","existence":"some"
                 }
             },
         })

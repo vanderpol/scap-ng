@@ -62,7 +62,7 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
             "state":{
                 "field":"result",
                 "record":{
-                    "mask":False,
+                    
                     "match":"all",
                     "existence":"some",
                     "fields":{
@@ -70,7 +70,6 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                             "value":"Microsoft Windows 11 Enterprise",
                             "operation":"equal",
                             "datatype":"string",
-                            "mask":False,
                             "match":"all",
                             "existence":"some",
                         },
@@ -78,7 +77,6 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                             "value":"10.0",
                             "operation":"greater_or_equal",
                             "datatype":"version",
-                            "mask":False,
                             "match":"all",
                             "existence":"some",
                         },
@@ -94,7 +92,7 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
             "state":{
                 "field":"result",
                 "record":{
-                    "mask":False,
+                    
                     "match":"all",
                     "existence":"some",
                     "fields":{
@@ -102,7 +100,6 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                             "value":"HOST1",
                             "operation":"equal_ci",
                             "datatype":"string",
-                            "mask":False,
                             "match":"all",
                             "existence":"some",
                         }
@@ -118,18 +115,18 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
             "state":{
                 "field":"result",
                 "record":{
-                    "mask":False,
+                    
                     "match":"all",
                     "existence":"some",
                     "fields":{
                         "Adapters":{
                             "list":{
-                                "mask":False,
+                                
                                 "match":"any",
                                 "existence":"some",
                                 "item":{
                                     "record":{
-                                        "mask":False,
+                                        
                                         "match":"all",
                                         "existence":"some",
                                         "fields":{
@@ -137,7 +134,6 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                                                 "value":"Ethernet",
                                                 "operation":"equal",
                                                 "datatype":"string",
-                                                "mask":False,
                                                 "match":"all",
                                                 "existence":"some",
                                             }
@@ -161,7 +157,6 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                     "value":"x",
                     "operation":"equal",
                     "datatype":"record",
-                    "mask":False,
                     "match":"all",
                     "existence":"some",
                 },

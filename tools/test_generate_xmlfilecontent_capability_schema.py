@@ -28,7 +28,7 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,datatype="string",operation="equal"):
-        return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+        return {"value":value,"operation":operation,"datatype":datatype}
 
     def test_full_path_and_directory_name_xpath_alternatives(self):
         self.validate_def("object",{
@@ -43,8 +43,7 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
     def test_value_of_is_multi_valued_item_with_single_state_field(self):
         self.validate_def("state",{
             "state_title":None,"capability":"independent.xmlfilecontent",
-            "state":{"field":"value_of","value":"enabled","operation":"equal","datatype":"string",
-                     "mask":False,"match":"all","existence":"some"},
+            "state":{"field":"value_of","value":"enabled","operation":"equal","datatype":"string","match":"all","existence":"some"},
         })
         self.validate_def("collected_item",{
             "id":"xml-1","capability":"independent.xmlfilecontent","status":"exists",

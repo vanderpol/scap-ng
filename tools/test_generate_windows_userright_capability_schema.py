@@ -25,7 +25,7 @@ class WindowsUserRightCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,operation="equal"):
-        return {"value":value,"operation":operation,"datatype":"string","mask":False}
+        return {"value":value,"operation":operation,"datatype":"string"}
 
     def test_valid_userright_object(self):
         self.validate_def("object",{
@@ -51,7 +51,6 @@ class WindowsUserRightCapabilitySchemaTests(unittest.TestCase):
                 "value":"S-1-5-32-544",
                 "operation":"equal",
                 "datatype":"string",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },
@@ -64,7 +63,6 @@ class WindowsUserRightCapabilitySchemaTests(unittest.TestCase):
                 "value":"BUILTIN\\Administrators",
                 "operation":"equal_ci",
                 "datatype":"string",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },
@@ -79,7 +77,6 @@ class WindowsUserRightCapabilitySchemaTests(unittest.TestCase):
                 "value":"SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME",
                 "operation":"equal",
                 "datatype":"string",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },

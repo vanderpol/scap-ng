@@ -26,7 +26,7 @@ class WuaUpdateSearcherCapabilityTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][kind],registry=self.registry).validate(value)
 
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_direct_object_materializes_superseded_behavior(self):
         self.validate("object",{
@@ -50,7 +50,7 @@ class WuaUpdateSearcherCapabilityTests(unittest.TestCase):
         self.validate("state",{
             "state_title":None,"capability":"windows.wuaupdatesearcher",
             "state":{"field":"source_path","value":"https://wsus.example/","operation":"equal",
-                     "datatype":"string","mask":False,"match":"all","existence":"some"}
+                     "datatype":"string","match":"all","existence":"some"}
         })
 
     def test_source_path_is_collected_item_field(self):
@@ -67,13 +67,13 @@ class WuaUpdateSearcherCapabilityTests(unittest.TestCase):
         self.validate("state",{
             "state_title":None,"capability":"windows.wuaupdatesearcher",
             "state":{"field":"source","value":"Offline_Cab_File","operation":"equal",
-                     "datatype":"string","mask":False,"match":"all","existence":"some"}
+                     "datatype":"string","match":"all","existence":"some"}
         })
         with self.assertRaises(jsonschema.ValidationError):
             self.validate("state",{
                 "state_title":None,"capability":"windows.wuaupdatesearcher",
                 "state":{"field":"source","value":"Internet","operation":"equal",
-                         "datatype":"string","mask":False,"match":"all","existence":"some"}
+                         "datatype":"string","match":"all","existence":"some"}
             })
 
 if __name__=="__main__":
