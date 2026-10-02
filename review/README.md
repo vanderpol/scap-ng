@@ -44,3 +44,18 @@ The repository is being losslessly rebaselined. Existing authoritative material 
 During that migration, `review/current/` is the canonical navigation layer. A file is not considered current merely because it exists elsewhere in the repository.
 
 No historical material is deleted as part of establishing this review surface.
+
+
+## Review lifecycle — hard rule
+
+The review surface has one active target and immutable completed baselines.
+
+1. `review/current/` is the **only** active external review target.
+2. When a review cycle is declared complete, copy/freeze that exact reviewed state under the next immutable `review/iterations/NNN/` directory.
+3. A completed iteration SHALL NOT be edited to incorporate later design changes. Corrections discovered later belong in a new `review/current/` cycle.
+4. After freezing an iteration, rebuild `review/current/` from the accepted baseline plus the next proposed changes.
+5. Review iterations are provenance checkpoints, not release numbers.
+6. Alpha, beta, release-candidate, and stable releases SHALL be promoted from a specific completed review iteration. A release SHALL record the source review iteration and commit/tag from which it was produced.
+7. Do not create a release directly from an unreviewed or partially reviewed working tree merely because the implementation is functional.
+8. Tools, tests, CI helpers, conversion scratch data, transition notes, and bulk source corpora SHALL remain outside the review surface.
+9. New reviewable artifacts SHALL enter through `review/current/`; do not create parallel active review trees elsewhere in the repository.
