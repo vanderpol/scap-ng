@@ -103,6 +103,73 @@ def _native_scalar_predicate(payload: dict, mapping: dict, *, record_field=False
     return out
 
 
+
+def _native_object_predicate(payload: dict, mapping: dict):
+    """Translate one aligned OVAL Object entity into the shared native predicate."""
+    if not isinstance(payload,dict) or "value" not in payload:
+        raise ValueError("native Object selector requires an entity payload with value")
+    out={
+        "value":copy.deepcopy(payload.get("value")),
+        "operation":_translate(mapping,"operation",payload.get("operation","equals")),
+        "datatype":_translate(mapping,"datatype",payload.get("datatype","string")),
+    }
+    if bool(payload.get("mask",False)) or bool(payload.get("redact_result",False)):
+        out["redact_result"]=True
+    if "variable_check" in payload:
+        out["variable_match"]=_translate(
+            mapping,"check",payload.get("variable_check","all")
+        )
+    return out
+
+
+def _coerce_collection_parameter(value, spec: dict):
+    kind=spec.get("type")
+    if kind=="boolean":
+        if isinstance(value,bool):
+            return value
+        if isinstance(value,str):
+            normalized=value.strip().lower()
+            if normalized in ("true","1"):
+                return True
+            if normalized in ("false","0"):
+                return False
+        raise ValueError(f"invalid boolean collection parameter value: {value!r}")
+    if kind=="integer":
+        if isinstance(value,int) and not isinstance(value,bool):
+            return value
+        if isinstance(value,str):
+            return int(value,10)
+        raise ValueError(f"invalid integer collection parameter value: {value!r}")
+    return copy.deepcopy(value)
+
+
+def _materialize_behavior_collection_parameters(obj: dict, mapping: dict):
+    """Move reviewed OVAL behavior inputs into explicit native collection parameters."""
+    native_cfg=mapping.get("native") or {}
+    specs=native_cfg.get("collection_parameters") or {}
+    if not specs:
+        return
+    defaults=(mapping.get("migration_crosswalk") or {}).get("materialized_defaults") or {}
+    behaviors=obj.get("behaviors") or {}
+    collect=copy.deepcopy(obj.get("collect") or {})
+    consumed=set()
+    for name,spec in specs.items():
+        default_key=f"behaviors.{name}"
+        if name in behaviors:
+            collect[name]=_coerce_collection_parameter(behaviors[name],spec)
+            consumed.add(name)
+        elif default_key in defaults:
+            collect[name]=_coerce_collection_parameter(defaults[default_key],spec)
+    if collect:
+        obj["collect"]=collect
+    remaining={k:v for k,v in behaviors.items() if k not in consumed}
+    if remaining:
+        raise ValueError(
+            "unmapped OVAL behavior semantics remain for reviewed native capability: "
+            + ", ".join(sorted(remaining))
+        )
+    obj.pop("behaviors",None)
+
 def _native_record(record_value, parent_payload: dict, mapping: dict):
     fields={}
     for field in record_value.get("record") or []:
@@ -248,13 +315,22 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
         if isinstance(obj.get("select"),dict) and selector_map:
             renamed={}
             for key,value in obj["select"].items():
-                renamed[selector_map.get(key,key)]=value
+                native_key=selector_map.get(key,key)
+                if isinstance(value,dict) and bool(value.get("nil",False)):
+                    if native_key != "name":
+                        raise ValueError(
+                            f"legacy nil Object entity has no reviewed native mapping: {key}"
+                        )
+                    renamed[native_key]=None
+                    continue
+                renamed[native_key]=_native_object_predicate(value,mapping)
             obj["select"]=renamed
+
+        _materialize_behavior_collection_parameters(obj,mapping)
 
         if isinstance(obj.get("set"),dict):
             obj["set"]=_transform_set(obj["set"])
         obj.pop("filters",None)
-        obj.pop("behaviors",None)
 
     states=assessment.get("states") or {}
     for state in states.values():
@@ -279,6 +355,31 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             test["states_match"]=LOGICAL_OPERATOR.get(
                 legacy_operator,legacy_operator
             )
+
+    test_source=native_cfg.get("test_source") or {}
+    if test_source.get("kind")=="none":
+        singleton_ids={
+            object_id
+            for object_id,obj in objects.items()
+            if obj.get("capability")==native
+        }
+        for test in tests.values():
+            if test.get("capability") != native:
+                continue
+            object_id=test.pop("object",None)
+            if object_id is not None and object_id not in singleton_ids:
+                raise ValueError(
+                    f"singleton-source Test referenced non-singleton Object: {object_id}"
+                )
+        for object_id in sorted(singleton_ids):
+            obj=objects[object_id]
+            meaningful=set(obj)-{"object_title","capability"}
+            if meaningful:
+                raise ValueError(
+                    f"singleton-source Object carries unexpected semantics: {object_id}: "
+                    + ", ".join(sorted(meaningful))
+                )
+            del objects[object_id]
 
     return result
 
