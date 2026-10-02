@@ -63,8 +63,9 @@ Future documentation and directory naming SHOULD distinguish:
 Calling both simply “OVAL 5.12.3” is ambiguous and can create a false sense of
 standards conformance.
 
-## Windows snapshot correction
+## Windows schema verification correction
 
-Project-owner clarification, 2026-10-02: approved Windows OVAL tests such as `cmdlet` and `ntuser` are standard language capabilities. If a checked-in Windows definitions schema appears to omit approved families, the audit is using an incomplete or mismatched schema artifact and must be reconciled against the complete SCAP 1.4 schema/test-content set. This is a schema-source problem, not an extension boundary. The only known custom SCC/NIWC Test/Object/State family in this workstream is `independent:sqlext`.
+The checked-in Windows definitions XSD is the authoritative OVAL-Community v5.12.3 blob. A large-file connector read returned an empty content payload and temporarily caused approved Windows definitions to appear absent. Direct Git-blob retrieval confirmed the definitions are present. This was a tooling artifact, not a schema-source defect.
+
 
 Project-owner clarification: all other OVAL Test/Object/State families used by this project are standard SCAP 1.4 schema/test-content surface. Only `independent:sqlext` is custom.
