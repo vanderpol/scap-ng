@@ -24,7 +24,10 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
+PACKAGE_MANIFEST_SCHEMA = Path(__file__).resolve().parents[1] / "schema/v0.1.0/package-manifest.schema.json"
+
 import yaml
+import jsonschema
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -417,6 +420,8 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
         except KeyError as exc:
             raise ValueError(f"{package}: missing META-INF/manifest.json") from exc
         manifest = json.loads(manifest_bytes)
+        schema = json.loads(PACKAGE_MANIFEST_SCHEMA.read_text(encoding="utf-8"))
+        jsonschema.Draft202012Validator(schema).validate(manifest)
         objects = manifest.get("objects")
         if not isinstance(objects, dict):
             raise ValueError(f"{package}: manifest objects must be a mapping")
