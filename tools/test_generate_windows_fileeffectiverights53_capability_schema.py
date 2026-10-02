@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+import json
+from pathlib import Path
+import unittest
+
+import jsonschema
+from referencing import Registry, Resource
+
+from generate_capability_schema import generate
+
+
+ROOT=Path(__file__).resolve().parents[1]
+MAPPING=ROOT/"schema/v0.1.0/capability-mappings/windows.fileeffectiverights53.json"
+
+
+class WindowsFileEffectiveRights53Tests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mapping=json.loads(MAPPING.read_text(encoding="utf-8"))
+        cls.schema=generate(cls.mapping,ROOT)
+        common=json.loads((ROOT/"schema/v0.1.0/capability-common.schema.json").read_text(encoding="utf-8"))
+        cls.registry=Registry().with_resource(common["$id"],Resource.from_contents(common))
+
+    def validate_def(self,name,value):
+        jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
+
+    def entity(self,value,operation="equal",datatype="string"):
+        return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+
+    def test_file_and_trustee_sid_are_both_required(self):
+        self.validate_def("object",{
+            "object_title":"Administrators rights on hosts",
+            "capability":"windows.fileeffectiverights53",
+            "select":{
+                "full_path":self.entity(r"C:\\Windows\\System32\\drivers\\etc\\hosts"),
+                "trustee_sid":self.entity("S-1-5-32-544"),
+            },
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":None,
+                "capability":"windows.fileeffectiverights53",
+                "select":{"full_path":self.entity(r"C:\\Windows\\win.ini")},
+            })
+
+    def test_windows_junction_traversal_is_shared(self):
+        self.validate_def("object",{
+            "object_title":"rights below config directory",
+            "capability":"windows.fileeffectiverights53",
+            "select":{
+                "directory":self.entity(r"C:\\ProgramData"),
+                "name":self.entity(".*",operation="match"),
+                "trustee_sid":self.entity("S-1-5-18"),
+            },
+            "traversal":{
+                "max_depth":1,
+                "recurse":"junctions_and_directories",
+                "filesystem":"same",
+            },
+        })
+
+    def test_effective_right_boolean_state(self):
+        self.validate_def("state",{
+            "state_title":None,
+            "capability":"windows.fileeffectiverights53",
+            "state":{
+                "field":"file_write_data","value":False,"operation":"equal","datatype":"boolean",
+                "mask":False,"match":"all","existence":"some",
+            },
+        })
+
+    def test_deprecated_behaviors_and_windows_view_absent(self):
+        encoded=json.dumps(self.schema)
+        self.assertNotIn("include_group",encoded)
+        self.assertNotIn("resolve_group",encoded)
+        self.assertNotIn("windows_view",encoded)
+
+
+if __name__=="__main__":
+    unittest.main()
