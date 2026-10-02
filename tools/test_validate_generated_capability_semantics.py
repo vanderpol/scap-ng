@@ -290,6 +290,22 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         self.assertIn("macos.pwpolicy512.directory_node_equal",codes)
         self.assertIn("macos.pwpolicy512.xpath_equal",codes)
 
+    def test_lockout_policy_negative_literal_time_is_rejected(self):
+        doc={"assessment":{"objects":{},"states":{
+            "duration":{"capability":"windows.lockoutpolicy","state":{
+                "field":"lockout_duration","value":-1,"datatype":"integer","operation":"equal"}}
+        },"tests":{"t":{"capability":"windows.lockoutpolicy","states":["duration"]}}}}
+        rows=validate_assessment_capability_semantics(doc)
+        self.assertIn("windows.lockoutpolicy.nonnegative_time_values",{row["code"] for row in rows})
+
+    def test_lockout_policy_variable_time_is_not_guessed_statically(self):
+        doc={"assessment":{"objects":{},"states":{
+            "duration":{"capability":"windows.lockoutpolicy","state":{
+                "field":"lockout_duration","value":{"variable":"duration"},"datatype":"integer","operation":"equal"}}
+        },"tests":{"t":{"capability":"windows.lockoutpolicy","states":["duration"]}}}}
+        rows=validate_assessment_capability_semantics(doc)
+        self.assertNotIn("windows.lockoutpolicy.nonnegative_time_values",{row["code"] for row in rows})
+
     def test_wuaupdatesearcher_xml_date_lexical_form(self):
         bad={
             "assessment":{
