@@ -7,6 +7,8 @@ clean SCAP-NG capability shapes without changing the round-trip IR underneath.
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 
 
 LOGICAL_OPERATOR = {"AND": "all", "OR": "any"}
@@ -268,4 +270,21 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
                 legacy_operator,legacy_operator
             )
 
+    return result
+
+
+
+def ready_capability_mappings(mapping_dir: Path):
+    """Yield reviewed mappings explicitly approved for post-alignment conversion."""
+    for path in sorted(mapping_dir.glob("*.json")):
+        mapping=json.loads(path.read_text(encoding="utf-8"))
+        if (mapping.get("native") or {}).get("post_alignment_ready",False):
+            yield mapping
+
+
+def apply_ready_capability_mappings(document: dict, mapping_dir: Path) -> dict:
+    """Apply only explicitly reviewed clean-native mappings to one Assessment."""
+    result=copy.deepcopy(document)
+    for mapping in ready_capability_mappings(mapping_dir):
+        result=apply_capability_mapping(result,mapping)
     return result
