@@ -209,6 +209,86 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                     {row["code"] for row in rows},
                 )
 
+
+    def test_ntuser_registry_type_value_datatype(self):
+        doc={
+            "assessment":{
+                "objects":{},
+                "states":{
+                    "type":{"capability":"windows.ntuser","state":{
+                        "field":"type","value":"dword","operation":"equal","datatype":"string"
+                    }},
+                    "value":{"capability":"windows.ntuser","state":{
+                        "field":"value","value":"1","operation":"equal","datatype":"string"
+                    }},
+                },
+                "tests":{
+                    "t":{"capability":"windows.ntuser","states":["type","value"]}
+                },
+            }
+        }
+        rows=validate_assessment_capability_semantics(doc)
+        self.assertIn("windows.ntuser.value_type_datatype",{r["code"] for r in rows})
+
+    def test_pwpolicy_auth_pair_and_equal_only_fields(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{
+                    "o":{
+                        "capability":"macos.pwpolicy512",
+                        "select":{
+                            "authenticator":entity("admin"),
+                            "authenticator_password":None,
+                            "directory_node":entity("/LDAPv3/example",operation="match"),
+                            "xpath":entity("/dict/key/text()",operation="match"),
+                        },
+                    }
+                },
+                "states":{},
+                "tests":{},
+            }
+        })
+        codes={r["code"] for r in rows}
+        self.assertIn("macos.pwpolicy512.auth_pair",codes)
+        self.assertIn("macos.pwpolicy512.directory_node_equal",codes)
+        self.assertIn("macos.pwpolicy512.xpath_equal",codes)
+
+    def test_wuaupdatesearcher_xml_date_lexical_form(self):
+        bad={
+            "assessment":{
+                "objects":{},
+                "states":{
+                    "s":{"capability":"windows.wuaupdatesearcher","state":{
+                        "field":"last_deployment_change_time",
+                        "value":"2026-10-02T00:00:00",
+                        "operation":"equal","datatype":"string"
+                    }}
+                },
+                "tests":{
+                    "t":{"capability":"windows.wuaupdatesearcher","states":["s"]}
+                },
+            }
+        }
+        rows=validate_assessment_capability_semantics(bad)
+        self.assertIn("windows.wuaupdatesearcher.date_lexical_form",{r["code"] for r in rows})
+
+        good={
+            "assessment":{
+                "objects":{},
+                "states":{
+                    "s":{"capability":"windows.wuaupdatesearcher","state":{
+                        "field":"last_deployment_change_time",
+                        "value":"2026-10-02",
+                        "operation":"equal","datatype":"string"
+                    }}
+                },
+                "tests":{
+                    "t":{"capability":"windows.wuaupdatesearcher","states":["s"]}
+                },
+            }
+        }
+        self.assertEqual(validate_assessment_capability_semantics(good),[])
+
     def test_valid_graph_is_clean(self):
         doc={
             "assessment":{
