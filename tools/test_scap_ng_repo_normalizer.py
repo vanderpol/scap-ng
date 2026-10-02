@@ -25,19 +25,22 @@ class RepoNormalizerTests(unittest.TestCase):
                 "mode":"automated",
                 "class":"compliance",
                 "purpose":"assessment",
-                "collections":{
+                "specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},
+                "objects":{
                     "files":{
-                        "collection_title":"files",
+                        "object_title":"files",
                         "capability":"unix.file",
                         "select":{"path":{"operation":"equals","datatype":"string","value":literal}},
                     }
                 },
+                "states":{},
                 "tests":{
                     "test-file":{
                         "test_title":"file",
                         "capability":"unix.file",
-                        "collection":"files",
-                        "assertion":{"existence":"at_least_one_exists","item_quantifier":"all","state":None},
+                        "object":"files",
+                        "check_existence":"at_least_one_exists",
+                        "check":"all",
                     }
                 },
                 "evaluate":{"test":"test-file"},
@@ -85,7 +88,7 @@ class RepoNormalizerTests(unittest.TestCase):
                 for variant in near["variant_differences"]
                 for item in variant["differences"]
             }
-            self.assertIn("$.collections.files.select.path.value",diff_paths)
+            self.assertIn("$.objects.files.select.path.value",diff_paths)
             shared=list((output/"shared"/"assessments").glob("*.yaml"))
             self.assertEqual(len(shared),1)
             shared_assessment=yaml.safe_load(shared[0].read_text())["assessment"]
