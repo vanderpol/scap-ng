@@ -1029,6 +1029,22 @@ def unsupported_definition_features(oroot, definition_id, *, budget: ConversionB
 
             elif kind in ("object", "state"):
                 for descendant in node.iter():
+                    child_kind = local(descendant.tag)
+                    # OVAL 5.12.3 Schematron requires textfilecontent54 Object
+                    # pattern entities to explicitly use operation="pattern match".
+                    # The generic EntityObjectStringType XSD default ("equals")
+                    # does not make a missing/wrong operation semantically valid.
+                    if (
+                        kind == "object"
+                        and name == "textfilecontent54_object"
+                        and child_kind == "pattern"
+                        and descendant.get("operation") != "pattern match"
+                    ):
+                        add(
+                            "invalid_textfilecontent54_pattern_operation",
+                            ref,
+                            descendant.get("operation") or "<default equals>",
+                        )
                     var_ref = descendant.get("var_ref")
                     var_check = descendant.get("var_check")
                     if var_check is not None and not var_ref:
@@ -1047,7 +1063,6 @@ def unsupported_definition_features(oroot, definition_id, *, budget: ConversionB
                                 )
                         if any(local(child.tag) == "field" for child in descendant):
                             add("record_entity_var_ref_not_permitted", ref, local(descendant.tag))
-                    child_kind = local(descendant.tag)
                     if kind == "object" and child_kind == "set":
                         tracker.note_expression_depth(depth(descendant))
                     if kind == "object" and child_kind == "var_ref" and text(descendant):
