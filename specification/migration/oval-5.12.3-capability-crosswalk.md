@@ -51,6 +51,17 @@ while the native capability name may differ from the source basename.
 | `windows:wmi57_test` | `windows.wmi.query` | [windows.wmi.query](../../schema/v0.1.0/capability-mappings/windows.wmi.query.json) |
 | `linux:rpminfo_test` | `linux.rpminfo` | [linux.rpminfo](../../schema/v0.1.0/capability-mappings/linux.rpminfo.json) |
 | `independent:textfilecontent54_test` | `independent.textfilecontent54` | [independent.textfilecontent54](../../schema/v0.1.0/capability-mappings/independent.textfilecontent54.json) |
+| `windows:auditeventpolicysubcategories_test` | `windows.auditeventpolicysubcategories` | [windows.auditeventpolicysubcategories](../../schema/v0.1.0/capability-mappings/windows.auditeventpolicysubcategories.json) |
+| `windows:userright_test` | `windows.userright` | [windows.userright](../../schema/v0.1.0/capability-mappings/windows.userright.json) |
+| `independent:shellcommand_test` | `independent.shellcommand` | [independent.shellcommand](../../schema/v0.1.0/capability-mappings/independent.shellcommand.json) |
+| `unix:sysctl_test` | `unix.sysctl` | [unix.sysctl](../../schema/v0.1.0/capability-mappings/unix.sysctl.json) |
+| `linux:partition_test` | `linux.partition` | [linux.partition](../../schema/v0.1.0/capability-mappings/linux.partition.json) |
+| `linux:systemdunitproperty_test` | `linux.systemdunitproperty` | [linux.systemdunitproperty](../../schema/v0.1.0/capability-mappings/linux.systemdunitproperty.json) |
+| `windows:fileeffectiverights53_test` | `windows.fileeffectiverights53` | [windows.fileeffectiverights53](../../schema/v0.1.0/capability-mappings/windows.fileeffectiverights53.json) |
+| `windows:cmdlet_test` | `windows.cmdlet` | [windows.cmdlet](../../schema/v0.1.0/capability-mappings/windows.cmdlet.json) |
+| `unix:symlink_test` | `unix.symlink` | [unix.symlink](../../schema/v0.1.0/capability-mappings/unix.symlink.json) |
+| `windows:lockoutpolicy_test` | `windows.lockoutpolicy` | [windows.lockoutpolicy](../../schema/v0.1.0/capability-mappings/windows.lockoutpolicy.json) |
+| `windows:passwordpolicy_test` | `windows.passwordpolicy` | [windows.passwordpolicy](../../schema/v0.1.0/capability-mappings/windows.passwordpolicy.json) |
 
 Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
 in which the revised capability was introduced/fixed, for example `54` in
