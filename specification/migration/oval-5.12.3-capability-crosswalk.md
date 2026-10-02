@@ -50,6 +50,7 @@ while the native capability name may differ from the source basename.
 | `independent:variable_test` | `variable.value` | [variable.value](../../schema/v0.1.0/capability-mappings/variable.value.json) |
 | `windows:wmi57_test` | `windows.wmi.query` | [windows.wmi.query](../../schema/v0.1.0/capability-mappings/windows.wmi.query.json) |
 | `linux:rpminfo_test` | `linux.rpminfo` | [linux.rpminfo](../../schema/v0.1.0/capability-mappings/linux.rpminfo.json) |
+| `independent:textfilecontent54_test` | `independent.textfilecontent54` | [independent.textfilecontent54](../../schema/v0.1.0/capability-mappings/independent.textfilecontent54.json) |
 
 Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
 in which the revised capability was introduced/fixed, for example `54` in
