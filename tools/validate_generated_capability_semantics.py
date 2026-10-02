@@ -445,6 +445,9 @@ EXECUTABLE_SEMANTIC_RULE_IDS={
     "unix.uname.singleton_source",
     "windows.passwordpolicy.singleton_source",
     "windows.auditeventpolicysubcategories.singleton_source",
+    "macos.disabledservice.implicit_population",
+    "macos.gatekeeper.implicit_source",
+    "macos.softwareupdate.implicit_population",
 }
 
 
@@ -467,9 +470,6 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.sql512.result_record",
     "independent.sql512.engine_filterability",
     "independent.unknown.fixed_result",
-    "macos.disabledservice.implicit_population",
-    "macos.gatekeeper.implicit_source",
-    "macos.softwareupdate.implicit_population",
     "linux.rpmverifyfile.materialized_behaviors",
     "linux.rpmverifypackage.materialized_behaviors",
     "linux.dpkginfo.debian_evr",
@@ -545,6 +545,9 @@ SINGLETON_SOURCE_CAPABILITIES={
     "linux.apparmorstatus",
     "linux.sestatus",
     "unix.uname",
+    "macos.disabledservice",
+    "macos.gatekeeper",
+    "macos.softwareupdate",
 }
 
 
