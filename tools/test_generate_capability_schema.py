@@ -155,7 +155,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                         "operation": "equal",
                         "datatype": "string",
                     "mask": False,
-                        "entity_existence": "none",
+                        "existence": "none",
                     }
                 },
             })
@@ -171,9 +171,9 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "operation": "equal",
                     "datatype": "string",
                     "mask": False,
-                    "entity_check": "all",
-                    "entity_existence": "some",
-                    "var_check": "all",
+                    "match": "all",
+                    "existence": "some",
+                    "variable_match": "all",
                 },
             })
 
@@ -186,9 +186,9 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "operation": "equal",
                 "datatype": "string",
                     "mask": False,
-                "entity_check": "all",
-                "entity_existence": "some",
-                "var_check": "all",
+                "match": "all",
+                "existence": "some",
+                "variable_match": "all",
             },
         })
 
@@ -198,8 +198,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "test_title": None,
                 "capability": "linux.rpminfo",
                 "object": "passwd-object",
-                "check_existence": "some",
-                "check": "all",
+                "existence": "some",
+                "match": "all",
             })
 
     def test_valid_state_field(self):
@@ -212,8 +212,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "operation": "equal",
                 "datatype": "integer",
                     "mask": False,
-                "entity_check": "all",
-                "entity_existence": "some",
+                "match": "all",
+                "existence": "some",
             },
         })
 
@@ -242,8 +242,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "operation": "equal",
                     "datatype": "integer",
                     "mask": False,
-                    "entity_check": "all",
-                    "entity_existence": "some",
+                    "match": "all",
+                    "existence": "some",
                 },
             })
 
@@ -256,8 +256,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "operation": "equal",
                 "datatype": "boolean",
                     "mask": False,
-                "entity_check": "all",
-                "entity_existence": "some",
+                "match": "all",
+                "existence": "some",
             },
         })
 
@@ -272,8 +272,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "operation": "equal",
                     "datatype": "boolean",
                     "mask": False,
-                    "entity_check": "all",
-                    "entity_existence": "some",
+                    "match": "all",
+                    "existence": "some",
                 },
             })
 
@@ -315,8 +315,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                         "operation": "equal",
                         "datatype": "integer",
                         "mask": False,
-                        "entity_check": "all",
-                        "entity_existence": "some",
+                        "match": "all",
+                        "existence": "some",
                     },
                 })
                 with self.assertRaises(jsonschema.ValidationError):
@@ -329,8 +329,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                             "operation": "equal",
                             "datatype": "string",
                             "mask": False,
-                            "entity_check": "all",
-                            "entity_existence": "some",
+                            "match": "all",
+                            "existence": "some",
                         },
                     })
 
