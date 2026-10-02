@@ -187,6 +187,28 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(doc)
         self.assertEqual([r["code"] for r in rows],["test.state_capability"])
 
+
+    def test_windows_hierarchy_pattern_key_rejects_traversal(self):
+        for capability in ("windows.registry","windows.ntuser","windows.regkeyeffectiverights53"):
+            with self.subTest(capability=capability):
+                rows=validate_assessment_capability_semantics({
+                    "assessment":{
+                        "objects":{
+                            "o":{
+                                "capability":capability,
+                                "select":{"key":entity("Software/.*",operation="match")},
+                                "traversal":{"max_depth":2},
+                            }
+                        },
+                        "states":{},
+                        "tests":{},
+                    }
+                })
+                self.assertIn(
+                    f"{capability}.pattern_key_no_traversal",
+                    {row["code"] for row in rows},
+                )
+
     def test_valid_graph_is_clean(self):
         doc={
             "assessment":{
