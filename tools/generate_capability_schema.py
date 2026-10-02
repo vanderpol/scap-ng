@@ -291,19 +291,19 @@ def generate(mapping, repo_root):
     capability = mapping["capability"]
     test_required = [
         "test_title", "capability", test_source_field,
-        "check_existence", "check",
+        "existence", "match",
     ]
     test_properties = {
         "test_title": {"type": ["string", "null"]},
         "capability": {"const": capability},
         test_source_field: {"type": "string", "minLength": 1},
-        "check_existence": {
+        "existence": {
             "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
         },
-        "check": {
+        "match": {
             "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/match_quantifier"
         },
-        "state_operator": {
+        "states_match": {
             "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/logical_operator"
         },
         "states": {
