@@ -531,6 +531,47 @@ def classify_declared_semantic_rules(mapping):
     }
 
 
+SINGLETON_SOURCE_CAPABILITIES={
+    "independent.family",
+    "windows.lockoutpolicy",
+    "windows.passwordpolicy",
+    "windows.auditeventpolicysubcategories",
+    "iosxe.version",
+    "panos.version",
+    "asa.version",
+    "macos.profiles",
+    "macos.systemsetup",
+    "macos.filevault",
+    "macos.firmwarepassword",
+    "linux.apparmorstatus",
+    "linux.sestatus",
+    "unix.uname",
+}
+
+
+def validate_singleton_source_document(document):
+    assessment=document.get("assessment",document)
+    diagnostics=[]
+    for test_id,test in (assessment.get("tests") or {}).items():
+        capability=test.get("capability")
+        if capability in SINGLETON_SOURCE_CAPABILITIES and "object" in test:
+            diagnostics.append({
+                "test":test_id,
+                "code":f"{capability}.singleton_source",
+                "fields":["object"],
+                "message":"singleton-source capability Test must not reference an Object",
+            })
+    for object_id,obj in (assessment.get("objects") or {}).items():
+        capability=obj.get("capability")
+        if capability in SINGLETON_SOURCE_CAPABILITIES:
+            diagnostics.append({
+                "object":object_id,
+                "code":f"{capability}.singleton_source",
+                "message":"singleton-source capability must not define an Object",
+            })
+    return diagnostics
+
+
 def validate_assessment_capability_semantics(document):
     """Validate current native Assessment cross-node capability semantics."""
     assessment=document.get("assessment",document)
@@ -649,6 +690,7 @@ def validate_assessment_capability_semantics(document):
             validate_windows_policy_state_ranges(test_id,test,states)
         )
 
+    diagnostics.extend(validate_singleton_source_document(document))
     return diagnostics
 
 
