@@ -197,9 +197,16 @@ or a grouped capability regression.
 - `unix.symlink` — canonical symbolic-link target resolution;
 - `windows.lockoutpolicy` — singleton system lockout policy;
 - `windows.passwordpolicy` — singleton system password policy;
-- `unix.password` — UNIX passwd account metadata with existing OVAL field terminology preserved.
+- `unix.password` — UNIX passwd account metadata with existing OVAL field terminology preserved;
+- `unix.shadow` — shadow password-aging metadata using the shared canonical State/Item field model;
+- `linux.selinuxsecuritycontext` — file/process SELinux context collection with shared file traversal and PID selection;
+- `unix.interface` — interface metadata including multi-valued flags.
 
 The next tranche covers lower-frequency production candidates and then the
 remaining supported Self-Assertion language-conformance surface. Capabilities
 SHOULD continue to reuse shared primitives and SHALL NOT be bulk-generated from
 XSD names without semantic review.
+
+## Source-governance caveat for Windows extension families
+
+Some current Windows-native mappings were prototyped from production/SCC semantics and system-characteristics Item shapes even though the corresponding Test/Object/State family is absent from the official OVAL-Community v5.12.3 Windows definitions schema. These mappings SHALL NOT be described as standard OVAL 5.12.3 migration mappings until their exact publisher-extension provenance is identified and recorded. Native SCAP-NG design work may continue, but the standard migration crosswalk must distinguish standard OVAL from publisher extensions.
