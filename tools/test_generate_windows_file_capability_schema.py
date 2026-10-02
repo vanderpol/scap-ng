@@ -87,8 +87,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                         "operation":"equal",
                         "datatype":"string",
                         "mask":False,
-                        "entity_check":"all",
-                        "entity_existence":"some",
+                        "match":"all",
+                        "existence":"some",
                     },
                 })
         with self.assertRaises(jsonschema.ValidationError):
@@ -101,8 +101,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                     "operation":"equal",
                     "datatype":"string",
                     "mask":False,
-                    "entity_check":"all",
-                    "entity_existence":"some",
+                    "match":"all",
+                    "existence":"some",
                 },
             })
 
@@ -116,8 +116,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                 "operation":"equal",
                 "datatype":"string",
                 "mask":False,
-                "entity_check":"any",
-                "entity_existence":"some",
+                "match":"any",
+                "existence":"some",
             },
         })
         with self.assertRaises(jsonschema.ValidationError):
@@ -130,8 +130,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                     "operation":"equal",
                     "datatype":"string",
                     "mask":False,
-                    "entity_check":"any",
-                    "entity_existence":"some",
+                    "match":"any",
+                    "existence":"some",
                 },
             })
 
@@ -147,8 +147,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                         "operation":"equal",
                         "datatype":"integer",
                         "mask":False,
-                        "entity_check":"all",
-                        "entity_existence":"some",
+                        "match":"all",
+                        "existence":"some",
                     },
                 })
 
@@ -164,8 +164,8 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                         "operation":"equal",
                         "datatype":datatype,
                         "mask":False,
-                        "entity_check":"all",
-                        "entity_existence":"some",
+                        "match":"all",
+                        "existence":"some",
                     },
                 })
 
