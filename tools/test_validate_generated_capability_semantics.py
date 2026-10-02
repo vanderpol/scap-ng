@@ -23,7 +23,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
             "select":{"full_path":entity("/etc/passwd")},
             "traversal":{
                 "max_depth":1,
-                "follow_symlinks":False,
+                "follow_links":False,
                 "filesystem":"local",
             },
         }
@@ -41,7 +41,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_unix_file_object({
             "capability":"unix.file",
             "select":{"full_path":entity("/etc/.*",operation="match")},
-            "traversal":{"max_depth":1,"follow_symlinks":False,"filesystem":"same"},
+            "traversal":{"max_depth":1,"follow_links":False,"filesystem":"same"},
         })
         self.assertEqual(
             [r["code"] for r in rows],
@@ -57,7 +57,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
             },
             "traversal":{
                 "max_depth":2,
-                "follow_symlinks":False,
+                "follow_links":False,
                 "filesystem":"same",
             },
         })
@@ -98,7 +98,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                         "select":{"full_path":entity("/etc/passwd")},
                         "traversal":{
                             "max_depth":1,
-                            "follow_symlinks":False,
+                            "follow_links":False,
                             "filesystem":"local",
                         },
                         "collect":{"algorithm":"sha256"},
