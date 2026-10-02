@@ -1,7 +1,7 @@
 """Regression for the full review's shared manual-selector source binding."""
 import unittest
 import xml.etree.ElementTree as ET
-from scap_upconvert_v003.convert_collection_review import manual_procedure, NS
+from scap_upconvert_v003.convert_collection_review import manual_procedure, scoped_assessment_id, NS
 from scap_upconvert_v003.convert_full_review import render_profiles, profile_description
 X=NS['x']
 
@@ -30,6 +30,23 @@ class ManualBinding(unittest.TestCase):
         a=self.check('default','First procedure.');b=self.check('manual','Different procedure.')
         with self.assertRaisesRegex(ValueError,'conflicting procedures'):
             manual_procedure({'id':'SV-1','checks':[a,b]},a)
+
+
+class AssessmentIdentityScoping(unittest.TestCase):
+    def test_generated_assessment_ids_are_benchmark_scoped(self):
+        self.assertEqual(
+            scoped_assessment_id('niwc.mozilla-firefox-windows', 'SV-251546.automated'),
+            'niwc.mozilla-firefox-windows.SV-251546.automated',
+        )
+        self.assertEqual(
+            scoped_assessment_id('niwc.mozilla-firefox-linux', 'SV-251546.automated'),
+            'niwc.mozilla-firefox-linux.SV-251546.automated',
+        )
+        self.assertNotEqual(
+            scoped_assessment_id('niwc.mozilla-firefox-windows', 'SV-251546.automated'),
+            scoped_assessment_id('niwc.mozilla-firefox-linux', 'SV-251546.automated'),
+        )
+        self.assertEqual(scoped_assessment_id(None, 'SV-1.automated'), 'SV-1.automated')
 
 class ProfileRendering(unittest.TestCase):
     def fixture(self):
