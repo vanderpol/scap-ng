@@ -128,3 +128,12 @@ With structural schema validation green for fresh/current content, the next requ
 - capability-specific cross-field semantics currently implemented by the native semantic validator.
 
 Semantic failures SHALL receive the same triage treatment as schema failures: classify as content/generator defect, semantic-validator defect, schema/design defect, or source migration issue before changing either content or validation rules.
+
+
+## Generated capability-schema gate
+
+The maintained Capability State/Item parity workflow now also generates every reviewed capability mapping and validates each generated fragment against JSON Schema Draft 2020-12.
+
+Initial combined result on 2026-10-02: **green**.
+
+This closes a gap that static top-level schema validation alone could not cover: a reviewed mapping or generator change can no longer silently produce a malformed capability schema while the shared schemas remain valid.
