@@ -35,6 +35,7 @@ class SELinuxSecurityContextCapabilitySchemaTests(unittest.TestCase):
             "object_title":"passwd context",
             "capability":"linux.selinuxsecuritycontext",
             "select":{"full_path":self.entity("/etc/passwd","string")},
+            "filesystem":"any",
         })
         self.validate_def("object",{
             "object_title":"pid context",
