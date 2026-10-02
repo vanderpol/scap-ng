@@ -80,19 +80,55 @@
         },
         "redacted": {
           "type": "boolean",
-          "default": false
+          "default": false,
+          "description": "When true, the value has been intentionally omitted from emitted results/evidence. A redacted typed value SHALL NOT carry a value property."
         }
       },
       "allOf": [
         {
           "if": {
             "properties": {
-              "datatype": {
-                "const": "record"
+              "redacted": {
+                "const": true
               }
             },
             "required": [
-              "datatype"
+              "redacted"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "datatype": {
+                    "const": "record"
+                  }
+                },
+                "required": [
+                  "datatype"
+                ]
+              },
+              {
+                "not": {
+                  "properties": {
+                    "redacted": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "redacted"
+                  ]
+                }
+              }
             ]
           },
           "then": {
