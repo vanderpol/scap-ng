@@ -133,9 +133,12 @@ def generate(mapping, repo_root):
     root = ET.parse(xsd_path).getroot()
 
     test_el = direct_global(root, "element", source["test"])
-    object_el = direct_global(root, "element", source["object"])
+    object_el = (
+        direct_global(root, "element", source["object"])
+        if source.get("object") else None
+    )
     state_el = direct_global(root, "element", source["state"])
-    object_fields = immediate_payload_elements(object_el)
+    object_fields = immediate_payload_elements(object_el) if object_el is not None else {}
     state_fields = immediate_payload_elements(state_el)
     traversal_definition = mapping.get("native", {}).get("traversal_definition")
     if traversal_definition is None and mapping.get("native", {}).get("uses_file_traversal", False):
@@ -145,49 +148,55 @@ def generate(mapping, repo_root):
         if traversal_definition else None
     )
 
-    selector_props = {}
-    selector_map = mapping["native"]["selector_map"]
-    reverse_selector_map = {native: source for source, native in selector_map.items()}
-    for alternative in mapping["native"]["object_selector_alternatives"]:
-        for name in alternative:
-            source_name = reverse_selector_map[name]
-            field = object_fields[source_name]
-            dtypes = source_datatypes(field)
-            enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
-            if enum_values:
-                selector_schema = {
-                    "oneOf": [
-                        {"type": "string", "enum": list(enum_values)},
-                        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
-                    ]
-                }
-            else:
-                selector_schema = generic_entity_schema(dtypes, state=False)
-            if name in mapping["native"].get("nullable_selectors", ["name"]):
-                selector_schema = {
-                    "oneOf": [
-                        selector_schema,
-                        {"type": "null"},
-                    ]
-                }
-            selector_props[name] = selector_schema
+    test_source = mapping.get("native", {}).get(
+        "test_source", {"kind": "object", "field": "object"}
+    )
+    test_source_kind = test_source.get("kind", "object")
+    test_source_field = test_source.get("field", test_source_kind)
 
+    selector_props = {}
     selector_alternatives = []
-    for alternative in mapping["native"]["object_selector_alternatives"]:
-        selector_alternatives.append({
-            "required": list(alternative),
-            "not": {
-                "anyOf": [
-                    {"required": [other]}
-                    for other in selector_props
-                    if other not in alternative
-                ]
-            } if any(other not in alternative for other in selector_props) else {},
-        })
-    # Remove empty 'not' helper if there is only one possible field set.
-    for alt in selector_alternatives:
-        if alt.get("not") == {}:
-            alt.pop("not", None)
+    if test_source_kind == "object":
+        selector_map = mapping["native"]["selector_map"]
+        reverse_selector_map = {native: source for source, native in selector_map.items()}
+        for alternative in mapping["native"]["object_selector_alternatives"]:
+            for name in alternative:
+                source_name = reverse_selector_map[name]
+                field = object_fields[source_name]
+                dtypes = source_datatypes(field)
+                enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
+                if enum_values:
+                    selector_schema = {
+                        "oneOf": [
+                            {"type": "string", "enum": list(enum_values)},
+                            {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                        ]
+                    }
+                else:
+                    selector_schema = generic_entity_schema(dtypes, state=False)
+                if name in mapping["native"].get("nullable_selectors", ["name"]):
+                    selector_schema = {
+                        "oneOf": [
+                            selector_schema,
+                            {"type": "null"},
+                        ]
+                    }
+                selector_props[name] = selector_schema
+
+        for alternative in mapping["native"]["object_selector_alternatives"]:
+            selector_alternatives.append({
+                "required": list(alternative),
+                "not": {
+                    "anyOf": [
+                        {"required": [other]}
+                        for other in selector_props
+                        if other not in alternative
+                    ]
+                } if any(other not in alternative for other in selector_props) else {},
+            })
+        for alt in selector_alternatives:
+            if alt.get("not") == {}:
+                alt.pop("not", None)
 
     collect_properties = {}
     collect_required = []
@@ -256,89 +265,96 @@ def generate(mapping, repo_root):
         object_required.append("collect")
 
     capability = mapping["capability"]
+    test_required = [
+        "test_title", "capability", test_source_field,
+        "check_existence", "check",
+    ]
+    test_properties = {
+        "test_title": {"type": ["string", "null"]},
+        "capability": {"const": capability},
+        test_source_field: {"type": "string", "minLength": 1},
+        "check_existence": {
+            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
+        },
+        "check": {
+            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/match_quantifier"
+        },
+        "state_operator": {
+            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/logical_operator"
+        },
+        "states": {
+            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
+        },
+    }
+
+    defs = {
+        "test": {
+            "type": "object",
+            "required": test_required,
+            "properties": test_properties,
+            "additionalProperties": False,
+        },
+        "state": {
+            "type": "object",
+            "required": ["state_title", "capability", "state"],
+            "properties": {
+                "state_title": {"type": ["string", "null"]},
+                "capability": {"const": capability},
+                "state": {
+                    "type": "object",
+                    "required": ["field"],
+                    "properties": {
+                        "field": {
+                            "type": "string",
+                            "enum": sorted(state_names),
+                        }
+                    },
+                    "allOf": [
+                        {
+                            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
+                        },
+                        {"oneOf": state_field_branches}
+                    ],
+                    "unevaluatedProperties": False,
+                },
+            },
+            "additionalProperties": False,
+        },
+    }
+
+    if test_source_kind == "object":
+        defs["object"] = {
+            "type": "object",
+            "required": object_required,
+            "properties": {
+                "object_title": {"type": ["string", "null"]},
+                "capability": {"const": capability},
+                "select": {
+                    "type": "object",
+                    "properties": selector_props,
+                    "additionalProperties": False,
+                    "oneOf": selector_alternatives,
+                },
+                **({"traversal": traversal_schema} if traversal_schema else {}),
+                **({"collect": collect_schema} if collect_schema else {}),
+                "set": {
+                    "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
+                },
+            },
+            "additionalProperties": False,
+            "oneOf": [
+                {"required": ["select"], "not": {"required": ["set"]}},
+                {"required": ["set"], "not": {"required": ["select"]}},
+            ],
+        }
+
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": f"https://scap-ng.dev/schema/v0.1.0/generated/capabilities/{capability}.schema.json",
         "title": f"Generated SCAP-NG capability fragment: {capability}",
         "description": f"Native SCAP-NG capability schema for {capability}.",
         "x-semantic-validator-rules": mapping.get("semantic_validator_rules", []),
-        "$defs": {
-            "test": {
-                "type": "object",
-                "required": [
-                    "test_title", "capability", "object",
-                    "check_existence", "check",
-                ],
-                "properties": {
-                    "test_title": {"type": ["string", "null"]},
-                    "capability": {"const": capability},
-                    "object": {"type": "string", "minLength": 1},
-                    "check_existence": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
-                    },
-                    "check": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/match_quantifier"
-                    },
-                    "state_operator": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/logical_operator"
-                    },
-                    "states": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
-                    },
-                },
-                "additionalProperties": False,
-            },
-            "object": {
-                "type": "object",
-                "required": object_required,
-                "properties": {
-                    "object_title": {"type": ["string", "null"]},
-                    "capability": {"const": capability},
-                    "select": {
-                        "type": "object",
-                        "properties": selector_props,
-                        "additionalProperties": False,
-                        "oneOf": selector_alternatives,
-                    },
-                    **({"traversal": traversal_schema} if traversal_schema else {}),
-                    **({"collect": collect_schema} if collect_schema else {}),
-                    "set": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
-                    },
-                },
-                "additionalProperties": False,
-                "oneOf": [
-                    {"required": ["select"], "not": {"required": ["set"]}},
-                    {"required": ["set"], "not": {"required": ["select"]}},
-                ],
-            },
-            "state": {
-                "type": "object",
-                "required": ["state_title", "capability", "state"],
-                "properties": {
-                    "state_title": {"type": ["string", "null"]},
-                    "capability": {"const": capability},
-                    "state": {
-                        "type": "object",
-                        "required": ["field"],
-                        "properties": {
-                            "field": {
-                                "type": "string",
-                                "enum": sorted(state_names),
-                            }
-                        },
-                        "allOf": [
-                            {
-                                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
-                            },
-                            {"oneOf": state_field_branches}
-                        ],
-                        "unevaluatedProperties": False,
-                    },
-                },
-                "additionalProperties": False,
-            },
-        },
+        "$defs": defs,
 
     }
     return generated
