@@ -7,13 +7,15 @@ current compatibility contract without erasing those identities.
 """
 
 def nodes(value):
-    if isinstance(value, dict):
-        yield value
-        for child in value.values():
-            yield from nodes(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from nodes(child)
+    """Yield mapping nodes iteratively so deep valid graphs are stack-safe."""
+    stack=[value]
+    while stack:
+        current=stack.pop()
+        if isinstance(current,dict):
+            yield current
+            stack.extend(reversed(list(current.values())))
+        elif isinstance(current,list):
+            stack.extend(reversed(current))
 
 
 def _require_capability(value, label):
