@@ -137,7 +137,8 @@ class RepoNormalizerTests(unittest.TestCase):
             finally:
                 __import__("sys").argv=old_argv
             report=json.loads(report_path.read_text())
-            self.assertEqual(report["mode"],"dry-run-exact-plan-plus-near-duplicate-review")
+            self.assertEqual(report["mode"],"dry-run-exact-plan")
+            self.assertEqual(report["advisory_mode"],"all")
             self.assertFalse(report["planned_changes"]["rewrite_requested"])
             self.assertEqual(report["summary"]["rule_files_rewritten"],0)
             self.assertEqual(report["summary"]["local_assessment_files_removed"],0)
@@ -209,6 +210,43 @@ class RepoNormalizerTests(unittest.TestCase):
                 __import__("sys").argv=old_argv
             self.assertTrue(sentinel.exists())
             self.assertEqual(sentinel.read_text(encoding="utf-8"),"original destination")
+
+
+    def test_exact_only_mode_skips_advisory_queues_without_changing_exact_groups(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/example")
+            self.benchmark(root,"b","R2","/etc/example")
+            self.benchmark(root,"c","R3","/etc/other")
+            report_all=Path(td)/"all.json"
+            report_none=Path(td)/"none.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--report",str(report_all),
+                    "--advisory","all",
+                ]
+                self.assertEqual(normalizer.main(),0)
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--report",str(report_none),
+                    "--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            all_report=json.loads(report_all.read_text())
+            none_report=json.loads(report_none.read_text())
+            self.assertEqual(
+                all_report["summary"]["exact_duplicate_groups"],
+                none_report["summary"]["exact_duplicate_groups"],
+            )
+            self.assertEqual(
+                all_report["summary"]["duplicate_assessment_definitions_avoided"],
+                none_report["summary"]["duplicate_assessment_definitions_avoided"],
+            )
+            self.assertEqual(none_report["advisory_mode"],"none")
+            self.assertEqual(none_report["near_duplicate_review_groups"],[])
+            self.assertEqual(none_report["near_duplicate_rule_candidates"],[])
 
 
 if __name__=="__main__":
