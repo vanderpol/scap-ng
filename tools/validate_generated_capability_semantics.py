@@ -143,6 +143,22 @@ def validate_unix_file_object(obj):
 
 
 
+def validate_equal_only_selectors(obj, capability, fields):
+    if obj.get("capability") != capability:
+        return []
+    diagnostics=[]
+    select=obj.get("select") or {}
+    for field in fields:
+        value=select.get(field)
+        if isinstance(value,dict) and value.get("operation") != "equal":
+            diagnostics.append({
+                "code":f"{capability}.{field}_equal",
+                "fields":[field],
+                "message":f"{capability} {field} selector must use equal operation",
+            })
+    return diagnostics
+
+
 def validate_panos_config_object(obj):
     if obj.get("capability") != "panos.config":
         return []
@@ -394,6 +410,9 @@ EXECUTABLE_SEMANTIC_RULE_IDS={
     "independent.textfilecontent54.pattern_operation",
     "independent.xmlfilecontent.xpath_equal",
     "panos.config.xpath_equal",
+    "macos.plist511.filepath_equal",
+    "macos.plist511.xpath_equal",
+    "macos.systemprofiler.xpath_equal",
     "independent.yamlfilecontent.content_equal",
     "independent.yamlfilecontent.yamlpath_equal",
     "independent.yamlfilecontent.inline_content_no_traversal",
@@ -441,6 +460,8 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "independent.unknown.fixed_result",
     "panos.version.singleton_source",
     "asa.version.singleton_source",
+    "macos.profiles.singleton_source",
+    "macos.systemsetup.singleton_source",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
@@ -488,6 +509,10 @@ def validate_assessment_capability_semantics(document):
         for row in validate_windows_cmdlet_object(obj):
             diagnostics.append({"object":object_id,**row})
         for row in validate_panos_config_object(obj):
+            diagnostics.append({"object":object_id,**row})
+        for row in validate_equal_only_selectors(obj,"macos.plist511",("full_path","xpath")):
+            diagnostics.append({"object":object_id,**row})
+        for row in validate_equal_only_selectors(obj,"macos.systemprofiler",("xpath",)):
             diagnostics.append({"object":object_id,**row})
 
         for referenced_object_id in _iter_set_object_refs(obj.get("set")):
