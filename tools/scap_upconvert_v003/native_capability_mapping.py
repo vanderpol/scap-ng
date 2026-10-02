@@ -206,8 +206,10 @@ def _extract_collector_value(source_value, mapping: dict):
         op=source_value.get("operation","equals")
         if _translate(mapping,"operation",op) != "equal":
             raise ValueError("collector input cannot use comparison semantics")
-        if bool(source_value.get("mask",False)):
-            raise ValueError("collector input cannot be masked")
+        if bool(source_value.get("mask",False)) or bool(source_value.get("redact_result",False)):
+            raise ValueError(
+                "collector input redaction cannot be preserved by scalar collection-parameter lowering"
+            )
         source_value=source_value["value"]
     return copy.deepcopy(source_value)
 
