@@ -260,6 +260,12 @@ def _materialize_behavior_collection_parameters(obj: dict, mapping: dict):
     if collect:
         obj["collect"]=collect
     remaining={k:v for k,v in behaviors.items() if k not in consumed}
+    deprecated=set(crosswalk.get("deprecated") or {}) & set(remaining)
+    if deprecated:
+        raise ValueError(
+            "unsupported deprecated OVAL behavior semantics: "
+            + ", ".join(sorted(deprecated))
+        )
     if remaining:
         raise ValueError(
             "unmapped OVAL behavior semantics remain for reviewed native capability: "
