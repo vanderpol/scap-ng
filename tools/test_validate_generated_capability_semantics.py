@@ -333,6 +333,18 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                 })
                 self.assertIn(f"{capability}.{field}_equal",{row["code"] for row in rows})
 
+    def test_singleton_source_capabilities_reject_objects(self):
+        for capability in ("independent.family","windows.lockoutpolicy","iosxe.version","panos.version","asa.version"):
+            with self.subTest(capability=capability):
+                rows=validate_assessment_capability_semantics({
+                    "assessment":{
+                        "objects":{"o":{"capability":capability}},
+                        "states":{},
+                        "tests":{"t":{"capability":capability,"object":"o"}},
+                    }
+                })
+                self.assertIn(f"{capability}.singleton_source",{row["code"] for row in rows})
+
     def test_panos_config_xpath_requires_equality(self):
         rows=validate_assessment_capability_semantics({
             "assessment":{"objects":{"o":{"capability":"panos.config","select":{"xpath":entity("/config/.*",operation="match")}}},"states":{},"tests":{}}
