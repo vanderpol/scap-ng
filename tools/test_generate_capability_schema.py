@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 
 import jsonschema
+from referencing import Registry, Resource
 
 from generate_capability_schema import generate
 
@@ -17,11 +18,25 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
     def setUpClass(cls):
         cls.mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
         cls.schema = generate(cls.mapping, ROOT)
+        common_path = ROOT / "schema/v0.1.0/capability-common.schema.json"
+        cls.common = json.loads(common_path.read_text(encoding="utf-8"))
+        cls.registry = Registry().with_resource(
+            cls.common["$id"], Resource.from_contents(cls.common)
+        )
 
     def validate_def(self, name, value):
         jsonschema.Draft202012Validator(
-            self.schema["$defs"][name]
+            self.schema["$defs"][name],
+            registry=self.registry,
         ).validate(value)
+
+
+    def test_generated_schema_reuses_shared_common_primitives(self):
+        encoded = json.dumps(self.schema)
+        self.assertIn("capability-common.schema.json#/$defs/object_entity_base", encoded)
+        self.assertIn("capability-common.schema.json#/$defs/state_entity_base", encoded)
+        self.assertIn("capability-common.schema.json#/$defs/state_filter", encoded)
+        self.assertNotIn('"variable_reference":', encoded)
 
     def test_source_inventory_is_extracted_from_pinned_xsd(self):
         catalog = self.schema["x-source-field-catalog"]
