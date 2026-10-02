@@ -12,6 +12,7 @@ from oval_result_truth_tables import (
     decisive_partial_check, decisive_partial_existence,
     NO_VALUES, apply_filter_state_result, select_collected_object_instance,
     evaluate_record_field, evaluate_record_entity, validate_record_state_constraints,
+    evaluate_state_entity_existence,
 )
 
 
@@ -575,6 +576,53 @@ class StateEntityAggregationOrder(unittest.TestCase):
                 entity_check="all",
                 comparison_rows=[[]],
             )
+
+
+class StateEntityExistenceSemantics(unittest.TestCase):
+    def test_default_at_least_one_exists(self):
+        self.assertEqual(
+            evaluate_state_entity_existence("at_least_one_exists", exists=1),
+            TRUE,
+        )
+        self.assertEqual(
+            evaluate_state_entity_existence("at_least_one_exists"),
+            FALSE,
+        )
+
+    def test_none_exist_uses_existence_chart(self):
+        self.assertEqual(
+            evaluate_state_entity_existence(
+                "none_exist", does_not_exist=2
+            ),
+            TRUE,
+        )
+        self.assertEqual(
+            evaluate_state_entity_existence("none_exist", exists=1),
+            FALSE,
+        )
+
+    def test_entity_status_errors_are_not_coerced(self):
+        self.assertEqual(
+            evaluate_state_entity_existence(
+                "only_one_exists", exists=1, error=1
+            ),
+            ERROR,
+        )
+        self.assertEqual(
+            evaluate_state_entity_existence(
+                "at_least_one_exists", not_collected=1
+            ),
+            UNKNOWN,
+        )
+
+    def test_any_exist_preserves_oval_chart_behavior(self):
+        self.assertEqual(evaluate_state_entity_existence("any_exist"), TRUE)
+        self.assertEqual(
+            evaluate_state_entity_existence(
+                "any_exist", exists=1, error=1
+            ),
+            TRUE,
+        )
 
 
 class RecordEntitySemantics(unittest.TestCase):

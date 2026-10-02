@@ -248,7 +248,35 @@ Migration tooling SHALL preserve source provenance if explicit legacy `mask` usa
 
 Evidence: GitHub Actions run 36931308817, source-explicit mask census; 212 files scanned, 0 explicit occurrences, 0 scan failures.
 
-## 14. Record entity evaluation
+## 14. State-entity existence
+
+OVAL State entities have their own `check_existence`, distinct from Test
+`check_existence`. The pinned OVAL 5.12.3 `ExistenceEnumeration`
+documentation explicitly states that its evaluation charts apply secondarily
+to State entities in corresponding Items.
+
+A conforming evaluator SHALL evaluate the corresponding Item-entity status
+population with the same five ExistenceEnumeration modes before ordinary value
+comparison/quantifier aggregation. In particular:
+
+- `error` and `not collected` statuses SHALL retain their chart-defined
+  `error` / `unknown` effects;
+- decisive existence results SHALL NOT be replaced by favorable value
+  comparisons;
+- State-entity existence SHALL remain a separate scope from Test existence.
+
+The generic chart is executable in
+`evaluate_state_entity_existence()`. The helper deliberately stops at the
+existence piece; it does not invent a value-comparison result when the existence
+mode permits zero corresponding entities.
+
+The EntityState base-type prose includes an example for `none_exist` phrased
+in terms of one or more `does not exist` entities, while the authoritative
+ExistenceEnumeration chart also defines the all-zero status population. The
+native contract follows the explicit chart for the existence piece and does not
+derive additional zero-entity comparison semantics from that example alone.
+
+## 15. Record entity evaluation
 
 OVAL-derived record values have capability-specific semantics that are stricter
 than ordinary scalar entities. These rules are source-backed by the pinned OVAL
@@ -279,7 +307,7 @@ into unrelated Item entities before applying the above aggregation order.
 Executable coverage is provided by `tools/oval_result_truth_tables.py` and
 `tools/test_oval_result_truth_tables.py`.
 
-## 15. Unresolved items
+## 16. Unresolved items
 
 These remain open and SHALL NOT be silently guessed:
 

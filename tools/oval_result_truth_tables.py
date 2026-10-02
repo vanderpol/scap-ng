@@ -470,3 +470,22 @@ def validate_record_state_constraints(*, datatype, operation, var_ref=None, var_
     if var_check is not None:
         errors.append("record entity var_check does not apply")
     return errors
+
+
+def evaluate_state_entity_existence(
+    mode, *, exists=0, does_not_exist=0, error=0, not_collected=0
+):
+    """Evaluate the State-entity existence piece before value comparison.
+
+    OVAL 5.12.3 ExistenceEnumeration explicitly states that its tables apply
+    secondarily to State entities in corresponding Items. This helper therefore
+    reuses the authoritative existence table without guessing the subsequent
+    zero-entity value-comparison behavior.
+    """
+    return aggregate_existence(
+        mode,
+        exists=exists,
+        does_not_exist=does_not_exist,
+        error=error,
+        not_collected=not_collected,
+    )
