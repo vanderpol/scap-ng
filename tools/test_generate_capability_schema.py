@@ -96,7 +96,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             },
             "traversal": {
                 "max_depth": 0,
-                "follow_symlinks": True,
+                "follow_links": True,
                 "filesystem": "local",
             },
         })
