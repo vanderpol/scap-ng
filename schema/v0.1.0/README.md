@@ -129,6 +129,32 @@ those semantics are preserved. Deep capability schemas SHALL be generated
 against this aligned vocabulary rather than the earlier
 Collection/assertion/item-quantifier prototype.
 
+## Capability-schema maintenance model
+
+Capability validation is deliberately split into three layers so pre-alpha
+design changes do not require repetitive hand edits across many schemas:
+
+1. `capability-common.schema.json` owns reusable authored-Assessment primitives
+   such as Variable references, entity value/reference structure, common Object
+   and State entity semantics, State filters, and reference-set shapes.
+2. Reviewed capability mappings under `capability-mappings/` describe only the
+   source-backed Test/Object/State family, selectors, behaviors, field
+   datatypes, capability-specific constraints, and semantic-validator rules.
+3. Capability JSON Schemas are generated disposable artifacts. They reference
+   the common schema and add only capability-specific narrowing. Generated
+   files are not independent hand-maintained sources of truth.
+
+A change to a common semantic concept SHOULD therefore require one common-schema
+change plus regression updates, not repetitive edits to every capability.
+A capability-specific change SHOULD normally require a mapping/generator change
+and regeneration.
+
+The pinned OVAL 5.12.3 schemas remain the lossless-conversion reference, not the
+native inheritance design. OVAL Board changes MAY require substantial changes
+while SCAP-NG is pre-alpha; the mapping/generator boundary is intentionally
+designed to absorb those changes without making generated capability schemas
+stable API commitments prematurely.
+
 ## Planned next schemas
 
 Package-manifest and deeper reusable result-component schemas remain to be
