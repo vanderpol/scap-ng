@@ -383,6 +383,22 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                         },
                     })
 
+    def test_mapping_state_fields_have_collected_item_parity(self):
+        source_names = set(self.mapping["native"].get("state_field_map", {}))
+        source_names.update(self.mapping["native"].get("native_added_state_fields", {}))
+        item_only = set(self.mapping["native"].get("item_only_field_map", {}))
+        collected = self.schema["$defs"]["collected_item"]["allOf"][1]["properties"]["fields"]["properties"]
+        native_state_names = set(self.mapping["native"].get("state_field_map", {}).values())
+        native_state_names.update(
+            spec.get("native_name", source)
+            for source, spec in self.mapping["native"].get("native_added_state_fields", {}).items()
+        )
+        native_item_only = set(self.mapping["native"].get("item_only_field_map", {}).values())
+        self.assertTrue(source_names)
+        self.assertTrue(native_state_names.issubset(set(collected)))
+        self.assertTrue(native_item_only.issubset(set(collected)))
+        self.assertTrue(item_only.isdisjoint(source_names))
+
     def test_semantic_validator_rules_are_not_lost(self):
         rules = {
             row["id"]: row
