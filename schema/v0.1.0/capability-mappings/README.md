@@ -171,41 +171,24 @@ A mapping change SHOULD state whether it:
 Removal of a legacy feature that could affect supported content SHALL also be
 tracked in the migration disposition documentation.
 
-## Current reviewed capabilities
+## Current reviewed capability status
 
-The capability-schema design now includes the original diverse proof cases plus
-the production-first translation tranche. Each listed capability has a reviewed
-mapping; focused regression coverage is maintained in `tools/test_generate_*.py`
-or a grouped capability regression.
+The content-backed OVAL 5.12.3 migration surface is now reviewed across the current Independent, Linux, Unix, macOS, Solaris, and Windows tranche used by production content and/or SCAP Self-Assertion / validation content.
 
-- `unix.file` — native file metadata and shared Unix/Independent file traversal;
-- `file.hash` — shared file selection plus required collection parameter;
-- `windows.file` — Windows file selection with junction-aware traversal;
-- `windows.registry` — hierarchical non-filesystem traversal and typed values;
-- `variable.value` — direct Test source with no fake Object;
-- `windows.wmi.query` — collector-driven query plus structured record State;
-- `linux.rpminfo` — package metadata and explicit source-default materialization;
-- `independent.textfilecontent54` — file traversal, regex match/instance selection, and explicit regex/item-creation behaviors;
-- `windows.auditeventpolicysubcategories` — singleton system source with deprecated state entity excluded;
-- `windows.userright` — user-right enumeration with trustee name/SID state;
-- `independent.shellcommand` — command-oriented collection with trust/security guardrails;
-- `unix.sysctl` — kernel parameter collection;
-- `linux.partition` — mounted partition metadata and effective mount options;
-- `linux.systemdunitproperty` — unit/property collection;
-- `windows.fileeffectiverights53` — trustee-SID effective rights with shared Windows traversal;
-- `windows.cmdlet` — structured record-valued PowerShell invocation and result predicates;
-- `unix.symlink` — canonical symbolic-link target resolution;
-- `windows.lockoutpolicy` — singleton system lockout policy;
-- `windows.passwordpolicy` — singleton system password policy;
-- `unix.password` — UNIX passwd account metadata with existing OVAL field terminology preserved;
-- `unix.shadow` — shadow password-aging metadata using the shared canonical State/Item field model;
-- `linux.selinuxsecuritycontext` — file/process SELinux context collection with shared file traversal and PID selection;
-- `unix.interface` — interface metadata including multi-valued flags.
+The authoritative per-capability inventory, source Test names, evidence counts, reviewed native names, and deferred schema-only candidates are maintained in the [OVAL 5.12.3 capability crosswalk](../../../specification/migration/oval-5.12.3-capability-crosswalk.md).
 
-The next tranche covers lower-frequency production candidates and then the
-remaining supported Self-Assertion language-conformance surface. Capabilities
-SHOULD continue to reuse shared primitives and SHALL NOT be bulk-generated from
-XSD names without semantic review.
+Important checkpoints:
+
+- production-heavy capabilities are complete;
+- lower-frequency production mappings are complete;
+- content-backed Windows mappings are complete;
+- reviewed native renames such as `filehash58 → file.hash`, `variable → variable.value`, and `wmi57 → windows.wmi.query` count as covered migration surface;
+- schema-only candidates without concrete content evidence remain intentionally deferred;
+- every reviewed capability mapping is covered by the maintained State/Item parity and generated-schema gates.
+
+The project has now entered the repository-wide validation phase. Current fresh native content is validated structurally with JSON Schema, then by Assessment semantic-graph validation, then by cross-document package-graph validation. The same gates run again after normalization so normalization cannot preserve local schema validity while breaking references or capability semantics.
+
+Historical/example artifacts are audited separately from the normative current-content gate and are triaged before any schema or content change.
 
 ## Windows schema verification note
 
