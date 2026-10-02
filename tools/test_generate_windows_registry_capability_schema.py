@@ -321,6 +321,24 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
             {row["code"] for row in validate_assessment_capability_semantics(doc)},
         )
 
+    def test_resource_registry_types_do_not_guess_value_datatype(self):
+        for registry_type in ("none","resource_list","full_resource_descriptor","resource_requirements_list"):
+            with self.subTest(registry_type=registry_type):
+                doc={
+                    "assessment":{
+                        "objects":{"o":{"capability":"windows.registry"}},
+                        "states":{
+                            "type-state":{"capability":"windows.registry","state":{
+                                "field":"type","value":registry_type,"operation":"equal","datatype":"string"}},
+                            "value-state":{"capability":"windows.registry","state":{
+                                "field":"value","value":"opaque","operation":"equal","datatype":"string"}},
+                        },
+                        "tests":{"t":{"capability":"windows.registry","object":"o","states":["type-state","value-state"]}},
+                    }
+                }
+                codes={row["code"] for row in validate_assessment_capability_semantics(doc)}
+                self.assertNotIn("windows.registry.value_type_datatype",codes)
+
     def test_windows_view_is_not_native(self):
         self.assertNotIn("windows_view",json.dumps(self.schema))
 
