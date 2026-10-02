@@ -36,6 +36,39 @@ class NativePackageGraphValidationTests(unittest.TestCase):
             root=Path(td); self.build_valid(root)
             self.assertEqual(validate_package(root),[])
 
+    def test_corpus_level_shared_assessment_reference(self):
+        with tempfile.TemporaryDirectory() as td:
+            corpus=Path(td)
+            package=corpus/"pkg"
+            self.build_valid(package)
+            shared=corpus/"shared"/"assessments"/"shared.assessment.yaml"
+            write(shared, {"assessment":{"id":"shared.auto"}})
+
+            rule_path=package/"rules"/"R1.rule.yaml"
+            rule=yaml.safe_load(rule_path.read_text())
+            rule["rule"]["assessment_choices"]["default"]["assessment"]="../../shared/assessments/shared.assessment.yaml"
+            write(rule_path,rule)
+
+            rows=validate_package(package, reference_root=corpus)
+            self.assertEqual(rows,[])
+
+    def test_reference_escape_beyond_corpus_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            corpus=Path(td)/"corpus"
+            package=corpus/"pkg"
+            self.build_valid(package)
+            outside=Path(td)/"outside.assessment.yaml"
+            write(outside, {"assessment":{"id":"outside"}})
+
+            rule_path=package/"rules"/"R1.rule.yaml"
+            rule=yaml.safe_load(rule_path.read_text())
+            rule["rule"]["assessment_choices"]["default"]["assessment"]="../../../outside.assessment.yaml"
+            write(rule_path,rule)
+
+            rows=validate_package(package, reference_root=corpus)
+            self.assertIn("reference_escape",{r["code"] for r in rows})
+
+
     def test_missing_assessment_reference(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); self.build_valid(root)
