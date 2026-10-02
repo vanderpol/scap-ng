@@ -65,4 +65,6 @@ standards conformance.
 
 ## Windows snapshot correction
 
-Project-owner clarification, 2026-10-02: approved Windows OVAL tests such as `cmdlet` and `ntuser` are standard language capabilities. The checked-in Windows definitions schema snapshot is missing approved families and must be reconciled with the proper approved schema set. This is a schema-source problem, not an extension boundary. The only known custom SCC/NIWC Test/Object/State family in this workstream is `independent:sqlext`.
+Project-owner clarification, 2026-10-02: approved Windows OVAL tests such as `cmdlet` and `ntuser` are standard language capabilities. If a checked-in Windows definitions schema appears to omit approved families, the audit is using an incomplete or mismatched schema artifact and must be reconciled against the complete SCAP 1.4 schema/test-content set. This is a schema-source problem, not an extension boundary. The only known custom SCC/NIWC Test/Object/State family in this workstream is `independent:sqlext`.
+
+Project-owner clarification: all other OVAL Test/Object/State families used by this project are standard SCAP 1.4 schema/test-content surface. Only `independent:sqlext` is custom.
