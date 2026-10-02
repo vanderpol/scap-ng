@@ -19,7 +19,12 @@ class UnixPasswordCapabilitySchemaTests(unittest.TestCase):
         cls.mapping=json.loads(MAPPING.read_text(encoding="utf-8"))
         cls.schema=generate(cls.mapping,ROOT)
         common=json.loads((ROOT/"schema/v0.1.0/capability-common.schema.json").read_text(encoding="utf-8"))
-        cls.registry=Registry().with_resource(common["$id"],Resource.from_contents(common))
+        collected=json.loads((ROOT/"schema/v0.1.0/collected-item.schema.json").read_text(encoding="utf-8"))
+        result_types=json.loads((ROOT/"schema/v0.1.0/result-types.schema.json").read_text(encoding="utf-8"))
+        cls.registry=(Registry()
+            .with_resource(common["$id"],Resource.from_contents(common))
+            .with_resource(collected["$id"],Resource.from_contents(collected))
+            .with_resource(result_types["$id"],Resource.from_contents(result_types)))
 
     def validate_def(self,name,value):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
@@ -58,6 +63,30 @@ class UnixPasswordCapabilitySchemaTests(unittest.TestCase):
                         "mask":False,"match":"all","existence":"some",
                     },
                 })
+
+    def test_collected_item_reuses_state_field_surface(self):
+        self.validate_def("collected_item",{
+            "id":"item-1",
+            "capability":"unix.password",
+            "status":"exists",
+            "fields":{
+                "username":{"datatype":"string","value":"root"},
+                "user_id":{"datatype":"integer","value":0},
+                "group_id":{"datatype":"integer","value":0},
+                "home_dir":{"datatype":"string","value":"/root"},
+            },
+            "provenance":{},
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("collected_item",{
+                "id":"item-2",
+                "capability":"unix.password",
+                "status":"exists",
+                "fields":{
+                    "user_id":{"datatype":"boolean","value":False},
+                },
+                "provenance":{},
+            })
 
 
 if __name__=="__main__":
