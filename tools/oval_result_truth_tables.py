@@ -427,3 +427,46 @@ def aggregate_state(operator, predicate_results):
 def aggregate_item_states(state_operator, state_results):
     """Combine multiple referenced State results for one collected item."""
     return aggregate_operator(state_operator, state_results)
+
+
+def evaluate_record_field(field_name, comparison_results, entity_check="all"):
+    """Evaluate one expected record field against same-name Item fields.
+
+    OVAL 5.12.3 EntityStateFieldType requires a missing expected field to
+    produce error. When multiple same-name Item fields are present,
+    entity_check combines their comparison results.
+    """
+    values = list(comparison_results)
+    if not values:
+        return ERROR
+    return aggregate_check(entity_check, values)
+
+
+def evaluate_record_entity(field_results):
+    """Combine expected record-field results for one record Item entity.
+
+    OVAL 5.12.3 EntityStateRecordType defines the parent record comparison as
+    logical AND across its expected fields. Parent record entity_check, when
+    multiple record entities with the same name exist, is applied outside this
+    helper by the ordinary entity aggregation layer.
+    """
+    values = list(field_results)
+    if not values:
+        # A record State with no field requirements imposes no failing field
+        # predicate on the record value.
+        return TRUE
+    return aggregate_operator("AND", values)
+
+
+def validate_record_state_constraints(*, datatype, operation, var_ref=None, var_check=None):
+    """Validate OVAL-derived record State constraints stated by 5.12.3 schema."""
+    errors = []
+    if datatype != "record":
+        errors.append("record entity datatype must be record")
+    if operation != "equals":
+        errors.append("record entity operation must be equals")
+    if var_ref is not None:
+        errors.append("record entity var_ref is not permitted")
+    if var_check is not None:
+        errors.append("record entity var_check does not apply")
+    return errors

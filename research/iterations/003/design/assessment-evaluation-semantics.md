@@ -248,7 +248,38 @@ Migration tooling SHALL preserve source provenance if explicit legacy `mask` usa
 
 Evidence: GitHub Actions run 36931308817, source-explicit mask census; 212 files scanned, 0 explicit occurrences, 0 scan failures.
 
-## 14. Unresolved items
+## 14. Record entity evaluation
+
+OVAL-derived record values have capability-specific semantics that are stricter
+than ordinary scalar entities. These rules are source-backed by the pinned OVAL
+5.12.3 `EntityStateRecordType` and `EntityStateFieldType` documentation and
+are part of the native compatibility contract.
+
+For a record State entity:
+
+- the datatype SHALL be `record`;
+- the record-level operation SHALL be `equals`;
+- record-level `var_ref` SHALL NOT be used;
+- record-level `var_check` SHALL NOT be used;
+- each expected named field is compared independently against corresponding
+  same-name fields in the collected Item;
+- if an expected field is absent from the Item, that field result SHALL be
+  `error`;
+- when an Item contains multiple fields with the same name, the field's
+  `entity_check` combines the comparison results for those occurrences;
+- the resulting expected-field results for one record are combined with logical
+  AND;
+- if multiple corresponding record entities exist at the enclosing Item/entity
+  scope, the ordinary parent record `entity_check` is applied after each
+  record has been evaluated.
+
+A processor SHALL preserve field grouping. It SHALL NOT flatten record fields
+into unrelated Item entities before applying the above aggregation order.
+
+Executable coverage is provided by `tools/oval_result_truth_tables.py` and
+`tools/test_oval_result_truth_tables.py`.
+
+## 15. Unresolved items
 
 These remain open and SHALL NOT be silently guessed:
 

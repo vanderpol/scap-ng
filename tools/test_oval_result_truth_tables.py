@@ -11,6 +11,7 @@ from oval_result_truth_tables import (
     evaluate_variable_entity_reference, combine_set_flags, SET_FLAGS,
     decisive_partial_check, decisive_partial_existence,
     NO_VALUES, apply_filter_state_result, select_collected_object_instance,
+    evaluate_record_field, evaluate_record_entity, validate_record_state_constraints,
 )
 
 
@@ -574,6 +575,49 @@ class StateEntityAggregationOrder(unittest.TestCase):
                 entity_check="all",
                 comparison_rows=[[]],
             )
+
+
+class RecordEntitySemantics(unittest.TestCase):
+    def test_missing_expected_field_is_error(self):
+        self.assertEqual(evaluate_record_field("name", []), ERROR)
+
+    def test_repeated_same_name_fields_use_entity_check(self):
+        rows = [TRUE, FALSE]
+        self.assertEqual(
+            evaluate_record_field("user", rows, entity_check="all"),
+            FALSE,
+        )
+        self.assertEqual(
+            evaluate_record_field("user", rows, entity_check="at least one"),
+            TRUE,
+        )
+
+    def test_record_fields_are_anded(self):
+        self.assertEqual(evaluate_record_entity([TRUE, TRUE]), TRUE)
+        self.assertEqual(evaluate_record_entity([TRUE, FALSE, ERROR]), FALSE)
+        self.assertEqual(evaluate_record_entity([TRUE, ERROR]), ERROR)
+
+    def test_record_constraints_are_explicit(self):
+        self.assertEqual(
+            validate_record_state_constraints(
+                datatype="record", operation="equals"
+            ),
+            [],
+        )
+        self.assertEqual(
+            validate_record_state_constraints(
+                datatype="string",
+                operation="pattern match",
+                var_ref="oval:org.example:var:1",
+                var_check="all",
+            ),
+            [
+                "record entity datatype must be record",
+                "record entity operation must be equals",
+                "record entity var_ref is not permitted",
+                "record entity var_check does not apply",
+            ],
+        )
 
 
 if __name__ == "__main__":
