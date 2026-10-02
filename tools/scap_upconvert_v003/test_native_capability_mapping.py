@@ -148,6 +148,14 @@ class NativeCapabilityMappingTests(unittest.TestCase):
             "filters":[{"action":"exclude","state":"state-result"}],
         })
 
+    def test_test_state_operator_uses_clean_native_logical_name(self):
+        doc=self.aligned_wmi_document()
+        doc["assessment"]["tests"]["test-query"]["state_operator"]="XOR"
+        out=apply_capability_mapping(doc,self.mapping)
+        test=out["assessment"]["tests"]["test-query"]
+        self.assertNotIn("state_operator",test)
+        self.assertEqual(test["states_match"],"odd")
+
     def test_collector_comparison_semantics_fail_closed(self):
         doc=self.aligned_wmi_document()
         doc["assessment"]["objects"]["query-object"]["select"]["wql"]["operation"]="pattern match"
