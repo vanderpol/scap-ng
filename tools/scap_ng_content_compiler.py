@@ -248,7 +248,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             app_id,
             "applicability_catalog",
-            "objects/applicability.json",
+            "o/p.json",
             compiled_applicability,
             applicability_path,
         )
@@ -274,7 +274,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             rid,
             "rule",
-            f"objects/rules/{safe_name(rid)}.json",
+            f"o/r/{hashlib.sha256(rid.encode('utf-8')).hexdigest()[:16]}.json",
             compiled,
             rule_path,
         )
@@ -283,7 +283,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
         add_object(
             aid,
             "assessment",
-            f"objects/assessments/{safe_name(aid)}.json",
+            f"o/a/{hashlib.sha256(aid.encode('utf-8')).hexdigest()[:16]}.json",
             doc,
             source_path,
         )
@@ -291,7 +291,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
     add_object(
         benchmark["id"],
         "benchmark",
-        "objects/benchmark.json",
+        "o/b.json",
         compiled_benchmark,
         benchmark_path,
     )
@@ -320,7 +320,6 @@ def write_bundle(
                 "path": row["path"],
                 "sha256": row["sha256"],
                 "size": row["size"],
-                "source": row["source"],
             }
             for oid, row in sorted(object_index.items())
         },
@@ -355,6 +354,7 @@ def write_bundle(
         for name, data in sorted(members.items()):
             deterministic_zip_add(zf, name, data)
 
+    verification = verify_bundle(output, verify_signature=sign_self_signed)
     return {
         "benchmark_id": benchmark["id"],
         "file": output.name,
@@ -366,6 +366,130 @@ def write_bundle(
         "signing_trust": "self-signed-experimental-no-publisher-trust"
         if sign_self_signed
         else None,
+        "verified_object_graph": verification["objects"],
+    }
+
+
+def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
+    """Verify archive profile, manifest integrity and logical package references."""
+    with zipfile.ZipFile(package, "r") as zf:
+        infos = zf.infolist()
+        names = [x.filename for x in infos]
+        if len(names) != len(set(names)):
+            raise ValueError(f"{package}: duplicate ZIP member names")
+        for name in names:
+            p = Path(name)
+            if (
+                name.startswith("/")
+                or "\\" in name
+                or any(part in {"", ".", ".."} for part in p.parts)
+                or (p.parts and re.match(r"^[A-Za-z]:$", p.parts[0]))
+            ):
+                raise ValueError(f"{package}: unsafe ZIP member path {name!r}")
+
+        try:
+            manifest_bytes = zf.read("META-INF/manifest.json")
+        except KeyError as exc:
+            raise ValueError(f"{package}: missing META-INF/manifest.json") from exc
+        manifest = json.loads(manifest_bytes)
+        objects = manifest.get("objects")
+        if not isinstance(objects, dict):
+            raise ValueError(f"{package}: manifest objects must be a mapping")
+
+        expected = {"META-INF/manifest.json"}
+        sig = manifest.get("signature") or {}
+        for key in ("path", "certificate_path"):
+            value = sig.get(key)
+            if isinstance(value, str):
+                expected.add(value)
+
+        physical_paths = set()
+        for object_id, row in objects.items():
+            if not isinstance(row, dict):
+                raise ValueError(f"{package}: invalid manifest object record {object_id}")
+            path = row.get("path")
+            if not isinstance(path, str):
+                raise ValueError(f"{package}: object {object_id} missing path")
+            if path in physical_paths:
+                raise ValueError(f"{package}: multiple logical objects share member path {path}")
+            physical_paths.add(path)
+            expected.add(path)
+            try:
+                data = zf.read(path)
+            except KeyError as exc:
+                raise ValueError(f"{package}: missing member {path} for {object_id}") from exc
+            if len(data) != row.get("size"):
+                raise ValueError(f"{package}: size mismatch for {object_id}")
+            if hashlib.sha256(data).hexdigest() != row.get("sha256"):
+                raise ValueError(f"{package}: digest mismatch for {object_id}")
+
+        if (manifest.get("integrity") or {}).get("unexpected_members") == "reject":
+            unexpected = sorted(set(names) - expected)
+            if unexpected:
+                raise ValueError(f"{package}: unexpected ZIP members: {unexpected}")
+
+        entrypoint = manifest.get("entrypoint")
+        entry = objects.get(entrypoint)
+        if not isinstance(entry, dict) or entry.get("type") != "benchmark":
+            raise ValueError(f"{package}: entrypoint does not resolve to Benchmark")
+        benchmark_doc = json.loads(zf.read(entry["path"]))
+        benchmark = benchmark_doc.get("benchmark") or {}
+
+        for rid in benchmark.get("rules") or []:
+            row = objects.get(rid)
+            if not isinstance(row, dict) or row.get("type") != "rule":
+                raise ValueError(f"{package}: Benchmark Rule {rid} does not resolve through manifest")
+
+        app_id = benchmark.get("applicability_catalog")
+        if app_id is not None:
+            app_row = objects.get(app_id)
+            if not isinstance(app_row, dict) or app_row.get("type") != "applicability_catalog":
+                raise ValueError(f"{package}: applicability catalog {app_id} does not resolve")
+            app_doc = json.loads(zf.read(app_row["path"]))
+            conditions = (app_doc.get("applicability") or {}).get("conditions") or {}
+            rows = conditions.values() if isinstance(conditions, dict) else conditions
+            for condition in rows:
+                if not isinstance(condition, dict):
+                    continue
+                aid = condition.get("assessment")
+                if aid is None:
+                    continue
+                target = objects.get(aid)
+                if not isinstance(target, dict) or target.get("type") != "assessment":
+                    raise ValueError(
+                        f"{package}: applicability Assessment {aid} does not resolve"
+                    )
+
+        for object_id, row in objects.items():
+            if row.get("type") != "rule":
+                continue
+            rule_doc = json.loads(zf.read(row["path"]))
+            rule = rule_doc.get("rule") or {}
+            for selector, choice in (rule.get("assessment_choices") or {}).items():
+                if not isinstance(choice, dict):
+                    continue
+                aid = choice.get("assessment")
+                if aid is None:
+                    continue
+                target = objects.get(aid)
+                if not isinstance(target, dict) or target.get("type") != "assessment":
+                    raise ValueError(
+                        f"{package}: Rule {object_id} choice {selector} Assessment "
+                        f"{aid} does not resolve"
+                    )
+
+        if verify_signature and sig.get("format") == "cms-detached-der":
+            verify_cms_signature(
+                manifest_bytes,
+                zf.read(sig["path"]),
+                zf.read(sig["certificate_path"]),
+            )
+
+    return {
+        "benchmark_id": entrypoint,
+        "objects": len(objects),
+        "members": len(names),
+        "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
     }
 
 
