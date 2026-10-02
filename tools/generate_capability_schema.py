@@ -222,7 +222,15 @@ def generate(mapping, repo_root):
             source_name = reverse_selector_map[name]
             field = object_fields[source_name]
             dtypes = source_datatypes(field)
-            selector_props[name] = generic_entity_schema(dtypes, state=False)
+            selector_schema = generic_entity_schema(dtypes, state=False)
+            if name == "name":
+                selector_schema = {
+                    "oneOf": [
+                        selector_schema,
+                        {"type": "null"},
+                    ]
+                }
+            selector_props[name] = selector_schema
             selector_field_meta[name] = {
                 "source_field": source_name,
                 "datatypes": dtypes,
