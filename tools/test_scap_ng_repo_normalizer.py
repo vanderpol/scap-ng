@@ -106,6 +106,64 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertTrue((output/"c"/"assessments"/"automated"/"R3.automated.assessment.yaml").exists())
 
 
+    def test_manual_duplicates_keep_manual_shared_filename(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            for name,rule_id in (("a","R1"),("b","R2")):
+                b=root/name
+                dump(b/"benchmark.yaml",{"benchmark":{"id":name,"rules":[rule_id],"profiles":[]}})
+                dump(b/"assessments"/"manual"/f"{rule_id}.manual.assessment.yaml",{
+                    "assessment":{
+                        "id":f"{rule_id}.manual",
+                        "version":1,
+                        "assessment_title":"Manual check",
+                        "mode":"manual",
+                        "class":"compliance",
+                        "purpose":"assessment",
+                        "procedure":"Verify the setting manually.",
+                        "response":{
+                            "type":"compliance",
+                            "choices":[
+                                {"value":"pass","label":"Pass","outcome":"true"},
+                                {"value":"fail","label":"Fail","outcome":"false"},
+                            ],
+                            "allow_comment":True,
+                            "allow_evidence":True,
+                        },
+                    }
+                })
+                dump(b/"rules"/f"{rule_id}.rule.yaml",{
+                    "rule":{
+                        "id":rule_id,
+                        "title":"Manual rule",
+                        "assessment_choices":{
+                            "default":{"assessment":f"../assessments/manual/{rule_id}.manual.assessment.yaml"},
+                            "manual":{"assessment":f"../assessments/manual/{rule_id}.manual.assessment.yaml"},
+                        },
+                        "default_assessment_choice":"default",
+                    }
+                })
+
+            output=Path(td)/"normalized"
+            report=Path(td)/"report.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--rewrite","--output-root",str(output),
+                    "--report",str(report),"--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+
+            shared=list((output/"shared"/"assessments").glob("*.yaml"))
+            self.assertEqual(len(shared),1)
+            self.assertTrue(shared[0].name.endswith(".manual.assessment.yaml"))
+            doc=yaml.safe_load(shared[0].read_text())["assessment"]
+            self.assertEqual(doc["mode"],"manual")
+            self.assertIn("response",doc)
+
+
     def test_applicability_assessments_are_normalized_and_rewritten(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"source"
