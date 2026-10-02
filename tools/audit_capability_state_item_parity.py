@@ -74,7 +74,10 @@ def field_datatypes(element):
     # Unknown specialized entity types are compared by exact XSD type name
     # instead of silently treating them as strings.
     if typed:
-        return {"xsd-type:" + typed}
+        # OVAL duplicates equivalent State/Item entity wrapper type names.
+        # Compare their semantic suffix rather than the serialization role.
+        canonical = typed.replace("EntityState", "Entity").replace("EntityItem", "Entity")
+        return {"xsd-type:" + canonical}
     return {"unknown"}
 
 
@@ -179,6 +182,9 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
     state_names = set(state_fields)
     item_names = set(item_fields)
     object_names = set(object_fields)
+    # behaviors controls collection; it is not a collected entity and therefore
+    # is intentionally outside the Object-field subset invariant.
+    object_names.discard("behaviors")
 
     only_state = sorted(state_names - item_names)
     only_item = sorted(item_names - state_names)
