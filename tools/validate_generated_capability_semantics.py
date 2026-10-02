@@ -22,7 +22,7 @@ def _is_variable_value(value):
     )
 
 
-FILE_SELECTION_CAPABILITIES={"unix.file","file.hash"}
+FILE_SELECTION_CAPABILITIES={"unix.file","file.hash","windows.file"}
 
 
 def validate_file_selection_object(obj):
@@ -68,6 +68,17 @@ def validate_file_selection_object(obj):
                 "code":f"{capability}.name_empty",
                 "fields":["name"],
                 "message":"empty name requires a Variable reference or match semantics; use null to select the directory itself",
+            })
+        if (
+            capability == "windows.file"
+            and isinstance(value, str)
+            and not pattern
+            and any(ch in value for ch in '\\/:*?>|<"')
+        ):
+            diagnostics.append({
+                "code":"windows.file.literal_name_characters",
+                "fields":["name"],
+                "message":"literal Windows file name contains path separator or reserved filename characters",
             })
 
     return diagnostics
