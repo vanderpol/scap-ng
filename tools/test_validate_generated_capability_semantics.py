@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import unittest
+import json
+from pathlib import Path
 
 from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
@@ -22,6 +24,17 @@ def entity(value, operation="equal", datatype="string", **extra):
 
 
 class SemanticRuleCoverageTests(unittest.TestCase):
+    def test_all_capability_mapping_rules_have_enforcement_classification(self):
+        root=Path(__file__).resolve().parents[1]
+        mapping_dir=root/"schema/v0.1.0/capability-mappings"
+        missing={}
+        for path in sorted(mapping_dir.glob("*.json")):
+            mapping=json.loads(path.read_text(encoding="utf-8"))
+            unclassified=classify_declared_semantic_rules(mapping)["unclassified"]
+            if unclassified:
+                missing[path.name]=unclassified
+        self.assertEqual(missing,{})
+
     def test_known_executable_inventory_covers_representative_capabilities(self):
         for rule_id in (
             "unix.file.full_path_no_traversal",
