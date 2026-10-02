@@ -32,6 +32,7 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
         self.validate_def("object",{
             "object_title":"Administrators rights on hosts",
             "capability":"windows.fileeffectiverights53",
+            "filesystem":"any",
             "select":{
                 "full_path":self.entity(r"C:\\Windows\\System32\\drivers\\etc\\hosts"),
                 "trustee_sid":self.entity("S-1-5-32-544"),
@@ -41,7 +42,8 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             self.validate_def("object",{
                 "object_title":None,
                 "capability":"windows.fileeffectiverights53",
-                "select":{"full_path":self.entity(r"C:\\Windows\\win.ini")},
+                "filesystem":"any",
+            "select":{"full_path":self.entity(r"C:\\Windows\\win.ini")},
             })
 
     def test_windows_junction_traversal_is_shared(self):
@@ -65,7 +67,8 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             "assessment":{
                 "objects":{"o":{
                     "capability":"windows.fileeffectiverights53",
-                    "select":{
+                    "filesystem":"any",
+            "select":{
                         "directory":self.entity(r"C:\\ProgramData",operation="equal_ci"),
                         "name":self.entity(".*",operation="match"),
                         "trustee_sid":self.entity("S-1-5-18"),
@@ -90,7 +93,8 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             "assessment":{
                 "objects":{"o":{
                     "capability":"windows.fileeffectiverights53",
-                    "select":{
+                    "filesystem":"any",
+            "select":{
                         "full_path":self.entity(r"C:\\\\Windows\\\\win.ini"),
                         "trustee_sid":self.entity("S-1-5-18"),
                     },
