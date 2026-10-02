@@ -114,3 +114,30 @@ SHOULD NOT duplicate the child's authoritative execution graph. Any intentional
 denormalization must be documented as an index, projection, or compact policy
 context. New canonical result properties should be checked against the ownership
 table before being accepted.
+
+
+## Second-pass schema boundary audit
+
+A follow-up audit checked the remaining canonical result/source schemas for the
+same two failure modes: speculative syntax and structurally complete records
+that nevertheless accepted arbitrary properties.
+
+Changes made in this pass:
+
+- removed `assessment_result.selected_branch`; it was explicitly reserved for
+  a future conditional-result design and had no current normative semantics;
+- closed Assessment Result manual-response, consumed Organizational Input,
+  reason, and input-binding records where their current property sets are
+  already explicit;
+- closed reusable `typed_value` objects;
+- closed Scan Result target and Benchmark-index records;
+- closed the Benchmark platform record and Organizational Input intended-scope
+  record.
+
+Open maps remain open only where extensibility is intentional, including
+capability-specific Assessment structures, Parameter/input constraint payloads,
+scanner implementation metadata, summary aggregates, and provenance/extension
+maps whose vocabulary has not yet been standardized.
+
+The regression guard now tests both layer ownership and these canonical
+boundary decisions.
