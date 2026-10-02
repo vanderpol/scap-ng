@@ -302,6 +302,62 @@ jobs:
           (ev/"README.md").write_text("\n".join(lines),encoding="utf-8")
           print(json.dumps(summary,indent=2,sort_keys=True))
           PY
+      - name: Stage complete NIWC Current review artifact
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+
+          root=Path("work/niwc-current-review")
+          shutil.rmtree(root,ignore_errors=True)
+          root.mkdir(parents=True,exist_ok=True)
+
+          mappings=[
+              (Path("work/fresh-current"), root/"source"),
+              (Path("work/normalized-current"), root/"normalized"),
+              (Path("work/packages-after"), root/"packages"),
+              (Path("work/evidence"), root/"evidence"),
+          ]
+          for source,target in mappings:
+              if source.exists():
+                  shutil.copytree(source,target)
+
+          summary={
+              "artifact":"niwc-current-full-review",
+              "scap_ng_revision":"${{ github.sha }}",
+              "niwc_revision":"${{ env.NIWC_REVISION }}",
+              "source_packages_expected":65,
+              "layout":{
+                  "source":"Fresh current-design SCAP-NG source trees generated from pinned NIWC Current packages.",
+                  "normalized":"Exact-semantics normalized source trees with shared Assessments.",
+                  "packages":"Compiled readable .scapng bundles.",
+                  "evidence":"Generation status, blockers, validation, normalization, compiler and provenance reports.",
+              },
+          }
+          (root/"REVIEW.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          (root/"README.md").write_text(
+              "# NIWC Current full SCAP-NG review build\n\n"
+              "This artifact is generated fresh from all 65 pinned NIWC Current SCAP 1.4 packages.\n"
+              "Packages that cannot be converted are still accounted for under evidence/conversion-output/status/.\n\n"
+              "## Layout\n\n"
+              "- source/ — fresh generated native SCAP-NG authoring trees\n"
+              "- normalized/ — exact-semantics normalized authoring trees\n"
+              "- packages/ — compiled readable .scapng bundles\n"
+              "- evidence/ — validation, blocker, provenance, normalization and compiler reports\n\n"
+              "SCAP-NG source commit: ${{ github.sha }}\n\n"
+              "Pinned NIWC source revision: ${{ env.NIWC_REVISION }}\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: niwc-current-full-review
+          path: work/niwc-current-review
+          if-no-files-found: error
+          compression-level: 6
       - uses: actions/upload-artifact@v4
         if: always()
         with:
