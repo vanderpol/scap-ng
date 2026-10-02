@@ -371,6 +371,18 @@ def _iter_set_object_refs(expression):
             yield from _iter_set_object_refs(nested)
 
 
+def validate_declared_semantic_rules(mapping, implemented_rule_ids):
+    """Report reviewed semantic rules that lack executable validation coverage.
+
+    Some rules are structural and are enforced by generated JSON Schema rather than
+    this semantic validator. Callers supply the rule IDs implemented by the layer
+    they are auditing so metadata cannot be mistaken for executable enforcement.
+    """
+    declared={row.get("id") for row in mapping.get("semantic_validator_rules",[]) if row.get("id")}
+    missing=sorted(declared-set(implemented_rule_ids))
+    return missing
+
+
 def validate_assessment_capability_semantics(document):
     """Validate current native Assessment cross-node capability semantics."""
     assessment=document.get("assessment",document)
