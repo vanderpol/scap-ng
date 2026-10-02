@@ -87,7 +87,7 @@ Reviewed after the production-first checkpoint:
 - `linux.selinuxsecuritycontext` — production:2 — **reviewed mapping complete**
 - `unix.interface` — production:2 — **reviewed mapping complete**
 
-Windows candidates such as `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` currently have Item definitions in the pinned system-characteristics schema but no corresponding Test/Object/State family in the official OVAL-Community v5.12.3 Windows definitions schema. Treat them as source-governance/provenance work, not standard 5.12.3 mappings, until their publisher-extension source is identified.
+Windows content-backed capability completion is now complete. `ntuser`, `service`, `sid_sid`, `user_sid55`, `appcmdlistconfig`, and the other reviewed Windows families are standard OVAL 5.12.3 capabilities verified against the authoritative OVAL-Community schema blobs and SCAP Self-Assertion evidence.
 
 ### Content-backed standard capability checkpoint — 2026-10-02
 
@@ -96,9 +96,15 @@ All currently inventoried **standard OVAL 5.12.3 capability candidates with prod
 The remaining candidate inventory is intentionally split into two deferred workstreams:
 
 - **schema-only standard candidates** with no concrete content examples; these are deferred until after higher-value SCAP-NG design work or until concrete content evidence appears;
-- **Windows content-backed capability completion** using the authoritative v5.12.3 Windows definitions/system-characteristics schemas and SCAP Self-Assertion content.
+- **Windows content-backed capability completion — complete** using the authoritative v5.12.3 Windows definitions/system-characteristics schemas and SCAP Self-Assertion content.
 
 Reviewed native renames such as `filehash58 → file.hash`, `variable → variable.value`, and `wmi57 → windows.wmi.query` count as covered migration surface rather than unmapped candidates.
+
+### Windows completion checkpoint — 2026-10-02
+
+All currently inventoried content-backed Windows OVAL 5.12.3 capabilities now have reviewed native mappings. The maintained State/Item parity gate passes across the completed Windows mapping set. Focused grouped regressions cover IIS AppCmd, SID/group identity, services, NTUSER registry hives, registry effective rights, User SID, WMI/Cmdlet records and Windows Update Searcher.
+
+`windows.wuaupdatesearcher` intentionally repairs the confirmed OVAL 5.12.3 scalar State omission for `source_path`; the defect is tracked as OV-XSD-008 for possible OVAL 5.12.4 maintenance.
 
 ### Conformance-completion tranche
 
