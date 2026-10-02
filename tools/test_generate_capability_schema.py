@@ -35,7 +35,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         encoded = json.dumps(self.schema)
         self.assertIn("capability-common.schema.json#/$defs/object_entity_base", encoded)
         self.assertIn("capability-common.schema.json#/$defs/state_entity_base", encoded)
-        self.assertIn("capability-common.schema.json#/$defs/state_filter", encoded)
+        self.assertIn("capability-common.schema.json#/$defs/set_expression", encoded)
         self.assertIn("capability-common.schema.json#/$defs/set_expression", encoded)
         self.assertNotIn('"variable_reference":', encoded)
 
