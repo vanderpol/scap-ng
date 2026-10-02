@@ -106,6 +106,88 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertTrue((output/"c"/"assessments"/"automated"/"R3.automated.assessment.yaml").exists())
 
 
+    def test_applicability_assessments_are_normalized_and_rewritten(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/a")
+            self.benchmark(root,"b","R2","/etc/b")
+            for name in ("a","b"):
+                b=root/name
+                dump(b/"assessments"/"applicability"/"platform.assessment.yaml",{
+                    "assessment":{
+                        "id":f"{name}.platform",
+                        "version":1,
+                        "assessment_title":f"{name} platform",
+                        "mode":"automated",
+                        "class":"inventory",
+                        "purpose":"applicability",
+                        "specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},
+                        "objects":{},
+                        "states":{},
+                        "tests":{},
+                        "evaluate":{},
+                    }
+                })
+                dump(b/"applicability.yaml",{
+                    "applicability":{
+                        "id":f"{name}.applicability",
+                        "conditions":{
+                            "platform":{
+                                "assessment":"assessments/applicability/platform.assessment.yaml"
+                            }
+                        },
+                    }
+                })
+
+            output=Path(td)/"normalized"
+            report_path=Path(td)/"report.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--rewrite","--output-root",str(output),
+                    "--report",str(report_path),"--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+
+            report=json.loads(report_path.read_text())
+            self.assertEqual(report["summary"]["applicability_files_rewritten"],2)
+            app_members=[
+                group for group in report["exact_groups"]
+                if any(
+                    consumer.get("consumer_kind")=="applicability"
+                    for member in group["members"]
+                    for consumer in member["consumers"]
+                )
+            ]
+            self.assertEqual(len(app_members),1)
+            for name in ("a","b"):
+                app=yaml.safe_load((output/name/"applicability.yaml").read_text())["applicability"]
+                ref=app["conditions"]["platform"]["assessment"]
+                self.assertIn("shared/assessments",ref)
+                self.assertFalse(
+                    (output/name/"assessments"/"applicability"/"platform.assessment.yaml").exists()
+                )
+
+    def test_missing_applicability_assessment_fails_repository_validation(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/a")
+            dump(root/"a"/"applicability.yaml",{
+                "applicability":{
+                    "id":"a.applicability",
+                    "conditions":{
+                        "platform":{
+                            "assessment":"assessments/applicability/missing.assessment.yaml"
+                        }
+                    },
+                }
+            })
+            with self.assertRaisesRegex(ValueError,"unresolved reference"):
+                normalizer.validate_normalized_repository(root)
+
+
     def test_rule_overlap_queue_requires_strong_evidence(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
