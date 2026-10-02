@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Audit explicit runtime defaults in generated native v003 assessments.
 
-This tests source readability and selected OVAL-derived invariants. It does
+This tests source readability and selected OVAL-derived invariants. Generic OVAL mask=false is intentionally not a native authored default; result redaction is explicit via redact_result when needed. It does
 not prove complete execution parity and deliberately distinguishes Object
 entities, State entities, and record fields from variable expressions.
 """
@@ -33,7 +33,7 @@ def audit_doc(document, source="<memory>"):
         if not isinstance(item, dict) or "value" not in item:
             issue("UNNORMALIZED_ENTITY", path)
             return
-        for field in ("operation", "datatype", "mask"):
+        for field in ("operation", "datatype"):
             if field not in item:
                 issue("HIDDEN_ENTITY_DEFAULT_"+field.upper(), path)
         if has_variable(item.get("value")):

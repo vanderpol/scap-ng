@@ -6,7 +6,7 @@ from audit_v003_explicit_defaults import audit_doc
 class ExplicitDefaultsTests(unittest.TestCase):
     def fixture(self):
         obj = {"value": {"variable": "v"}, "variable_check": "all",
-               "operation": "equals", "datatype": "string", "mask": False}
+               "operation": "equals", "datatype": "string"}
         state = dict(obj, field="filename", entity_check="all",
                      entity_existence="at_least_one_exists")
         return {"assessment": {"mode": "automated",
@@ -45,7 +45,7 @@ class ExplicitDefaultsTests(unittest.TestCase):
     def test_record_fields(self):
         doc = self.fixture()
         record = {"name": "key", "value": "value", "operation": "equals",
-                  "datatype": "string", "mask": False, "entity_check": "all"}
+                  "datatype": "string", "entity_check": "all"}
         doc["assessment"]["checks"]["x"]["collect"]["select"]["record"] = {
             "operation": "equals", "datatype": "record", "mask": False,
             "value": {"record": [record]}}
