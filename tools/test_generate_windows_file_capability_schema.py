@@ -65,6 +65,35 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
+    def test_windows_traversal_preserves_junction_terminology(self):
+        self.validate_def("object",{
+            "object_title":"junction traversal",
+            "capability":"windows.file",
+            "select":{
+                "directory":self.entity(r"C:\\Windows"),
+                "name":self.entity(".*",operation="match"),
+            },
+            "traversal":{
+                "max_depth":2,
+                "recurse":"junctions_and_directories",
+                "filesystem":"same",
+            },
+        })
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":"unix terminology is not Windows traversal syntax",
+                "capability":"windows.file",
+                "select":{
+                    "directory":self.entity(r"C:\\Windows"),
+                    "name":self.entity(".*",operation="match"),
+                },
+                "traversal":{
+                    "max_depth":2,
+                    "recurse":"symlinks_and_directories",
+                    "filesystem":"same",
+                },
+            })
+
     def test_directory_itself_uses_null_name(self):
         self.validate_def("object",{
             "object_title":"Windows directory",
