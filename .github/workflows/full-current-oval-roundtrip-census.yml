@@ -142,6 +142,7 @@ jobs:
               "Filter capability mismatch:",
               "collection_graph_type_binding:Filter capability mismatch:",
           )
+          source_defect_features={"var_ref_datatype_mismatch"}
           for row in report["results"]:
               if row.get("equal"):
                   continue
@@ -161,6 +162,8 @@ jobs:
                       if x.get("feature")=="nonstandard_oval_element" and x.get("detail")
                   )
               elif isinstance(row.get("error"),str) and row["error"].startswith(source_defect_prefixes):
+                  source_defects.append(row)
+              elif names and names <= source_defect_features:
                   source_defects.append(row)
               else:
                   bad.append(row)
