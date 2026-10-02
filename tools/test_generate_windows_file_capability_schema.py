@@ -94,6 +94,22 @@ class WindowsFileCapabilitySchemaTests(unittest.TestCase):
                 },
             })
 
+    def test_full_path_rejects_windows_traversal_semantically(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{
+                    "o":{
+                        "capability":"windows.file",
+                        "select":{"full_path":self.entity(r"C:\\\\Windows\\\\win.ini")},
+                        "traversal":{"max_depth":1,"recurse":"junctions","filesystem":"same"},
+                    }
+                },
+                "states":{},
+                "tests":{},
+            }
+        })
+        self.assertIn("windows.file.full_path_no_traversal",{row["code"] for row in rows})
+
     def test_directory_itself_uses_null_name(self):
         self.validate_def("object",{
             "object_title":"Windows directory",
