@@ -177,8 +177,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                         "operation":"equal",
                         "datatype":"string",
                         "mask":False,
-                        "entity_check":"all",
-                        "entity_existence":"some",
+                        "match":"all",
+                        "existence":"some",
                     },
                 })
 
@@ -194,8 +194,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                             "operation":"equal",
                             "datatype":"string",
                             "mask":False,
-                            "entity_check":"all",
-                            "entity_existence":"some",
+                            "match":"all",
+                            "existence":"some",
                         },
                     })
 
@@ -216,8 +216,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                         "operation":"equal",
                         "datatype":datatype,
                         "mask":False,
-                        "entity_check":"all",
-                        "entity_existence":"some",
+                        "match":"all",
+                        "existence":"some",
                     },
                 })
 
@@ -231,8 +231,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                     "operation":"equal",
                     "datatype":"string",
                     "mask":False,
-                    "entity_check":"all",
-                    "entity_existence":"some",
+                    "match":"all",
+                    "existence":"some",
                 },
             },
         }
@@ -250,8 +250,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                             "operation":"equal",
                             "datatype":"integer",
                             "mask":False,
-                            "entity_check":"all",
-                            "entity_existence":"some",
+                            "match":"all",
+                            "existence":"some",
                         },
                     },
                 },
@@ -290,8 +290,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                             "operation":"equal",
                             "datatype":"string",
                             "mask":False,
-                            "entity_check":"all",
-                            "entity_existence":"some",
+                            "match":"all",
+                            "existence":"some",
                         },
                     },
                     "value-state":{
@@ -302,8 +302,8 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                             "operation":"greater_or_equal",
                             "datatype":"version",
                             "mask":False,
-                            "entity_check":"all",
-                            "entity_existence":"some",
+                            "match":"all",
+                            "existence":"some",
                         },
                     },
                 },
