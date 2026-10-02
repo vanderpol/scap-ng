@@ -55,7 +55,7 @@ def validate_file_selection_object(obj):
     directory=select.get("directory")
     if (
         isinstance(directory, dict)
-        and directory.get("operation") != "equal"
+        and directory.get("operation") not in {"equal","equal_ci"}
         and traversal is not None
     ):
         diagnostics.append({
