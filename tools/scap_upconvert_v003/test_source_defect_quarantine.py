@@ -77,6 +77,52 @@ class SourceDefectQuarantineTests(unittest.TestCase):
         self.assertIsNone(review.source_defect_reason("definition_not_found"))
         self.assertIsNone(review.source_defect_reason("roundtrip_mismatch"))
 
+        self.assertEqual(
+            review.source_defect_features_reason([
+                {
+                    "feature": "var_ref_datatype_mismatch",
+                    "source_id": "oval:test:obj:1",
+                    "detail": "pid:int!=oval:test:var:1:boolean",
+                }
+            ]),
+            "var_ref_datatype_mismatch",
+        )
+        self.assertIsNone(review.source_defect_features_reason([
+            {"feature": "variable_kind", "source_id": "oval:test:var:1"}
+        ]))
+        self.assertIsNone(review.source_defect_features_reason([
+            {"feature": "var_ref_datatype_mismatch"},
+            {"feature": "definition_not_found"},
+        ]))
+
+    def test_feature_level_source_defect_uses_verified_manual_fallback(self):
+        findings=[{
+            "feature":"var_ref_datatype_mismatch",
+            "source_id":"oval:test:obj:1",
+            "detail":"pid:int!=oval:test:var:1:boolean",
+        }]
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            tmp=root/"tmp"
+            tmp.mkdir()
+            original=ET.Element("{"+review.OD+"}oval_definitions")
+            with patch.object(
+                review,
+                "unsupported_definition_features",
+                return_value=findings,
+            ):
+                result,failed=review.convert_rule(
+                    self.rec(),original,root,None,tmp
+                )
+
+            self.assertFalse(failed)
+            self.assertEqual(result["selectors"]["default"],result["selectors"]["manual"])
+            self.assertNotIn("automated",result["selectors"])
+            fallback=result["source_defect_fallbacks"][0]
+            self.assertEqual(fallback["classification"],"source_content_defect")
+            self.assertEqual(fallback["reason"],"var_ref_datatype_mismatch")
+            self.assertIn("var_ref_datatype_mismatch",fallback["error"])
+
     def test_known_source_defect_uses_verified_manual_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
