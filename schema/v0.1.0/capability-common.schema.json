@@ -584,6 +584,50 @@
       ],
       "unevaluatedProperties": false,
       "description": "Windows file traversal. Preserves the non-deprecated OVAL junction terminology rather than silently treating it as Unix symlink syntax."
+    },
+    "object_record_field": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        {
+          "type": "object",
+          "required": [
+            "match"
+          ],
+          "properties": {
+            "match": {
+              "$ref": "#/$defs/match_quantifier"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "One named field in an authored record-valued Object input. The field key supplies identity; match preserves OVAL field entity_check semantics."
+    },
+    "object_record": {
+      "type": "object",
+      "required": [
+        "fields",
+        "mask"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/object_record_field"
+          }
+        },
+        "mask": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authored record-valued Object input. Record field names are structurally unique. Parent record datatype=record and operation=equals are implicit because no other native values are meaningful."
     }
   }
 }
