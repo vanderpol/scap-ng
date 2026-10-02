@@ -177,13 +177,48 @@ def check(policy):
         if path.startswith(("research/iterations/001/", "research/iterations/002/")):
             failures.append("Current CI executes archived iteration code: " + path)
     baseline = tracked_tree(policy["baseline_commit"])
-    missing = [p for p in baseline if not (ROOT / p).exists()]
-    failures.extend("Lost baseline path: " + p for p in missing)
-    historical = [p for p in baseline if p.startswith(("research/iterations/001/", "research/iterations/002/")) and (ROOT / p).exists()]
-    process = subprocess.run(["git", "hash-object", "--stdin-paths"], input="\n".join(historical) + "\n", text=True, capture_output=True, check=True, cwd=ROOT)
-    for p, actual in zip(historical, process.stdout.splitlines()):
-        if actual != baseline[p]["git_blob"]:
-            failures.append("Historical payload changed: " + p)
+
+    removed_roots = policy.get("removed_historical_trees", {})
+    allowed_missing = set()
+    for root, record in removed_roots.items():
+        expected = {p for p in baseline if p == root or p.startswith(root + "/")}
+        if not expected:
+            failures.append("Removed historical tree not present in baseline: " + root)
+            continue
+        actual_tree = git("rev-parse", f'{policy["baseline_commit"]}:{root}').decode().strip()
+        if actual_tree != record.get("tree_sha"):
+            failures.append(
+                f"Removed historical tree SHA mismatch for {root}: "
+                f"policy={record.get('tree_sha')} baseline={actual_tree}"
+            )
+        if not record.get("recovery_tag"):
+            failures.append("Removed historical tree missing recovery tag: " + root)
+        allowed_missing.update(expected)
+
+    missing = [p for p in baseline if not (ROOT / p).exists() and p not in allowed_missing]
+    failures.extend("Lost unaccounted baseline path: " + p for p in missing)
+
+    historical = [
+        p for p in baseline
+        if p.startswith(("research/iterations/001/", "research/iterations/002/"))
+        and (ROOT / p).exists()
+    ]
+    if historical:
+        process = subprocess.run(
+            ["git", "hash-object", "--stdin-paths"],
+            input="\n".join(historical) + "\n",
+            text=True,
+            capture_output=True,
+            check=True,
+            cwd=ROOT,
+        )
+        for p, actual in zip(historical, process.stdout.splitlines()):
+            if actual != baseline[p]["git_blob"]:
+                failures.append("Historical payload changed: " + p)
+
+    for path in policy.get("current_data_inputs", []):
+        if not (ROOT / path).is_file():
+            failures.append("Missing promoted current data input: " + path)
     return failures
 
 
