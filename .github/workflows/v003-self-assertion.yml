@@ -160,35 +160,27 @@ jobs:
               raise SystemExit(1)
 
           roundtrip=json.loads(Path("self-assertion-v003-roundtrip.json").read_text())
+          found_roundtrip={}
           bad=[]
-          blocked_deprecated=set()
-          blocked_invalid=set()
           for row in roundtrip.get("results",[]):
               if row.get("equal"):
                   continue
               features=row.get("unsupported_features") or []
               names={x.get("feature") for x in features}
               key=(row.get("file"),row.get("definition_id"))
-              if names == {"deprecated_oval_test"} and row.get("definition_id") in expected_deprecated:
-                  blocked_deprecated.add(row["definition_id"])
-              elif names == {"var_ref_datatype_mismatch"} and key in expected_source_invalid:
-                  blocked_invalid.add(key)
-              else:
+              found_roundtrip[key]=names
+              if key not in expected_blockers or names != expected_blockers[key]:
                   bad.append(row)
-          if (bad or blocked_deprecated != set(expected_deprecated)
-                  or blocked_invalid != expected_source_invalid):
+
+          if bad or found_roundtrip != expected_blockers:
               print(json.dumps({
                   "unexpected_roundtrip_failures":bad,
-                  "deprecated":sorted(blocked_deprecated),
-                  "source_invalid":sorted(blocked_invalid),
+                  "expected":{str(k):sorted(v) for k,v in expected_blockers.items()},
+                  "found":{str(k):sorted(v) for k,v in found_roundtrip.items()},
               },indent=2))
               raise SystemExit(1)
 
-          expected_equal=(
-              roundtrip.get("definitions")
-              - len(expected_deprecated)
-              - len(expected_source_invalid)
-          )
+          expected_equal=roundtrip.get("definitions") - len(expected_blockers)
           if roundtrip.get("semantic_equal") != expected_equal:
               raise SystemExit(
                   f"semantic count mismatch: {roundtrip.get('semantic_equal')} "
@@ -197,8 +189,9 @@ jobs:
           print(json.dumps({
               "definitions":roundtrip["definitions"],
               "semantic_equal":roundtrip["semantic_equal"],
-              "deprecated_blockers":sorted(blocked_deprecated),
-              "source_invalid_var_ref_datatype":sorted(blocked_invalid),
+              "expected_blockers":{
+                  str(k):sorted(v) for k,v in expected_blockers.items()
+              },
           },indent=2))
           PY
 
