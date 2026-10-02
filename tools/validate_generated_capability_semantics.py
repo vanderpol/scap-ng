@@ -495,15 +495,36 @@ RUNTIME_SEMANTIC_RULE_IDS={
 }
 
 def validate_declared_semantic_rules(mapping, implemented_rule_ids):
-    """Report reviewed semantic rules that lack executable validation coverage.
-
-    Some rules are structural and are enforced by generated JSON Schema rather than
-    this semantic validator. Callers supply the rule IDs implemented by the layer
-    they are auditing so metadata cannot be mistaken for executable enforcement.
-    """
+    """Report reviewed semantic rules that lack the caller's enforcement coverage."""
     declared={row.get("id") for row in mapping.get("semantic_validator_rules",[]) if row.get("id")}
     missing=sorted(declared-set(implemented_rule_ids))
     return missing
+
+
+def classify_declared_semantic_rules(mapping):
+    """Return declared rule IDs grouped by their required enforcement layer.
+
+    Capability-specific filter_state_capability declarations are implemented by
+    the generic recursive Object/State capability validator.
+    """
+    declared={row.get("id") for row in mapping.get("semantic_validator_rules",[]) if row.get("id")}
+    executable=set()
+    for rule_id in declared:
+        if rule_id.endswith(".filter_state_capability"):
+            executable.add(rule_id)
+        elif rule_id in EXECUTABLE_SEMANTIC_RULE_IDS:
+            executable.add(rule_id)
+    structural=declared & STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS
+    runtime=declared & RUNTIME_SEMANTIC_RULE_IDS
+    policy=declared & POLICY_SEMANTIC_RULE_IDS
+    accounted=executable | structural | runtime | policy
+    return {
+        "executable":sorted(executable),
+        "structural_or_import":sorted(structural),
+        "runtime":sorted(runtime),
+        "policy":sorted(policy),
+        "unclassified":sorted(declared-accounted),
+    }
 
 
 def validate_assessment_capability_semantics(document):
