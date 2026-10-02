@@ -469,6 +469,9 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "macos.softwareupdate.implicit_population",
     "linux.apparmorstatus.singleton_source",
     "linux.sestatus.singleton_source",
+    "linux.rpmverifyfile.materialized_behaviors",
+    "linux.rpmverifypackage.materialized_behaviors",
+    "linux.dpkginfo.debian_evr",
     "linux.selinuxsecuritycontext.null_pid",
 }
 
@@ -481,6 +484,8 @@ POLICY_SEMANTIC_RULE_IDS={
 RUNTIME_SEMANTIC_RULE_IDS={
     "independent.shellcommand.pattern_semantics",
     "linux.partition.mount_options_complete",
+    "linux.rpminfo.filepaths_collection",
+    "linux.rpmverifypackage.skipped_results",
     # These require collection/evaluation behavior rather than static authored-content validation.
     "independent.xmlfilecontent.xpath_text_values",
 }
