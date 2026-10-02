@@ -218,34 +218,26 @@
       ]
     },
     "file_traversal": {
-      "type": "object",
-      "required": [
-        "max_depth",
-        "follow_links",
-        "filesystem"
-      ],
-      "properties": {
-        "max_depth": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "minimum": 0
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
         },
-        "follow_links": {
-          "type": "boolean"
-        },
-        "filesystem": {
-          "type": "string",
-          "enum": [
-            "any",
-            "local",
-            "same"
-          ]
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "symlinks",
+                "symlinks_and_directories"
+              ]
+            }
+          }
         }
-      },
-      "additionalProperties": false,
-      "x-scap-ng-shared-base": "hierarchy_traversal"
+      ],
+      "unevaluatedProperties": false,
+      "description": "Independent/Unix file traversal. Preserves the complete non-deprecated OVAL recurse vocabulary."
     },
     "file_selection": {
       "type": "object",
@@ -537,6 +529,61 @@
         }
       },
       "additionalProperties": false
+    },
+    "file_traversal_base": {
+      "type": "object",
+      "required": [
+        "max_depth",
+        "recurse",
+        "filesystem"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Maximum downward recursion depth; null means no limit. OVAL -1 imports as null."
+        },
+        "recurse": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filesystem": {
+          "type": "string",
+          "enum": [
+            "any",
+            "local",
+            "same"
+          ],
+          "description": "OVAL recurse_file_system all/local/defined maps to any/local/same."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Shared non-deprecated file traversal structure. Downward traversal is implicit; deprecated OVAL recurse_direction=up is not representable."
+    },
+    "windows_file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "junctions",
+                "junctions_and_directories"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Windows file traversal. Preserves the non-deprecated OVAL junction terminology rather than silently treating it as Unix symlink syntax."
     }
   }
 }
