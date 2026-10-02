@@ -27,6 +27,9 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
     def validate_def(self,name,value):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
+    def behavior_defaults(self):
+        return {"item_creation":"all_object_elements_fullfilled"}
+
     def entity(self,value,datatype="string",operation="equal"):
         return {"value":value,"operation":operation,"datatype":datatype}
 
@@ -34,11 +37,31 @@ class XMLFileContentCapabilitySchemaTests(unittest.TestCase):
         self.validate_def("object",{
             "object_title":"xml direct","capability":"independent.xmlfilecontent",
             "select":{"full_path":self.entity("/etc/example.xml"),"xpath":self.entity("/a/b/text()")},
+            "collect":self.behavior_defaults(),
         })
         self.validate_def("object",{
             "object_title":"xml split","capability":"independent.xmlfilecontent",
             "select":{"directory":self.entity("/etc"),"name":self.entity("example.xml"),"xpath":self.entity("/a/b/text()")},
+            "collect":self.behavior_defaults(),
         })
+
+    def test_item_creation_default_is_explicit(self):
+        base={
+            "object_title":"xml",
+            "capability":"independent.xmlfilecontent",
+            "select":{
+                "full_path":{"value":"/etc/example.xml","operation":"equal","datatype":"string"},
+                "xpath":{"value":"/a/b/text()","operation":"equal","datatype":"string"},
+            },
+            "collect":{"item_creation":"all_object_elements_fullfilled"},
+        }
+        self.validate_def("object",base)
+        missing={**base}
+        missing.pop("collect")
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",missing)
+        alternate={**base,"collect":{"item_creation":"filepath_exists"}}
+        self.validate_def("object",alternate)
 
     def test_value_of_is_multi_valued_item_with_single_state_field(self):
         self.validate_def("state",{
