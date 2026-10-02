@@ -408,6 +408,41 @@
       "additionalProperties": false
     },
     "record_field_predicate": {
+      "$ref": "#/$defs/structured_value_predicate"
+    },
+    "record_predicate": {
+      "type": "object",
+      "required": [
+        "fields",
+        "match",
+        "existence",
+        "mask"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/structured_value_predicate"
+          }
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "mask": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scalar_value_predicate": {
       "type": "object",
       "required": [
         "value",
@@ -448,25 +483,48 @@
       },
       "additionalProperties": false
     },
-    "record_predicate": {
+    "structured_value_predicate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_value_predicate"
+        },
+        {
+          "type": "object",
+          "required": [
+            "record"
+          ],
+          "properties": {
+            "record": {
+              "$ref": "#/$defs/record_predicate"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "list"
+          ],
+          "properties": {
+            "list": {
+              "$ref": "#/$defs/list_predicate"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "list_predicate": {
       "type": "object",
       "required": [
-        "fields",
+        "item",
         "match",
         "existence",
         "mask"
       ],
       "properties": {
-        "fields": {
-          "type": "object",
-          "minProperties": 1,
-          "propertyNames": {
-            "type": "string",
-            "minLength": 1
-          },
-          "additionalProperties": {
-            "$ref": "#/$defs/record_field_predicate"
-          }
+        "item": {
+          "$ref": "#/$defs/structured_value_predicate"
         },
         "match": {
           "$ref": "#/$defs/match_quantifier"
