@@ -55,6 +55,8 @@ jobs:
           python - <<'PY'
           import json, os, re, shutil, subprocess, sys
           from pathlib import Path
+          sys.path.insert(0, str(Path("scap-ng/tools").resolve()))
+          from generate_niwc_current_review import native_artifact_base
           batch=int(os.environ["BATCH"])
           revision=os.environ["NIWC_REVISION"]
           files=sorted(p for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip") if "Consolidated" not in p.name)
@@ -65,7 +67,7 @@ jobs:
           generated.mkdir(parents=True,exist_ok=True); status_dir.mkdir(parents=True,exist_ok=True); logs.mkdir(parents=True,exist_ok=True)
           for source in selected:
               artifact=source.name
-              key=re.sub(r"[^A-Za-z0-9._-]+","_",source.stem)
+              key=native_artifact_base(source.stem)
               out=generated/key; split=Path("work")/f"split-{key}"; log_path=logs/f"{key}.log"
               shutil.rmtree(out,ignore_errors=True); shutil.rmtree(split,ignore_errors=True)
               command=[sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
