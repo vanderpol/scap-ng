@@ -205,6 +205,18 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(doc)
         self.assertIn("test.state_capability",{row["code"] for row in rows})
 
+    def test_query_collection_inputs_are_required(self):
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":"missing query","capability":"windows.wmi.query",
+                "collect":{"namespace":"root\\\\cimv2"},
+            })
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":"missing namespace","capability":"windows.wmi.query",
+                "collect":{"query":"SELECT Caption FROM Win32_OperatingSystem"},
+            })
+
     def test_legacy_wmi57_vocabulary_is_not_runtime_schema(self):
         encoded=json.dumps(self.schema).lower()
         self.assertNotIn("wmi57",encoded)
