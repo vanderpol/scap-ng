@@ -81,7 +81,7 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
             "state": {
                 "field": "evr",
                 "value": "0:9.0p1-1.el9",
-                "operation": "greater than or equal",
+                "operation": "greater_or_equal",
                 "datatype": "rpm_evr",
                 "mask": False,
                 "match": "all",
