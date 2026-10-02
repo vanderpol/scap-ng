@@ -144,7 +144,11 @@ def _coerce_collection_parameter(value, spec: dict):
 
 
 def _materialize_file_traversal(obj: dict, mapping: dict):
-    """Translate OVAL file scope and downward recursion into separate native fields."""
+    """Translate OVAL file scope and downward recursion into separate native fields.
+
+    Filesystem scope remains explicit even when no recursion occurs because
+    OVAL recurse_file_system also constrains exact-path and search collection.
+    """
     native_cfg=mapping.get("native") or {}
     traversal_definition=native_cfg.get("traversal_definition")
     if traversal_definition is None and native_cfg.get("uses_file_traversal",False):
