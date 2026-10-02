@@ -68,7 +68,7 @@ class RepoNormalizerTests(unittest.TestCase):
             old_argv=__import__("sys").argv
             try:
                 __import__("sys").argv=[
-                    "normalizer",str(root),"--output-root",str(output),
+                    "normalizer",str(root),"--rewrite","--output-root",str(output),
                     "--report",str(report_path),"--top-near","50",
                 ]
                 self.assertEqual(normalizer.main(),0)
@@ -120,6 +120,66 @@ class RepoNormalizerTests(unittest.TestCase):
                 {row["left"]["rule_id"],row["right"]["rule_id"]}=={"R1","R3"}
                 for row in candidates
             ))
+
+
+    def test_default_mode_is_dry_run(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"a","R1","/etc/example")
+            self.benchmark(root,"b","R2","/etc/example")
+            report_path=Path(td)/"report.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--report",str(report_path),
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            report=json.loads(report_path.read_text())
+            self.assertEqual(report["mode"],"dry-run-exact-plan-plus-near-duplicate-review")
+            self.assertFalse(report["planned_changes"]["rewrite_requested"])
+            self.assertEqual(report["summary"]["rule_files_rewritten"],0)
+            self.assertEqual(report["summary"]["local_assessment_files_removed"],0)
+            self.assertEqual(report["summary"]["exact_duplicate_groups"],1)
+            self.assertFalse((Path(td)/"normalized").exists())
+
+    def test_rewrite_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as td:
+            source=Path(td)/"source"
+            self.benchmark(source,"a","R1","/etc/example")
+            self.benchmark(source,"b","R2","/etc/example")
+            first=Path(td)/"first"
+            second=Path(td)/"second"
+            report1=Path(td)/"report1.json"
+            report2=Path(td)/"report2.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(source),"--rewrite","--output-root",str(first),
+                    "--report",str(report1),
+                ]
+                self.assertEqual(normalizer.main(),0)
+                __import__("sys").argv=[
+                    "normalizer",str(first),"--rewrite","--output-root",str(second),
+                    "--report",str(report2),
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            second_report=json.loads(report2.read_text())
+            self.assertEqual(second_report["summary"]["exact_duplicate_groups"],0)
+            self.assertEqual(second_report["summary"]["duplicate_assessment_definitions_avoided"],0)
+            self.assertEqual(second_report["summary"]["rule_files_rewritten"],0)
+            self.assertEqual(second_report["summary"]["local_assessment_files_removed"],0)
+
+            def tree_bytes(root):
+                return {
+                    p.relative_to(root).as_posix(): p.read_bytes()
+                    for p in sorted(root.rglob("*"))
+                    if p.is_file()
+                }
+            self.assertEqual(tree_bytes(first),tree_bytes(second))
 
 
 if __name__=="__main__":
