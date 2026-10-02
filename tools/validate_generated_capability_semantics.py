@@ -459,6 +459,7 @@ def executable_rule_id_for_diagnostic(code):
 
 
 STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
+    "windows.wmi.query.structured_results",
     # Enforced by generated schema structure or lossless importer materialization.
     "independent.yamlfilecontent.record_keys",
     "windows.cmdlet.record_fields",
@@ -487,6 +488,7 @@ POLICY_SEMANTIC_RULE_IDS={
 }
 
 RUNTIME_SEMANTIC_RULE_IDS={
+    "windows.wmi.query.source_fields",
     "linux.inetlisteningservers.protocol",
     "independent.environmentvariable58.null_pid",
     "linux.selinuxsecuritycontext.null_pid",
