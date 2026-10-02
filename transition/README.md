@@ -1,3 +1,7 @@
+# Latest completed checkpoint
+
+The 2026-10-02 bounded repository rebaseline and publication are complete; the final preservation and schema Actions passed. Start with [the completed checkpoint and receiving-session prompt](rebaseline-checkpoint-2026-10-02.md), [START-HERE](../START-HERE.md), and [58 live Board votes](../board/VOTES.md). This is suitable for a bounded receiving-session access/test acceptance. Complete chat-history recovery and a wholesale migration are not claimed. The dated preparation observations below remain preserved as history.
+
 # Current task checkpoint — repository rebaseline and Board votes
 
 2026-10-02: schema validation is resolved at technical commit `564d1ed8924f3265da5601874d6429f4b7db3572`; full fresh corpus run 37004465863 passed. The next active task is a lossless repository rebaseline, novice/Board navigation, complete path/dependency inventory, historical workflow gating, and publication of individual versioned yes/no Board Discussions. Follow docs/repository-map.md, docs/lossless-rebaseline.md and board/README.md. No historical payload deletion or ownership transfer is authorized. Read the latest repository-audit/publication Actions and board/discussion-index.json before claiming publication or preservation complete.
