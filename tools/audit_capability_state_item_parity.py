@@ -56,6 +56,23 @@ def restriction_values(node):
     return values
 
 
+def field_enumeration(element, root):
+    """Return a field's explicit source vocabulary, resolving named XSD types."""
+    if element is None:
+        return set()
+    values = set(restriction_values(element))
+    typed = (element.get("type") or "").split(":")[-1]
+    if typed:
+        for child in root:
+            if child.tag in (XSD + "complexType", XSD + "simpleType") and child.get("name") == typed:
+                values.update(restriction_values(child))
+                break
+    # Empty-string enum entries in OVAL State types are serialization/error
+    # allowances, not real semantic values authors should need to compare.
+    values.discard("")
+    return values
+
+
 def field_datatypes(element):
     typed = (element.get("type") or "").split(":")[-1]
     for suffix, values in KNOWN_TYPED_SUFFIXES.items():
@@ -270,6 +287,43 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
             + ", ".join(row["field"] for row in datatype_mismatches)
         )
 
+    enum_mismatches = []
+    corrected_enum_defects = []
+    value_enums = mapping.get("native", {}).get("state_value_enums", {})
+    for name in sorted(state_names & item_names):
+        state_enum = field_enumeration(state_fields[name], def_root)
+        item_enum = field_enumeration(item_fields[name], sc_root)
+        if not state_enum and not item_enum:
+            continue
+        if state_enum == item_enum:
+            continue
+
+        native_name = state_field_map.get(name, name)
+        native_enum = set(value_enums.get(native_name, []))
+        # A reviewed NG correction may widen State vocabulary to the Item
+        # vocabulary so every collected value remains filterable.
+        if item_enum and native_enum == item_enum:
+            corrected_enum_defects.append({
+                "field": name,
+                "state": sorted(state_enum),
+                "item": sorted(item_enum),
+                "native": sorted(native_enum),
+            })
+            continue
+
+        enum_mismatches.append({
+            "field": name,
+            "state": sorted(state_enum),
+            "item": sorted(item_enum),
+            "native_override": sorted(native_enum),
+        })
+
+    if enum_mismatches:
+        errors.append(
+            "State/Item enumeration mismatches: "
+            + ", ".join(row["field"] for row in enum_mismatches)
+        )
+
     details.update({
         "definitions_schema": definitions_rel,
         "system_characteristics_schema": sc_rel,
@@ -282,6 +336,8 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         "allowed_item_only_complex_fields": allowed_item_only,
         "datatype_mismatches": datatype_mismatches,
         "corrected_source_defects": corrected_source_defects,
+        "enumeration_mismatches": enum_mismatches,
+        "corrected_enumeration_defects": corrected_enum_defects,
     })
 
     return {
