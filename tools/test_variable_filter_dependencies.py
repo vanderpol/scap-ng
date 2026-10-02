@@ -720,7 +720,12 @@ class DependencyTests(unittest.TestCase):
 
         count = component("count")
         count.extend([literal("a"), literal("b"), literal("c")])
-        result = evaluate(count)
+        root = source()
+        variable_node = variable(root, 1, count)
+        variable_node.set("datatype", "int")
+        nodes = {n.get("id"): n for n in root.iter() if n.get("id")}
+        kinds = {key: "variable" for key in nodes if ":var:" in key}
+        result = ir.resolve_static_variables(nodes, kinds)["oval:dependency:var:1"]
         self.assertEqual(result["values"], ["3"])
         self.assertEqual(result["datatype"], "int")
 

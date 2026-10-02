@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 from xsd_effective_defaults import catalog, effective_type_attributes
@@ -27,6 +28,9 @@ SCOPES = {
 
 
 def load_importer(path: Path):
+    parent = str(path.resolve().parent)
+    if parent not in sys.path:
+        sys.path.insert(0, parent)
     spec = importlib.util.spec_from_file_location("oval_semantic_ir", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

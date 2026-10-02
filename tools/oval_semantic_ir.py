@@ -1148,12 +1148,11 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096, *, budge
         name = local(node.tag)
 
         if name == "literal_component":
-            return result(
-                "exact_static",
-                values=[text_value(node) or ""],
-                operation=name,
-                datatype=node.get("datatype", "string"),
-            )
+            resolved = bounded([text_value(node) or ""], name)
+            return {
+                **resolved,
+                "datatype": node.get("datatype", "string"),
+            }
 
         if name == "variable_component":
             ref = node.get("var_ref")
@@ -1562,12 +1561,12 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096, *, budge
                 for child in element
                 if local(child.tag) == "value"
             ]
-            resolved = result(
-                "exact_static",
-                values=values,
-                variable_type=kind,
-                datatype=element.get("datatype"),
-            )
+            static = bounded(values, kind)
+            resolved = {
+                **static,
+                "variable_type": kind,
+                "datatype": element.get("datatype"),
+            }
 
         elif kind == "external_variable":
             resolved = result(
