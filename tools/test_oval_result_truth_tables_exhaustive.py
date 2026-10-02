@@ -12,6 +12,7 @@ import unittest
 from oval_result_truth_tables import (
     TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE,
     aggregate_check, aggregate_operator, aggregate_existence,
+    evaluate_state_entity_existence,
 )
 
 RESULT_ORDER = (TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE)
@@ -131,6 +132,7 @@ class ExhaustiveExistenceChartParity(unittest.TestCase):
             ex, de, er, nc = counts
             for mode in modes:
                 with self.subTest(mode=mode, counts=counts):
+                    expected = chart_existence(mode, counts)
                     self.assertEqual(
                         aggregate_existence(
                             mode,
@@ -139,7 +141,17 @@ class ExhaustiveExistenceChartParity(unittest.TestCase):
                             error=er,
                             not_collected=nc,
                         ),
-                        chart_existence(mode, counts),
+                        expected,
+                    )
+                    self.assertEqual(
+                        evaluate_state_entity_existence(
+                            mode,
+                            exists=ex,
+                            does_not_exist=de,
+                            error=er,
+                            not_collected=nc,
+                        ),
+                        expected,
                     )
 
 
