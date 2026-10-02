@@ -129,10 +129,12 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         self.assertNotIn("mask",record)
         self.assertNotIn("mask",record["fields"]["caption"])
 
-    def test_collector_mask_true_fails_closed_until_output_binding_is_explicit(self):
+    def test_collector_redaction_fails_closed_until_output_binding_is_explicit(self):
         doc=self.aligned_wmi_document()
-        doc["assessment"]["objects"]["query-object"]["select"]["namespace"]["mask"]=True
-        with self.assertRaisesRegex(ValueError,"collector input cannot be masked"):
+        selector=doc["assessment"]["objects"]["query-object"]["select"]["namespace"]
+        selector.pop("mask",None)
+        selector["redact_result"]=True
+        with self.assertRaisesRegex(ValueError,"collector input redaction cannot be preserved"):
             apply_capability_mapping(doc,self.mapping)
 
     def test_wmi_test_controls_use_native_shared_vocabulary(self):
