@@ -89,6 +89,30 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                 })
                 self.assertEqual(rows,[])
 
+    def test_file_hash_reuses_file_selection_semantics(self):
+        rows=validate_assessment_capability_semantics({
+            "assessment":{
+                "objects":{
+                    "h":{
+                        "capability":"file.hash",
+                        "select":{"full_path":entity("/etc/passwd")},
+                        "traversal":{
+                            "max_depth":1,
+                            "follow_symlinks":False,
+                            "filesystem":"local",
+                        },
+                        "collect":{"algorithm":"sha256"},
+                    }
+                },
+                "states":{},
+                "tests":{},
+            }
+        })
+        self.assertIn(
+            "file.hash.full_path_no_traversal",
+            {row["code"] for row in rows},
+        )
+
     def test_filter_state_capability_must_match_object(self):
         doc={
             "assessment":{
