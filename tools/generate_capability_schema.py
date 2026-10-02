@@ -15,6 +15,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 XSD = "{http://www.w3.org/2001/XMLSchema}"
+COMMON_CAPABILITY_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/capability-common.schema.json"
 
 
 def local(tag):
@@ -167,65 +168,27 @@ def behavior_contract(root, type_name, *, reject_deprecated_values=False):
 
 
 def generic_entity_schema(allowed_datatypes, *, state=False):
-    """Native scalar entity shape used by generated capability fragments.
+    """Compose a capability entity from shared authored-Assessment primitives.
 
-    Stage-1 native source materializes operation/datatype explicitly. Variable
-    references remain values ({variable: <id>}) so literal and derived values
-    occupy one stable slot. State-only quantifiers are not permitted on Object
-    selectors.
+    Common value/reference/quantifier semantics live in capability-common.schema.json.
+    The generated capability fragment contributes only datatype narrowing and closes
+    the composed object with unevaluatedProperties.
     """
-    properties = {
-        "value": {
-            "oneOf": [
-                {"type": ["string", "number", "integer", "boolean", "null"]},
-                {
-                    "type": "object",
-                    "required": ["variable"],
-                    "properties": {
-                        "variable": {"type": "string", "minLength": 1},
-                    },
-                    "additionalProperties": False,
-                },
-            ]
-        },
-        "operation": {"type": "string", "minLength": 1},
-        "datatype": {
-            "type": "string",
-            "enum": sorted(set(allowed_datatypes)),
-        },
-        "var_check": {"type": "string", "minLength": 1},
-        "nil": {"type": "boolean"},
-    }
-    required = ["value", "operation", "datatype"]
-    if state:
-        properties.update({
-            "entity_check": {"type": "string", "minLength": 1},
-            "entity_existence": {"type": "string", "minLength": 1},
-        })
-        required.extend(["entity_check", "entity_existence"])
-
+    base = "state_entity_base" if state else "object_entity_base"
     return {
-        "type": "object",
-        "properties": properties,
-        "required": required,
-        "additionalProperties": False,
         "allOf": [
+            {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{base}"},
             {
-                "if": {"required": ["var_check"]},
-                "then": {
-                    "properties": {
-                        "value": {
-                            "type": "object",
-                            "required": ["variable"],
-                            "properties": {
-                                "variable": {"type": "string", "minLength": 1},
-                            },
-                            "additionalProperties": False,
-                        }
+                "type": "object",
+                "properties": {
+                    "datatype": {
+                        "type": "string",
+                        "enum": sorted(set(allowed_datatypes)),
                     }
                 },
-            }
+            },
         ],
+        "unevaluatedProperties": False,
     }
 
 
@@ -352,9 +315,7 @@ def generate(mapping, repo_root):
                         "enum": controls["state_operator"],
                     },
                     "states": {
-                        "type": "array",
-                        "items": {"type": "string", "minLength": 1},
-                        "uniqueItems": True,
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
                     },
                 },
                 "additionalProperties": False,
@@ -376,13 +337,7 @@ def generate(mapping, repo_root):
                     "filters": {
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "required": ["state", "action"],
-                            "properties": {
-                                "state": {"type": "string", "minLength": 1},
-                                "action": {"type": "string", "enum": ["include", "exclude"]},
-                            },
-                            "additionalProperties": False,
+                            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_filter"
                         },
                     },
                 },
@@ -405,37 +360,15 @@ def generate(mapping, repo_root):
                             "field": {
                                 "type": "string",
                                 "enum": sorted(state_names),
-                            },
-                            **{
-                                key: value
-                                for key, value in generic_entity_schema(["string"], state=True)["properties"].items()
-                                if key != "datatype"
-                            },
-                            "datatype": {"type": "string"},
-                        },
-                        "required": [
-                            "field", "value", "operation", "datatype",
-                            "entity_check", "entity_existence"
-                        ],
-                        "additionalProperties": False,
-                        "allOf": [
-                            {"oneOf": state_field_branches},
-                            {
-                                "if": {"required": ["var_check"]},
-                                "then": {
-                                    "properties": {
-                                        "value": {
-                                            "type": "object",
-                                            "required": ["variable"],
-                                            "properties": {
-                                                "variable": {"type": "string", "minLength": 1}
-                                            },
-                                            "additionalProperties": False
-                                        }
-                                    }
-                                }
                             }
+                        },
+                        "allOf": [
+                            {
+                                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
+                            },
+                            {"oneOf": state_field_branches}
                         ],
+                        "unevaluatedProperties": False,
                     },
                 },
                 "additionalProperties": False,
