@@ -239,8 +239,24 @@ def generate(mapping, repo_root):
         }
 
     state_value_enums = mapping["native"].get("state_value_enums", {})
-    state_field_branches = []
+    record_state_fields = set(mapping["native"].get("record_state_fields", []))
+    scalar_state_branches = []
+    record_state_branches = []
     for name, meta in sorted(state_meta.items()):
+        if name in record_state_fields:
+            record_state_branches.append({
+                "type": "object",
+                "required": ["field", "record"],
+                "properties": {
+                    "field": {"const": name},
+                    "record": {
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/record_predicate"
+                    },
+                },
+                "additionalProperties": False,
+            })
+            continue
+
         props = {
             "field": {"const": name},
             "datatype": {
@@ -255,7 +271,7 @@ def generate(mapping, repo_root):
                     {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
                 ]
             }
-        state_field_branches.append({
+        scalar_state_branches.append({
             "properties": props,
             "required": ["field"],
         })
@@ -301,21 +317,30 @@ def generate(mapping, repo_root):
                 "state_title": {"type": ["string", "null"]},
                 "capability": {"const": capability},
                 "state": {
-                    "type": "object",
-                    "required": ["field"],
-                    "properties": {
-                        "field": {
-                            "type": "string",
-                            "enum": sorted(state_names),
-                        }
-                    },
-                    "allOf": [
-                        {
-                            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
-                        },
-                        {"oneOf": state_field_branches}
-                    ],
-                    "unevaluatedProperties": False,
+                    "oneOf": (
+                        [
+                            {
+                                "type": "object",
+                                "required": ["field"],
+                                "properties": {
+                                    "field": {
+                                        "type": "string",
+                                        "enum": sorted(
+                                            name for name in state_names
+                                            if name not in record_state_fields
+                                        ),
+                                    }
+                                },
+                                "allOf": [
+                                    {
+                                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
+                                    },
+                                    {"oneOf": scalar_state_branches},
+                                ],
+                                "unevaluatedProperties": False,
+                            }
+                        ] if scalar_state_branches else []
+                    ) + record_state_branches,
                 },
             },
             "additionalProperties": False,
