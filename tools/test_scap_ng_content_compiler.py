@@ -126,7 +126,10 @@ class ContentCompilerTests(unittest.TestCase):
             write_bundle(out,benchmark,members,index,sign_self_signed=False,provenance={"generated_fresh_for_this_run":True})
             import zipfile
             with zipfile.ZipFile(out,"a") as zf:
-                zf.writestr("extra.txt",b"x")
+                info=zipfile.ZipInfo("extra.txt",date_time=(1980,1,1,0,0,0))
+                info.compress_type=zipfile.ZIP_DEFLATED
+                info.external_attr=0o100644 << 16
+                zf.writestr(info,b"x")
             with self.assertRaisesRegex(ValueError,"unexpected ZIP members"):
                 verify_bundle(out)
 
