@@ -29,13 +29,12 @@ class UnixInterfaceCapabilitySchemaTests(unittest.TestCase):
 
     def state(self,field,value):
         return {"state_title":None,"capability":"unix.interface",
-                "state":{"field":field,"value":value,"operation":"equal","datatype":"string",
-                         "mask":False,"match":"all","existence":"some"}}
+                "state":{"field":field,"value":value,"operation":"equal","datatype":"string","match":"all","existence":"some"}}
 
     def test_name_object_selector(self):
         self.validate_def("object",{
             "object_title":"eth0","capability":"unix.interface",
-            "select":{"name":{"value":"eth0","operation":"equal","datatype":"string","mask":False}},
+            "select":{"name":{"value":"eth0","operation":"equal","datatype":"string"}},
         })
 
     def test_interface_type_vocabulary(self):

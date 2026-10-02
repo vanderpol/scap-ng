@@ -28,15 +28,14 @@ class UnixShadowCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def state_entity(self,field,value,datatype="string"):
         return {
             "state_title":None,
             "capability":"unix.shadow",
             "state":{
-                "field":field,"value":value,"operation":"equal","datatype":datatype,
-                "mask":False,"match":"all","existence":"some",
+                "field":field,"value":value,"operation":"equal","datatype":datatype,"match":"all","existence":"some",
             },
         }
 

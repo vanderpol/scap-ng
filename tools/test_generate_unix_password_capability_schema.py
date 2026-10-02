@@ -30,7 +30,7 @@ class UnixPasswordCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,operation="equal",datatype="string"):
-        return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+        return {"value":value,"operation":operation,"datatype":datatype}
 
     def test_username_selector(self):
         self.validate_def("object",{
@@ -51,16 +51,14 @@ class UnixPasswordCapabilitySchemaTests(unittest.TestCase):
                     "state_title":None,
                     "capability":"unix.password",
                     "state":{
-                        "field":field,"value":0,"operation":"equal","datatype":"integer",
-                        "mask":False,"match":"all","existence":"some",
+                        "field":field,"value":0,"operation":"equal","datatype":"integer","match":"all","existence":"some",
                     },
                 })
                 self.validate_def("state",{
                     "state_title":None,
                     "capability":"unix.password",
                     "state":{
-                        "field":field,"value":"0","operation":"equal","datatype":"string",
-                        "mask":False,"match":"all","existence":"some",
+                        "field":field,"value":"0","operation":"equal","datatype":"string","match":"all","existence":"some",
                     },
                 })
 

@@ -37,7 +37,6 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
             "value":value,
             "operation":operation,
             "datatype":datatype,
-            "mask":False,
         }
 
     def defaults(self):
@@ -161,7 +160,6 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
                         "value":"enabled",
                         "operation":"equal",
                         "datatype":"string",
-                        "mask":False,
                         "match":"all",
                         "existence":"some",
                     },

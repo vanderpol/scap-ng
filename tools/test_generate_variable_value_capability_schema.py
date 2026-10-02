@@ -89,7 +89,6 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
                 "value":5,
                 "operation":"greater_or_equal",
                 "datatype":"integer",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },
