@@ -31,12 +31,14 @@ def summarize(folder: Path, expected_sources: list[str]) -> dict:
     unaccounted = []
     for row in by_source.values():
         for field in ("definitions", "semantic_equal", "deprecated_blockers",
-                      "publisher_extension_blockers", "unexpected_failures", "parse_failures"):
+                      "publisher_extension_blockers", "source_content_defects",
+                      "unexpected_failures", "parse_failures"):
             totals[field] += int(row.get(field, 0))
         extensions.update(row.get("publisher_extension_elements") or [])
         classified = sum(int(row.get(k, 0)) for k in (
             "semantic_equal", "deprecated_blockers",
-            "publisher_extension_blockers", "unexpected_failures"
+            "publisher_extension_blockers", "source_content_defects",
+            "unexpected_failures"
         ))
         if classified != int(row.get("definitions", 0)):
             unaccounted.append({"source": row.get("source"),
@@ -77,20 +79,22 @@ def render_markdown(report: dict) -> str:
         f"- Comparator-equivalent percentage: {report['semantic_equal_percent_of_all_definitions']}",
         f"- Deprecated-test blockers: {totals.get('deprecated_blockers', 0)}",
         f"- Publisher-extension blockers: {totals.get('publisher_extension_blockers', 0)}",
+        f"- Source-content defects quarantined: {totals.get('source_content_defects', 0)}",
         f"- Unexpected failures: {totals.get('unexpected_failures', 0)}",
         f"- Missing packages: {len(report['missing_sources'])}",
         f"- Duplicate reports: {len(report['duplicate_sources'])}",
         "",
-        "| Package | Definitions | Comparator equivalent | Deprecated | Extensions | Unexpected |",
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
+        "| Package | Definitions | Comparator equivalent | Deprecated | Extensions | Source defects | Unexpected |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in report["per_package"]:
         lines.append(
-            "| `{}` | {} | {} | {} | {} | {} |".format(
+            "| `{}` | {} | {} | {} | {} | {} | {} |".format(
                 str(row.get("source", "")).replace("|", "/"),
                 row.get("definitions", 0), row.get("semantic_equal", 0),
                 row.get("deprecated_blockers", 0),
                 row.get("publisher_extension_blockers", 0),
+                row.get("source_content_defects", 0),
                 row.get("unexpected_failures", 0),
             )
         )
