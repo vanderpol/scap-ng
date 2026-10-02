@@ -73,6 +73,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "datatype": "string",
                 }
             },
+            "filesystem": "any",
         })
 
     def test_valid_path_filename_object(self):
@@ -94,8 +95,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "traversal": {
                 "max_depth": 0,
                 "recurse": "symlinks_and_directories",
-                "filesystem": "local",
             },
+            "filesystem": "local",
         })
 
     def test_unix_traversal_preserves_symlink_terminology(self):
@@ -117,8 +118,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             "traversal": {
                 "max_depth": 2,
                 "recurse": "symlinks",
-                "filesystem": "local",
             },
+            "filesystem": "local",
         })
         with self.assertRaises(jsonschema.ValidationError):
             self.validate_def("object", {
@@ -139,8 +140,8 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "traversal": {
                     "max_depth": 2,
                     "recurse": "junctions",
-                    "filesystem": "local",
                 },
+                "filesystem": "local",
             })
 
     def test_directory_selection_uses_native_null_name(self):
@@ -155,6 +156,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 },
                 "name": None,
             },
+            "filesystem": "any",
         })
 
     def test_filepath_and_path_filename_are_mutually_exclusive(self):
