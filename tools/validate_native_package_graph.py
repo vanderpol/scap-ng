@@ -16,25 +16,34 @@ def load_yaml(path: Path):
     return value
 
 
-def validate_package(root: Path):
-    # Normalize the package root once. References and discovered document keys
-    # are resolved below; using the same canonical root avoids platform-specific
-    # relative_to() failures (notably on Windows temporary-directory paths).
+def validate_package(root: Path, reference_root: Path | None = None):
+    # A normalized corpus MAY hoist exact duplicate Assessments into a corpus-level
+    # shared/ tree. Keep package membership local, but resolve document references
+    # against the containing corpus root so those shared Assessments remain legal.
     root = root.resolve()
+    reference_root = (reference_root or root).resolve()
     diagnostics=[]
     documents={}
     identities={}
-    for path in sorted(root.rglob("*.yaml")):
+    for path in sorted(reference_root.rglob("*.yaml")):
         doc=load_yaml(path)
         kind=next(iter(doc))
         payload=doc[kind]
-        documents[path.resolve()]=(kind,payload)
+        resolved=path.resolve()
+        documents[resolved]=(kind,payload)
+        # Package-local identities determine Benchmark Rule membership. Shared
+        # corpus documents are available for reference resolution but SHALL NOT
+        # pollute the package's local identity namespace.
+        try:
+            rel=resolved.relative_to(root)
+        except ValueError:
+            continue
         identity=payload.get("id") if isinstance(payload,dict) else None
         if identity:
             if identity in identities:
-                diagnostics.append({"code":"duplicate_identity","id":identity,"paths":[identities[identity],path.relative_to(root).as_posix()]})
+                diagnostics.append({"code":"duplicate_identity","id":identity,"paths":[identities[identity],rel.as_posix()]})
             else:
-                identities[identity]=path.relative_to(root).as_posix()
+                identities[identity]=rel.as_posix()
 
     bench_path=(root/"benchmark.yaml").resolve()
     if bench_path not in documents or documents[bench_path][0]!="benchmark":
@@ -43,21 +52,37 @@ def validate_package(root: Path):
 
     def resolve(owner: Path, ref, expected_kind):
         if not isinstance(ref,str) or not ref:
-            diagnostics.append({"code":"reference_invalid","owner":owner.relative_to(root).as_posix(),"reference":ref,"expected_kind":expected_kind})
+            try:
+                owner_display=owner.relative_to(root).as_posix()
+            except ValueError:
+                owner_display=owner.relative_to(reference_root).as_posix()
+            diagnostics.append({"code":"reference_invalid","owner":owner_display,"reference":ref,"expected_kind":expected_kind})
             return None
         target=(owner.parent/ref).resolve()
         try:
-            target.relative_to(root.resolve())
+            target.relative_to(reference_root)
         except ValueError:
-            diagnostics.append({"code":"reference_escape","owner":owner.relative_to(root).as_posix(),"reference":ref})
+            try:
+                owner_display=owner.relative_to(root).as_posix()
+            except ValueError:
+                owner_display=owner.relative_to(reference_root).as_posix()
+            diagnostics.append({"code":"reference_escape","owner":owner_display,"reference":ref})
             return None
         found=documents.get(target)
         if found is None:
-            diagnostics.append({"code":"reference_missing","owner":owner.relative_to(root).as_posix(),"reference":ref,"expected_kind":expected_kind})
+            try:
+                owner_display=owner.relative_to(root).as_posix()
+            except ValueError:
+                owner_display=owner.relative_to(reference_root).as_posix()
+            diagnostics.append({"code":"reference_missing","owner":owner_display,"reference":ref,"expected_kind":expected_kind})
             return None
         kind,payload=found
         if kind!=expected_kind:
-            diagnostics.append({"code":"reference_wrong_type","owner":owner.relative_to(root).as_posix(),"reference":ref,"expected_kind":expected_kind,"actual_kind":kind})
+            try:
+                owner_display=owner.relative_to(root).as_posix()
+            except ValueError:
+                owner_display=owner.relative_to(reference_root).as_posix()
+            diagnostics.append({"code":"reference_wrong_type","owner":owner_display,"reference":ref,"expected_kind":expected_kind,"actual_kind":kind})
             return None
         return payload
 
@@ -136,8 +161,9 @@ def main():
     ap.add_argument("--report",type=Path)
     args=ap.parse_args()
     results=[]
+    corpus_root=args.corpus_root.resolve()
     for package in find_packages(args.corpus_root):
-        diagnostics=validate_package(package)
+        diagnostics=validate_package(package, reference_root=corpus_root)
         results.append({
             "package":package.relative_to(args.corpus_root).as_posix() or ".",
             "valid":not diagnostics,
