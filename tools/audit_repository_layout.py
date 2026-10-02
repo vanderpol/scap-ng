@@ -178,7 +178,7 @@ def check(policy):
             failures.append("Current CI executes archived iteration code: " + path)
     baseline = tracked_tree(policy["baseline_commit"])
 
-    removed_roots = policy.get("removed_historical_trees", {})
+    removed_roots = policy.get("removed_trees", {})
     allowed_missing = set()
     for root, record in removed_roots.items():
         expected = {p for p in baseline if p == root or p.startswith(root + "/")}
