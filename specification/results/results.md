@@ -197,83 +197,58 @@ Rule result, compliance finding, or implicit applicability decision.
 
 ## 6. Rule result self-description
 
-A Rule result SHOULD contain enough Rule context for common downstream use
-without requiring the consumer to possess the original Benchmark.
+A Rule Result SHOULD be compact, policy-facing, and independently useful for
+ordinary reporting without becoming a second copy of the Assessment execution
+record.
 
-This SHOULD include, as applicable:
+A Rule Result SHOULD contain, as applicable:
 
 - stable Rule identity;
 - important publisher identifiers;
-- title;
-- severity;
-- effective scoring weight when defined;
-- outcome;
+- title and severity;
+- effective scoring weight and reporting/scoring disposition when defined;
+- policy-facing outcome;
 - concise deterministic message;
-- structured failure reason;
-- decisive `observed_state` for machine-readable observed-versus-required comparison when applicable;
-- bounded evidence;
-- Assessment mode;
-- effective check selector and Assessment Method identity/version;
-- effective Parameters materially relevant to the Rule;
-- applicability disposition and supporting applicability-result references when applicable;
-- `expected_state`, always present;
-- Tailoring and Organizational Input provenance where relevant.
+- structured Rule-level reason;
+- identity/version of the effective selected Assessment;
+- effective check selector;
+- effective Parameters that are policy inputs to the Rule;
+- Rule applicability disposition plus references to the applicability
+  Assessment Results that established it;
+- one or more result instances containing the policy-facing instance outcome
+  and a reference to the corresponding detailed Assessment Result;
+- optional references to decisive evidence members.
+
+A Rule Result SHALL NOT duplicate the detailed Assessment execution graph.
+In particular, collected Items, observed State/entity values, Variable results,
+Test/Object/State/Entity evaluation detail, Assessment completeness counters,
+bounded-evidence accounting, and consumed Organizational Input execution detail
+belong to the referenced Assessment Result.
 
 The full Rule discussion, remediation, Manual Assessment procedure, and
 Assessment implementation SHOULD NOT automatically be copied into every Rule
-result.
+Result.
 
-### Decisive observed-state visibility
+### Expected and observed values
 
-A failed or otherwise diagnostically meaningful automated Rule Result SHOULD
-expose a bounded `observed_state` collection containing the smallest concrete
-observations needed for ordinary human/SIEM understanding of the outcome.
+Expected and observed technical values are Assessment execution data.
 
-Each observed-state entry SHOULD identify, as applicable, the collected Item
-reference, State identity, State slot/entity, datatype, observed value or
-protected/redacted representation, and collection/entity status.
+For automated evaluation, the authoritative expected values SHALL be retained
+in the detailed Assessment Result through the preserved Test/State/Entity and
+effective input-binding data. Authoritative observations SHALL be retained
+through collected Items and the corresponding State/Entity/Test results.
 
-`observed_state` is a compact projection of authoritative detailed Assessment
-evidence. It SHALL NOT become a second independent evidence truth. The referenced
-Assessment Result remains authoritative for the complete Test/Object/Item/State/
-Entity evaluation graph.
+A Rule Result MAY reference the Assessment Result or a bounded evidence member
+needed for ordinary reporting, but SHALL NOT embed an independent
+`expected_state`, `observed_state`, or equivalent technical mini-graph.
+This avoids creating two separately evolving sources of truth for the same
+evaluation.
 
-A missing required item SHALL NOT be represented by fabricating an observed
-Item. In that case the structured reason and expected state describe the
-absence, while `observed_state` may be empty.
-
-## Expected-state visibility
-
-Every Rule Result SHALL expose an `expected_state` collection, including when
-all expected values come directly from publisher-authored Assessment State and
-no Organizational Input is involved.
-
-The purpose is interoperability: consumers SHALL NOT be required to discover a
-rare result element only when an exceptional policy source is encountered.
-`expected_state` is therefore a stable part of the Rule Result contract.
-
-For an automated Rule Result, each expected-state entry SHOULD identify, as
-applicable:
-
-- State identity or structural path;
-- State slot/entity identity;
-- datatype;
-- comparison operation;
-- entity/state quantifier semantics needed to interpret the value;
-- effective expected value or protected/redacted representation;
-- source of that value, such as `publisher`, `publisher_profile`, or
-  `organizational_input`;
-- source/provenance reference when the value was not directly publisher-authored.
-
-When a Rule has no materialized expected State (for example, a procedure-only
-Manual Assessment), `expected_state` SHALL still be present as an empty
-collection unless the final manual-result model defines an equivalent populated
-representation. Absence of the field SHALL NOT be used to signal 'not used'.
-
-For organization-defined expected values, the same expected-state entry format
-SHALL be used. Organizational Input therefore changes the `source` and adds a
-provenance reference; it does not introduce a separate hidden result surface.
-
+Organizational Input values that affect execution SHALL be retained in the
+Assessment Result's effective/consumed input bindings and in the Benchmark
+Result's effective-policy provenance as appropriate. The Rule Result MAY
+identify the relevant policy Parameter or reason, but SHALL NOT duplicate the
+full Organizational Input execution/provenance record.
 
 ## Rule result instances and fan-out
 
@@ -838,8 +813,7 @@ WMI57/cmdlet-style collection to retain their observed structure.
 
 ## 17. Failure counts and evidence maximums
 
-Assessment Result and Benchmark/Rule Result reporting SHOULD use the same
-terminology for bounded failure evidence.
+Assessment Result reporting SHOULD use the canonical terminology below for bounded failure evidence. Benchmark and Rule Results MAY reference that evidence but SHALL NOT duplicate the detailed bounded-evidence accounting.
 
 The canonical terms are:
 
