@@ -56,6 +56,7 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
                 "pattern":self.entity(r"(?m)^PermitRootLogin\s+(\S+)",operation="match"),
                 "instance":self.entity(1,datatype="integer"),
             },
+            "filesystem":"any",
             "collect":self.defaults(),
         })
 
@@ -72,8 +73,8 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
             "traversal":{
                 "max_depth":None,
                 "recurse":"symlinks_and_directories",
-                "filesystem":"local",
             },
+            "filesystem":"local",
             "collect":self.defaults(),
         })
 
