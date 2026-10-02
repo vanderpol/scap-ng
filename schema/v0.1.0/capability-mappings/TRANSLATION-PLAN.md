@@ -83,6 +83,23 @@ In particular:
 
 The later complexity-discovery study may classify complex legacy checks as native capability, new abstraction, shell command, or inherently complex. That research is separate from the current faithful capability translation.
 
+## Future Object-selector expansion principle
+
+SCAP-NG Object selection does not need to remain artificially limited to the exact selector surface exposed by legacy OVAL Objects.
+
+When a capability's canonical Item/State model contains a stable field that can be used efficiently and unambiguously to identify the desired collection population, a future native Object MAY expose that field as an additional direct selector. This can let authors target the wanted population directly rather than collect a broader set and then apply a State filter.
+
+Any such expansion must be deliberate rather than mechanical:
+
+- the field must already exist in the canonical State/Item model;
+- direct selection semantics must be well-defined and implementable across scanners;
+- selection must not change the meaning of the collected Item;
+- filters remain valid for post-collection narrowing and set semantics;
+- migration from OVAL must preserve the original Object+filter behavior even when NG offers a more direct native authoring form;
+- additions should be evaluated capability-by-capability and recorded as intentional native improvements, not silently inferred from every Item field.
+
+This is a future design/authoring simplification topic and is not a reason to change current lossless migration mappings without review.
+
 ## Working method
 
 Translate one semantic family at a time. For every Object/State/Item family, enforce the invariant `Object data fields ⊆ State fields = Item fields`; collection controls such as OVAL behaviors are not Item fields. State/Item field identity and datatype semantics SHALL come from one canonical capability entity model so authored State predicates and runtime collected evidence cannot drift.
