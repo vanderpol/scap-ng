@@ -33,9 +33,7 @@ standard OVAL 5.12.3.
 Generic SCAP 1.4 → SCAP-NG conversion SHALL derive the standard OVAL vocabulary
 from the pinned authoritative upstream OVAL schemas.
 
-Content that depends on SCC/NIWC additions SHALL be reported as a publisher
-extension unless and until a publisher-specific conversion profile defines its
-execution semantics and reverse mapping.
+The only currently known SCC/NIWC custom Test/Object/State family in this workstream is `sqlext`. Approved Windows OVAL tests SHALL NOT be classified as publisher extensions because of omissions in a checked-in schema snapshot.
 
 ## Current implementation
 
@@ -64,3 +62,7 @@ Future documentation and directory naming SHOULD distinguish:
 
 Calling both simply “OVAL 5.12.3” is ambiguous and can create a false sense of
 standards conformance.
+
+## Windows snapshot correction
+
+Project-owner clarification, 2026-10-02: approved Windows OVAL tests such as `cmdlet` and `ntuser` are standard language capabilities. The checked-in Windows definitions schema snapshot is missing approved families and must be reconciled with the proper approved schema set. This is a schema-source problem, not an extension boundary. The only known custom SCC/NIWC Test/Object/State family in this workstream is `independent:sqlext`.
