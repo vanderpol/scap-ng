@@ -425,6 +425,12 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "linux.selinuxsecuritycontext.null_pid",
 }
 
+POLICY_SEMANTIC_RULE_IDS={
+    # Normative deployment/authoring policy rather than document-shape or evaluator checks.
+    "independent.shellcommand.trusted_content",
+    "independent.shellcommand.not_generic_escape_hatch",
+}
+
 RUNTIME_SEMANTIC_RULE_IDS={
     "independent.shellcommand.pattern_semantics",
     # These require collection/evaluation behavior rather than static authored-content validation.
