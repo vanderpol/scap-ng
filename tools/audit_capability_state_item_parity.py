@@ -157,11 +157,38 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         }
 
     definitions_path = repo_root / definitions_rel
-    sc_rel = source.get("system_characteristics_schema") or infer_sc_schema(definitions_rel)
-    sc_path = repo_root / sc_rel
-
     errors = []
     details = {}
+
+    fixed_result = mapping.get("native", {}).get("fixed_result")
+    if fixed_result is not None:
+        if not definitions_path.exists():
+            errors.append(f"missing definitions schema: {definitions_rel}")
+            return {"capability": capability, "mapping": str(mapping_path.relative_to(repo_root)), "ok": False, "errors": errors}
+        def_root = ET.parse(definitions_path).getroot()
+        test_name = source.get("test")
+        test_el = direct_global(def_root, "element", test_name) if test_name else None
+        if test_el is None:
+            errors.append(f"missing source Test {test_name!r} in {definitions_rel}")
+        for forbidden in ("object", "state", "item"):
+            if source.get(forbidden):
+                errors.append(f"fixed-result capability unexpectedly declares source.{forbidden}")
+        details.update({
+            "definitions_schema": definitions_rel,
+            "test": test_name,
+            "fixed_result": fixed_result,
+            "parity": "not_applicable_objectless_stateless",
+        })
+        return {
+            "capability": capability,
+            "mapping": str(mapping_path.relative_to(repo_root)),
+            "ok": not errors,
+            "errors": errors,
+            "details": details,
+        }
+
+    sc_rel = source.get("system_characteristics_schema") or infer_sc_schema(definitions_rel)
+    sc_path = repo_root / sc_rel
 
     if not definitions_path.exists():
         errors.append(f"missing definitions schema: {definitions_rel}")
