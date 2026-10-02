@@ -350,12 +350,33 @@ class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
         }}
         out=apply_capability_mapping(doc,mapping)
         obj=out["assessment"]["objects"]["o"]
+        self.assertEqual(obj["filesystem"],"local")
         self.assertEqual(obj["traversal"],{
             "max_depth":None,
             "recurse":"symlinks_and_directories",
-            "filesystem":"local",
         })
         self.assertNotIn("behaviors",obj)
+
+    def test_full_path_preserves_nondefault_filesystem_scope_without_recursion(self):
+        mapping=self.mapping("independent.textfilecontent54.json")
+        doc={"assessment":{
+            "objects":{"o":{
+                "object_title":"scoped exact file",
+                "capability":"independent.textfilecontent54",
+                "select":{
+                    "filepath":{"value":"/etc/example","operation":"equals","datatype":"string"},
+                    "pattern":{"value":"x","operation":"pattern match","datatype":"string"},
+                    "instance":{"value":"1","operation":"equals","datatype":"int"},
+                },
+                "behaviors":{"recurse_file_system":"local"},
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["o"]
+        self.assertEqual(obj["filesystem"],"local")
+        self.assertNotIn("traversal",obj)
 
     def test_rpmverifyfile_behaviors_become_explicit_collect_flags(self):
         mapping=self.mapping("linux.rpmverifyfile.json")
