@@ -209,23 +209,28 @@ def generate(mapping, repo_root):
     collect_properties = {}
     collect_required = []
     for name, spec in mapping.get("native", {}).get("collection_parameters", {}).items():
-        literal = {
-            "type": spec.get("type", "string"),
-        }
-        if spec.get("enum"):
-            literal["enum"] = list(spec["enum"])
+        if spec.get("schema_ref"):
+            literal = {
+                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{spec['schema_ref']}"
+            }
+        else:
+            literal = {
+                "type": spec.get("type", "string"),
+            }
+            if spec.get("enum"):
+                literal["enum"] = list(spec["enum"])
         if spec.get("description"):
             literal["description"] = spec["description"]
-        prop = (
-            {
-                "oneOf": [
-                    literal,
-                    {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
-                ]
-            }
-            if spec.get("allow_variable", False)
-            else literal
-        )
+
+        variants = [literal]
+        if spec.get("allow_variable", False):
+            variants.append(
+                {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"}
+            )
+        if spec.get("nullable", False):
+            variants.append({"type": "null"})
+        prop = variants[0] if len(variants) == 1 else {"oneOf": variants}
+
         collect_properties[name] = prop
         if spec.get("required", False):
             collect_required.append(name)
