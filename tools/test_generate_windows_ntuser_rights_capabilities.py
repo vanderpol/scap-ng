@@ -64,6 +64,15 @@ class WindowsNtuserRightsTests(unittest.TestCase):
             },"provenance":{}
         })
 
+    def test_sid_behavior_defaults_are_explicit(self):
+        for cap in ("windows.sid","windows.sid_sid"):
+            with self.subTest(cap=cap):
+                schema=self.schema(cap)
+                collect=schema["$defs"]["object"]["properties"]["collect"]
+                self.assertEqual(set(collect["required"]),{"include_group","resolve_group"})
+                self.assertEqual(collect["properties"]["include_group"]["type"],"boolean")
+                self.assertEqual(collect["properties"]["resolve_group"]["type"],"boolean")
+
     def test_regkey_effective_rights(self):
         self.validate("windows.regkeyeffectiverights53","object",{
             "object_title":"HKLM rights","capability":"windows.regkeyeffectiverights53",
