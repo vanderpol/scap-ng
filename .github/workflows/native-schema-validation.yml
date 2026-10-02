@@ -1,0 +1,60 @@
+name: Native SCAP-NG schema validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - schema/v0.1.0/**
+      - tools/validate_native_json_schemas.py
+      - research/iterations/003/source/split-policy-assessment/rhel9-full/**
+      - research/iterations/003/examples/tailoring-all-options/**
+      - research/iterations/003/examples/results-model-bakeoff/**
+      - tools/fixtures/rhel9-tailoring/**
+      - .github/workflows/native-schema-validation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: rhel9-full
+            root: research/iterations/003/source/split-policy-assessment/rhel9-full
+          - name: tailoring-example
+            root: research/iterations/003/examples/tailoring-all-options
+          - name: results-example
+            root: research/iterations/003/examples/results-model-bakeoff
+          - name: rhel9-tailoring-fixture
+            root: tools/fixtures/rhel9-tailoring
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check jsonschema pyyaml
+      - name: Validate ${{ matrix.name }}
+        id: validate
+        continue-on-error: true
+        run: |
+          mkdir -p validation-reports
+          python tools/validate_native_json_schemas.py \
+            "${{ matrix.root }}" \
+            --schema-dir schema/v0.1.0 \
+            --report "validation-reports/${{ matrix.name }}.json"
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-schema-validation-${{ matrix.name }}
+          path: validation-reports/${{ matrix.name }}.json
+      - name: Enforce schema validation
+        if: steps.validate.outcome != 'success'
+        run: |
+          cat "validation-reports/${{ matrix.name }}.json"
+          exit 1
