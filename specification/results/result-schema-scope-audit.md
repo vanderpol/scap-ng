@@ -133,6 +133,7 @@ Changes made in this pass:
 - closed Scan Result target and Benchmark-index records;
 - closed the Benchmark platform record and Organizational Input intended-scope
   record.
+- removed the authored Test-level `result` field from `assessment.schema.json`; runtime Test outcomes belong only in result artifacts.
 
 Open maps remain open only where extensibility is intentional, including
 capability-specific Assessment structures, Parameter/input constraint payloads,
