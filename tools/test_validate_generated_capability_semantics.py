@@ -138,6 +138,23 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         rows=validate_assessment_capability_semantics(doc)
         self.assertIn("object.filter_state_capability",{r["code"] for r in rows})
 
+    def test_deep_nested_set_filter_capability_is_validated(self):
+        expression={"operator":"union","operands":[{"object":"source","filters":[{"state":"wrong","action":"include"}]}]}
+        for _ in range(31):
+            expression={"operator":"union","operands":[{"set":expression}]}
+        doc={
+            "assessment":{
+                "objects":{
+                    "source":{"capability":"unix.file"},
+                    "o":{"capability":"unix.file","set":expression},
+                },
+                "states":{"wrong":{"capability":"windows.file"}},
+                "tests":{},
+            }
+        }
+        rows=validate_assessment_capability_semantics(doc)
+        self.assertIn("object.filter_state_capability",{r["code"] for r in rows})
+
     def test_nested_set_filter_capability_is_validated(self):
         doc={
             "assessment":{
