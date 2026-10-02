@@ -69,14 +69,14 @@ assessment:
         value: SELECT DomainRole FROM win32_computersystem
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000034:
-      source_state_id: oval:mil.disa.stig.win:ste:20000034
+    oval:mil.disa.stig.win:ste:20000032:
+      source_state_id: oval:mil.disa.stig.win:ste:20000032
       source_type: userright_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
       entities:
       - attributes:
-          operation: pattern match
+          operation: case insensitive equals
         effective_attributes:
           check_existence:
             origin: xsd_default
@@ -92,84 +92,12 @@ assessment:
             value: 'false'
           operation:
             origin: explicit
-            value: pattern match
+            value: case insensitive equals
         kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^(?i)(NT Authority\\)?Local account$
+        value: Everyone
       state_title: null
-    oval:mil.disa.stig.win:ste:10000200:
-      source_state_id: oval:mil.disa.stig.win:ste:10000200
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '1'
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: record
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: equals
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      state_title: Domain Member Workstation
-    oval:mil.disa.stig.win:ste:10000300:
-      source_state_id: oval:mil.disa.stig.win:ste:10000300
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '2'
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: explicit
-            value: record
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: equals
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      state_title: Standalone Server
     oval:mil.disa.stig.win:ste:20000033:
       source_state_id: oval:mil.disa.stig.win:ste:20000033
       source_type: userright_state
@@ -227,6 +155,35 @@ assessment:
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: ^(?i)(.+\\)?Enterprise Admins$
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000034:
+      source_state_id: oval:mil.disa.stig.win:ste:20000034
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: xsd_default
+            value: string
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(NT Authority\\)?Local account$
       state_title: null
     oval:mil.disa.stig.win:ste:10000100:
       source_state_id: oval:mil.disa.stig.win:ste:10000100
@@ -300,35 +257,6 @@ assessment:
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       state_title: Domain Member Server
-    oval:mil.disa.stig.win:ste:20000032:
-      source_state_id: oval:mil.disa.stig.win:ste:20000032
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-        effective_attributes:
-          check_existence:
-            origin: xsd_default
-            value: at_least_one_exists
-          datatype:
-            origin: xsd_default
-            value: string
-          entity_check:
-            origin: xsd_default
-            value: all
-          mask:
-            origin: xsd_default
-            value: 'false'
-          operation:
-            origin: explicit
-            value: case insensitive equals
-        kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Everyone
-      state_title: null
     oval:mil.disa.stig.win:ste:20000040:
       source_state_id: oval:mil.disa.stig.win:ste:20000040
       source_type: userright_state
@@ -358,21 +286,80 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: ^(?i)(.+\\)?Domain Admins$
       state_title: null
+    oval:mil.disa.stig.win:ste:10000300:
+      source_state_id: oval:mil.disa.stig.win:ste:10000300
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: record
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: Standalone Server
+    oval:mil.disa.stig.win:ste:10000200:
+      source_state_id: oval:mil.disa.stig.win:ste:10000200
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '1'
+        effective_attributes:
+          check_existence:
+            origin: xsd_default
+            value: at_least_one_exists
+          datatype:
+            origin: explicit
+            value: record
+          entity_check:
+            origin: xsd_default
+            value: all
+          mask:
+            origin: xsd_default
+            value: 'false'
+          operation:
+            origin: explicit
+            value: equals
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: Domain Member Workstation
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25349508:
-        source_test_id: oval:mil.disa.stig.win:tst:25349508
-        source_type: userright_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Deny log on through Remote Desktop Services - Everyone
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25349500
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000032
-        source_other: []
       oval:mil.disa.stig.win:tst:25349506:
         source_test_id: oval:mil.disa.stig.win:tst:25349506
         source_type: userright_test
@@ -413,18 +400,18 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:20000033
         source_other: []
-      oval:mil.disa.stig.win:tst:25349510:
-        source_test_id: oval:mil.disa.stig.win:tst:25349510
+      oval:mil.disa.stig.win:tst:25349508:
+        source_test_id: oval:mil.disa.stig.win:tst:25349508
         source_type: userright_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        test_title: Deny log on through Remote Desktop Services - Enterprise Admins
+        test_title: Deny log on through Remote Desktop Services - Everyone
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
         - oval:mil.disa.stig.win:obj:25349500
         predicates:
-        - oval:mil.disa.stig.win:ste:20000041
+        - oval:mil.disa.stig.win:ste:20000032
         source_other: []
       oval:mil.disa.stig.win:tst:25349509:
         source_test_id: oval:mil.disa.stig.win:tst:25349509
@@ -453,61 +440,20 @@ assessment:
         - oval:mil.disa.stig.win:ste:10000200
         - oval:mil.disa.stig.win:ste:10000400
         source_other: []
+      oval:mil.disa.stig.win:tst:25349510:
+        source_test_id: oval:mil.disa.stig.win:tst:25349510
+        source_type: userright_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Deny log on through Remote Desktop Services - Enterprise Admins
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25349500
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000041
+        source_other: []
     definitions:
-      oval:mil.disa.stig.windows11:def:253495:
-        source_definition_id: oval:mil.disa.stig.windows11:def:253495
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:253495
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations
-              must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems
-              and unauthenticated access on all systems.
-          - attributes:
-              family: windows
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Microsoft Windows 11
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
-
-
-              The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging
-              on using Remote Desktop Services.
-
-
-              If Remote Desktop Services is not used by the organization, the Everyone group must be assigned this right to
-              prevent all access.
-
-
-              In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
-              systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the
-              compromise of an entire domain.
-
-
-              Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
-              resulting from credential theft attacks.
-
-
-              The Guests group must be assigned this right to prevent unauthenticated access.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:253495:
         source_definition_id: oval:mil.disa.stig.defs:def:253495
         class: compliance
@@ -569,6 +515,60 @@ assessment:
               access on all systems.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.windows11:def:253495:
+        source_definition_id: oval:mil.disa.stig.windows11:def:253495
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253495
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations
+              must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems
+              and unauthenticated access on all systems.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
+
+
+              The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging
+              on using Remote Desktop Services.
+
+
+              If Remote Desktop Services is not used by the organization, the Everyone group must be assigned this right to
+              prevent all access.
+
+
+              In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
+              systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the
+              compromise of an entire domain.
+
+
+              Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
+              resulting from credential theft attacks.
+
+
+              The Guests group must be assigned this right to prevent unauthenticated access.'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -731,6 +731,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
-    semantic_ir_sha256: f9ad1eaa2de8e7893b3feaa4179a50249528fdc3671e55652a542ad676338fc3
+    semantic_ir_sha256: 357dd866440ad6da5de46e5a9fb94e31f470f4db2b577591d7c58391706962f1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e555eba67890a94fc654481b131e64a4d79d2ae3a5e5cd5b65aa4c0ca0eee2d2
