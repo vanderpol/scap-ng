@@ -1632,15 +1632,14 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         test_title = node_title(test)
 
         # OVAL independent:unknown_test intentionally has no Object and always
-        # evaluates to unknown. Preserve that result explicitly instead of
-        # inventing collection semantics.
+        # evaluates to unknown by capability semantics. Do not embed a runtime
+        # result in authored content or invent collection semantics.
         if test_name == "unknown_test":
             check_id = unique_check_id(test_title, capability)
             test_to_check[test_ref] = check_id
             checks[check_id] = {
                 "test_title": test_title,
                 "capability": capability,
-                "result": "unknown",
             }
             return {("test" if collection_graph else "check"): check_id}, None
 

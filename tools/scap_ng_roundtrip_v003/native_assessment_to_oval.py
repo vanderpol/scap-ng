@@ -473,8 +473,8 @@ class Builder:
             raise ValueError(f"Unknown Test reference: {check_id}")
         check = self.test_nodes[check_id]
 
-        if check.get("result") == "unknown":
-            capability = check.get("capability") or "independent.unknown"
+        if check.get("capability") == "independent.unknown":
+            capability = check["capability"]
             family, name = split_capability(capability)
             tid = self.ids.get("tst", check_id)
             ET.SubElement(self.tests, q(family_ns(family), name + "_test"), {

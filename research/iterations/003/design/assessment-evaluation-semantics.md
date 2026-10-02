@@ -8,6 +8,18 @@ This document is the current detailed home for Assessment evaluation semantics d
 
 ## 1. Evaluation model
 
+### Objectless unknown capability
+
+The working `independent.unknown` capability preserves OVAL 5.12.3
+`independent:unknown_test`: its implementation is unknown and evaluation always
+produces `unknown`. It consumes no Object or State. The capability declaration
+expresses this behavior; an authored Test SHALL NOT carry `result: unknown`.
+That field belongs to the runtime Test result. The source-required `check`
+attribute is ignored for this Test under the pinned independent XSD, so reverse
+conversion may emit any valid value. Source explicitness belongs in provenance.
+This is preserved source behavior, not proof of a native runtime implementation
+or Board ratification of the working capability name.
+
 An automated Assessment is a typed dependency graph of Tests, Objects, States, Variables and an `evaluate` expression.
 
 - A **Test** evaluates Items produced by an Object, optionally against one or more States.

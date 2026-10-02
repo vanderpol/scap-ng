@@ -160,3 +160,17 @@ selection inside the State payload, not an attached runtime outcome.
 This is an architectural boundary check, not deep capability validation or
 proof of evaluator equivalence. Provenance: **Evidence/Audit**, reproduced from
 the checked-in schema and corrected with failing-then-passing instance tests.
+
+### Corpus follow-up: objectless unknown Tests
+
+Run 37002838788 at `7cff61a364123f060c1d82a59fa213577f77df91` validated
+25,147 fresh NIWC Current native documents and rejected 34. Every rejection was
+the converter's authored `result: unknown` on `independent.unknown` Tests.
+The pinned OVAL independent XSD defines `unknown_test` as always producing
+unknown, without an Object, and ignores its required `check` value.
+The converter now expresses this through the capability alone; the reverse
+emitter recognizes that capability directly. The runtime-result prohibition is
+retained. `tools/test_unknown_test_roundtrip.py` covers source lowering, native
+schema acceptance, rejection of an attached runtime result and objectless reverse
+conversion with several valid source `check` values. Artifact replay and fresh
+CI generation are separate evidence gates; a replay is not a fresh conversion.
