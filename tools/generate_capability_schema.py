@@ -367,10 +367,7 @@ def generate(mapping, repo_root):
                 "additionalProperties": False,
             },
         },
-        "x-scap-ng-audit-crosswalk": {
-            "object_selectors": selector_field_meta,
-            "state_fields": state_meta,
-        },
+
     }
     return generated
 
