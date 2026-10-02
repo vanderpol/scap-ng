@@ -162,8 +162,8 @@ class WindowsWmiQueryCapabilitySchemaTests(unittest.TestCase):
                     "operation":"equal",
                     "datatype":"record",
                     "mask":False,
-                    "entity_check":"all",
-                    "entity_existence":"some",
+                    "match":"all",
+                    "existence":"some",
                 },
             })
 
