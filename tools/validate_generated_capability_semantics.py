@@ -467,19 +467,19 @@ STRUCTURAL_OR_IMPORT_SEMANTIC_RULE_IDS={
     "windows.sid_sid.materialized_behaviors",
     "windows.wuaupdatesearcher.materialized_superseded_default",
     "windows.wuaupdatesearcher.source_path_repair",
-    "independent.family.literal_vocabulary",
     "independent.sql512.result_record",
     "independent.sql512.engine_filterability",
     "independent.unknown.fixed_result",
     "linux.rpmverifyfile.materialized_behaviors",
     "linux.rpmverifypackage.materialized_behaviors",
+}
+
+POLICY_SEMANTIC_RULE_IDS={
+    "independent.family.literal_vocabulary",
     "linux.dpkginfo.debian_evr",
     "unix.interface.type_literal",
     "unix.shadow.encrypt_method_literal",
     "windows.auditeventpolicysubcategories.supported_fields",
-}
-
-POLICY_SEMANTIC_RULE_IDS={
     # Normative deployment/authoring policy rather than document-shape or evaluator checks.
     "independent.shellcommand.trusted_content",
     "independent.shellcommand.not_generic_escape_hatch",
