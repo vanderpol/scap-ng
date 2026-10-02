@@ -20,18 +20,46 @@ def assessment_test_syntax(document):
             assertion["item_quantifier"] = assertion.pop("check")
 
     def rename(expression):
-        if isinstance(expression, list):
-            return [rename(term) for term in expression]
-        if not isinstance(expression, dict):
+        """Rename check references without relying on Python recursion depth."""
+        if not isinstance(expression, (dict, list)):
             return expression
-        if "check" in expression:
-            target = expression["check"]
-            if target not in names:
-                raise ValueError(f"Unknown technical Test reference: {target}")
-            return {("test" if key == "check" else key):
-                    (names[target] if key == "check" else rename(value))
-                    for key, value in expression.items()}
-        return {key: rename(value) for key, value in expression.items()}
+
+        root = {} if isinstance(expression, dict) else [None] * len(expression)
+        stack = [(expression, root)]
+        while stack:
+            source, target = stack.pop()
+            if isinstance(source, dict):
+                check_target = source.get("check")
+                if check_target is not None and check_target not in names:
+                    raise ValueError(f"Unknown technical Test reference: {check_target}")
+                for key, value in source.items():
+                    new_key = "test" if key == "check" else key
+                    if key == "check":
+                        target[new_key] = names[value]
+                    elif isinstance(value, dict):
+                        child = {}
+                        target[new_key] = child
+                        stack.append((value, child))
+                    elif isinstance(value, list):
+                        child = [None] * len(value)
+                        target[new_key] = child
+                        stack.append((value, child))
+                    else:
+                        target[new_key] = value
+            else:
+                for index, value in enumerate(source):
+                    if isinstance(value, dict):
+                        child = {}
+                        target[index] = child
+                        stack.append((value, child))
+                    elif isinstance(value, list):
+                        child = [None] * len(value)
+                        target[index] = child
+                        stack.append((value, child))
+                    else:
+                        target[index] = value
+        return root
+
     assessment["evaluate"] = rename(assessment["evaluate"])
     return result
 
