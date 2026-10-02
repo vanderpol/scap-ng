@@ -7,7 +7,7 @@ from validate_generated_capability_semantics import (
 )
 
 
-def entity(value, operation="equals", datatype="string", **extra):
+def entity(value, operation="equal", datatype="string", **extra):
     return {
         "value":value,
         "operation":operation,
@@ -17,76 +17,75 @@ def entity(value, operation="equals", datatype="string", **extra):
 
 
 class UnixFileSemanticValidationTests(unittest.TestCase):
-    def test_filepath_rejects_recursion_behaviors(self):
+    def test_full_path_rejects_traversal(self):
         obj={
             "capability":"unix.file",
-            "select":{"filepath":entity("/etc/passwd")},
-            "behaviors":{
+            "select":{"full_path":entity("/etc/passwd")},
+            "traversal":{
                 "max_depth":1,
-                "recurse":"directories",
-                "recurse_direction":"down",
+                "follow_symlinks":False,
+                "filesystem":"local",
             },
         }
         rows=validate_unix_file_object(obj)
         self.assertEqual(
             [r["code"] for r in rows],
-            ["unix.file.filepath_no_recursion_behaviors"],
+            ["unix.file.full_path_no_traversal"],
         )
         self.assertEqual(
             set(rows[0]["fields"]),
-            {"max_depth","recurse","recurse_direction"},
+            {"traversal"},
         )
 
-    def test_filepath_pattern_rejects_defined_filesystem(self):
+    def test_full_path_rejects_any_traversal(self):
         rows=validate_unix_file_object({
             "capability":"unix.file",
-            "select":{"filepath":entity("/etc/.*",operation="pattern match")},
-            "behaviors":{"recurse_file_system":"defined"},
+            "select":{"full_path":entity("/etc/.*",operation="match")},
+            "traversal":{"max_depth":1,"follow_symlinks":False,"filesystem":"same"},
         })
         self.assertEqual(
             [r["code"] for r in rows],
-            ["unix.file.filepath_pattern_defined_filesystem"],
+            ["unix.file.full_path_no_traversal"],
         )
 
-    def test_path_pattern_rejects_recursion_controls(self):
+    def test_directory_pattern_rejects_traversal(self):
         rows=validate_unix_file_object({
             "capability":"unix.file",
             "select":{
-                "path":entity("/etc/.*",operation="pattern match"),
-                "filename":entity("passwd"),
+                "directory":entity("/etc/.*",operation="match"),
+                "name":entity("passwd"),
             },
-            "behaviors":{
+            "traversal":{
                 "max_depth":2,
-                "recurse":"directories",
-                "recurse_direction":"down",
-                "recurse_file_system":"defined",
+                "follow_symlinks":False,
+                "filesystem":"same",
             },
         })
         self.assertEqual(
             [r["code"] for r in rows],
-            ["unix.file.path_pattern_no_recursion_behaviors"],
+            ["unix.file.pattern_directory_no_traversal"],
         )
         self.assertEqual(
             set(rows[0]["fields"]),
-            {"max_depth","recurse","recurse_direction","recurse_file_system"},
+            {"traversal"},
         )
 
     def test_empty_filename_requires_defined_special_semantics(self):
         literal=validate_unix_file_object({
             "capability":"unix.file",
-            "select":{"path":entity("/etc"),"filename":entity("")},
+            "select":{"directory":entity("/etc"),"name":entity("")},
         })
         self.assertEqual([r["code"] for r in literal],["unix.file.filename_empty"])
 
         for filename in (
             entity("",nil=True),
-            entity("",operation="pattern match"),
+            entity("",operation="match"),
             entity({"variable":"filename-var"}),
         ):
             with self.subTest(filename=filename):
                 rows=validate_unix_file_object({
                     "capability":"unix.file",
-                    "select":{"path":entity("/etc"),"filename":filename},
+                    "select":{"directory":entity("/etc"),"name":filename},
                 })
                 self.assertEqual(rows,[])
 
@@ -94,9 +93,17 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
         doc={
             "assessment":{
                 "objects":{
-                    "o":{"capability":"unix.file","filters":[
-                        {"state":"s","action":"include"}
-                    ]}
+                    "source":{"capability":"unix.file"},
+                    "filtered":{"capability":"unix.file","set":{
+                        "operator":"union",
+                        "operands":[{"object":"source","filters":[{"state":"filter-state","action":"include"}]}]
+                    }},
+                    "o":{"capability":"unix.file","set":{
+                        "operator":"union",
+                        "operands":[{"object":"source","filters":[
+                            {"state":"s","action":"include"}
+                        ]}]
+                    }}
                 },
                 "states":{
                     "s":{"capability":"linux.rpminfo"}
@@ -131,10 +138,9 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                     "o":{
                         "capability":"unix.file",
                         "select":{
-                            "path":entity("/etc"),
-                            "filename":entity("passwd"),
+                            "directory":entity("/etc"),
+                            "name":entity("passwd"),
                         },
-                        "filters":[{"state":"filter-state","action":"include"}],
                     }
                 },
                 "states":{
