@@ -241,6 +241,34 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
 
     only_state = sorted(state_names - item_names)
     raw_only_item = sorted(item_names - state_names)
+    native_added_state = mapping.get("native", {}).get("native_added_state_fields", {})
+    allowed_native_added = []
+    for name in list(raw_only_item):
+        if name not in native_added_state:
+            continue
+        spec = native_added_state[name]
+        if not isinstance(spec, dict) or not spec.get("reason"):
+            errors.append(
+                f"native-added State field {name!r} must provide a non-empty reason"
+            )
+            continue
+        dtypes = field_datatypes(item_fields[name])
+        native_name = spec.get("native_name", name)
+        override = set(mapping.get("native", {}).get("field_datatypes", {}).get(native_name, []))
+        if override and override != dtypes:
+            errors.append(
+                f"native-added State field {name!r} datatype override {sorted(override)} "
+                f"does not match Item datatype {sorted(dtypes)}"
+            )
+            continue
+        allowed_native_added.append({
+            "field": name,
+            "native_name": native_name,
+            "item_datatypes": sorted(dtypes),
+            "reason": spec["reason"],
+        })
+        raw_only_item.remove(name)
+
     declared_item_only = mapping.get("native", {}).get("item_only_complex_fields", {})
     if isinstance(declared_item_only, list):
         declared_item_only = {name: "explicitly declared complex Item-only field" for name in declared_item_only}
@@ -360,6 +388,7 @@ def audit_mapping(mapping_path: Path, repo_root: Path):
         "object_fields": sorted(object_names),
         "state_fields": sorted(state_names),
         "item_fields": sorted(item_names),
+        "allowed_native_added_state_fields": allowed_native_added,
         "allowed_item_only_complex_fields": allowed_item_only,
         "datatype_mismatches": datatype_mismatches,
         "corrected_source_defects": corrected_source_defects,
@@ -404,7 +433,7 @@ def main():
 
     if args.json:
         print(json.dumps({
-            "invariant": "Object scalar fields subset State fields; scalar State/Item fields align, with only explicitly justified complex Item-only exceptions",
+            "invariant": "Object scalar fields subset State fields; scalar State/Item fields align, allowing explicit native State repairs for source omissions and justified complex Item-only exceptions",
             "checked": len(results),
             "failures": len(failures),
             "results": results,
