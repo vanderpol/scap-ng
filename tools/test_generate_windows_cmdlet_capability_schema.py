@@ -32,11 +32,9 @@ class WindowsCmdletCapabilitySchemaTests(unittest.TestCase):
                     "value":"Spooler",
                     "operation":"equal",
                     "datatype":"string",
-                    "mask":False,
                     "match":"all",
                 }
             },
-            "mask":False,
         }
 
     def test_structured_cmdlet_invocation(self):
@@ -81,14 +79,12 @@ class WindowsCmdletCapabilitySchemaTests(unittest.TestCase):
                             "value":"Running",
                             "operation":"equal",
                             "datatype":"string",
-                            "mask":False,
                             "match":"all",
                             "existence":"some",
                         }
                     },
                     "match":"all",
                     "existence":"some",
-                    "mask":False,
                 },
             },
         })

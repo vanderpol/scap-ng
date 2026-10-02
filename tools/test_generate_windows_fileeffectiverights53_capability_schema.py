@@ -26,7 +26,7 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,operation="equal",datatype="string"):
-        return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+        return {"value":value,"operation":operation,"datatype":datatype}
 
     def test_file_and_trustee_sid_are_both_required(self):
         self.validate_def("object",{
@@ -82,8 +82,7 @@ class WindowsFileEffectiveRights53Tests(unittest.TestCase):
             "state_title":None,
             "capability":"windows.fileeffectiverights53",
             "state":{
-                "field":"file_write_data","value":False,"operation":"equal","datatype":"boolean",
-                "mask":False,"match":"all","existence":"some",
+                "field":"file_write_data","value":False,"operation":"equal","datatype":"boolean","match":"all","existence":"some",
             },
         })
 

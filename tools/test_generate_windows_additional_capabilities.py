@@ -27,7 +27,7 @@ class WindowsAdditionalCapabilitiesTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
 
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_appcmd_identifier_vocabulary(self):
         self.validate("windows.appcmd","object",{
