@@ -26,6 +26,18 @@ class TestSyntax(unittest.TestCase):
         self.assertEqual(original, before)
         verify_assessment_test_syntax(original, result)
 
+    def test_deep_evaluation_tree_is_stack_safe(self):
+        original = self.source()
+        expr = {"check": "alpha"}
+        for _ in range(1500):
+            expr = {"not": expr}
+        original["assessment"]["evaluate"] = expr
+        converted = assessment_test_syntax(original)
+        node = converted["assessment"]["evaluate"]
+        for _ in range(1500):
+            node = node["not"]
+        self.assertEqual(node, {"test": "test-alpha"})
+
     def test_unknown_reference_rejected(self):
         original = self.source()
         original["assessment"]["evaluate"] = {"check": "missing"}
