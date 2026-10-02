@@ -196,6 +196,49 @@ class EffectiveAttributeTests(unittest.TestCase):
                     "xsd_default",
                 )
 
+
+    def test_object_behaviors_do_not_inherit_entity_defaults(self):
+        obj = element(
+            f'<unix:file_object xmlns:unix="{UNIX}" '
+            'id="oval:example:obj:1" version="1">'
+            '<unix:path>/tmp</unix:path>'
+            '<unix:behaviors recurse_direction="none" max_depth="-1"/>'
+            '</unix:file_object>'
+        )
+        parsed = ir.parse_object(obj)
+        behavior = next(
+            child for child in parsed["children"] if child["name"] == "behaviors"
+        )
+        self.assertEqual(
+            behavior["attributes"],
+            {"recurse_direction": "none", "max_depth": "-1"},
+        )
+        self.assertNotIn("effective_attributes", behavior)
+        self.assertEqual(
+            behavior["effective_attribute_resolution"]["status"],
+            "requires_schema_behavior_contract",
+        )
+        self.assertEqual(
+            behavior["effective_attribute_resolution"]["reason"],
+            "platform_specific_behavior_defaults_not_resolved_in_generic_ir",
+        )
+
+    def test_object_entity_defaults_remain_separate_from_behaviors(self):
+        obj = element(
+            f'<unix:file_object xmlns:unix="{UNIX}" '
+            'id="oval:example:obj:1" version="1">'
+            '<unix:path>/tmp</unix:path>'
+            '<unix:behaviors/>'
+            '</unix:file_object>'
+        )
+        parsed = ir.parse_object(obj)
+        path = next(child for child in parsed["children"] if child["name"] == "path")
+        behavior = next(
+            child for child in parsed["children"] if child["name"] == "behaviors"
+        )
+        self.assertEqual(path["effective_attributes"]["datatype"]["value"], "string")
+        self.assertNotIn("effective_attributes", behavior)
+
     def test_unknown_scope_fails_closed(self):
         with self.assertRaises(ValueError):
             ir.effective_attributes(element("<path/>"), "behavior")

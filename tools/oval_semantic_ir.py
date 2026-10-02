@@ -585,6 +585,14 @@ def semantic_child(e, *, context=None):
         out["attributes"] = attrs
     if context in ("state_entity", "object_entity") and n != "notes":
         out["effective_attributes"] = effective_attributes(e, context)
+    elif context == "behavior":
+        # Behavior defaults are capability/type specific. The complete pinned
+        # XSD inventory resolves them structurally, but generic IR must not
+        # pretend EntityAttributeGroup defaults apply to <behaviors>.
+        out["effective_attribute_resolution"] = {
+            "status": "requires_schema_behavior_contract",
+            "reason": "platform_specific_behavior_defaults_not_resolved_in_generic_ir",
+        }
     val = text_value(e)
     if val is not None:
         out["value"] = val
@@ -655,8 +663,18 @@ def parse_test(e):
 
 
 def parse_object(e):
-    children = [semantic_child(c, context="object_entity" if local(c.tag) != "notes" else None)
-                for c in e if isinstance(c.tag, str)]
+    children = []
+    for c in e:
+        if not isinstance(c.tag, str):
+            continue
+        child_name = local(c.tag)
+        if child_name == "behaviors":
+            context = "behavior"
+        elif child_name in {"notes", "set"}:
+            context = None
+        else:
+            context = "object_entity"
+        children.append(semantic_child(c, context=context))
     return {
         "id": e.get("id"),
         "type": local(e.tag),
