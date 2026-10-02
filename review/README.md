@@ -18,7 +18,8 @@ Reviewable output includes:
 - normative or near-normative specification text;
 - schemas that define the proposed authoring/result contract;
 - small, understandable examples;
-- selected full benchmark examples used to demonstrate real-world coverage;
+- small representative benchmark/rule/assessment samples used to demonstrate real-world coverage;
+- stable full-URL references to complete generated review artifacts produced by CI;
 - Board decision questions and links to their GitHub Discussions;
 - validation/equivalence summaries needed to understand what has and has not been demonstrated.
 
@@ -59,3 +60,6 @@ The review surface has one active target and immutable completed baselines.
 7. Do not create a release directly from an unreviewed or partially reviewed working tree merely because the implementation is functional.
 8. Tools, tests, CI helpers, conversion scratch data, transition notes, and bulk source corpora SHALL remain outside the review surface.
 9. New reviewable artifacts SHALL enter through `review/current/`; do not create parallel active review trees elsewhere in the repository.
+10. Complete generated/compiled review products SHALL normally be published as GitHub Actions artifacts (or another explicitly approved non-Git evidence store) and referenced from the review set by the **full HTTPS URL** to the exact workflow run/artifact. Do not use only an artifact name or repository-relative path.
+11. Do not recommit large generated products to Git solely for review. Git SHALL retain compact summaries, manifests, hashes/provenance, and small representative samples needed to understand the design.
+12. A frozen `review/iterations/NNN/` checkpoint SHALL record the full artifact URL, artifact name, source commit, input pins, and validation status. It does not duplicate bulk generated artifacts into Git.
