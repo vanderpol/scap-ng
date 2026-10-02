@@ -69,13 +69,13 @@ def source_datatypes(element):
     typed = element.get("type") or ""
     suffix_map = {
         "EntityStateStringType": ["string"],
-        "EntityStateIntType": ["int"],
+        "EntityStateIntType": ["integer"],
         "EntityStateBoolType": ["boolean"],
         "EntityStateFloatType": ["float"],
         "EntityStateVersionType": ["version"],
         "EntityStateIPAddressStringType": ["string"],
         "EntityObjectStringType": ["string"],
-        "EntityObjectIntType": ["int"],
+        "EntityObjectIntType": ["integer"],
         "EntityObjectBoolType": ["boolean"],
     }
     short = typed.split(":")[-1]
@@ -88,7 +88,16 @@ def source_datatypes(element):
         if attr.tag == XSD + "attribute" and attr.get("name") == "datatype":
             values = restriction_values(attr)
             if values:
-                return values
+                return [
+                    {
+                        "int": "integer",
+                        "ipv4_address": "ipv4",
+                        "ipv6_address": "ipv6",
+                        "evr_string": "rpm_evr",
+                        "debian_evr_string": "debian_evr",
+                    }.get(value, value)
+                    for value in values
+                ]
             if attr.get("default"):
                 return [attr.get("default")]
     return ["string"]
@@ -202,24 +211,21 @@ def generate(mapping, repo_root):
     state_el = direct_global(root, "element", source["state"])
     object_fields = immediate_payload_elements(object_el)
     state_fields = immediate_payload_elements(state_el)
-    behavior = behavior_contract(
-        root,
-        source["behavior_type"],
-        reject_deprecated_values=(
-            mapping.get("native", {}).get("deprecated_enum_policy") == "reject"
-        ),
-    )
+    behavior = {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/file_traversal"}
 
     selector_props = {}
     selector_field_meta = {}
+    selector_map = mapping["native"]["selector_map"]
+    reverse_selector_map = {native: source for source, native in selector_map.items()}
     for alternative in mapping["native"]["object_selector_alternatives"]:
         for name in alternative:
-            field = object_fields[name]
+            source_name = reverse_selector_map[name]
+            field = object_fields[source_name]
             dtypes = source_datatypes(field)
             selector_props[name] = generic_entity_schema(dtypes, state=False)
             selector_props[name]["description"] = docs(field)
             selector_field_meta[name] = {
-                "source_type": field.get("type"),
+                "source_field": source_name,
                 "datatypes": dtypes,
             }
 
@@ -252,9 +258,10 @@ def generate(mapping, repo_root):
         if name in {"value"}:
             continue
         dtypes = source_datatypes(field)
-        state_names.append(name)
-        state_meta[name] = {
-            "source_type": field.get("type"),
+        native_name = mapping["native"].get("state_field_map", {}).get(name, name)
+        state_names.append(native_name)
+        state_meta[native_name] = {
+            "source_field": name,
             "datatypes": dtypes,
             "description": docs(field),
         }
@@ -273,23 +280,12 @@ def generate(mapping, repo_root):
         for name, meta in sorted(state_meta.items())
     ]
 
-    controls = mapping["native"]["test_result_controls"]
     capability = mapping["capability"]
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": f"https://scap-ng.dev/schema/v0.1.0/generated/capabilities/{capability}.schema.json",
         "title": f"Generated SCAP-NG capability fragment: {capability}",
-        "description": docs(test_el),
-        "x-scap-ng-generated": {
-            "generator": "tools/generate_capability_schema.py",
-            "mapping_format": mapping["format"],
-            "source_language": source["language"],
-            "source_schema": source["definitions_schema"],
-            "source_namespace": source["namespace"],
-            "source_test": source["test"],
-            "source_object": source["object"],
-            "source_state": source["state"],
-        },
+        "description": f"Native SCAP-NG capability schema for {capability}.",
         "x-semantic-validator-rules": mapping.get("semantic_validator_rules", []),
         "$defs": {
             "test": {
@@ -303,16 +299,13 @@ def generate(mapping, repo_root):
                     "capability": {"const": capability},
                     "object": {"type": "string", "minLength": 1},
                     "check_existence": {
-                        "type": "string",
-                        "enum": controls["check_existence"],
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
                     },
                     "check": {
-                        "type": "string",
-                        "enum": controls["check"],
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/match_quantifier"
                     },
                     "state_operator": {
-                        "type": "string",
-                        "enum": controls["state_operator"],
+                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/logical_operator"
                     },
                     "states": {
                         "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
@@ -332,7 +325,7 @@ def generate(mapping, repo_root):
                         "additionalProperties": False,
                         "oneOf": selector_alternatives,
                     },
-                    "behaviors": behavior,
+                    "traversal": behavior,
                     "set": {"type": "object"},
                     "filters": {
                         "type": "array",
@@ -374,7 +367,7 @@ def generate(mapping, repo_root):
                 "additionalProperties": False,
             },
         },
-        "x-source-field-catalog": {
+        "x-scap-ng-audit-crosswalk": {
             "object_selectors": selector_field_meta,
             "state_fields": state_meta,
         },
@@ -396,7 +389,7 @@ def main():
     print(json.dumps({
         "capability": mapping["capability"],
         "output": str(args.output),
-        "state_fields": len(generated["x-source-field-catalog"]["state_fields"]),
+        "state_fields": len(generated["x-scap-ng-audit-crosswalk"]["state_fields"]),
         "object_selectors": sorted(generated["x-source-field-catalog"]["object_selectors"]),
         "semantic_rules": len(generated["x-semantic-validator-rules"]),
     }, indent=2, sort_keys=True))
