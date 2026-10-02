@@ -85,6 +85,21 @@ def _iter_set_filters(expression):
             yield from _iter_set_filters(nested)
 
 
+def _iter_set_object_refs(expression):
+    """Yield Object IDs referenced by a native recursive Set expression."""
+    if not isinstance(expression, dict):
+        return
+    for operand in expression.get("operands") or []:
+        if not isinstance(operand, dict):
+            continue
+        object_id=operand.get("object")
+        if isinstance(object_id,str):
+            yield object_id
+        nested=operand.get("set")
+        if isinstance(nested,dict):
+            yield from _iter_set_object_refs(nested)
+
+
 def validate_assessment_capability_semantics(document):
     """Validate current native Assessment cross-node capability semantics."""
     assessment=document.get("assessment",document)
@@ -97,6 +112,23 @@ def validate_assessment_capability_semantics(document):
     for object_id,obj in objects.items():
         for row in validate_unix_file_object(obj):
             diagnostics.append({"object":object_id,**row})
+
+        for referenced_object_id in _iter_set_object_refs(obj.get("set")):
+            referenced_object=objects.get(referenced_object_id)
+            if referenced_object is None:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"object.set_object_missing",
+                    "referenced_object":referenced_object_id,
+                    "message":"Set references an unknown Object",
+                })
+            elif referenced_object.get("capability") != obj.get("capability"):
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"object.set_object_capability",
+                    "referenced_object":referenced_object_id,
+                    "message":"Set Object capability must match parent Object capability",
+                })
 
         for flt in _iter_set_filters(obj.get("set")):
             state_id=flt.get("state")
