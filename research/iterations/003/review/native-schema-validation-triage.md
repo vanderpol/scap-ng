@@ -137,3 +137,26 @@ The maintained Capability State/Item parity workflow now also generates every re
 Initial combined result on 2026-10-02: **green**.
 
 This closes a gap that static top-level schema validation alone could not cover: a reviewed mapping or generator change can no longer silently produce a malformed capability schema while the shared schemas remain valid.
+
+
+## Package-graph validation phase
+
+Structural file validation and intra-Assessment graph validation are now complemented by a standalone cross-document package validator.
+
+The validator checks, independently of the converter:
+
+- Benchmark Rule IDs resolve to Rule documents;
+- applicability catalog references resolve to the correct document type;
+- applicability conditions resolve to Assessment documents;
+- each Rule default assessment selector exists;
+- every Rule assessment choice resolves to an Assessment;
+- Rule applicability identifiers resolve to catalog conditions;
+- Rule `requires` / `conflicts` references resolve to Benchmark Rules;
+- Benchmark platform applicability identifiers resolve;
+- Benchmark grouping contains exactly the Benchmark Rule population with no loss or duplication;
+- duplicate native document identities are diagnosed;
+- references cannot escape the package root.
+
+The full-current workflow runs this check both before and after normalization. This specifically tests that normalization cannot preserve local JSON Schema validity while breaking the package graph.
+
+As with schema failures, package-graph failures SHALL be triaged before repair as source/content defects, generator defects, normalizer defects, or validator defects.
