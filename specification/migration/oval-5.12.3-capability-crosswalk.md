@@ -305,11 +305,11 @@ this capability to `unix.command` merely because a common use invokes Bash.
 | `wmi57_test` | `windows.wmi57` | production:55, self-assertion:5 | candidate; name-review |
 | `wuaupdatesearcher_test` | `windows.wuaupdatesearcher` | self-assertion:9 | candidate |
 
-### Windows approved-test schema snapshot caveat
+### Windows approved-test verification
 
-Approved Windows OVAL tests including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` SHALL be treated as standard OVAL capabilities. Approved Windows families are part of the SCAP 1.4 schema/test-content surface; an apparent omission in one inspected XSD SHALL be treated as a source-file mismatch, not as an extension boundary.
+Approved Windows OVAL tests including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` are present in the authoritative OVAL-Community v5.12.3 Windows definitions schema. A prior review falsely reported them missing because a large-file connector path returned zero file content; fetching the Git blob by SHA confirmed the definitions are present.
 
-The schema source used by the audit must be reconciled against the complete SCAP 1.4 schema/test-content distribution. The only currently known SCC/NIWC custom Test/Object/State family is `independent:sqlext`.
+This is not a schema defect or publisher-extension boundary. The only currently known SCC/NIWC custom Test/Object/State family is `independent:sqlext`.
 
 
 ## Excluded/deprecated Test types
