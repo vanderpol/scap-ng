@@ -305,6 +305,7 @@ def generate(mapping, repo_root):
 
     state_names = []
     state_meta = {}
+    item_meta = {}
     field_map = mapping["native"].get("state_field_map", {})
     datatype_overrides = mapping["native"].get("field_datatypes", {})
     for source_name, native_name in field_map.items():
@@ -322,8 +323,28 @@ def generate(mapping, repo_root):
         # correct an upstream State/Item inconsistency, but they still describe
         # the Item-backed native datatype.
         dtypes = datatype_overrides.get(native_name) or source_datatypes(item_field)
+        meta = {
+            "datatypes": dtypes,
+            "multiple": item_field.get("maxOccurs") not in (None, "1"),
+        }
         state_names.append(native_name)
-        state_meta[native_name] = {
+        state_meta[native_name] = meta
+        item_meta[native_name] = meta
+
+    item_only_map = mapping["native"].get("item_only_field_map", {})
+    item_only_exceptions = mapping["native"].get("item_only_complex_fields", {})
+    for source_name, native_name in item_only_map.items():
+        if source_name not in item_only_exceptions:
+            raise ValueError(
+                f"item-only field {source_name!r} must be justified in native.item_only_complex_fields"
+            )
+        item_field = item_fields.get(source_name)
+        if item_field is None:
+            raise KeyError(
+                f"mapping references missing source Item-only field {source_name!r}"
+            )
+        dtypes = datatype_overrides.get(native_name) or source_datatypes(item_field)
+        item_meta[native_name] = {
             "datatypes": dtypes,
             "multiple": item_field.get("maxOccurs") not in (None, "1"),
         }
@@ -398,7 +419,7 @@ def generate(mapping, repo_root):
             meta["datatypes"],
             multiple=meta.get("multiple", False),
         )
-        for name, meta in sorted(state_meta.items())
+        for name, meta in sorted(item_meta.items())
     }
 
     defs = {
