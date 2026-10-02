@@ -207,9 +207,13 @@ remaining supported Self-Assertion language-conformance surface. Capabilities
 SHOULD continue to reuse shared primitives and SHALL NOT be bulk-generated from
 XSD names without semantic review.
 
-## Source-governance caveat for Windows extension families
+## Windows schema snapshot discrepancy
 
-Some current Windows-native mappings were prototyped from production/SCC semantics and system-characteristics Item shapes even though the corresponding Test/Object/State family is absent from the official OVAL-Community v5.12.3 Windows definitions schema. These mappings SHALL NOT be described as standard OVAL 5.12.3 migration mappings until their exact publisher-extension provenance is identified and recorded. Native SCAP-NG design work may continue, but the standard migration crosswalk must distinguish standard OVAL from publisher extensions.
+Approved Windows OVAL capabilities including `cmdlet`, `ntuser`, `service`, `sid_sid`, `user_sid55`, and `appcmdlistconfig` are standard OVAL tests, not publisher extensions.
+
+The currently checked-in Windows definitions XSD snapshot does not expose several of these approved families even though approved OVAL documentation and validation/content evidence do. This SHALL be treated as a defective, incomplete, or mismatched schema snapshot that must be reconciled. Absence from this snapshot is not evidence of non-standard status.
+
+The only currently known SCC/NIWC custom Test/Object/State family in this workstream is `independent:sqlext`.
 
 
 ## Content-backed standard checkpoint — 2026-10-02
