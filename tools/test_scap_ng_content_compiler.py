@@ -20,7 +20,7 @@ class ContentCompilerTests(unittest.TestCase):
             b=root/"example"
             dump(b/"benchmark.yaml",{"benchmark":{"id":"example","version":{"value":"1"},"rules":["R1"],"profiles":[]}})
             dump(b/"assessments"/"automated"/"R1.automated.assessment.yaml",{
-                "assessment":{"id":"R1.automated","mode":"automated","collections":{},"tests":{},"evaluate":None}
+                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":null,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"rules"/"R1.rule.yaml",{
                 "rule":{
@@ -30,11 +30,11 @@ class ContentCompilerTests(unittest.TestCase):
                 }
             })
             benchmark,members,index=compile_benchmark(root,b)
-            self.assertIn("R1.automated",index)
+            self.assertIn("example.R1.automated",index)
             rule_doc=json.loads(members["objects/rules/R1.json"])
             self.assertEqual(
                 rule_doc["rule"]["assessment_choices"]["automated"]["assessment"],
-                "R1.automated",
+                "example.R1.automated",
             )
             out=Path(td)/"example.scapng"
             metrics=write_bundle(
@@ -63,11 +63,11 @@ class ContentCompilerTests(unittest.TestCase):
                 }
             })
             dump(b/"assessments"/"automated"/"R1.automated.assessment.yaml",{
-                "assessment":{"id":"R1.automated","mode":"automated","collections":{},"tests":{},"evaluate":None}
+                "assessment":{"id":"example.R1.automated","version":1,"assessment_title":null,"mode":"automated","class":"compliance","purpose":"assessment","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},"objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"assessments"/"applicability"/"platform.assessment.yaml",{
-                "assessment":{"id":"platform.assessment","mode":"automated","purpose":"applicability",
-                              "collections":{},"tests":{},"evaluate":None}
+                "assessment":{"id":"example.platform.assessment","version":1,"assessment_title":null,"mode":"automated","class":"inventory","purpose":"applicability","specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.1.0"},
+                              "objects":{},"states":{},"tests":{},"evaluate":{}}
             })
             dump(b/"rules"/"R1.rule.yaml",{
                 "rule":{
@@ -87,11 +87,11 @@ class ContentCompilerTests(unittest.TestCase):
                 }
             })
             benchmark,members,index=compile_benchmark(root,b)
-            self.assertIn("platform.assessment",index)
+            self.assertIn("example.platform.assessment",index)
             app=json.loads(members["objects/applicability.json"])
             self.assertEqual(
                 app["applicability"]["conditions"]["platform.example"]["assessment"],
-                "platform.assessment",
+                "example.platform.assessment",
             )
 
 
