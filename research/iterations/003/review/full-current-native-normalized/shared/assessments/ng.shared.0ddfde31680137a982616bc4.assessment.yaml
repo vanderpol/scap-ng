@@ -1,0 +1,86 @@
+assessment:
+  id: ng.shared.0ddfde31680137a982616bc4
+  version: 1
+  assessment_title: FTP is Installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    check-if-ftp-installed-object:
+      capability: windows.cmdlet
+      select:
+        module_name:
+          operation: equals
+          datatype: string
+          value: ServerManager
+        module_id:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        module_version:
+          operation: equals
+          datatype: version
+          nil: true
+          value: ''
+        verb:
+          operation: equals
+          datatype: string
+          value: Get
+        noun:
+          operation: equals
+          datatype: string
+          value: windowsfeature
+        parameters:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: name
+              value: Web-Ftp-Service
+              operation: equals
+              datatype: string
+              entity_check: all
+        select:
+          operation: equals
+          datatype: record
+          value:
+            record:
+            - name: property
+              value: installstate
+              operation: equals
+              datatype: string
+              entity_check: all
+      object_title: Check if FTP is installed
+  states:
+    state-is-install-state-not-equal-to-installed:
+      state_title: Is install state not equal to installed
+      capability: windows.cmdlet
+      state:
+        field: value
+        value:
+          record:
+          - name: installstate
+            value: Installed
+            operation: case insensitive not equal
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-ftp-installed:
+      test_title: FTP is installed
+      capability: windows.cmdlet
+      object: check-if-ftp-installed-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-is-install-state-not-equal-to-installed
+  evaluate:
+    not:
+      test: test-ftp-installed

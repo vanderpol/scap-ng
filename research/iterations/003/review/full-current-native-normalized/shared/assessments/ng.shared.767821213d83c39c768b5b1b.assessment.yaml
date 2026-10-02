@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.767821213d83c39c768b5b1b
+  version: 1
+  assessment_title: SQL Server 2016
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    independent-sqlext-object:
+      capability: independent.sqlext
+      select:
+        engine:
+          operation: equals
+          datatype: string
+          value: sqlserver
+        version:
+          operation: equals
+          datatype: string
+          value: 2016|2017|2019
+        instance:
+          operation: pattern match
+          datatype: string
+          value: .*
+        database:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+        sql:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      behaviors:
+        context: instance
+      object_title: null
+  states: {}
+  tests:
+    test-this-benchmark-applicable-if-at-least-one-sql-server-2016:
+      test_title: This benchmark is applicable if at least one SQL Server 2016-2022 instance is online.
+      capability: independent.sqlext
+      object: independent-sqlext-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-this-benchmark-applicable-if-at-least-one-sql-server-2016

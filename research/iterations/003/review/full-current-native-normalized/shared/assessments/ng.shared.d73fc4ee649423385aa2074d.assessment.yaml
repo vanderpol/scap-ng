@@ -1,0 +1,41 @@
+assessment:
+  id: ng.shared.d73fc4ee649423385aa2074d
+  version: 1
+  assessment_title: Cisco IOS-XE
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    show-login-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          value: show version
+      object_title: show login
+  states:
+    state-login-block-for:
+      state_title: login block-for
+      capability: iosxe.line
+      state:
+        field: config_line
+        value: Cisco IOS[ -]XE [Ss]oftware
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-show-version-shows-correct-version:
+      test_title: show version shows correct version
+      capability: iosxe.line
+      object: show-login-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-login-block-for
+  evaluate:
+    test: test-show-version-shows-correct-version

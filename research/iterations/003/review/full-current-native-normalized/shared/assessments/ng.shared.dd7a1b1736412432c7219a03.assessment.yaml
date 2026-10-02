@@ -1,0 +1,70 @@
+assessment:
+  id: ng.shared.dd7a1b1736412432c7219a03
+  version: 1
+  assessment_title: Cisco IOS
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-version-information-object:
+      capability: iosxe.global
+      select:
+        global_command:
+          operation: pattern match
+          datatype: string
+          value: ^version 1
+      object_title: gather version information
+    show-login-object:
+      capability: iosxe.line
+      select:
+        show_subcommand:
+          operation: equals
+          datatype: string
+          value: show version
+      object_title: show login
+  states:
+    state-look-for-ios-versions-less-than-16:
+      state_title: Look for IOS versions less than 16
+      capability: iosxe.global
+      state:
+        field: global_command
+        value: 12\.|13\.|14\.|15\.
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+    state-login-block-for:
+      state_title: login block-for
+      capability: iosxe.line
+      state:
+        field: config_line
+        value: Cisco IOS[ -]XE [Ss]oftware
+        operation: pattern match
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-show-version-shows-correct-version:
+      test_title: show version shows correct version
+      capability: iosxe.global
+      object: gather-version-information-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-look-for-ios-versions-less-than-16
+    test-show-version-shows-correct-version-2:
+      test_title: show version shows correct version
+      capability: iosxe.line
+      object: show-login-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-login-block-for
+  evaluate:
+    all:
+    - test: test-show-version-shows-correct-version
+    - not:
+        test: test-show-version-shows-correct-version-2

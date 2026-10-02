@@ -1,0 +1,30 @@
+assessment:
+  id: ng.shared.fa5c7be44a15802062907668
+  version: 1
+  assessment_title: WSUS Installation
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    wsus-service-installed-object:
+      capability: windows.service
+      select:
+        service_name:
+          operation: equals
+          datatype: string
+          value: WsusService
+      object_title: Is WSUS service installed
+  states: {}
+  tests:
+    test-server-hosting-wsus:
+      test_title: Is server hosting WSUS
+      capability: windows.service
+      object: wsus-service-installed-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    not:
+      test: test-server-hosting-wsus

@@ -1,0 +1,38 @@
+assessment:
+  id: ng.shared.9a940cab978d1801f9a63f5b
+  version: 1
+  assessment_title: Linux with no NFS mounts configured
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    etc-fstab-uncommented-nfs-capturing-options-object:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          value: '1'
+      object_title: /etc/fstab, uncommented, nfs, capturing options
+  states: {}
+  tests:
+    test-nfs-mounts-present:
+      test_title: NFS mounts are present
+      capability: independent.textfilecontent54
+      object: etc-fstab-uncommented-nfs-capturing-options-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    not:
+      test: test-nfs-mounts-present

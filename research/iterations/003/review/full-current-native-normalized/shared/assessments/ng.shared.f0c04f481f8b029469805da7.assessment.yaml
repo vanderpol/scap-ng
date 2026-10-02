@@ -1,0 +1,49 @@
+assessment:
+  id: ng.shared.f0c04f481f8b029469805da7
+  version: 1
+  assessment_title: Microsoft IIS 10.0
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    iis-version-string-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: equals
+          datatype: string
+          value: Software\Microsoft\InetStp
+        name:
+          operation: equals
+          datatype: string
+          value: VersionString
+      object_title: IIS Version String
+  states:
+    state-value-equal-to-10-0:
+      state_title: Value Equal To 10.0
+      capability: windows.registry
+      state:
+        field: value
+        value: Version 10.0
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-microsoft-iis-10-0-installed:
+      test_title: Microsoft IIS 10.0 is installed
+      capability: windows.registry
+      object: iis-version-string-object
+      check_existence: at_least_one_exists
+      check: only one
+      states:
+      - state-value-equal-to-10-0
+  evaluate:
+    test: test-microsoft-iis-10-0-installed

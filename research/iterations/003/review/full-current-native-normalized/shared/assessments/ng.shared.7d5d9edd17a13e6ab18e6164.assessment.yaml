@@ -1,0 +1,61 @@
+assessment:
+  id: ng.shared.7d5d9edd17a13e6ab18e6164
+  version: 1
+  assessment_title: Linux krb5 workstation 1.17 or higher is not installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        name:
+          operation: equals
+          datatype: string
+          value: krb5-workstation
+      object_title: null
+  states:
+    state-1-17-18-or-newer-release:
+      state_title: 1.17-18 or newer release
+      capability: linux.rpminfo
+      state:
+        all:
+        - field: release
+          value: '18'
+          operation: greater than or equal
+          datatype: version
+          entity_check: all
+          entity_existence: at_least_one_exists
+        - field: version
+          value: '1.17'
+          operation: equals
+          datatype: version
+          entity_check: all
+          entity_existence: at_least_one_exists
+    state-1-17-or-newer-version:
+      state_title: 1.17 or newer version
+      capability: linux.rpminfo
+      state:
+        field: version
+        value: '1.17'
+        operation: greater than
+        datatype: version
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-krb5-workstation-1-17-18-el8-x86-64-or-newer:
+      test_title: krb5-workstation-1.17-18.el8.x86_64 or newer is installed.
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      check_existence: at_least_one_exists
+      check: all
+      state_operator: OR
+      states:
+      - state-1-17-18-or-newer-release
+      - state-1-17-or-newer-version
+  evaluate:
+    not:
+      test: test-krb5-workstation-1-17-18-el8-x86-64-or-newer

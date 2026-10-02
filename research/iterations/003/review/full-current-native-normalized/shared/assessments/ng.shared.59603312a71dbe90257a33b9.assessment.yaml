@@ -1,0 +1,51 @@
+assessment:
+  id: ng.shared.59603312a71dbe90257a33b9
+  version: 1
+  assessment_title: Windows Standalone Server
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi57
+      select:
+        namespace:
+          operation: equals
+          datatype: string
+          value: root\cimv2
+        wql:
+          operation: equals
+          datatype: string
+          value: SELECT DomainRole FROM win32_computersystem
+      object_title: null
+  states:
+    state-standalone-server:
+      state_title: Standalone Server
+      capability: windows.wmi57
+      state:
+        field: result
+        value:
+          record:
+          - name: domainrole
+            value: '2'
+            operation: equals
+            datatype: string
+            entity_check: all
+        operation: equals
+        datatype: record
+        entity_check: all
+        entity_existence: at_least_one_exists
+  tests:
+    test-system-windows-standalone-server:
+      test_title: The system is a Windows Standalone Server
+      capability: windows.wmi57
+      object: windows-wmi57-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-standalone-server
+  evaluate:
+    test: test-system-windows-standalone-server
