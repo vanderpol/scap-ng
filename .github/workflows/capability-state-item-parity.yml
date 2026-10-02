@@ -1,0 +1,24 @@
+name: Capability State Item parity
+on:
+  push:
+    branches: [main]
+    paths:
+      - schema/v0.1.0/capability-mappings/**
+      - third_party/scap-1.4-schemas/oval_5.12.3/**
+      - tools/audit_capability_state_item_parity.py
+      - .github/workflows/capability-state-item-parity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit Object subset and State Item parity
+        run: python tools/audit_capability_state_item_parity.py --json
