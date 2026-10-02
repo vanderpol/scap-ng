@@ -16,6 +16,7 @@ on:
       - tools/check_current_authoring_contract.py
       - tools/validate_native_json_schemas.py
       - tools/validate_native_semantics.py
+      - tools/validate_native_package_graph.py
       - tools/validate_generated_capability_semantics.py
       - schema/v0.1.0/**
       - .github/workflows/scap-ng-full-current-native-normalize-compile.yml
@@ -191,6 +192,10 @@ jobs:
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/fresh-current \
             --report work/evidence/semantic-validation-before-normalization.json
+      - name: Validate fresh native package graph semantics
+        run: |
+          python scap-ng/tools/validate_native_package_graph.py work/fresh-current \
+            --report work/evidence/package-graph-before-normalization.json
 
       - name: Normalize exact duplicates and report near overlaps
         run: |
@@ -208,6 +213,10 @@ jobs:
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/normalized-current \
             --report work/evidence/semantic-validation-after-normalization.json
+      - name: Validate normalized native package graph semantics
+        run: |
+          python scap-ng/tools/validate_native_package_graph.py work/normalized-current \
+            --report work/evidence/package-graph-after-normalization.json
 
       - name: Compile unnormalized corpus baseline
         run: |
@@ -230,6 +239,8 @@ jobs:
           schema_after=json.loads((ev/"schema-validation-after-normalization.json").read_text())
           semantic_before=json.loads((ev/"semantic-validation-before-normalization.json").read_text())
           semantic_after=json.loads((ev/"semantic-validation-after-normalization.json").read_text())
+          package_before=json.loads((ev/"package-graph-before-normalization.json").read_text())
+          package_after=json.loads((ev/"package-graph-after-normalization.json").read_text())
           before=json.loads((ev/"compiler-before.json").read_text())
           after=json.loads((ev/"compiler-after.json").read_text())
           signed=json.loads((ev/"compiler-signed-test.json").read_text())
@@ -246,6 +257,10 @@ jobs:
                    "semantic_invalid_before":semantic_before["invalid"],
                    "semantic_assessments_after":semantic_after["assessment_documents_checked"],
                    "semantic_invalid_after":semantic_after["invalid"],
+                   "package_graph_packages_before":package_before["packages_checked"],
+                   "package_graph_invalid_before":package_before["invalid"],
+                   "package_graph_packages_after":package_after["packages_checked"],
+                   "package_graph_invalid_after":package_after["invalid"],
                    "compiled_bundles_before":before["bundles"],"compiled_bytes_before":before["total_bytes"],
                    "compiled_bundles_after":after["bundles"],"compiled_bytes_after":after["total_bytes"],
                    "compiled_byte_delta":delta,"compiled_byte_reduction_pct":pct,
@@ -262,7 +277,9 @@ jobs:
                  f"- Schema documents before normalization: **{summary['schema_documents_before']}** / invalid **{summary['schema_invalid_before']}**",
                  f"- Schema documents after normalization: **{summary['schema_documents_after']}** / invalid **{summary['schema_invalid_after']}**",
                  f"- Assessment semantics before normalization: **{summary['semantic_assessments_before']}** / invalid **{summary['semantic_invalid_before']}**",
-                 f"- Assessment semantics after normalization: **{summary['semantic_assessments_after']}** / invalid **{summary['semantic_invalid_after']}**","",
+                 f"- Assessment semantics after normalization: **{summary['semantic_assessments_after']}** / invalid **{summary['semantic_invalid_after']}**",
+                 f"- Package graphs before normalization: **{summary['package_graph_packages_before']}** / invalid **{summary['package_graph_invalid_before']}**",
+                 f"- Package graphs after normalization: **{summary['package_graph_packages_after']}** / invalid **{summary['package_graph_invalid_after']}**","",
                  "## Exact normalization",f"- Referenced Assessment definitions before: **{summary['referenced_assessment_instances_before']}**",
                  f"- Definitions after proven exact normalization: **{summary['assessment_definitions_after_exact_normalization']}**",
                  f"- Duplicate definitions avoided: **{summary['duplicate_assessment_definitions_avoided']}**",
