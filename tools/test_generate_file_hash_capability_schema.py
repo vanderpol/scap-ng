@@ -122,8 +122,8 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
                 "operation":"equal",
                 "datatype":"string",
                 "mask":False,
-                "entity_check":"all",
-                "entity_existence":"some",
+                "match":"all",
+                "existence":"some",
             },
         })
         self.validate_def("state",{
@@ -135,8 +135,8 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
                 "operation":"equal",
                 "datatype":"string",
                 "mask":False,
-                "entity_check":"all",
-                "entity_existence":"some",
+                "match":"all",
+                "existence":"some",
             },
         })
 
