@@ -96,7 +96,7 @@ All currently inventoried **standard OVAL 5.12.3 capability candidates with prod
 The remaining candidate inventory is intentionally split into two deferred workstreams:
 
 - **schema-only standard candidates** with no concrete content examples; these are deferred until after higher-value SCAP-NG design work or until concrete content evidence appears;
-- **Windows publisher-extension families** whose system-characteristics Items exist and whose SCC/NIWC content may exercise them, but whose Test/Object/State families are absent from official OVAL-Community v5.12.3 definitions. These require exact extension provenance before they are described as migration mappings.
+- **Windows schema-snapshot reconciliation** for approved OVAL tests that are absent from the currently checked-in Windows definitions XSD. These remain standard capability work; the only known custom Test/Object/State family is `independent:sqlext`.
 
 Reviewed native renames such as `filehash58 → file.hash`, `variable → variable.value`, and `wmi57 → windows.wmi.query` count as covered migration surface rather than unmapped candidates.
 
