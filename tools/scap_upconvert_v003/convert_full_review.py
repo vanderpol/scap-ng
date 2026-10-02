@@ -384,6 +384,26 @@ def main(argv=None):
                         'unsupported':unsupported,
                     })
                     continue
+                defect=review.source_defect_features_reason(unsupported)
+                if defect:
+                    blocked_applicability[ref]={
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'unsupported':unsupported,
+                        'classification':'source_content_defect',
+                        'reason':defect,
+                    }
+                    app_ids[ref]=None
+                    app_evidence.append({
+                        'source_platform':ref,
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'status':'skipped_source_defect_applicability',
+                        'classification':'source_content_defect',
+                        'reason':defect,
+                        'unsupported':unsupported,
+                    })
+                    continue
                 raise ValueError('Applicability source blocked: '+str(unsupported))
             provenance={};native,error=source.lower_definition(definition_oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
             if error:
