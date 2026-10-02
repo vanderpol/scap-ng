@@ -44,8 +44,8 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
             "test_title":"threshold check",
             "capability":"variable.value",
             "variable":"threshold",
-            "check_existence":"some",
-            "check":"all",
+            "existence":"some",
+            "match":"all",
             "states":["expected"],
         })
 
@@ -55,8 +55,8 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
                 "test_title":"legacy-shaped check",
                 "capability":"variable.value",
                 "object":"variable-object",
-                "check_existence":"some",
-                "check":"all",
+                "existence":"some",
+                "match":"all",
             })
 
     def test_state_has_only_native_value_field(self):
@@ -90,8 +90,8 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
                 "operation":"greater_or_equal",
                 "datatype":"integer",
                 "mask":False,
-                "entity_check":"all",
-                "entity_existence":"some",
+                "match":"all",
+                "existence":"some",
             },
         })
 
