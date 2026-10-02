@@ -149,6 +149,21 @@ class TextFileContent54CapabilitySchemaTests(unittest.TestCase):
         })
         self.assertIn("independent.textfilecontent54.pattern_operation",{row["code"] for row in rows})
 
+    def test_false_result_redaction_is_rejected(self):
+        value=self.entity("secret",operation="match")
+        value["redact_result"]=False
+        with self.assertRaises(jsonschema.ValidationError):
+            self.validate_def("object",{
+                "object_title":"no-op redaction is not authored",
+                "capability":"independent.textfilecontent54",
+                "select":{
+                    "full_path":self.entity("/etc/shadow"),
+                    "pattern":value,
+                    "instance":self.entity(1,datatype="integer"),
+                },
+                "collect":self.defaults(),
+            })
+
     def test_state_retains_text_and_subexpression(self):
         for field in ("text","subexpression"):
             with self.subTest(field=field):
