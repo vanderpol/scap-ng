@@ -35,9 +35,22 @@ Generated JSON Schema alone is not capability completion.
 - `linux.selinuxsecuritycontext`
 - `unix.interface`
 
+## Evidence-backed prioritization rule
+
+Capability translation SHALL prioritize constructs for which we have executable or authored content evidence:
+
+1. production content;
+2. OVAL Self-Assertion / validation content;
+3. other concrete checked-in examples;
+4. schema-only candidates last.
+
+A capability that exists only in an XSD, with no known production, Self-Assertion, validation, or other concrete content example, MAY be deferred until after the content-backed migration surface and other higher-value SCAP-NG design work are complete. Schema existence alone is not sufficient reason to spend early implementation effort.
+
+Deferred schema-only candidates remain part of the language inventory and are not considered removed or unsupported by policy. They are simply lower priority until concrete usage evidence or a standards requirement justifies implementation.
+
 ## Translation ordering
 
-Use observed production use as the primary implementation order, then use OVAL Self-Assertion to fill language-conformance gaps. Do not infer that a low-use capability is removable merely because it is uncommon.
+Use observed production use as the primary implementation order, then use OVAL Self-Assertion to fill language-conformance gaps. Schema-only candidates with no concrete content evidence are deferred until after content-backed capability work and higher-value SCAP-NG design tasks. Do not infer that a low-use capability is removable merely because it is uncommon.
 
 ### Production-first tranche
 
