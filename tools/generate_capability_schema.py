@@ -47,24 +47,6 @@ def restriction_values(node):
     return values
 
 
-def deprecated_restriction_values(node):
-    rows = []
-    for child in node.iter():
-        if child.tag != XSD + "enumeration" or child.get("value") is None:
-            continue
-        deprecated = [
-            n for n in child.iter()
-            if local(n.tag) == "deprecated_info"
-        ]
-        if deprecated:
-            rows.append({
-                "value": child.get("value"),
-                "evidence": " ".join(docs(n) or " ".join("".join(n.itertext()).split())
-                                     for n in deprecated).strip(),
-            })
-    return rows
-
-
 def source_datatypes(element):
     typed = element.get("type") or ""
     suffix_map = {
@@ -120,62 +102,6 @@ def immediate_payload_elements(global_element):
     return result
 
 
-def behavior_contract(root, type_name, *, reject_deprecated_values=False):
-    node = direct_global(root, "complexType", type_name)
-    props = {}
-    required = []
-    for attr in node:
-        if attr.tag != XSD + "attribute" or not attr.get("name"):
-            continue
-        name = attr.get("name")
-        schema = {"description": docs(attr)}
-        values = restriction_values(attr)
-        if values:
-            schema["type"] = "string"
-            deprecated_values = deprecated_restriction_values(attr)
-            deprecated_set = {row["value"] for row in deprecated_values}
-            schema["enum"] = [
-                value for value in values
-                if not (reject_deprecated_values and value in deprecated_set)
-            ]
-            if deprecated_values:
-                schema["x-oval-deprecated-enum-values"] = deprecated_values
-                schema["x-scap-ng-deprecated-enum-policy"] = (
-                    "reject" if reject_deprecated_values else "allow_with_warning"
-                )
-        else:
-            # FileBehaviors max_depth is the current integer case.
-            has_integer = any(
-                x.tag == XSD + "restriction" and (x.get("base") or "").endswith("integer")
-                for x in attr.iter()
-            )
-            schema["type"] = "integer" if has_integer else "string"
-            mins = [
-                int(x.get("value"))
-                for x in attr.iter()
-                if x.tag == XSD + "minInclusive" and x.get("value") is not None
-            ]
-            if mins:
-                schema["minimum"] = min(mins)
-        if attr.get("default") is not None:
-            raw = attr.get("default")
-            if schema.get("type") == "integer":
-                raw = int(raw)
-            schema["default"] = raw
-            schema["x-oval-default"] = raw
-        if attr.get("use") == "required":
-            required.append(name)
-        props[name] = schema
-    out = {
-        "type": "object",
-        "properties": props,
-        "additionalProperties": False,
-    }
-    if required:
-        out["required"] = required
-    return out
-
-
 def generic_entity_schema(allowed_datatypes, *, state=False):
     """Compose a capability entity from shared authored-Assessment primitives.
 
@@ -211,10 +137,13 @@ def generate(mapping, repo_root):
     state_el = direct_global(root, "element", source["state"])
     object_fields = immediate_payload_elements(object_el)
     state_fields = immediate_payload_elements(state_el)
-    behavior = {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/file_traversal"}
+    traversal_schema = (
+        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/file_traversal"}
+        if mapping.get("native", {}).get("uses_file_traversal", False)
+        else None
+    )
 
     selector_props = {}
-    selector_field_meta = {}
     selector_map = mapping["native"]["selector_map"]
     reverse_selector_map = {native: source for source, native in selector_map.items()}
     for alternative in mapping["native"]["object_selector_alternatives"]:
@@ -231,10 +160,6 @@ def generate(mapping, repo_root):
                     ]
                 }
             selector_props[name] = selector_schema
-            selector_field_meta[name] = {
-                "source_field": source_name,
-                "datatypes": dtypes,
-            }
 
     selector_alternatives = []
     for alternative in mapping["native"]["object_selector_alternatives"]:
@@ -253,6 +178,30 @@ def generate(mapping, repo_root):
         if alt.get("not") == {}:
             alt.pop("not", None)
 
+    collect_properties = {}
+    collect_required = []
+    for name, spec in mapping.get("native", {}).get("collection_parameters", {}).items():
+        prop = {
+            "type": spec.get("type", "string"),
+        }
+        if spec.get("enum"):
+            prop["enum"] = list(spec["enum"])
+        if spec.get("description"):
+            prop["description"] = spec["description"]
+        collect_properties[name] = prop
+        if spec.get("required", False):
+            collect_required.append(name)
+
+    collect_schema = None
+    if collect_properties:
+        collect_schema = {
+            "type": "object",
+            "properties": collect_properties,
+            "additionalProperties": False,
+        }
+        if collect_required:
+            collect_schema["required"] = collect_required
+
     state_names = []
     state_meta = {}
     field_map = mapping["native"].get("state_field_map", {})
@@ -269,19 +218,27 @@ def generate(mapping, repo_root):
             "datatypes": dtypes,
         }
 
-    state_field_branches = [
-        {
-            "properties": {
-                "field": {"const": name},
-                "datatype": {
-                    "type": "string",
-                    "enum": sorted(set(meta["datatypes"])),
-                },
+    state_value_enums = mapping["native"].get("state_value_enums", {})
+    state_field_branches = []
+    for name, meta in sorted(state_meta.items()):
+        props = {
+            "field": {"const": name},
+            "datatype": {
+                "type": "string",
+                "enum": sorted(set(meta["datatypes"])),
             },
-            "required": ["field"],
         }
-        for name, meta in sorted(state_meta.items())
-    ]
+        if name in state_value_enums:
+            props["value"] = {
+                "oneOf": [
+                    {"type": "string", "enum": list(state_value_enums[name])},
+                    {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                ]
+            }
+        state_field_branches.append({
+            "properties": props,
+            "required": ["field"],
+        })
 
     capability = mapping["capability"]
     generated = {
@@ -328,7 +285,8 @@ def generate(mapping, repo_root):
                         "additionalProperties": False,
                         "oneOf": selector_alternatives,
                     },
-                    "traversal": behavior,
+                    **({"traversal": traversal_schema} if traversal_schema else {}),
+                    **({"collect": collect_schema} if collect_schema else {}),
                     "set": {
                         "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
                     },
