@@ -21,4 +21,18 @@ jobs:
         with:
           python-version: '3.12'
       - name: Audit Object subset and State Item parity
-        run: python tools/audit_capability_state_item_parity.py --json
+        id: audit
+        continue-on-error: true
+        run: |
+          python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json
+      - name: Upload parity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-state-item-parity
+          path: capability-state-item-parity.json
+      - name: Enforce parity
+        if: steps.audit.outcome != 'success'
+        run: |
+          cat capability-state-item-parity.json
+          exit 1
