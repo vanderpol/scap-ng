@@ -26,19 +26,19 @@ Status values:
 | variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
 | object_component | object -> item field -> variable values, optional record_field | prototype | 0/1/many items and repeated item entities; record_field |
 | literal_component | typed literal expression input | prototype | datatype/cast rules |
-| arithmetic | 2+ operands; int/float; Cartesian product for collections | prototype | product cardinality, casts, error propagation |
-| begin | one string component plus required character/string | prototype | collection-valued input and datatype constraints |
+| arithmetic | 2+ operands; int/float; Cartesian product for collections | prototype | exact-static success/error fixtures added; runtime collection/error propagation remains #26 |
+| begin | one string component plus required character/string | prototype | exact-static fixture added; collection-valued/runtime conformance remains #26 |
 | concat | 2+ components; Cartesian product; DNE/error flag propagation | prototype | exact flag/result semantics |
-| end | one string component plus required character/string | prototype | collection-valued input |
-| escape_regex | one string component mapped over collection | prototype | exact escaping subset |
-| split | one string component -> collection including empty values | prototype | delimiter edge cases |
-| substring | one string component with start/length semantics | prototype | boundary/error cases |
-| time_difference | string/int date/time operands and format semantics | prototype | complete format/type cases |
-| regex_capture | one string component; capture semantics | prototype | no-match and collection behavior |
-| unique | de-duplicate collection values | prototype | datatype equality rules |
-| count | collection -> integer count | prototype | zero/DNE/error inputs |
-| glob_to_regex | glob conversion semantics | design | exact OVAL conversion rules |
-| merge | merge record-valued/component data | design | exact MergeFunctionType structure/semantics |
+| end | one string component plus required character/string | prototype | exact-static fixture added; collection-valued/runtime conformance remains #26 |
+| escape_regex | one string component mapped over collection | prototype | exact-static escaping fixture added; independent runtime comparison remains #26 |
+| split | one string component -> collection including empty values | prototype | empty-field delimiter fixture added; broader runtime edge cases remain #26 |
+| substring | one string component with start/length semantics | prototype | success and out-of-range error fixtures added |
+| time_difference | string/int date/time operands and format semantics | prototype | two-operand exact-static fixture added; one-operand current-time case remains runtime-dependent |
+| regex_capture | one string component; capture semantics | prototype | match/no-match fixtures added; collection runtime comparison remains #26 |
+| unique | de-duplicate collection values | prototype | exact-static duplicate fixture added; datatype equality cross-check remains #26 |
+| count | collection -> integer count | prototype | exact-static count fixture added; DNE/error runtime cases remain #26 |
+| glob_to_regex | glob conversion semantics | prototype | exact-static conversion + invalid-pattern fixtures added; differential execution remains #26 |
+| merge | merge component values with delimiter/sort/order semantics | prototype | lexical success + numeric-sort error fixtures added; record/runtime variants remain #26 |
 | var_ref in object entities | variable supplies selector values | prototype | all operations, multi-valued var_check |
 | var_ref in state entities | variable supplies expected values | native | many-to-many var_check + entity_check truth-table ordering is covered; target execution remains #26 |
 | var_ref datatype matching | referenced variable datatype must match consuming entity rules | design | validator generated from schema constraints |

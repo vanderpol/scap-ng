@@ -478,6 +478,106 @@ class DependencyTests(unittest.TestCase):
                 ))
                 self.assertFalse(validator.validate(mismatch))
 
+    def test_static_function_semantics_matrix(self):
+        def evaluate(expr):
+            root = source()
+            variable(root, 1, expr)
+            nodes = {n.get("id"): n for n in root.iter() if n.get("id")}
+            kinds = {key: "variable" for key in nodes if ":var:" in key}
+            return ir.resolve_static_variables(nodes, kinds)["oval:dependency:var:1"]
+
+        def unary(name, value, **attrs):
+            node = component(name, **attrs)
+            node.append(literal(value))
+            return node
+
+        arithmetic = component("arithmetic", arithmetic_operation="add")
+        arithmetic.extend([literal("2"), literal("3")])
+        self.assertEqual(evaluate(arithmetic)["values"], ["5"])
+
+        escaped = evaluate(unary("escape_regex", "a.b*"))
+        self.assertEqual(escaped["values"], [r"a\.b\*"])
+
+        globbed = evaluate(unary("glob_to_regex", "*.txt"))
+        self.assertEqual(globbed["values"], [r"^(?=[^\.])[^/]*\.txt$"])
+
+        merged = component("merge", delimiter=",", sort="lexical", order="ascending")
+        merged.extend([literal("b"), literal("a")])
+        self.assertEqual(evaluate(merged)["values"], ["a,b"])
+
+        capture = unary("regex_capture", "prefix id=42 suffix", pattern=r"id=([0-9]+)")
+        self.assertEqual(evaluate(capture)["values"], ["42"])
+
+        no_capture = unary("regex_capture", "no id here", pattern=r"id=([0-9]+)")
+        self.assertEqual(evaluate(no_capture)["values"], [""])
+
+        split = unary("split", "a,,b", delimiter=",")
+        self.assertEqual(evaluate(split)["values"], ["a", "", "b"])
+
+        substring = unary(
+            "substring", "abcdef", substring_start="2", substring_length="3"
+        )
+        self.assertEqual(evaluate(substring)["values"], ["bcd"])
+
+        difference = component(
+            "time_difference", format_1="year_month_day", format_2="year_month_day"
+        )
+        difference.extend([literal("2024-01-02"), literal("2024-01-01")])
+        self.assertEqual(evaluate(difference)["values"], ["86400"])
+
+        unique = component("unique")
+        unique.extend([literal("a"), literal("a"), literal("b")])
+        self.assertEqual(evaluate(unique)["values"], ["a", "b"])
+
+        count = component("count")
+        count.extend([literal("a"), literal("b"), literal("c")])
+        result = evaluate(count)
+        self.assertEqual(result["values"], ["3"])
+        self.assertEqual(result["datatype"], "int")
+
+        self.assertEqual(
+            evaluate(unary("begin", "value", character="/"))["values"],
+            ["/value"],
+        )
+        self.assertEqual(
+            evaluate(unary("end", "value", character="/"))["values"],
+            ["value/"],
+        )
+
+    def test_static_function_error_semantics(self):
+        def evaluate(expr):
+            root = source()
+            variable(root, 1, expr)
+            nodes = {n.get("id"): n for n in root.iter() if n.get("id")}
+            kinds = {key: "variable" for key in nodes if ":var:" in key}
+            return ir.resolve_static_variables(nodes, kinds)["oval:dependency:var:1"]
+
+        divide = component("arithmetic", arithmetic_operation="divide")
+        divide.extend([literal("1"), literal("0")])
+        result = evaluate(divide)
+        self.assertEqual(result["status"], "static_evaluation_error")
+        self.assertEqual(result["reason"], "arithmetic_input_or_operation_error")
+
+        bad_substring = component(
+            "substring", substring_start="99", substring_length="2"
+        )
+        bad_substring.append(literal("abc"))
+        result = evaluate(bad_substring)
+        self.assertEqual(result["status"], "static_evaluation_error")
+        self.assertEqual(result["reason"], "substring_start_beyond_input_length")
+
+        bad_glob = component("glob_to_regex")
+        bad_glob.append(literal("abc\\"))
+        result = evaluate(bad_glob)
+        self.assertEqual(result["status"], "static_evaluation_error")
+        self.assertTrue(result["reason"].startswith("glob_to_regex_invalid_pattern:"))
+
+        bad_merge = component("merge", sort="numeric")
+        bad_merge.extend([literal("2"), literal("not-a-number")])
+        result = evaluate(bad_merge)
+        self.assertEqual(result["status"], "static_evaluation_error")
+        self.assertEqual(result["reason"], "merge_numeric_sort_non_numeric_value")
+
     def test_concat_limit_is_checked_before_product_allocation(self):
         root = source()
         expr = component("concat")
