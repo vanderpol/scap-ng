@@ -24,7 +24,7 @@ def validate(schema,name,value):
 
 
 def entity(value,operation="equal",datatype="string"):
-    return {"value":value,"operation":operation,"datatype":datatype,"mask":False}
+    return {"value":value,"operation":operation,"datatype":datatype}
 
 
 class UnixSysctlTests(unittest.TestCase):
@@ -42,8 +42,7 @@ class UnixSysctlTests(unittest.TestCase):
             "state_title":None,
             "capability":"unix.sysctl",
             "state":{
-                "field":"value","value":0,"operation":"equal","datatype":"integer",
-                "mask":False,"match":"all","existence":"some",
+                "field":"value","value":0,"operation":"equal","datatype":"integer","match":"all","existence":"some",
             },
         })
 
@@ -65,8 +64,7 @@ class LinuxPartitionTests(unittest.TestCase):
                     "state_title":None,
                     "capability":"linux.partition",
                     "state":{
-                        "field":field,"value":1,"operation":"greater_or_equal","datatype":"integer",
-                        "mask":False,"match":"all","existence":"some",
+                        "field":field,"value":1,"operation":"greater_or_equal","datatype":"integer","match":"all","existence":"some",
                     },
                 })
 
@@ -101,8 +99,7 @@ class LinuxSystemdUnitPropertyTests(unittest.TestCase):
             "state_title":None,
             "capability":"linux.systemdunitproperty",
             "state":{
-                "field":"value","value":"active","operation":"equal","datatype":"string",
-                "mask":False,"match":"all","existence":"some",
+                "field":"value","value":"active","operation":"equal","datatype":"string","match":"all","existence":"some",
             },
         })
 

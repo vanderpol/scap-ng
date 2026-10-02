@@ -28,7 +28,7 @@ class SELinuxSecurityContextCapabilitySchemaTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema["$defs"][name],registry=self.registry).validate(value)
 
     def entity(self,value,datatype):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_file_and_pid_object_alternatives(self):
         self.validate_def("object",{
@@ -62,8 +62,7 @@ class SELinuxSecurityContextCapabilitySchemaTests(unittest.TestCase):
             "state_title":None,
             "capability":"linux.selinuxsecuritycontext",
             "state":{
-                "field":"pid","value":1,"operation":"equal","datatype":"integer",
-                "mask":False,"match":"all","existence":"some",
+                "field":"pid","value":1,"operation":"equal","datatype":"integer","match":"all","existence":"some",
             },
         })
         self.validate_def("collected_item",{

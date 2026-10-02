@@ -29,7 +29,7 @@ class LinuxConformanceCapabilitiesTests(unittest.TestCase):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
 
     def entity(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_apparmorstatus_is_singleton(self):
         self.validate("linux.apparmorstatus","test",{
@@ -48,8 +48,7 @@ class LinuxConformanceCapabilitiesTests(unittest.TestCase):
         for datatype,value in (("string","(none)"),("integer",0)):
             self.validate("linux.dpkginfo","state",{
                 "state_title":None,"capability":"linux.dpkginfo",
-                "state":{"field":"epoch","value":value,"operation":"equal","datatype":datatype,
-                         "mask":False,"match":"all","existence":"some"}
+                "state":{"field":"epoch","value":value,"operation":"equal","datatype":datatype,"match":"all","existence":"some"}
             })
 
     def test_inet_listening_server_state_item_surface(self):

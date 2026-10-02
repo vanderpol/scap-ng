@@ -39,7 +39,6 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "value": "openssh-server",
                     "operation": "equal",
                     "datatype": "string",
-                    "mask": False,
                 }
             },
             "collect": {
@@ -56,7 +55,6 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
                         "value": "openssh-server",
                         "operation": "equal",
                         "datatype": "string",
-                        "mask": False,
                     }
                 },
             })
@@ -83,7 +81,6 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "value": "0:9.0p1-1.el9",
                 "operation": "greater_or_equal",
                 "datatype": "rpm_evr",
-                "mask": False,
                 "match": "all",
                 "existence": "some",
             },
@@ -97,7 +94,6 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
                 "value": 0,
                 "operation": "equal",
                 "datatype": "integer",
-                "mask": False,
                 "match": "all",
                 "existence": "some",
             },
@@ -113,7 +109,6 @@ class LinuxRpmInfoGeneratedCapabilitySchemaTests(unittest.TestCase):
                     "value": "0:1.2-3",
                     "operation": "equal",
                     "datatype": "string",
-                    "mask": False,
                     "match": "all",
                     "existence": "some",
                 },

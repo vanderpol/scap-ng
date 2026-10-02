@@ -36,7 +36,6 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
             "value":value,
             "operation":operation,
             "datatype":datatype,
-            "mask":False,
         }
 
     def test_reuses_shared_file_and_set_primitives(self):
@@ -121,7 +120,6 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
                 "value":"sha256",
                 "operation":"equal",
                 "datatype":"string",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },
@@ -134,7 +132,6 @@ class FileHashCapabilitySchemaTests(unittest.TestCase):
                 "value":"abcdef",
                 "operation":"equal",
                 "datatype":"string",
-                "mask":False,
                 "match":"all",
                 "existence":"some",
             },

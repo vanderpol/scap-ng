@@ -24,7 +24,7 @@ class JunosPanosCapabilityTests(unittest.TestCase):
     def validate(self,cap,kind,value):
         jsonschema.Draft202012Validator(self.schema(cap)["$defs"][kind],registry=self.registry).validate(value)
     def e(self,value,datatype="string"):
-        return {"value":value,"operation":"equal","datatype":datatype,"mask":False}
+        return {"value":value,"operation":"equal","datatype":datatype}
 
     def test_junos_show(self):
         self.validate("junos.show","object",{
