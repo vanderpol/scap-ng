@@ -36,6 +36,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertIn("capability-common.schema.json#/$defs/object_entity_base", encoded)
         self.assertIn("capability-common.schema.json#/$defs/state_entity_base", encoded)
         self.assertIn("capability-common.schema.json#/$defs/state_filter", encoded)
+        self.assertIn("capability-common.schema.json#/$defs/set_expression", encoded)
         self.assertNotIn('"variable_reference":', encoded)
 
     def test_generated_schema_uses_clean_native_vocabulary(self):
@@ -48,18 +49,18 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertIn('"owner_uid"', encoded)
         self.assertIn('"traversal"', encoded)
 
-    def test_source_inventory_is_extracted_from_pinned_xsd(self):
-        catalog = self.schema["x-source-field-catalog"]
-        self.assertEqual(
-            set(catalog["object_selectors"]),
-            {"full_path", "directory", "name"},
-        )
-        self.assertIn("full_path", catalog["state_fields"])
-        self.assertIn("directory", catalog["state_fields"])
-        self.assertIn("name", catalog["state_fields"])
-        self.assertIn("size", catalog["state_fields"])
-        self.assertIn("setuid", catalog["state_fields"])
-        self.assertIn("has_extended_acl", catalog["state_fields"])
+    def test_mapping_keeps_legacy_crosswalk_outside_runtime_schema(self):
+        self.assertIn("migration_crosswalk", self.mapping)
+        encoded = json.dumps(self.schema)
+        self.assertNotIn("migration_crosswalk", encoded)
+        self.assertNotIn("OVAL 5.12.3", encoded)
+        self.assertNotIn("filepath", encoded)
+        self.assertNotIn("user_id", encoded)
+
+    def test_native_field_names_are_present(self):
+        encoded = json.dumps(self.schema)
+        for name in ("full_path", "directory", "name", "owner_uid", "owner_gid", "setuid", "setgid"):
+            self.assertIn(f'"{name}"', encoded)
 
     def test_valid_filepath_object(self):
         self.validate_def("object", {
@@ -100,7 +101,7 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
             },
         })
 
-    def test_directory_selection_preserves_nil_semantics(self):
+    def test_directory_selection_uses_native_null_name(self):
         self.validate_def("object", {
             "object_title": "directory itself",
             "capability": "unix.file",
@@ -281,6 +282,32 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
                 },
             })
 
+    def test_shared_set_model_accepts_nested_native_sets(self):
+        self.validate_def("object", {
+            "object_title": "combined files",
+            "capability": "unix.file",
+            "set": {
+                "operator": "union",
+                "operands": [
+                    {
+                        "object": "files-a",
+                        "filters": [
+                            {"state": "only-root-owned", "action": "include"}
+                        ],
+                    },
+                    {
+                        "set": {
+                            "operator": "difference",
+                            "operands": [
+                                {"object": "files-b", "filters": []},
+                                {"object": "excluded-files", "filters": []},
+                            ],
+                        }
+                    },
+                ],
+            },
+        })
+
     def test_semantic_validator_rules_are_not_lost(self):
         rules = {
             row["id"]: row
@@ -289,7 +316,6 @@ class UnixFileGeneratedCapabilitySchemaTests(unittest.TestCase):
         self.assertIn("unix.file.filter_state_capability", rules)
         self.assertIn("unix.file.full_path_no_traversal", rules)
         self.assertIn("unix.file.pattern_directory_no_traversal", rules)
-        self.assertIn("unix.file.full_path_no_traversal", rules)
 
 
 if __name__ == "__main__":
