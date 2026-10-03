@@ -1,0 +1,221 @@
+[
+  {
+    "id": "unix-file-resolved-owner",
+    "expected_valid": true,
+    "item": {
+      "id": "file-1",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "full_path": {
+          "datatype": "string",
+          "value": "/fixture/config"
+        },
+        "owner_uid": {
+          "datatype": "integer",
+          "value": 1001
+        },
+        "owner_user_name": {
+          "datatype": "string",
+          "value": "fixture-user"
+        }
+      },
+      "provenance": {
+        "target_ref": "fixture-target",
+        "source_execution_ref": "collect-1"
+      },
+      "context": {
+        "name_resolution": {
+          "owner_user_name": {
+            "source_field": "owner_uid",
+            "target_context_ref": "fixture-target/accounts",
+            "source_ref": "fixture-identity-snapshot",
+            "observed_at": "2026-10-03T00:00:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "unix-file-unmapped-group",
+    "expected_valid": true,
+    "item": {
+      "id": "file-2",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "owner_gid": {
+          "datatype": "integer",
+          "value": 98765
+        },
+        "owner_group_name": {
+          "datatype": "string",
+          "status": "does_not_exist"
+        }
+      },
+      "provenance": {
+        "target_ref": "fixture-target",
+        "source_execution_ref": "collect-1"
+      },
+      "context": {
+        "name_resolution": {
+          "owner_group_name": {
+            "source_field": "owner_gid",
+            "target_context_ref": "fixture-target/accounts",
+            "source_ref": "fixture-identity-snapshot",
+            "observed_at": "2026-10-03T00:00:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "text-location",
+    "expected_valid": true,
+    "item": {
+      "id": "match-1",
+      "capability": "independent.textfilecontent54",
+      "status": "exists",
+      "fields": {
+        "full_path": {
+          "datatype": "string",
+          "value": "/fixture/config"
+        },
+        "text": {
+          "datatype": "string",
+          "value": "fixture setting"
+        }
+      },
+      "provenance": {
+        "target_ref": "fixture-target"
+      },
+      "context": {
+        "locators": [
+          {
+            "kind": "text",
+            "source_ref": "fixture-config-snapshot",
+            "line": 7,
+            "column": 1
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "query-row-and-property",
+    "expected_valid": true,
+    "item": {
+      "id": "row-1",
+      "capability": "windows.wmi.query",
+      "status": "exists",
+      "fields": {
+        "result": [
+          {
+            "datatype": "record",
+            "value": {
+              "Caption": {
+                "datatype": "string",
+                "value": "Fixture service"
+              }
+            }
+          }
+        ]
+      },
+      "provenance": {
+        "target_ref": "fixture-target",
+        "source_execution_ref": "query-1"
+      },
+      "context": {
+        "locators": [
+          {
+            "kind": "record",
+            "source_ref": "fixture-query-result",
+            "index": 0,
+            "field": "result",
+            "value_index": 0,
+            "property": "Caption"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "import-origin-required",
+    "expected_valid": false,
+    "item": {
+      "id": "import-1",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {},
+      "provenance": {},
+      "imported": true
+    }
+  },
+  {
+    "id": "import-origin-present",
+    "expected_valid": true,
+    "item": {
+      "id": "import-1",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {},
+      "provenance": {},
+      "imported": true,
+      "context": {
+        "origin": {
+          "result_ref": "source-result",
+          "item_ref": "source-item"
+        }
+      }
+    }
+  },
+  {
+    "id": "no-name-without-numeric-identity",
+    "expected_valid": false,
+    "item": {
+      "id": "file-3",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "owner_user_name": {
+          "datatype": "string",
+          "value": "fixture-user"
+        }
+      },
+      "provenance": {}
+    }
+  },
+  {
+    "id": "redacted-value-prohibited",
+    "expected_valid": false,
+    "item": {
+      "id": "file-4",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "owner_uid": {
+          "datatype": "integer",
+          "value": 1001,
+          "redacted": true
+        }
+      },
+      "provenance": {}
+    }
+  },
+  {
+    "id": "registry-view-remains-excluded",
+    "expected_valid": false,
+    "item": {
+      "id": "registry-1",
+      "capability": "windows.registry",
+      "status": "exists",
+      "fields": {
+        "registry_view": {
+          "datatype": "string",
+          "value": "64-bit"
+        }
+      },
+      "provenance": {}
+    }
+  }
+]

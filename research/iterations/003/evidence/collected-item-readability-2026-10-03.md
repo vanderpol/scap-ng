@@ -22,7 +22,6 @@ All 100 mappings generated without error. This checks generation and inventories
 | `windows.file` | Owner string, version/company/product data | Clarify whether owner is SID or resolved name and whether both are needed | Existing string contract alone does not define owner identity resolution; confirm source collector behavior first |
 | Windows effective rights, SID, group and user rights capabilities | Trustee SID and name, or user/group SID/name pairs | Reuse existing names; specify resolution status/context rather than adding duplicates | Unknown identities and remote-domain resolution must not erase SID evidence |
 | Text/XML/YAML content, `unix.sshd`, device line/section/config capabilities | Resource or selector and extracted values, often source text | Matched source position or record locator for navigating decisive evidence | Line/byte/path semantics vary by parser and encoding; locator cannot imply effective configuration when the check examines explicit declarations |
-| `windows.registry`, `windows.ntuser` | Hive/key/value name and type; NTUSER already includes account identity | Explicit registry-view context where target evidence needs it | Must reflect actual 32/64-bit collection view, not a guessed display label |
 | `windows.cmdlet`, WMI, SQL, appcmd and shell command capabilities | Query/command/interface and results, with varying structural detail | Row/property or output-record identity and acquisition status for navigation | Retain correlation and datatypes; avoid echoing secrets in commands/queries; never use shell traversal as enrichment |
 | Package/version/update capabilities | Most already expose name, version, architecture, descriptions or titles | Focus on clearly locating the package/file involved in verification failures | Keep publisher expectation and observed value separate; do not imply installed state from a display name |
 | Systemd/SMF/service capabilities | Units/service identifiers; Windows service already has display name/description | Optional service display description where current Item only exposes a unit/key | Extra lookup must use target evidence; existing display fields need no duplicate |
@@ -49,3 +48,9 @@ Cover resolved UID/GID, unmapped IDs, lookup denial/error/unavailable service, a
 ## What remains
 
 Select concrete additions, define optional versus mandatory fields, audit capability Item status requirements, separate result-only additions from State mappings, and specify lookup/derivation provenance. Implement changes in the versioned result/capability contracts after those choices are agreed. Conditional evaluation and Item inclusion remain separate 0.2.0 work; editor R&D follows those semantics rather than determining them.
+
+## Removed proposal — owner correction, 2026-10-03
+
+Registry view was intentionally deprecated because it was not useful. The earlier recommendation is superseded and SHALL NOT be reintroduced as a 0.2.0 result enrichment. This correction does not change schemas, collectors, or migration behavior.
+
+The remaining candidates are resolved in the [collected Item checkpoint](../../../../transition/collected-items-2026-10-03.md).
