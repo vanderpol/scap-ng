@@ -25,3 +25,7 @@ Next: review the guard table, explicit N/A node and intrinsic-applicability comp
 ## Published checkpoint
 
 [PR #127](https://github.com/vanderpol/scap-ng/pull/127), branch `conditional-conformance-0.2-20261003`, technical checkpoint `cc70ed3590006d9de0b8b2a6bce339a15433a5ce`. The [Windows and Ubuntu current-regression run](https://github.com/vanderpol/scap-ng/actions/runs/37141128864) completed successfully on both platforms and uploaded the experimental known-result reports. [Repository verification](https://github.com/vanderpol/scap-ng/actions/runs/37141128912) also succeeded. Source role metadata was explicitly corrected to purpose `applicability` before this final technical run. This publication is experimental content/model work, remains unmerged at checkpoint recording, and does not promote conditional schemas into 0.2.0.
+
+## Superseding owner direction — 2026-10-03
+
+Automatic conditional normalization and candidate detection are removed from the planned features. Issue #126 is closed as not planned: the general Boolean-pattern rewrite is not lossless across six-state truth or collection/evidence behavior. Earlier deferred-feature wording above is historical. Preserve the counterexample regression and continue authored conditional support.
