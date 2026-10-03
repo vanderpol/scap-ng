@@ -119,39 +119,48 @@ All **100** current authoring mappings generate meta-valid schemas; **99** have 
 
 ## New-test disposition
 
-All 22 new tests lack current NG mappings. The following are native implementation candidates, not implemented or Board-ratified capabilities. Keep source names as provisional capability names until a deliberate native naming review. Each needs a native selector/State/Item mapping plus standalone positive, negative, absent, error, unknown, incomplete, redacted and set/filter/Variable cases where applicable. Share the existing typed values, quantifiers, status/completeness and capability-reference enforcement; add no duplicate OVAL-shaped runtime syntax.
+The original inventory found **22** OVAL 6.0-only Tests: 20 ESX and two
+Kubernetes. That count is an inventory fact, not an active 0.2.0 implementation
+backlog.
 
-| Proposed capability | Disposition and contract review |
-| --- | --- |
-| `esx.host_acceptancelevel` | Native implementation candidate. Host software acceptance level; preserve enum and missing/error status. |
-| `esx.host_account` | Native implementation candidate. Account name, domain, role and shell access; distinguish local/domain identities. |
-| `esx.host_advancedsetting` | Native implementation candidate. Named host setting; typed values can be repeated in Items. |
-| `esx.host_authentication` | Native implementation candidate. Domain membership; preserve explicit status vocabulary. |
-| `esx.host_busadapter` | Native implementation candidate. Adapter type and device identity; CHAP names are identity metadata, not credentials. |
-| `esx.host_coredump` | Native implementation candidate. Network coredump configuration; preserve IP/port datatypes. |
-| `esx.host_firewallexception` | Native implementation candidate. Firewall exception and service details; retain start/end ports and direction enum. |
-| `esx.host_lockdown` | Native implementation candidate. Lockdown mode plus repeated allowed users; retain empty/error distinctions. |
-| `esx.host_module` | Native implementation candidate. Module name, version and acceptance level; State version and Item string need explicit comparison semantics. |
-| `esx.host_ntpserver` | Native implementation candidate. Repeated server names; zero servers and acquisition failure differ. |
-| `esx.host_portgroup` | Native implementation candidate. Port group plus virtual switch identify selection; preserve VLAN integer. |
-| `esx.host_service` | Native implementation candidate. Service policy/running/required flags; no service-management execution. |
-| `esx.host_vib` | Native implementation candidate. Installed VIB identity, vendor, creation date, version and acceptance level. |
-| `esx.host_vswitchpolicy` | Native implementation candidate. Switch MAC/promiscuous/forged-transmit policy enums. |
-| `esx.host_webserverssl` | Native implementation candidate. Certificate validity/issuer/expiry; retain acquisition timestamp context for days remaining. |
-| `esx.vds_portgroup` | Native implementation candidate. Distributed-switch plus port-group identity; IP/port/policy fields. |
-| `esx.vds` | Native implementation candidate. Distributed-switch identity and health-check flags; management-plane target context required. |
-| `esx.vm_advancedsetting` | Native implementation candidate. Inherited vm_name selector/State/Item identity plus named repeated typed setting. |
-| `esx.vm_device` | Native implementation candidate. Inherited VM and device fields are essential; an empty local declaration is not an empty contract. |
-| `esx.vm_harddiskdevice` | Native implementation candidate. Inherited VM/device identity and connection flags plus persistence enum. |
-| `kubernetes.kubectl` | Native implementation candidate. Typed resource/namespace/YAML-path query and repeated record results; API-backed acquisition, not arbitrary shell text. |
-| `kubernetes.kubepsp` | Native implementation candidate. Version-scoped PSP query and record results; preserve older supported contexts without treating absent API as empty success. |
+The current owner-approved disposition supersedes the earlier candidate language:
 
-## Acquisition and fixture gates
+- **ESX (20 Tests): deferred pending upstream guidance.** Existing experimental
+  0.2.0 ESX mappings and synthetic fixtures remain evidence, but the family is
+  not a 0.2.0 freeze blocker and should not be expanded merely to reduce this
+  inventory count.
+- **Kubernetes `kubectl_test`: deferred for 0.2.0.** The useful semantic need is
+  Kubernetes resource/API observation, but the OVAL 6.0 contract is shaped around
+  `kubectl get ... -o=yaml` and YAML-path selection. SCAP-NG should define a
+  native resource/API model with current content, typed Items, error/completeness
+  behavior and collector equivalence before standardizing a capability.
+  Do not lower it automatically to `independent.shellcommand`.
+- **Kubernetes `kubepsp_test`: deferred for 0.2.0.** PodSecurityPolicy was
+  deprecated in Kubernetes 1.21 and removed in 1.25. A new native capability
+  tied to PSP is not justified for the modern 0.2.0 vocabulary solely because
+  OVAL 6.0 added the Test. Legacy-platform migration can be revisited if concrete
+  supported content requires it.
 
-- VMware: distinguish ESXi host, VM-on-host and management-plane distributed-switch targets. Keep source VM/device and switch/port-group selectors; record stable acquisition identity/provenance so repeated names do not merge observations. API permissions, unsupported API versions and partial retrieval must be explicit. PowerCLI examples are evidence, not a required runtime dependency.
-- Kubernetes: explicit cluster/namespace/resource identity and deterministic structured path evaluation; no arbitrary command injection. Record resource version, namespace and provenance as appropriate. Keep repeated record results and missing/error/redacted properties distinct.
-- `kubepsp` is not marked deprecated in the pinned OVAL schema, but Kubernetes removed its API in 1.25. Retain the candidate for valid older contexts with explicit version prerequisites; do not silently substitute Pod Security Admission or declare policy compliance from a missing API. [Official Kubernetes prerequisite](https://kubernetes.io/docs/concepts/security/pod-security-policy/).
-- Existence/population completeness and required comparison lineage are separate from reported-element projection. Native schemas are only one gate; source compilation, synthetic oracles and live target acquisition are separate evidence.
+See [the detailed Kubernetes disposition](../../../transition/kubernetes-oval6-disposition-2026-10-03.md).
+These rows SHALL be accounted as **reviewed/deferred**, not “missing
+implementation.” SCAP-NG treats OVAL 6.0 new Tests as capability leads rather
+than mandatory native serialization contracts.
+
+### Acquisition and future-fixture gates
+
+If ESX work resumes, distinguish ESXi host, VM-on-host and management-plane
+distributed-switch targets; preserve source selector identity and explicit
+permission/API-version/partial-retrieval behavior. PowerCLI examples remain
+evidence, not a required runtime dependency.
+
+If a native Kubernetes capability is proposed later, require explicit
+cluster/namespace/resource identity, deterministic structured field selection,
+current platform examples, repeated-result semantics, permission/absence/error
+behavior, collection completeness, provenance, and evidence that API-backed and
+optional CLI-backed collectors produce equivalent native Items.
+
+Existence/population completeness and comparison lineage remain separate from
+reported-element projection. A native schema alone is not conformance evidence.
 
 ## New-test source finding
 
@@ -168,4 +177,4 @@ PYTHONPATH=tools python tools/test_oval_new_tests_audit.py
 
 The upstream tool requires the exact pinned commit and reads baseline and upstream Git blobs, avoiding checkout newline conversion. It performs no network calls itself. Recompute coverage separately from the new-Test comparison. The 13 focused regressions guard scope, family/type identity, inheritance, cardinality, missing contracts, cycles, pins and the isolated Kubernetes pattern finding.
 
-Next bounded work: add versioned 0.2.0 native ESX/Kubernetes mappings and small standalone expected-result cases in coherent capability groups, starting with simple host settings/service/acceptance levels. Resolve management/VM target context and record-query semantics before claiming those groups complete. The wider method-level coverage audit and target conformance remain open under #131/#128.
+Next bounded work for the 0.2.0 freeze is semantic/documentation reconciliation and exact-head validation. ESX and Kubernetes new-Test expansion are deferred as recorded above. The wider method-level coverage audit, vendor conformance corpus, and live target execution remain open under #131/#128.
