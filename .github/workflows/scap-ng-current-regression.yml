@@ -5,6 +5,7 @@ on:
       - tools/**
       - schema/v0.1.0/**
       - schema/v0.2.0/**
+      - docs/audit/capability-coverage-2026-10-03/**
       - tests/conditional-0.2.0/**
       - tests/reported-elements-0.2.0/**
       - tests/assessment-results-0.2.0/**
@@ -23,6 +24,8 @@ on:
       - tools/assessment_results_v02.py
       - tools/item_materialization_v02.py
       - tools/result_package_v02.py
+      - tools/audit_oval_new_tests.py
+      - tools/audit_capability_coverage.py
       - tools/reported_elements.py
       - tests/conditional-0.2.0/**
       - tests/reported-elements-0.2.0/**
@@ -34,6 +37,7 @@ on:
       - tools/validate_native_package_graph.py
       - schema/v0.1.0/**
       - schema/v0.2.0/**
+      - docs/audit/capability-coverage-2026-10-03/**
       - tests/collected-items-0.2.0/**
       - tools/collected_item_contract_v02.py
       - tools/scap_ng_repo_normalizer.py
@@ -66,6 +70,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1 cryptography jsonschema
+      - name: Checkout pinned OVAL 6.0 new-test evidence
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: 5afcf590fb5d334687bfdc47f98716424cdb7f3d
+          path: work/oval60
+          sparse-checkout: oval-schemas
+      - name: Verify new-test inventory and source schema compilation
+        run: python tools/audit_oval_new_tests.py --upstream-repo work/oval60 --check
       - name: Current source graph and actual corpus CLI
         run: |
           python tools/test_named_collection_graph.py
@@ -89,6 +102,7 @@ jobs:
           python tools/test_assessment_results_v02.py
           python tools/test_item_materialization_v02.py
           python tools/test_result_package_v02.py
+          python tools/test_oval_new_tests_audit.py
           python tools/assessment_results_v02.py --assessments tests/assessment-results-0.2.0/content --result-set tests/assessment-results-0.2.0/expected-results/conditional-ownership.result-set.json
           python tools/check_current_authoring_contract.py tests/assessment-results-0.2.0/content
           python tools/conditional_conformance.py --report work/conditional-results.json

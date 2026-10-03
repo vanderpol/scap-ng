@@ -158,3 +158,24 @@ validates references and optionally recorded expression scheduling, not policy
 interpretation/scoring, acquisition truth or signer trust. Auxiliary evidence
 packaging, source Benchmark replay and target conformance remain. See
 [the checkpoint](../../../../transition/result-package-2026-10-03.md).
+
+## OVAL 6.0 comparison scope — 2026-10-03 owner clarification
+
+SCAP-NG essentially replaces OVAL 6.0. Use 6.0 as a capability/semantic
+completeness reference for the native replacement, not an intermediate format or
+an embedded OVAL runtime. Already represented semantics need no duplicate syntax.
+The separate mandatory lossless SCAP 1.4/OVAL 5.12.x migration requirement remains;
+preserve later baseline fixes and effective deprecation/governance decisions.
+OVAL 6.0 ingestion is not implicitly required by this comparison. Track #131.
+
+Owner follow-up: fixes in 5.12.3 have not all been ported to 6.0. Limit the
+6.0 review to **new tests and their associated Object/State/Item contracts**.
+Keep existing 5.12.3-derived behavior; existing-test/core/result/namespace and
+encapsulated-definition differences are outside this pass. This supersedes the
+broader delta work originally listed in #131.
+
+The first [coverage/new-Test audit](../../../../docs/audit/capability-coverage-2026-10-03/README.md)
+pins 20 new ESX and 2 Kubernetes Tests and their inherited contracts. No native
+mapping or collector is introduced by the inventory. Current standalone content
+covers only two mapped capabilities; wider vendor/method-level and target cases
+remain open. See [the handoff](../../../../transition/capability-coverage-2026-10-03.md).
