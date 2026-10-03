@@ -95,3 +95,8 @@ local Variable Item references and verified source-byte observation imports.
 origin history and incompleteness survive copying. This does not implement a
 collection cache or invent a content-authored inclusion control. See
 [standalone expected results](../../tests/item-materialization-0.2.0/README.md).
+
+The unsigned result-package draft adds Scan/Benchmark/Rule Result schemas and a
+closed exact-byte manifest connecting logical Assessment execution references.
+See [the checkpoint](../../transition/result-package-2026-10-03.md) for scope,
+validation limits and [the known result](../../tests/result-package-0.2.0/README.md).
