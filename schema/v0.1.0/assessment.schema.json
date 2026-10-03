@@ -24,8 +24,10 @@
           "minLength": 1
         },
         "version": {
-          "type": "integer",
-          "minimum": 1
+          "type": [
+            "integer",
+            "string"
+          ]
         },
         "assessment_title": {
           "type": [
@@ -268,7 +270,10 @@
             "null"
           ],
           "description": "Intrinsic Assessment applicability expression. False yields Assessment outcome not_applicable; distinct from SCAP-NG Rule applicability."
-        }
+        },
+        "response": {},
+        "references": {},
+        "evidence_guidance": {}
       },
       "additionalProperties": false,
       "allOf": [
@@ -284,9 +289,7 @@
             ]
           },
           "then": {
-            "required": [
-              "procedure"
-            ]
+            "$ref": "manual-assessment.schema.json#/properties/assessment"
           }
         },
         {
@@ -305,7 +308,37 @@
               "specification",
               "tests",
               "evaluate"
-            ]
+            ],
+            "properties": {
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "procedure"
+                  ]
+                },
+                {
+                  "required": [
+                    "response"
+                  ]
+                },
+                {
+                  "required": [
+                    "references"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence_guidance"
+                  ]
+                }
+              ]
+            }
           }
         }
       ]

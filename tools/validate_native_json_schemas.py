@@ -10,9 +10,10 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from collections import deque
 
 import yaml
-from jsonschema import Draft202012Validator, RefResolver
+from jsonschema import Draft202012Validator, RefResolver, ValidationError
 
 
 DOCUMENTS = {
@@ -69,8 +70,6 @@ def classify(path: Path):
     name=path.name
     if name.endswith(".rule.yaml") or (path.parent.name=="rules" and path.suffix==".yaml"):
         return "rule","rule.schema.json"
-    if name.endswith(".manual.assessment.yaml") or name.endswith(".document-review.assessment.yaml"):
-        return "manual-assessment","manual-assessment.schema.json"
     if name.endswith(".assessment-result.yaml"):
         return "assessment-result","assessment-result.schema.json"
     if name.endswith(".tailoring.yaml"):
@@ -80,6 +79,35 @@ def classify(path: Path):
     if name.endswith(".assessment.yaml") or ("assessments" in path.parts and path.suffix==".yaml"):
         return "assessment","assessment.schema.json"
     return None
+
+
+def document_errors(v, doc):
+    """Structural errors plus required semantic uniqueness of manual answers.
+
+    JSON Schema uniqueItems cannot enforce uniqueness by one object property.
+    Reject both exact and conflicting duplicates, preserving distinct answers
+    that intentionally share an outcome. Invalid shapes remain schema errors.
+    """
+    yield from v.iter_errors(doc)
+    assessment = doc.get("assessment")
+    if not isinstance(assessment, dict) or assessment.get("mode") != "manual":
+        return
+    response = assessment.get("response")
+    if not isinstance(response, dict) or not isinstance(response.get("choices"), list):
+        return
+    seen = {}
+    for index, choice in enumerate(response["choices"]):
+        if not isinstance(choice, dict) or not isinstance(choice.get("value"), str):
+            continue
+        value = choice["value"]
+        if value in seen:
+            yield ValidationError(
+                f"Duplicate manual response value {value!r}; first declared at choices/{seen[value]}",
+                validator="unique_response_value",
+                path=deque(["assessment", "response", "choices", index, "value"]),
+            )
+        else:
+            seen[value] = index
 
 
 def main():
@@ -102,7 +130,7 @@ def main():
             continue
         v=validators[schema_name]
         doc=load_yaml(path)
-        errors=sorted(v.iter_errors(doc),key=lambda e:list(e.absolute_path))
+        errors=sorted(document_errors(v, doc),key=lambda e:tuple(map(str,e.absolute_path)))
         results.append({
             "path":path.relative_to(args.corpus_root).as_posix(),
             "kind":kind,
@@ -112,7 +140,7 @@ def main():
                 "schema_path":"/".join(map(str,e.absolute_schema_path)),
                 "validator":e.validator,
                 "message":e.message,
-                "classification":"untriaged",
+                "classification":"semantic" if e.validator == "unique_response_value" else "untriaged",
             } for e in errors[:50]],
         })
 

@@ -30,6 +30,8 @@ Latest explicit owner instructions take precedence. Historical generated source,
 
 ## Current observation, not a release checkpoint
 
+Latest scope/triage checkpoint: [0.2.0 owner requests and independently reproduced schema issues, 2026-10-03](schema-0.2.0-scope-2026-10-03.md). This records conditional evaluation, collected Item inclusion, and an all-capability collected-field readability audit before editor R&D. It does not claim implementation or a stable release.
+
 Repository sampled at commit `56a65e1f3431ff4ac0fa0a893a920fc5aa726188`:
 Load only reviewed post-alignment capability mappings.
 
@@ -77,4 +79,3 @@ Primary repository: vanderpol/scap-ng. Previously authorized related repositorie
 ## Provenance and coverage
 
 Classification: **Evidence/Audit**. Prepared from directly visible owner instructions, supplied conversation summaries, targeted history retrieval and inspected repository files. No external redesign draft establishes owner acceptance. This directory is not a verbatim archive, and complete conversation enumeration is unavailable through the retrieval used so far. See decisions.md and recovered-notes.md for limits. No completeness guarantee or transition-ready claim is made.
-
