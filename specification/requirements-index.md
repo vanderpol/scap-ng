@@ -38,6 +38,8 @@ inference.
 SCAP-NG SHALL support lossless migration of supported SCAP 1.4 semantics before
 optional native refactoring.
 
+SCAP-NG conformance claims SHALL distinguish structural/schema validity, semantic validity, known-result evaluation, collection/acquisition, live-target execution, and migration-equivalence evidence. Evidence at one layer SHALL NOT be represented as proof of a stronger layer.
+
 SCAP-NG SHOULD reuse established NIST/SCAP/XCCDF/OVAL terminology when the
 existing term remains semantically correct. New normative terminology SHOULD
 be introduced only when no existing standards term accurately represents the
