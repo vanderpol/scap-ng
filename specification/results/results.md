@@ -820,6 +820,24 @@ structures are retained on collected Item/entity data. This preserves the OVAL
 record constraint while still allowing record-producing capabilities such as
 WMI57/cmdlet-style collection to retain their observed structure.
 
+### Conformance evidence boundary
+
+Result completeness fields describe what happened during a particular execution.
+They SHALL NOT be used to overstate the conformance evidence available for the
+implementation itself.
+
+A synthetically supplied collected Item can demonstrate evaluator/result
+behavior without demonstrating that a collector can acquire that Item from a
+real target. Likewise, a result with `population_complete: true` states that
+the relevant population for that execution was completely evaluated according
+to the producing capability; it does not by itself prove portable acquisition
+conformance across implementations.
+
+Claims about schema validity, semantic validity, known-result evaluation,
+collection/acquisition, live-target execution, and migration equivalence SHALL
+follow the distinct evidence layers defined in
+[Conformance and Validation](../core/conformance.md#4a-conformance-evidence-layers).
+
 ## 17. Failure counts and evidence maximums
 
 Assessment Result reporting SHOULD use the canonical terminology below for bounded failure evidence. Benchmark and Rule Results MAY reference that evidence but SHALL NOT duplicate the detailed bounded-evidence accounting.
