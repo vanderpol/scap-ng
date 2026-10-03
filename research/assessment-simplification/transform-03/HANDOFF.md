@@ -41,3 +41,19 @@ regex compilation; its kernel/provider prerequisites remain unresolved.
 No user decision presently blocks further bounded work. This wave is complete
 as a compiler proof and research recommendation, not a standards acceptance or
 deployable equivalent scan.
+
+## Later owner clarification: reuse SCAP 1.4 before inventing features
+
+2026-10-03, receiving SHA `809fffb5a5a4e23842b41819c9a2b264747be900`.
+Existing shellcommand may be the correct final solution. Investigate how a move
+from DISA 1.3 restrictions to available 1.4 methods removes complexity; do not
+presume a new native provider/domain operation is necessary. Preserve original
+filesystem, constrained-input and accuracy requirements.
+
+The [baseline comparison](EXISTING-CAPABILITIES.md) and reproducible source
+inventory show all five pinned **enhanced NIWC** packages declare 1.4 and seven
+selected checks already use shellcommand. That evidence does not establish the
+status of all original DISA content. Compare paired original/enhanced checks before
+attributing actual savings to the version upgrade. Source declarations, all five
+ZIP hashes and twelve Test-family inventories were checked; no commands from
+content or target tests were run, and previous semantic suites were not repeated.

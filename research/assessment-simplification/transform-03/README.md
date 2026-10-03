@@ -11,6 +11,10 @@ The recommendation is an optional requirement-oriented authoring language over
 named Objects. Authors state what must hold, exceptions and absence behavior;
 the compiler emits the current Object/State/Test graph whenever that is accurate.
 Domain operations needing new execution remain separately labeled proposals.
+The [existing-capability baseline](EXISTING-CAPABILITIES.md) includes SCAP 1.4 and
+existing shellcommand as possible final solutions; new runtime features require
+an evidenced gap. Seven selected checks already use shellcommand in enhanced
+SCAP 1.4 packages, so a version upgrade and remaining complexity are separate claims.
 YAML is the inspectable prototype, not the claimed readability benefit. A sentence
 editor could expose the same typed operations without interpreting free prose.
 
@@ -84,6 +88,7 @@ validation alone.
 ## Continue reading or reproduce
 
 - [Transform versus new runtime methods, across all 12 cases](COMPARISON.md).
+- [Existing SCAP 1.4/shellcommand options before new features](EXISTING-CAPABILITIES.md).
 - [Experimental normative semantics and supported subset](SEMANTICS.md).
 - [Versioned yes/no decision candidates](DECISIONS.md).
 - [Source/version/provenance ledger](PROVENANCE.md).

@@ -6,6 +6,12 @@ method can be simpler to author yet still need a new acquisition/evaluation
 contract. Complete Check Text, source versions and graph closures remain in the
 linked dossiers; none is superseded by a miniature DSL example.
 
+Owner clarification: [existing SCAP 1.4 and shellcommand](EXISTING-CAPABILITIES.md)
+SHOULD be evaluated before new features. Typed DNS/configuration providers below
+are possible alternatives, not required additions. The pinned enhanced corpus
+already includes seven shellcommand-bearing cases and five SCAP 1.4 packages;
+upgrade savings from original DISA 1.3 content require a separate paired comparison.
+
 ## Across the selected cases
 
 | Rule / source | Easier author-facing concept | Compiler versus execution evidence |
@@ -31,6 +37,7 @@ Server2025-specific evidence. No new platform was needed for this compiler proof
 | Approach | Author readability / reduction | Scanner implementation cost | Compatibility risk / evidence |
 | --- | --- | --- | --- |
 | Current explicit native form | Familiar explicit Objects/States/Tests; repeats simple predicate machinery | Existing intended backend contract | Current target contract; no released scanner equivalence claim |
+| Existing SCAP 1.4 / focused shellcommand | Can replace indirect acquisition with a fixed service/utility query | Existing command capability; query/error/output verification still costs work | Seven selected cases already use it. Specific simpler replacements and paired DISA upgrade savings remain unproven. |
 | Publisher table/template only | Reduces repeated nodes but leaves regex/graph reasoning | No new runtime operation | Prior 36-row bounded source contracts; useful, insufficient for the clarified author goal |
 | Requirement-oriented **compiler** | Author names the allowance and empty behavior; 36 versus 242 lines for this identical fixed fixture | No new scanner primitive; modest compiler/diagnostic mapping work | Independent Boolean source predicate and bounded status tests; account/discovery/target scope unproved |
 | Requirement-oriented **domain methods** | Named settings, scoped DNS relationships, symbolic audit coverage remove more conceptual overhead | Provider/parser/type/version/error contracts; audit algorithm is substantial | Previous synthetic evidence; potentially changed requirement/source semantics; target investigation required |
@@ -41,9 +48,10 @@ was performed. Fewer lines are evidence of representational reduction only.
 
 ## Refinement decisions and rejected shortcuts
 
-The best next direction is a small typed authoring layer plus compiler, with
-domain-method research where existing primitives cannot express the desired
-method clearly/accurately. It is unnecessary to standardize every convenience
+The best next direction starts with existing SCAP 1.4 capabilities, including
+suitable fixed shellcommand queries, then a small typed authoring layer/compiler
+where it helps. Domain-method research is justified where those existing methods
+cannot express the desired method clearly/accurately. It is unnecessary to standardize every convenience
 as a new scanner operation. The permission experiment retains independently
 observable booleans, solving the earlier mode-only model's partial-value weakness.
 
