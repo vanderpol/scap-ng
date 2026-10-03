@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/item-report.schema.json",
+  "title": "Draft derived Item report 0.2.0",
+  "description": "An explicitly marked projection of evaluated/redacted canonical Items. Not a replacement Assessment Result.",
+  "type": "object", "required": ["item_report"], "additionalProperties": false,
+  "properties": {
+    "item_report": {
+      "type": "object", "required": ["kind", "source_execution_ref", "source_completeness", "items"],
+      "properties": {
+        "kind": {"const": "reported_elements_projection"},
+        "source_execution_ref": {"type": "string", "minLength": 1},
+        "source_completeness": {
+          "type": "object", "required": ["logical_complete", "population_complete", "evidence_complete"],
+          "properties": {"logical_complete": {"type": "boolean"}, "population_complete": {"type": "boolean"}, "evidence_complete": {"type": "boolean"}},
+          "additionalProperties": false
+        },
+        "items": {
+          "type": "array", "items": {
+            "type": "object", "required": ["item", "selection"],
+            "properties": {
+              "item": {
+                "type": "object", "required": ["id", "capability", "status", "fields", "provenance"],
+                "properties": {
+                  "id": {"type": "string", "minLength": 1}, "capability": {"type": "string", "minLength": 1},
+                  "status": {"enum": ["exists", "does_not_exist", "error", "not_collected"]},
+                  "imported": {"type": "boolean"}, "provenance": {"type": "object"}, "context": {"type": "object"},
+                  "fields": {"type": "object", "additionalProperties": {"oneOf": [
+                    {"$ref": "https://scap-ng.dev/schema/v0.1.0/result-types.schema.json#/$defs/typed_value"},
+                    {"type": "array", "items": {"$ref": "https://scap-ng.dev/schema/v0.1.0/result-types.schema.json#/$defs/typed_value"}}
+                  ]}}
+                }, "additionalProperties": false
+              },
+              "selection": {
+                "type": "object", "required": ["omitted_elements", "unavailable_elements", "retained_required_elements"],
+                "properties": {
+                  "omitted_elements": {"$ref": "#/$defs/names"}, "unavailable_elements": {"$ref": "#/$defs/names"},
+                  "retained_required_elements": {"$ref": "#/$defs/names"}
+                }, "additionalProperties": false
+              }
+            }, "additionalProperties": false
+          }
+        }
+      }, "additionalProperties": false
+    }
+  },
+  "$defs": {"names": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}}
+}
