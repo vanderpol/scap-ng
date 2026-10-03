@@ -30,6 +30,8 @@ Latest explicit owner instructions take precedence. Historical generated source,
 
 ## Current observation, not a release checkpoint
 
+Conditional research checkpoint: [known-result suite and owner requests, 2026-10-03](conditional-suite-2026-10-03.md). Proposed conditional/N/A semantics remain experimental; this is separate from completed 0.1.0 enforcement fixes.
+
 Latest scope/triage checkpoint: [0.2.0 owner requests and independently reproduced schema issues, 2026-10-03](schema-0.2.0-scope-2026-10-03.md). This records conditional evaluation, collected Item inclusion, and an all-capability collected-field readability audit before editor R&D. It does not claim implementation or a stable release.
 
 Repository sampled at commit `56a65e1f3431ff4ac0fa0a893a920fc5aa726188`:

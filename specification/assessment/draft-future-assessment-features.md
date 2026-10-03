@@ -10,6 +10,16 @@ Nothing in this document changes current SCAP 1.4 conversion output.
 
 ## 1. Conditional evaluation
 
+Owner-directed 2026-10-03 experiment:
+[conditional known-result content](../../tests/conditional-0.2.0/README.md).
+It demonstrates six-state guard handling, nested/dependent conditions, skipped
+paths, intrinsic applicability and a proposed explicit `not_applicable` outcome
+with a reason. Its controlled Test-result model and fixture grammar are
+experimental; passing them does not promote the proposal into v0.1.0 or claim
+that a released v0.2.0 implementation exists. Conditional normalizer upgrading
+is deferred until implemented/tested/merged 0.2.0, tracked in
+[issue #126](https://github.com/vanderpol/scap-ng/issues/126).
+
 SCAP-NG is considering a constrained declarative conditional-evaluation
 construct.
 

@@ -1,0 +1,395 @@
+# Known results for proposal-01; Test outcomes are simulated terminal inputs.
+cases:
+- id: local-true
+  description: Select then; the erroneous unselected result is not consumed.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: 'true'
+    conditional.local:test-else: error
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: local-false
+  description: False selects else, whose false result remains false.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'false'
+    conditional.local:test-then: error
+    conditional.local:test-else: 'false'
+  expected_outcome: 'false'
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-else
+  expected_branches:
+  - else
+- id: guard-error
+  description: 'Proposed propagation: neither branch runs for a non-Boolean condition.'
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: error
+    conditional.local:test-then: 'true'
+    conditional.local:test-else: 'true'
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.local:test-guard
+  expected_branches:
+  - null
+- id: guard-unknown
+  description: 'Proposed propagation: neither branch runs for a non-Boolean condition.'
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: unknown
+    conditional.local:test-then: 'true'
+    conditional.local:test-else: 'true'
+  expected_outcome: unknown
+  expected_executed_tests:
+  - conditional.local:test-guard
+  expected_branches:
+  - null
+- id: guard-not_evaluated
+  description: 'Proposed propagation: neither branch runs for a non-Boolean condition.'
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: not_evaluated
+    conditional.local:test-then: 'true'
+    conditional.local:test-else: 'true'
+  expected_outcome: not_evaluated
+  expected_executed_tests:
+  - conditional.local:test-guard
+  expected_branches:
+  - null
+- id: guard-not_applicable
+  description: 'Proposed propagation: neither branch runs for a non-Boolean condition.'
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: not_applicable
+    conditional.local:test-then: 'true'
+    conditional.local:test-else: 'true'
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.local:test-guard
+  expected_branches:
+  - null
+- id: selected-false
+  description: Selected branch outcome is preserved; unselected result may be absent.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: 'false'
+  expected_outcome: 'false'
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: selected-error
+  description: Selected branch outcome is preserved; unselected result may be absent.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: error
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: selected-unknown
+  description: Selected branch outcome is preserved; unselected result may be absent.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: unknown
+  expected_outcome: unknown
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: selected-not_evaluated
+  description: Selected branch outcome is preserved; unselected result may be absent.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: not_evaluated
+  expected_outcome: not_evaluated
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: selected-not_applicable
+  description: Selected branch outcome is preserved; unselected result may be absent.
+  assessment: conditional.local
+  test_results:
+    conditional.local:test-guard: 'true'
+    conditional.local:test-then: not_applicable
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.local:test-guard
+  - conditional.local:test-then
+  expected_branches:
+  - then
+- id: dependent-role
+  description: Use a statically declared applicability Assessment result as the condition.
+  assessment: conditional.dependent
+  test_results:
+    conditional.role:test-role: 'false'
+    conditional.dependent:test-else: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.role:test-role
+  - conditional.dependent:test-else
+  expected_branches:
+  - else
+- id: dependent-error
+  description: Dependency error does not become a false condition.
+  assessment: conditional.dependent
+  test_results:
+    conditional.role:test-role: error
+    conditional.dependent:test-then: 'true'
+    conditional.dependent:test-else: 'true'
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.role:test-role
+  expected_branches:
+  - null
+- id: nested-inner-false
+  description: Outer then contains a second conditional; trace is completion order.
+  assessment: conditional.nested
+  test_results:
+    conditional.nested:test-guard: 'true'
+    conditional.nested:test-inner: 'false'
+    conditional.nested:test-alternate: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.nested:test-guard
+  - conditional.nested:test-inner
+  - conditional.nested:test-alternate
+  expected_branches:
+  - else
+  - then
+- id: nested-outer-false
+  description: Inactive nested guard is not demanded.
+  assessment: conditional.nested
+  test_results:
+    conditional.nested:test-guard: 'false'
+    conditional.nested:test-else: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.nested:test-guard
+  - conditional.nested:test-else
+  expected_branches:
+  - else
+- id: nested-inner-unknown
+  description: Selected nested conditional cannot decide; propagate its outcome.
+  assessment: conditional.nested
+  test_results:
+    conditional.nested:test-guard: 'true'
+    conditional.nested:test-inner: unknown
+  expected_outcome: unknown
+  expected_executed_tests:
+  - conditional.nested:test-guard
+  - conditional.nested:test-inner
+  expected_branches:
+  - null
+  - then
+- id: shared-guard
+  description: The same Test is reused; no duplicate Test execution.
+  assessment: conditional.shared
+  test_results:
+    conditional.shared:test-guard: 'true'
+    conditional.shared:test-then: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.shared:test-guard
+  - conditional.shared:test-then
+  expected_branches:
+  - then
+- id: logical-false-dominates-error
+  description: Existing AND semantics yield false even with an erroneous sibling.
+  assessment: conditional.logical
+  test_results:
+    conditional.logical:test-guard: 'false'
+    conditional.logical:test-second: error
+    conditional.logical:test-else: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.logical:test-guard
+  - conditional.logical:test-second
+  - conditional.logical:test-else
+  expected_branches:
+  - else
+- id: logical-unknown
+  description: A compound condition can be unresolved.
+  assessment: conditional.logical
+  test_results:
+    conditional.logical:test-guard: 'true'
+    conditional.logical:test-second: unknown
+  expected_outcome: unknown
+  expected_executed_tests:
+  - conditional.logical:test-guard
+  - conditional.logical:test-second
+  expected_branches:
+  - null
+- id: negated-false
+  description: Negation changes false to true before branch selection.
+  assessment: conditional.negated
+  test_results:
+    conditional.negated:test-guard: 'false'
+    conditional.negated:test-then: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.negated:test-guard
+  - conditional.negated:test-then
+  expected_branches:
+  - then
+- id: negated-error
+  description: Negation preserves error.
+  assessment: conditional.negated
+  test_results:
+    conditional.negated:test-guard: error
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.negated:test-guard
+  expected_branches:
+  - null
+- id: intrinsic-not-applicable
+  description: False intrinsic applicability prevents normal evaluation.
+  assessment: conditional.applicability
+  test_results:
+    conditional.applicability:test-applicable: 'false'
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.applicability:test-applicable
+  expected_branches: []
+- id: intrinsic-error
+  description: Applicability acquisition failure is not not_applicable.
+  assessment: conditional.applicability
+  test_results:
+    conditional.applicability:test-applicable: error
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.applicability:test-applicable
+  expected_branches: []
+- id: intrinsic-true
+  description: Intrinsic applicability and conditional selection remain separate stages.
+  assessment: conditional.applicability
+  test_results:
+    conditional.applicability:test-applicable: 'true'
+    conditional.applicability:test-guard: 'false'
+    conditional.applicability:test-else: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.applicability:test-applicable
+  - conditional.applicability:test-guard
+  - conditional.applicability:test-else
+  expected_branches:
+  - else
+- id: selected-dependency
+  description: Selected dependent Assessment may itself return not_applicable.
+  assessment: conditional.branch-dependency
+  test_results:
+    conditional.branch-dependency:test-guard: 'true'
+    conditional.role:test-role: not_applicable
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.branch-dependency:test-guard
+  - conditional.role:test-role
+  expected_branches:
+  - then
+- id: unselected-dependency
+  description: Declared dependency is validated but not invoked when its branch is
+    inactive.
+  assessment: conditional.branch-dependency
+  test_results:
+    conditional.branch-dependency:test-guard: 'false'
+    conditional.branch-dependency:test-else: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.branch-dependency:test-guard
+  - conditional.branch-dependency:test-else
+  expected_branches:
+  - else
+- id: explicit-not-applicable
+  description: Direct terminal outcome with an authored explanation; no synthetic
+    Test.
+  assessment: conditional.explicit-na
+  test_results:
+    conditional.explicit-na:test-guard: 'false'
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.explicit-na:test-guard
+  expected_branches:
+  - else
+- id: explicit-na-guard-error
+  description: Error cannot take the absence branch and claim not_applicable.
+  assessment: conditional.explicit-na
+  test_results:
+    conditional.explicit-na:test-guard: error
+  expected_outcome: error
+  expected_executed_tests:
+  - conditional.explicit-na:test-guard
+  expected_branches:
+  - null
+- id: explicit-na-component-present
+  description: Present component configuration fails normally.
+  assessment: conditional.explicit-na
+  test_results:
+    conditional.explicit-na:test-guard: 'true'
+    conditional.explicit-na:test-then: 'false'
+  expected_outcome: 'false'
+  expected_executed_tests:
+  - conditional.explicit-na:test-guard
+  - conditional.explicit-na:test-then
+  expected_branches:
+  - then
+- id: intrinsic-equivalent-absence
+  description: Existing intrinsic applicability offers the same whole-Assessment absence
+    decision.
+  assessment: conditional.intrinsic-na
+  test_results:
+    conditional.intrinsic-na:test-guard: 'false'
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.intrinsic-na:test-guard
+  expected_branches: []
+- id: na-under-all
+  description: Inherited aggregation can ignore a not_applicable child; it does not
+    force the whole Assessment not_applicable.
+  assessment: conditional.na-in-all
+  test_results:
+    conditional.na-in-all:test-guard: 'false'
+    conditional.na-in-all:test-other: 'true'
+  expected_outcome: 'true'
+  expected_executed_tests:
+  - conditional.na-in-all:test-guard
+  - conditional.na-in-all:test-other
+  expected_branches:
+  - else
+- id: na-under-any
+  description: Likewise OR combines the remaining applicable child.
+  assessment: conditional.na-in-any
+  test_results:
+    conditional.na-in-any:test-guard: 'false'
+    conditional.na-in-any:test-other: 'false'
+  expected_outcome: 'false'
+  expected_executed_tests:
+  - conditional.na-in-any:test-guard
+  - conditional.na-in-any:test-other
+  expected_branches:
+  - else
+- id: negated-not-applicable
+  description: Negation does not turn not_applicable into a Boolean.
+  assessment: conditional.negated-na
+  test_results:
+    conditional.negated-na:test-guard: 'false'
+  expected_outcome: not_applicable
+  expected_executed_tests:
+  - conditional.negated-na:test-guard
+  expected_branches:
+  - else
