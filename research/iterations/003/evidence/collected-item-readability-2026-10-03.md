@@ -22,7 +22,6 @@ All 100 mappings generated without error. This checks generation and inventories
 | `windows.file` | Owner string, version/company/product data | Clarify whether owner is SID or resolved name and whether both are needed | Existing string contract alone does not define owner identity resolution; confirm source collector behavior first |
 | Windows effective rights, SID, group and user rights capabilities | Trustee SID and name, or user/group SID/name pairs | Reuse existing names; specify resolution status/context rather than adding duplicates | Unknown identities and remote-domain resolution must not erase SID evidence |
 | Text/XML/YAML content, `unix.sshd`, device line/section/config capabilities | Resource or selector and extracted values, often source text | Matched source position or record locator for navigating decisive evidence | Line/byte/path semantics vary by parser and encoding; locator cannot imply effective configuration when the check examines explicit declarations |
-| `windows.registry`, `windows.ntuser` | Hive/key/value name and type; NTUSER already includes account identity | Explicit registry-view context where target evidence needs it | Must reflect actual 32/64-bit collection view, not a guessed display label |
 | `windows.cmdlet`, WMI, SQL, appcmd and shell command capabilities | Query/command/interface and results, with varying structural detail | Row/property or output-record identity and acquisition status for navigation | Retain correlation and datatypes; avoid echoing secrets in commands/queries; never use shell traversal as enrichment |
 | Package/version/update capabilities | Most already expose name, version, architecture, descriptions or titles | Focus on clearly locating the package/file involved in verification failures | Keep publisher expectation and observed value separate; do not imply installed state from a display name |
 | Systemd/SMF/service capabilities | Units/service identifiers; Windows service already has display name/description | Optional service display description where current Item only exposes a unit/key | Extra lookup must use target evidence; existing display fields need no duplicate |
@@ -32,6 +31,10 @@ All 100 mappings generated without error. This checks generation and inventories
 | Basic family/uname, variable value and simple security toggles | Direct observed value and target/result context | No evidence for a blanket additional attribute | Clarify labels/units in schema documentation before adding collection work |
 
 These groups cover the reviewed field patterns; the JSON inventory remains the exhaustive per-capability record. A suggested addition is not proof that a source collector supplies it. The next design pass must turn selected candidates into source-backed contracts and fixtures, not automatically apply every table entry.
+
+## Removed proposal — owner correction, 2026-10-03
+
+Registry view was intentionally deprecated because it was not useful. The owner explicitly directed its removal from the proposed collected Item additions. The earlier registry-view recommendation is superseded and SHALL NOT be reintroduced as a 0.2.0 result enrichment proposal. This correction removes a recommendation; it does not change existing schemas, collectors or migration behavior.
 
 ## Proposed contract rules
 
