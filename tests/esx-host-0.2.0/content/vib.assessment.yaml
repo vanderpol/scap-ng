@@ -1,0 +1,42 @@
+assessment:
+  id: esx.fixture.vib
+  version: 1
+  assessment_title: Synthetic ESXi host vib check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Select named host vib
+      capability: esx.host_vib
+      select:
+        vib_name:
+          datatype: string
+          operation: equal
+          value: fixture-vib
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_vib
+      state:
+        field: acceptance_level
+        datatype: string
+        operation: equal
+        value: VMwareCertified
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare selected host vib
+      capability: esx.host_vib
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

@@ -1,0 +1,42 @@
+assessment:
+  id: esx.fixture.account
+  version: 1
+  assessment_title: Synthetic ESXi host account check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Select named host account
+      capability: esx.host_account
+      select:
+        account_name:
+          datatype: string
+          operation: equal
+          value: audit-user
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_account
+      state:
+        field: shell_access_enabled
+        datatype: boolean
+        operation: equal
+        value: false
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare selected host account
+      capability: esx.host_account
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

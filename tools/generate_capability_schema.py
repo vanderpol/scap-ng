@@ -476,6 +476,22 @@ def generate(mapping, repo_root):
         )
         for name, meta in sorted(item_meta.items())
     }
+    for name, value_type in mapping["native"].get("item_value_types", {}).items():
+        if name not in collected_field_properties or value_type not in {"string", "boolean", "integer", "number"}:
+            raise ValueError(f"Invalid Item value type field: {name}")
+        field_schema = collected_field_properties[name]
+        entity_schema = field_schema["items"] if item_meta[name].get("multiple", False) else field_schema
+        entity_schema["allOf"].append({"properties": {"value": {"type": value_type}}})
+
+    # Explicit reviewed observed-value enums do not constrain omitted payloads
+    # (redaction/nonexistent/error). Restrict only a present value, per entity.
+    for name, values in mapping["native"].get("item_value_enums", {}).items():
+        if name not in collected_field_properties or not values:
+            raise ValueError(f"Invalid Item value enum field: {name}")
+        field_schema = collected_field_properties[name]
+        entity_schema = field_schema["items"] if item_meta[name].get("multiple", False) else field_schema
+        entity_schema["allOf"].append({"properties": {"value": {"enum": list(values)}}})
+
     for name, description in field_documentation.items():
         if name not in collected_field_properties:
             raise ValueError(f"Documentation references unknown Item field: {name}")

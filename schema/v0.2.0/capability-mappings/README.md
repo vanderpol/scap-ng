@@ -19,3 +19,11 @@ are carried into the new JSON Schema annotations.
 references](../../../specification/assessment/reference/README.md) explain the
 source contract and evidence limits. No live collector, mandatory PowerCLI
 backend, OVAL 6.0 importer, or finalized 0.2.0 release is claimed.
+
+The next host slice adds `esx.host_account` and `esx.host_vib`. Account shell
+access is Boolean; VIB acceptance categories retain their exact five values.
+VIB versions and creation dates remain strings. Explicit `item_value_types`
+and `item_value_enums` restrict present observed payloads without requiring
+payloads for redacted/unavailable entities. Their opt-in generator behavior
+does not alter stable mappings. See the linked capability references and
+`tools/test_esx_identity_software_v02.py`.

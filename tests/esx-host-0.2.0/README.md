@@ -37,3 +37,29 @@ Tests, selectors, State fields, cross-capability references, typed/multiple/stat
 Items, reporting/redaction, and exact committed source/license preservation.
 Simple synthetic equality cases are not a general State evaluator. Full vendor
 and target coverage remains tracked in #128/#131.
+
+## Host account and installed software slice
+
+- [Account Assessment](content/account.assessment.yaml) selects `audit-user`
+  and requires Boolean shell access false. [Item](account-item.json) includes
+  domain, description and role as synthetic supporting observations.
+- [VIB Assessment](content/vib.assessment.yaml) selects `fixture-vib` and requires
+  the `VMwareCertified` category. [Item](vib-item.json) preserves vendor, creation
+  date and version as strings.
+- [Expected equality results](expected-results/identity-software.json) explain
+  passing/failing examples, including `Unknown` as a present category yielding
+  false against `VMwareCertified`, not the technical unknown outcome.
+
+Run `python tools/test_esx_identity_software_v02.py` with the commands above.
+It checks exact source field/type/cardinality declarations, category enums,
+XML-placeholder removal versus native Variable references, unavailable/redacted
+entities, JSON payload types, report identity, invalid unused nodes, graph
+compatibility, version isolation and real unsigned compilation/verification.
+Structural Variable-reference validation is not a runtime value-resolution
+oracle. Account description/role can require confidentiality controls. The
+comparator oracle uses independently stated scalar equality, not a converter's
+output. Existing collection-status expectations apply to both new capabilities.
+
+Provenance: Adapted source contracts; Common native fixtures; Evidence/Audit
+synthetic expected results. All original XSD license notices remain retained.
+Live-target and complete vendor conformance remain open.
