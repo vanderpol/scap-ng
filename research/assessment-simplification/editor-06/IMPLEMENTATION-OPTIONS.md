@@ -1,5 +1,10 @@
 # Language, deployment and Git integration recommendation
 
+Sequencing correction: the owner's subsequent [all-content requirement](FULL-COVERAGE.md)
+makes complete native-model handling and hard mixed dependency fixtures the first
+architecture gate. The simple-slice-first task near the end remains historical
+proposal text; it cannot establish complete editor capability on its own.
+
 **Experimental recommendation, 2026-10-03.** Receiving `main` SHA
 `30f01a6f3117a309cdea7051611508fcf943230c`. Owner favors a separate editor research
 repository and direct editing for the straightforward majority of content. The

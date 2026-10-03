@@ -1,5 +1,13 @@
 # Resume the open editor/recipe brainstorming
 
+Latest owner correction: [ALL supported content coverage](FULL-COVERAGE.md).
+The editor must create/edit/inspect deep mixed dependency graphs, not merely common
+forms or raw-only preservation. The current inventory records 100 mapping files,
+28 shared definitions and 13 legacy function members, with every editor status
+not_implemented. Reconcile schema-only/unmapped gaps and conformance/production
+interactions before claims. A simple AND hard mixed-graph prototype is the new
+architecture gate; earlier simple-slice-only sequencing below is superseded.
+
 Latest continuation: [implementation options](IMPLEMENTATION-OPTIONS.md), receiving
 `30f01a6f3117a309cdea7051611508fcf943230c`. Owner favors a separate research repo
 and direct editing for the straightforward majority. TypeScript/React with an

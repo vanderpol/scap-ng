@@ -1,5 +1,11 @@
 # An open authoring workbench with recipes and templates
 
+Owner's latest requirement: [complete content support](FULL-COVERAGE.md), including
+deep Variable/Object/Filter/Set graphs. Guided views are conveniences; preserve-only
+or raw-text fallback does not establish full structured authoring support. The
+[current obligation inventory](authoring-obligations.json) has no implemented-editor
+coverage. Complete model handling takes priority over recipes/packaging.
+
 **Experimental brainstorming, 2026-10-03.** Owner requested expanding the editor
 idea using the preceding research, including recipes/templates and an open-source
 tool reusable in multiple environments. These are proposals, not accepted schema,
