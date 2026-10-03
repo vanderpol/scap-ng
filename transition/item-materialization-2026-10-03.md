@@ -43,7 +43,7 @@ helper to avoid overwriting original availability accounting.
 `import_items` requires exact UTF-8 JSON source artifact bytes, an independently
 trusted `sha256:<hex>` pin, expected source execution ID, exact target reference,
 exact nonempty binding-set ID, selected source Item IDs and an explicit unique
-source-to-local ID mapping. JSON duplicate members/nonfinite numbers, bad byte
+source-to-local ID mapping. JSON duplicate members/nonfinite numbers or numeric rounding/underflow, bad byte
 pins, wrong targets/bindings, missing source Items, invalid observations and local
 mapping collisions fail. Local collisions with existing Items fail at assembly.
 
@@ -89,3 +89,7 @@ including the **17** focused methods and existing conditional/result/reporting
 contracts. The preservation audit reports no failures across 34,242 baseline
 paths; all draft schemas meta-validate in the result integration suite. The
 committed exact-byte import and scope/count fixtures pass offline checks.
+
+The byte import helper rejects floating values that cannot preserve their exact
+JSON numeric value through its Python float representation; it never silently
+rounds them. Wider numeric precision requires a future lossless numeric consumer.

@@ -116,7 +116,7 @@ class MaterializationTests(unittest.TestCase):
         self.assertEqual(actual,expected['items'])
 
     def test_nonfinite_keywords_and_overflow_numbers_rejected(self):
-        for value in (b'NaN',b'Infinity',b'1e999'):
+        for value in (b'NaN',b'Infinity',b'1e999',b'1e-999',b'0.10000000000000001'):
             raw=self.bytes();data=b'{"ignored":'+value+b','+raw[1:]
             with self.subTest(value=value),self.assertRaises(ValueError):
                 import_items(data,expected_digest='sha256:'+hashlib.sha256(data).hexdigest(),expected_execution_id=self.source['execution_id'],target_ref='fixture-target',binding_set_id='fixture-bindings-empty',item_refs=[],local_ids={})

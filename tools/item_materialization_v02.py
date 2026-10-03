@@ -5,6 +5,7 @@ Collection-cache authorization, freshness and resource acquisition belong to the
 producer. Importing observations never imports a Test's truth or re-resolves names.
 """
 import copy
+from decimal import Decimal
 import hashlib
 import json
 import math
@@ -100,6 +101,8 @@ def validate_materialization(result):
 def _finite_float(text):
     value=float(text)
     if not math.isfinite(value): raise ValueError('Non-finite JSON number')
+    if Decimal(str(value))!=Decimal(text):
+        raise ValueError('JSON floating value cannot be preserved by this helper')
     return value
 
 
