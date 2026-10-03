@@ -573,6 +573,43 @@ The working vocabulary decision and migration crosswalk are recorded in
 [Assessment vocabulary alignment with OVAL](../../research/iterations/003/design/assessment-oval-vocabulary-alignment.md).
 
 
+## Native authored literal datatypes
+
+For specification version 0.2.0, authored scalar literals SHALL use the native
+JSON/YAML value kind corresponding to their declared SCAP-NG datatype. Authors
+and editors SHALL NOT rely on OVAL/XML lexical strings where the native
+serialization provides an unambiguous typed value.
+
+In particular:
+
+- `datatype: boolean` SHALL use a Boolean literal such as `true` or `false`;
+  strings such as `"true"`, `"false"`, `"1"`, and `"0"` are invalid
+  native authored Boolean literals;
+- `datatype: integer` SHALL use a JSON/YAML integer and SHALL NOT accept a
+  Boolean or numeric string as an authored literal;
+- `datatype: float` SHALL use a finite JSON/YAML numeric value rather than a
+  numeric string or Boolean;
+- string-based datatypes, including `string`, `binary`, `version`,
+  IP-address and package/version lexical datatypes, SHALL use string literals
+  unless a capability-specific contract defines a structured representation;
+- record values SHALL use the structured record representation rather than a
+  scalar literal.
+
+A Variable reference is not a literal and is validated against the referenced
+Variable's declared/effective datatype separately.
+
+SCAP 1.4 migration tooling MAY accept source lexical forms that are valid under
+the pinned OVAL/XML datatype contract, but it SHALL convert them into the native
+SCAP-NG representation before emitting 0.2.0 authored content. Source lexical
+spelling MAY be retained in migration provenance when needed for round-trip or
+audit evidence. An importer SHALL NOT force native authors to preserve XML
+lexical aliases merely because the legacy source permitted them.
+
+This rule deliberately separates source compatibility from native authoring:
+for example, OVAL Boolean lexical values `true`, `false`, `1`, and `0`
+remain valid migration inputs where the source schema permits them, while native
+SCAP-NG Boolean literals are the JSON/YAML Boolean values `true` and `false`.
+
 ## Structured record values
 
 The Assessment language SHALL support **record** values as first-class
