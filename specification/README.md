@@ -74,6 +74,9 @@ below; every page also contains **Previous · Contents · Next** navigation.
   capabilities, reuse, explicit semantics.
 - `assessment/manual-assessment.md` — procedure-only Check Text baseline and
   default manual-result behavior.
+- [Assessment reference](assessment/reference/README.md) — shared behavior,
+  initial capability/field documentation, known-result examples and provenance;
+  an incomplete documentation foundation for the 0.2.0 work.
 
 ### Results
 
@@ -258,4 +261,3 @@ A proposed feature that materially increases implementation complexity SHOULD
 identify the concrete requirement it satisfies and why an existing simpler
 construct cannot satisfy it. Hypothetical flexibility alone is insufficient
 justification.
-
