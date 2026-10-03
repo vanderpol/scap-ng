@@ -52,3 +52,9 @@ Cover resolved UID/GID, unmapped IDs, lookup denial/error/unavailable service, a
 ## What remains
 
 Select concrete additions, define optional versus mandatory fields, audit capability Item status requirements, separate result-only additions from State mappings, and specify lookup/derivation provenance. Implement changes in the versioned result/capability contracts after those choices are agreed. Conditional evaluation and Item inclusion remain separate 0.2.0 work; editor R&D follows those semantics rather than determining them.
+
+## Removed proposal — owner correction, 2026-10-03
+
+Registry view was intentionally deprecated because it was not useful. The earlier recommendation is superseded and SHALL NOT be reintroduced as a 0.2.0 result enrichment. This correction does not change schemas, collectors, or migration behavior.
+
+The remaining candidates are resolved in the [collected Item checkpoint](../../../../transition/collected-items-2026-10-03.md).
