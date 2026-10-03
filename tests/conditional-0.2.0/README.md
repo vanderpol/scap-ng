@@ -2,7 +2,7 @@
 
 **Status: experimental proposal-01.** This uses the small-example / controlled-input / known-result method of OVAL Self-Assertion. It is new project-authored conditional research, not copied SCAP 1.4 test content or a released 0.2.0 schema. Expected results describe the proposed contract below; they do not establish that this contract is ratified.
 
-The owner requested explanatory test content for known conditional scenarios, and a way for a conditional to return `not_applicable`. The source baseline is `ab6e9fb1b291fab389157990e5a66f4d29ed1a97`. [Provenance](provenance.json) records the inspected contracts and hashes. Normalizer candidate analysis is deferred in [#126](https://github.com/vanderpol/scap-ng/issues/126) until conditional 0.2.0 is implemented, tested and merged. Reported elements are tracked separately in [#125](https://github.com/vanderpol/scap-ng/issues/125).
+The owner requested explanatory test content for known conditional scenarios, and a way for a conditional to return `not_applicable`. The source baseline is `ab6e9fb1b291fab389157990e5a66f4d29ed1a97`. [Provenance](provenance.json) records the inspected contracts and hashes. Owner follow-up on 2026-10-03 removed automatic conditional normalization and candidate detection from planned features; [#126](https://github.com/vanderpol/scap-ng/issues/126) is closed as not planned. Reported elements are tracked separately in [#125](https://github.com/vanderpol/scap-ng/issues/125).
 
 ## Start with one example
 
@@ -109,7 +109,7 @@ The suite runner checks 465 positive evaluations (33 curated + 432 matrices) and
 
 ## Normalizer feasibility finding
 
-The apparently obvious `(G AND T) OR (NOT G AND E)` rewrite is not universally equivalent to this proposed conditional. With `G=error`, `T=false`, `E=false`, inherited aggregation yields `false`, while proposed conditional propagation yields `error`. A focused regression preserves this counterexample. A future normalizer needs stronger pattern-specific semantic and collection/evidence proof; it cannot simply recognize a Boolean shape and upgrade it. This supports the conservative gate in #126.
+The apparently obvious `(G AND T) OR (NOT G AND E)` rewrite is not universally equivalent to this proposed conditional. With `G=error`, `T=false`, `E=false`, inherited aggregation yields `false`, while proposed conditional propagation yields `error`. A focused regression preserves this counterexample. A Boolean shape does not justify a lossless upgrade. The owner removed this potential normalizer feature on 2026-10-03; #126 is closed as not planned. Keep this counterexample as conformance evidence.
 
 ## Design questions before implementation
 
