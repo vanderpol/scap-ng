@@ -63,6 +63,41 @@ basic serialization schemas, including:
 - compiled references use stable logical identity rather than authoring paths;
 - duplicate authoritative definitions are rejected.
 
+## 4A. Conformance evidence layers
+
+SCAP-NG conformance evidence SHALL identify what has actually been proven. The
+following layers are distinct and SHALL NOT be collapsed into a single
+"validated" or "conformant" claim:
+
+1. **serialization/schema validity** — the artifact is structurally valid;
+2. **semantic validity** — cross-field, cross-reference, datatype, capability,
+   cardinality, and other normative semantic constraints are satisfied;
+3. **known-result evaluator conformance** — supplied observations/inputs produce
+   independently predetermined outcomes and evidence;
+4. **collection/acquisition conformance** — an implementation obtains the
+   required target observations with the capability's specified identity,
+   completeness, status, datatype, and error behavior;
+5. **live target execution conformance** — collection plus evaluation is proven
+   against representative real targets for the claimed platform/capability;
+6. **migration equivalence evidence** — supported legacy source semantics are
+   shown to survive conversion without semantic weakening or strengthening.
+
+Evidence at one layer SHALL NOT be claimed as evidence at a stronger layer.
+In particular:
+
+- successful JSON Schema, XSD, or Schematron validation does not prove runtime
+  evaluation or target collection;
+- synthetic supplied Items/observations can prove evaluator behavior but do not
+  prove a collector can acquire those observations;
+- successful document round-trip comparison does not prove collector or
+  evaluator equivalence;
+- one implementation's behavior does not become normative merely because the
+  reference implementation behaves that way.
+
+Conformance reports SHOULD identify the exact fixture/source revision,
+implementation version, capability, target context when applicable, and the
+evidence layer being claimed.
+
 ## 5. Invalid or unsupported content
 
 A content consumer SHALL detect invalid compiled content before execution.
