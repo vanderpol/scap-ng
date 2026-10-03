@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+from capability_registry import draft_capabilities, load_mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = ROOT / "specification/assessment/reference"
@@ -43,9 +44,9 @@ def main():
         for command in re.findall(r"^python (tools/[^\s]+\.py)", text, re.MULTILINE):
             if not (ROOT / command).is_file():
                 errors.append(f"{document.name}: nonexistent documented command {command}")
-    for capability in ["unix.file", "variable.value"]:
-        mapping = json.loads((ROOT / "schema/v0.1.0/capability-mappings" /
-                              (capability + ".json")).read_text(encoding="utf-8"))
+    capabilities = ["unix.file", "variable.value", *sorted(draft_capabilities())]
+    for capability in capabilities:
+        mapping = load_mapping(capability)
         text = (REFERENCE / (capability + ".md")).read_text(encoding="utf-8")
         heading = "Comparable and collected fields" if capability == "unix.file" else "State and Item field reference"
         expected = set(mapping["native"]["state_field_map"].values())
@@ -58,7 +59,7 @@ def main():
     if table_fields(text, "Draft 0.2.0 result-only fields") != set(extensions):
         errors.append("unix.file: result-only field table differs")
     print(json.dumps({"documents": len(documents), "source_pins": len(ledger["sources"]),
-                      "capability_references": 2, "errors": errors}, indent=2))
+                      "capability_references": len(capabilities), "errors": errors}, indent=2))
     return bool(errors)
 
 

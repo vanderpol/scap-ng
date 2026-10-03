@@ -13,6 +13,8 @@ by each Test, Object, or State.
 | --- | --- | --- | --- |
 | `unix.file` | Unix file identity, ownership, mode bits, times, size, and ACL presence | 0.1.0 base; draft 0.2.0 result names/reporting | [Unix files](unix.file.md) |
 | `variable.value` | Values produced by a named Variable | 0.1.0 base; draft 0.2.0 expressions/reporting | [Variable values](variable.value.md) |
+| `esx.host_service` | Named ESXi host service configuration/running state | Draft 0.2.0 addition | [Host services](esx.host_service.md) |
+| `esx.host_advancedsetting` | Named ESXi host setting with typed repeated values | Draft 0.2.0 addition | [Host settings](esx.host_advancedsetting.md) |
 
 ## Where requirements live
 
@@ -57,9 +59,11 @@ consistency, migration equivalence, and actual target execution. A callback-base
 conditional fixture does not prove a collector or State comparator.
 
 The [capability coverage inventory](../../../docs/audit/capability-coverage-2026-10-03/README.md)
-records the wider catalog and its gaps. These two starter references do not
+records the wider catalog and its gaps. These initial references do not
 complete documentation of the 100 mapped capabilities or the 22 new OVAL 6.0
-Tests. Expansion is tracked in GitHub #128/#131 alongside 0.2.0 stabilization.
+Tests. Two new ESXi host mappings have synthetic cases; the other 20 new Tests
+still need implementation. Expansion is tracked in GitHub #128/#131 alongside
+0.2.0 stabilization.
 
 ## Provenance
 

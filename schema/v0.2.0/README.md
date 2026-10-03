@@ -6,6 +6,9 @@ examples. Its coverage is incomplete; it does not turn this partial draft into
 a released specification or claim live collector conformance.
 
 This is a partial versioned draft, not a complete 0.2.0 release schema set.
+The [draft capability additions](capability-mappings/README.md) include ESXi host
+services and named advanced settings with typed repeated values, field
+annotations and synthetic known-result cases. They do not expand 0.1.0.
 It adds `assessment.schema.json`, recursive `expression.schema.json`, and an
 expression-stage `expression-result.schema.json`. Unchanged manual authoring is
 explicitly pinned to the 0.1.0 manual schema. Use the maintained schema harness

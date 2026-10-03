@@ -1,0 +1,42 @@
+assessment:
+  id: esx.fixture.service
+  version: 1
+  assessment_title: Synthetic ESXi host service check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Select named host service
+      capability: esx.host_service
+      select:
+        service_name:
+          datatype: string
+          operation: equal
+          value: TSM-SSH
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_service
+      state:
+        field: service_running
+        datatype: boolean
+        operation: equal
+        value: false
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare selected host service
+      capability: esx.host_service
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

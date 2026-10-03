@@ -196,3 +196,19 @@ and reference documentation is a proposed future consolidation; existing JSON
 mappings remain generator inputs and no catalog/generation replacement is
 implemented by this documentation slice. Do not independently edit duplicate
 truth tables or infer finalized runtime conformance from the starter references.
+
+## New ESXi host capability slice — draft 0.2.0
+
+Native `esx.host_service` and `esx.host_advancedsetting` mappings retain named
+Object selection, compatible States, scalar service Booleans and typed repeated
+advanced-setting values. A versioned registry exposes them only to 0.2.0 while
+reusing existing shared native primitives and preserving all 0.1.0 mappings.
+The new field documentation is also present in generated schema annotations.
+Exact licensed ESX source blobs are retained as a partial metadata reference;
+complete upstream XSD compilation uses the pinned public CI checkout. This is
+not OVAL 6.0 ingestion or a broader adoption of existing 6.0 differences.
+
+The [known-result content](../../../../tests/esx-host-0.2.0/README.md) validates
+source shapes, references, synthetic Items and reporting, not live VMware
+acquisition/comparison. See [the checkpoint](../../../../transition/esx-host-capabilities-2026-10-03.md).
+Twenty other new Tests and full vendor/target conformance remain in #128/#131.

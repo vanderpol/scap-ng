@@ -13,6 +13,8 @@ on:
       - tests/item-materialization-0.2.0/**
       - tests/result-package-0.2.0/**
       - tests/collected-items-0.2.0/**
+      - tests/esx-host-0.2.0/**
+      - third_party/oval-6.0-new-tests/**
       - .github/workflows/scap-ng-current-regression.yml
   push:
     branches: [main]
@@ -28,6 +30,9 @@ on:
       - tools/audit_oval_new_tests.py
       - tools/audit_capability_coverage.py
       - tools/check_assessment_reference.py
+      - tools/capability_registry.py
+      - tests/esx-host-0.2.0/**
+      - third_party/oval-6.0-new-tests/**
       - specification/assessment/reference/**
       - tools/reported_elements.py
       - tests/conditional-0.2.0/**
@@ -85,6 +90,9 @@ jobs:
       - name: Current source graph and actual corpus CLI
         run: |
           python tools/check_assessment_reference.py
+          python tools/test_esx_host_capabilities_v02.py
+          python tools/validate_native_json_schemas.py tests/esx-host-0.2.0/content --schema-dir schema/v0.2.0
+          python tools/check_current_authoring_contract.py tests/esx-host-0.2.0/content
           python tools/test_named_collection_graph.py
           python tools/scap_upconvert_v003/test_collection_capabilities.py
           python tools/scap_upconvert_v003/test_manual_response_contract.py

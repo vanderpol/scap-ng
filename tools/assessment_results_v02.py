@@ -10,6 +10,7 @@ import copy
 import json
 from functools import lru_cache
 from pathlib import Path
+from capability_registry import load_mapping
 from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 from assessment_expression import AssessmentExpressionEvaluator, load_assessments
@@ -36,7 +37,7 @@ def item_validator(capability):
     # Closed capability vocabulary and path protection use the reporting registry.
     from reported_elements import capability_fields
     capability_fields(capability)
-    mapping = json.loads((ROOT / 'schema/v0.1.0/capability-mappings' / (capability + '.json')).read_text())
+    mapping = load_mapping(capability)
     schema = capability_schema(mapping)
     if schema is None:
         raise ValueError(f'{capability} does not produce Items')

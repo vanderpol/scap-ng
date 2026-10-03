@@ -1,0 +1,42 @@
+assessment:
+  id: esx.fixture.advancedsetting
+  version: 1
+  assessment_title: Synthetic ESXi host advancedsetting check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Select named host advancedsetting
+      capability: esx.host_advancedsetting
+      select:
+        advanced_setting_name:
+          datatype: string
+          operation: equal
+          value: UserVars.ESXiShellTimeOut
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_advancedsetting
+      state:
+        field: advanced_setting_value
+        datatype: integer
+        operation: equal
+        value: 600
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare selected host advancedsetting
+      capability: esx.host_advancedsetting
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

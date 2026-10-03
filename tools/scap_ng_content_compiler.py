@@ -231,15 +231,29 @@ def validate_draft_expression_assessments(assessments):
     from validate_native_json_schemas import build_validators, document_errors
     from assessment_expression import AssessmentExpressionEvaluator
     from reported_elements import source_errors
+    from capability_registry import draft_capabilities
+    from validate_generated_capability_semantics import validate_assessment_capability_semantics
+    new_capabilities = draft_capabilities()
     validators = None
     for aid, assessment in assessments.items():
+        has_new_capability = any(
+            isinstance(node, dict) and isinstance(node.get("capability"), str) and node["capability"] in new_capabilities
+            for section in ["objects", "states", "tests"]
+            for node in (assessment.get(section, {}) if isinstance(assessment.get(section, {}), dict) else {}).values()
+        )
         if assessment.get("specification", {}).get("version") != "0.2.0":
+            if has_new_capability:
+                raise ValueError(f"{aid}: new capability requires specification 0.2.0")
             continue
         if validators is None:
             validators = build_validators(Path(__file__).resolve().parents[1] / "schema/v0.2.0")
         errors = list(document_errors(validators["assessment.schema.json"], {"assessment": assessment}))
         if errors:
             raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
+        if has_new_capability:
+            graph_errors = validate_assessment_capability_semantics(assessment)
+            if graph_errors:
+                raise ValueError(f"{aid}: incompatible capability graph: {graph_errors[0]['message']}")
         reporting_errors = source_errors(assessment)
         if reporting_errors:
             raise ValueError(f"{aid}: invalid reported_elements: {reporting_errors[0]}")
