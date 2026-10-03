@@ -161,3 +161,14 @@ JSON Schema only after:
 6. conformance tests can distinguish valid from invalid behavior.
 
 Until then, these sections are design guidance only.
+
+### Item materialization checkpoint — 2026-10-03
+
+The older open Item-scope/provenance questions above now have a bounded
+[0.2.0 working contract](../../transition/item-materialization-2026-10-03.md):
+producer serialization defaults to all locally available observations; consumed
+mode retains all recorded logical/decisive uses. Explicit local IDs, byte-pinned
+origin context, import chains and conservative incompleteness are represented.
+This is a helper/result-schema checkpoint; runtime collection-cache reuse,
+collector-specific cache keys/freshness authorization, whole-scan deduplication
+and Board ratification remain open. No automatic source conversion uses it.
