@@ -1,0 +1,34 @@
+assessment:
+  id: niwc.rhel_9.condition.linux-uefi-boot.assessment
+  version: 6
+  assessment_title: Linux UEFI Boot
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    unix-file-object:
+      capability: unix.file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          value: /sys/firmware/efi
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: null
+  states: {}
+  tests:
+    test-sys-firmware-efi-exists:
+      test_title: /sys/firmware/efi exists
+      capability: unix.file
+      object: unix-file-object
+      check_existence: all_exist
+      check: all
+  evaluate:
+    test: test-sys-firmware-efi-exists

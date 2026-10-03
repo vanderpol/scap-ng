@@ -1,0 +1,101 @@
+assessment:
+  id: niwc.ms_windows_server_dns.condition.crypto-folder-file-based-zones-exist.assessment
+  version: 8
+  assessment_title: Crypto_Folder_and_File_Based_Zones_Exist
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    resolved-allusersprofile-folder-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: $env:ALLUSERSPROFILE
+      object_title: The resolved %ALLUSERSPROFILE% folder
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    metadata-allusersprofile-microsoft-crypto-folder-object:
+      capability: windows.file
+      select:
+        path:
+          operation: case insensitive equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: resolved-allusersprofile-microsoft-crypto-folder-variable
+        filename:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: Metadata for the %ALLUSERSPROFILE%\Microsoft\Crypto folder
+    list-all-file-based-zones-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}
+      object_title: The list of all file-based zones
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  variables:
+    resolved-allusersprofile-microsoft-crypto-folder-variable:
+      title: The resolved %ALLUSERSPROFILE%\Microsoft\Crypto folder
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: resolved-allusersprofile-folder-object
+            field: stdout_line
+        - literal:
+            value: \Microsoft\Crypto
+            datatype: string
+  states:
+    state-no-file-based-zones-exist:
+      state_title: No file-based zones exist
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equal
+        datatype: string
+        match: all
+        existence: none
+  tests:
+    test-allusersprofile-microsoft-crypto-folder-exists:
+      test_title: The %ALLUSERSPROFILE%\Microsoft\Crypto folder exists
+      capability: windows.file
+      object: metadata-allusersprofile-microsoft-crypto-folder-object
+      check_existence: at_least_one_exists
+      check: all
+    test-no-file-based-zones-exist:
+      test_title: No file-based zones exist
+      capability: independent.shellcommand
+      object: list-all-file-based-zones-object
+      states:
+      - state-no-file-based-zones-exist
+      existence: some
+      match: all
+  evaluate:
+    all:
+    - test: test-allusersprofile-microsoft-crypto-folder-exists
+    - not:
+        test: test-no-file-based-zones-exist

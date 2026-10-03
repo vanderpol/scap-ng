@@ -1,0 +1,54 @@
+rule:
+  id: SV-214268
+  version: r961632
+  title: Cookies exchanged between the Apache web server and the client, such as session cookies, must have cookie
+    properties set to prohibit client-side scripts from reading the cookie data.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'A cookie can be read by client-side scripts easily if cookie properties are not set properly. By
+    allowing cookies to be read by the client-side scripts, information such as session identifiers could be compromised
+    and used by an attacker who intercepts the cookie. Setting cookie properties (i.e., HttpOnly property) to disallow
+    client-side scripts from reading cookies better protects the information inside the cookie. Satisfies: SRG-APP-000439-WSR-000154,
+    SRG-APP-000439-WSR-000155'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: AS24-U1-000870
+  - scheme: vulnerability
+    value: V-214268
+  - scheme: cci
+    value: CCI-002418
+  references:
+  - title: DPMS Target Apache Server 2.4 UNIX Server
+    publisher: DISA
+    type: DPMS Target
+    subject: Apache Server 2.4 UNIX Server
+    identifier: '3996'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Determine the location of the "HTTPD_ROOT" directory and the "httpd.conf" file: # apachectl -V |
+      egrep -i ''httpd_root|server_config_file'' -D HTTPD_ROOT="/etc/httpd" -D SERVER_CONFIG_FILE="conf/httpd.conf"
+      NOTE: SSL directives may also be located in /etc/httpd/conf.d/ssl.conf. Set "Session" to "on". Ensure the
+      "SessionCookieName" directive includes "httpOnly" and "secure".'
+  organizational_input_requirements: {}
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/niwc.apache_server_2-4_unix_server.SV-214268.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/niwc.apache_server_2-4_unix_server.SV-214268.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/niwc.apache_server_2-4_unix_server.SV-214268.manual.assessment.yaml
+  default_assessment_choice: default

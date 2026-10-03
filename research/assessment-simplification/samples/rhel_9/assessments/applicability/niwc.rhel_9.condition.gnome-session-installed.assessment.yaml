@@ -1,0 +1,45 @@
+assessment:
+  id: niwc.rhel_9.condition.gnome-session-installed.assessment
+  version: 13
+  assessment_title: Gnome Session is installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        package_name:
+          value: gnome-session
+          operation: equal
+          datatype: string
+      object_title: null
+    linux-dpkginfo-object:
+      capability: linux.dpkginfo
+      select:
+        name:
+          value: gnome-shell
+          operation: equal
+          datatype: string
+      object_title: null
+  states: {}
+  tests:
+    test-gnome-session-package-installed-rpm:
+      test_title: The gnome-session package is installed. (RPM).
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      existence: some
+      match: all
+    test-gnome-session-package-installed-deb:
+      test_title: The gnome-session package is installed. (DEB)
+      capability: linux.dpkginfo
+      object: linux-dpkginfo-object
+      existence: all
+      match: all
+  evaluate:
+    any:
+    - test: test-gnome-session-package-installed-rpm
+    - test: test-gnome-session-package-installed-deb

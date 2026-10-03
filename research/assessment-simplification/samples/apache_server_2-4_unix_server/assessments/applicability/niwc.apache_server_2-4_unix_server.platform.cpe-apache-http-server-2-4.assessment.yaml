@@ -1,0 +1,52 @@
+assessment:
+  id: niwc.apache_server_2-4_unix_server.platform.cpe-apache-http-server-2-4.assessment
+  version: 3
+  assessment_title: Apache 2.4 UNIX
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-unique-apache-http-installation-paths-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
+        pattern:
+          operation: equals
+          datatype: string
+          value: ^\/\S+(\/httpd|\/apache2)\s*
+      object_title: Gather unique apache http installation paths
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  states:
+    state-bash-command-returns-a-path:
+      state_title: Bash Command returns a path
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^/
+        operation: match
+        datatype: string
+        match: all
+        existence: some
+  tests:
+    test-gather-all-installation-directories-from-running-apache-httpd-processes:
+      test_title: Gather all installation directories from running apache httpd processes
+      capability: independent.shellcommand
+      object: gather-unique-apache-http-installation-paths-object
+      states:
+      - state-bash-command-returns-a-path
+      existence: some
+      match: all
+  evaluate:
+    test: test-gather-all-installation-directories-from-running-apache-httpd-processes

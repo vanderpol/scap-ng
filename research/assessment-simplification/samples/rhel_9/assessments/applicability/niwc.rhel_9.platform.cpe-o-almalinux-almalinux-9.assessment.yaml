@@ -1,0 +1,55 @@
+assessment:
+  id: niwc.rhel_9.platform.cpe-o-almalinux-almalinux-9.assessment
+  version: 13
+  assessment_title: AlmaLinux 9
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-cpe-name-attribute-object:
+      capability: independent.textfilecontent54
+      select:
+        full_path:
+          value: /etc/os-release
+          operation: equal
+          datatype: string
+        pattern:
+          value: ^CPE_NAME="(.+)"
+          operation: match
+          datatype: string
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+      object_title: gather the CPE_NAME attribute
+      filesystem: any
+      collect:
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: all_object_elements_fullfilled
+  states:
+    state-cpe-name-matches-almalinux-almalinux-9:
+      state_title: CPE_NAME matches almalinux:almalinux:9
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: almalinux:almalinux:9
+        operation: match
+        datatype: string
+        match: all
+        existence: some
+  tests:
+    test-os-release-file-has-cpe-name-almalinux-almalinux-9:
+      test_title: The os-release file has CPE_NAME of almalinux:almalinux:9
+      capability: independent.textfilecontent54
+      object: gather-cpe-name-attribute-object
+      states:
+      - state-cpe-name-matches-almalinux-almalinux-9
+      existence: all
+      match: all
+  evaluate:
+    test: test-os-release-file-has-cpe-name-almalinux-almalinux-9

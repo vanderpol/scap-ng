@@ -1,0 +1,72 @@
+assessment:
+  id: niwc.rhel_9.platform.cpe-o-redhat-enterprise-linux-9-0.assessment
+  version: 13
+  assessment_title: Red Hat Enterprise Linux 9
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        package_name:
+          value: redhat-release
+          operation: equal
+          datatype: string
+      object_title: null
+    linux-rpminfo-object-2:
+      capability: linux.rpminfo
+      select:
+        package_name:
+          value: toss-release
+          operation: equal
+          datatype: string
+      object_title: null
+    linux-rpminfo-object-3:
+      capability: linux.rpminfo
+      select:
+        package_name:
+          value: oraclelinux-release
+          operation: equal
+          datatype: string
+      object_title: null
+  states:
+    state-linux-rpminfo:
+      state_title: null
+      capability: linux.rpminfo
+      state:
+        field: version
+        value: ^9\.\d+$
+        operation: match
+        datatype: string
+        match: all
+        existence: some
+  tests:
+    test-redhat-release-package-version-9:
+      test_title: The redhat-release package is version 9.
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      states:
+      - state-linux-rpminfo
+      existence: all
+      match: all
+    test-toss-package-not-installed:
+      test_title: The TOSS Package is not Installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object-2
+      existence: none
+      match: all
+    test-oracle-linux-package-not-installed:
+      test_title: The Oracle Linux Package is not Installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object-3
+      existence: none
+      match: all
+  evaluate:
+    all:
+    - test: test-redhat-release-package-version-9
+    - test: test-toss-package-not-installed
+    - test: test-oracle-linux-package-not-installed

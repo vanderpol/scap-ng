@@ -1,0 +1,266 @@
+assessment:
+  id: niwc.ms_windows_server_dns.SV-259345.automated
+  version: 8
+  assessment_title: The validity period for the Resource Record Signatures (RRSIGs) covering a zone's DNSKEY RRSet
+    must be no less than two days and no more than one week.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    list-all-forward-reverse-lookup-zones-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}
+      object_title: The list of all forward and reverse lookup zones
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    list-all-forward-lookup-zones-that-not-integrated-active-directory-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object
+            {$_.ZoneName}
+      object_title: The list of all forward lookup zones that are not integrated with Active Directory
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    list-all-forward-lookup-zones-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
+            -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}
+      object_title: The list of all forward lookup zones
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    issigned-setting-each-forward-lookup-zone-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-issigned-setting-each-forward-lookup-zone-variable
+      object_title: The 'IsSigned' setting for each forward lookup zone
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    list-dns-key-signature-validity-periods-zone-signing-keys-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-list-dns-key-signature-validity-periods-zone-signing-variable
+      object_title: The list of DNS key signature validity periods for the zone signing keys
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    list-dns-key-signature-validity-periods-key-signing-keys-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-list-dns-key-signature-validity-periods-key-signing-variable
+      object_title: The list of DNS key signature validity periods for the key signing keys
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  variables:
+    command-get-issigned-setting-each-forward-lookup-zone-variable:
+      title: The command to get the 'IsSigned' setting for each forward lookup zone
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DnsServerZone -Name '
+            datatype: string
+        - values:
+            object: list-all-forward-lookup-zones-object
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IsSigned}} catch {}'
+            datatype: string
+    command-get-list-dns-key-signature-validity-periods-zone-signing-variable:
+      title: The command to get the list of DNS key signature validity periods for the zone signing keys
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DNSServerSigningKey -ZoneName '
+            datatype: string
+        - values:
+            object: list-all-forward-lookup-zones-object
+            field: stdout_line
+        - literal:
+            value: ' | Where-Object KeyType -eq ''ZoneSigningKey'' | ForEach-Object {$_.DnsKeySignatureValidityPeriod.Days
+              * 24 + $_.DnsKeySignatureValidityPeriod.Hours}} catch {Write-Output ''0''}'
+            datatype: string
+    command-get-list-dns-key-signature-validity-periods-key-signing-variable:
+      title: The command to get the list of DNS key signature validity periods for the key signing keys
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-DNSServerSigningKey -ZoneName '
+            datatype: string
+        - values:
+            object: list-all-forward-lookup-zones-object
+            field: stdout_line
+        - literal:
+            value: ' | Where-Object KeyType -eq ''KeySigningKey'' | ForEach-Object {$_.DnsKeySignatureValidityPeriod.Days
+              * 24 + $_.DnsKeySignatureValidityPeriod.Hours}} catch {Write-Output ''0''}'
+            datatype: string
+  states:
+    state-there-are-no-forward-or-reverse-lookup-zones:
+      state_title: There are no forward or reverse lookup zones
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equal
+        datatype: string
+        match: all
+        existence: none
+    state-there-are-no-forward-lookup-zones-that-are-not-integrate:
+      state_title: There are no forward lookup zones that are not integrated with Active Directory
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equal
+        datatype: string
+        match: all
+        existence: none
+    state-the-issigned-setting-for-each-forward-lookup-zone-is-set:
+      state_title: The 'IsSigned' setting for each forward lookup zone is set to 'True'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: 'True'
+        operation: equal
+        datatype: string
+        match: all
+        existence: one
+    state-the-dns-key-signature-validity-period-is-greater-than-or:
+      state_title: The DNS key signature validity period is greater than or equal to 48 hours
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '48'
+        operation: greater_or_equal
+        datatype: integer
+        match: all
+        existence: some
+    state-the-dns-key-signature-validity-period-is-less-than-or-eq:
+      state_title: The DNS key signature validity period is less than or equal to 168 hours
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: '168'
+        operation: less_or_equal
+        datatype: integer
+        match: all
+        existence: some
+  tests:
+    test-dns-server-caching-only-there-no-forward-or-reverse-lookup:
+      test_title: DNS server is caching only (there are no forward or reverse lookup zones)
+      capability: independent.shellcommand
+      object: list-all-forward-reverse-lookup-zones-object
+      states:
+      - state-there-are-no-forward-or-reverse-lookup-zones
+      existence: some
+      match: all
+    test-all-forward-lookup-zones-if-any-integrated-active-directory:
+      test_title: All forward lookup zones (if any) are integrated with Active Directory
+      capability: independent.shellcommand
+      object: list-all-forward-lookup-zones-that-not-integrated-active-directory-object
+      states:
+      - state-there-are-no-forward-lookup-zones-that-are-not-integrate
+      existence: some
+      match: all
+    test-all-forward-lookup-zones-dnssec-signed:
+      test_title: All forward lookup zones are DNSSEC signed
+      capability: independent.shellcommand
+      object: issigned-setting-each-forward-lookup-zone-object
+      states:
+      - state-the-issigned-setting-for-each-forward-lookup-zone-is-set
+      existence: some
+      match: all
+    test-all-forward-lookup-zones-have-dns-key-signature-validity-periods:
+      test_title: All forward lookup zones have DNS key signature validity periods between two days and a week for
+        their zone signing keys
+      capability: independent.shellcommand
+      object: list-dns-key-signature-validity-periods-zone-signing-keys-object
+      states:
+      - state-the-dns-key-signature-validity-period-is-greater-than-or
+      - state-the-dns-key-signature-validity-period-is-less-than-or-eq
+      existence: some
+      match: all
+      states_match: all
+    test-all-forward-lookup-zones-have-dns-key-signature-validity-periods-2:
+      test_title: All forward lookup zones have DNS key signature validity periods between two days and a week for
+        their key signing keys
+      capability: independent.shellcommand
+      object: list-dns-key-signature-validity-periods-key-signing-keys-object
+      states:
+      - state-the-dns-key-signature-validity-period-is-greater-than-or
+      - state-the-dns-key-signature-validity-period-is-less-than-or-eq
+      existence: some
+      match: all
+      states_match: all
+  evaluate:
+    any:
+    - test: test-dns-server-caching-only-there-no-forward-or-reverse-lookup
+    - test: test-all-forward-lookup-zones-if-any-integrated-active-directory
+    - all:
+      - test: test-all-forward-lookup-zones-dnssec-signed
+      - test: test-all-forward-lookup-zones-have-dns-key-signature-validity-periods
+      - test: test-all-forward-lookup-zones-have-dns-key-signature-validity-periods-2

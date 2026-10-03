@@ -1,0 +1,32 @@
+assessment:
+  id: niwc.ms_windows_server_2025.SV-278138.manual
+  version: 1
+  assessment_title: Windows Server 2025 permissions on the Active Directory data files must only allow system administrators
+    (SAs) access.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'This applies to domain controllers. It is not applicable for other systems. Run "Regedit". Navigate
+    to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters". Note the directory locations in the
+    values for: Database log files path DSA Database file By default, they will be \Windows\NTDS. If the locations
+    are different, run the following for each: Open "command prompt (Admin)". Navigate to the NTDS directory (\Windows\NTDS
+    by default). Run "icacls *.*". If the permissions on each file are not as restrictive as the following, this
+    is a finding: NT AUTHORITY\SYSTEM:(I)(F) BUILTIN\Administrators:(I)(F) (I) - permission inherited from parent
+    container (F) - full access'
+  response:
+    type: compliance
+    choices:
+    - value: pass
+      label: Pass
+      outcome: 'true'
+    - value: fail
+      label: Fail
+      outcome: 'false'
+    - value: unknown
+      label: Unknown
+      outcome: unknown
+    - value: not_applicable
+      label: Not applicable
+      outcome: not_applicable
+    allow_comment: true
+    allow_evidence: true

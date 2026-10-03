@@ -1,0 +1,254 @@
+assessment:
+  id: niwc.ms_windows_server_dns.SV-259374.automated
+  version: 8
+  assessment_title: The Windows DNS Server's IP address must be statically defined and configured locally on the
+    server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    list-online-network-adapter-interface-indexes-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          value: Get-NetAdapter | Where-Object Status -EQ 'Up' | ForEach-Object {$_.ifIndex}
+      object_title: The list of online network adapter interface indexes
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    number-online-network-adapter-interface-indexes-object:
+      capability: independent.variable
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          value:
+            variable: number-online-network-adapter-interface-indexes-variable
+      object_title: The number of online network adapter interface indexes
+    ipv4-address-each-online-network-adapter-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-ipv4-address-each-online-network-adapter-variable
+      object_title: The IPv4 address for each online network adapter
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    prefix-length-subnet-mask-each-online-network-adapter-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-prefix-length-subnet-mask-each-online-network-adapter-variable
+      object_title: The prefix length (subnet mask) for each online network adapter
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    default-gateway-each-online-network-adapter-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-default-gateway-each-online-network-adapter-variable
+      object_title: The default gateway for each online network adapter
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    suffix-origin-each-online-network-adapter-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-get-suffix-origin-each-online-network-adapter-variable
+      object_title: The suffix origin for each online network adapter
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  variables:
+    number-online-network-adapter-interface-indexes-variable:
+      title: The number of online network adapter interface indexes
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            object: list-online-network-adapter-interface-indexes-object
+            field: stdout_line
+    command-get-ipv4-address-each-online-network-adapter-variable:
+      title: The command to get the IPv4 address for each online network adapter
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-NetIPConfiguration -InterfaceIndex '
+            datatype: string
+        - values:
+            object: list-online-network-adapter-interface-indexes-object
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IPv4Address.IPAddress}} catch {}'
+            datatype: string
+    command-get-prefix-length-subnet-mask-each-online-network-adapter-variable:
+      title: The command to get the prefix length (subnet mask) for each online network adapter
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-NetIPConfiguration -InterfaceIndex '
+            datatype: string
+        - values:
+            object: list-online-network-adapter-interface-indexes-object
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IPv4Address.PrefixLength}} catch {}'
+            datatype: string
+    command-get-default-gateway-each-online-network-adapter-variable:
+      title: The command to get the default gateway for each online network adapter
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-NetIPConfiguration -InterfaceIndex '
+            datatype: string
+        - values:
+            object: list-online-network-adapter-interface-indexes-object
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IPv4DefaultGateway.NextHop}} catch {}'
+            datatype: string
+    command-get-suffix-origin-each-online-network-adapter-variable:
+      title: The command to get the suffix origin for each online network adapter
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'try {Get-NetIPConfiguration -InterfaceIndex '
+            datatype: string
+        - values:
+            object: list-online-network-adapter-interface-indexes-object
+            field: stdout_line
+        - literal:
+            value: ' | ForEach-Object {$_.IPv4Address.SuffixOrigin}} catch {}'
+            datatype: string
+  states:
+    state-the-number-of-online-network-adapter-interface-indexes-i:
+      state_title: The number of online network adapter interface indexes is 0
+      capability: independent.variable
+      state:
+        field: value
+        value: '0'
+        operation: equals
+        datatype: string
+        entity_check: all
+        entity_existence: only_one_exists
+    state-the-output-is-not-empty:
+      state_title: The output is not empty
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ^.+$
+        operation: match
+        datatype: string
+        match: all
+        existence: one
+    state-all-online-network-adapters-have-a-suffix-origin-equal-t:
+      state_title: All online network adapters have a suffix origin equal to 'Manual'
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: Manual
+        operation: equal
+        datatype: string
+        match: all
+        existence: one
+  tests:
+    test-there-no-online-network-adapters:
+      test_title: There are no online network adapters
+      capability: independent.variable
+      object: number-online-network-adapter-interface-indexes-object
+      check_existence: at_least_one_exists
+      check: all
+      states:
+      - state-the-number-of-online-network-adapter-interface-indexes-i
+    test-all-online-network-adapters-have-ipv4-address:
+      test_title: All online network adapters have an IPv4 address
+      capability: independent.shellcommand
+      object: ipv4-address-each-online-network-adapter-object
+      states:
+      - state-the-output-is-not-empty
+      existence: some
+      match: all
+    test-all-online-network-adapters-have-prefix-length-subnet-mask:
+      test_title: All online network adapters have a prefix length (subnet mask)
+      capability: independent.shellcommand
+      object: prefix-length-subnet-mask-each-online-network-adapter-object
+      states:
+      - state-the-output-is-not-empty
+      existence: some
+      match: all
+    test-all-online-network-adapters-have-default-gateway:
+      test_title: All online network adapters have a default gateway
+      capability: independent.shellcommand
+      object: default-gateway-each-online-network-adapter-object
+      states:
+      - state-the-output-is-not-empty
+      existence: some
+      match: all
+    test-all-online-network-adapters-have-suffix-origin-equal-manual:
+      test_title: All online network adapters have a suffix origin equal to 'Manual'
+      capability: independent.shellcommand
+      object: suffix-origin-each-online-network-adapter-object
+      states:
+      - state-all-online-network-adapters-have-a-suffix-origin-equal-t
+      existence: some
+      match: all
+  evaluate:
+    any:
+    - test: test-there-no-online-network-adapters
+    - all:
+      - test: test-all-online-network-adapters-have-ipv4-address
+      - test: test-all-online-network-adapters-have-prefix-length-subnet-mask
+      - test: test-all-online-network-adapters-have-default-gateway
+      - test: test-all-online-network-adapters-have-suffix-origin-equal-manual

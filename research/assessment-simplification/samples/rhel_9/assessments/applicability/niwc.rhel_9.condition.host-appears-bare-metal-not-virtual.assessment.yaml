@@ -1,0 +1,48 @@
+assessment:
+  id: niwc.rhel_9.condition.host-appears-bare-metal-not-virtual.assessment
+  version: 13
+  assessment_title: Host appears to be bare metal, not virtual.
+  mode: automated
+  class: compliance
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    retrieve-usbguard-rules-list-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: lscpu | grep -P '(?i)hypervisor\s+vendor:\s+\S'
+      object_title: Retrieve usbguard rules list.
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  states:
+    state-confirm-the-existence-of-hypervisor-line:
+      state_title: Confirm the existence of hypervisor line.
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: ''
+        operation: equal
+        datatype: string
+        match: all
+        existence: none
+  tests:
+    test-query-lscpu-indication-hypervisor-vendor:
+      test_title: Query lscpu for indication of a hypervisor vendor.
+      capability: independent.shellcommand
+      object: retrieve-usbguard-rules-list-object
+      states:
+      - state-confirm-the-existence-of-hypervisor-line
+      existence: some
+      match: any
+  evaluate:
+    test: test-query-lscpu-indication-hypervisor-vendor

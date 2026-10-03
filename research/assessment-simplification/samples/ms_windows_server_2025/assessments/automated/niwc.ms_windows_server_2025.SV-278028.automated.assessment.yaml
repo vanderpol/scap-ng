@@ -1,0 +1,301 @@
+assessment:
+  id: niwc.ms_windows_server_2025.SV-278028.automated
+  version: 1
+  assessment_title: Windows Server 2025 FTP servers must be configured to prevent access to the system drive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    get-website-bindings-filter-applied-ones-that-include-ftp-object:
+      capability: windows.appcmd
+      select:
+        identifier_type:
+          value: Site
+          operation: equal
+          datatype: string
+        identifier:
+          value: .*
+          operation: match
+          datatype: string
+        parameter:
+          value: bindings
+          operation: equal
+          datatype: string
+      object_title: Get Website Bindings with filter applied for ones that include FTP
+    get-boot-drive-object:
+      capability: independent.environmentvariable58
+      select:
+        pid: null
+        name:
+          value: SYSTEMDRIVE
+          operation: equal
+          datatype: string
+      object_title: Get boot drive
+    if-site-includes-root-drive-this-finding-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: update-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: ''
+      object_title: If the site includes root of the drive this is a finding.
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    get-program-files-directory-object:
+      capability: independent.environmentvariable58
+      select:
+        pid: null
+        name:
+          value: PROGRAMFILES
+          operation: equal
+          datatype: string
+      object_title: Get the Program Files Directory
+    if-site-includes-program-files-this-finding-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: update-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: ''
+      object_title: If the site includes Program Files this is a finding.
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    get-program-files-x86-directory-object:
+      capability: independent.environmentvariable58
+      select:
+        pid: null
+        name:
+          value: PROGRAMFILES(X86)
+          operation: equal
+          datatype: string
+      object_title: Get the Program Files(x86) Directory
+    if-site-includes-program-files-x86-this-finding-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: update-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: ''
+      object_title: If the site includes Program Files(x86) this is a finding.
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    get-windows-directory-object:
+      capability: independent.environmentvariable58
+      select:
+        pid: null
+        name:
+          value: WINDIR
+          operation: equal
+          datatype: string
+      object_title: Get the Windows Directory
+    if-site-includes-windows-directory-this-finding-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: powershell
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: update-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: ''
+      object_title: If the site includes Windows Directory this is a finding.
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  variables:
+    constant-value-variable:
+      title: ''''
+      kind: constant
+      datatype: string
+      expression:
+        literal: Get-Website '
+    constant-value-variable-2:
+      title: ''''
+      kind: constant
+      datatype: string
+      expression:
+        literal: ''' | Select-Object -ExpandProperty physicalPath'
+    update-variable:
+      title: update
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: constant-value-variable
+        - values:
+            object: get-website-bindings-filter-applied-ones-that-include-ftp-object
+            field: identifier
+        - variable: constant-value-variable-2
+    forward-slash-variable:
+      title: Forward Slash
+      kind: constant
+      datatype: string
+      expression:
+        literal: \
+    boot-drive-forward-slash-added-variable:
+      title: Boot Drive with Forward Slash Added
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: get-boot-drive-object
+            field: value
+        - variable: forward-slash-variable
+    program-files-variable:
+      title: Program Files
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: get-program-files-directory-object
+          field: value
+    program-files-x86-variable:
+      title: Program Files(x86)
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: get-program-files-x86-directory-object
+          field: value
+    windows-directory-variable:
+      title: Windows Directory
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: get-windows-directory-object
+          field: value
+  states:
+    state-results-include-ftp:
+      state_title: results include FTP
+      capability: windows.appcmd
+      state:
+        field: result
+        value: ftp
+        operation: match
+        datatype: string
+        match: all
+        existence: some
+    state-boot-drive-with-forward-slash-added:
+      state_title: Boot Drive with Forward Slash Added
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value:
+          variable: boot-drive-forward-slash-added-variable
+        operation: equal_ci
+        datatype: string
+        match: all
+        variable_match: all
+        existence: some
+    state-program-files:
+      state_title: Program Files
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value:
+          variable: program-files-variable
+        operation: equal_ci
+        datatype: string
+        match: all
+        variable_match: all
+        existence: some
+    state-program-files-x86:
+      state_title: Program Files(x86)
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value:
+          variable: program-files-x86-variable
+        operation: equal_ci
+        datatype: string
+        match: all
+        variable_match: all
+        existence: some
+    state-windows-directory:
+      state_title: Windows Directory
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value:
+          variable: windows-directory-variable
+        operation: equal_ci
+        datatype: string
+        match: all
+        variable_match: all
+        existence: some
+  tests:
+    test-if-site-includes-root-drive-this-finding:
+      test_title: If the site includes root of the drive this is a finding.
+      capability: independent.shellcommand
+      object: if-site-includes-root-drive-this-finding-object
+      existence: none
+      match: all
+    test-if-site-includes-program-files-this-finding:
+      test_title: If the site includes Program Files this is a finding.
+      capability: independent.shellcommand
+      object: if-site-includes-program-files-this-finding-object
+      existence: none
+      match: all
+    test-if-site-includes-program-files-x86-this-finding:
+      test_title: If the site includes Program Files(x86) this is a finding.
+      capability: independent.shellcommand
+      object: if-site-includes-program-files-x86-this-finding-object
+      existence: none
+      match: all
+    test-if-site-includes-windows-directory-this-finding:
+      test_title: If the site includes Windows Directory this is a finding.
+      capability: independent.shellcommand
+      object: if-site-includes-windows-directory-this-finding-object
+      existence: none
+      match: all
+  evaluate:
+    all:
+    - test: test-if-site-includes-root-drive-this-finding
+    - test: test-if-site-includes-program-files-this-finding
+    - test: test-if-site-includes-program-files-x86-this-finding
+    - test: test-if-site-includes-windows-directory-this-finding

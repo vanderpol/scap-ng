@@ -1,0 +1,56 @@
+assessment:
+  id: niwc.rhel_9.condition.rhel9-not-fips.assessment
+  version: 4
+  assessment_title: RHEL9 and Not FIPS
+  mode: automated
+  class: compliance
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    proc-sys-crypto-fips-enabled-object:
+      capability: independent.textfilecontent54
+      select:
+        full_path:
+          value: /proc/sys/crypto/fips_enabled
+          operation: equal
+          datatype: string
+        pattern:
+          value: ^(\d+)$
+          operation: match
+          datatype: string
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+      object_title: /proc/sys/crypto/fips_enabled
+      filesystem: any
+      collect:
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: all_object_elements_fullfilled
+  states:
+    state-independent-textfilecontent54:
+      state_title: null
+      capability: independent.textfilecontent54
+      state:
+        field: subexpression
+        value: '1'
+        operation: equal
+        datatype: integer
+        match: all
+        existence: some
+  tests:
+    test-fips-enabled-1:
+      test_title: fips_enabled == 1
+      capability: independent.textfilecontent54
+      object: proc-sys-crypto-fips-enabled-object
+      states:
+      - state-independent-textfilecontent54
+      existence: all
+      match: all
+  evaluate:
+    not:
+      test: test-fips-enabled-1

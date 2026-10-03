@@ -1,0 +1,38 @@
+assessment:
+  id: niwc.ms_windows_server_2025.condition.windows-openssh.assessment
+  version: 3
+  assessment_title: Windows OpenSSH
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-registry-object:
+      capability: windows.registry
+      select:
+        hive:
+          operation: case insensitive equals
+          datatype: string
+          value: HKEY_LOCAL_MACHINE
+        key:
+          operation: pattern match
+          datatype: string
+          value: ^(?i)SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component\sBased\sServicing\\Packages\\OpenSSH-Server-Package~.+$
+        name:
+          operation: equals
+          datatype: string
+          nil: true
+          value: ''
+      object_title: null
+  states: {}
+  tests:
+    test-openssh-server-installed:
+      test_title: OpenSSH Server is installed
+      capability: windows.registry
+      object: windows-registry-object
+      check_existence: at_least_one_exists
+      check: all
+  evaluate:
+    test: test-openssh-server-installed

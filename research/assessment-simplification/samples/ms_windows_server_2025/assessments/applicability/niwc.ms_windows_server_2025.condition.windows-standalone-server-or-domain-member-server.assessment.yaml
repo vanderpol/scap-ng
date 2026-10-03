@@ -1,0 +1,69 @@
+assessment:
+  id: niwc.ms_windows_server_2025.condition.windows-standalone-server-or-domain-member-server.assessment
+  version: 1
+  assessment_title: Windows Standalone Server or Domain Member Server
+  mode: automated
+  class: compliance
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
+  states:
+    state-standalone-server:
+      state_title: Standalone Server
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '2'
+              operation: equal
+              datatype: string
+              match: all
+              existence: some
+    state-domain-member-server:
+      state_title: Domain Member Server
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '3'
+              operation: equal
+              datatype: string
+              match: all
+              existence: some
+  tests:
+    test-system-windows-standalone-server:
+      test_title: The system is a Windows Standalone Server
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-standalone-server
+      existence: some
+      match: all
+    test-system-windows-domain-member-server:
+      test_title: The system is a Windows Domain Member Server
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-domain-member-server
+      existence: some
+      match: all
+  evaluate:
+    any:
+    - test: test-system-windows-standalone-server
+    - test: test-system-windows-domain-member-server

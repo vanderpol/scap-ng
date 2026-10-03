@@ -1,0 +1,61 @@
+assessment:
+  id: niwc.ms_windows_server_2025.condition.windows-domain-controller.assessment
+  version: 2
+  assessment_title: Windows Domain Controller
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      object_title: null
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
+  states:
+    state-backup-domain-controller:
+      state_title: Backup Domain Controller
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '4'
+              operation: equal
+              datatype: string
+              match: all
+              existence: some
+    state-primary-domain-controller:
+      state_title: Primary Domain Controller
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          match: all
+          existence: some
+          fields:
+            domainrole:
+              value: '5'
+              operation: equal
+              datatype: string
+              match: all
+              existence: some
+  tests:
+    test-system-windows-domain-controller:
+      test_title: The system is a Windows Domain Controller
+      capability: windows.wmi.query
+      object: windows-wmi57-object
+      states:
+      - state-backup-domain-controller
+      - state-primary-domain-controller
+      existence: some
+      match: all
+      states_match: any
+  evaluate:
+    test: test-system-windows-domain-controller

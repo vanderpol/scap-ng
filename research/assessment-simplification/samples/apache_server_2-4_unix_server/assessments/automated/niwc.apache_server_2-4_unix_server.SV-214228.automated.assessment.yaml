@@ -1,0 +1,479 @@
+assessment:
+  id: niwc.apache_server_2-4_unix_server.SV-214228.automated
+  version: 2
+  assessment_title: The Apache web server must limit the number of allowed simultaneous session requests.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    gather-unique-apache-http-installation-paths-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          value: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
+        pattern:
+          operation: equals
+          datatype: string
+          value: ^\/\S+(\/httpd|\/apache2)\s*
+      object_title: Gather unique apache http installation paths
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-httpd-root-files-via-apachectl-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: httpd-root-apachectl-v-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: HTTPD_ROOT
+      object_title: Gather HTTPD_ROOT files via apachectl
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-server-config-file-files-via-apachectl-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: server-config-file-apachectl-v-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: SERVER_CONFIG_FILE
+      object_title: Gather SERVER_CONFIG_FILE files via apachectl
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-include-statements-from-httpd-conf-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: shell-command-check-all-include-include-optional-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: \S+
+      object_title: Gather Include statements from httpd.conf
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-all-keepalive-data-from-httpd-all-include-conf-files-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: .+
+      object_title: Gather all KeepAlive data from httpd and all Include conf files
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-all-loaded-config-files-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: command-gather-httpd-apache2-list-all-loaded-configuration-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: ' \('
+      object_title: Gather all loaded config files
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-all-keepalive-data-from-all-loaded-conf-files-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: shell-command-check-keepalive-in-all-loaded-conf-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: .+
+      object_title: Gather all KeepAlive data from all loaded conf files
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-all-maxkeepaliverequests-data-from-httpd-all-include-conf-files-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: MaxKeepAliveRequests (\d+)
+      object_title: Gather all MaxKeepAliveRequests data from httpd and all Include conf files
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+    gather-all-maxkeepaliverequests-data-from-all-loaded-conf-files-object:
+      capability: independent.shellcommand
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          variable_check: all
+          value:
+            variable: shell-command-check-maxkeepaliverequests-in-all-loaded-conf-files-variable
+        pattern:
+          operation: equals
+          datatype: string
+          value: MaxKeepAliveRequests (\d+)
+      object_title: Gather all MaxKeepAliveRequests data from all loaded conf files
+      collect:
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+  variables:
+    apache-base-install-directories-unix-variable:
+      title: Apache base install directories (unix)
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: gather-unique-apache-http-installation-paths-object
+              field: stdout_line
+          pattern: (^\/.+\/)httpd|(^\/.+/)apache2
+    httpd-root-apachectl-v-variable:
+      title: httpd_root to apachectl -V
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-base-install-directories-unix-variable
+        - literal:
+            value: apachectl -V | grep -i 'httpd_root'
+            datatype: string
+    filepath-httpd-root-variable:
+      title: Filepath to HTTPD_ROOT
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: gather-httpd-root-files-via-apachectl-object
+              field: stdout_line
+          pattern: ' -D HTTPD_ROOT="(.+)"'
+    server-config-file-apachectl-v-variable:
+      title: server_config_file to apachectl -V
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-base-install-directories-unix-variable
+        - literal:
+            value: apachectl -V | grep -i 'server_config_file'
+            datatype: string
+    relative-server-config-file-variable:
+      title: relative to SERVER_CONFIG_FILE
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: gather-server-config-file-files-via-apachectl-object
+              field: stdout_line
+          pattern: ' -D SERVER_CONFIG_FILE="(.+)"'
+    filepath-http-conf-file-variable:
+      title: Filepath to http conf file
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: filepath-httpd-root-variable
+        - literal:
+            value: /
+            datatype: string
+        - variable: relative-server-config-file-variable
+    shell-command-check-all-include-include-optional-files-variable:
+      title: shell command to check for all Include and Include Optional files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iEHn ''^\s*Include\s+|^\s*IncludeOptional\s+'' '
+            datatype: string
+        - variable: filepath-http-conf-file-variable
+    all-included-conf-files-from-include-refernces-in-httd-conf-variable:
+      title: All included conf files from Include refernces in httd.conf
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: filepath-httpd-root-variable
+        - literal:
+            value: /
+            datatype: string
+        - regex_capture:
+            value:
+              values:
+                object: gather-include-statements-from-httpd-conf-object
+                field: stdout_line
+            pattern: \S+\s+(\S+)\s*
+    merged-included-conf-files-from-include-refernces-in-httd-conf-variable:
+      title: merged included conf files from Include refernces in httd.conf
+      kind: local
+      datatype: string
+      expression:
+        merge:
+          values:
+            variable: all-included-conf-files-from-include-refernces-in-httd-conf-variable
+          delimiter: ' '
+          sort: document
+          order: ascending
+    httpd-conf-merged-included-conf-files-from-include-refernces-in-variable:
+      title: httpd.conf and merged included conf files from Include refernces in httd.conf
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: filepath-http-conf-file-variable
+        - literal:
+            value: ' '
+            datatype: string
+        - variable: merged-included-conf-files-from-include-refernces-in-httd-conf-variable
+    shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable:
+      title: shell command to check KeepAlive in httpd.conf and all Include conf files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iHn ''^\s*KeepAlive'' '
+            datatype: string
+        - variable: httpd-conf-merged-included-conf-files-from-include-refernces-in-variable
+    apache-path-httpd-or-apache2-variable:
+      title: Apache path to httpd or apache2
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            values:
+              object: gather-unique-apache-http-installation-paths-object
+              field: stdout_line
+          pattern: '(^\/.+\/httpd|^\/.+\/apache2) '
+    command-gather-httpd-apache2-list-all-loaded-configuration-files-variable:
+      title: command to gather httpd/apache2 list of all loaded configuration files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-path-httpd-or-apache2-variable
+        - literal:
+            value: ' -t -D DUMP_INCLUDES'
+            datatype: string
+    all-loaded-configuration-filepaths-variable:
+      title: All loaded configuration filepaths
+      kind: local
+      datatype: string
+      expression:
+        unique:
+          regex_capture:
+            value:
+              values:
+                object: gather-all-loaded-config-files-object
+                field: stdout_line
+            pattern: \(.*\) (/.*)
+    merged-list-all-loaded-config-files-variable:
+      title: Merged list of all loaded config files
+      kind: local
+      datatype: string
+      expression:
+        merge:
+          values:
+            variable: all-loaded-configuration-filepaths-variable
+          delimiter: ' '
+          sort: document
+          order: ascending
+    shell-command-check-keepalive-in-all-loaded-conf-files-variable:
+      title: shell command to check KeepAlive in all loaded conf files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iHn ''^\s*KeepAlive'' '
+            datatype: string
+        - variable: merged-list-all-loaded-config-files-variable
+    shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable:
+      title: shell command to check MaxKeepAliveRequests in httpd.conf and all Include conf files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iHn ''^\s*MaxKeepAliveRequests'' '
+            datatype: string
+        - variable: httpd-conf-merged-included-conf-files-from-include-refernces-in-variable
+    shell-command-check-maxkeepaliverequests-in-all-loaded-conf-files-variable:
+      title: shell command to check MaxKeepAliveRequests in all loaded conf files
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'grep -iHn ''^\s*MaxKeepAliveRequests'' '
+            datatype: string
+        - variable: merged-list-all-loaded-config-files-variable
+  states:
+    state-keepalive-is-on:
+      state_title: KeepAlive is On
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: \s*KeepAlive On
+        operation: match
+        datatype: string
+        match: all
+        existence: some
+    state-keepalive-is-on-if-found:
+      state_title: KeepAlive is On (if found)
+      capability: independent.shellcommand
+      state:
+        field: stdout_line
+        value: \s*KeepAlive On
+        operation: match
+        datatype: string
+        match: all
+        existence: optional
+    state-maxkeepaliverequests-not-less-than-100:
+      state_title: MaxKeepAliveRequests not less than 100
+      capability: independent.shellcommand
+      state:
+        field: subexpression
+        value: '100'
+        operation: greater_or_equal
+        datatype: integer
+        match: all
+        existence: some
+    state-maxkeepaliverequests-is-not-less-than-100-if-found:
+      state_title: MaxKeepAliveRequests is not less than 100 (if found)
+      capability: independent.shellcommand
+      state:
+        field: subexpression
+        value: '100'
+        operation: greater_or_equal
+        datatype: integer
+        match: all
+        existence: optional
+  tests:
+    test-verify-that-keepalive-directive-defined-configured-on-in-httpd-conf:
+      test_title: Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or
+        included conf files
+      capability: independent.shellcommand
+      object: gather-all-keepalive-data-from-httpd-all-include-conf-files-object
+      states:
+      - state-keepalive-is-on
+      existence: some
+      match: all
+    test-if-keepalive-directive-defined-in-other-loaded-configuration-files-verify:
+      test_title: If the KeepAlive directive is defined in other loaded configuration files, verify it is configured
+        to On
+      capability: independent.shellcommand
+      object: gather-all-keepalive-data-from-all-loaded-conf-files-object
+      states:
+      - state-keepalive-is-on-if-found
+      existence: some
+      match: all
+    test-verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf:
+      test_title: Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf
+        or included conf files
+      capability: independent.shellcommand
+      object: gather-all-maxkeepaliverequests-data-from-httpd-all-include-conf-files-object
+      states:
+      - state-maxkeepaliverequests-not-less-than-100
+      existence: some
+      match: all
+    test-if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify:
+      test_title: If the MaxKeepAliveRequests directive is defined in other loaded configuration files, verify it
+        is configured to 100 or greater
+      capability: independent.shellcommand
+      object: gather-all-maxkeepaliverequests-data-from-all-loaded-conf-files-object
+      states:
+      - state-maxkeepaliverequests-is-not-less-than-100-if-found
+      existence: some
+      match: all
+  evaluate:
+    all:
+    - test: test-verify-that-keepalive-directive-defined-configured-on-in-httpd-conf
+    - test: test-if-keepalive-directive-defined-in-other-loaded-configuration-files-verify
+    - test: test-verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf
+    - test: test-if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify

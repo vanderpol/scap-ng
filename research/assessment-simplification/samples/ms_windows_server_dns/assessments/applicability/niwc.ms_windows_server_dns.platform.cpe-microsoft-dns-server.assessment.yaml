@@ -1,0 +1,44 @@
+assessment:
+  id: niwc.ms_windows_server_dns.platform.cpe-microsoft-dns-server.assessment
+  version: 3
+  assessment_title: Microsoft DNS Server
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    select-ids-from-get-windowsfeature-where-installed-object:
+      capability: windows.wmi.query
+      object_title: Select the ids from 'Get-WindowsFeature | Where Installed'
+      collect:
+        namespace: root\cimv2
+        query: SELECT name FROM win32_serverfeature where ID = 13
+  states:
+    state-dns-server-role-13-is-enabled:
+      state_title: DNS Server (Role 13) is enabled
+      capability: windows.wmi.query
+      state:
+        field: result
+        record:
+          match: all
+          existence: some
+          fields:
+            name:
+              value: DNS Server
+              operation: equal
+              datatype: string
+              match: all
+              existence: some
+  tests:
+    test-dns-server-installed:
+      test_title: DNS Server is installed
+      capability: windows.wmi.query
+      object: select-ids-from-get-windowsfeature-where-installed-object
+      states:
+      - state-dns-server-role-13-is-enabled
+      existence: some
+      match: all
+  evaluate:
+    test: test-dns-server-installed

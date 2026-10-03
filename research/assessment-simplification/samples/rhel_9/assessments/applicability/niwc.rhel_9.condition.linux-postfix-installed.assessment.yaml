@@ -1,0 +1,29 @@
+assessment:
+  id: niwc.rhel_9.condition.linux-postfix-installed.assessment
+  version: 1
+  assessment_title: Linux with postfix installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    linux-rpminfo-object:
+      capability: linux.rpminfo
+      select:
+        package_name:
+          value: postfix
+          operation: equal
+          datatype: string
+      object_title: null
+  states: {}
+  tests:
+    test-postfix-package-installed:
+      test_title: The postfix package is installed
+      capability: linux.rpminfo
+      object: linux-rpminfo-object
+      existence: some
+      match: all
+  evaluate:
+    test: test-postfix-package-installed

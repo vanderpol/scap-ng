@@ -4,6 +4,7 @@ Start with the [visitor guide](../START-HERE.md), [current design](iterations/00
 
 - Iterations 001 and 002 were removed from the active working tree during the lossless rebaseline. Their exact trees remain available from tag `pre-rebaseline-2026-10-02` and are indexed in `archive/README.md`.
 - Iteration 003: mixed current design, current generated review candidates, earlier slices and historical source/package snapshots. Read its [status guide](iterations/003/README.md) before selecting content.
+- [Assessment simplification research handoff](assessment-simplification/README.md): 12 pinned Rule/Assessment cases and staged Codex instructions for discovering clearer, equally accurate methods. Research inputs, not accepted new syntax.
 - Datastream/vulnerability directories: retained topic research, not current implementation or source-generation acceptance evidence.
 
 [Complete inventory](../docs/audit/repository-inventory.tsv.gz) · [Decision reconciliation](../docs/decision-reconciliation.md) · [Archives](../archive/README.md).

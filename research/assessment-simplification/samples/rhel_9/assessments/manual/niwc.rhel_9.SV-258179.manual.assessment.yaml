@@ -1,0 +1,34 @@
+assessment:
+  id: niwc.rhel_9.SV-258179.manual
+  version: 1
+  assessment_title: RHEL 9 must audit all uses of the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr,
+    and lremovexattr system calls.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'Verify RHEL 9 is configured to audit the execution of the "setxattr", "fsetxattr", "lsetxattr", "removexattr",
+    "fremovexattr", and "lremovexattr" system calls with the following command: $ sudo auditctl -l | grep xattr
+    -a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000
+    -F auid!=-1 -F key=perm_mod -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr
+    -F auid>=1000 -F auid!=-1 -F key=perm_mod -a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr
+    -F auid=0 -F key=perm_mod -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr
+    -F auid=0 -F key=perm_mod If both the "b32" and "b64" audit rules are not defined for the "setxattr", "fsetxattr",
+    "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls, or any of the lines returned are
+    commented out, this is a finding.'
+  response:
+    type: compliance
+    choices:
+    - value: pass
+      label: Pass
+      outcome: 'true'
+    - value: fail
+      label: Fail
+      outcome: 'false'
+    - value: unknown
+      label: Unknown
+      outcome: unknown
+    - value: not_applicable
+      label: Not applicable
+      outcome: not_applicable
+    allow_comment: true
+    allow_evidence: true
