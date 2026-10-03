@@ -112,4 +112,7 @@ validation limits and [the known result](../../tests/result-package-0.2.0/README
 Host account and installed VIB additions are documented in the
 [capability reference](../../specification/assessment/reference/README.md), with
 [synthetic known results](../../tests/esx-host-0.2.0/README.md). Four of the 22
-new OVAL 6.0 Test contracts now have draft native mappings; 18 remain.
+OVAL 6.0-only Test contracts have draft native mappings. The remaining count is
+**not** an active 0.2.0 backlog: ESX expansion is deferred pending upstream
+guidance, and both Kubernetes Tests are reviewed/deferred for 0.2.0 in
+[the disposition](../../transition/kubernetes-oval6-disposition-2026-10-03.md).
