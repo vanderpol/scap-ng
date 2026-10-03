@@ -48,13 +48,32 @@ Variables are typed value collections with zero/one/many cardinality and status.
 An empty string is one string value, not a zero-value Variable. Do not invent
 replacement values to hide zero cardinality or a resolution failure.
 
-The shared OVAL-derived contract distinguishes reference contexts: zero values
-at an Object selector can mean that Object does not exist; zero values at an
-expected State entity reference produce an error before comparison. Those rules
-do not automatically define every zero-value behavior for this native direct
-Test source. A complete direct-Variable zero-value/result table and independent
-execution cases remain required; this reference does not invent one from the
-removed Object wrapper. See [Variable semantics §5](../../../research/iterations/003/design/assessment-evaluation-semantics.md)
+For the native direct `variable.value` Test, a referenced Variable that resolves
+successfully but produces **zero values SHALL produce the technical outcome
+`error` before State/value comparison**. This follows the pinned OVAL 5.12.3
+Variable contract, which requires an analysis error when a Variable returns no
+value. Removing the legacy `variable_object` wrapper SHALL NOT turn that source
+error into Object absence, an empty successful Item set, Boolean false, unknown,
+or not-applicable.
+
+This direct-Test rule is deliberately narrower than every possible Variable use
+inside an Object-selection graph. Object collection semantics remain governed by
+the applicable Object/capability contract. A State entity that references a
+zero-valued Variable likewise cannot perform its comparison and produces error at
+that comparison layer. Missing Variable references remain invalid authored
+content rather than runtime zero cardinality.
+
+Evaluators SHALL preserve the distinction among:
+- zero values: resolved Variable with no values → `error`;
+- one empty string value for datatype string: one ordinary value;
+- failed/errored Variable resolution: `error` with the underlying diagnostic;
+- unavailable/indeterminate source where the finalized capability contract yields
+  `unknown`: `unknown`, not zero values;
+- one or many resolved values: continue normal typed comparison and aggregation.
+
+Independent conformance fixtures SHALL cover zero/one/many values for constant,
+external, and derived Variables where those source forms can legitimately produce
+the cardinality. See [Variable semantics §5](../../../research/iterations/003/design/assessment-evaluation-semantics.md)
 and #128/#131.
 
 Test `existence` and `match` remain explicit structural fields. Missing Variable
