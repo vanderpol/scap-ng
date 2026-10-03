@@ -30,7 +30,16 @@ Complete converted Benchmarks, compiled `.scapng` packages, corpus-wide reports,
 
 Small representative source/examples belong in Git. Large generated products do not. A completed review iteration freezes the full artifact URL and provenance rather than copying the artifact back into Git.
 
-Example current full-corpus run: https://github.com/vanderpol/scap-ng/actions/runs/37004465863
+## Full NIWC Current review build
+
+- Workflow run: https://github.com/vanderpol/scap-ng/actions/runs/37080131809
+- Artifact name: `niwc-current-full-review`
+- SCAP-NG source commit: `3505d47729237debc0481b99daf318da4ae288c2`
+- Pinned NIWC source revision: `8c8e5dff860af6b1290ee9273a282db24278f8d5`
+- Scope: all 65 pinned NIWC Current SCAP 1.4 packages are accounted for. Successfully converted packages are included under `source/`, exact-semantics normalized trees under `normalized/`, compiled readable bundles under `packages/`, and blocked-package/validation/provenance details under `evidence/`.
+
+The workflow run above is the canonical download location for this review cycle. Open the run and download the `niwc-current-full-review` artifact.
+
 
 ## Iterations
 
