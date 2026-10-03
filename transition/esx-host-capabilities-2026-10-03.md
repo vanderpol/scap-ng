@@ -1,5 +1,8 @@
 # First new ESXi host capability group — 2026-10-03
 
+> **Superseding scope note — 2026-10-03:** this file is a historical implementation checkpoint. Further ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 freeze blocker. Older “tests remain” counts below are inventory history, not current tasking. See `handoff-0.2.0-content-development-2026-10-03.md`.
+
+
 Base: merged audit/documentation checkpoint
 `6282b7785f08f02c9694d4fb5b60d1a065435a2e`.
 
