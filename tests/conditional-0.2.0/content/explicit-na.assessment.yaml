@@ -1,0 +1,59 @@
+# EXPERIMENTAL syntax; outcome fixtures are separate from authored source.
+assessment:
+  id: conditional.explicit-na
+  version: 1
+  assessment_title: 'Experimental conditional: explicit-na'
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.experimental.conditional
+    version: proposal-01
+  variables:
+    guard:
+      variable_title: guard
+      kind: constant
+      datatype: boolean
+      value: true
+    then:
+      variable_title: then
+      kind: constant
+      datatype: boolean
+      value: true
+  states:
+    is-true:
+      state_title: Value is true
+      capability: variable.value
+      state:
+        field: value
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+  tests:
+    test-guard:
+      test_title: guard
+      capability: variable.value
+      variable: guard
+      states:
+      - is-true
+      existence: some
+      match: all
+    test-then:
+      test_title: then
+      capability: variable.value
+      variable: then
+      states:
+      - is-true
+      existence: some
+      match: all
+  evaluate:
+    if:
+      test: test-guard
+    then:
+      test: test-then
+    else:
+      not_applicable:
+        reason: The optional component is absent, so its configuration requirement
+          does not apply.
