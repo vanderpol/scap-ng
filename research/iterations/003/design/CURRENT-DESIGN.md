@@ -137,3 +137,14 @@ per run. Final Item inclusion/import controls, production lineage, multi-context
 result-package composition and full vendor cases remain. See
 [the result checkpoint](../../../../transition/assessment-results-2026-10-03.md)
 and [standalone known-result content](../../../../tests/assessment-results-0.2.0/README.md).
+
+## Draft Item inclusion/import checkpoint — 2026-10-03
+
+The result helper now defaults to all available local observations and offers
+consumed scope retaining every recorded Test/Variable/field-use Item. Availability
+accounting, exact source-byte pins, target/binding checks, local import identities
+and origin chains are represented; imported acquisition/evidence incompleteness
+is preserved conservatively. This is producer serialization, not a new authored
+selector or truth operator. Collection-cache execution/authorization, real lineage,
+result-package composition and target conformance remain. See
+[the materialization checkpoint](../../../../transition/item-materialization-2026-10-03.md).

@@ -15,6 +15,7 @@ from referencing import Registry, Resource
 from assessment_expression import AssessmentExpressionEvaluator, load_assessments
 from collected_item_contract_v02 import capability_schema, context_errors
 from reported_elements import project_items, _check_redaction
+from item_materialization_v02 import materialize_observations, validate_materialization
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / 'schema/v0.2.0'
@@ -108,6 +109,9 @@ def validate_result_set(document, assessments):
             target = item['provenance'].get('target_ref')
             if target != document['target_ref']:
                 raise ValueError('Item target provenance mismatch')
+        validate_materialization(result)
+        for variable in variables.values():
+            check_refs(variable.get('item_refs',[]),items,'Variable/Item')
         for obj in objects.values():
             if obj['capability'] != source['objects'][obj['id']]['capability']:
                 raise ValueError('Object capability mismatch')
@@ -194,7 +198,7 @@ def validate_result_set(document, assessments):
             raise ValueError('Expression replay differs from recorded scheduling')
     return document
 
-def assemble_result_set(assessments, expression, observations, *, include_reports=True):
+def assemble_result_set(assessments, expression, observations, *, include_reports=True, item_scope='all'):
     """Observations are per-invocation evidence, supplied by a trusted producer.
 
     This evaluator supports one target and one shared binding context per run.
@@ -219,8 +223,8 @@ def assemble_result_set(assessments, expression, observations, *, include_report
     if set(observations) != set(by_id): raise ValueError('Observations must match the executed invocation closure')
     results = []
     for identity, invocation in by_id.items():
-        source = assessments[identity]; evidence = copy.deepcopy(observations[identity])
-        if set(evidence) - {'tests','objects','items','variables','diagnostics','field_uses','logical_complete','population_complete','evidence_complete','manual_response','input_bindings','binding_set_id','consumed_organizational_inputs','evidence','evidence_summary','reason'}:
+        source = assessments[identity]; evidence = materialize_observations(observations[identity],scope=item_scope)
+        if set(evidence) - {'tests','objects','items','variables','diagnostics','field_uses','logical_complete','population_complete','evidence_complete','manual_response','input_bindings','binding_set_id','consumed_organizational_inputs','evidence','evidence_summary','reason','item_materialization'}:
             raise ValueError('Unexpected observation attributes')
         row = dict(evidence, result_schema_version='0.2.0', execution_id=invocation['invocation_ref'],
                    assessment={'id':identity,'version':source['version']}, purpose=source['purpose'],

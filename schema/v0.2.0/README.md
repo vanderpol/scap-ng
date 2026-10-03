@@ -85,3 +85,13 @@ optional derived Item reports. Shared Item/result types now have v0.2.0 IDs.
 The source-aware helper validates capability Item contracts and recorded
 scheduling offline. The result-set wrapper is development transport, not a final
 result package. See the [known-result examples](../../tests/assessment-results-0.2.0/README.md).
+
+## Item inclusion and import provenance
+
+The [materialization checkpoint](../../transition/item-materialization-2026-10-03.md)
+adds producer-side `all`/`consumed` Item scope with explicit availability accounting,
+local Variable Item references and verified source-byte observation imports.
+`all` is the default; consumed/decisive evidence remains mandatory. Source context,
+origin history and incompleteness survive copying. This does not implement a
+collection cache or invent a content-authored inclusion control. See
+[standalone expected results](../../tests/item-materialization-0.2.0/README.md).

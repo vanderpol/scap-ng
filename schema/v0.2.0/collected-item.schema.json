@@ -288,9 +288,92 @@
             "item_ref": {
               "type": "string",
               "minLength": 1
+            },
+            "source_execution_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "binding_set_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_completeness": {
+              "$ref": "result-types.schema.json#/$defs/completeness"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "source_digest"
+                ]
+              },
+              "then": {
+                "required": [
+                  "source_execution_ref",
+                  "binding_set_id",
+                  "source_completeness"
+                ]
+              }
+            }
+          ]
+        },
+        "import_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "result_ref",
+              "item_ref"
+            ],
+            "properties": {
+              "result_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "item_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_execution_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "binding_set_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_completeness": {
+                "$ref": "result-types.schema.json#/$defs/completeness"
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "source_digest"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "source_execution_ref",
+                    "binding_set_id",
+                    "source_completeness"
+                  ]
+                }
+              }
+            ]
+          }
         }
       },
       "additionalProperties": false
