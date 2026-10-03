@@ -1,5 +1,10 @@
 # Assessment simplification research
 
+Latest brainstorming: [open editor, recipes and templates, editor 06](editor-06/README.md).
+Proposes a shared native authoring core for multiple frontends, optional versioned
+recipes, native repair/detachment and reusable catalogs. Concepts only; no editor
+implementation, portability, usability or execution claims.
+
 Latest corpus reading: [all RHEL 9 and Windows Server 2025 Check Texts, requirements 05](requirements-05/README.md).
 All 736 requirements were read, with pinned original text, interpretation notes,
 twelve expanded problem families and source discrepancies. Coverage verification

@@ -1,5 +1,14 @@
 # Research receiving-session checkpoint
 
+## Latest continuation: open editor and recipes, 2026-10-03
+
+Start with [editor-06](editor-06/README.md) and its [handoff](editor-06/HANDOFF.md)
+for the owner's request to brainstorm an open-source editor usable across
+environments. Native editing, copied templates, versioned recipe expansion and
+shared Assessments are distinct; native output, explicit regeneration/detachment,
+scope/error visibility and frontend-independent core are recommended experiments.
+No implementation or adoption is claimed. Full-corpus interpretation remains below.
+
 ## Latest continuation: full requirement reading, 2026-10-03
 
 Start with [requirements-05](requirements-05/README.md) and its
