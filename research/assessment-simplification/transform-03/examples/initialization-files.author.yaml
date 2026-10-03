@@ -1,0 +1,36 @@
+# EXPERIMENTAL authoring form. Fixed homes illustrate scope; no account discovery.
+format: experimental-permission-authoring-v1
+id: research.transform.initialization-files
+title: Initialization files have no permissions beyond the stated allowance
+objects:
+  alice-initialization-files:
+    files:
+      directory: /home/alice
+      names_matching: '^\.[^\s\.]+'
+      depth: 1
+      recurse: symlinks
+      filesystem: any
+  root-initialization-files:
+    files:
+      directory: /root
+      names_matching: '^\.[^\s\.]+'
+      depth: 1
+      recurse: symlinks
+      filesystem: any
+tests:
+  protect-user-files:
+    every: alice-initialization-files
+    missing: allowed
+    permissions_at_most:
+      owner: [read, write, execute]
+      group: [read]
+      other: []
+      special: []
+  protect-root-files:
+    every: root-initialization-files
+    missing: violation
+    permissions_at_most:
+      owner: [read, write, execute]
+      group: [read]
+      other: []
+      special: []

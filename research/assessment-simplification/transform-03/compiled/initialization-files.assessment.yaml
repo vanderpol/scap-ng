@@ -1,0 +1,242 @@
+# EXPERIMENTAL compiled authoring; unchanged native target.
+assessment:
+  id: research.transform.initialization-files
+  version: 1
+  assessment_title: Initialization files have no permissions beyond the stated allowance
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.1.0
+  objects:
+    object-alice-initialization-files:
+      object_title: alice-initialization-files
+      capability: unix.file
+      select:
+        directory:
+          value: /home/alice
+          operation: equal
+          datatype: string
+        name:
+          value: ^\.[^\s\.]+
+          operation: match
+          datatype: string
+      traversal:
+        max_depth: 1
+        recurse: symlinks
+      filesystem: any
+    object-root-initialization-files:
+      object_title: root-initialization-files
+      capability: unix.file
+      select:
+        directory:
+          value: /root
+          operation: equal
+          datatype: string
+        name:
+          value: ^\.[^\s\.]+
+          operation: match
+          datatype: string
+      traversal:
+        max_depth: 1
+        recurse: symlinks
+      filesystem: any
+  states:
+    state-protect-user-files-group-write:
+      state_title: 'protect-user-files: group_write must be false'
+      capability: unix.file
+      state:
+        field: group_write
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-group-execute:
+      state_title: 'protect-user-files: group_execute must be false'
+      capability: unix.file
+      state:
+        field: group_execute
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-other-read:
+      state_title: 'protect-user-files: other_read must be false'
+      capability: unix.file
+      state:
+        field: other_read
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-other-write:
+      state_title: 'protect-user-files: other_write must be false'
+      capability: unix.file
+      state:
+        field: other_write
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-other-execute:
+      state_title: 'protect-user-files: other_execute must be false'
+      capability: unix.file
+      state:
+        field: other_execute
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-setuid:
+      state_title: 'protect-user-files: setuid must be false'
+      capability: unix.file
+      state:
+        field: setuid
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-setgid:
+      state_title: 'protect-user-files: setgid must be false'
+      capability: unix.file
+      state:
+        field: setgid
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-user-files-sticky:
+      state_title: 'protect-user-files: sticky must be false'
+      capability: unix.file
+      state:
+        field: sticky
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-group-write:
+      state_title: 'protect-root-files: group_write must be false'
+      capability: unix.file
+      state:
+        field: group_write
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-group-execute:
+      state_title: 'protect-root-files: group_execute must be false'
+      capability: unix.file
+      state:
+        field: group_execute
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-other-read:
+      state_title: 'protect-root-files: other_read must be false'
+      capability: unix.file
+      state:
+        field: other_read
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-other-write:
+      state_title: 'protect-root-files: other_write must be false'
+      capability: unix.file
+      state:
+        field: other_write
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-other-execute:
+      state_title: 'protect-root-files: other_execute must be false'
+      capability: unix.file
+      state:
+        field: other_execute
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-setuid:
+      state_title: 'protect-root-files: setuid must be false'
+      capability: unix.file
+      state:
+        field: setuid
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-setgid:
+      state_title: 'protect-root-files: setgid must be false'
+      capability: unix.file
+      state:
+        field: setgid
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+    state-protect-root-files-sticky:
+      state_title: 'protect-root-files: sticky must be false'
+      capability: unix.file
+      state:
+        field: sticky
+        value: false
+        operation: equal
+        datatype: boolean
+        match: all
+        existence: some
+  tests:
+    test-protect-user-files:
+      test_title: protect-user-files
+      capability: unix.file
+      object: object-alice-initialization-files
+      existence: optional
+      match: all
+      states_match: all
+      states:
+      - state-protect-user-files-group-write
+      - state-protect-user-files-group-execute
+      - state-protect-user-files-other-read
+      - state-protect-user-files-other-write
+      - state-protect-user-files-other-execute
+      - state-protect-user-files-setuid
+      - state-protect-user-files-setgid
+      - state-protect-user-files-sticky
+    test-protect-root-files:
+      test_title: protect-root-files
+      capability: unix.file
+      object: object-root-initialization-files
+      existence: some
+      match: all
+      states_match: all
+      states:
+      - state-protect-root-files-group-write
+      - state-protect-root-files-group-execute
+      - state-protect-root-files-other-read
+      - state-protect-root-files-other-write
+      - state-protect-root-files-other-execute
+      - state-protect-root-files-setuid
+      - state-protect-root-files-setgid
+      - state-protect-root-files-sticky
+  evaluate:
+    all:
+    - test: test-protect-user-files
+    - test: test-protect-root-files

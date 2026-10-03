@@ -1,0 +1,101 @@
+{
+  "status": "bounded_lowering_passed_not_scanner_equivalence",
+  "receiving_commit": "acdfa66b77d531a37e8fd36ad199c94883d3a7a5",
+  "branch": "main",
+  "checks": [
+    {
+      "label": "transform-tests",
+      "command": [
+        "/workspace/.venvs/scap-ng/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/assessment-simplification/transform-03",
+        "-p",
+        "test_transform.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "transform-tests.txt"
+    },
+    {
+      "label": "native-schema",
+      "command": [
+        "/workspace/.venvs/scap-ng/bin/python",
+        "tools/validate_native_json_schemas.py",
+        "research/assessment-simplification/transform-03/compiled",
+        "--schema-dir",
+        "schema/v0.1.0"
+      ],
+      "exit_code": 0,
+      "log": "native-schema.txt"
+    },
+    {
+      "label": "authoring-contract",
+      "command": [
+        "/workspace/.venvs/scap-ng/bin/python",
+        "tools/check_current_authoring_contract.py",
+        "research/assessment-simplification/transform-03/compiled"
+      ],
+      "exit_code": 0,
+      "log": "authoring-contract.txt"
+    },
+    {
+      "label": "diagnostic-demo",
+      "command": [
+        "/workspace/.venvs/scap-ng/bin/python",
+        "research/assessment-simplification/transform-03/demo.py"
+      ],
+      "exit_code": 0,
+      "log": "diagnostic-demo.txt"
+    },
+    {
+      "label": "six-state-regressions",
+      "command": [
+        "/workspace/.venvs/scap-ng/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools",
+        "-p",
+        "test_oval_result_truth_tables*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "six-state-regressions.txt"
+    }
+  ],
+  "semantic_cases": {
+    "source_permission_modes": 4096,
+    "nontrivial_allowances": 4095,
+    "mode_checks_per_allowance": 4,
+    "eight_comparison_outcomes": 65536,
+    "two_comparison_six_state_combinations": 36
+  },
+  "size": {
+    "author_lines_including_comments": 36,
+    "compiled_lines_including_comments": 242,
+    "objects": 2,
+    "states": 16,
+    "tests": 2
+  },
+  "sha256": {
+    "research/assessment-simplification/transform-03/examples/initialization-files.author.yaml": "e1236c382f7658e0292cdedb9557f8d48236f675fe9a8aa74130808eac725f18",
+    "research/assessment-simplification/transform-03/compiled/initialization-files.assessment.yaml": "d633199a3e8a3b8854886293a7a3c2cb53418e7f7d5e7cf00cce035c87ae4a10",
+    "research/assessment-simplification/evidence/rhel_9/SV-257889/source-oval.xml": "7be599449201b641e35a6a0c005b3dfbd812fdc1a94889b90b0b2a161513ffd4",
+    "schema/v0.1.0/assessment.schema.json": "b667e7708ebcea9026a2ea980b0f5033776ba3e30aaed2cdae8c799eca1e9eb4",
+    "schema/v0.1.0/capability-common.schema.json": "7c44f605806d4302fc29f37daf4031d4e43c819ec9f1d3d56e0be64839b8cdcf",
+    "schema/v0.1.0/capability-mappings/unix.file.json": "772dc9a608bb1a7131dc473a7016bebfca527ff23894d40ad58de7bbc0ba16ef",
+    "tools/generate_capability_schema.py": "43e0b89a95fa269af293483611c0cc167dd1bd6300e2984de93cb75aa615ac25",
+    "tools/oval_result_truth_tables.py": "e969bd3bcd955cd5bc7dc4acdc5d1255c56939ad3f93984cf2b744ef402d40ee"
+  },
+  "limits": [
+    "No target scan, account discovery, native traversal or new collector execution.",
+    "Permission predicate compared with pinned source XML; complete source scope not compiled.",
+    "Test status control flow reuses pinned repository helpers, not an independent scanner oracle.",
+    "Deep capability schemas generated from reviewed mapping and validated inside transform tests.",
+    "No fresh upstream Self-Assertion corpus or author usability trial."
+  ]
+}

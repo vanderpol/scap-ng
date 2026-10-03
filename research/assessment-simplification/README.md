@@ -1,5 +1,12 @@
 # Assessment simplification research
 
+Latest continuation: [requirement-oriented authoring compiler, transform 03](transform-03/README.md).
+A readable permission allowance compiles to current independent Boolean States,
+with exhaustive source-predicate and partial-result evidence. Its
+[comparison](transform-03/COMPARISON.md) distinguishes compiler conveniences from
+new DNS/Apache/audit execution contracts. Experimental research only; the current
+schema/converter and single external review surface are unchanged.
+
 Owner-corrected direction: [new assessment methods, method 02](method-02/README.md).
 This explores direct Object requirements, semantic permission allowances,
 configuration constraints and symbolic audit coverage. The earlier graph/table
