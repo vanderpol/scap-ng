@@ -1,0 +1,25 @@
+# EXPERIMENTAL direct requirements; acquisition is not implemented here.
+# Classified-network and platform applicability remain separate Assessments.
+objects:
+  zones:
+    capability: windows.dns.forward-zones
+    scope:
+      exclude_types: [Forwarder]
+      exclude_names: [TrustAnchors]
+      auto_created: false
+      reverse: false
+tests:
+  DNSSEC records:
+    every: zones
+    as: zone
+    empty: allowed
+    unless:
+      every: zones
+      as: integrated-zone
+      empty: allowed
+      require:
+        integrated: {equals: true}
+    require:
+      signed: {equals: true}
+      records: {include: [RRSIG, DNSKEY, NSEC3]}
+evaluate: all

@@ -1,6 +1,11 @@
 # Assessment simplification research
 
-Latest continuation: [refinement 01](refinement-01/README.md) adds finite-table
+Owner-corrected direction: [new assessment methods, method 02](method-02/README.md).
+This explores direct Object requirements, semantic permission allowances,
+configuration constraints and symbolic audit coverage. The earlier graph/table
+work below remains evidence; it is not the main authoring-method goal.
+
+Previous continuation: [refinement 01](refinement-01/README.md) adds finite-table
 expansion with full bounded source-contract comparison, typed DNS acquisition
 experiments, an Apache occurrence library, adversarial tests and a new handoff.
 The initial study below is preserved as the baseline.

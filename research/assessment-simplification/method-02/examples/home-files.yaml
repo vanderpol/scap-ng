@@ -1,0 +1,42 @@
+# EXPERIMENTAL method-02. Source plans below are specified, not executed here.
+objects:
+  user-files:
+    capability: unix.file
+    scope:
+      beneath_account_homes: {uid_at_least: 1000, exclude_home: /}
+      account_name_pattern: '[\w]+'
+      file_name_pattern: '^\.[^\s\.]+'
+      exclude_type: directory
+      traversal: {direction: down, depth: 1, follow_links: true, filesystems: any}
+  root-files:
+    capability: unix.file
+    scope:
+      beneath_account_homes: {uid_at_most: 0, exclude_home: /}
+      account_name_pattern: '[\w]+'
+      file_name_pattern: '^\.[^\s\.]+'
+      exclude_type: directory
+      traversal: {direction: down, depth: 1, follow_links: true, filesystems: any}
+tests:
+  User initialization files:
+    every: user-files
+    as: file
+    empty: allowed
+    require:
+      permissions:
+        at_most:
+          owner: [read, write, execute]
+          group: [read]
+          other: []
+          special: []
+  Root initialization files:
+    every: root-files
+    as: file
+    empty: violation
+    require:
+      permissions:
+        at_most:
+          owner: [read, write, execute]
+          group: [read]
+          other: []
+          special: []
+evaluate: all

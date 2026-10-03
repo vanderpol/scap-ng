@@ -1,0 +1,615 @@
+{
+  "kind": "synthetic method experiments, not target scans",
+  "cases": {
+    "permissions": {
+      "result": "false",
+      "tests": {
+        "User initialization files": "false",
+        "Root initialization files": "true"
+      },
+      "findings": [
+        {
+          "test": "User initialization files",
+          "item": "/home/alice/.profile",
+          "field": "permissions",
+          "operator": "at_most",
+          "result": "false",
+          "detail": {
+            "forbidden": [
+              "other.read"
+            ]
+          }
+        },
+        {
+          "test": "Root initialization files",
+          "item": "/root/.profile",
+          "field": "permissions",
+          "operator": "at_most",
+          "result": "true",
+          "detail": {
+            "forbidden": []
+          }
+        }
+      ]
+    },
+    "dns": {
+      "result": "false",
+      "tests": {
+        "DNSSEC records": "false"
+      },
+      "findings": [
+        {
+          "test": "DNSSEC records",
+          "item": "example.test",
+          "field": "integrated",
+          "operator": "equals",
+          "result": "false",
+          "detail": null
+        },
+        {
+          "test": "DNSSEC records",
+          "item": "example.test",
+          "field": "signed",
+          "operator": "equals",
+          "result": "true",
+          "detail": null
+        },
+        {
+          "test": "DNSSEC records",
+          "item": "example.test",
+          "field": "records",
+          "operator": "include",
+          "result": "false",
+          "detail": {
+            "missing": [
+              "NSEC3"
+            ]
+          }
+        }
+      ]
+    },
+    "apache": {
+      "result": "false",
+      "tests": {
+        "KeepAlive requirements": "false"
+      },
+      "findings": [
+        {
+          "test": "KeepAlive requirements",
+          "item": "httpd-one",
+          "field": "main",
+          "operator": "settings",
+          "result": "false",
+          "detail": {
+            "settings": [
+              {
+                "name": "KeepAlive",
+                "result": "false",
+                "occurrences": [
+                  {
+                    "occurrence": "conf:1",
+                    "result": "false"
+                  },
+                  {
+                    "occurrence": "conf:2",
+                    "result": "true"
+                  }
+                ]
+              },
+              {
+                "name": "MaxKeepAliveRequests",
+                "result": "true",
+                "occurrences": [
+                  {
+                    "occurrence": "conf:3",
+                    "result": "true"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "test": "KeepAlive requirements",
+          "item": "httpd-one",
+          "field": "loaded",
+          "operator": "settings",
+          "result": "true",
+          "detail": {
+            "settings": [
+              {
+                "name": "KeepAlive",
+                "result": "true",
+                "occurrences": []
+              },
+              {
+                "name": "MaxKeepAliveRequests",
+                "result": "true",
+                "occurrences": []
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "audit": {
+      "result": "false",
+      "coverage": [
+        {
+          "architecture": "b32",
+          "syscall": "setxattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "setxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "fsetxattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "fsetxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "lsetxattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "lsetxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "removexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "removexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "fremovexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "fremovexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "lremovexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 1
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b32",
+          "syscall": "lremovexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 2
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 2
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "setxattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 3
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "setxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "fsetxattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 3
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "fsetxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "lsetxattr",
+          "actor": "root-logins",
+          "result": "false",
+          "witnesses": [],
+          "gaps": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": null
+            }
+          ]
+        },
+        {
+          "architecture": "b64",
+          "syscall": "lsetxattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "removexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 3
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "removexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "fremovexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 3
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "fremovexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "lremovexattr",
+          "actor": "root-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                0,
+                0
+              ],
+              "rule_line": 3
+            }
+          ],
+          "gaps": []
+        },
+        {
+          "architecture": "b64",
+          "syscall": "lremovexattr",
+          "actor": "user-logins",
+          "result": "true",
+          "witnesses": [
+            {
+              "auid": [
+                1000,
+                1000
+              ],
+              "rule_line": 4
+            },
+            {
+              "auid": [
+                1001,
+                4294967294
+              ],
+              "rule_line": 4
+            }
+          ],
+          "gaps": []
+        }
+      ]
+    }
+  },
+  "explanations": [
+    "/home/alice/.profile allows other.read, which is outside the stated permission allowance.",
+    "example.test has RRSIG and DNSKEY records but is missing NSEC3.",
+    "httpd-one explicitly declares KeepAlive Off at conf:1; a later On does not satisfy an all-occurrence requirement.",
+    "Loaded b64 rules do not cover lsetxattr for audit user ID 0."
+  ]
+}

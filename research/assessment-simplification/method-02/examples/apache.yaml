@@ -1,0 +1,21 @@
+# EXPERIMENTAL typed, explicit configuration observations; no shell traversal.
+# main and loaded are distinct acquisition groups, scoped to one installation.
+objects:
+  installations:
+    capability: apache.installations
+    scope: {configuration: explicit-occurrences, filesystem_acquisition: native}
+tests:
+  KeepAlive requirements:
+    every: installations
+    as: installation
+    empty: violation
+    require:
+      main:
+        settings:
+          KeepAlive: {equals: 'On', presence: required}
+          MaxKeepAliveRequests: {at_least: 100, presence: required}
+      loaded:
+        settings:
+          KeepAlive: {equals: 'On', presence: optional}
+          MaxKeepAliveRequests: {at_least: 100, presence: optional}
+evaluate: all

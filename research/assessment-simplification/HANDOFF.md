@@ -1,6 +1,11 @@
 # Research receiving-session checkpoint
 
-Latest continuation: [refinement-01/HANDOFF.md](refinement-01/HANDOFF.md).
+Current research direction and handoff: [method-02/HANDOFF.md](method-02/HANDOFF.md).
+The owner clarified that new assessment methods understandable without OVAL
+graph expertise are the goal. Earlier table/graph preservation checkpoints remain
+valuable but do not satisfy that aim by themselves.
+
+Prior continuation: [refinement-01/HANDOFF.md](refinement-01/HANDOFF.md).
 Its source-contract/table, DNS and Apache experiments advance the bounded work
 listed below. This original checkpoint is retained as historical evidence.
 

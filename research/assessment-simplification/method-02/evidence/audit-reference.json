@@ -1,0 +1,24 @@
+{
+  "url": "https://raw.githubusercontent.com/linux-audit/audit-userspace/ccd29d145591aba9dd5a01b3207d3dbd18e2413b/docs/auditctl.8",
+  "revision": "ccd29d145591aba9dd5a01b3207d3dbd18e2413b",
+  "sha256": "24c4ca2f15182bea236977f10ca7cf172af26a83590a16d6dd8cce5b8490e190",
+  "limits": "Current upstream documentation, not the RHEL9 deployed audit/kernel version or target conformance.",
+  "excerpts": [
+    {
+      "term": "first match",
+      "excerpt": "s at the top of the list instead of the bottom. This is because the event triggers on the first matching rule.\n.TP\n.B always\nAllocate an audit context, always fill it in at syscall entry time, and always write out a record at syscall exit time.\n.RE\n.TP\n.BI \\-A\\  list , action\nAdd rule to the beginning \\fIlist\\fP with \\fIaction\\fP.\n.TP\n\\fB\\-C\\fP [\\fIf\\fP\\fB=\\fP\\fIf\\fP | \\fIf\\fP\\fB!=\\fP\\fIf\\fP]\nBuild an inter-field comparison rule: field, operation, field. You may pass multiple comparisons on a single command line. Each one must start with \\fB\\-C\\fP. Each inter-field equation is anded with each other as well as equations starting with \\fB\\-F\\fP to trigger an audit record. There are 2 operators supported - equal, and not equal. Valid fields are:\n.RS\n.TP 12\n.B auid, uid, euid, suid, "
+    },
+    {
+      "term": "never",
+      "excerpt": " This means that the most likely use for this filter is with rules that have an action of never since nothing has to be done to allow events to be recorded.\n.TP\n.B exclude\nAdd a rule to the event type exclusion filter list. This list is used to filter events that you do not want to see. For example, if you do not want to see any avc messages, you would using this list to record that. Events can be excluded by process ID, user ID, group ID, login user ID, message type, subject context, or executable name. The action is ignored and uses its default of \"never\".\n.TP\n.B filesystem\nAdd a rule that will be applied to a whole filesystem. The filesystem must be identified with a fstype field. Normally this filter is used to exclude any events for a whole filesystem such as tracefs or debu"
+    },
+    {
+      "term": "arch=",
+      "excerpt": " action, key, and fields are identical. For example:\n\n.nf\n.B auditctl \\-a always,exit \\-F arch=b64 \\-S openat \\-F success=0\n.fi\n.nf\n.B auditctl \\-a always,exit \\-F arch=b64 \\-S truncate \\-F success=0\n.fi\n\ncould be re-written as one rule:\n\n.nf\n.B auditctl \\-a always,exit \\-F arch=b64 \\-S openat \\-S truncate \\-F success=0\n.fi\n\nAlso, try to use file system auditing wherever practical. This improves performance. For example, if you were wanting to capture all failed opens & truncates like above, but were only concerned about files in /etc and didn't care about /usr or /sbin, its possible to use this rule:\n\n.nf\n.B auditctl \\-a always,exit \\-F arch=b64 \\-S openat,truncate \\-F dir=/etc \\-F success=0\n.fi\n\nThis will be higher performance since the kernel will not evaluate it each and ever"
+    },
+    {
+      "term": "b32",
+      "excerpt": "ant to use the 32 bit syscall table and your machine supports 32 bit, you can also use\n.B b32\nfor the arch. The same applies to the 64 bit syscall table, you can use\n.B b64.\nIn this way, you can write rules that are somewhat arch independent because the family type will be auto detected. However, syscalls can be arch specific and what is available on x86_64, may not be available on ppc. The arch directive should precede the \\-S option so that auditctl knows which internal table to use to look up the syscall numbers.\n.TP\n.B auid\nThe original ID the user logged in with. Its an abbreviation of audit uid. Sometimes its referred to as loginuid. Either the user account text or number may be used.\n.TP\n.B devmajor\nDevice Major Number\n.TP\n.B devminor\nDevice Minor Number\n.TP\n.B dir\nFull Pa"
+    }
+  ]
+}
