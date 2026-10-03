@@ -211,7 +211,7 @@ not OVAL 6.0 ingestion or a broader adoption of existing 6.0 differences.
 The [known-result content](../../../../tests/esx-host-0.2.0/README.md) validates
 source shapes, references, synthetic Items and reporting, not live VMware
 acquisition/comparison. See [the checkpoint](../../../../transition/esx-host-capabilities-2026-10-03.md).
-Twenty other new Tests and full vendor/target conformance remain in #128/#131.
+The other OVAL 6.0-only Tests are not an active 0.2.0 implementation backlog. ESX expansion is deferred pending upstream guidance; the two Kubernetes Tests are reviewed/deferred for 0.2.0. Full vendor/target conformance remains under #128/#131.
 
 
 ## New ESXi host account and VIB slice — draft 0.2.0
