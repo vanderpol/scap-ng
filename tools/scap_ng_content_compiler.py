@@ -230,6 +230,7 @@ def validate_draft_expression_assessments(assessments):
     """Validate the explicit 0.2.0 slice after dependency binding, not 0.1.0."""
     from validate_native_json_schemas import build_validators, document_errors
     from assessment_expression import AssessmentExpressionEvaluator
+    from reported_elements import source_errors
     validators = None
     for aid, assessment in assessments.items():
         if assessment.get("specification", {}).get("version") != "0.2.0":
@@ -239,6 +240,9 @@ def validate_draft_expression_assessments(assessments):
         errors = list(document_errors(validators["assessment.schema.json"], {"assessment": assessment}))
         if errors:
             raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
+        reporting_errors = source_errors(assessment)
+        if reporting_errors:
+            raise ValueError(f"{aid}: invalid reported_elements: {reporting_errors[0]}")
         graph = {}
         def collect(identity):
             if identity in graph:

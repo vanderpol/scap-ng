@@ -71,3 +71,7 @@ An expression-stage result is not a complete Assessment Result. Connecting its
 trace to the complete 0.2.0 Item/Test/State/result-package graph, target acquisition
 conformance, and the remaining release features still precede 0.2.0 promotion.
 See [the integration checkpoint](../../transition/conditional-integration-2026-10-03.md).
+
+## Reported elements draft
+
+The [single-commit reporting checkpoint](../../transition/reported-elements-2026-10-03.md) adds Test-only `reported_elements`: `all` by default, `compared`, or a unique array of top-level Item field names. It provides generated capability overlays and a marked derived Item report, preserves canonical truth and source completeness, and keeps `redact_result` as the separate cross-result confidentiality control. Full Assessment Result integration and actual field-use lineage production remain release prerequisites.

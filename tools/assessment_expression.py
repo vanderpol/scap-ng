@@ -49,6 +49,11 @@ class AssessmentExpressionEvaluator:
         for identity, assessment in assessments.items():
             if assessment.get("id") != identity:
                 raise ContentError("assessment_identity", identity)
+            if assessment.get("specification", {}).get("version") == "0.2.0" or any("reported_elements" in test for test in assessment.get("tests", {}).values()):
+                from reported_elements import source_errors
+                errors = source_errors(assessment)
+                if errors:
+                    raise ContentError("reported_elements", errors[0])
             for alias, dep in assessment.get("dependencies", {}).items():
                 if not isinstance(dep, dict) or not isinstance(dep.get("expected_id"), str):
                     raise ContentError("dependency_shape", alias)
