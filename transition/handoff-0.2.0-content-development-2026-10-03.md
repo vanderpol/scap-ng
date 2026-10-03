@@ -18,24 +18,29 @@ For OVAL 6.0, focus only on genuinely **new Tests/capabilities**. Preserve the O
 
 ## Remaining 0.2.0 closure work
 
-Before handing broad content expansion to Codex, complete and record these bounded items:
+Before handing broad content expansion to Codex, complete and record these bounded items.
 
-1. **Direct Variable zero-value semantics**
+Current progress at the latest documentation checkpoint: items 1–3 have semantic
+dispositions; item 2 also has semantic-validator regressions. Item 1 has a focused
+truth-table regression. Item 4 is in reconciliation. Item 5 remains the final gate.
+
+1. **Direct Variable zero-value semantics — DISPOSITIONED, CI EVIDENCE PENDING**
    - Specify the expected Test behavior when a directly tested Variable resolves to zero values.
    - Add focused positive/negative/six-state conformance cases as applicable.
    - Make the result deterministic enough that downstream content authors do not invent different interpretations.
 
-2. **Typed authored-literal policy**
+2. **Typed authored-literal policy — DISPOSITIONED/ENFORCED, CI EVIDENCE PENDING**
    - Resolve the representation/validation boundary for typed authored values, especially boolean textual values such as `"false"` versus native JSON boolean `false`.
    - Define when lexical conversion is permitted and when authoring is invalid.
    - Add independent semantic/validation tests.
 
-3. **OVAL 6.0 new-Test disposition after ESX deferral**
+3. **OVAL 6.0 new-Test disposition after ESX deferral — COMPLETE FOR 0.2.0 SCOPE**
    - Reconcile the two Kubernetes new Tests identified by the pinned audit.
-   - Either add a native 0.2.0 mapping plus small known-result content, or explicitly defer/unsupported them with rationale.
+   - Both Kubernetes Tests are explicitly deferred for 0.2.0; see [the disposition](kubernetes-oval6-disposition-2026-10-03.md).
+   - `kubepsp_test` targets removed PodSecurityPolicy; `kubectl_test` awaits a native Kubernetes resource/API model and conformance content.
    - Do not reopen the broader OVAL 6.0 delta.
 
-4. **Documentation/version reconciliation**
+4. **Documentation/version reconciliation — IN PROGRESS**
    - Update coverage and transition language that still says large numbers of OVAL 6 Tests “remain” when those counts include deferred ESX work.
    - Reconcile schema/reference/result/result-package documentation and capability matrices with the final owner-approved scope.
    - Preserve 0.1.0 behavior and historical checkpoints.
