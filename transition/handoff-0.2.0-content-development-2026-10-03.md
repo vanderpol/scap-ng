@@ -44,6 +44,7 @@ Current progress at the latest documentation checkpoint: items 1–4 are disposi
    - Preserve 0.1.0 behavior and historical checkpoints.
 
 5. **Exact-head validation and freeze checkpoint**
+   - Follow [the explicit freeze criteria](0.2.0-freeze-criteria-2026-10-03.md); do not broaden the claim beyond those evidence layers.
    - Run the maintained schema/meta-validation, semantic validation, authoring-contract, result-package, preservation and relevant bundle/compiler tests on one exact commit.
    - Require successful Windows and Linux CI for that exact technical checkpoint.
    - Record exact commit SHA, workflow evidence, source pins, known limitations and explicit deferrals.
