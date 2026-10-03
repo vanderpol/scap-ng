@@ -226,6 +226,35 @@ def resolve_assessment(source_root: Path, rule_path: Path, ref: str) -> tuple[Pa
     return target, doc
 
 
+def validate_draft_expression_assessments(assessments):
+    """Validate the explicit 0.2.0 slice after dependency binding, not 0.1.0."""
+    from validate_native_json_schemas import build_validators, document_errors
+    from assessment_expression import AssessmentExpressionEvaluator
+    from reported_elements import source_errors
+    validators = None
+    for aid, assessment in assessments.items():
+        if assessment.get("specification", {}).get("version") != "0.2.0":
+            continue
+        if validators is None:
+            validators = build_validators(Path(__file__).resolve().parents[1] / "schema/v0.2.0")
+        errors = list(document_errors(validators["assessment.schema.json"], {"assessment": assessment}))
+        if errors:
+            raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
+        reporting_errors = source_errors(assessment)
+        if reporting_errors:
+            raise ValueError(f"{aid}: invalid reported_elements: {reporting_errors[0]}")
+        graph = {}
+        def collect(identity):
+            if identity in graph:
+                return
+            node = assessments[identity]
+            graph[identity] = node
+            for dependency in node.get("dependencies", {}).values():
+                collect(dependency["expected_id"])
+        collect(aid)
+        AssessmentExpressionEvaluator(graph)
+
+
 def compile_benchmark(source_root: Path, benchmark_dir: Path):
     benchmark_path = benchmark_dir / "benchmark.yaml"
     benchmark_doc = load_yaml(benchmark_path)
@@ -236,6 +265,14 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
     members: dict[str, bytes] = {}
     object_index: dict[str, dict] = {}
     assessment_docs: dict[str, tuple[Path, dict]] = {}
+
+    def remember_assessment(aid, source_path, doc):
+        previous = assessment_docs.get(aid)
+        if previous is not None and previous[0] != source_path:
+            raise ValueError(f"duplicate Assessment identity {aid}: {previous[0]} vs {source_path}")
+        if previous is not None:
+            return  # Preserve an already compiled shared dependency.
+        assessment_docs[aid] = (source_path, doc)
 
     def add_object(object_id: str, kind: str, member: str, obj: dict, source_path: Path):
         if object_id in object_index:
@@ -283,7 +320,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
                         source_root, applicability_path, ref
                     )
                     aid = assessment_doc["assessment"]["id"]
-                    assessment_docs[aid] = (target, assessment_doc)
+                    remember_assessment(aid, target, assessment_doc)
                     updated["assessment"] = aid
                 conditions[condition_id] = updated
         elif isinstance(source_conditions, list):
@@ -296,7 +333,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
                     source_root, applicability_path, row["assessment"]
                 )
                 aid = assessment_doc["assessment"]["id"]
-                assessment_docs[aid] = (target, assessment_doc)
+                remember_assessment(aid, target, assessment_doc)
                 updated = json.loads(json.dumps(row))
                 updated["assessment"] = aid
                 conditions.append(updated)
@@ -332,7 +369,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
                 source_root, rule_path, choice["assessment"]
             )
             aid = assessment_doc["assessment"]["id"]
-            assessment_docs[aid] = (target, assessment_doc)
+            remember_assessment(aid, target, assessment_doc)
             choice["assessment"] = aid
         rid = rule["id"]
         add_object(
@@ -342,6 +379,44 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
             compiled,
             rule_path,
         )
+
+    # Resolve every declared edge, including unused/unselected branches, before
+    # packaging. A dependency is an immutable manifest object, never a source path.
+    active, finished = set(), set()
+    def close_dependencies(aid):
+        if aid in active:
+            raise ValueError(f"Assessment dependency cycle: {aid}")
+        if aid in finished:
+            return
+        if len(active) >= 200:
+            raise ValueError("Assessment dependency depth budget exceeded")
+        active.add(aid)
+        source_path, doc = assessment_docs[aid]
+        compiled_doc = json.loads(json.dumps(doc))
+        for alias, dependency in compiled_doc["assessment"].get("dependencies", {}).items():
+            if not isinstance(dependency, dict) or not isinstance(dependency.get("assessment"), str):
+                raise ValueError(f"{aid}: invalid Assessment dependency {alias}")
+            target_path, target_doc = resolve_assessment(source_root, source_path, dependency["assessment"])
+            # Resolve symlinks too; lexical containment alone is insufficient.
+            if not target_path.resolve().is_relative_to(source_root.resolve()):
+                raise ValueError(f"{aid}: dependency escapes corpus root: {alias}")
+            target = target_doc["assessment"]
+            for key, actual in (("expected_id", target["id"]), ("expected_version", target.get("version")), ("purpose", target.get("purpose"))):
+                if dependency.get(key) is not None and dependency[key] != actual:
+                    raise ValueError(f"{aid}: dependency {alias} {key} mismatch")
+            remember_assessment(target["id"], target_path, target_doc)
+            close_dependencies(target["id"])
+            dependency.update(assessment=target["id"], expected_id=target["id"], expected_version=target.get("version"))
+        assessment_docs[aid] = (source_path, compiled_doc)
+        active.remove(aid)
+        finished.add(aid)
+
+    for aid in list(assessment_docs):
+        close_dependencies(aid)
+
+    validate_draft_expression_assessments({
+        aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()
+    })
 
     for aid, (source_path, doc) in sorted(assessment_docs.items()):
         add_object(
@@ -570,6 +645,36 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
                         f"{package}: Rule {object_id} choice {selector} Assessment "
                         f"{aid} does not resolve"
                     )
+
+        assessments = {}
+        for identity, row in objects.items():
+            if row["type"] == "assessment":
+                assessments[identity] = json.loads(zf.read(row["path"]))["assessment"]
+        active, finished = set(), set()
+        def verify_dependencies(identity):
+            if identity in active:
+                raise ValueError(f"{package}: Assessment dependency cycle: {identity}")
+            if identity in finished:
+                return
+            if len(active) >= 200:
+                raise ValueError(f"{package}: Assessment dependency depth budget exceeded")
+            active.add(identity)
+            for alias, dependency in assessments[identity].get("dependencies", {}).items():
+                target_id = dependency.get("assessment")
+                target = assessments.get(target_id)
+                if target is None:
+                    raise ValueError(f"{package}: Assessment {identity} dependency {alias} does not resolve")
+                if dependency.get("expected_id") != target_id or dependency.get("expected_version") != target.get("version"):
+                    raise ValueError(f"{package}: Assessment {identity} dependency {alias} identity/version mismatch")
+                if dependency.get("purpose") is not None and dependency["purpose"] != target.get("purpose"):
+                    raise ValueError(f"{package}: Assessment {identity} dependency {alias} purpose mismatch")
+                verify_dependencies(target_id)
+            active.remove(identity)
+            finished.add(identity)
+        for identity in assessments:
+            verify_dependencies(identity)
+
+        validate_draft_expression_assessments(assessments)
 
         if verify_signature and sig.get("format") == "cms-detached-der":
             verify_cms_signature(

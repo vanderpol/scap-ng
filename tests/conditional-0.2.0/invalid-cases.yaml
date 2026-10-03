@@ -1,0 +1,45 @@
+# Mutations of the valid source registry; these must fail before execution.
+cases:
+  - id: missing-else
+    path: [conditional.local, evaluate, else]
+    operation: delete
+    expected_error: expression_shape
+  - id: missing-test-in-inactive-branch
+    path: [conditional.local, evaluate, else]
+    value: {test: test-missing}
+    expected_error: missing_test
+  - id: undeclared-dependent-assessment
+    path: [conditional.local, evaluate, else]
+    value: {assessment: unsigned-content}
+    expected_error: undeclared_dependency
+  - id: missing-dependency-target
+    path: [conditional.dependent, dependencies, role, expected_id]
+    value: conditional.absent
+    expected_error: missing_dependency
+  - id: wrong-dependency-version
+    path: [conditional.dependent, dependencies, role, expected_version]
+    value: 2
+    expected_error: dependency_version
+  - id: cycle-even-if-never-selected
+    path: [conditional.role, dependencies]
+    value:
+      cyclic:
+        expected_id: conditional.dependent
+        expected_version: 1
+    expected_error: dependency_cycle
+  - id: organizational-input-cannot-name-branch
+    path: [conditional.local, evaluate, if]
+    value: {input: branch-name}
+    expected_error: expression_shape
+  - id: no-command-construction
+    path: [conditional.local, evaluate, else]
+    value: {command: injected-command}
+    expected_error: expression_shape
+  - id: empty-compound-guard
+    path: [conditional.local, evaluate, if]
+    value: {all: []}
+    expected_error: empty_expression
+  - id: missing-not-applicable-explanation
+    path: [conditional.explicit-na, evaluate, else]
+    value: {not_applicable: {reason: ' '}}
+    expected_error: not_applicable_reason

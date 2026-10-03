@@ -13,13 +13,7 @@ ITEM_ID = "https://scap-ng.dev/experimental/0.2.0/collected-item.schema.json"
 TYPES_ID = "https://scap-ng.dev/experimental/0.2.0/result-types.schema.json"
 STATUSES = ["exists", "does_not_exist", "error", "not_collected"]
 # New fields are result-only. Values are resolved in the observed target namespace.
-NAMES = {
-    "unix.file": {"owner_user_name": "owner_uid", "owner_group_name": "owner_gid"},
-    "unix.process58": {"user_name": "user_id", "real_user_name": "ruid", "login_user_name": "loginuid"},
-    "linux.inetlisteningservers": {"user_name": "user_id"},
-    "unix.password": {"primary_group_name": "group_id"},
-    "macos.accountinfo": {"primary_group_name": "gid"},
-}
+NAMES = json.loads((ROOT / "schema/v0.2.0/result-field-extensions.json").read_text())["capabilities"]
 
 
 def shared(root=ROOT):

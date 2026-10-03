@@ -117,3 +117,7 @@ The earlier permission for Tailoring to refine publisher Parameter values is sup
 ## Informational policy disposition — retained working control
 
 Owner direction, 2026-10-01: retain Rule `role` for informational/reporting-only use until an adequate alternative is agreed. It belongs to Rule policy, not the Assessment technical truth domain. Assessment-native informational and eventual role replacement remain research/Board topics; earlier replacement proposals do not authorize removal. See specification/results/results.md.
+
+## Conditional normalization scope — 2026-10-03 owner direction
+
+Automatic normalization to conditional evaluation and conditional-candidate detection are removed from planned features; #126 is closed as not planned. Boolean-pattern equivalence does not preserve the full six-state domain or collection/evidence behavior. Preserve the counterexample regression. Source-authored conditional support continues toward 0.2.0; do not treat this scope reduction as removing the conditional feature itself.

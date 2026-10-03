@@ -10,6 +10,25 @@ Nothing in this document changes current SCAP 1.4 conversion output.
 
 ## 1. Conditional evaluation
 
+Integration checkpoint, 2026-10-03: the working proposal now has a
+[partial versioned 0.2.0 schema and callback evaluator](../../schema/v0.2.0/README.md),
+including static compiler/package dependency closure and explicit N/A. The older
+illustrative `assessment_result`/`equals` form below is superseded in that draft
+by the ordinary `assessment` alias leaf. This does not amend v0.1.0, establish
+Board ratification, or declare a released v0.2.0 implementation.
+
+Owner-directed 2026-10-03 experiment:
+[conditional known-result content](../../tests/conditional-0.2.0/README.md).
+It demonstrates six-state guard handling, nested/dependent conditions, skipped
+paths, intrinsic applicability and a proposed explicit `not_applicable` outcome
+with a reason. Its controlled Test-result model and fixture grammar are
+experimental; passing them does not promote the proposal into v0.1.0 or claim
+that a released v0.2.0 implementation exists. Owner follow-up, 2026-10-03: automatic conditional normalization and candidate
+detection are removed from planned features because the general rewrite is not
+lossless across six-state truth or collection/evidence behavior.
+[Issue #126](https://github.com/vanderpol/scap-ng/issues/126) is closed as not planned;
+source-authored conditional support continues.
+
 SCAP-NG is considering a constrained declarative conditional-evaluation
 construct.
 

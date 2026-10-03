@@ -1,0 +1,364 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/assessment.schema.json",
+  "title": "Draft SCAP-NG Assessment 0.2.0 expression slice",
+  "description": "Partial 0.2.0 source schema; uses pinned 0.1.0 manual contract. Not a complete released schema set.",
+  "type": "object",
+  "required": [
+    "assessment"
+  ],
+  "properties": {
+    "assessment": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "assessment_title",
+        "mode",
+        "class",
+        "purpose"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "assessment_title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "automated"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "compliance",
+            "vulnerability",
+            "patch",
+            "inventory",
+            "miscellaneous"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "assessment",
+            "applicability"
+          ]
+        },
+        "objects": {
+          "type": "object",
+          "description": "Optional named resource-selection/acquisition Objects. Omit when an automated Assessment has no Object-backed Tests.",
+          "additionalProperties": {
+            "type": "object",
+            "not": {
+              "required": [
+                "result"
+              ]
+            }
+          }
+        },
+        "variables": {
+          "type": "object",
+          "description": "Named Variables.",
+          "additionalProperties": {
+            "type": "object",
+            "not": {
+              "required": [
+                "result"
+              ]
+            }
+          }
+        },
+        "states": {
+          "type": "object",
+          "description": "Optional named predicates/States. Omit when Tests do not require separate State predicates.",
+          "additionalProperties": {
+            "type": "object",
+            "not": {
+              "required": [
+                "result"
+              ]
+            }
+          }
+        },
+        "tests": {
+          "type": "object",
+          "description": "Named Tests. A capability defines its Test source shape: commonly an Object, but clean native capabilities MAY consume another first-class source such as a Variable directly.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "test_title",
+              "capability"
+            ],
+            "properties": {
+              "test_title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reported_elements": {
+                "$ref": "reported-elements.schema.json"
+              },
+              "capability": {
+                "type": "string",
+                "minLength": 1
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1
+              },
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "existence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "match": {
+                "type": "string",
+                "minLength": 1
+              },
+              "states_match": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "any",
+                  "one",
+                  "odd"
+                ]
+              }
+            },
+            "additionalProperties": true,
+            "not": {
+              "required": [
+                "result"
+              ]
+            }
+          }
+        },
+        "evaluate": {
+          "$ref": "expression.schema.json"
+        },
+        "procedure": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Named typed input contracts declared by the Assessment. Policy-layer bindings are supplied by the referring Rule/Assessment selection, not hard-coded here.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "datatype",
+              "cardinality",
+              "required"
+            ],
+            "properties": {
+              "datatype": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cardinality": {
+                "type": "string",
+                "enum": [
+                  "one",
+                  "zero_or_one",
+                  "one_or_more",
+                  "zero_or_more"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "constraints": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Publisher-authored evidence requirements/guidance for this Assessment. This is source policy metadata, not collected runtime evidence; observed evidence belongs in Assessment Results or referenced evidence artifacts."
+        },
+        "specification": {
+          "type": "object",
+          "description": "Exact automated assessment specification used by this Assessment. The current pre-alpha implementation identifier is provisional pending OVAL Board naming/ratification.",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "object",
+          "description": "Statically declared dependencies on other Assessments whose final Assessment truth/result may be consumed by this Assessment's evaluate expression. Keys are local aliases.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "assessment"
+            ],
+            "properties": {
+              "assessment": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Explicit source reference to the dependent Assessment; compiled packages resolve this to an immutable packaged Assessment identity."
+              },
+              "expected_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "expected_version": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ]
+              },
+              "purpose": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "assessment",
+                  "applicability",
+                  null
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "applicability": {
+          "oneOf": [
+            {
+              "$ref": "expression.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "response": {},
+        "references": {},
+        "evidence_guidance": {}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "manual"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "$ref": "https://scap-ng.dev/schema/v0.1.0/manual-assessment.schema.json#/properties/assessment"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "automated"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "specification",
+              "tests",
+              "evaluate"
+            ],
+            "properties": {
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "specification": {
+                "properties": {
+                  "id": {
+                    "const": "scap-ng.pre-alpha.assessment"
+                  },
+                  "version": {
+                    "const": "0.2.0"
+                  }
+                }
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "procedure"
+                  ]
+                },
+                {
+                  "required": [
+                    "response"
+                  ]
+                },
+                {
+                  "required": [
+                    "references"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence_guidance"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

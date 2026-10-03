@@ -1,0 +1,114 @@
+{
+  "source_execution_ref": "reporting-execution-1",
+  "source_completeness": {
+    "logical_complete": true,
+    "population_complete": true,
+    "evidence_complete": true
+  },
+  "items": [
+    {
+      "id": "file-1",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "full_path": {
+          "datatype": "string",
+          "value": "/fixture/config"
+        },
+        "owner_uid": {
+          "datatype": "integer",
+          "value": 1001
+        },
+        "owner_gid": {
+          "datatype": "integer",
+          "value": 1002
+        },
+        "owner_user_name": {
+          "datatype": "string",
+          "value": "fixture-user"
+        },
+        "owner_group_name": {
+          "datatype": "string",
+          "value": "fixture-group"
+        },
+        "size": {
+          "datatype": "integer",
+          "value": 42
+        },
+        "owner_read": {
+          "datatype": "boolean",
+          "value": true
+        }
+      },
+      "provenance": {
+        "target_ref": "fixture-target",
+        "source_execution_ref": "collection-1"
+      },
+      "context": {
+        "name_resolution": {
+          "owner_user_name": {
+            "source_field": "owner_uid",
+            "target_context_ref": "fixture-target/accounts",
+            "source_ref": "fixture-nss",
+            "observed_at": "2026-10-03T00:00:00Z"
+          },
+          "owner_group_name": {
+            "source_field": "owner_gid",
+            "target_context_ref": "fixture-target/accounts",
+            "source_ref": "fixture-nss",
+            "observed_at": "2026-10-03T00:00:00Z"
+          }
+        },
+        "locators": [
+          {
+            "kind": "record",
+            "source_ref": "fixture-record",
+            "index": 0,
+            "field": "size"
+          }
+        ]
+      }
+    }
+  ],
+  "uses": [
+    {
+      "test_ref": "test-owner",
+      "item_ref": "file-1",
+      "used_elements": [
+        "owner_uid"
+      ],
+      "required_elements": [
+        "full_path"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "omission-defaults-all"
+    },
+    {
+      "id": "explicit-all",
+      "control": "all"
+    },
+    {
+      "id": "compared-plus-identity",
+      "control": "compared"
+    },
+    {
+      "id": "explicit-owner-name",
+      "control": [
+        "owner_user_name"
+      ]
+    },
+    {
+      "id": "empty-list-keeps-decisive-evidence",
+      "control": []
+    },
+    {
+      "id": "known-but-unavailable",
+      "control": [
+        "modify_time"
+      ]
+    }
+  ]
+}

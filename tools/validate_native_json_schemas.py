@@ -33,7 +33,11 @@ def load_yaml(path: Path):
 
 def schema_store(schema_dir: Path):
     store={}
-    for path in schema_dir.glob("*.schema.json"):
+    paths = list(schema_dir.glob("*.schema.json"))
+    # The partial 0.2.0 slice explicitly pins unchanged 0.1.0 manual types.
+    if schema_dir.name == "v0.2.0":
+        paths.extend((schema_dir.parent / "v0.1.0").glob("*.schema.json"))
+    for path in paths:
         doc=json.loads(path.read_text(encoding="utf-8"))
         if "$id" in doc:
             store[doc["$id"]]=doc

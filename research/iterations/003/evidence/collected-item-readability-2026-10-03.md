@@ -32,6 +32,10 @@ All 100 mappings generated without error. This checks generation and inventories
 
 These groups cover the reviewed field patterns; the JSON inventory remains the exhaustive per-capability record. A suggested addition is not proof that a source collector supplies it. The next design pass must turn selected candidates into source-backed contracts and fixtures, not automatically apply every table entry.
 
+## Removed proposal — owner correction, 2026-10-03
+
+Registry view was intentionally deprecated because it was not useful. The owner explicitly directed its removal from the proposed collected Item additions. The earlier registry-view recommendation is superseded and SHALL NOT be reintroduced as a 0.2.0 result enrichment proposal. This correction removes a recommendation; it does not change existing schemas, collectors or migration behavior.
+
 ## Proposed contract rules
 
 1. Observed identity SHALL remain distinguishable from a resolved display name. Numeric UID/GID/SID values SHALL NOT be replaced by explanatory labels.

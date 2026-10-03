@@ -4,6 +4,9 @@ on:
     paths:
       - tools/**
       - schema/v0.1.0/**
+      - schema/v0.2.0/**
+      - tests/conditional-0.2.0/**
+      - tests/reported-elements-0.2.0/**
       - tests/collected-items-0.2.0/**
       - .github/workflows/scap-ng-current-regression.yml
   push:
@@ -12,10 +15,16 @@ on:
       - tools/scap_upconvert_v003/**
       - tools/scap_ng_roundtrip_v003/**
       - tools/test_*.py
+      - tools/conditional_conformance.py
+      - tools/assessment_expression.py
+      - tools/reported_elements.py
+      - tests/conditional-0.2.0/**
+      - tests/reported-elements-0.2.0/**
       - tools/generate_capability_schema.py
       - tools/validate_generated_capability_semantics.py
       - tools/validate_native_package_graph.py
       - schema/v0.1.0/**
+      - schema/v0.2.0/**
       - tests/collected-items-0.2.0/**
       - tools/collected_item_contract_v02.py
       - tools/scap_ng_repo_normalizer.py
@@ -65,6 +74,11 @@ jobs:
           python tools/test_result_messages.py
           python tools/test_result_schema_scope.py
           python tools/test_schema_issue_regressions.py
+          python tools/test_conditional_conformance.py
+          python tools/test_conditional_integration.py
+          python tools/test_reported_elements.py
+          python tools/conditional_conformance.py --report work/conditional-results.json
+          python tools/check_current_authoring_contract.py tests/conditional-0.2.0/content
           python tools/test_collected_item_contract_v02.py
           python tools/test_unknown_test_roundtrip.py
           python tools/test_assessment_optional_node_families.py
@@ -119,6 +133,12 @@ jobs:
         with:
           name: generated-capability-schema-${{ matrix.os }}
           path: work/generated-capability-schemas/unix.file.schema.json
+
+      - name: Upload experimental conditional known-result report
+        uses: actions/upload-artifact@v4
+        with:
+          name: conditional-known-results-${{ matrix.os }}
+          path: work/conditional-results.json
 
       - name: Repository normalization and content compiler
         run: |
