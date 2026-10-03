@@ -1,5 +1,10 @@
 # Assessment simplification research
 
+Latest concepts: [ten authoring/assessment alternatives, concepts 04](concepts-04/README.md),
+including native editing without a second language, reusable observation recipes,
+acceptance cases and directly evaluated domain contracts. Concepts only; no new
+execution/equivalence claim. The compiler's implementation risk remains explicit.
+
 Latest continuation: [requirement-oriented authoring compiler, transform 03](transform-03/README.md).
 A readable permission allowance compiles to current independent Boolean States,
 with exhaustive source-predicate and partial-result evidence. Its
