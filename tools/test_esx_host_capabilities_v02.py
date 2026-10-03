@@ -10,7 +10,7 @@ import unittest
 
 import yaml
 from jsonschema import Draft202012Validator, ValidationError
-from capability_registry import ROOT, load_mapping, mappings, mapping_path
+from capability_registry import ROOT, load_mapping, mappings, mapping_path, draft_capabilities
 from generate_capability_schema import generate
 from assessment_results_v02 import item_validator
 from reported_elements import generate_reporting_capability, project_items
@@ -38,7 +38,7 @@ class EsxHostCapabilityTests(unittest.TestCase):
 
     def test_versioned_registration_does_not_expand_stable_catalog(self):
         self.assertEqual(len(mappings("0.1.0")), 100)
-        self.assertEqual(len(mappings("0.2.0")), 102)
+        self.assertEqual(len(mappings("0.2.0")), 100 + len(draft_capabilities()))
         for kind in self.documents:
             cap = "esx.host_" + kind
             with self.assertRaises(ValueError):

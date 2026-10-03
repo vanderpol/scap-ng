@@ -15,6 +15,8 @@ by each Test, Object, or State.
 | `variable.value` | Values produced by a named Variable | 0.1.0 base; draft 0.2.0 expressions/reporting | [Variable values](variable.value.md) |
 | `esx.host_service` | Named ESXi host service configuration/running state | Draft 0.2.0 addition | [Host services](esx.host_service.md) |
 | `esx.host_advancedsetting` | Named ESXi host setting with typed repeated values | Draft 0.2.0 addition | [Host settings](esx.host_advancedsetting.md) |
+| `esx.host_account` | Named host accounts and shell access | Draft 0.2.0 addition | [Host accounts](esx.host_account.md) |
+| `esx.host_vib` | Installed VIB metadata and acceptance category | Draft 0.2.0 addition | [Installed VIBs](esx.host_vib.md) |
 
 ## Where requirements live
 

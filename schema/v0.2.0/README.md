@@ -108,3 +108,8 @@ The unsigned result-package draft adds Scan/Benchmark/Rule Result schemas and a
 closed exact-byte manifest connecting logical Assessment execution references.
 See [the checkpoint](../../transition/result-package-2026-10-03.md) for scope,
 validation limits and [the known result](../../tests/result-package-0.2.0/README.md).
+
+Host account and installed VIB additions are documented in the
+[capability reference](../../specification/assessment/reference/README.md), with
+[synthetic known results](../../tests/esx-host-0.2.0/README.md). Four of the 22
+new OVAL 6.0 Test contracts now have draft native mappings; 18 remain.

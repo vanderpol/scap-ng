@@ -212,3 +212,17 @@ The [known-result content](../../../../tests/esx-host-0.2.0/README.md) validates
 source shapes, references, synthetic Items and reporting, not live VMware
 acquisition/comparison. See [the checkpoint](../../../../transition/esx-host-capabilities-2026-10-03.md).
 Twenty other new Tests and full vendor/target conformance remain in #128/#131.
+
+
+## New ESXi host account and VIB slice — draft 0.2.0
+
+`esx.host_account` and `esx.host_vib` retain named Object selectors and all
+source State/Item fields. Account shell access is Boolean; VIB category is one
+of five exact strings, with `Unknown` distinct from technical unknown. VIB
+version/date remain strings. Explicit present-payload type/enum constraints are
+opt-in mapping projections, preserving stable generated contracts. The native
+Variable-reference form replaces the source's empty XML enum placeholder.
+[References](../../../../specification/assessment/reference/README.md) and
+[synthetic cases](../../../../tests/esx-host-0.2.0/README.md) explain limitations.
+Four new Tests are now represented; 18 remain, including live acquisition and
+independent comparator/vendor evidence. This does not finalize 0.2.0.
