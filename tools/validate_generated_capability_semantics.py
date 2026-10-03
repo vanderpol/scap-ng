@@ -22,6 +22,77 @@ def _is_variable_value(value):
     )
 
 
+_STRING_LITERAL_DATATYPES = {
+    "string",
+    "binary",
+    "version",
+    "ipv4",
+    "ipv6",
+    "rpm_evr",
+    "debian_evr",
+    "fileset_revision",
+    "ios_version",
+}
+
+
+def _native_literal_matches_datatype(value, datatype):
+    """Return True when a literal uses the native JSON representation for datatype."""
+    if _is_variable_value(value):
+        return True
+    if datatype == "boolean":
+        return isinstance(value, bool)
+    if datatype == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if datatype == "float":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if datatype in _STRING_LITERAL_DATATYPES:
+        return isinstance(value, str)
+    # record literals are represented by the structured predicate forms rather
+    # than scalar entity_value.
+    return datatype == "record"
+
+
+def _iter_authored_predicates(node):
+    """Yield scalar authored predicate dictionaries recursively."""
+    if isinstance(node, dict):
+        if {"value", "datatype"}.issubset(node):
+            yield node
+        for value in node.values():
+            yield from _iter_authored_predicates(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _iter_authored_predicates(value)
+
+
+def validate_v02_native_literal_types(document):
+    """Reject lexical/string stand-ins for typed native 0.2.0 literals."""
+    assessment = document.get("assessment", document)
+    specification = assessment.get("specification") or {}
+    if specification.get("version") != "0.2.0":
+        return []
+
+    diagnostics = []
+    for section in ("objects", "states"):
+        for node_id, node in (assessment.get(section) or {}).items():
+            for predicate in _iter_authored_predicates(node):
+                value = predicate.get("value")
+                datatype = predicate.get("datatype")
+                if _is_variable_value(value):
+                    continue
+                if not _native_literal_matches_datatype(value, datatype):
+                    diagnostics.append({
+                        section[:-1]: node_id,
+                        "code": "assessment.native_literal_datatype",
+                        "datatype": datatype,
+                        "value": value,
+                        "message": (
+                            "0.2.0 authored literals must use the native JSON "
+                            "representation for their declared datatype"
+                        ),
+                    })
+    return diagnostics
+
+
 FILE_SELECTION_CAPABILITIES={
     "unix.file",
     "file.hash",
@@ -712,6 +783,7 @@ def validate_assessment_capability_semantics(document):
         )
 
     diagnostics.extend(validate_singleton_source_document(document))
+    diagnostics.extend(validate_v02_native_literal_types(document))
     return diagnostics
 
 
