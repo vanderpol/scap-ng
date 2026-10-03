@@ -6,6 +6,8 @@ Broad Codex content development should begin only after the five bounded 0.2.0 c
 
 The maintained ready-to-use Codex task is [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md). The intended authority order is specification → implementation/reference guidance → conformance content → editor.
 
+The handoff has also been audited against the draft specification in [spec-coverage-audit-0.2.0-2026-10-03.md](spec-coverage-audit-0.2.0-2026-10-03.md). Universal author/processor requirements found during that audit belong in the specification; workflow-only Codex guidance remains outside the normative core.
+
 The historical transition material below remains useful provenance. Statements below that describe Codex handoff as merely “preparation only” or identify older repository tasks should be read as dated history rather than the current 0.2.0 handoff state.
 
 # Latest completed checkpoint
