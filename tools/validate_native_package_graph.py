@@ -16,21 +16,30 @@ def load_yaml(path: Path):
     return value
 
 
-def validate_package(root: Path, reference_root: Path | None = None):
+def build_document_index(reference_root: Path):
+    """Load the corpus once so multi-package validation does not repeatedly parse every YAML file."""
+    reference_root=reference_root.resolve()
+    documents={}
+    for path in sorted(reference_root.rglob("*.yaml")):
+        doc=load_yaml(path)
+        kind=next(iter(doc))
+        payload=doc[kind]
+        documents[path.resolve()]=(kind,payload)
+    return documents
+
+
+def validate_package(root: Path, reference_root: Path | None = None, documents=None):
     # A normalized corpus MAY hoist exact duplicate Assessments into a corpus-level
     # shared/ tree. Keep package membership local, but resolve document references
     # against the containing corpus root so those shared Assessments remain legal.
     root = root.resolve()
     reference_root = (reference_root or root).resolve()
+    if documents is None:
+        documents=build_document_index(reference_root)
+
     diagnostics=[]
-    documents={}
     identities={}
-    for path in sorted(reference_root.rglob("*.yaml")):
-        doc=load_yaml(path)
-        kind=next(iter(doc))
-        payload=doc[kind]
-        resolved=path.resolve()
-        documents[resolved]=(kind,payload)
+    for resolved,(kind,payload) in documents.items():
         # Package-local identities determine Benchmark Rule membership. Shared
         # corpus documents are available for reference resolution but SHALL NOT
         # pollute the package's local identity namespace.
@@ -50,39 +59,29 @@ def validate_package(root: Path, reference_root: Path | None = None):
         return [{"code":"benchmark_missing","message":"benchmark.yaml is missing or wrong document type"}]
     benchmark=documents[bench_path][1]
 
+    def owner_display(owner: Path):
+        try:
+            return owner.relative_to(root).as_posix()
+        except ValueError:
+            return owner.relative_to(reference_root).as_posix()
+
     def resolve(owner: Path, ref, expected_kind):
         if not isinstance(ref,str) or not ref:
-            try:
-                owner_display=owner.relative_to(root).as_posix()
-            except ValueError:
-                owner_display=owner.relative_to(reference_root).as_posix()
-            diagnostics.append({"code":"reference_invalid","owner":owner_display,"reference":ref,"expected_kind":expected_kind})
+            diagnostics.append({"code":"reference_invalid","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind})
             return None
         target=(owner.parent/ref).resolve()
         try:
             target.relative_to(reference_root)
         except ValueError:
-            try:
-                owner_display=owner.relative_to(root).as_posix()
-            except ValueError:
-                owner_display=owner.relative_to(reference_root).as_posix()
-            diagnostics.append({"code":"reference_escape","owner":owner_display,"reference":ref})
+            diagnostics.append({"code":"reference_escape","owner":owner_display(owner),"reference":ref})
             return None
         found=documents.get(target)
         if found is None:
-            try:
-                owner_display=owner.relative_to(root).as_posix()
-            except ValueError:
-                owner_display=owner.relative_to(reference_root).as_posix()
-            diagnostics.append({"code":"reference_missing","owner":owner_display,"reference":ref,"expected_kind":expected_kind})
+            diagnostics.append({"code":"reference_missing","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind})
             return None
         kind,payload=found
         if kind!=expected_kind:
-            try:
-                owner_display=owner.relative_to(root).as_posix()
-            except ValueError:
-                owner_display=owner.relative_to(reference_root).as_posix()
-            diagnostics.append({"code":"reference_wrong_type","owner":owner_display,"reference":ref,"expected_kind":expected_kind,"actual_kind":kind})
+            diagnostics.append({"code":"reference_wrong_type","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind,"actual_kind":kind})
             return None
         return payload
 
@@ -135,8 +134,14 @@ def validate_package(root: Path, reference_root: Path | None = None):
         diagnostics.append({"code":"benchmark_applicability_missing","conditions":sorted(missing_platform)})
 
     grouped=[]
+    seen_groups=set()
     def collect(groups):
         for group in groups or []:
+            marker=id(group)
+            if marker in seen_groups:
+                diagnostics.append({"code":"benchmark_group_cycle","message":"Benchmark group nesting contains a cycle"})
+                continue
+            seen_groups.add(marker)
             grouped.extend(group.get("rules") or [])
             collect(group.get("groups"))
     collect(benchmark.get("groups"))
@@ -162,8 +167,9 @@ def main():
     args=ap.parse_args()
     results=[]
     corpus_root=args.corpus_root.resolve()
+    documents=build_document_index(corpus_root)
     for package in find_packages(args.corpus_root):
-        diagnostics=validate_package(package, reference_root=corpus_root)
+        diagnostics=validate_package(package, reference_root=corpus_root, documents=documents)
         results.append({
             "package":package.relative_to(args.corpus_root).as_posix() or ".",
             "valid":not diagnostics,
