@@ -423,6 +423,13 @@ class VariableReferenceSemantics(unittest.TestCase):
             ERROR,
         )
 
+    def test_zero_values_direct_variable_test_means_error(self):
+        result = resolve_variable_reference([])
+        self.assertEqual(
+            apply_variable_reference_context(result, "direct_test"),
+            ERROR,
+        )
+
     def test_values_are_preserved(self):
         self.assertEqual(
             resolve_variable_reference(["a", "b"]),
