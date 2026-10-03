@@ -7,6 +7,7 @@ producer. Importing observations never imports a Test's truth or re-resolves nam
 import copy
 import hashlib
 import json
+import math
 import re
 from reported_elements import _check_redaction
 
@@ -96,6 +97,12 @@ def validate_materialization(result):
             raise ValueError('All scope cannot omit collection Items')
 
 
+def _finite_float(text):
+    value=float(text)
+    if not math.isfinite(value): raise ValueError('Non-finite JSON number')
+    return value
+
+
 def _unique_object(pairs):
     result={}
     for key,value in pairs:
@@ -116,7 +123,7 @@ def import_items(source_bytes, *, expected_digest, expected_execution_id, target
     digest='sha256:'+hashlib.sha256(source_bytes).hexdigest()
     if not isinstance(expected_digest,str) or not re.fullmatch(r'sha256:[0-9a-f]{64}',expected_digest) or digest!=expected_digest:
         raise ValueError('Source artifact digest mismatch')
-    source=json.loads(source_bytes.decode('utf-8'),object_pairs_hook=_unique_object,
+    source=json.loads(source_bytes.decode('utf-8'),object_pairs_hook=_unique_object,parse_float=_finite_float,
                       parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Non-finite JSON number')))
     from assessment_results_v02 import validate_schema,item_validator
     validate_schema('assessment-result.schema.json',source)

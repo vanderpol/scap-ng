@@ -72,7 +72,7 @@ local Test truth.
 
 ## Coverage and remaining gates
 
-Sixteen focused methods cover all/consumed defaults/counts, indirect/Variable uses,
+Seventeen focused methods cover all/consumed defaults/counts, indirect/Variable uses,
 empty consumption, missing/duplicate identities, invalid unused observations,
 verified import pins, target/binding errors, reimport chains, redaction, local
 collisions, incompleteness, metadata tampering and committed known-result copies.
@@ -85,7 +85,7 @@ algorithms or multi-context result-package composition. The complete vendor corp
 integration, target conformance and Board decisions remain release prerequisites.
 
 Local validation checkpoint: all **69** current-regression commands passed,
-including the **16** focused methods and existing conditional/result/reporting
+including the **17** focused methods and existing conditional/result/reporting
 contracts. The preservation audit reports no failures across 34,242 baseline
 paths; all draft schemas meta-validate in the result integration suite. The
 committed exact-byte import and scope/count fixtures pass offline checks.

@@ -115,4 +115,10 @@ class MaterializationTests(unittest.TestCase):
         actual=import_items((directory/'source.assessment-result.json').read_bytes(),expected_digest=expected['source_digest'],expected_execution_id='fixture-source-ownership-execution',target_ref='fixture-target',binding_set_id='fixture-bindings-empty',item_refs=['file-config'],local_ids={'file-config':'local-file'})
         self.assertEqual(actual,expected['items'])
 
+    def test_nonfinite_keywords_and_overflow_numbers_rejected(self):
+        for value in (b'NaN',b'Infinity',b'1e999'):
+            raw=self.bytes();data=b'{"ignored":'+value+b','+raw[1:]
+            with self.subTest(value=value),self.assertRaises(ValueError):
+                import_items(data,expected_digest='sha256:'+hashlib.sha256(data).hexdigest(),expected_execution_id=self.source['execution_id'],target_ref='fixture-target',binding_set_id='fixture-bindings-empty',item_refs=[],local_ids={})
+
 if __name__=='__main__':unittest.main()
