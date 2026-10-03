@@ -27,8 +27,10 @@ reproducible across Windows newline settings. Thirteen focused audit tests cover
 scope, inheritance, choices, cardinality, type identity, missing contracts,
 cycles, pins and the isolated binding-pattern finding.
 
-Next bounded task: native ESX mappings and standalone known-result fixtures in
-small groups, then Kubernetes structured-resource/record cases. Preserve every
+Superseding 0.2.0 disposition: ESX expansion is deferred pending upstream
+guidance, and both Kubernetes new Tests are reviewed/deferred; see
+`kubernetes-oval6-disposition-2026-10-03.md`. The next bounded task is final
+semantic/documentation reconciliation and exact-head validation. Preserve every
 non-deprecated supported contract and explicitly resolve target/resource context,
 status/completeness and source ambiguities before claiming a group complete.
 Provenance: Evidence/Audit, Adapted source schema metadata, Common audit tools.
