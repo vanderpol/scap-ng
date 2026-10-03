@@ -1,3 +1,13 @@
+# Current 0.2.0 handoff status
+
+The active handoff is now [SCAP-NG 0.2.0 content-development handoff](handoff-0.2.0-content-development-2026-10-03.md).
+
+Broad Codex content development should begin only after the five bounded 0.2.0 closure items in that checkpoint are resolved and an exact-head validation checkpoint is recorded. VMware ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 blocker. Content development precedes editor development.
+
+The maintained ready-to-use Codex task is [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md). The intended authority order is specification → implementation/reference guidance → conformance content → editor.
+
+The historical transition material below remains useful provenance. Statements below that describe Codex handoff as merely “preparation only” or identify older repository tasks should be read as dated history rather than the current 0.2.0 handoff state.
+
 # Latest completed checkpoint
 
 The 2026-10-02 bounded repository rebaseline and publication are complete; the final preservation and schema Actions passed. Start with [the completed checkpoint and receiving-session prompt](rebaseline-checkpoint-2026-10-02.md), [START-HERE](../START-HERE.md), and [58 live Board votes](../board/VOTES.md). This is suitable for a bounded receiving-session access/test acceptance. Complete chat-history recovery and a wholesale migration are not claimed. The dated preparation observations below remain preserved as history.
