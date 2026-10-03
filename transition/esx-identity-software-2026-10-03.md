@@ -1,5 +1,8 @@
 # ESXi host accounts and installed VIBs — 2026-10-03
 
+> **Superseding scope note — 2026-10-03:** this file is a historical implementation checkpoint. Further ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 freeze blocker. Older “tests remain” counts below are inventory history, not current tasking. See `handoff-0.2.0-content-development-2026-10-03.md`.
+
+
 Repository: `vanderpol/scap-ng`; base `main` at
 `a36ab1fc8583c62b075fb7f4492d705b9c7723f4` (merged #140).
 Implementation branch: `esx-host-identity-software-20261003`.
