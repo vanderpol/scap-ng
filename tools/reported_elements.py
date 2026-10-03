@@ -10,6 +10,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 import yaml
 from generate_capability_schema import generate
+from capability_registry import load_mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTROL = json.loads((ROOT / "schema/v0.2.0/reported-elements.schema.json").read_text())
@@ -20,11 +21,7 @@ EXTENSIONS = json.loads((ROOT / "schema/v0.2.0/result-field-extensions.json").re
 def capability_fields(capability):
     if not isinstance(capability, str) or not capability:
         raise ValueError("A capability identifier is required")
-    path = ROOT / "schema/v0.1.0/capability-mappings" / (capability + ".json")
-    # Never interpret a capability identifier as a filesystem path.
-    if capability != path.stem or "/" in capability or "\\" in capability or not path.is_file():
-        raise ValueError(f"Unknown capability: {capability}")
-    mapping = json.loads(path.read_text())
+    mapping = load_mapping(capability)
     generated = generate(mapping, ROOT)
     item = generated.get("$defs", {}).get("collected_item")
     fields = set()

@@ -93,6 +93,37 @@ def document_errors(v, doc):
     that intentionally share an outcome. Invalid shapes remain schema errors.
     """
     yield from v.iter_errors(doc)
+    # New versioned capability contracts are checked even in skipped branches.
+    assessment = doc.get("assessment")
+    if isinstance(assessment, dict):
+        from capability_registry import draft_capabilities, load_mapping
+        from generate_capability_schema import generate
+        from reported_elements import generate_reporting_capability
+        draft = draft_capabilities()
+        for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
+            nodes = assessment.get(section, {})
+            if not isinstance(nodes, dict):
+                continue
+            for identity, node in nodes.items():
+                if not isinstance(node, dict) or not isinstance(node.get("capability"), str) or node["capability"] not in draft:
+                    continue
+                version = assessment.get("specification", {})
+                if not isinstance(version, dict) or version.get("version") != "0.2.0":
+                    yield ValidationError("New capability requires specification 0.2.0", path=["assessment", section, identity])
+                    continue
+                mapping = load_mapping(node["capability"])
+                generated = generate_reporting_capability(mapping) if kind == "test" else generate(mapping, Path(__file__).resolve().parents[1])
+                if kind not in generated["$defs"]:
+                    yield ValidationError("Capability does not support this source node", path=["assessment", section, identity])
+                    continue
+                root = Path(__file__).resolve().parents[1]
+                store = schema_store(root / "schema/v0.2.0")
+                from referencing import Registry, Resource
+                registry = Registry().with_resources((uri, Resource.from_contents(schema)) for uri, schema in store.items())
+                validator = Draft202012Validator(generated["$defs"][kind], registry=registry)
+                for error in validator.iter_errors(node):
+                    error.path.extendleft(reversed(["assessment", section, identity]))
+                    yield error
     assessment = doc.get("assessment")
     if not isinstance(assessment, dict) or assessment.get("mode") != "manual":
         return

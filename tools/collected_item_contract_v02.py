@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from generate_capability_schema import generate, collected_value_schema
+from capability_registry import mappings
 
 ROOT = Path(__file__).resolve().parents[1]
 ITEM_ID = "https://scap-ng.dev/experimental/0.2.0/collected-item.schema.json"
@@ -149,8 +150,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     item, types = shared()
     files = {"collected-item.schema.json": item, "result-types.schema.json": types}
-    for path in sorted((ROOT / "schema/v0.1.0/capability-mappings").glob("*.json")):
-        mapping = json.loads(path.read_text())
+    for mapping in mappings():
         if "capability" in mapping:
             schema = capability_schema(mapping)
             if schema is not None:

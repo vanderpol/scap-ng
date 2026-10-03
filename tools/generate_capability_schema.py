@@ -186,12 +186,16 @@ def generate(mapping, repo_root):
     xsd_path = repo_root / source["definitions_schema"]
     root = ET.parse(xsd_path).getroot()
     capability = mapping["capability"]
+    version = mapping.get("specification_version", "0.1.0")
+    if version not in {"0.1.0", "0.2.0"}:
+        raise ValueError(f"Unsupported capability schema version: {version}")
+    field_documentation = mapping.get("native", {}).get("field_documentation", {})
     fixed_result = mapping.get("native", {}).get("fixed_result")
     if fixed_result is not None:
         direct_global(root, "element", source["test"])
         return {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": f"https://scap-ng.dev/schema/v0.1.0/generated/capabilities/{capability}.schema.json",
+            "$id": f"https://scap-ng.dev/schema/v{version}/generated/capabilities/{capability}.schema.json",
             "title": f"Generated SCAP-NG capability fragment: {capability}",
             "description": f"Native SCAP-NG fixed-result capability schema for {capability}.",
             "x-fixed-result": fixed_result,
@@ -276,6 +280,8 @@ def generate(mapping, repo_root):
                     ]
                 }
             selector_props[name] = selector_schema
+            if name in field_documentation:
+                selector_props[name]["description"] = field_documentation[name]
 
         for alternative in mapping["native"].get("object_selector_alternatives", []):
             disallowed = [
@@ -434,6 +440,8 @@ def generate(mapping, repo_root):
             "properties": props,
             "required": ["field"],
         })
+        if name in field_documentation:
+            scalar_state_branches[-1]["description"] = field_documentation[name]
 
     object_required = ["object_title", "capability"]
 
@@ -468,6 +476,10 @@ def generate(mapping, repo_root):
         )
         for name, meta in sorted(item_meta.items())
     }
+    for name, description in field_documentation.items():
+        if name not in collected_field_properties:
+            raise ValueError(f"Documentation references unknown Item field: {name}")
+        collected_field_properties[name]["description"] = description
 
     defs = {
         "collected_item": {
@@ -598,7 +610,7 @@ def generate(mapping, repo_root):
 
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$id": f"https://scap-ng.dev/schema/v0.1.0/generated/capabilities/{capability}.schema.json",
+        "$id": f"https://scap-ng.dev/schema/v{version}/generated/capabilities/{capability}.schema.json",
         "title": f"Generated SCAP-NG capability fragment: {capability}",
         "description": f"Native SCAP-NG capability schema for {capability}.",
         "x-semantic-validator-rules": mapping.get("semantic_validator_rules", []),
