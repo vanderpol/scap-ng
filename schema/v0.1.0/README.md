@@ -69,6 +69,25 @@ It does **not** prove:
 
 Those remain semantic-validator and conformance-test responsibilities.
 
+### Required document validation workflow
+
+Run `python tools/validate_native_json_schemas.py <corpus-root> --schema-dir schema/v0.1.0 --report <report.json>`.
+The harness applies structural schemas and the required Manual Assessment
+response-value uniqueness check. A bare JSON Schema validator cannot enforce
+uniqueness by one property of choice objects: both identical and conflicting
+duplicate response values SHALL be rejected, while distinct answers MAY share
+an outcome. Integrators SHOULD use `document_errors` from the harness or enforce
+the same semantic rule. Schema-only validation does not establish this check.
+
+All supported Assessment filenames select the same mode-aware Assessment schema.
+Manual mode delegates to the Manual Assessment response contract; automated
+mode rejects manual-only procedure/response fields. Publisher Profiles require
+`disabled_rules` and prohibit `enabled_rules`; external Tailoring permissions are
+unchanged. Redacted input records in Assessment and Benchmark Results prohibit
+any `value` property, including null. Unredacted Benchmark input registry records
+still require their value. These are enforcement corrections for existing
+0.1.0 draft behavior, not new language features.
+
 ## Corpus evidence
 
 GitHub Actions run #44

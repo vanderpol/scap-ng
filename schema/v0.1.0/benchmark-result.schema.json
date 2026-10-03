@@ -121,7 +121,6 @@
                 "type": "object",
                 "required": [
                   "parameter",
-                  "value",
                   "source",
                   "provenance"
                 ],
@@ -187,7 +186,33 @@
                     "type": "boolean"
                   }
                 },
-                "additionalProperties": true
+                "additionalProperties": true,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "redacted": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "redacted"
+                      ]
+                    },
+                    "then": {
+                      "not": {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    },
+                    "else": {
+                      "required": [
+                        "value"
+                      ]
+                    }
+                  }
+                ]
               }
             }
           },
