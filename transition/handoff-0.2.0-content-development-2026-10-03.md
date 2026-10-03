@@ -20,9 +20,7 @@ For OVAL 6.0, focus only on genuinely **new Tests/capabilities**. Preserve the O
 
 Before handing broad content expansion to Codex, complete and record these bounded items.
 
-Current progress at the latest documentation checkpoint: items 1–3 have semantic
-dispositions; item 2 also has semantic-validator regressions. Item 1 has a focused
-truth-table regression. Item 4 is in reconciliation. Item 5 remains the final gate.
+Current progress at the latest documentation checkpoint: items 1–4 are dispositioned. Item 2 has semantic-validator regressions and item 1 has a focused truth-table regression. Current design, schema README, coverage audit and historical ESX checkpoints have been reconciled with the deferred scope. Item 5 remains the final gate.
 
 1. **Direct Variable zero-value semantics — DISPOSITIONED, CI EVIDENCE PENDING**
    - Specify the expected Test behavior when a directly tested Variable resolves to zero values.
@@ -40,7 +38,7 @@ truth-table regression. Item 4 is in reconciliation. Item 5 remains the final ga
    - `kubepsp_test` targets removed PodSecurityPolicy; `kubectl_test` awaits a native Kubernetes resource/API model and conformance content.
    - Do not reopen the broader OVAL 6.0 delta.
 
-4. **Documentation/version reconciliation — IN PROGRESS**
+4. **Documentation/version reconciliation — COMPLETE FOR FREEZE SCOPE**
    - Update coverage and transition language that still says large numbers of OVAL 6 Tests “remain” when those counts include deferred ESX work.
    - Reconcile schema/reference/result/result-package documentation and capability matrices with the final owner-approved scope.
    - Preserve 0.1.0 behavior and historical checkpoints.
