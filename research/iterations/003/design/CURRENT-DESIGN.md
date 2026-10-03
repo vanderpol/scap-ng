@@ -224,5 +224,5 @@ opt-in mapping projections, preserving stable generated contracts. The native
 Variable-reference form replaces the source's empty XML enum placeholder.
 [References](../../../../specification/assessment/reference/README.md) and
 [synthetic cases](../../../../tests/esx-host-0.2.0/README.md) explain limitations.
-Four new Tests are now represented; 18 remain, including live acquisition and
+Four new Tests are represented experimentally; the remaining OVAL 6.0-only Tests are deferred for the 0.2.0 freeze. Live acquisition and
 independent comparator/vendor evidence. This does not finalize 0.2.0.
