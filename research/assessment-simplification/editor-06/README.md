@@ -17,6 +17,13 @@ This develops [the ten earlier concepts](../concepts-04/README.md) using the
 editor/compiler/scanner, change established schemas or create an external review
 tree. `review/current/` remains the sole external review surface.
 
+Continuation: [language, deployment and Git integration recommendation](IMPLEMENTATION-OPTIONS.md)
+responds to the owner's preference for a separate research repository and direct
+editing of straightforward content. It proposes a TypeScript/React core/UI and
+local desktop product, reusing current Python validators through an adapter.
+Technology and repository name remain recommendations, not accepted implementation
+or measured coverage decisions.
+
 ## The author should see Objects and requirements
 
 A beginner need not start by laying out a graph of node references. A useful first

@@ -1,5 +1,12 @@
 # Resume the open editor/recipe brainstorming
 
+Latest continuation: [implementation options](IMPLEMENTATION-OPTIONS.md), receiving
+`30f01a6f3117a309cdea7051611508fcf943230c`. Owner favors a separate research repo
+and direct editing for the straightforward majority. TypeScript/React with an
+initial Electron/local-checkout product, existing Python validation adapter and
+separate Git/forge integrations are recommendations. The suggested repository
+scap-ng-editor-research has NOT been created. The approximate 90% is unmeasured.
+
 2026-10-03, `vanderpol/scap-ng`, `main`; receiving
 `b13f665be9b39e7f0f19825954fe33632f4e5c3d`, clean. Find publication using
 `git log -1 -- research/assessment-simplification/editor-06`.
