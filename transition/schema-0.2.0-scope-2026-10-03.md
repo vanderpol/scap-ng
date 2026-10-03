@@ -60,3 +60,7 @@ Added `tools/test_schema_issue_regressions.py` to the native-schema and current-
 - All 21 top-level schemas passed Draft 2020-12 meta-validation.
 
 Total: **82 local tests passed**. No full 65-package rebuild or target equivalence test was run locally. CI completion must be checked on the published implementation commit before closing issues. The 0.2.0 scope above remains design work, not implemented functionality. Next: agree conditional outcome rules and Item inclusion semantics, then inventory all capability result fields and propose additions with explicit collection/lookup behavior.
+
+The [initial all-capability collected-field review](../research/iterations/003/evidence/collected-item-readability-2026-10-03.md) now inventories all 100 mappings, 99 Item definitions, with no generation errors. It records readable-result candidates and Unix ownership acceptance cases. The full machine-readable field inventory includes hashes. This completes the initial field review, not the selection, specification or implementation of new attributes.
+
+Publication: [PR #124](https://github.com/vanderpol/scap-ng/pull/124), branch `schema-enforcement-0.2-scope-20261003`. Automatic approval review rejected a direct push to `main`; a review branch is the safer publication path. Shell push also lacked GitHub credentials, so the connected GitHub tools published the review branch. PR-triggered schema/regression CI is enabled for this publication path; completed CI evidence must be inspected before closure.
