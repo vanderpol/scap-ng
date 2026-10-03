@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from lxml import etree as ET
-from audit_oval_new_tests import scan,contract,tree,materialize,ROOT
+from audit_oval_new_tests import scan,contract,tree,materialize,snapshot,ROOT
 
 X='http://www.w3.org/2001/XMLSchema'
 K='urn:oval:v6:definitions:kubernetes'
@@ -77,6 +77,13 @@ class NewTestAuditTests(unittest.TestCase):
                 self.assertEqual(owner.getroottree().xpath('//'+assertion['context'],namespaces={'kube-def':K}),[])
                 corrected=assertion['context'].replace('kube-def:test/','kube-def:'+row['test']+'/')
                 self.assertEqual(len(owner.getroottree().xpath('//'+corrected,namespaces={'kube-def':K})),1)
+    def test_snapshot_preserves_git_blob_bytes_instead_of_checkout_newlines(self):
+        raw=b'<schema>committed</schema>\r\n'
+        with patch('audit_oval_new_tests.subprocess.check_output',side_effect=['schemas/source.xsd\nschemas/README.md\n',raw]):
+            snapshot(self.before,'HEAD','schemas',self.after)
+        self.assertEqual((self.after/'source.xsd').read_bytes(),raw)
+        self.assertFalse((self.after/'README.md').exists())
+
     def test_wrong_upstream_pin_rejected(self):
         with patch('audit_oval_new_tests.subprocess.check_output',return_value='wrong\n'):
             with self.assertRaisesRegex(ValueError,'pinned'):materialize(self.after,self.before)

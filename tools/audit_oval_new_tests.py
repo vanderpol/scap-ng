@@ -116,25 +116,30 @@ def scan(before,after):
         'scope':'Only test names added to v6.0 relative to the vendored 5.12.3 definitions inventory. Existing-test/core/result/namespace/encapsulation differences are excluded. Associated new-test inheritance and type constraints are inventory evidence, not a semantic-equivalence claim.',
         'baseline':'third_party/scap-1.4-schemas/oval_5.12.3','definition_files':files,'new_tests':rows,'referenced_types':all_types}
 
+def snapshot(repo,revision,prefix,destination):
+    paths=subprocess.check_output(['git','-C',str(repo),'ls-tree','-r','--name-only',revision,prefix],text=True).splitlines()
+    for path in paths:
+        if path.endswith('.xsd'):
+            raw=subprocess.check_output(['git','-C',str(repo),'show',revision+':'+path]);(destination/Path(path).name).write_bytes(raw)
+
 def materialize(repo,destination):
     head=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD'],text=True).strip()
     if head!=UPSTREAM:raise ValueError('Upstream checkout must be pinned to '+UPSTREAM)
-    paths=subprocess.check_output(['git','-C',str(repo),'ls-tree','-r','--name-only',UPSTREAM,'oval-schemas'],text=True).splitlines()
-    for path in paths:
-        if path.endswith('.xsd'):
-            raw=subprocess.check_output(['git','-C',str(repo),'show',UPSTREAM+':'+path]);(destination/Path(path).name).write_bytes(raw)
+    snapshot(repo,UPSTREAM,'oval-schemas',destination)
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--upstream-repo',type=Path,required=True)
     ap.add_argument('--output',type=Path,default=ROOT/'docs/audit/capability-coverage-2026-10-03/oval-new-tests.json');ap.add_argument('--check',action='store_true')
     args=ap.parse_args()
     with tempfile.TemporaryDirectory() as tmp:
-        materialize(args.upstream_repo,Path(tmp));result=scan(ROOT/'third_party/scap-1.4-schemas/oval_5.12.3',Path(tmp))
+        before=Path(tmp)/'baseline';after=Path(tmp)/'upstream';before.mkdir();after.mkdir()
+        snapshot(ROOT,'HEAD','third_party/scap-1.4-schemas/oval_5.12.3',before)
+        materialize(args.upstream_repo,after);result=scan(before,after)
         result['source_schema_compilation']={}
         for family in sorted({row['family'] for row in result['new_tests']}):
             for kind in ('definitions','system-characteristics'):
                 filename=family+'-'+kind+'-schema.xsd'
-                ET.XMLSchema(ET.parse(str(Path(tmp)/filename)))
+                ET.XMLSchema(ET.parse(str(after/filename)))
                 result['source_schema_compilation'][filename]='passed'
     encoded=json.dumps(result,indent=2,sort_keys=True)+'\n'
     if args.check:

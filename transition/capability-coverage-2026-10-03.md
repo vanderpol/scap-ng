@@ -23,7 +23,7 @@ All four new-family XSDs compile. An isolated namespace-aware regression proves
 four Kubernetes Test binding contexts do not select the actual Test elements;
 track #137 without modifying upstream files or claiming complete validator
 behavior. Source pins and exact Git-blob reading make the upstream inventory
-reproducible across Windows newline settings. Twelve focused audit tests cover
+reproducible across Windows newline settings. Thirteen focused audit tests cover
 scope, inheritance, choices, cardinality, type identity, missing contracts,
 cycles, pins and the isolated binding-pattern finding.
 

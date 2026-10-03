@@ -166,6 +166,6 @@ PYTHONPATH=tools python tools/audit_capability_coverage.py --output work/current
 PYTHONPATH=tools python tools/test_oval_new_tests_audit.py
 ```
 
-The upstream tool requires the exact pinned commit and reads Git blobs, avoiding checkout newline conversion. It performs no network calls itself. Recompute coverage separately from the new-Test comparison. The 12 focused regressions guard scope, family/type identity, inheritance, cardinality, missing contracts, cycles, pins and the isolated Kubernetes pattern finding.
+The upstream tool requires the exact pinned commit and reads baseline and upstream Git blobs, avoiding checkout newline conversion. It performs no network calls itself. Recompute coverage separately from the new-Test comparison. The 13 focused regressions guard scope, family/type identity, inheritance, cardinality, missing contracts, cycles, pins and the isolated Kubernetes pattern finding.
 
 Next bounded work: add versioned 0.2.0 native ESX/Kubernetes mappings and small standalone expected-result cases in coherent capability groups, starting with simple host settings/service/acceptance levels. Resolve management/VM target context and record-query semantics before claiming those groups complete. The wider method-level coverage audit and target conformance remain open under #131/#128.
