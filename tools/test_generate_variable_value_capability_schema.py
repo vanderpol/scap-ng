@@ -121,6 +121,77 @@ class VariableValueCapabilitySchemaTests(unittest.TestCase):
         self.assertNotIn("variable_object",encoded)
         self.assertNotIn("independent",encoded.lower())
 
+    def test_v02_boolean_literal_must_be_native_json_boolean(self):
+        def document(value):
+            return {
+                "assessment":{
+                    "specification":{
+                        "id":"scap-ng.pre-alpha.assessment",
+                        "version":"0.2.0",
+                    },
+                    "variables":{"guard":{"datatype":"boolean"}},
+                    "objects":{},
+                    "states":{
+                        "expected":{
+                            "capability":"variable.value",
+                            "state":{
+                                "field":"value",
+                                "value":value,
+                                "operation":"equal",
+                                "datatype":"boolean",
+                                "match":"all",
+                                "existence":"some",
+                            },
+                        }
+                    },
+                    "tests":{},
+                }
+            }
+
+        rows=validate_assessment_capability_semantics(document(False))
+        self.assertNotIn(
+            "assessment.native_literal_datatype",
+            {row["code"] for row in rows},
+        )
+
+        rows=validate_assessment_capability_semantics(document("false"))
+        self.assertIn(
+            "assessment.native_literal_datatype",
+            {row["code"] for row in rows},
+        )
+
+    def test_v02_integer_rejects_json_boolean_and_string(self):
+        def codes(value):
+            doc={
+                "assessment":{
+                    "specification":{
+                        "id":"scap-ng.pre-alpha.assessment",
+                        "version":"0.2.0",
+                    },
+                    "objects":{},
+                    "variables":{},
+                    "states":{
+                        "expected":{
+                            "capability":"variable.value",
+                            "state":{
+                                "field":"value",
+                                "value":value,
+                                "operation":"equal",
+                                "datatype":"integer",
+                                "match":"all",
+                                "existence":"some",
+                            },
+                        }
+                    },
+                    "tests":{},
+                }
+            }
+            return {row["code"] for row in validate_assessment_capability_semantics(doc)}
+
+        self.assertNotIn("assessment.native_literal_datatype",codes(0))
+        self.assertIn("assessment.native_literal_datatype",codes(False))
+        self.assertIn("assessment.native_literal_datatype",codes("0"))
+
 
 if __name__=="__main__":
     unittest.main()
