@@ -44,12 +44,15 @@ def _native_literal_matches_datatype(value, datatype):
     if datatype == "integer":
         return isinstance(value, int) and not isinstance(value, bool)
     if datatype == "float":
-        return isinstance(value, (int, float)) and not isinstance(value, bool)
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            return False
+        import math
+        return math.isfinite(value)
     if datatype in _STRING_LITERAL_DATATYPES:
         return isinstance(value, str)
-    # record literals are represented by the structured predicate forms rather
-    # than scalar entity_value.
-    return datatype == "record"
+    # record literals are represented by structured predicate forms, never as
+    # a scalar entity_value.
+    return False
 
 
 def _iter_authored_predicates(node):
