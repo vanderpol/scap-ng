@@ -57,3 +57,24 @@ status of all original DISA content. Compare paired original/enhanced checks bef
 attributing actual savings to the version upgrade. Source declarations, all five
 ZIP hashes and twelve Test-family inventories were checked; no commands from
 content or target tests were run, and previous semantic suites were not repeated.
+
+## Further owner clarification: inherited Tests and filesystem-search boundary
+
+2026-10-03, receiving SHA `20c922dbd353f8f6c8aa6d46c65d90babb21fbbc`.
+Most NIWC 1.4 content derives from DISA 1.3 and carries DISA-developed Tests that
+may transition to shellcommand later. This is owner-provided lineage context;
+the previous twelve-case inventory does not quantify it. Do not treat a 1.4
+declaration or existing shellcommand Tests as evidence that retained Tests are
+already modernized. Investigate rewrites against complete pinned inherited graphs;
+paired DISA packages are only necessary for claims specifically attributing or
+quantifying original-DISA upgrade savings.
+
+Shellcommand SHALL NOT be used for **any filesystem searches**, not merely broad
+scans. Native scanner Objects retain file discovery, include discovery, traversal,
+configured remote-filesystem scope/exclusions, permissions, links/junctions and
+collection behavior. Preserve the scanner's ability to optimize those operations.
+Focused service queries remain legitimate when they respect this boundary.
+
+Updated research direction/comparison only; no schemas, converter code, executable
+Assessments or test semantics changed. Validation: documentation diff/links and
+scope reviewed; no semantic suites or target commands rerun for this clarification.

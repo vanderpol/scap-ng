@@ -15,6 +15,10 @@ The [existing-capability baseline](EXISTING-CAPABILITIES.md) includes SCAP 1.4 a
 existing shellcommand as possible final solutions; new runtime features require
 an evidenced gap. Seven selected checks already use shellcommand in enhanced
 SCAP 1.4 packages, so a version upgrade and remaining complexity are separate claims.
+Most NIWC 1.4 content inherits DISA 1.3 Tests, per the owner's clarification;
+retained Tests remain candidates for focused shellcommand rewrites. Shellcommand
+SHALL NOT perform filesystem searches; scanner Objects retain remote-filesystem
+awareness, selection behavior and traversal efficiencies.
 YAML is the inspectable prototype, not the claimed readability benefit. A sentence
 editor could expose the same typed operations without interpreting free prose.
 

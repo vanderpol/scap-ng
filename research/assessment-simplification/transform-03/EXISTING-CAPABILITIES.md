@@ -23,6 +23,16 @@ paired original/enhanced versions of the same requirement, including wording,
 applicability, scope and error/results, before attributing savings to the upgrade.
 A version upgrade enables a rewrite; it does not automatically rewrite content.
 
+Owner clarification: most NIWC SCAP 1.4 content derives from DISA SCAP 1.3
+content and retains many DISA-developed Tests. Therefore a 1.4 package declaration,
+or shellcommand use elsewhere in that package, SHALL NOT be treated as evidence
+that every retained Test has been simplified using available 1.4 methods. The
+research SHOULD assess those retained Tests for suitable shellcommand rewrites.
+This lineage is owner-provided context, not a corpus-wide measurement made by
+the twelve-case inventory. A paired original DISA package is useful for quantified
+upgrade-attribution claims, but is not required to investigate a rewrite against
+the complete inherited Test graph already present in a pinned NIWC package.
+
 The pinned OVAL 5.12.3 independent schema defines `shellcommand_test`. Current NG
 already has the reviewed `independent.shellcommand` mapping, with explicit
 interpreter, command, optional line pattern and error flags. OVAL's source contract
@@ -52,10 +62,20 @@ useful evidence. The typed DNS/configuration providers from method-02 remain
 **alternatives**, not prerequisites. Even a validated audit coverage algorithm
 could live in a publisher command if that proves simpler and sufficiently portable.
 
-Original constraints remain: shellcommand SHALL NOT become the universal primary
-method; filesystem traversal/broad scanning SHALL remain native; Organizational
-Input SHALL be constrained and SHALL NOT inject commands or choose Tests. Effectively
-deprecated Tests SHALL NOT be revived by command wrappers or upgrades.
+Shellcommand SHALL NOT perform filesystem searches, including file discovery,
+directory enumeration for locating files, recursive searches or include-file
+discovery. This applies to small searches as well as broad scans. Native scanner
+Objects SHALL select/acquire the files, retaining configured remote-filesystem
+scope/exclusions, permissions, link/junction handling and collection status. The
+scanner MAY use its own traversal, caching, batching and other efficiencies.
+Wrapping a filesystem search in a command or helper does not change this boundary.
+Focused service/administrative queries remain candidates when they do not delegate
+filesystem searching to shellcommand; utility behavior must be checked accordingly.
+
+Original constraints also remain: shellcommand SHALL NOT become the universal
+primary method; Organizational Input SHALL be constrained and SHALL NOT inject
+commands or choose Tests. Effectively deprecated Tests SHALL NOT be revived by
+command wrappers or upgrades.
 
 This checkpoint inspected sources/schemas; no content commands or target scans
 ran, and unrelated semantic suites were not repeated. No upgrade savings or

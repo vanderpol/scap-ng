@@ -12,6 +12,14 @@ are possible alternatives, not required additions. The pinned enhanced corpus
 already includes seven shellcommand-bearing cases and five SCAP 1.4 packages;
 upgrade savings from original DISA 1.3 content require a separate paired comparison.
 
+The owner clarified that most NIWC 1.4 content derives from DISA 1.3 and retains
+many DISA Tests. Investigate those inherited Tests even when their package is
+already labeled 1.4; package version does not prove Test modernization. Paired
+DISA packages are needed for quantified lineage/upgrade claims, not to begin a
+before/after rewrite against the pinned inherited graph. Shellcommand SHALL NOT
+perform filesystem searches of any scope: native scanner selection retains remote
+filesystem awareness and implementation efficiencies.
+
 ## Across the selected cases
 
 | Rule / source | Easier author-facing concept | Compiler versus execution evidence |
