@@ -1,5 +1,15 @@
 # Research receiving-session checkpoint
 
+## Latest continuation: full requirement reading, 2026-10-03
+
+Start with [requirements-05](requirements-05/README.md) and its
+[handoff](requirements-05/HANDOFF.md). All 445 RHEL 9 and 291 Windows Server 2025
+complete Check Texts were read and pinned. This broadens requirement interpretation,
+not complete OVAL graph/scanner equivalence claims. The new notes expose crypto
+manual 13 versus prior automated 12 resources, additional audit domains, actual
+DeviceGuard behavior and Windows principal/ACL scope. Prior research below remains
+bounded evidence; use the new handoff for the next source-driven experiments.
+
 Current research direction and handoff: [method-02/HANDOFF.md](method-02/HANDOFF.md).
 The owner clarified that new assessment methods understandable without OVAL
 graph expertise are the goal. Earlier table/graph preservation checkpoints remain

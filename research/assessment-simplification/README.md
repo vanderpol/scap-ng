@@ -1,5 +1,11 @@
 # Assessment simplification research
 
+Latest corpus reading: [all RHEL 9 and Windows Server 2025 Check Texts, requirements 05](requirements-05/README.md).
+All 736 requirements were read, with pinned original text, interpretation notes,
+twelve expanded problem families and source discrepancies. Coverage verification
+does not establish scanner equivalence; additional samples' full OVAL closures and
+target validation remain follow-up work.
+
 Latest concepts: [ten authoring/assessment alternatives, concepts 04](concepts-04/README.md),
 including native editing without a second language, reusable observation recipes,
 acceptance cases and directly evaluated domain contracts. Concepts only; no new
