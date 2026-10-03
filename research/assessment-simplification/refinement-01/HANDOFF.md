@@ -7,6 +7,11 @@ Pre-alpha instructions required continuing on main, not a routine PR.
 Use `git log -1 -- research/assessment-simplification/refinement-01` for the actual
 containing checkpoint SHA; the final publication report identifies it. Do not
 assume the receiving SHA contains this work.
+The tested implementation was published in
+`cb0bfd7e27a942650fff2d6a3bfc0ffd7082fcdd`. See [BACKLOG](BACKLOG.md) for created
+issues #122 (DNS target comparison) and #123 (audit source-coverage investigation).
+Existing #24/#44 cover authoring tooling/acquisition reuse; no duplicate issue
+or Board vote was created for those broader topics.
 
 Read root AGENTS/current design/transition again at the next receiving commit.
 Then read this directory's README, SAMPLES, CONTRACTS, DECISIONS and evidence.

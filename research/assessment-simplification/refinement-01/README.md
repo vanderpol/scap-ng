@@ -18,6 +18,9 @@ outside this checkpoint.
 Read [sample refinements](SAMPLES.md), [comparison and execution contracts](CONTRACTS.md),
 [versioned decision candidates](DECISIONS.md), [evidence](evidence/), and
 [resumption instructions](HANDOFF.md).
+Implementation checkpoint is `cb0bfd7e27a942650fff2d6a3bfc0ffd7082fcdd` on `main`.
+[Backlog follow-ups](BACKLOG.md) record issues #122 and #123 and related existing
+work; no Board vote was opened.
 
 ## Experiments and revisions
 
