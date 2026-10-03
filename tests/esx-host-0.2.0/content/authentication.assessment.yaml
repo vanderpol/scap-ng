@@ -1,0 +1,38 @@
+assessment:
+  id: esx.fixture.authentication
+  version: 1
+  assessment_title: Synthetic ESXi host authentication check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Acquire host-wide authentication observations
+      capability: esx.host_authentication
+      select: {}
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_authentication
+      state:
+        field: domain_membership_status
+        datatype: string
+        operation: equal
+        value: Ok
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare host-wide authentication
+      capability: esx.host_authentication
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

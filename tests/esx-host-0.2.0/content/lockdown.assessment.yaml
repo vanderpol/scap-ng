@@ -1,0 +1,38 @@
+assessment:
+  id: esx.fixture.lockdown
+  version: 1
+  assessment_title: Synthetic ESXi host lockdown check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Acquire host-wide lockdown observations
+      capability: esx.host_lockdown
+      select: {}
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_lockdown
+      state:
+        field: lockdown
+        datatype: string
+        operation: equal
+        value: strict
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare host-wide lockdown
+      capability: esx.host_lockdown
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

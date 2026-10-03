@@ -63,3 +63,19 @@ output. Existing collection-status expectations apply to both new capabilities.
 Provenance: Adapted source contracts; Common native fixtures; Evidence/Audit
 synthetic expected results. All original XSD license notices remain retained.
 Live-target and complete vendor conformance remain open.
+
+## Host-wide settings slice
+
+Five selectorless named Objects use explicit `select: {}` in one ESXi host's
+invocation context. Assessments and synthetic Items cover host acceptance policy,
+lockdown mode/exception users, configured NTP servers, network core dumps and
+domain membership. [Expected results](expected-results/hostwide.json) give ten
+explained passing/failing equality cases. Repeated NTP servers and exception users
+are arrays; their entity quantifier is distinct from the Test's Item quantifier.
+
+Run `python tools/test_esx_hostwide_v02.py`. Its source/type/cardinality checks,
+invalid/unused-node checks, single-operand filtered Sets, version isolation,
+status/redaction/category cases, report provenance, and actual unsigned compilation
+are representation evidence. They do not acquire a VMware target or implement a
+complete State comparator. [Source investigation](../../../transition/esx-source-evidence-2026-10-03.md)
+records the upstream issue/PR trail and the absence of retrieved real scan results.

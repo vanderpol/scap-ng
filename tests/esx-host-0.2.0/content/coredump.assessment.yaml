@@ -1,0 +1,38 @@
+assessment:
+  id: esx.fixture.coredump
+  version: 1
+  assessment_title: Synthetic ESXi host coredump check
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    selected:
+      object_title: Acquire host-wide coredump observations
+      capability: esx.host_coredump
+      select: {}
+  states:
+    expected:
+      state_title: Expected fixture value
+      capability: esx.host_coredump
+      state:
+        field: enabled
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+  tests:
+    test-check:
+      test_title: Compare host-wide coredump
+      capability: esx.host_coredump
+      object: selected
+      states:
+      - expected
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-check

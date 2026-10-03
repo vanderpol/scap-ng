@@ -17,6 +17,11 @@ by each Test, Object, or State.
 | `esx.host_advancedsetting` | Named ESXi host setting with typed repeated values | Draft 0.2.0 addition | [Host settings](esx.host_advancedsetting.md) |
 | `esx.host_account` | Named host accounts and shell access | Draft 0.2.0 addition | [Host accounts](esx.host_account.md) |
 | `esx.host_vib` | Installed VIB metadata and acceptance category | Draft 0.2.0 addition | [Installed VIBs](esx.host_vib.md) |
+| `esx.host_acceptancelevel` | Host software acceptance policy | Draft 0.2.0 addition | [Host acceptancelevel](esx.host_acceptancelevel.md) |
+| `esx.host_lockdown` | Lockdown mode and exception users | Draft 0.2.0 addition | [Host lockdown](esx.host_lockdown.md) |
+| `esx.host_ntpserver` | Configured NTP server occurrences | Draft 0.2.0 addition | [Host ntpserver](esx.host_ntpserver.md) |
+| `esx.host_coredump` | Network core-dump configuration | Draft 0.2.0 addition | [Host coredump](esx.host_coredump.md) |
+| `esx.host_authentication` | Domain membership configuration/status | Draft 0.2.0 addition | [Host authentication](esx.host_authentication.md) |
 
 ## Where requirements live
 

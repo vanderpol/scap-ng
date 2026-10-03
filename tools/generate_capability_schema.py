@@ -229,6 +229,13 @@ def generate(mapping, repo_root):
     object_fields = immediate_payload_elements(object_el) if object_el is not None else {}
     state_fields = immediate_payload_elements(state_el)
     item_fields = immediate_payload_elements(item_el)
+    selectorless = mapping.get("native", {}).get("selectorless_object", False)
+    if selectorless:
+        payload = {name for name in object_fields if name != source.get("object")}
+        if (version != "0.2.0" or object_el is None or payload
+                or mapping["native"].get("selector_map")
+                or mapping["native"].get("collect_schema")):
+            raise ValueError("Selectorless Object requires a reviewed 0.2.0 empty source selection")
     traversal_definition = mapping.get("native", {}).get("traversal_definition")
     if traversal_definition is None and mapping.get("native", {}).get("uses_file_traversal", False):
         traversal_definition = "file_traversal"
@@ -569,7 +576,20 @@ def generate(mapping, repo_root):
             },
         }
         object_alternatives = []
-        if selector_props:
+        if selectorless:
+            if collect_schema:
+                raise ValueError("Selectorless Object cannot also require acquisition arguments")
+            # Explicit empty selection acquires this capability's host-wide
+            # observations in the invocation's target context. Sets remain a
+            # separate form; filters use ordinary Set operands.
+            object_properties["select"] = {
+                "type": "object", "maxProperties": 0,
+            }
+            object_alternatives.append({
+                "required": ["select"],
+                "not": {"required": ["set"]},
+            })
+        elif selector_props:
             object_properties["select"] = {
                 "type": "object",
                 "properties": selector_props,
