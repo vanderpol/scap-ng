@@ -1,5 +1,9 @@
 # Research receiving-session checkpoint
 
+Latest continuation: [refinement-01/HANDOFF.md](refinement-01/HANDOFF.md).
+Its source-contract/table, DNS and Apache experiments advance the bounded work
+listed below. This original checkpoint is retained as historical evidence.
+
 Date: 2026-10-03 UTC (owner task began October 2 America/New_York).
 
 Repository: `https://github.com/vanderpol/scap-ng.git`; branch `main`.

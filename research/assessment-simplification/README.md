@@ -1,5 +1,10 @@
 # Assessment simplification research
 
+Latest continuation: [refinement 01](refinement-01/README.md) adds finite-table
+expansion with full bounded source-contract comparison, typed DNS acquisition
+experiments, an Apache occurrence library, adversarial tests and a new handoff.
+The initial study below is preserved as the baseline.
+
 **Research checkpoint, 2026-10-03: all 12 packet cases investigated. Experimental proposals only; no schema/converter changes or scanner-equivalence claim.**
 
 Start with the [findings and limits](FINDINGS.md), [comparison](COMPARISON.md), [experimental execution contracts](FEATURES.md), [versioned yes/no decision candidates](DECISIONS.md), and [resumption handoff](HANDOFF.md). This is development research, not a parallel external review surface.
