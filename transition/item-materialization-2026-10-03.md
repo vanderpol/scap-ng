@@ -93,3 +93,8 @@ committed exact-byte import and scope/count fixtures pass offline checks.
 The byte import helper rejects floating values that cannot preserve their exact
 JSON numeric value through its Python float representation; it never silently
 rounds them. Wider numeric precision requires a future lossless numeric consumer.
+
+Windows CI exposed automatic checkout newline conversion of the byte-pinned
+source fixture. A file-specific Git attribute now disables text conversion for
+that artifact. Its bytes are stable across platforms; import verification still
+checks exact bytes and never normalizes them to make a mismatched digest pass.
