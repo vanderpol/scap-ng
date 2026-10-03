@@ -179,3 +179,20 @@ pins 20 new ESX and 2 Kubernetes Tests and their inherited contracts. No native
 mapping or collector is introduced by the inventory. Current standalone content
 covers only two mapped capabilities; wider vendor/method-level and target cases
 remain open. See [the handoff](../../../../transition/capability-coverage-2026-10-03.md).
+
+## Assessment documentation foundation — 2026-10-03 owner direction
+
+Begin shared Markdown and a reusable capability reference format while finishing
+0.2.0. Establish source-backed examples before bounded Codex catalog expansion.
+The [Assessment reference](../../../../specification/assessment/reference/README.md)
+links current authorities, documents Unix file and direct-Variable fields, and
+distinguishes structural, synthetic, migration, and target evidence.
+
+The intended publication is one versioned NG specification/capability reference.
+Useful source XSD documentation must survive as reviewed native explanations,
+with useful descriptions/examples also in JSON Schema annotations. JSON Schema
+is not the sole semantic authority. A structured YAML catalog generating schemas
+and reference documentation is a proposed future consolidation; existing JSON
+mappings remain generator inputs and no catalog/generation replacement is
+implemented by this documentation slice. Do not independently edit duplicate
+truth tables or infer finalized runtime conformance from the starter references.

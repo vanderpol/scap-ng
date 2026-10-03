@@ -18,6 +18,11 @@ Until the lossless repository rebaseline is complete, the current review set lin
    - [Windows 11 full-review summary](examples/windows11-full.md)
 7. [Full-current normalization evidence summary](evidence/full-current-normalization.md)
 
+The [Assessment reference](../../specification/assessment/reference/README.md)
+now provides shared behavior and initial `unix.file`/`variable.value` field
+guides. It remains incomplete; its examples distinguish structural/synthetic
+evidence from target execution, and 0.2.0 is still a partial draft.
+
 ## Review boundary
 
 Reviewers should judge the design from the material above, not from old generators, superseded renderers, historical prototypes, transition notes, or helper scripts.

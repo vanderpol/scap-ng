@@ -1,5 +1,10 @@
 # Draft 0.2.0 Assessment expression slice
 
+Read the [Assessment author and assessor reference](../../specification/assessment/reference/README.md)
+for shared behavior, initial capability field guides, and linked expected-result
+examples. Its coverage is incomplete; it does not turn this partial draft into
+a released specification or claim live collector conformance.
+
 This is a partial versioned draft, not a complete 0.2.0 release schema set.
 It adds `assessment.schema.json`, recursive `expression.schema.json`, and an
 expression-stage `expression-result.schema.json`. Unchanged manual authoring is

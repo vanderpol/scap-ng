@@ -1,5 +1,10 @@
 # Assessment Method
 
+For field-level authoring and implementation guidance, start with the
+[Assessment reference](reference/README.md). It links the shared evaluation
+contract and the initial Unix file/direct-Variable references; catalog coverage
+is still incomplete.
+
 **Status:** pre-alpha normative draft
 
 ## 1. Purpose
