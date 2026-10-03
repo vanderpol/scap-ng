@@ -1,0 +1,618 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/assessment-result.schema.json",
+  "title": "SCAP-NG Assessment Result draft v0.2.0 strawman",
+  "description": "Detailed execution result for one Assessment invocation, including Test outcomes, collected Items, bindings, completeness, and diagnostics. Pre-alpha strawman.",
+  "type": "object",
+  "required": [
+    "assessment_result"
+  ],
+  "properties": {
+    "assessment_result": {
+      "type": "object",
+      "required": [
+        "result_schema_version",
+        "execution_id",
+        "assessment",
+        "purpose",
+        "class",
+        "outcome",
+        "logical_complete",
+        "population_complete",
+        "evidence_complete",
+        "tests",
+        "objects",
+        "items",
+        "variables",
+        "diagnostics",
+        "mode",
+        "target_ref",
+        "expression_execution",
+        "field_uses"
+      ],
+      "properties": {
+        "result_schema_version": {
+          "const": "0.2.0"
+        },
+        "execution_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "digest": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "purpose": {
+          "$ref": "result-types.schema.json#/$defs/assessment_purpose"
+        },
+        "class": {
+          "$ref": "result-types.schema.json#/$defs/assessment_class"
+        },
+        "mode": {
+          "enum": [
+            "automated",
+            "manual"
+          ]
+        },
+        "outcome": {
+          "$ref": "result-types.schema.json#/$defs/technical_outcome"
+        },
+        "logical_complete": {
+          "type": "boolean"
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "test-result.schema.json"
+          }
+        },
+        "objects": {
+          "type": "array",
+          "description": "Runtime Object/collection-execution records. Terminology is under active alignment with OVAL.",
+          "items": {
+            "$ref": "collection-result.schema.json"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "collected-item.schema.json"
+          }
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "$ref": "variable-result.schema.json"
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "manual_response": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Required provenance for a completed manual Assessment result.",
+          "properties": {
+            "outcome": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "error",
+                "unknown",
+                "not_evaluated",
+                "not_applicable"
+              ]
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "started_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "response_source": {
+              "type": "string",
+              "enum": [
+                "direct",
+                "imported",
+                "delegated"
+              ]
+            },
+            "evaluator": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "object",
+                  "required": [
+                    "scheme",
+                    "value"
+                  ],
+                  "properties": {
+                    "scheme": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "display_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "organization": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "identity_source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "organizational_unit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "contact": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "phone": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "uri": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "review": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "comments": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "consumed_organizational_inputs": {
+          "type": "array",
+          "description": "Organizational Input bindings consumed by this Assessment execution.",
+          "items": {
+            "type": "object",
+            "required": [
+              "input",
+              "organizational_input_ref",
+              "materialized"
+            ],
+            "properties": {
+              "input": {
+                "type": "string",
+                "minLength": 1
+              },
+              "state_slot": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {},
+              "redacted": {
+                "type": "boolean"
+              },
+              "organizational_input_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "materialized": {
+                "type": "boolean"
+              },
+              "validation_status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "redacted": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "redacted"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "required": [
+                      "value"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported_organizational_input",
+                    "missing_organizational_input",
+                    "invalid_organizational_input"
+                  ]
+                },
+                "input": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "state_slot": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "message": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "dependent_assessments": {
+          "type": "array",
+          "description": "Assessment-result dependencies consumed by this Assessment invocation.",
+          "items": {
+            "type": "object",
+            "required": [
+              "alias",
+              "assessment",
+              "execution_id",
+              "outcome"
+            ],
+            "properties": {
+              "alias": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assessment": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "version"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "version": {
+                    "type": [
+                      "string",
+                      "integer"
+                    ]
+                  },
+                  "digest": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "execution_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "true",
+                  "false",
+                  "error",
+                  "unknown",
+                  "not_evaluated",
+                  "not_applicable"
+                ]
+              },
+              "purpose": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "assessment",
+                  "applicability",
+                  null
+                ]
+              },
+              "reused": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "binding_set_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional deterministic identifier/digest for the complete effective input-binding set of this invocation."
+        },
+        "input_bindings": {
+          "type": "array",
+          "description": "Effective named Assessment inputs for this invocation. Distinct effective bindings require distinct execution identities.",
+          "items": {
+            "type": "object",
+            "required": [
+              "input",
+              "source"
+            ],
+            "properties": {
+              "input": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {},
+              "redacted": {
+                "type": "boolean"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "redacted": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "redacted"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "required": [
+                      "value"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "evidence_summary": {
+          "$ref": "result-types.schema.json#/$defs/bounded_evidence"
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expression_execution": {
+          "$ref": "expression-invocation.schema.json"
+        },
+        "field_uses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "test_ref",
+              "item_ref",
+              "used_elements",
+              "required_elements"
+            ],
+            "properties": {
+              "test_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "item_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "used_elements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "required_elements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "relationship": {
+                "enum": [
+                  "direct",
+                  "variable",
+                  "filter",
+                  "selection"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "item_report": {
+          "$ref": "item-report.schema.json#/properties/item_report"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "manual"
+              },
+              "outcome": {
+                "enum": [
+                  "true",
+                  "false",
+                  "error",
+                  "unknown",
+                  "not_applicable"
+                ]
+              }
+            },
+            "required": [
+              "mode",
+              "outcome"
+            ]
+          },
+          "then": {
+            "required": [
+              "manual_response"
+            ],
+            "properties": {
+              "manual_response": {
+                "type": "object",
+                "required": [
+                  "outcome",
+                  "completed_at",
+                  "response_source",
+                  "evaluator"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

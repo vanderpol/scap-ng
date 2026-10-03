@@ -128,13 +128,18 @@ class AssessmentExpressionEvaluator:
         context = json.dumps({"target": target, "bindings": bindings or {}}, sort_keys=True)
         invocation_ref = "expression-" + uuid.uuid4().hex
         test_cache, assessment_cache, trace, executed, diagnostics = {}, {}, [], [], []
+        invocation_ids, records = {entry: invocation_ref}, {}
 
-        def skip(path, reason):
-            trace.append({"path": path, "kind": "expression", "outcome": "not_evaluated", "reason": reason})
+        def emit(identity, record):
+            record["owner_invocation_ref"] = invocation_ids[identity]
+            trace.append(record)
+
+        def skip(identity, path, reason):
+            emit(identity, {"path": path, "kind": "expression", "outcome": "not_evaluated", "reason": reason})
 
         def expression(identity, node, path):
             if "not_applicable" in node:
-                trace.append({"path": path, "kind": "terminal", "outcome": "not_applicable",
+                emit(identity, {"path": path, "kind": "terminal", "outcome": "not_applicable",
                               "reason": node["not_applicable"]["reason"]})
                 return "not_applicable"
             if "test" in node:
@@ -151,7 +156,7 @@ class AssessmentExpressionEvaluator:
                     test_cache[key] = source
                     executed.append(f"{identity}:{name}")
                 result = test_cache[key]
-                trace.append({"path": path, "kind": "test", "test": name, "assessment": identity,
+                emit(identity, {"path": path, "kind": "test", "test": name, "assessment": identity,
                               "outcome": result, "reused": reused})
                 return result
             if "assessment" in node:
@@ -160,8 +165,8 @@ class AssessmentExpressionEvaluator:
                 dependent = dep["expected_id"]
                 reused = (dependent, context) in assessment_cache
                 result = invocation(dependent)
-                trace.append({"path": path, "kind": "dependency", "alias": alias,
-                              "assessment": dependent, "invocation_ref": invocation_ref, "outcome": result, "reused": reused})
+                emit(identity, {"path": path, "kind": "dependency", "alias": alias,
+                              "assessment": dependent, "invocation_ref": invocation_ids[dependent], "outcome": result, "reused": reused})
                 return result
             if "if" in node:
                 guard = expression(identity, node["if"], path + "/if")
@@ -169,12 +174,12 @@ class AssessmentExpressionEvaluator:
                 if guard in ("true", "false"):
                     selected = "then" if guard == "true" else "else"
                     result = expression(identity, node[selected], path + "/" + selected)
-                    skip(path + "/" + ("else" if selected == "then" else "then"), "conditional_branch_not_selected")
+                    skip(identity, path + "/" + ("else" if selected == "then" else "then"), "conditional_branch_not_selected")
                 else:
                     result = guard
-                    skip(path + "/then", "condition_unresolved")
-                    skip(path + "/else", "condition_unresolved")
-                trace.append({"path": path, "kind": "conditional", "condition_outcome": guard,
+                    skip(identity, path + "/then", "condition_unresolved")
+                    skip(identity, path + "/else", "condition_unresolved")
+                emit(identity, {"path": path, "kind": "conditional", "condition_outcome": guard,
                               "selected_branch": selected, "outcome": result})
                 return result
             if "not" in node:
@@ -192,6 +197,7 @@ class AssessmentExpressionEvaluator:
             key = (identity, context)
             if key in assessment_cache:
                 return assessment_cache[key]
+            invocation_ids.setdefault(identity, "expression-" + uuid.uuid4().hex)
             assessment = self.assessments[identity]
             if assessment.get("mode") == "manual":
                 if evaluate_manual is None:
@@ -199,14 +205,14 @@ class AssessmentExpressionEvaluator:
                 result = evaluate_manual(identity, copy.deepcopy({"target": target, "bindings": bindings or {}}))
                 if not isinstance(result, str) or result not in OUTCOMES:
                     raise ContentError("invalid_manual_outcome", str(result))
-                trace.append({"path": identity, "kind": "manual", "outcome": result})
+                emit(identity, {"path": identity, "kind": "manual", "outcome": result})
                 assessment_cache[key] = result
                 return result
             if assessment.get("applicability") is not None:
                 outcome = expression(identity, assessment["applicability"], identity + "/applicability")
                 if outcome != "true":
                     result = "not_applicable" if outcome == "false" else outcome
-                    skip(identity + "/evaluate", "intrinsic_applicability_not_true")
+                    skip(identity, identity + "/evaluate", "intrinsic_applicability_not_true")
                     assessment_cache[key] = result
                     return result
             result = expression(identity, assessment["evaluate"], identity + "/evaluate")
@@ -214,5 +220,11 @@ class AssessmentExpressionEvaluator:
             return result
 
         outcome = invocation(entry)
+        for (identity, _), result in assessment_cache.items():
+            own_trace = [row for row in trace if row["owner_invocation_ref"] == invocation_ids[identity]]
+            names = list(dict.fromkeys(row["test"] for row in own_trace if row["kind"] == "test"))
+            records[identity] = {"assessment": identity, "invocation_ref": invocation_ids[identity],
+                                 "outcome": result, "executed_tests": names, "trace": own_trace,
+                                 "diagnostics": [d for d in diagnostics if d["test"] in {f"{identity}:{name}" for name in names}]}
         return {"outcome": outcome, "executed_tests": executed, "trace": trace, "diagnostics": diagnostics,
-                "context": {"target": target, "invocation_ref": invocation_ref}, "evaluation_scope": "assessment_expression"}
+                "context": {"target": target, "invocation_ref": invocation_ref}, "evaluation_scope": "assessment_expression", "invocations": list(records.values())}

@@ -7,6 +7,7 @@ on:
       - schema/v0.2.0/**
       - tests/conditional-0.2.0/**
       - tests/reported-elements-0.2.0/**
+      - tests/assessment-results-0.2.0/**
       - tests/collected-items-0.2.0/**
       - .github/workflows/scap-ng-current-regression.yml
   push:
@@ -17,9 +18,11 @@ on:
       - tools/test_*.py
       - tools/conditional_conformance.py
       - tools/assessment_expression.py
+      - tools/assessment_results_v02.py
       - tools/reported_elements.py
       - tests/conditional-0.2.0/**
       - tests/reported-elements-0.2.0/**
+      - tests/assessment-results-0.2.0/**
       - tools/generate_capability_schema.py
       - tools/validate_generated_capability_semantics.py
       - tools/validate_native_package_graph.py
@@ -77,6 +80,9 @@ jobs:
           python tools/test_conditional_conformance.py
           python tools/test_conditional_integration.py
           python tools/test_reported_elements.py
+          python tools/test_assessment_results_v02.py
+          python tools/assessment_results_v02.py --assessments tests/assessment-results-0.2.0/content --result-set tests/assessment-results-0.2.0/expected-results/conditional-ownership.result-set.json
+          python tools/check_current_authoring_contract.py tests/assessment-results-0.2.0/content
           python tools/conditional_conformance.py --report work/conditional-results.json
           python tools/check_current_authoring_contract.py tests/conditional-0.2.0/content
           python tools/test_collected_item_contract_v02.py
