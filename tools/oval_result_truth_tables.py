@@ -369,7 +369,7 @@ def apply_variable_reference_context(variable_result, context):
     if status == NO_VALUES:
         if context == "object":
             return "does_not_exist"
-        if context == "state":
+        if context in {"state", "direct_test"}:
             return ERROR
         raise ValueError(f"unsupported variable reference context: {context}")
     if status != TRUE:
