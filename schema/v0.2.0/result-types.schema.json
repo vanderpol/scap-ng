@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/result-types.schema.json",
+  "title": "Draft shared result types 0.2.0",
+  "description": "Reusable structural types for SCAP-NG result schemas. Runtime truth/aggregation semantics are defined by the specification and conformance tests, not by JSON Schema alone.",
+  "$defs": {
+    "technical_outcome": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ],
+      "description": "Six-state technical Assessment/Test outcome. Informational is deliberately not a seventh technical truth value."
+    },
+    "assessment_purpose": {
+      "type": "string",
+      "enum": [
+        "assessment",
+        "applicability"
+      ]
+    },
+    "assessment_class": {
+      "type": "string",
+      "enum": [
+        "compliance",
+        "vulnerability",
+        "patch",
+        "inventory",
+        "miscellaneous"
+      ],
+      "description": "Defines what technical truth means. Policy-facing pass/fail interpretation belongs to the consuming Rule."
+    },
+    "completeness": {
+      "type": "object",
+      "required": [
+        "logical_complete",
+        "population_complete",
+        "evidence_complete"
+      ],
+      "properties": {
+        "logical_complete": {
+          "type": "boolean"
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "stop_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "typed_value": {
+      "description": "A typed scalar or record result value. Multi-valued entities/Variables are represented by arrays of typed_value rather than by an implicit multi-value scalar.",
+      "type": "object",
+      "required": [
+        "datatype"
+      ],
+      "properties": {
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {},
+        "status": {
+          "enum": [
+            "exists",
+            "does_not_exist",
+            "error",
+            "not_collected"
+          ]
+        },
+        "redacted": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, the value has been intentionally omitted from emitted results/evidence. A redacted typed value SHALL NOT carry a value property."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "does_not_exist",
+                  "error",
+                  "not_collected"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "redacted": {
+                "const": true
+              }
+            },
+            "required": [
+              "redacted"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "datatype": {
+                    "const": "record"
+                  }
+                },
+                "required": [
+                  "datatype"
+                ]
+              },
+              {
+                "not": {
+                  "properties": {
+                    "redacted": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "redacted"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "does_not_exist",
+                        "error",
+                        "not_collected"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "object",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/typed_value"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/typed_value"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "bounded_evidence": {
+      "type": "object",
+      "required": [
+        "observed_failures",
+        "actual_failures",
+        "maximum",
+        "returned",
+        "truncated_population"
+      ],
+      "properties": {
+        "observed_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_failures": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "enum": [
+                "unknown"
+              ]
+            }
+          ]
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated_population": {
+          "type": "boolean"
+        },
+        "stop_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

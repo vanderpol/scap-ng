@@ -1,24 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://scap-ng.dev/schema/v0.2.0/expression-result.schema.json",
-  "title": "Draft Assessment expression execution result 0.2.0",
-  "description": "Expression-stage result, not a complete Assessment Result or scanner result package.",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/expression-invocation.schema.json",
   "type": "object",
   "required": [
+    "assessment",
+    "invocation_ref",
     "outcome",
     "executed_tests",
     "trace",
-    "diagnostics",
-    "context",
-    "evaluation_scope",
-    "invocations"
+    "diagnostics"
   ],
   "properties": {
-    "outcome": {
-      "$ref": "#/$defs/outcome"
+    "assessment": {
+      "type": "string",
+      "minLength": 1
     },
-    "evaluation_scope": {
-      "const": "assessment_expression"
+    "invocation_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "$ref": "expression-result.schema.json#/$defs/outcome"
     },
     "executed_tests": {
       "type": "array",
@@ -26,42 +28,6 @@
         "type": "string"
       },
       "uniqueItems": true
-    },
-    "context": {
-      "type": "object",
-      "required": [
-        "target",
-        "invocation_ref"
-      ],
-      "properties": {
-        "target": {
-          "type": "string"
-        },
-        "invocation_ref": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "additionalProperties": false
-    },
-    "diagnostics": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "code",
-          "test"
-        ],
-        "properties": {
-          "code": {
-            "const": "missing_test_result"
-          },
-          "test": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      }
     },
     "trace": {
       "type": "array",
@@ -371,14 +337,27 @@
         "additionalProperties": false
       }
     },
-    "invocations": {
+    "diagnostics": {
       "type": "array",
-      "minItems": 1,
       "items": {
-        "$ref": "expression-invocation.schema.json"
+        "type": "object",
+        "required": [
+          "code",
+          "test"
+        ],
+        "properties": {
+          "code": {
+            "const": "missing_test_result"
+          },
+          "test": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     }
   },
+  "additionalProperties": false,
   "$defs": {
     "outcome": {
       "enum": [
@@ -390,6 +369,5 @@
         "not_applicable"
       ]
     }
-  },
-  "additionalProperties": false
+  }
 }

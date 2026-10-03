@@ -75,3 +75,13 @@ See [the integration checkpoint](../../transition/conditional-integration-2026-1
 ## Reported elements draft
 
 The [single-commit reporting checkpoint](../../transition/reported-elements-2026-10-03.md) adds Test-only `reported_elements`: `all` by default, `compared`, or a unique array of top-level Item field names. It provides generated capability overlays and a marked derived Item report, preserves canonical truth and source completeness, and keeps `redact_result` as the separate cross-result confidentiality control. Full Assessment Result integration and actual field-use lineage production remain release prerequisites.
+
+## Assessment Result integration
+
+The [result integration checkpoint](../../transition/assessment-results-2026-10-03.md)
+adds a canonical draft Assessment Result graph with per-invocation expression
+records, local Test/Object/Item/Variable evidence, dependency execution IDs and
+optional derived Item reports. Shared Item/result types now have v0.2.0 IDs.
+The source-aware helper validates capability Item contracts and recorded
+scheduling offline. The result-set wrapper is development transport, not a final
+result package. See the [known-result examples](../../tests/assessment-results-0.2.0/README.md).

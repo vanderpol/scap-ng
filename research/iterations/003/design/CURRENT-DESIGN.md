@@ -121,3 +121,19 @@ Owner direction, 2026-10-01: retain Rule `role` for informational/reporting-only
 ## Conditional normalization scope — 2026-10-03 owner direction
 
 Automatic normalization to conditional evaluation and conditional-candidate detection are removed from planned features; #126 is closed as not planned. Boolean-pattern equivalence does not preserve the full six-state domain or collection/evidence behavior. Preserve the counterexample regression. Source-authored conditional support continues toward 0.2.0; do not treat this scope reduction as removing the conditional feature itself.
+
+## Draft Assessment Result integration — 2026-10-03
+
+The partial 0.2.0 result schema now links per-invocation expression traces to
+local Test/Object/Item/Variable evidence, exact dependency execution identities
+and optional derived reported-element projections. Source-aware validation
+checks local materialization, provenance targets, field-use records and recorded
+expression scheduling. Canonical Items retain the approved optional resolved
+names and lookup/locator/import metadata. 0.1.0 remains unchanged.
+
+This is representation/consistency evidence, not target acquisition or complete
+scanner conformance. The evaluator still uses one shared target/binding context
+per run. Final Item inclusion/import controls, production lineage, multi-context
+result-package composition and full vendor cases remain. See
+[the result checkpoint](../../../../transition/assessment-results-2026-10-03.md)
+and [standalone known-result content](../../../../tests/assessment-results-0.2.0/README.md).

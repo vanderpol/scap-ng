@@ -1,0 +1,43 @@
+assessment:
+  id: results.ownership
+  version: 1
+  assessment_title: Report ownership with optional identity names
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    config:
+      object_title: Fixture configuration file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/config
+      filesystem: any
+  states:
+    owner:
+      state_title: File is owned by UID 0
+      capability: unix.file
+      state:
+        field: owner_uid
+        datatype: integer
+        operation: equal
+        value: 0
+        match: all
+        existence: some
+  tests:
+    test-owner:
+      test_title: Compare numeric owner and report its name
+      capability: unix.file
+      object: config
+      states:
+      - owner
+      existence: some
+      match: all
+      reported_elements: compared
+  evaluate:
+    test: test-owner
