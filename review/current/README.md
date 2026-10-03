@@ -32,9 +32,11 @@ Small representative source/examples belong in Git. Large generated products do 
 
 ## Full NIWC Current review build
 
-- Workflow run: https://github.com/vanderpol/scap-ng/actions/runs/37080131809
+- Workflow run: https://github.com/vanderpol/scap-ng/actions/runs/37083265100
 - Artifact name: `niwc-current-full-review`
-- SCAP-NG source commit: `3505d47729237debc0481b99daf318da4ae288c2`
+- Direct artifact download: https://github.com/vanderpol/scap-ng/actions/runs/37083265100/artifacts/11260426828
+- Result: **success**. 65 source packages accounted for; 63 native Benchmarks and compiled bundles; 2 source/conversion blockers retained in evidence. Schema, Assessment graph and package graph checks report zero invalid documents/graphs before and after normalization.
+- SCAP-NG source commit: `5acbd67af155668440615b0d6b1f6412805caa10`
 - Pinned NIWC source revision: `8c8e5dff860af6b1290ee9273a282db24278f8d5`
 - Scope: all 65 pinned NIWC Current SCAP 1.4 packages are accounted for. Successfully converted packages are included under `source/`, exact-semantics normalized trees under `normalized/`, compiled readable bundles under `packages/`, and blocked-package/validation/provenance details under `evidence/`.
 
