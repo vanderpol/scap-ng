@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:independent-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:windows-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-common-5 https://github.com/OVALProject/Language/tree/5.11.2/schemas/oval-common-schema.xsd    http://oval.mitre.org/XMLSchema/oval-definitions-5 https://github.com/OVALProject/Language/tree/5.11.2/schemas/oval-definitions-schema.xsd    http://oval.mitre.org/XMLSchema/oval-definitions-5#independent https://github.com/OVALProject/Language/tree/5.11.2/schemas/independent-definitions-schema.xsd     http://oval.mitre.org/XMLSchema/oval-definitions-5#windows https://github.com/OVALProject/Language/tree/5.11.2/schemas/windows-definitions-schema.xsd"><generator>
+        <oval:product_name>Naval Information Warfare Center Atlantic</oval:product_name>
+        <oval:schema_version>5.12.2</oval:schema_version>
+        <oval:timestamp>2025-07-16T09:00:00</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:navy.navwar.niwcatlantic.scc.apache.2.4.windows:def:100" version="3" class="inventory">
+          <metadata>
+            <title>Apache 2.4 UNIX STIG benchmark applicability.</title>
+            <reference source="CPE" ref_id="cpe:/a:apache:http_server:2.4"/>
+            <description>A version of Apache 2.4 http server is installed</description>
+          </metadata>
+          <criteria>
+            <criterion comment="Apache http is running" test_ref="oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:1"/>
+          </criteria>
+        </definition>
+      </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:1" version="1" comment="Gather all installation directories from running apache httpd processes" check_existence="at_least_one_exists" check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:1"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:1"/>
+        </independent-def:shellcommand_test>
+      </tests><objects><independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:1" version="1" comment="Gather unique apache http installation paths">
+          <independent-def:shell>bash</independent-def:shell>
+          <independent-def:command>ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq</independent-def:command>
+          <independent-def:pattern>^\/\S+(\/httpd|\/apache2)\s*</independent-def:pattern>
+        </independent-def:shellcommand_object>
+      </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:1" version="1" comment="Bash Command returns a path">
+          <independent-def:stdout_line operation="pattern match">^/</independent-def:stdout_line>
+        </independent-def:shellcommand_state>
+      </states></oval_definitions>

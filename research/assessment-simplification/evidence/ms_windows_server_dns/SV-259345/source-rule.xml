@@ -1,0 +1,61 @@
+<xccdf:Rule xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cpe="http://cpe.mitre.org/language/2.0" xmlns="http://scap.nist.gov/schema/scap/source/1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259345r961863_rule" weight="10.0" severity="medium">
+          <xccdf:version>WDNS-22-000014</xccdf:version>
+          <xccdf:title>The validity period for the Resource Record Signatures (RRSIGs) covering a zone's DNSKEY RRSet must be no less than two days and no more than one week.</xccdf:title>
+          <xccdf:description>&lt;VulnDiscussion&gt;The best way for a zone administrator to minimize the impact of a key compromise is by limiting the validity period of RRSIGs in the zone and the parent zone. This strategy limits the time during which an attacker can take advantage of a compromised key to forge responses. An attacker that has compromised a zone signing key (ZSK) can use that key only during the key signing key's (KSK's) signature validity interval. An attacker that has compromised a KSK can use that key for only as long as the signature interval of the RRSIG covering the Delegation Signer (DS) Resource Record (RR) in the delegating parent. These validity periods should be short, which will require frequent re-signing.
+
+To minimize the impact of a compromised ZSK, a zone administrator should set a signature validity period of one week for RRSIGs covering the DNSKEY RRSet in the zone (the RRSet that contains the ZSK and KSK for the zone). The DNSKEY RRSet can be re-signed without performing a ZSK rollover, but scheduled ZSK rollovers should still be performed at regular intervals.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</xccdf:description>
+          <xccdf:reference>
+            <dc:title>DPMS Target Microsoft Windows Server Domain Name System </dc:title>
+            <dc:publisher>DISA</dc:publisher>
+            <dc:type>DPMS Target</dc:type>
+            <dc:subject>Microsoft Windows Server Domain Name System </dc:subject>
+            <dc:identifier>5576</dc:identifier>
+          </xccdf:reference>
+          <xccdf:platform idref="#xccdf_navy.navwar.niwcatlantic.scc_platform_File_Based_Zones_Exist"/>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-000366</xccdf:ident>
+          <xccdf:fixtext fixref="F-62992r939739_fix">Log on to the DNS server using the account designated as Administrator or DNS Administrator.
+
+Press the Windows key + R and execute "dnsmgmt.msc".
+
+On the opened DNS Manager snap-in from the left pane, expand the server name for the DNS server and then expand "Forward Lookup Zones".
+
+From the expanded list, click to select the zone.
+
+Right-click the zone and select DNSSEC &gt;&gt; Properties.
+
+Select the "KSK" tab. For the "DNSKEY RRSET signature validity period (hours):" setting, configure to a value between 48 and 168 hours. 
+
+Select the "ZSK" tab. For the "DNSKEY signature validity period (hours):" setting, configure to a value between 48 and 168 hours.</xccdf:fixtext>
+          <xccdf:fix id="F-62992r939739_fix"/>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="">
+            <xccdf:check-content-ref href="U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml" name="oval:navy.navwar.niwcatlantic.scc.windows:def:259345"/>
+          </xccdf:check>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="automated">
+            <xccdf:check-content-ref href="U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml" name="oval:navy.navwar.niwcatlantic.scc.windows:def:259345"/>
+          </xccdf:check>
+          <xccdf:check system="http://scap.nist.gov/schema/ocil/2" selector="manual">
+            <xccdf:check-content-ref href="U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-ocil.xml" name="ocil:navy.navwar.niwcatlantic.scc.server:questionnaire:2301"/>
+            <xccdf:check-content>Note: This check is not applicable for Windows DNS Servers that host only Active Directory-integrated zones or Windows DNS Servers on a classified network.
+
+Log on to the DNS server using the account designated as Administrator or DNS Administrator.
+
+Press the Windows key + R and execute "dnsmgmt.msc".
+
+On the opened DNS Manager snap-in from the left pane, expand the server name for the DNS server and then expand "Forward Lookup Zones".
+
+From the expanded list, click to select the zone.
+
+Right-click the zone and select DNSSEC &gt;&gt; Properties.
+
+Select the "KSK" tab.
+
+Verify the "DNSKEY signature validity period (hours):" is set to at least 48 hours and no more than 168 hours. 
+
+Select the "ZSK" tab. 
+
+Verify the "DNSKEY signature validity period (hours):" is set to at least 48 hours and no more than 168 hours.
+
+If either the "KSK" or "ZSK" tab "DNSKEY signature validity period (hours):" values are set to less than 48 hours or more than 168 hours, this is a finding.</xccdf:check-content>
+          </xccdf:check>
+        </xccdf:Rule>
+      

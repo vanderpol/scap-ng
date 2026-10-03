@@ -1,0 +1,50 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-259374
+  version: 1
+  assessment_title: Experimental SV-259374
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: windows.network.interface
+      select:
+        status: Up
+        address_family: IPv4
+        identity_fields:
+        - ifIndex
+        - address
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: windows.network.interface
+      state:
+        all:
+        - field: address
+          operation: nonempty
+          value: true
+        - field: prefix_length
+          operation: nonempty
+          value: true
+        - field: gateway
+          operation: nonempty
+          value: true
+        - field: suffix_origin
+          operation: equal
+          value: Manual
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: windows.network.interface
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'true'
+  evaluate:
+    all:
+    - test: test-each-required-record

@@ -1,0 +1,437 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-258179
+  version: 1
+  assessment_title: Experimental SV-258179
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    persisted-rules:
+      capability: independent.textfilecontent54
+      select:
+        full_path: /etc/audit/audit.rules
+      collect:
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: source-per-row
+  variables:
+    pattern-template-1:
+      title: Source-preserving regex grammar
+      kind: constant
+      datatype: string
+      expression:
+        literal: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=${arch}\s+(?:.*(-S\s+${syscall}\s+|(\s+|,)${syscall}(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+    pattern-template-2:
+      title: Source-preserving regex grammar
+      kind: constant
+      datatype: string
+      expression:
+        literal: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=${arch}\s+(?:.*(-S\s+${syscall}\s+|(\s+|,)${syscall}(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+    pattern-template-3:
+      title: Source-preserving regex grammar
+      kind: constant
+      datatype: string
+      expression:
+        literal: ^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=${arch}\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\b${syscall}\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$
+    pattern-template-4:
+      title: Source-preserving regex grammar
+      kind: constant
+      datatype: string
+      expression:
+        literal: ^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=${arch}\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\b${syscall}\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid=0(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$
+  tests:
+    test-audit-patterns:
+      test_title: Preserved audit pattern rows
+      capability: research.required_rows
+      phase: authoring_expansion
+      object: persisted-rules
+      rows:
+      - template: pattern-template-1
+        syscall: fsetxattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-1
+        syscall: fsetxattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: fsetxattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: fsetxattr
+        arch: b64
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-3
+        syscall: lsetxattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-3
+        syscall: lsetxattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-4
+        syscall: lsetxattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-4
+        syscall: lsetxattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-1
+        syscall: fremovexattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-1
+        syscall: fremovexattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: fremovexattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: fremovexattr
+        arch: b64
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-1
+        syscall: lremovexattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-1
+        syscall: lremovexattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: lremovexattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: lremovexattr
+        arch: b64
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-3
+        syscall: removexattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-3
+        syscall: removexattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-4
+        syscall: removexattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-4
+        syscall: removexattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: some
+        match: all
+      - template: pattern-template-1
+        syscall: setxattr
+        arch: b32
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-1
+        syscall: setxattr
+        arch: b64
+        auid: user
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: setxattr
+        arch: b32
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+      - template: pattern-template-2
+        syscall: setxattr
+        arch: b64
+        auid: root
+        instance:
+          value: '1'
+          operation: greater_or_equal
+          datatype: integer
+        collection_options:
+          ignore_case: false
+          multiline: true
+          singleline: false
+          item_creation: all_object_elements_fullfilled
+        filesystem: any
+        existence: all
+        match: all
+  evaluate:
+    all:
+    - test: test-audit-patterns

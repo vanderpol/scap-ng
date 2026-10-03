@@ -1,0 +1,50 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-259345
+  version: 1
+  assessment_title: Experimental SV-259345
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: windows.dns.signingkey
+      select:
+        zones:
+          exclude_types:
+          - Forwarder
+          exclude_names:
+          - TrustAnchors
+          autocreated: false
+          reverse: false
+        key_types:
+        - KSK
+        - ZSK
+        duration_representation: seconds
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: windows.dns.signingkey
+      state:
+        all:
+        - field: dnskey_validity_seconds
+          operation: greater_or_equal
+          value: 172800
+        - field: dnskey_validity_seconds
+          operation: less_or_equal
+          value: 604800
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: windows.dns.signingkey
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

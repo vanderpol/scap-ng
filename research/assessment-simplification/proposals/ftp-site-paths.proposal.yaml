@@ -1,0 +1,38 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-278028
+  version: 1
+  assessment_title: Experimental SV-278028
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: windows.iis.site
+      select:
+        bindings: ftp
+        path_interpretation: configured_and_native_resolved
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: windows.iis.site
+      state:
+        all:
+        - field: physical_path
+          operation: not_within_system_area
+          value: true
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: windows.iis.site
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

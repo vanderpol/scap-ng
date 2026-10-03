@@ -1,4 +1,37 @@
-# Assessment simplification research handoff
+# Assessment simplification research
+
+**Research checkpoint, 2026-10-03: all 12 packet cases investigated. Experimental proposals only; no schema/converter changes or scanner-equivalence claim.**
+
+Start with the [findings and limits](FINDINGS.md), [comparison](COMPARISON.md), [experimental execution contracts](FEATURES.md), [versioned yes/no decision candidates](DECISIONS.md), and [resumption handoff](HANDOFF.md). This is development research, not a parallel external review surface.
+
+| Source | Dossiers |
+| --- | --- |
+| RHEL 9 | [Audit syscalls](dossiers/SV-258179.md), [home initialization files](dossiers/SV-257889.md), [crypto back ends](dossiers/SV-258236.md) |
+| Windows Server 2025 | [FTP paths](dossiers/SV-278028.md), [AD effective rights](dossiers/SV-278138.md), [registry ACEs](dossiers/SV-278001.md) |
+| Windows DNS | [RR completeness](dossiers/SV-259350.md), [key durations](dossiers/SV-259345.md), [interface addressing](dossiers/SV-259374.md) |
+| Apache server/site | [KeepAlive](dossiers/SV-214228.md), [cookie flags](dossiers/SV-214268.md), [default documents](dossiers/SV-214292.md) |
+
+Each dossier links unchanged before content, pinned original Rule/OVAL XML, dependency edges, a proposed after sketch, alternatives and a concrete result matrix. `evidence/` retains legacy provenance separately from `proposals/`. Applicability source closures are separate per-family evidence. All proposal files are labeled experimental and remain outside the established schema.
+
+Reproduce from repository root (Python 3.12, PyYAML, lxml and jsonschema):
+
+```bash
+python research/assessment-simplification/experiments/extract_evidence.py /path/to/pinned/niwc-checkout
+python research/assessment-simplification/experiments/build_dossiers.py
+python research/assessment-simplification/experiments/verify_study.py
+python -m unittest discover -s research/assessment-simplification/experiments -p test_semantics.py -v
+python -m unittest discover -s tools -p 'test_oval_result_truth_tables*.py' -v
+python tools/check_current_authoring_contract.py research/assessment-simplification/samples
+python tools/validate_native_json_schemas.py research/assessment-simplification/samples --schema-dir schema/v0.1.0
+```
+
+`extract_evidence.py` verifies all five ZIP hashes before reading them and uses the maintained splitter's resolver and closure code. Preserve the NIWC `Current/` filenames in the pinned checkout. No source shell commands execute. `build_dossiers.py` is a research presenter, not a production converter. The 22 new test methods include 4096 exhaustive modes and 294 regex text fixtures; subcases are not counted as separate unittest methods. The 63 inherited tests are schema-derived evaluator unit regressions, not target scans or a fresh upstream Self-Assertion run.
+
+The original receiving-session brief and packet descriptions follow unchanged below.
+
+---
+
+# Original assessment simplification research handoff
 
 **Status: research inputs and instructions; no redesign is accepted by this packet.**
 

@@ -1,0 +1,48 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-278001
+  version: 1
+  assessment_title: Experimental SV-278001
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: windows.registry.ace
+      select:
+        hive: HKLM
+        keys:
+        - SECURITY
+        - SOFTWARE
+        - SYSTEM
+        view: explicit_aces
+        role_source: authored-domain-role
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+    authored-domain-role:
+      capability: windows.wmi.query
+      select:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM Win32_ComputerSystem
+  states:
+    state-required-fields:
+      capability: windows.registry.ace
+      state:
+        all:
+        - field: ace
+          operation: allowed_by_published_default_table
+          value: true
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: windows.registry.ace
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

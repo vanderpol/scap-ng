@@ -1,0 +1,49 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-214292
+  version: 1
+  assessment_title: Experimental SV-214292
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    document-roots:
+      capability: apache.configuration
+      select:
+        representation: explicit_DocumentRoot
+        source_groups:
+        - main_and_includes
+        - loaded_files
+    records:
+      capability: unix.file
+      select:
+        directories:
+          object_field: document-roots
+          field: directory
+        name: index.html
+        name_comparison: equal_ci
+        traversal: null
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: unix.file
+      state:
+        all:
+        - field: exists
+          operation: equal
+          value: true
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: unix.file
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

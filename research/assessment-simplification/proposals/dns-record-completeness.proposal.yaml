@@ -1,0 +1,56 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-259350
+  version: 1
+  assessment_title: Experimental SV-259350
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: windows.dns.zone
+      select:
+        zones:
+          exclude_types:
+          - Forwarder
+          exclude_names:
+          - TrustAnchors
+          autocreated: false
+          reverse: false
+        rr_types:
+        - RRSIG
+        - NSEC3
+        - DNSKEY
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: windows.dns.zone
+      state:
+        all:
+        - field: signed
+          operation: equal
+          value: true
+        - field: rrsig_count
+          operation: greater_than
+          value: 0
+        - field: nsec3_count
+          operation: greater_than
+          value: 0
+        - field: dnskey_count
+          operation: greater_than
+          value: 0
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: windows.dns.zone
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

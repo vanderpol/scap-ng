@@ -1,0 +1,132 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-257889
+  version: 1
+  assessment_title: Experimental SV-257889
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    accounts:
+      capability: unix.password
+      select:
+        username:
+          operation: match
+          value: '[\w]+'
+    normal-users:
+      capability: unix.password
+      source: accounts
+      filters:
+      - field: user_id
+        operation: greater_or_equal
+        value: 1000
+      - field: home_dir
+        operation: not_equal
+        value: /
+    root-users:
+      capability: unix.password
+      source: accounts
+      filters:
+      - field: user_id
+        operation: less_or_equal
+        value: 0
+      - field: home_dir
+        operation: not_equal
+        value: /
+    normal-files:
+      capability: unix.file
+      select:
+        directory:
+          variable: normal-homes
+        name:
+          operation: match
+          value: ^\.[^\s\.]+
+      filters:
+      - field: type
+        operation: not_equal
+        value: directory
+      traversal:
+        max_depth: 1
+        follow_links: true
+        filesystem: any
+    root-files:
+      capability: unix.file
+      select:
+        directory:
+          variable: root-homes
+        name:
+          operation: match
+          value: ^\.[^\s\.]+
+      filters:
+      - field: type
+        operation: not_equal
+        value: directory
+      traversal:
+        max_depth: 1
+        follow_links: true
+        filesystem: any
+  variables:
+    normal-homes:
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: normal-users
+          field: home_dir
+    root-homes:
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: root-users
+          field: home_dir
+  states:
+    state-permitted-bits:
+      capability: unix.file
+      state:
+        all:
+        - field: setuid
+          operation: equal
+          value: false
+        - field: setgid
+          operation: equal
+          value: false
+        - field: sticky
+          operation: equal
+          value: false
+        - field: group_write
+          operation: equal
+          value: false
+        - field: group_execute
+          operation: equal
+          value: false
+        - field: other_read
+          operation: equal
+          value: false
+        - field: other_write
+          operation: equal
+          value: false
+        - field: other_execute
+          operation: equal
+          value: false
+  tests:
+    test-normal-files:
+      test_title: normal initialization permissions
+      capability: unix.file
+      object: normal-files
+      states:
+      - state-permitted-bits
+      existence: optional
+      match: all
+    test-root-files:
+      test_title: root initialization permissions
+      capability: unix.file
+      object: root-files
+      states:
+      - state-permitted-bits
+      existence: some
+      match: all
+  evaluate:
+    all:
+    - test: test-normal-files
+    - test: test-root-files

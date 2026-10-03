@@ -1,0 +1,53 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-214228
+  version: 1
+  assessment_title: Experimental SV-214228
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: apache.configuration
+      select:
+        representation: explicit_directives
+        directives:
+        - KeepAlive
+        - MaxKeepAliveRequests
+        scope: installation-context
+        source_groups:
+        - main_and_includes
+        - loaded_files
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: apache.configuration
+      state:
+        all:
+        - field: keepalive
+          operation: equal_ci
+          value: 'On'
+        - field: max_keep_alive_requests
+          operation: greater_or_equal
+          value: 100
+        - field: keepalive_explicit
+          operation: equal
+          value: true
+        - field: max_keep_alive_requests_explicit
+          operation: equal
+          value: true
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: apache.configuration
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

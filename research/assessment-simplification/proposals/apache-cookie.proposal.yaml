@@ -1,0 +1,46 @@
+# EXPERIMENTAL research notation; not accepted v0.1.0 grammar.
+assessment:
+  id: research.SV-214268
+  version: 1
+  assessment_title: Experimental SV-214268
+  mode: automated
+  class: compliance
+  purpose: assessment
+  objects:
+    records:
+      capability: apache.configuration
+      select:
+        representation: cookie_records
+        scope: installation-context-cookie
+      record_identity: key
+      collection_contract: typed-status-per-key-v1
+  states:
+    state-required-fields:
+      capability: apache.configuration
+      state:
+        all:
+        - field: session_enabled
+          operation: equal
+          value: true
+        - field: cookie_attributes
+          operation: superset
+          value:
+          - HttpOnly
+          - Secure
+        - field: session_cookie_module_loaded
+          operation: equal
+          value: true
+  tests:
+    test-each-required-record:
+      test_title: Each required record satisfies all fields
+      capability: apache.configuration
+      object: records
+      states:
+      - state-required-fields
+      existence: some
+      match: all
+      required_key_coverage: true
+      empty_result: 'false'
+  evaluate:
+    all:
+    - test: test-each-required-record

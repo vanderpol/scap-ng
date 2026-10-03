@@ -1,0 +1,56 @@
+<xccdf:Rule xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cpe="http://cpe.mitre.org/language/2.0" xmlns="http://scap.nist.gov/schema/scap/source/1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="xccdf_mil.disa.stig_rule_SV-258179r1155601_rule" weight="10.0" severity="medium">
+          <xccdf:version>RHEL-09-654025</xccdf:version>
+          <xccdf:title>RHEL 9 must audit all uses of the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr, and lremovexattr system calls.</xccdf:title>
+          <xccdf:description>&lt;VulnDiscussion&gt;Without generating audit records specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
+
+Audit records can be generated from various components within the information system (e.g., module or policy filter).
+
+When a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and "unset" in the same way.
+
+The system call rules are loaded into a matching engine that intercepts each system call made by all programs on the system. Therefore, it is very important to use system call rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The performance can be helped, however, by combining system calls into one rule whenever possible.
+
+Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000458-GPOS-00203, SRG-OS-000462-GPOS-00206, SRG-OS-000463-GPOS-00207, SRG-OS-000471-GPOS-00215, SRG-OS-000474-GPOS-00219, SRG-OS-000466-GPOS-00210, SRG-OS-000064-GPOS-00033&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</xccdf:description>
+          <xccdf:reference>
+            <dc:title>DPMS Target Red Hat Enterprise Linux 9</dc:title>
+            <dc:publisher>DISA</dc:publisher>
+            <dc:type>DPMS Target</dc:type>
+            <dc:subject>Red Hat Enterprise Linux 9</dc:subject>
+            <dc:identifier>5551</dc:identifier>
+          </xccdf:reference>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-000130</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-000135</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-000169</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-000172</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-002884</xccdf:ident>
+          <xccdf:fixtext fixref="F-61844r1045321_fix">Configure RHEL 9 to audit the execution of the "setxattr", "fsetxattr", "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls by adding or updating the following lines to "/etc/audit/rules.d/audit.rules":
+
+-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid&gt;=1000 -F auid!=unset -k perm_mod
+-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid&gt;=1000 -F auid!=unset -k perm_mod
+-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
+-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
+
+To load the rules to the kernel immediately, use the following command:
+
+$ sudo augenrules --load</xccdf:fixtext>
+          <xccdf:fix id="F-61844r1045321_fix"/>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml" name="oval:mil.disa.stig.rhel9os:def:258179"/>
+          </xccdf:check>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="automated">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml" name="oval:mil.disa.stig.rhel9os:def:258179"/>
+          </xccdf:check>
+          <xccdf:check system="http://scap.nist.gov/schema/ocil/2" selector="manual">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml" name="ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75701"/>
+            <xccdf:check-content>Verify RHEL 9 is configured to audit the execution of the "setxattr", "fsetxattr", "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls with the following command:
+
+$ sudo auditctl -l | grep xattr
+
+-a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid&gt;=1000 -F auid!=-1 -F key=perm_mod
+-a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid&gt;=1000 -F auid!=-1 -F key=perm_mod
+-a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid=0 -F key=perm_mod
+-a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid=0 -F key=perm_mod
+
+If both the "b32" and "b64" audit rules are not defined for the "setxattr", "fsetxattr", "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls, or any of the lines returned are commented out, this is a finding.</xccdf:check-content>
+          </xccdf:check>
+        </xccdf:Rule>
+      

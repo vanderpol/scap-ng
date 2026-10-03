@@ -1,0 +1,76 @@
+<xccdf:Rule xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cpe="http://cpe.mitre.org/language/2.0" xmlns="http://scap.nist.gov/schema/scap/source/1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="xccdf_mil.disa.stig_rule_SV-258236r1101920_rule" weight="10.0" severity="high">
+          <xccdf:version>RHEL-09-672020</xccdf:version>
+          <xccdf:title>RHEL 9 cryptographic policy must not be overridden.</xccdf:title>
+          <xccdf:description>&lt;VulnDiscussion&gt;Centralized cryptographic policies simplify applying secure ciphers across an operating system and the applications that run on that operating system. Use of weak or untested encryption algorithms undermines the purposes of using encryption to protect data.
+
+Satisfies: SRG-OS-000396-GPOS-00176, SRG-OS-000393-GPOS-00173, SRG-OS-000394-GPOS-00174&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</xccdf:description>
+          <xccdf:reference>
+            <dc:title>DPMS Target Red Hat Enterprise Linux 9</dc:title>
+            <dc:publisher>DISA</dc:publisher>
+            <dc:type>DPMS Target</dc:type>
+            <dc:subject>Red Hat Enterprise Linux 9</dc:subject>
+            <dc:identifier>5551</dc:identifier>
+          </xccdf:reference>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-002450</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-002890</xccdf:ident>
+          <xccdf:ident system="http://cyber.mil/cci">CCI-003123</xccdf:ident>
+          <xccdf:fixtext fixref="F-61901r1051252_fix">Configure RHEL 9 to correctly implement the systemwide cryptographic policies by reinstalling the crypto-policies package contents.
+
+Reinstall crypto-policies with the following command:
+
+$ sudo dnf -y reinstall crypto-policies
+
+Set the crypto-policy to FIPS with the following command:
+
+$ sudo update-crypto-policies --set FIPS
+
+Setting system policy to FIPS
+
+Note: Systemwide crypto policies are applied on application startup. It is recommended to restart the system for the change of policies to fully take place.</xccdf:fixtext>
+          <xccdf:fix id="F-61901r1051252_fix"/>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml" name="oval:mil.disa.stig.rhel9os:def:258236"/>
+          </xccdf:check>
+          <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" selector="automated">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml" name="oval:mil.disa.stig.rhel9os:def:258236"/>
+          </xccdf:check>
+          <xccdf:check system="http://scap.nist.gov/schema/ocil/2" selector="manual">
+            <xccdf:check-content-ref href="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml" name="ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86701"/>
+            <xccdf:check-content>Verify that RHEL 9 cryptographic policies are not overridden.
+
+Verify that the configured policy matches the generated policy with the following command:
+
+$ sudo update-crypto-policies --check
+
+The configured policy matches the generated policy
+
+If the returned message does not match the above, but instead matches the following, this is a finding:
+
+The configured policy does NOT match the generated policy
+
+List all of the crypto backends configured on the system with the following command:
+
+$ ls -l /etc/crypto-policies/back-ends/ 
+
+lrwxrwxrwx. 1 root root  40 Nov 13 16:29 bind.config -&gt; /usr/share/crypto-policies/FIPS/bind.txt
+lrwxrwxrwx. 1 root root  42 Nov 13 16:29 gnutls.config -&gt; /usr/share/crypto-policies/FIPS/gnutls.txt
+lrwxrwxrwx. 1 root root  40 Nov 13 16:29 java.config -&gt; /usr/share/crypto-policies/FIPS/java.txt
+lrwxrwxrwx. 1 root root  46 Nov 13 16:29 javasystem.config -&gt; /usr/share/crypto-policies/FIPS/javasystem.txt
+lrwxrwxrwx. 1 root root  40 Nov 13 16:29 krb5.config -&gt; /usr/share/crypto-policies/FIPS/krb5.txt
+lrwxrwxrwx. 1 root root  45 Nov 13 16:29 libreswan.config -&gt; /usr/share/crypto-policies/FIPS/libreswan.txt
+lrwxrwxrwx. 1 root root  42 Nov 13 16:29 libssh.config -&gt; /usr/share/crypto-policies/FIPS/libssh.txt
+-rw-r--r--. 1 root root 398 Nov 13 16:29 nss.config
+lrwxrwxrwx. 1 root root  43 Nov 13 16:29 openssh.config -&gt; /usr/share/crypto-policies/FIPS/openssh.txt
+lrwxrwxrwx. 1 root root  49 Nov 13 16:29 opensshserver.config -&gt; /usr/share/crypto-policies/FIPS/opensshserver.txt
+lrwxrwxrwx. 1 root root  46 Nov 13 16:29 opensslcnf.config -&gt; /usr/share/crypto-policies/FIPS/opensslcnf.txt
+lrwxrwxrwx. 1 root root  43 Nov 13 16:29 openssl.config -&gt; /usr/share/crypto-policies/FIPS/openssl.txt
+lrwxrwxrwx. 1 root root  48 Nov 13 16:29 openssl_fips.config -&gt; /usr/share/crypto-policies/FIPS/openssl_fips.txt
+
+If the paths do not point to the respective files under /usr/share/crypto-policies/FIPS path, this is a finding.
+
+Note: nss.config should not be symlinked.
+
+Note: If there is an operational need to use a subpolicy that causes the links to the crypto backends to break, this is a finding, and exceptions will need to be made by the authorizing official (AO) and documented with the information system security officer (ISSO).</xccdf:check-content>
+          </xccdf:check>
+        </xccdf:Rule>
+      
