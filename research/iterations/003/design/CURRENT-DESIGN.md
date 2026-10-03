@@ -148,3 +148,13 @@ is preserved conservatively. This is producer serialization, not a new authored
 selector or truth operator. Collection-cache execution/authorization, real lineage,
 result-package composition and target conformance remain. See
 [the materialization checkpoint](../../../../transition/item-materialization-2026-10-03.md).
+
+## Draft result-package checkpoint — 2026-10-03
+
+Scan/Benchmark/Rule Result artifacts now link distinct Assessment executions
+through a closed unsigned exact-byte manifest. Separate invocation groups support
+repeated source identities without conflating target/binding contexts. This
+validates references and optionally recorded expression scheduling, not policy
+interpretation/scoring, acquisition truth or signer trust. Auxiliary evidence
+packaging, source Benchmark replay and target conformance remain. See
+[the checkpoint](../../../../transition/result-package-2026-10-03.md).
