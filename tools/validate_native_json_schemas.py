@@ -179,7 +179,9 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("corpus_root",type=Path)
     ap.add_argument("--schema-dir",type=Path,required=True)
-    ap.add_argument("--report",type=Path)\n    ap.add_argument("--allow-unpromoted-conversion-vocabulary", action="store_true",\n                    help="Accept lossless aligned OVAL vocabulary only for known 0.2.0 mappings not yet promoted by the legacy converter; strict native validation remains the default.")
+    ap.add_argument("--report",type=Path)
+    ap.add_argument("--allow-unpromoted-conversion-vocabulary", action="store_true",
+                    help="Accept lossless aligned OVAL vocabulary only for known 0.2.0 mappings not yet promoted by the legacy converter; strict native validation remains the default.")
     args=ap.parse_args()
 
     validators=build_validators(args.schema_dir)
