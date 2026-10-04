@@ -1,0 +1,641 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/capability-common.schema.json",
+  "title": "SCAP-NG shared capability schema primitives v0.2.0",
+  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern.",
+  "$defs": {
+    "variable_reference": {
+      "type": "object",
+      "required": [
+        "variable"
+      ],
+      "properties": {
+        "variable": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "entity_value": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        {
+          "$ref": "#/$defs/variable_reference"
+        }
+      ]
+    },
+    "object_entity_base": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "$ref": "#/$defs/comparison_operation"
+        },
+        "datatype": {
+          "$ref": "#/$defs/native_datatype"
+        },
+        "variable_match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "variable_match"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state_entity_base": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "$ref": "#/$defs/comparison_operation"
+        },
+        "datatype": {
+          "$ref": "#/$defs/native_datatype"
+        },
+        "variable_match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "variable_match"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state_filter": {
+      "type": "object",
+      "required": [
+        "state",
+        "action"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "include",
+            "exclude"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "test_reference_set": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "comparison_operation": {
+      "type": "string",
+      "enum": [
+        "equal",
+        "not_equal",
+        "equal_ci",
+        "not_equal_ci",
+        "greater_than",
+        "greater_or_equal",
+        "less_than",
+        "less_or_equal",
+        "bit_and",
+        "bit_or",
+        "match",
+        "subset",
+        "superset"
+      ]
+    },
+    "match_quantifier": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any",
+        "one",
+        "none"
+      ]
+    },
+    "existence_requirement": {
+      "type": "string",
+      "enum": [
+        "all",
+        "some",
+        "none",
+        "one",
+        "optional"
+      ]
+    },
+    "logical_operator": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any",
+        "one",
+        "odd"
+      ]
+    },
+    "native_datatype": {
+      "type": "string",
+      "enum": [
+        "string",
+        "boolean",
+        "integer",
+        "float",
+        "binary",
+        "version",
+        "ipv4",
+        "ipv6",
+        "rpm_evr",
+        "debian_evr",
+        "fileset_revision",
+        "ios_version",
+        "record"
+      ]
+    },
+    "file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "symlinks",
+                "symlinks_and_directories"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Independent/Unix file traversal. Preserves the complete non-deprecated OVAL recurse vocabulary."
+    },
+    "file_selection": {
+      "type": "object",
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "directory": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "name": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "traversal": {
+          "$ref": "#/$defs/file_traversal"
+        },
+        "filesystem": {
+          "$ref": "#/$defs/filesystem_scope"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "full_path"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "directory"
+                ]
+              },
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "traversal"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "directory",
+            "name"
+          ],
+          "not": {
+            "required": [
+              "full_path"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "set_object_operand": {
+      "type": "object",
+      "required": [
+        "object",
+        "filters"
+      ],
+      "properties": {
+        "object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state_filter"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_nested_operand": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "set": {
+          "$ref": "#/$defs/set_expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_operand": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/set_object_operand"
+        },
+        {
+          "$ref": "#/$defs/set_nested_operand"
+        }
+      ]
+    },
+    "set_expression": {
+      "type": "object",
+      "required": [
+        "operator",
+        "operands"
+      ],
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": [
+            "union",
+            "intersection",
+            "difference"
+          ]
+        },
+        "operands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/set_operand"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operator": {
+                "const": "difference"
+              }
+            },
+            "required": [
+              "operator"
+            ]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "hierarchy_traversal": {
+      "type": "object",
+      "required": [
+        "max_depth"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "record_field_predicate": {
+      "$ref": "#/$defs/structured_value_predicate"
+    },
+    "record_predicate": {
+      "type": "object",
+      "required": [
+        "fields",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/structured_value_predicate"
+          }
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "scalar_value_predicate": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation",
+        "datatype",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/entity_value"
+        },
+        "operation": {
+          "$ref": "#/$defs/comparison_operation"
+        },
+        "datatype": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/native_datatype"
+            },
+            {
+              "not": {
+                "const": "record"
+              }
+            }
+          ]
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "structured_value_predicate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_value_predicate"
+        },
+        {
+          "type": "object",
+          "required": [
+            "record"
+          ],
+          "properties": {
+            "record": {
+              "$ref": "#/$defs/record_predicate"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "list"
+          ],
+          "properties": {
+            "list": {
+              "$ref": "#/$defs/list_predicate"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "list_predicate": {
+      "type": "object",
+      "required": [
+        "item",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "item": {
+          "$ref": "#/$defs/structured_value_predicate"
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "file_traversal_base": {
+      "type": "object",
+      "required": [
+        "max_depth",
+        "recurse"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Maximum downward recursion depth; null means no limit. OVAL -1 imports as null."
+        },
+        "recurse": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "description": "Shared non-deprecated downward file recursion structure. Downward traversal is implicit; deprecated OVAL recurse_direction=up is not representable."
+    },
+    "windows_file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "junctions",
+                "junctions_and_directories"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Windows file traversal. Preserves the non-deprecated OVAL junction terminology rather than silently treating it as Unix symlink syntax."
+    },
+    "object_record_field": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        {
+          "type": "object",
+          "required": [
+            "match"
+          ],
+          "properties": {
+            "match": {
+              "$ref": "#/$defs/match_quantifier"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "One named field in an authored record-valued Object input. The field key supplies identity; match preserves OVAL field entity_check semantics."
+    },
+    "object_record": {
+      "type": "object",
+      "required": [
+        "fields"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/object_record_field"
+          }
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authored record-valued Object input. Record field names are structurally unique. Parent record datatype=record and operation=equals are implicit because no other native values are meaningful."
+    },
+    "filesystem_scope": {
+      "type": "string",
+      "enum": [
+        "any",
+        "local",
+        "same"
+      ],
+      "description": "Filesystem search scope independent of recursion. OVAL recurse_file_system all/local/defined maps to any/local/same and applies to exact full_path as well as directory/name selection."
+    }
+  }
+}
