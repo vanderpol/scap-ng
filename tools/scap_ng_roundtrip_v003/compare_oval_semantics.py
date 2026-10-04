@@ -35,6 +35,19 @@ def semantic_scalar(datatype, value):
             return "true"
         if normalized in {"false","0"}:
             return "false"
+    if datatype=="int":
+        try:
+            return str(int(str(text).strip(), 10))
+        except ValueError:
+            return text
+    if datatype=="float":
+        try:
+            number=float(str(text).strip())
+        except ValueError:
+            return text
+        if number == 0:
+            number = 0.0
+        return format(number, ".17g")
     return text
 
 class Model:
