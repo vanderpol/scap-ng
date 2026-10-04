@@ -103,6 +103,12 @@ Do **not** run the 65-benchmark corpus merely because code, schemas, converter b
 
 The full-corpus workflow is intentionally manual-only. It provides broad confidence for a deliverable; it is not the primary way to understand or iterate on a language change.
 
+## Review lifecycle
+
+Review navigation has one active authority: [`board/README.md`](board/README.md) for the current external/Board review. Compact supporting summaries may live under `review/current/` without restating project status.
+
+When a review cycle is formally completed, preserve the exact reviewed state under an immutable `review/iterations/NNN/` checkpoint with the source commit/tag and any durable external artifact URL/hash. Later corrections belong to a new review cycle; do not rewrite a completed review checkpoint. Large generated products should stay in CI/evidence storage rather than being recommitted merely for review.
+
 ## Version evolution
 
 For a new schema version:
