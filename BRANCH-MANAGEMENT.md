@@ -35,6 +35,7 @@ Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10
 | `esx-host-capabilities-20261003` | merged/stale | Earlier ESX host capability draft lineage; fully behind main. | Preserve history only; ESX expansion remains deferred. |
 | `esx-host-identity-software-20261003` | merged/stale | Earlier ESX identity/software draft lineage; fully behind main. | Preserve history only; ESX expansion remains deferred. |
 | `fast-five-conversion-regression` | merged/stale | Five-benchmark fast conversion regression lane. Merged through PR #148. | Safe cleanup candidate after freeze. |
+| `freeze-v020-exact-main-trigger` | merged/stale | Non-semantic CI trigger used to run all required 0.2.0 freeze gates against one exact main SHA. Merged through PR #149. | Safe cleanup candidate after freeze. |
 | `fix/variable-filter-dependency-validation` | historical/superseded | Old validation fix branch, diverged far behind current main. | Do not merge wholesale. |
 | `freeze-v020-final-audit-fixes` | merged/stale | Final audit/comparator fixes. Merged through PR #147. | Safe cleanup candidate after freeze. |
 | `freeze-v020-final-postmerge` | merged/stale | Earlier post-merge freeze work; fully behind main. | Safe cleanup candidate after freeze. |
