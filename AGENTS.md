@@ -227,13 +227,22 @@ Iteration 003 restarts SCAP 1.4 up-conversion from the accepted native design.
 - Rules reference applicability IDs, not Assessment file paths.
 - The clean-room converter lives under `tools/scap_upconvert_v003/` and SHALL NOT import the iteration-001/002 whole-benchmark conversion pipeline.
 
-## Pre-alpha publication workflow
+## Branch lifecycle and authoritative-main invariant
 
-Owner direction, 2026-09-30: during the current pre-alpha phase, commit completed
-and appropriately tested work directly to `main`. Do not create routine feature
-branches or pull requests unless the owner explicitly requests one. Record
-provenance, implementation limits and validation evidence as usual. Once the
-owner identifies a stable checkpoint, reassess the branch/review workflow.
+Owner correction, 2026-10-04: branch state must be managed explicitly. This rule supersedes the earlier pre-alpha preference for routine direct-to-`main` commits when autonomous work spans more than one coherent change or requires CI/review before acceptance.
+
+- `main` is the only authoritative completed project state. Work that exists only on a branch SHALL NOT be described as implemented, complete, frozen, handed off, or available to downstream agents.
+- Every substantive working branch SHALL have an explicit purpose and an immediately created pull request or equivalent durable tracking record. Do not leave accepted or potentially accepted work on an untracked branch.
+- A task owner SHALL keep branch lifetime short. Merge coherent accepted work promptly after required validation; otherwise explicitly classify the branch as deferred, experimental/historical, or abandoned.
+- Before any release, schema freeze, Codex handoff, major checkpoint, or completion claim, compare **every non-main branch** against current `main`. Every branch that is ahead or diverged SHALL be individually accounted for.
+- Branch audit classifications SHALL be recorded as one of: **merged/in-main**, **intentionally deferred**, **experimental/historical**, or **abandoned/superseded**. An ahead/diverged branch with no classification is a release/handoff blocker.
+- Never rely on memory that a branch was merged. Verify ancestry/compare state against the exact current `main` SHA.
+- Validation evidence from a branch does not validate `main`. Required release/freeze gates SHALL run against one exact technical `main` commit. Documentation-only descendants may be recorded separately only when they do not change the validated technical state.
+- When a later branch contains fixes that invalidate an earlier freeze candidate, the candidate is revoked until those fixes are merged and exact-main validation is repeated.
+- Temporary CI-verification branches SHALL be opened as PRs immediately and closed after their evidence is recorded. They SHALL NOT silently become alternate project baselines.
+- For small, atomic, low-risk documentation changes, direct-to-`main` commits remain allowed only when they cannot strand technical work or obscure release accounting.
+
+This invariant exists specifically to prevent orphaned accepted work, stale branch testing, and handoff from a branch state that differs from `main`.
 
 ## Current Rule/Assessment architecture
 
