@@ -450,11 +450,11 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             continue
         test["capability"]=native
         if "check_existence" in test:
-            test["existence"]=_translate(
-                mapping,"existence",test.pop("check_existence")
+            test["check_existence"]=_translate(
+                mapping,"existence",test["check_existence"]
             )
         if "check" in test:
-            test["match"]=_translate(mapping,"check",test.pop("check"))
+            test["check"]=_translate(mapping,"check",test["check"])
         if "state_operator" in test:
             legacy_operator=test.pop("state_operator")
             test["states_match"]=LOGICAL_OPERATOR.get(
