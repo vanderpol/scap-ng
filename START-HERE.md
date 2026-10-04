@@ -1,28 +1,35 @@
 # First visit to SCAP-NG
 
-SCAP-NG explores how to keep the investment in SCAP content while making content easier to author, scanners easier to implement, and assessment results easier to understand.
+SCAP-NG explores a next-generation SCAP model that keeps the investment in existing SCAP/OVAL content while making content easier to author, migrate, validate, and explain.
 
-The current model is **Benchmark → Rule → Assessment**. A Benchmark groups requirements. A Rule describes a requirement and offers named assessment choices. An Assessment describes how software or a person checks it. Rule policy and technical evaluation have separate responsibilities.
+The current architecture is **Benchmark → Rule → Assessment**. A Rule owns the requirement/policy context and named Assessment choices. An Assessment owns the technical or manual evaluation method. There is no separate Policy object.
 
-## A short reading path
+## Read in this order
 
-1. Start with the [current review set](review/current/README.md). It is the single navigation surface for material we want external reviewers to examine together.
-2. If you will change or maintain the project, read [MAINTAINING.md](MAINTAINING.md) and [BRANCH-MANAGEMENT.md](BRANCH-MANAGEMENT.md) before making changes. Machine-green is not the same as human-accepted.
-3. Read the [Board overview](board/README.md) for what needs a decision.
-4. Browse the [RHEL 9 full-review summary](review/current/examples/rhel9-full.md) or [Windows 11 full-review summary](review/current/examples/windows11-full.md) for complete source-generated examples. These are review candidates; their generation date and evidence matter.
-5. Read the [specification contents](specification/README.md) for the detailed model and its intentional differences from SCAP 1.4.
-6. Use the [voting proposal index](board/proposals/README.md) to respond to individual yes/no questions through GitHub Discussion reactions.
+1. [SCAP 1.4 → SCAP-NG key changes](board/SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md) — short architecture/semantic briefing.
+2. [Current review set](review/current/README.md) — the external-review navigation surface.
+3. [0.2.0 Board review](board/README.md) — sample conversions, Board questions, and voting.
+4. [Draft specification](specification/README.md) — detailed normative direction.
+5. [Current design contract](research/iterations/003/design/CURRENT-DESIGN.md) — implementation/design authority for maintainers.
+6. [Human-runnable tools](tools/HUMAN-RUNNABLE-SCRIPTS.md) — conversion, normalization, validation, packaging, and audits.
 
-You do not need to run a converter to review the work. Development and reproduction tools are intentionally outside the `review/` surface. If you do want to reproduce it, start with the [maintained converter instructions](tools/scap_upconvert_v003/README.md), using a pinned original SCAP package.
+## Current status
 
-## How to interpret status
+SCAP-NG 0.2.0 is technically frozen at schema baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d` for bounded content/conformance review.
 
-- **Working design:** direction accepted by the project owner; formal Board approval may still be needed.
-- **Draft specification/schema:** a proposed contract under development.
-- **Generated review candidate:** inspect alongside its source pin, command, warnings and exclusions.
-- **Historical artifact:** preserved so reasoning and experiments can be reconstructed; its syntax may be obsolete.
-- **Passing conversion or round trip:** evidence about representation and migration. It does not demonstrate scanner behavior on a target machine.
+The six-case OVAL Board pilot has been generated through the maintained converter and is now awaiting human semantic/readability review. Automated gates are strong evidence, but they are not equivalent to independent scanner/live-target conformance or Board ratification.
 
-The 0.2.0 technical content-development freeze is recorded at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Its exact-SHA full NIWC schema/normalization/compiler run passed, along with Self-Assertion, smoke, preservation, and Ubuntu/Windows current-design gates. See `transition/0.2.0-freeze-record-2026-10-04.md`. This is strong technical evidence, not an exhaustive independent human semantic audit. The repository contains no released reference scanner with established target-runtime equivalence.
+## Important distinctions
 
-For an older example or an unfamiliar script, consult the [repository map](docs/repository-map.md) before treating it as current.
+- **Working design:** current project direction; may still require Board ratification.
+- **Draft specification/schema:** proposed contract, not a released standard.
+- **Generated review content:** inspect with source pins, provenance, warnings, and expected results.
+- **Passing conversion/round trip:** migration/representation evidence, not target-runtime proof.
+- **Historical artifact:** preserved evidence; its syntax or architecture may be superseded.
+- **Human-accepted / Board-ratified:** separate status from machine validation.
+
+## If you want to run the project
+
+Start with [the human tooling guide](tools/HUMAN-RUNNABLE-SCRIPTS.md). The preferred conversion path is the current `scap_upconvert_v003` converter; historical renderers remain available only for reproduction/research.
+
+If you will modify semantics, read [MAINTAINING.md](MAINTAINING.md) first. Machine-green does not mean human-accepted.
