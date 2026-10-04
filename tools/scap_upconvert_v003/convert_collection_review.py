@@ -276,7 +276,34 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         if not parity['equal']:
             failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
         native=align_assessment_vocabulary(native)
-        native=apply_ready_capability_mappings(native,NATIVE_CAPABILITY_MAPPING_DIR)
+        try:
+            native=apply_ready_capability_mappings(native,NATIVE_CAPABILITY_MAPPING_DIR)
+        except ValueError as exc:
+            mapping_error=str(exc)
+            fallback_reason=None
+            if mapping_error.startswith("deprecated source capability windows.wmi"):
+                fallback_reason="deprecated_or_legacy_wmi_source"
+            elif mapping_error.startswith("nonstandard source capability independent.sqlext"):
+                fallback_reason="publisher_extension_independent_sqlext"
+            elif mapping_error.startswith("unsupported deprecated OVAL behavior semantics:"):
+                fallback_reason="deprecated_oval_behavior"
+            if fallback_reason and has_manual:
+                source_defect_selector_fallbacks.append({
+                    "selector":selector,
+                    "source_definition":did,
+                    "classification":"unsupported_automated_source",
+                    "reason":fallback_reason,
+                    "error":mapping_error,
+                })
+                result["assessments"].append({
+                    "status":"skipped_unsupported_automated_manual_fallback",
+                    "source_definition":did,
+                    "classification":"unsupported_automated_source",
+                    "reason":fallback_reason,
+                    "error":mapping_error,
+                })
+                continue
+            raise
         errors=violations(native)
         if errors: raise ValueError('Current vocabulary guard: '+str(errors))
         ref='assessments/automated/'+aid+'.assessment.yaml'
