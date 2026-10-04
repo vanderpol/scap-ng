@@ -1,3 +1,5 @@
+> **Temporary hold:** Do not start this task until the 0.2.0 version-promotion reconciliation completes and a new exact-main freeze SHA is recorded. The former a0fe3abf checkpoint is semantic/integration evidence, not the final authoring-schema baseline.
+
 # Codex task: SCAP-NG 0.2.0 content development and conformance corpus
 
 Status: **READY TO USE**.
