@@ -51,6 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: scap-ng
       - uses: actions/checkout@v4
         with:
@@ -109,6 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: scap-ng
       - uses: actions/setup-python@v5
         with:
@@ -337,7 +339,7 @@ jobs:
 
           summary={
               "artifact":"niwc-current-full-review",
-              "scap_ng_revision":"${{ github.sha }}",
+              "scap_ng_revision":"${{ github.event.pull_request.head.sha || github.sha }}",
               "niwc_revision":"${{ env.NIWC_REVISION }}",
               "source_packages_expected":65,
               "layout":{
@@ -357,7 +359,7 @@ jobs:
               "- normalized/ — exact-semantics normalized authoring trees\n"
               "- packages/ — compiled readable .scapng bundles\n"
               "- evidence/ — validation, blocker, provenance, normalization and compiler reports\n\n"
-              "SCAP-NG source commit: ${{ github.sha }}\n\n"
+              "SCAP-NG source commit: ${{ github.event.pull_request.head.sha || github.sha }}\n\n"
               "Pinned NIWC source revision: ${{ env.NIWC_REVISION }}\n",
               encoding="utf-8",
           )
