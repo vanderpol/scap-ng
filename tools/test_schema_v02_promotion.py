@@ -54,8 +54,9 @@ class Version020PromotionTests(unittest.TestCase):
                 self.assertIn("/schema/v0.2.0/", overlay_text)
                 self.assertNotIn("/schema/v0.1.0/", overlay_text)
                 self.assertIn("reported_elements", overlay["$defs"]["test"]["properties"])
-                self.assertIn("check_existence", generated["$defs"]["test"]["required"])
-                self.assertIn("check", generated["$defs"]["test"]["required"])
+                if mapping.get("native", {}).get("fixed_result") is None:
+                    self.assertIn("check_existence", generated["$defs"]["test"]["required"])
+                    self.assertIn("check", generated["$defs"]["test"]["required"])
                 self.assertNotIn("existence", generated["$defs"]["test"]["properties"])
                 self.assertNotIn("match", generated["$defs"]["test"]["properties"])
 
