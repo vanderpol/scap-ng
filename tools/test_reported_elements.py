@@ -71,7 +71,7 @@ class ReportedElementsTests(unittest.TestCase):
     def test_closed_generated_test_schema_accepts_control(self):
         mapping = json.loads((ROOT / "schema/v0.1.0/capability-mappings/unix.file.json").read_text())
         schema = generate_reporting_capability(mapping)
-        common = json.loads((ROOT / "schema/v0.1.0/capability-common.schema.json").read_text())
+        common = json.loads((ROOT / "schema/v0.2.0/capability-common.schema.json").read_text())
         registry = Registry().with_resource(common["$id"], Resource.from_contents(common))
         test = self.assessment["tests"]["test-owner"]
         v = Draft202012Validator(schema["$defs"]["test"], registry=registry)
