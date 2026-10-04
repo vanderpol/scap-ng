@@ -37,8 +37,8 @@ class Version020PromotionTests(unittest.TestCase):
             Draft202012Validator.check_schema(data)
             self.assertNotIn("https://scap-ng.dev/schema/v0.1.0/", text, path.name)
 
-    def test_all_inherited_capabilities_generate_as_020(self):
-        inherited = mappings("0.1.0")
+    def test_all_supported_capabilities_generate_from_020(self):
+        inherited = mappings("0.2.0")
         self.assertGreaterEqual(len(inherited), 100)
         for mapping in inherited:
             with self.subTest(capability=mapping["capability"]):
@@ -54,7 +54,7 @@ class Version020PromotionTests(unittest.TestCase):
 
     def test_capability_scope_separates_supported_from_experimental(self):
         scope = json.loads((V02 / "capability-scope.json").read_text(encoding="utf-8"))
-        inherited = {m["capability"] for m in mappings("0.1.0")}
+        inherited = {m["capability"] for m in mappings("0.2.0") if m["capability"] not in experimental}
         experimental = set(scope["experimental"])
         self.assertEqual(len(inherited), scope["supported"]["expected_count"])
         self.assertFalse(inherited & experimental)
