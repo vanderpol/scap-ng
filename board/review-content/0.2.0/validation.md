@@ -49,6 +49,13 @@ the checked-in oracle. Board content and reproducer paths now trigger this lane.
 Rebaseline smoke also discovers the new tests. Local success is not labeled as
 remote CI success; exact remote run evidence belongs in the final handoff report.
 
+The first Windows CI pilot step failed; its log download was blocked by the
+managed network policy. A local CRLF checkout simulation reproduces the inventory
+hash failure. Scoped `.gitattributes` now keeps YAML, JSON, XML and documentation
+as LF on every platform, preserving pinned bytes instead of weakening the hashes.
+The corrected Windows run is required before reporting cross-platform success.
+This is a pilot portability/harness issue, not a language/schema defect.
+
 The verbatim upstream MITRE terms retain four trailing-whitespace lines so their
 recorded source hash remains exact. All authored files pass the whitespace check.
 
