@@ -1,228 +1,104 @@
-# Current SCAP-NG design — authoritative authoring checkpoint
+# Current SCAP-NG design
 
-Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, preparing examples, or claiming review readiness. Earlier conversation summaries, generated trees and superseded design prose do not override these decisions. Update this record when the owner changes a decision.
+**Authoritative working-design checkpoint.** Historical experiments, generated trees, old proposal prose, and dated transition notes do not override this file. Material decisions should be reflected here when accepted by the project owner.
 
-## Settled owner direction
+**Current status:** SCAP-NG 0.2.0 is technically frozen for bounded human/OVAL Board review at schema baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
 
-- Architecture: **Benchmark → Rule → Assessment** for compliance and vulnerability content. There is no separate Policy object/file. Rule owns requirement/assertion metadata and named Assessment selections/defaults; Assessment owns the evaluation method.
-- Benchmark membership enables every Rule. Publisher Profiles are subtractive only: they MAY disable Rules and SHALL NOT expose `enabled_rules` or re-enable ancestor-disabled Rules. A Profile SHALL expose `disabled_rules`, including `[]` when it disables no additional Rules. Empty lists preserve the supported-data-elements convention and never re-enable ancestor-disabled Rules. External Tailoring MAY enable/disable existing Benchmark Rules, including restoring a publisher-disabled Rule, choose among existing named Rule Assessment selections. It SHALL NOT replace bindings or implementations; Organizational Input cannot select Tests. See `specification/policy/profiles-and-tailoring.md`; source Profile XML description wrappers SHALL NOT appear in native descriptions.
-- Authored Assessment selections use explicit YAML paths relative to the referring Rule. Preserve selector identity, aliases and default-versus-explicit provenance. Compiled resolution uses explicit manifest bindings; never guess filenames.
-- Compiled SCAP-NG packages use a manifest-authoritative logical object graph. The current preferred container is deterministic ZIP with the `.scapng` extension; archive paths are storage locations only, never semantic identity. Packaged Benchmark/Rule/applicability objects reference logical IDs, and scanners resolve those IDs through the manifest. The manifest SHALL NOT duplicate Rule selector/default policy logic. See [package container and manifest decision](package-container-and-manifest.md).
-- Native Assessment capabilities are a clean break from OVAL/XCCDF schema structure. Preserve required semantics, not legacy XML names, hidden defaults, type hierarchies, deprecated values, or serialization workarounds. Shared native comparison, quantifier, existence, Set/filter and file traversal primitives SHALL be reused across capabilities. The first stabilized slice is `unix.file`; see [native capability clean-break design](native-capability-clean-break.md).
-- Native automated evaluation nodes are **Tests**. Use `tests`, `test_title`, `test-` IDs and explicit Test references.
-- Native resource acquisition/selection nodes are **Objects**. **Collection** refers to the runtime act of evaluating an Object and producing Items plus collection status/completeness. Named/reusable Objects remain first-class where a capability actually selects/acquires system resources. Objects are **not** a mandatory wrapper around every Test source: a clean native capability MAY consume another first-class authored node directly when that is the natural semantic source. The first approved example is `variable.value`, whose Test references a named Variable directly instead of reproducing OVAL's `variable_object -> var_ref` indirection.
-- Assessment source presentation SHOULD place metadata first, then `objects` → `variables` → `states` → `tests` → `evaluate`, omitting absent sections. Automated Assessments do not require empty `objects` or `states` sections when the selected capability has no such nodes; This is a readability/output convention, not execution order: mapping key order SHALL NOT affect reference resolution; forward references remain valid. Sequence order retains its meaning where defined, such as function arguments. Our generators consistently follow this recommendation; `tools/check_current_authoring_contract.py` checks generated review presentation in CI. An order warning does not make an otherwise valid authored Assessment semantically invalid.
-- Variables SHALL support **both** references to existing named Objects and Collections embedded privately within the Variable. This is an agreed working-design requirement. Formal Board ratification is tracked separately; it does not remove either form from our working model.
-- Converted source SHALL preserve meaningful named Object boundaries and Variable dependencies. Do not duplicate a shared source Object inline at every use. Embedded Objects are supported for native authoring; they SHALL NOT be used to erase shared source references during lossless conversion.
-- Variables can consume Object fields or other Variables. Named intermediates and the complete graph through sets/filter States/functions must survive conversion. Source identity must remain in provenance so distinct source nodes are not merged merely because payloads match.
-- Native Assessments have no `deprecated` attribute. Effectively deprecated source Tests are blockers; they do not become native runtime flags.
-- Test, Object, and State/predicate capability/type remain independently declared where those nodes exist. An Object is a first-class reusable selection/acquisition node and SHALL retain its own capability when consumed by a Test or Variable. Tests declare their evaluation capability; States/predicates retain their comparison capability. A capability defines the Test's source kind (for example `object` or direct `variable`); validators SHALL resolve that source explicitly and reject incompatible or missing bindings rather than inventing an intermediate Object, inheriting a capability, or silently coercing declarations. Embedded/private resource selections likewise retain their own capability.
-- **Migration and normalization evidence is separate from native NG content.** Native Benchmark/Rule/Assessment/Object source SHALL NOT embed converter diagnostics, skipped-source-defect records, legacy OVAL graph dumps, parity traces, or repository-normalizer lineage merely for migration traceability. Conversion/normalization tools SHALL emit those details into separate evidence/report trees that may reference native logical IDs. Native content SHALL remain executable without that evidence, and the compiler SHALL NOT package migration/normalization evidence by default.
-- Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. The owner authorized current-design full RHEL9 review generation on 2026-09-30. Historical publishing workflows remain held; use the new source-driven full review entry point.
-- Conversion, normalization, audit, parity, source-defect, and legacy-node evidence SHALL remain outside the native Benchmark/Rule/Assessment/Object content graph. Evidence MAY reference native logical IDs, but native content SHALL NOT depend on migration evidence for execution. The compiler SHALL NOT package detailed conversion/normalizer evidence by default. Native fallback content contains only the valid resulting Assessment choices; exact source errors and skipped legacy paths belong in separate evidence reports.
+## Architecture
 
-Owner direction, 2026-09-30: run a complete round-trip regression of the pinned content corpus after the element-name and behavior changes. Production NIWC Current migration evidence and OVAL Self-Assertion language evidence remain separate. The broad corpus runner now defaults to the current named Object/Test graph; historical mode requires an explicit switch. Do not use an older-layout green run as current-design validation.
+- Compliance/vulnerability content uses **Benchmark → Rule → Assessment**. There is no separate Policy object/file.
+- A Rule owns requirement/policy metadata, applicability references, named Assessment choices/selectors, and the default choice.
+- An Assessment owns the automated or manual evaluation method.
+- Rule policy disposition (including current `role` handling for informational use) is separate from Assessment technical truth.
 
-## Converter delivery and stability requirement
+## Profiles, Tailoring, Parameters, and input
 
-Owner direction, 2026-09-30: once conversion reaches stability, provide the exact
-maintained converter and instructions for running it on the owner's Windows
-development computer. Windows portability is an implementation requirement now,
-not a late packaging task. The converter is the executable expression of the
-working NG design; source syntax, documented semantics and regression fixtures
-must evolve together. One documented entry point must reproduce the reviewed
-output from pinned original SCAP input. See
-[converter stability and Windows delivery](converter-stability-and-windows.md).
+- Benchmark membership enables Rules by default.
+- Publisher Profiles are subtractive: they may disable Rules and do not re-enable ancestor-disabled Rules.
+- External Tailoring may enable/disable existing Rules and choose among publisher-provided Assessment choices.
+- Tailoring SHALL NOT replace Assessment implementations or override publisher Parameter values.
+- Delegated organization-specific values use typed Organizational Input. A materially different requirement needs distinct policy identity.
+- Tailoring provenance should identify purpose, creator/modifier/authorizer, dates, organization, and authorization reference/status.
 
-## Open or not yet implemented
+## Native Assessment vocabulary
 
-- Exact Rule choice field names (`assessment_choices`, `default_assessment_choice`) are review proposals.
-- Complete `Object/State vocabulary migration, including the final item/state quantifier syntax, is unfinished.
-- Named Object graph conversion and reverse consumption now have a tested prototype (`collection_graph=True`), including source identity and Variable references. It is integrated into the complete pinned RHEL9 Rule/Benchmark research renderer; compiled package/signature and broader consumer integration remain unfinished. Object capability is retained on the Object itself; the earlier Variable-side `collection_capabilities` prototype is superseded and SHALL NOT be emitted.
-- Formal Board review of embedded Objects and colocated Filters remains pending. Both named-reference and embedded-Object Variable forms are required in the working design, not optional pending implementation choices.
-- Full runtime equivalence is unproven. Round-trip and source-reference checks alone do not establish evaluator equivalence.
+- Use **Assessment, Test, Object, State, Variable, and Item** where those concepts remain semantically aligned with OVAL.
+- `evaluate` is the native replacement for OVAL `criteria/criterion`.
+- Typed `*_title` metadata replaces generic OVAL `comment` presentation where appropriate.
+- **Object** is authored resource selection/acquisition. **Collection** is the runtime act of evaluating an Object and producing Items plus status/completeness; it is not an authored synonym for Object.
+- A Test may consume another first-class node directly when that is the natural semantic source; `variable.value` is the established example and does not require an artificial Object wrapper.
+- Test, Object, and State/predicate capabilities remain independently typed where those nodes exist.
+- Source/presentation mapping order has no execution meaning; forward references are valid. Recommended authored section order is metadata, `objects`, `variables`, `states`, `tests`, `evaluate`.
 
-## Object/dataflow checkpoint
+## Variables, Sets, Filters, and dataflow
 
-[Source-generated sample](../review/collection-dataflow-source-sample/README.md):
-selected Assessment output from 25 RHEL 9 Rules, converted from the pinned
-original ZIP. This is a tested dataflow prototype, not a full Benchmark compiler.
-Source graph sharing, Variable chains and private embedded native-authoring
-Collections have regression coverage. All 42 Variable-bearing RHEL 9 cases
-compare equal through the new graph/reverse path; 23 sample automated outputs
-also regenerate omni-schema-valid OVAL. Runtime conformance, complete Rule/Profile
-rendering were outside this slice. Windows/Linux graph and local-ZIP regressions subsequently passed; full-source review evidence is tracked separately below.
+- Variables may reference named Objects, other Variables, or contain private embedded resource selection where supported.
+- Lossless conversion preserves meaningful shared Object boundaries and Variable dependency graphs; it does not duplicate a shared source Object merely for convenience.
+- Sets, Filters, object/variable components, functions, existence/cardinality, datatypes, comparisons, records, and dependency behavior must retain their effective semantics.
+- Source identity remains available in migration provenance so distinct source nodes are not merged merely because payloads happen to match.
 
-## Full RHEL9 checkpoint
+## Applicability and conditionals
 
-[Current full-review summary](../../../../review/current/examples/rhel9-full.md) uses the pinned original package, not old rendered YAML: 445 Rules, 11 Profiles, 418 automated and 445 manual Assessments, 18 source-driven applicability conditions. All 4,895 Rule/Profile selection comparisons match. Automated/applicability definition round trips and pinned omni-schema checks pass. Relative Rule paths, source selectors/defaults, shared manual questionnaire aliases, grouping and native presentation/cleanliness are checked. The exact research CLI is `tools/scap_upconvert_v003/convert_full_review.py`; Windows/Linux full-package CI evidence is recorded with the review. This is not finalized grammar, compiled packaging or runtime conformance.
+- Applicability is explicit authored assessment logic, not hidden scanner OS/domain-role classification.
+- CPE/platform identifiers are naming/mapping metadata unless backed by executable applicability logic.
+- Source-authored conditional scheduling is supported where defined.
+- General unrestricted IF/ELIF/ELSE authoring is not the current direction.
+- Existing Boolean OVAL logic SHALL NOT be automatically rewritten as conditional execution merely because it appears equivalent; six-state outcomes, collection, evidence, and scheduling can differ.
 
-## Current artifact status
+## OVAL/SCAP migration
 
-[Tailoring worked examples](../examples/tailoring-all-options/README.md) cover the documented mutation surface, parent layering, provenance, publisher Profile values, named Assessment selections and separate Organizational Input. They include a real RHEL9 binding and resolved-policy snapshots. New detailed source field shapes remain proposals; the small resolver exercises the examples and is not a production assessor or finalized schema implementation.
+- Forward migration from SCAP 1.4 is mandatory.
+- OVAL 5.12.3 is the current semantic migration baseline, with later authoritative corrections/reinstatements handled explicitly.
+- OVAL 6 is used primarily to identify genuinely new Test/Object/State/Item semantics; it is not an intermediate runtime format.
+- Features exercised by current published content or conformance content are preserved unless a compelling explicit disposition documents an equivalent replacement/removal.
+- Effectively deprecated OVAL Tests are conversion blockers; native Assessments do not carry a `deprecated` runtime flag.
+- Source defects are preserved/reported as source defects rather than silently repaired during equivalence conversion.
+- Existing OVAL platform-family distinctions remain where collected-data/evaluation semantics materially differ.
 
-Owner direction, 2026-09-30: Tailoring SHALL have an obvious human-readable `purpose` and distinct provenance locations for creator, modifier and authorizer, with dates, organizational ownership and authorization reference/status. Keep these near the top of examples and retain unset draft fields explicitly as null. Preserve them in resolved policy provenance without treating metadata as execution-changing data.
+## Native capability design
 
-`review/test-vocabulary-slice` is **incomplete**, despite its passing narrow naming/path tests. It still contains older `collect`/`object_title`/capability duplication and has no Variable/Object dependency example. It SHALL NOT be described as a completed current-design slice.
+- Preserve semantics, not XML type hierarchies, wrapper elements, namespace mechanics, or historical serialization workarounds.
+- Reuse shared native primitives for comparison, quantifiers, existence/cardinality, records, Sets/Filters, traversal, and result behavior rather than duplicating them per capability.
+- Native capability names may remove obsolete historical numeric/version suffixes when reviewed semantics justify it; exact OVAL source identity remains in provenance.
+- Publisher/vendor extensions must remain isolated and cannot silently redefine core behavior.
 
-`source/split-rule-assessment/rhel9-full` is historical generated baseline data, not current native syntax. `source/split-policy-assessment/rhel9-full` is a superseded architecture experiment. Neither tree is an automatic source of current authoring decisions.
+## Provenance and native-source cleanliness
 
-## Assessment evaluator semantics checkpoint — 2026-10-01
+- Executable native Benchmark/Rule/Assessment/Object content does not embed XCCDF/OVAL/OCIL/CPE XML IDs, namespaces, href graphs, converter diagnostics, parity traces, or skipped-source-defect records merely for migration traceability.
+- Conversion/normalization evidence is emitted separately and may reference native logical IDs.
+- Native content must remain executable without migration evidence.
 
-The durable runtime semantic contract is now maintained in
-[assessment-evaluation-semantics.md](assessment-evaluation-semantics.md).
-Confirmed OVAL-derived behavior belongs there, with focused conformance tests;
-JSON Schema is a structural projection and SHALL NOT be the sole source for
-runtime/evaluation semantics. Ambiguous legacy behavior remains explicitly
-unresolved rather than being guessed into the native model.
+## Results and evidence
+
+- Results separate policy/Rule context from distinct Assessment executions and their Test/Object/Variable/Item evidence.
+- Execution identity, dependency scheduling, provenance, completeness, and outcome rationale are explicit.
+- Evidence caps or early termination may bound volume but must record completeness/truncation and must not change the normative verdict.
+- Schema/representation validity, known-result evaluation, acquisition/collector conformance, live-target testing, migration equivalence, human acceptance, and Board ratification are separate evidence levels.
+
+## Packaging
+
+- Compiled content uses a manifest-authoritative logical object graph.
+- The current preferred container is deterministic ZIP with the `.scapng` extension.
+- Archive paths are storage locations, not semantic identity; logical IDs resolve through the manifest.
+- Migration/normalization evidence is not packaged by default.
+- Signing/trust profiles remain under development; self-signed demonstrations do not establish publisher trust.
+
+## Current 0.2.0 review boundary
+
+- The schema meaning is frozen at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d` while human/OVAL Board review proceeds.
+- The six converter-produced Board cases under `board/review-content/0.2.0/` are pending human acceptance.
+- ESX/VMware expansion and the two Kubernetes OVAL 6-only Tests are deferred pending recorded guidance/decisions.
+- Full runtime equivalence remains unproven; round-trip/source-reference/schema checks alone do not establish scanner equivalence.
+- Content/conformance work precedes editor development.
 
 ## Required working procedure
 
-1. Read this record and repository instructions. Resolve conflicts in favor of the latest explicit owner instruction, update this record, and mark older prose superseded before generating examples.
-2. Inspect the selected script's input/output contract and consumers. Use pinned original SCAP input and faithful IR for lossless changes; do not normalize a stale rendered tree and call it a fresh conversion.
-3. Add focused regressions for the actual feature under review. Variable work must include named Object extraction, shared references, variable-to-variable dependencies, sets/filters and negative references/cycles. Do not use a no-variable slice as evidence for variable support.
-4. Run `tools/check_current_authoring_contract.py` on proposed review output. Resolve reported violations before calling that output ready. A blocked report is a valid checkpoint, not a pass.
-5. Record source pin, exact commands, results, unresolved blockers and coverage limits. Publish coherent checkpoints on main. Explain narrowly what is proved.
-6. Before reviewer handoff, compare both generator output and consumer behavior against every settled decision above. Run a full round trip after the accepted source grammar is implemented end-to-end.
+1. Start from current `main` and this design contract.
+2. Use pinned original SCAP/OVAL input for conversion work; do not normalize stale generated output and call it a fresh conversion.
+3. Reduce defects/ambiguities to small independently reasoned fixtures.
+4. Run focused tests first, then the fast five-benchmark integration lane when appropriate.
+5. Record source pins, commands, outcomes, limits, and human-review status.
+6. Do not encode a materially ambiguous semantic choice merely because one implementation passes tests.
+7. Use the full NIWC corpus only for intentional milestones/freezes/Board deliverables.
 
-Provenance: **Evidence/Audit** of owner decisions and observed regressions; no external redesign proposal supersedes the established model.
-
-## Complete current-design corpus regression
-
-[2026-09-30 checkpoint summary](../../../../review/current/evidence/full-current-normalization.md): all 65 pinned NIWC Current packages accounted for, 11,628 of 11,973 definition occurrences comparator-equal; 204 deprecated-Test, 132 publisher-extension and 9 confirmed source type-binding blockers. All regenerated package XSD and source-relative Schematron steps pass. Separate Self-Assertion has 165 of 167 equal with only 2 expected deprecated-Test blockers. Fresh full RHEL9 and current contract suites pass on Windows/Linux. The run fixed the historical-mode coverage gap, renamed Object terminology documentation guard, lexical QName diagnostic comparison and masked Schematron pipeline errors. This is conversion evidence, not target runtime equivalence; the complete census remains red for the explicitly documented source type errors.
-
-
-## OVAL-aligned vocabulary checkpoint — 2026-10-01
-
-The authoritative authored Assessment vocabulary is now **Assessment, Test, Object,
-State, Variable, and Item** where the underlying semantics remain aligned with
-OVAL. `evaluate` is the intentional native replacement for OVAL
-`criteria/criterion`, and typed `*_title` fields intentionally replace generic
-OVAL `comment` metadata.
-
-`Collection` is not an authored synonym for Object. It describes runtime
-execution of an Object. Older iteration-003 prose, generated examples, tool
-variable names, or evidence directories that use Collection as the authored
-OVAL-Object concept are historical implementation terminology and SHALL NOT
-override this decision.
-
-Before capability schemas become a baseline, generators, validators, examples,
-and current-design regression tooling SHALL either emit/consume the OVAL-aligned
-authored vocabulary or be explicitly labeled as legacy migration internals.
-
-## Tailoring Parameter boundary correction — 2026-10-01 owner decision recovered 2026-10-02
-
-The earlier permission for Tailoring to refine publisher Parameter values is superseded. Tailoring SHALL NOT override those values. If the publisher requires X and an organization chooses Y, that is a different policy requiring distinct policy identity; Organizational Input supplies only delegated values. Tailoring MAY still select an existing publisher-provided Assessment choice, including manual checking when automation poses operational risk, and enable/disable existing Rules. See specification/policy/profiles-and-tailoring.md and specification/policy/parameters-and-organizational-input.md. The worked resolver and fixtures now reject Parameter mutations in every Tailoring layer.
-
-## Informational policy disposition — retained working control
-
-Owner direction, 2026-10-01: retain Rule `role` for informational/reporting-only use until an adequate alternative is agreed. It belongs to Rule policy, not the Assessment technical truth domain. Assessment-native informational and eventual role replacement remain research/Board topics; earlier replacement proposals do not authorize removal. See specification/results/results.md.
-
-## Conditional normalization scope — 2026-10-03 owner direction
-
-Automatic normalization to conditional evaluation and conditional-candidate detection are removed from planned features; #126 is closed as not planned. Boolean-pattern equivalence does not preserve the full six-state domain or collection/evidence behavior. Preserve the counterexample regression. Source-authored conditional support continues toward 0.2.0; do not treat this scope reduction as removing the conditional feature itself.
-
-## Draft Assessment Result integration — 2026-10-03
-
-The partial 0.2.0 result schema now links per-invocation expression traces to
-local Test/Object/Item/Variable evidence, exact dependency execution identities
-and optional derived reported-element projections. Source-aware validation
-checks local materialization, provenance targets, field-use records and recorded
-expression scheduling. Canonical Items retain the approved optional resolved
-names and lookup/locator/import metadata. 0.1.0 remains unchanged.
-
-This is representation/consistency evidence, not target acquisition or complete
-scanner conformance. The evaluator still uses one shared target/binding context
-per run. Final Item inclusion/import controls, production lineage, multi-context
-result-package composition and full vendor cases remain. See
-[the result checkpoint](../../../../transition/assessment-results-2026-10-03.md)
-and [standalone known-result content](../../../../tests/assessment-results-0.2.0/README.md).
-
-## Draft Item inclusion/import checkpoint — 2026-10-03
-
-The result helper now defaults to all available local observations and offers
-consumed scope retaining every recorded Test/Variable/field-use Item. Availability
-accounting, exact source-byte pins, target/binding checks, local import identities
-and origin chains are represented; imported acquisition/evidence incompleteness
-is preserved conservatively. This is producer serialization, not a new authored
-selector or truth operator. Collection-cache execution/authorization, real lineage,
-result-package composition and target conformance remain. See
-[the materialization checkpoint](../../../../transition/item-materialization-2026-10-03.md).
-
-## Draft result-package checkpoint — 2026-10-03
-
-Scan/Benchmark/Rule Result artifacts now link distinct Assessment executions
-through a closed unsigned exact-byte manifest. Separate invocation groups support
-repeated source identities without conflating target/binding contexts. This
-validates references and optionally recorded expression scheduling, not policy
-interpretation/scoring, acquisition truth or signer trust. Auxiliary evidence
-packaging, source Benchmark replay and target conformance remain. See
-[the checkpoint](../../../../transition/result-package-2026-10-03.md).
-
-## OVAL 6.0 comparison scope — 2026-10-03 owner clarification
-
-SCAP-NG essentially replaces OVAL 6.0. Use 6.0 as a capability/semantic
-completeness reference for the native replacement, not an intermediate format or
-an embedded OVAL runtime. Already represented semantics need no duplicate syntax.
-The separate mandatory lossless SCAP 1.4/OVAL 5.12.x migration requirement remains;
-preserve later baseline fixes and effective deprecation/governance decisions.
-OVAL 6.0 ingestion is not implicitly required by this comparison. Track #131.
-
-Owner follow-up: fixes in 5.12.3 have not all been ported to 6.0. Limit the
-6.0 review to **new tests and their associated Object/State/Item contracts**.
-Keep existing 5.12.3-derived behavior; existing-test/core/result/namespace and
-encapsulated-definition differences are outside this pass. This supersedes the
-broader delta work originally listed in #131.
-
-The first [coverage/new-Test audit](../../../../docs/audit/capability-coverage-2026-10-03/README.md)
-pins 20 new ESX and 2 Kubernetes Tests and their inherited contracts. No native
-mapping or collector is introduced by the inventory. Current standalone content
-covers only two mapped capabilities; wider vendor/method-level and target cases
-remain open. See [the handoff](../../../../transition/capability-coverage-2026-10-03.md).
-
-## Assessment documentation foundation — 2026-10-03 owner direction
-
-Begin shared Markdown and a reusable capability reference format while finishing
-0.2.0. Establish source-backed examples before bounded Codex catalog expansion.
-The [Assessment reference](../../../../specification/assessment/reference/README.md)
-links current authorities, documents Unix file and direct-Variable fields, and
-distinguishes structural, synthetic, migration, and target evidence.
-
-The intended publication is one versioned NG specification/capability reference.
-Useful source XSD documentation must survive as reviewed native explanations,
-with useful descriptions/examples also in JSON Schema annotations. JSON Schema
-is not the sole semantic authority. A structured YAML catalog generating schemas
-and reference documentation is a proposed future consolidation; existing JSON
-mappings remain generator inputs and no catalog/generation replacement is
-implemented by this documentation slice. Do not independently edit duplicate
-truth tables or infer finalized runtime conformance from the starter references.
-
-## New ESXi host capability slice — draft 0.2.0
-
-Native `esx.host_service` and `esx.host_advancedsetting` mappings retain named
-Object selection, compatible States, scalar service Booleans and typed repeated
-advanced-setting values. A versioned registry exposes them only to 0.2.0 while
-reusing existing shared native primitives and preserving all 0.1.0 mappings.
-The new field documentation is also present in generated schema annotations.
-Exact licensed ESX source blobs are retained as a partial metadata reference;
-complete upstream XSD compilation uses the pinned public CI checkout. This is
-not OVAL 6.0 ingestion or a broader adoption of existing 6.0 differences.
-
-The [known-result content](../../../../tests/esx-host-0.2.0/README.md) validates
-source shapes, references, synthetic Items and reporting, not live VMware
-acquisition/comparison. See [the checkpoint](../../../../transition/esx-host-capabilities-2026-10-03.md).
-The other OVAL 6.0-only Tests are not an active 0.2.0 implementation backlog. ESX expansion is deferred pending upstream guidance; the two Kubernetes Tests are reviewed/deferred for 0.2.0. Full vendor/target conformance remains under #128/#131.
-
-
-## New ESXi host account and VIB slice — draft 0.2.0
-
-`esx.host_account` and `esx.host_vib` retain named Object selectors and all
-source State/Item fields. Account shell access is Boolean; VIB category is one
-of five exact strings, with `Unknown` distinct from technical unknown. VIB
-version/date remain strings. Explicit present-payload type/enum constraints are
-opt-in mapping projections, preserving stable generated contracts. The native
-Variable-reference form replaces the source's empty XML enum placeholder.
-[References](../../../../specification/assessment/reference/README.md) and
-[synthetic cases](../../../../tests/esx-host-0.2.0/README.md) explain limitations.
-Four new Tests are represented experimentally; the remaining OVAL 6.0-only Tests are deferred for the 0.2.0 freeze. Live acquisition and
-independent comparator/vendor evidence. This does not finalize 0.2.0.
+See [MAINTAINING.md](../../../../MAINTAINING.md) for the human acceptance process, [the 0.2.0 freeze record](../../../../transition/0.2.0-freeze-record-2026-10-04.md) for technical evidence, and [the OVAL Board packet](../../../../board/README.md) for current review questions.
