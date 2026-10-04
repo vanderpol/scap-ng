@@ -269,9 +269,19 @@ def generate(mapping, repo_root, schema_version=None):
             enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
             if enum_values:
                 selector_schema = {
-                    "oneOf": [
-                        {"type": "string", "enum": list(enum_values)},
-                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
+                    "allOf": [
+                        generic_entity_schema(dtypes, state=False, version=version),
+                        {
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "oneOf": [
+                                        {"type": "string", "enum": list(enum_values)},
+                                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
+                                    ]
+                                }
+                            },
+                        },
                     ]
                 }
             else:
@@ -527,38 +537,59 @@ def generate(mapping, repo_root, schema_version=None):
             "properties": test_properties,
             "additionalProperties": False,
         },
+        "state_predicate": {
+            "oneOf": (
+                [
+                    {
+                        "type": "object",
+                        "required": ["field"],
+                        "properties": {
+                            "field": {
+                                "type": "string",
+                                "enum": sorted(
+                                    name for name in state_names
+                                    if name not in record_state_fields
+                                ),
+                            }
+                        },
+                        "allOf": [
+                            {
+                                "$ref": f"{common_capability_schema_id}#/$defs/state_entity_base"
+                            },
+                            {"oneOf": scalar_state_branches},
+                        ],
+                        "unevaluatedProperties": False,
+                    }
+                ] if scalar_state_branches else []
+            ) + record_state_branches,
+        },
+        "state_expression": {
+            "oneOf": [
+                {"$ref": "#/$defs/state_predicate"},
+                *[
+                    {
+                        "type": "object",
+                        "required": [operator],
+                        "properties": {
+                            operator: {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {"$ref": "#/$defs/state_expression"},
+                            }
+                        },
+                        "additionalProperties": False,
+                    }
+                    for operator in ("all", "any", "one", "odd")
+                ],
+            ]
+        },
         "state": {
             "type": "object",
             "required": ["state_title", "capability", "state"],
             "properties": {
                 "state_title": {"type": ["string", "null"]},
                 "capability": {"const": capability},
-                "state": {
-                    "oneOf": (
-                        [
-                            {
-                                "type": "object",
-                                "required": ["field"],
-                                "properties": {
-                                    "field": {
-                                        "type": "string",
-                                        "enum": sorted(
-                                            name for name in state_names
-                                            if name not in record_state_fields
-                                        ),
-                                    }
-                                },
-                                "allOf": [
-                                    {
-                                        "$ref": f"{common_capability_schema_id}#/$defs/state_entity_base"
-                                    },
-                                    {"oneOf": scalar_state_branches},
-                                ],
-                                "unevaluatedProperties": False,
-                            }
-                        ] if scalar_state_branches else []
-                    ) + record_state_branches,
-                },
+                "state": {"$ref": "#/$defs/state_expression"},
             },
             "additionalProperties": False,
         },
