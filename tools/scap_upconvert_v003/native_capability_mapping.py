@@ -585,4 +585,14 @@ def apply_ready_capability_mappings(document: dict, mapping_dir: Path) -> dict:
     result=copy.deepcopy(document)
     for mapping in ready_capability_mappings(mapping_dir):
         result=apply_capability_mapping(result,mapping)
+    assessment=result.get("assessment",result)
+    for section in ("objects","states","tests"):
+        for identity,node in (assessment.get(section) or {}).items():
+            if not isinstance(node,dict):
+                continue
+            capability=node.get("capability")
+            if capability == "windows.wmi":
+                raise ValueError(f"deprecated source capability windows.wmi at {section}.{identity}; use reviewed windows.wmi.query only for wmi57 source")
+            if capability == "independent.sqlext":
+                raise ValueError(f"nonstandard source capability independent.sqlext at {section}.{identity}; publisher extension requires source remediation")
     return result
