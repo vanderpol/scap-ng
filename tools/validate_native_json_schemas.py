@@ -100,19 +100,25 @@ def document_errors(v, doc):
         from generate_capability_schema import generate
         from reported_elements import generate_reporting_capability
         draft = draft_capabilities()
+        declared_version = (assessment.get("specification") or {}).get("version")
         for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
             nodes = assessment.get(section, {})
             if not isinstance(nodes, dict):
                 continue
             for identity, node in nodes.items():
-                if not isinstance(node, dict) or not isinstance(node.get("capability"), str) or node["capability"] not in draft:
+                capability = node.get("capability") if isinstance(node, dict) else None
+                if not isinstance(capability, str):
                     continue
-                version = assessment.get("specification", {})
-                if not isinstance(version, dict) or version.get("version") != "0.2.0":
-                    yield ValidationError("New capability requires specification 0.2.0", path=["assessment", section, identity])
+                if declared_version != "0.2.0":
+                    if capability in draft:
+                        yield ValidationError("New capability requires specification 0.2.0", path=["assessment", section, identity])
                     continue
-                mapping = load_mapping(node["capability"])
-                generated = generate_reporting_capability(mapping) if kind == "test" else generate(mapping, Path(__file__).resolve().parents[1])
+                try:
+                    mapping = load_mapping(capability, "0.2.0")
+                except ValueError:
+                    yield ValidationError(f"Unknown 0.2.0 capability: {capability}", path=["assessment", section, identity, "capability"])
+                    continue
+                generated = generate_reporting_capability(mapping) if kind == "test" else generate(mapping, Path(__file__).resolve().parents[1], schema_version="0.2.0")
                 if kind not in generated["$defs"]:
                     yield ValidationError("Capability does not support this source node", path=["assessment", section, identity])
                     continue
