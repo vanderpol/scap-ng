@@ -2,7 +2,7 @@
 
 Branch state is part of the durable repository record.
 
-- Read `BRANCH-MANAGEMENT.md` during repository preflight whenever branch state could affect the task.
+- At the start of every repository task, read `BRANCH-MANAGEMENT.md` during preflight, even when no branch work is planned. Branch state is always part of the repository context.
 - Do not create a non-`main` branch without immediately recording its purpose, status, relationship to `main`, and intended disposition in `BRANCH-MANAGEMENT.md`.
 - Update that entry when the branch is merged, held/deferred, superseded, abandoned, or becomes ready to merge.
 - Before a freeze, handoff, release, or major review build, audit all non-`main` branches against `main` and resolve or explicitly classify every branch that is ahead/diverged.
