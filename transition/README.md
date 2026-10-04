@@ -1,21 +1,20 @@
-
-> **0.2.0 reconciliation hold (2026-10-03):** The former `a0fe3abf...` freeze is reclassified as a semantic/integration checkpoint. Broad feature work was merged and tested on main, but the complete v0.2.0 authoring schema surface had not yet been promoted. Do not start the Codex content task until the version-promotion gates pass on a new exact-main SHA. See [version promotion and freeze requirements](../specification/version-promotion-and-freeze.md) and the reopened [0.2.0 freeze criteria](0.2.0-freeze-criteria-2026-10-03.md).
-
 # Current 0.2.0 handoff status
 
-The active handoff is now [SCAP-NG 0.2.0 content-development handoff](handoff-0.2.0-content-development-2026-10-03.md).
+SCAP-NG 0.2.0 is **technically frozen for bounded content/conformance development** at exact technical baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
 
-The five bounded 0.2.0 closure items are complete. The technical content-development baseline is **frozen** at `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`. Exact-head smoke, Self-Assertion, Ubuntu/Windows current-design regression, and the full NIWC normalize/compile experiment all passed. See [the final freeze record](0.2.0-freeze-record-2026-10-03.md).
+Authoritative records:
+- [0.2.0 freeze record](0.2.0-freeze-record-2026-10-04.md)
+- [0.2.0 freeze criteria](0.2.0-freeze-criteria-2026-10-03.md)
+- [content-development handoff](handoff-0.2.0-content-development-2026-10-03.md)
+- [Codex 5–10 case pilot task](codex-test-content-0.2.0-task.md)
+- [human-auditable maintenance process](../MAINTAINING.md)
+- [branch registry](../BRANCH-MANAGEMENT.md)
 
-VMware ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 blocker. The two Kubernetes OVAL 6.0-only Tests are also explicitly reviewed/deferred for this freeze. Content development precedes editor development.
+All required exact-SHA technical gates passed, including Ubuntu/Windows current-design regression, Self-Assertion, smoke/preservation, and the full NIWC normalize/compile experiment. The fast five-benchmark regression lane is also green on current main.
 
-The maintained ready-to-use Codex task is [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md) and is pinned to the frozen semantic baseline. The intended authority order is specification → implementation/reference guidance → conformance content → editor.
+**Important claim boundary:** this is a technical content-development freeze, not proof that the entire language has received exhaustive independent human semantic audit. Machine-green does not mean human-accepted. Future semantic evolution SHALL use the human review packets and acceptance gates in `MAINTAINING.md`.
 
-The handoff has also been audited against the draft specification in [spec-coverage-audit-0.2.0-2026-10-03.md](spec-coverage-audit-0.2.0-2026-10-03.md). Universal author/processor requirements found during that audit belong in the specification; workflow-only Codex guidance remains outside the normative core.
-
-The explicit freeze gates and claim boundaries are recorded in [0.2.0-freeze-criteria-2026-10-03.md](0.2.0-freeze-criteria-2026-10-03.md).
-
-The historical transition material below remains useful provenance. Statements below that describe Codex handoff as merely “preparation only” or identify older repository tasks should be read as dated history rather than the current 0.2.0 handoff state.
+The immediate next step is the bounded 5–10 case Codex content pilot. It must stop for human review before scale-out. Content development remains ahead of editor development. ESX and the two Kubernetes OVAL 6-only tests remain deferred as recorded in the freeze documents.
 
 # Latest completed checkpoint
 
