@@ -1,8 +1,12 @@
 # SCAP-NG tooling
 
+**Human operators:** start with [Human-runnable SCAP-NG tools](HUMAN-RUNNABLE-SCRIPTS.md). It documents supported commands, examples, inputs/outputs, safety boundaries, and historical/research-only entry points.
+
 Start with the [current design](../research/iterations/003/design/CURRENT-DESIGN.md). Tool location or an old passing test does not establish current native syntax.
 
 ## Maintained entry points
+
+The table below is the short list. The [human-runnable tools guide](HUMAN-RUNNABLE-SCRIPTS.md) is the complete operator catalog.
 
 | Task | Entry point | Status |
 | --- | --- | --- |
