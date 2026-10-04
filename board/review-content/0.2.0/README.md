@@ -13,28 +13,40 @@ Starting checkout: clean `/workspace/scap-ng`, `main`,
 commits remain. Self-Assertion source is pinned to
 `e3538595c5083b9c34d937a81d319234df9bbfaa`, verified locally and through GitHub.
 
-## Six converted review cases
+## View the sample content
 
-| Sample / explanation | Source within `SCAP_1.4/OVAL_Test_Content/` | Selected OVAL scope | Review value / expected outcomes |
-| --- | --- | --- | --- |
-| [Family](examples/family.md) | `agnostic/ind-def_family_test.xml` | complete MITRE `def:95` | Singleton Object removal, regex Variable; true/false/error/unknown |
-| [UNIX file](examples/unix-file.md) | `unix/unix-def_file_test.xml` | NAVWAR `def:1`, `tst:9` | Exact file selection, existence/completeness and linked evidence; true/false/error/unknown/not_applicable |
-| [Registry](examples/registry.md) | `windows/win-def_registry_test.xml` | MITRE `def:38`, `tst:1020` | Hive mapping, case-insensitive State, exactly one satisfying Item; true/false/error |
-| [Directory filter](examples/directory-filter.md) | `unix/oval-def_set-unix.xml` | MITRE `def:276`, `tst:451` | Variable-backed operand EXCLUDE, distinct `one` quantifiers; true/false/error/unknown |
-| [Windows process query](examples/windows-process-query.md) | `windows/win-def_wmi57_object_test.xml` | complete MITRE `def:10` | Correlated records, integer boundary and field status; true/false/error/unknown |
-| [Symlink resolution](examples/symlink-resolution.md) | `unix/unix-def_symlink_test.xml` | complete NAVWAR UNIX `def:1` | Four-Test graph, negated existence, canonical target; true/false/error/unknown |
+If you only want to see what SCAP-NG Assessment content looks like, start here. **Refined NG** is the human-review form. **Mechanical NG** is the direct converter output before presentation cleanup. **Source XML** is the pinned SCAP 1.4/OVAL evidence used for comparison.
 
-MITRE and NAVWAR are the upstream identifier namespaces; tables abbreviate IDs
-only for reading. [Provenance](provenance/) keeps exact full IDs, versions, source
-namespaces/comments, whole-file/extract hashes and original source URLs. WMI is
-Windows Management Instrumentation; its fixed query uses WQL, WMI Query Language.
+| Sample | Refined NG Assessment | Mechanical NG | Source XML | Explanation |
+| --- | --- | --- | --- | --- |
+| Family | [`family.assessment.yaml`](content/family.assessment.yaml) | [mechanical](mechanical/family.assessment.yaml) | [OVAL XML](sources/family.xml) | [overview](examples/family.md) |
+| UNIX file | [`unix-file.assessment.yaml`](content/unix-file.assessment.yaml) | [mechanical](mechanical/unix-file.assessment.yaml) | [OVAL XML](sources/unix-file.xml) | [overview](examples/unix-file.md) |
+| Windows registry | [`registry.assessment.yaml`](content/registry.assessment.yaml) | [mechanical](mechanical/registry.assessment.yaml) | [OVAL XML](sources/registry.xml) | [overview](examples/registry.md) |
+| Directory filter | [`directory-filter.assessment.yaml`](content/directory-filter.assessment.yaml) | [mechanical](mechanical/directory-filter.assessment.yaml) | [OVAL XML](sources/filter.xml) | [overview](examples/directory-filter.md) |
+| Windows process query | [`windows-process-query.assessment.yaml`](content/windows-process-query.assessment.yaml) | [mechanical](mechanical/windows-process-query.assessment.yaml) | [OVAL XML](sources/windows-process-query.xml) | [overview](examples/windows-process-query.md) |
+| Symlink resolution | [`symlink-resolution.assessment.yaml`](content/symlink-resolution.assessment.yaml) | [mechanical](mechanical/symlink-resolution.assessment.yaml) | [OVAL XML](sources/symlink-resolution.xml) | [overview](examples/symlink-resolution.md) |
 
-For each case follow [manifest](manifest.json): source extract →
-`mechanical/<name>.assessment.yaml` → `content/<name>.assessment.yaml` →
-`expected/<name>.json` → explanation/provenance. Directory filter reuses
-`sources/filter.xml`. Three selected-criterion cases are explicitly **fragments**,
-not equivalent to their complete multi-Test source Definitions. Three complete
-Definitions preserve their whole executable closure.
+For a fast review, open a **Refined NG Assessment** first, then compare it with the adjacent **Source XML**. The explanation pages describe the selected OVAL scope, expected outcomes, and why each case was chosen.
+
+## What these six samples cover
+
+- **Family:** singleton Object removal and regex Variable behavior.
+- **UNIX file:** exact file selection, existence/completeness, and linked evidence.
+- **Windows registry:** hive mapping, case-insensitive State comparison, and single-item satisfaction.
+- **Directory filter:** Variable-backed EXCLUDE behavior and distinct `one` quantifiers.
+- **Windows process query:** correlated records, integer boundaries, and field status.
+- **Symlink resolution:** a four-Test graph, negated existence, and canonical target handling.
+
+Three samples preserve complete source Definitions; three are intentionally selected fragments for focused review. Exact source IDs, versions, hashes, namespaces, and source URLs are retained under [provenance](provenance/).
+
+## About this review set
+
+This is a bounded six-case converter pilot for human/OVAL Board review. The YAML files are native SCAP-NG Assessment content; the XML files are pinned source evidence. Machine validation does not make a sample accepted, and this pilot does not by itself establish live collector or independent scanner equivalence.
+
+Frozen technical baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Self-Assertion source is pinned to `e3538595c5083b9c34d937a81d319234df9bbfaa`.
+
+[Manifest](manifest.json) records the source → mechanical NG → refined NG → expected-result chain for each case.
+
 
 ## Conversion fidelity first
 
