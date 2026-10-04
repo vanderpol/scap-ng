@@ -53,59 +53,16 @@ class Version020PromotionTests(unittest.TestCase):
                 self.assertIn("reported_elements", overlay["$defs"]["test"]["properties"])
 
     def test_inherited_capability_is_deep_validated_under_020(self):
+        import yaml
         validators = build_validators(V02)
-        valid = {
-            "assessment": {
-                "id": "promotion.unix.file",
-                "version": 1,
-                "assessment_title": "Promotion regression",
-                "mode": "automated",
-                "class": "compliance",
-                "purpose": "assessment",
-                "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.2.0"},
-                "objects": {
-                    "passwd": {
-                        "object_title": "passwd",
-                        "capability": "unix.file",
-                        "select": {
-                            "full_path": {"value": "/etc/passwd", "operation": "equal", "datatype": "string"}
-                        }
-                    }
-                },
-                "states": {
-                    "owner": {
-                        "state_title": "root owner",
-                        "capability": "unix.file",
-                        "state": {
-                            "field": "user_id",
-                            "value": 0,
-                            "operation": "equal",
-                            "datatype": "integer",
-                            "match": "all",
-                            "existence": "some"
-                        }
-                    }
-                },
-                "tests": {
-                    "check": {
-                        "test_title": "owner",
-                        "capability": "unix.file",
-                        "object": "passwd",
-                        "states": ["owner"],
-                        "existence": "some",
-                        "match": "all",
-                        "states_match": "all",
-                        "reported_elements": "compared"
-                    }
-                },
-                "evaluate": {"test": "check"}
-            }
-        }
+        fixture = ROOT / "tests/reported-elements-0.2.0/ownership.assessment.yaml"
+        valid = yaml.safe_load(fixture.read_text(encoding="utf-8"))
         errors = list(document_errors(validators["assessment.schema.json"], valid))
         self.assertEqual(errors, [], [e.message for e in errors])
 
         invalid = json.loads(json.dumps(valid))
-        invalid["assessment"]["objects"]["passwd"]["select"]["invented"] = {
+        first_object = next(iter(invalid["assessment"]["objects"].values()))
+        first_object["select"]["invented"] = {
             "value": "x", "operation": "equal", "datatype": "string"
         }
         self.assertTrue(list(document_errors(validators["assessment.schema.json"], invalid)))
