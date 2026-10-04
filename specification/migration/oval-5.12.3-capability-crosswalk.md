@@ -38,34 +38,34 @@ that collapsing them would preserve semantics.
 
 The inventory below is historical naming research, not the current converter
 registry. For reviewed clean native capabilities, the exact source family is
-retained in [capability mappings](../../schema/v0.1.0/capability-mappings/README.md)
+retained in [0.2.0 supported capability mappings](../../schema/v0.2.0/capability-mappings/supported/)
 while the native capability name may differ from the source basename.
 
 | Exact OVAL source Test | Current native capability | Mapping |
 | --- | --- | --- |
-| `unix:file_test` | `unix.file` | [unix.file](../../schema/v0.1.0/capability-mappings/unix.file.json) |
-| `independent:filehash58_test` | `file.hash` | [file.hash](../../schema/v0.1.0/capability-mappings/file.hash.json) |
-| `windows:file_test` | `windows.file` | [windows.file](../../schema/v0.1.0/capability-mappings/windows.file.json) |
-| `windows:registry_test` | `windows.registry` | [windows.registry](../../schema/v0.1.0/capability-mappings/windows.registry.json) |
-| `independent:variable_test` | `variable.value` | [variable.value](../../schema/v0.1.0/capability-mappings/variable.value.json) |
-| `windows:wmi57_test` | `windows.wmi.query` | [windows.wmi.query](../../schema/v0.1.0/capability-mappings/windows.wmi.query.json) |
-| `linux:rpminfo_test` | `linux.rpminfo` | [linux.rpminfo](../../schema/v0.1.0/capability-mappings/linux.rpminfo.json) |
-| `independent:textfilecontent54_test` | `independent.textfilecontent54` | [independent.textfilecontent54](../../schema/v0.1.0/capability-mappings/independent.textfilecontent54.json) |
-| `windows:auditeventpolicysubcategories_test` | `windows.auditeventpolicysubcategories` | [windows.auditeventpolicysubcategories](../../schema/v0.1.0/capability-mappings/windows.auditeventpolicysubcategories.json) |
-| `windows:userright_test` | `windows.userright` | [windows.userright](../../schema/v0.1.0/capability-mappings/windows.userright.json) |
-| `independent:shellcommand_test` | `independent.shellcommand` | [independent.shellcommand](../../schema/v0.1.0/capability-mappings/independent.shellcommand.json) |
-| `unix:sysctl_test` | `unix.sysctl` | [unix.sysctl](../../schema/v0.1.0/capability-mappings/unix.sysctl.json) |
-| `linux:partition_test` | `linux.partition` | [linux.partition](../../schema/v0.1.0/capability-mappings/linux.partition.json) |
-| `linux:systemdunitproperty_test` | `linux.systemdunitproperty` | [linux.systemdunitproperty](../../schema/v0.1.0/capability-mappings/linux.systemdunitproperty.json) |
-| `windows:fileeffectiverights53_test` | `windows.fileeffectiverights53` | [windows.fileeffectiverights53](../../schema/v0.1.0/capability-mappings/windows.fileeffectiverights53.json) |
-| `windows:cmdlet_test` | `windows.cmdlet` | [windows.cmdlet](../../schema/v0.1.0/capability-mappings/windows.cmdlet.json) |
-| `unix:symlink_test` | `unix.symlink` | [unix.symlink](../../schema/v0.1.0/capability-mappings/unix.symlink.json) |
-| `windows:lockoutpolicy_test` | `windows.lockoutpolicy` | [windows.lockoutpolicy](../../schema/v0.1.0/capability-mappings/windows.lockoutpolicy.json) |
-| `windows:passwordpolicy_test` | `windows.passwordpolicy` | [windows.passwordpolicy](../../schema/v0.1.0/capability-mappings/windows.passwordpolicy.json) |
-| `unix:password_test` | `unix.password` | [unix.password](../../schema/v0.1.0/capability-mappings/unix.password.json) |
-| `unix:shadow_test` | `unix.shadow` | [unix.shadow](../../schema/v0.1.0/capability-mappings/unix.shadow.json) |
-| `linux:selinuxsecuritycontext_test` | `linux.selinuxsecuritycontext` | [linux.selinuxsecuritycontext](../../schema/v0.1.0/capability-mappings/linux.selinuxsecuritycontext.json) |
-| `unix:interface_test` | `unix.interface` | [unix.interface](../../schema/v0.1.0/capability-mappings/unix.interface.json) |
+| `unix:file_test` | `unix.file` | [unix.file](../../schema/v0.2.0/capability-mappings/supported/unix.file.json) |
+| `independent:filehash58_test` | `file.hash` | [file.hash](../../schema/v0.2.0/capability-mappings/supported/file.hash.json) |
+| `windows:file_test` | `windows.file` | [windows.file](../../schema/v0.2.0/capability-mappings/supported/windows.file.json) |
+| `windows:registry_test` | `windows.registry` | [windows.registry](../../schema/v0.2.0/capability-mappings/supported/windows.registry.json) |
+| `independent:variable_test` | `variable.value` | [variable.value](../../schema/v0.2.0/capability-mappings/supported/variable.value.json) |
+| `windows:wmi57_test` | `windows.wmi.query` | [windows.wmi.query](../../schema/v0.2.0/capability-mappings/supported/windows.wmi.query.json) |
+| `linux:rpminfo_test` | `linux.rpminfo` | [linux.rpminfo](../../schema/v0.2.0/capability-mappings/supported/linux.rpminfo.json) |
+| `independent:textfilecontent54_test` | `independent.textfilecontent54` | [independent.textfilecontent54](../../schema/v0.2.0/capability-mappings/supported/independent.textfilecontent54.json) |
+| `windows:auditeventpolicysubcategories_test` | `windows.auditeventpolicysubcategories` | [windows.auditeventpolicysubcategories](../../schema/v0.2.0/capability-mappings/supported/windows.auditeventpolicysubcategories.json) |
+| `windows:userright_test` | `windows.userright` | [windows.userright](../../schema/v0.2.0/capability-mappings/supported/windows.userright.json) |
+| `independent:shellcommand_test` | `independent.shellcommand` | [independent.shellcommand](../../schema/v0.2.0/capability-mappings/supported/independent.shellcommand.json) |
+| `unix:sysctl_test` | `unix.sysctl` | [unix.sysctl](../../schema/v0.2.0/capability-mappings/supported/unix.sysctl.json) |
+| `linux:partition_test` | `linux.partition` | [linux.partition](../../schema/v0.2.0/capability-mappings/supported/linux.partition.json) |
+| `linux:systemdunitproperty_test` | `linux.systemdunitproperty` | [linux.systemdunitproperty](../../schema/v0.2.0/capability-mappings/supported/linux.systemdunitproperty.json) |
+| `windows:fileeffectiverights53_test` | `windows.fileeffectiverights53` | [windows.fileeffectiverights53](../../schema/v0.2.0/capability-mappings/supported/windows.fileeffectiverights53.json) |
+| `windows:cmdlet_test` | `windows.cmdlet` | [windows.cmdlet](../../schema/v0.2.0/capability-mappings/supported/windows.cmdlet.json) |
+| `unix:symlink_test` | `unix.symlink` | [unix.symlink](../../schema/v0.2.0/capability-mappings/supported/unix.symlink.json) |
+| `windows:lockoutpolicy_test` | `windows.lockoutpolicy` | [windows.lockoutpolicy](../../schema/v0.2.0/capability-mappings/supported/windows.lockoutpolicy.json) |
+| `windows:passwordpolicy_test` | `windows.passwordpolicy` | [windows.passwordpolicy](../../schema/v0.2.0/capability-mappings/supported/windows.passwordpolicy.json) |
+| `unix:password_test` | `unix.password` | [unix.password](../../schema/v0.2.0/capability-mappings/supported/unix.password.json) |
+| `unix:shadow_test` | `unix.shadow` | [unix.shadow](../../schema/v0.2.0/capability-mappings/supported/unix.shadow.json) |
+| `linux:selinuxsecuritycontext_test` | `linux.selinuxsecuritycontext` | [linux.selinuxsecuritycontext](../../schema/v0.2.0/capability-mappings/supported/linux.selinuxsecuritycontext.json) |
+| `unix:interface_test` | `unix.interface` | [unix.interface](../../schema/v0.2.0/capability-mappings/supported/unix.interface.json) |
 
 Owner clarification, 2026-10-02: historical suffixes identify the OVAL version
 in which the revised capability was introduced/fixed, for example `54` in
