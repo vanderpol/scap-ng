@@ -42,6 +42,27 @@ Use the exact native capability names defined by the versioned 0.2.0 capability 
 
 Where a reviewed semantic rename exists, use it. In particular, OVAL `windows:wmi57_test` maps to native `windows.wmi.query`; deprecated `windows:wmi_test` is not interchangeable and must remain a migration blocker. NIWC/SCC `independent:sqlext` is publisher-extension vocabulary and is not a standard native capability. For other suffix-bearing names, use the currently mapped 0.2.0 name until a separate reviewed naming decision changes it.
 
+## Board-checkpoint deliverable
+
+The 5–10 case pilot is not merely preparation for later corpus work. Its reviewed output SHALL become part of the SCAP-NG 0.2.0 OVAL Board checkpoint.
+
+Stage the pilot under:
+
+`board/review-content/0.2.0/`
+
+Include:
+- the sample native SCAP-NG Assessment content;
+- any minimal Benchmark/Rule wrapper needed to make the example understandable;
+- independent expected Assessment/Rule results;
+- source/provenance records for converted examples;
+- a concise per-sample explanation of the OVAL semantic feature being demonstrated;
+- validation evidence/commands;
+- a manifest of the included samples.
+
+Do not put full STIGs or bulk generated corpora in the Board sample directory. The Board samples must be intentionally small and reviewable.
+
+After human acceptance, these files become the canonical worked examples/seed conformance cases. Do not maintain a second divergent copy elsewhere.
+
 ## Human review gate for the pilot
 
 Read `MAINTAINING.md` before changing content. Automated validation is evidence, not acceptance. The 5–10 case pilot SHALL be returned for human audit before scale-out. Any discovered semantic ambiguity SHALL be documented as a review question/reproducer; Codex SHALL NOT resolve a materially ambiguous language-design choice merely by changing schemas or expected results until a human accepts that choice.
@@ -52,7 +73,7 @@ Codex SHALL NOT begin with the full corpus described below. The first execution 
 
 The pilot SHALL produce the same quality of deliverables required by the full task: native content, independent expected results, provenance, coverage/inventory records, validation commands, and captured validation evidence. It SHALL include enough variety to expose misunderstandings in schema usage, directory/naming conventions, expected-result modeling, dependency/reference handling, and source provenance.
 
-After producing the pilot, **STOP**. Do not expand, batch-convert additional content, or generalize the pilot mechanically. The pilot must first be independently reviewed against the frozen 0.2.0 schemas/specification and rerun through maintained validation by the project owner/ChatGPT workflow. Any misunderstanding found in the pilot SHALL be corrected in the pilot before scale-out.
+After producing and staging the pilot in the Board-review directory, **STOP**. Do not expand, batch-convert additional content, or generalize the pilot mechanically. The pilot must first be independently reviewed against the frozen 0.2.0 schemas/specification and rerun through maintained validation by the project owner/ChatGPT workflow. Any misunderstanding found in the pilot SHALL be corrected in the pilot before scale-out.
 
 Expansion requires explicit approval after that review. Once approved, the accepted pilot files become canonical worked examples for subsequent batches. Scale-out SHALL proceed in bounded batches with validation between batches so that a minor interpretation error cannot contaminate the entire corpus.
 
