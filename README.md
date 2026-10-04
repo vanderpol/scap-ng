@@ -1,6 +1,6 @@
 # SCAP-NG
 
-Research toward a simpler successor to SCAP 1.4 that preserves useful OVAL/SCAP semantics while improving authoring, migration, packaging, and results.
+SCAP-NG is research toward a simpler successor to SCAP 1.4, designed to support **lossless semantic upgrades from SCAP 1.4** while improving authoring, migration, packaging, and results. The native representation may normalize and simplify legacy structures, but supported conversions are intended to preserve effective policy, assessment behavior, applicability, inputs, dependencies, evidence behavior, and source provenance rather than merely reproduce the original XML.
 
 **Status:** pre-alpha. SCAP-NG 0.2.0 is technically frozen for bounded human/OVAL Board review. It is not a released standard or production scanner, and passing conversion/schema tests do not establish live-target equivalence.
 
