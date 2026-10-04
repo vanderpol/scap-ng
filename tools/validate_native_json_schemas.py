@@ -148,7 +148,7 @@ def document_errors(v, doc):
             seen[value] = index
 
 
-def main():
+def diagnostic_value(value):\n    """Return a stable JSON-safe representation for jsonschema diagnostics."""\n    if value is None or isinstance(value, (str, int, float, bool)):\n        return value\n    if isinstance(value, (list, tuple)):\n        return [diagnostic_value(item) for item in value]\n    if isinstance(value, dict):\n        return {str(key): diagnostic_value(item) for key, item in value.items()}\n    return str(value)\n\n\ndef main():
     ap=argparse.ArgumentParser()
     ap.add_argument("corpus_root",type=Path)
     ap.add_argument("--schema-dir",type=Path,required=True)
@@ -176,7 +176,7 @@ def main():
             "errors":[{
                 "path":"/".join(map(str,e.absolute_path)),
                 "schema_path":"/".join(map(str,e.absolute_schema_path)),
-                "validator":e.validator,
+                "validator":diagnostic_value(e.validator),
                 "message":e.message,
                 "classification":"semantic" if e.validator == "unique_response_value" else "untriaged",
             } for e in errors[:50]],
