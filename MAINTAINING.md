@@ -78,14 +78,14 @@ The set may evolve, but changes to the set must be deliberate and documented.
 
 ### 3. Full milestone validation — occasional confidence gate
 
-Use the full NIWC Current corpus, broad Self-Assertion runs, platform matrices, and other expensive workflows for:
-- version freezes;
-- release candidates;
-- large converter architecture changes;
-- substantial schema refactors;
-- changes suspected to affect broad compatibility.
+Use the full NIWC Current corpus only when intentionally producing a durable deliverable/checkpoint, such as:
+- an OVAL Board review checkpoint;
+- a release or freeze candidate;
+- another explicitly named content deliverable.
 
-These workflows provide broad confidence. They are not the primary way to understand a language change.
+Do **not** run the 65-benchmark corpus merely because code, schemas, converter behavior, or documentation changed. Normal development uses focused tests plus the fast regression set.
+
+The full-corpus workflow is intentionally manual-only. It provides broad confidence for a deliverable; it is not the primary way to understand or iterate on a language change.
 
 ## Version evolution
 
