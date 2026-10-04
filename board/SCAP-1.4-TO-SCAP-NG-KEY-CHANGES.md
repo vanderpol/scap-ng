@@ -6,6 +6,16 @@ SCAP-NG is intended to preserve useful SCAP 1.4 and OVAL assessment semantics wh
 
 ## Key changes
 
+- **Assessments are small, standalone files instead of one monolithic checking document.** Each automated Assessment is independently valid and executable, which makes checks easier to author, review, test, reuse, and load only when needed. Reuse does **not** require rebuilding a giant shared OVAL document: common Assessments can be referenced as dependencies, and scanners may reuse compatible Collection Results/Items that were already collected rather than collect the same target data again. Reused collection data retains its original execution provenance, status, and completeness so efficiency does not change assessment truth.
+
+- **Conditional assessment logic is now explicit.** Native `evaluate` expressions support `if / then / else`. Only the selected branch is evaluated, allowing authors to express cases such as “if this role or condition applies, perform check A; otherwise perform check B” without encoding the behavior as an opaque Boolean workaround. Conditional execution preserves the full result domain rather than treating errors, unknowns, or not-applicable states as simple false values. Existing OVAL `AND`/`OR` trees are **not** automatically converted to conditionals unless the source semantics actually require conditional execution.
+
+- **Organizational Input replaces the practical need for unused interactive-variable behavior.** A publisher can deliberately leave a typed policy Parameter unresolved when the correct value must come from the deploying organization, site, mission owner, or system owner—for example an organization-approved timeout or required server list. The supplied value is validated, resolved before normal Assessment execution, and can carry authority/provenance information. Organizational Input is **not Tailoring**, does not make a Rule “tailored,” and cannot change which Tests run, inject commands, or alter executable control flow.
+
+- **NG Benchmarks are not a one-for-one copy of XCCDF.** XCCDF concepts that are used by real content or are necessary to preserve policy semantics are carried forward in cleaner native forms. Features, wrappers, indirections, and serialization mechanics that were unused and provided no required semantic behavior were intentionally not reproduced merely for structural compatibility. Migration tooling records source provenance and reports unsupported or omitted semantics rather than forcing obsolete XCCDF structure into native NG Benchmarks.
+
+- **Profiles are subtractive and much smaller.** Every Rule that belongs to a Benchmark is enabled by default. A publisher Profile records only the Rules it disables, plus permitted publisher Parameter values, rather than repeating a large list of Rules that are already enabled. Profile inheritance remains monotonic: child Profiles can disable additional Rules but do not silently re-enable parent exclusions. Local Tailoring remains separate and can explicitly enable or disable existing Benchmark Rules when an organization intentionally departs from publisher policy.
+
 - **Benchmark → Rule → Assessment.** A Rule owns the requirement, policy metadata, applicability references, and named Assessment choices/default. An Assessment owns how the requirement is evaluated. There is **no separate Policy object** in the current design.
 
 - **Preserve OVAL meaning, not OVAL XML structure.** Used, non-deprecated semantics are retained; XML type hierarchies, serialization workarounds, hidden defaults, and wrapper structure are not automatically carried forward.
@@ -28,11 +38,9 @@ SCAP-NG is intended to preserve useful SCAP 1.4 and OVAL assessment semantics wh
 
 - **Applicability is explicit content, not scanner magic.** CPE/platform names may describe targets, but executable applicability is represented by authored assessment logic. Hidden OS/domain-role inference is not assumed.
 
-- **Conditional execution preserves the full result domain.** Source-authored conditional behavior may schedule Assessments lazily, but existing Boolean OVAL structures are not automatically rewritten into conditionals because that can change error/unknown/not-applicable and evidence behavior.
-
 - **Manual assessment is first-class.** Human procedures, manual outcomes, comments/evidence, and workflow state are modeled intentionally alongside automation.
 
-- **Profiles, Tailoring, and Organizational Input are separated.** Publisher Profiles are subtractive. Tailoring can enable/disable existing Rules and choose published Assessment choices; it does not silently replace implementations or publisher Parameter values. Delegated values use typed Organizational Input.
+- **Profiles, Tailoring, Parameters, and Organizational Input have separate jobs.** Profiles express publisher-defined variations; Tailoring records deliberate local policy changes; Parameters carry typed policy data; Organizational Input resolves publisher-delegated values. These mechanisms are not interchangeable.
 
 - **Rule policy truth and Assessment technical truth are separate.** Informational/reporting-only policy remains a Rule concern rather than being forced into Assessment outcome semantics.
 
