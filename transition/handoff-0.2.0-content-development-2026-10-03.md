@@ -58,6 +58,10 @@ All five closure items are complete for the 0.2.0 content-development freeze. It
 
 These are the current handoff gates. Complete live collector execution, full vendor corpus coverage, independent scanner equivalence, exhaustive #128 conformance content, signature/trust implementation, and editor development are downstream work and are not prerequisites to freezing the 0.2.0 authoring contract unless a closure test exposes a specification defect.
 
+### Board checkpoint sample requirement
+
+The first 5–10 Codex Assessment examples are a required part of the 0.2.0 OVAL Board review checkpoint. Stage the reviewed sample set under `board/review-content/0.2.0/` with expected results, provenance, and concise explanatory notes. The Board checkpoint is not ready for external delivery until the owner has human-reviewed and accepted those samples.
+
 ## Codex content-development sequence
 
 Start the bounded Codex pilot from frozen technical baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d` or from a documented non-semantic descendant. Use [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md). The pilot must stop for human audit before scale-out.
