@@ -27,6 +27,11 @@ class ConditionalIntegrationTests(unittest.TestCase):
     def draft(self, assessment):
         doc = {"assessment": copy.deepcopy(assessment)}
         doc["assessment"]["specification"] = {"id": "scap-ng.pre-alpha.assessment", "version": "0.2.0"}
+        for test in doc["assessment"].get("tests", {}).values():
+            if "existence" in test and "check_existence" not in test:
+                test["check_existence"] = test.pop("existence")
+            if "match" in test and "check" not in test:
+                test["check"] = test.pop("match")
         return doc
 
     def schema_errors(self, doc):
