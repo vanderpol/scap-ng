@@ -35,6 +35,12 @@ Do not start by modifying schemas.
 
 Historical iteration-001 and early iteration-002 generated content is evidence, not current architecture.
 
+### Capability naming discipline
+
+Use the exact native capability names defined by the versioned 0.2.0 capability mappings. Do not derive names mechanically from OVAL Test names and do not independently strip or preserve historical numeric suffixes. Historical OVAL Test/Object/State identities remain in each mapping's durable source/migration provenance.
+
+Where a reviewed semantic rename exists, use it. In particular, OVAL `windows:wmi57_test` maps to native `windows.wmi.query`; deprecated `windows:wmi_test` is not interchangeable and must remain a migration blocker. NIWC/SCC `independent:sqlext` is publisher-extension vocabulary and is not a standard native capability. For other suffix-bearing names, use the currently mapped 0.2.0 name until a separate reviewed naming decision changes it.
+
 ## Pilot-first execution gate
 
 Codex SHALL NOT begin with the full corpus described below. The first execution is a deliberately small pilot of **5–10 cases** selected to cover distinct 0.2.0 semantics and source types without maximizing volume.
