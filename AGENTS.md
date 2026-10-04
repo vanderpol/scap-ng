@@ -1,3 +1,10 @@
+## Full-corpus execution invariant
+
+- The full 65-benchmark NIWC corpus is a deliverable/checkpoint gate only.
+- It SHALL NOT run as a routine development, pull-request, branch, or ordinary `main` regression.
+- Run it only when intentionally producing a durable content deliverable, release/freeze candidate, or OVAL Board review checkpoint.
+- Normal development SHALL use focused tests and the maintained fast regression set.
+
 ## Human-auditable maintenance invariant
 
 - At the start of every repository task, read `MAINTAINING.md` in addition to the normal repository preflight files.
