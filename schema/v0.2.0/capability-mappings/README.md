@@ -24,3 +24,4 @@ supported inherited capability against 0.2.0 schema IDs.
 Do not infer support from physical placement alone. A capability is supported
 only when listed by the 0.2.0 scope contract and accepted by the versioned
 registry/validation gates.
+\n## Strict authoring versus legacy-converter bridge\n\nStrict 0.2.0 validation is the default and is the contract for newly authored\ncontent, including the Codex pilot. The historical SCAP 1.4 converter may retain\nits lossless aligned OVAL vocabulary for a supported mapping until that mapping\nis explicitly marked `native.post_alignment_ready`. The full-corpus conversion\ngate may opt into that narrow bridge explicitly; it does not make the aligned\nlegacy shape valid for new 0.2.0 authoring. Unknown capabilities still fail.\n
