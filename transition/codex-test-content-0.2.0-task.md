@@ -2,7 +2,7 @@
 
 # Codex task: SCAP-NG 0.2.0 content development and conformance corpus
 
-Status: **READY TO USE**.
+Status: **HOLD — pilot only after the exact 0.2.0 main freeze is recorded.**
 
 Frozen 0.2.0 technical baseline:
 `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
@@ -37,6 +37,18 @@ Report any contradiction between the frozen checkpoint and current repository be
 Do not start by modifying schemas.
 
 Historical iteration-001 and early iteration-002 generated content is evidence, not current architecture.
+
+## Pilot-first execution gate
+
+Codex SHALL NOT begin with the full corpus described below. The first execution is a deliberately small pilot of **5–10 cases** selected to cover distinct 0.2.0 semantics and source types without maximizing volume.
+
+The pilot SHALL produce the same quality of deliverables required by the full task: native content, independent expected results, provenance, coverage/inventory records, validation commands, and captured validation evidence. It SHALL include enough variety to expose misunderstandings in schema usage, directory/naming conventions, expected-result modeling, dependency/reference handling, and source provenance.
+
+After producing the pilot, **STOP**. Do not expand, batch-convert additional content, or generalize the pilot mechanically. The pilot must first be independently reviewed against the frozen 0.2.0 schemas/specification and rerun through maintained validation by the project owner/ChatGPT workflow. Any misunderstanding found in the pilot SHALL be corrected in the pilot before scale-out.
+
+Expansion requires explicit approval after that review. Once approved, the accepted pilot files become canonical worked examples for subsequent batches. Scale-out SHALL proceed in bounded batches with validation between batches so that a minor interpretation error cannot contaminate the entire corpus.
+
+This pilot gate is normative for this handoff and overrides any later wording that could be read as permission to immediately create the full corpus.
 
 ## 2. Objective
 
