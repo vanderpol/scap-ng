@@ -36,11 +36,36 @@ def audit(package, output):
             + bindings[rid].get('source_defect_fallbacks',[])
         )
         fallbacks={row['selector']:row for row in fallback_rows}
-        expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
+        automated_source={
+            selector for selector,check in expected.items()
+            if check.get('system')!='http://scap.nist.gov/schema/ocil/2'
+        }
+        manual_source={
+            selector for selector,check in expected.items()
+            if check.get('system')=='http://scap.nist.gov/schema/ocil/2'
+        }
+        blocked_assessments=[
+            row for row in bindings[rid].get('assessments',[])
+            if row.get('status')=='blocked'
+        ]
+        quarantine_to_manual=(
+            manual_source
+            and set(choices)==manual_source
+            and len(blocked_assessments)>=len(automated_source)
+            and automated_source
+        )
+        expected_native=(
+            manual_source
+            if quarantine_to_manual
+            else set(expected)-{selector for selector in fallbacks if selector!='default'}
+        )
         if set(choices)!=expected_native: issues.append(rid+': selector set differs')
         default_fallback = fallbacks.get('default')
         if 'default' not in expected:
             issues.append(rid+': source default selection is not preserved')
+        elif quarantine_to_manual:
+            if native['default_assessment_choice'] not in manual_source:
+                issues.append(rid+': quarantined default did not resolve to source manual selector')
         elif default_fallback:
             if native['default_assessment_choice'] not in choices:
                 issues.append(rid+': source-defect default fallback is unresolved')
@@ -50,6 +75,10 @@ def audit(package, output):
                                 for a in bindings[rid]['assessments']
                                 if a.get('path') and a.get('source_graph_bindings')}
         for selector,check in expected.items():
+            if quarantine_to_manual and selector in automated_source:
+                if selector in choices:
+                    issues.append(rid+': quarantined automated selector was not skipped: '+selector)
+                continue
             if selector in fallbacks:
                 if selector!='default' and selector in choices:
                     issues.append(rid+': excluded automated selector was not skipped: '+selector)
