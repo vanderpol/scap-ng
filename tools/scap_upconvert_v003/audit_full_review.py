@@ -38,14 +38,25 @@ def audit(package, output):
         fallbacks={row['selector']:row for row in fallback_rows}
         expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
         if set(choices)!=expected_native: issues.append(rid+': selector set differs')
-        if 'default' not in expected or native['default_assessment_choice']!='default':
+        default_fallback = fallbacks.get('default')
+        if 'default' not in expected:
+            issues.append(rid+': source default selection is not preserved')
+        elif default_fallback:
+            if native['default_assessment_choice'] not in choices:
+                issues.append(rid+': source-defect default fallback is unresolved')
+        elif native['default_assessment_choice']!='default':
             issues.append(rid+': source default selection is not preserved')
         assessment_definitions={a['path']:a['source_graph_bindings']['source_definition']
                                 for a in bindings[rid]['assessments']
                                 if a.get('path') and a.get('source_graph_bindings')}
         for selector,check in expected.items():
-            if selector in fallbacks and selector!='default':
-                if selector in choices: issues.append(rid+': excluded automated selector was not skipped: '+selector)
+            if selector in fallbacks:
+                if selector!='default' and selector in choices:
+                    issues.append(rid+': excluded automated selector was not skipped: '+selector)
+                if selector not in choices:
+                    continue
+            if selector not in choices:
+                issues.append(rid+': missing native selector '+selector)
                 continue
             ref=choices[selector]['assessment']; target=(output/'rules'/ref).resolve()
             if not target.is_relative_to(output.resolve()): raise ValueError('Package escape')
