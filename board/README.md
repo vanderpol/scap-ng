@@ -5,12 +5,13 @@
 ## Start here
 
 1. Read **[SCAP 1.4 → SCAP-NG: key changes](SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)**.
-2. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
-3. Use the **[0.2.0 review checkpoint](SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)** for scope, evidence, and open Board questions.
-4. Consult the detailed **[OVAL-to-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** only when deeper mapping detail is needed.
-5. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
-6. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
-7. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
+2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the frozen schema set, capability mappings, validation commands, and newcomer guide are all there.
+3. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
+4. Use the **[0.2.0 review checkpoint](SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)** for scope, evidence, and open Board questions.
+5. Consult the detailed **[OVAL-to-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** only when deeper mapping detail is needed.
+6. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
+7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
+8. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
 
 ## Current working direction
 
