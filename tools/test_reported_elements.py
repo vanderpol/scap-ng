@@ -60,7 +60,7 @@ class ReportedElementsTests(unittest.TestCase):
             mapping = json.loads(path.read_text())
             if "capability" not in mapping:
                 continue
-            old, new = generate(mapping, ROOT), generate_reporting_capability(mapping)
+            old, new = generate(mapping, ROOT, schema_version="0.2.0"), generate_reporting_capability(mapping)
             Draft202012Validator.check_schema(new)
             for key in ["object", "state", "collected_item"]:
                 self.assertEqual(new["$defs"].get(key), old["$defs"].get(key))
@@ -212,7 +212,7 @@ class ReportedElementsTests(unittest.TestCase):
             dump(root / "benchmark.yaml", {"benchmark": {"id": "reporting", "version": {"value": "1"}, "rules": ["R1"], "profiles": []}})
             dump(root / "assessments/owner.assessment.yaml", {"assessment": assessment})
             dump(root / "rules/R1.rule.yaml", {"rule": {"id": "R1", "assessment_choices": {"auto": {"assessment": "../assessments/owner.assessment.yaml"}}}})
-            with self.assertRaisesRegex(ValueError, "invalid reported_elements"):
+            with self.assertRaisesRegex(ValueError, "invalid (reported_elements|0\\.2\\.0 Assessment)"):
                 compile_benchmark(root, root)
 
 
