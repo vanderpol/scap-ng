@@ -269,19 +269,9 @@ def generate(mapping, repo_root, schema_version=None):
             enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
             if enum_values:
                 selector_schema = {
-                    "allOf": [
-                        generic_entity_schema(dtypes, state=False, version=version),
-                        {
-                            "type": "object",
-                            "properties": {
-                                "value": {
-                                    "oneOf": [
-                                        {"type": "string", "enum": list(enum_values)},
-                                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
-                                    ]
-                                }
-                            },
-                        },
+                    "oneOf": [
+                        {"type": "string", "enum": list(enum_values)},
+                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
                     ]
                 }
             else:
