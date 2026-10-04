@@ -15,9 +15,10 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 XSD = "{http://www.w3.org/2001/XMLSchema}"
-COMMON_CAPABILITY_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/capability-common.schema.json"
-COLLECTED_ITEM_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/collected-item.schema.json"
-RESULT_TYPES_SCHEMA_ID = "https://scap-ng.dev/schema/v0.1.0/result-types.schema.json"
+def schema_id(version, filename):
+    if version not in {"0.1.0", "0.2.0"}:
+        raise ValueError(f"Unsupported capability schema version: {version}")
+    return f"https://scap-ng.dev/schema/v{version}/{filename}"
 
 
 def local(tag):
@@ -133,10 +134,10 @@ def infer_item_name(source):
     return state[:-6] + "_item"
 
 
-def collected_value_schema(allowed_datatypes, *, multiple=False):
+def collected_value_schema(allowed_datatypes, *, multiple=False, version="0.1.0"):
     typed = {
         "allOf": [
-            {"$ref": f"{RESULT_TYPES_SCHEMA_ID}#/$defs/typed_value"},
+            {"$ref": f"{schema_id(version, 'result-types.schema.json')}#/$defs/typed_value"},
             {
                 "type": "object",
                 "properties": {
@@ -156,7 +157,7 @@ def collected_value_schema(allowed_datatypes, *, multiple=False):
     return typed
 
 
-def generic_entity_schema(allowed_datatypes, *, state=False):
+def generic_entity_schema(allowed_datatypes, *, state=False, version="0.1.0"):
     """Compose a capability entity from shared authored-Assessment primitives.
 
     Common value/reference/quantifier semantics live in capability-common.schema.json.
@@ -166,7 +167,7 @@ def generic_entity_schema(allowed_datatypes, *, state=False):
     base = "state_entity_base" if state else "object_entity_base"
     return {
         "allOf": [
-            {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{base}"},
+            {"$ref": f"{schema_id(version, 'capability-common.schema.json')}#/$defs/{base}"},
             {
                 "type": "object",
                 "properties": {
@@ -181,14 +182,17 @@ def generic_entity_schema(allowed_datatypes, *, state=False):
     }
 
 
-def generate(mapping, repo_root):
+def generate(mapping, repo_root, schema_version=None):
     source = mapping["source"]
     xsd_path = repo_root / source["definitions_schema"]
     root = ET.parse(xsd_path).getroot()
     capability = mapping["capability"]
-    version = mapping.get("specification_version", "0.1.0")
+    version = schema_version or mapping.get("specification_version", "0.1.0")
     if version not in {"0.1.0", "0.2.0"}:
         raise ValueError(f"Unsupported capability schema version: {version}")
+    common_capability_schema_id = schema_id(version, "capability-common.schema.json")
+    collected_item_schema_id = schema_id(version, "collected-item.schema.json")
+    result_types_schema_id = schema_id(version, "result-types.schema.json")
     field_documentation = mapping.get("native", {}).get("field_documentation", {})
     fixed_result = mapping.get("native", {}).get("fixed_result")
     if fixed_result is not None:
@@ -233,11 +237,11 @@ def generate(mapping, repo_root):
     if traversal_definition is None and mapping.get("native", {}).get("uses_file_traversal", False):
         traversal_definition = "file_traversal"
     traversal_schema = (
-        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{traversal_definition}"}
+        {"$ref": f"{common_capability_schema_id}#/$defs/{traversal_definition}"}
         if traversal_definition else None
     )
     filesystem_schema = (
-        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/filesystem_scope"}
+        {"$ref": f"{common_capability_schema_id}#/$defs/filesystem_scope"}
         if traversal_definition in {"file_traversal", "windows_file_traversal"} else None
     )
 
@@ -267,11 +271,11 @@ def generate(mapping, repo_root):
                 selector_schema = {
                     "oneOf": [
                         {"type": "string", "enum": list(enum_values)},
-                        {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
                     ]
                 }
             else:
-                selector_schema = generic_entity_schema(dtypes, state=False)
+                selector_schema = generic_entity_schema(dtypes, state=False, version=version)
             if name in mapping["native"].get("nullable_selectors", ["name"]):
                 selector_schema = {
                     "oneOf": [
@@ -306,7 +310,7 @@ def generate(mapping, repo_root):
     for name, spec in mapping.get("native", {}).get("collection_parameters", {}).items():
         if spec.get("schema_ref"):
             literal = {
-                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/{spec['schema_ref']}"
+                "$ref": f"{common_capability_schema_id}#/$defs/{spec['schema_ref']}"
             }
         else:
             literal = {
@@ -320,7 +324,7 @@ def generate(mapping, repo_root):
         variants = [literal]
         if spec.get("allow_variable", False):
             variants.append(
-                {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"}
+                {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"}
             )
         if spec.get("nullable", False):
             variants.append({"type": "null"})
@@ -415,7 +419,7 @@ def generate(mapping, repo_root):
                 "properties": {
                     "field": {"const": name},
                     "record": {
-                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/record_predicate"
+                        "$ref": f"{common_capability_schema_id}#/$defs/record_predicate"
                     },
                 },
                 "additionalProperties": False,
@@ -433,7 +437,7 @@ def generate(mapping, repo_root):
             props["value"] = {
                 "oneOf": [
                     {"type": "string", "enum": list(state_value_enums[name])},
-                    {"$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/variable_reference"},
+                    {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
                 ]
             }
         scalar_state_branches.append({
@@ -453,16 +457,16 @@ def generate(mapping, repo_root):
         "test_title": {"type": ["string", "null"]},
         "capability": {"const": capability},
         "existence": {
-            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/existence_requirement"
+            "$ref": f"{common_capability_schema_id}#/$defs/existence_requirement"
         },
         "match": {
-            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/match_quantifier"
+            "$ref": f"{common_capability_schema_id}#/$defs/match_quantifier"
         },
         "states_match": {
-            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/logical_operator"
+            "$ref": f"{common_capability_schema_id}#/$defs/logical_operator"
         },
         "states": {
-            "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/test_reference_set"
+            "$ref": f"{common_capability_schema_id}#/$defs/test_reference_set"
         },
     }
     if test_source_kind != "none":
@@ -473,6 +477,7 @@ def generate(mapping, repo_root):
         name: collected_value_schema(
             meta["datatypes"],
             multiple=meta.get("multiple", False),
+            version=version,
         )
         for name, meta in sorted(item_meta.items())
     }
@@ -500,7 +505,7 @@ def generate(mapping, repo_root):
     defs = {
         "collected_item": {
             "allOf": [
-                {"$ref": COLLECTED_ITEM_SCHEMA_ID},
+                {"$ref": collected_item_schema_id},
                 {
                     "type": "object",
                     "properties": {
@@ -543,7 +548,7 @@ def generate(mapping, repo_root):
                                 },
                                 "allOf": [
                                     {
-                                        "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/state_entity_base"
+                                        "$ref": f"{common_capability_schema_id}#/$defs/state_entity_base"
                                     },
                                     {"oneOf": scalar_state_branches},
                                 ],
@@ -565,7 +570,7 @@ def generate(mapping, repo_root):
             **({"traversal": traversal_schema} if traversal_schema else {}),
             **({"collect": collect_schema} if collect_schema else {}),
             "set": {
-                "$ref": f"{COMMON_CAPABILITY_SCHEMA_ID}#/$defs/set_expression"
+                "$ref": f"{common_capability_schema_id}#/$defs/set_expression"
             },
         }
         object_alternatives = []
