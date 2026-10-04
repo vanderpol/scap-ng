@@ -46,6 +46,22 @@ Every change that modifies the language, schema meaning, result semantics, capab
 
 A large generated diff is not a review packet.
 
+## Minimal reproducer rule
+
+When a benchmark, Self-Assertion case, converter, schema, or evaluator exposes a defect:
+
+1. reduce the failure to the smallest fixture that still reproduces it;
+2. record the exact expected behavior independently of the implementation;
+3. fix the defect against that fixture;
+4. keep the fixture permanently as a regression;
+5. run focused validation;
+6. run the fast integration set only if the affected surface warrants it;
+7. defer any full-corpus confirmation until the next intentional deliverable/checkpoint.
+
+The reproducer SHOULD contain only the minimum Rule/Assessment/Test/Object/State/Variable/result material required to demonstrate the issue. Do not preserve unrelated benchmark structure merely because it existed in the source.
+
+If the reproducer cannot be made small without losing the failure, document why. That is itself useful evidence about hidden coupling or an architectural problem.
+
 ## Three levels of validation
 
 ### 1. Focused validation — normal inner loop
