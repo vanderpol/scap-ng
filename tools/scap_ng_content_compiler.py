@@ -247,7 +247,11 @@ def validate_draft_expression_assessments(assessments, *, allow_unpromoted_conve
             continue
         if validators is None:
             validators = build_validators(Path(__file__).resolve().parents[1] / "schema/v0.2.0")
-        errors = list(document_errors(\n            validators["assessment.schema.json"],\n            {"assessment": assessment},\n            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,\n        ))
+        errors = list(document_errors(
+            validators["assessment.schema.json"],
+            {"assessment": assessment},
+            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+        ))
         if errors:
             raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
         if has_new_capability:
@@ -428,7 +432,10 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
     for aid in list(assessment_docs):
         close_dependencies(aid)
 
-    validate_draft_expression_assessments(\n        {aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()},\n        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,\n    )
+    validate_draft_expression_assessments(
+        {aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()},
+        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+    )
 
     for aid, (source_path, doc) in sorted(assessment_docs.items()):
         add_object(
@@ -450,7 +457,16 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
     return benchmark, members, object_index
 
 
-def write_bundle(\n    output: Path,\n    benchmark: dict,\n    members: dict[str, bytes],\n    object_index: dict[str, dict],\n    *,\n    sign_self_signed: bool,\n    provenance: dict,\n    allow_unpromoted_conversion_vocabulary: bool = False,\n):
+def write_bundle(
+    output: Path,
+    benchmark: dict,
+    members: dict[str, bytes],
+    object_index: dict[str, dict],
+    *,
+    sign_self_signed: bool,
+    provenance: dict,
+    allow_unpromoted_conversion_vocabulary: bool = False,
+):
     manifest = {
         "format": "scap-ng-package-manifest",
         "format_version": "0.0.3-experimental",
@@ -498,7 +514,11 @@ def write_bundle(\n    output: Path,\n    benchmark: dict,\n    members: dict[st
         for name, data in sorted(members.items()):
             deterministic_zip_add(zf, name, data)
 
-    verification = verify_bundle(\n        output,\n        verify_signature=sign_self_signed,\n        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,\n    )
+    verification = verify_bundle(
+        output,
+        verify_signature=sign_self_signed,
+        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+    )
     return {
         "benchmark_id": benchmark["id"],
         "file": output.name,
@@ -514,7 +534,12 @@ def write_bundle(\n    output: Path,\n    benchmark: dict,\n    members: dict[st
     }
 
 
-def verify_bundle(\n    package: Path,\n    *,\n    verify_signature: bool = False,\n    allow_unpromoted_conversion_vocabulary: bool = False,\n) -> dict:
+def verify_bundle(
+    package: Path,
+    *,
+    verify_signature: bool = False,
+    allow_unpromoted_conversion_vocabulary: bool = False,
+) -> dict:
     """Verify archive profile, manifest integrity and logical package references."""
     with zipfile.ZipFile(package, "r") as zf:
         infos = zf.infolist()
@@ -678,7 +703,10 @@ def verify_bundle(\n    package: Path,\n    *,\n    verify_signature: bool = Fal
         for identity in assessments:
             verify_dependencies(identity)
 
-        validate_draft_expression_assessments(\n            assessments,\n            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,\n        )
+        validate_draft_expression_assessments(
+            assessments,
+            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+        )
 
         if verify_signature and sig.get("format") == "cms-detached-der":
             verify_cms_signature(
@@ -702,7 +730,12 @@ def main() -> int:
     ap.add_argument("--metrics", type=Path, required=True)
     ap.add_argument("--sign-self-signed-test-cert", action="store_true")
     ap.add_argument("--source-revision")
-    ap.add_argument("--scap-ng-revision")\n    ap.add_argument(\n        "--allow-unpromoted-conversion-vocabulary",\n        action="store_true",\n        help="Migration-only: permit known 0.2.0 mappings still using the explicit legacy conversion bridge. Strict native compilation remains the default.",\n    )
+    ap.add_argument("--scap-ng-revision")
+    ap.add_argument(
+        "--allow-unpromoted-conversion-vocabulary",
+        action="store_true",
+        help="Migration-only: permit known 0.2.0 mappings still using the explicit legacy conversion bridge. Strict native compilation remains the default.",
+    )
     args = ap.parse_args()
 
     source_root = _lexical_abs(args.corpus_root)
@@ -717,7 +750,11 @@ def main() -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     metrics = []
     for benchmark_dir in benchmark_dirs:
-        benchmark, members, object_index = compile_benchmark(\n            source_root,\n            benchmark_dir,\n            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,\n        )
+        benchmark, members, object_index = compile_benchmark(
+            source_root,
+            benchmark_dir,
+            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
+        )
         filename = f"{safe_name(benchmark['id'])}.scapng"
         metrics.append(
             write_bundle(
@@ -726,7 +763,9 @@ def main() -> int:
                 members,
                 object_index,
                 sign_self_signed=args.sign_self_signed_test_cert,
-                allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,\n                provenance={\n                    "authoring_source_root": source_root.name,
+                allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
+                provenance={
+                    "authoring_source_root": source_root.name,
                     "niwc_source_revision": args.source_revision,
                     "scap_ng_revision": args.scap_ng_revision,
                     "generated_fresh_for_this_run": True,
