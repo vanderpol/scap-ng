@@ -48,7 +48,7 @@ shared-table cases, not real VMware acquisition evidence.
 
 ## Provenance and gaps
 
-[Mapping](../../../schema/v0.2.0/capability-mappings/esx.host_service.json)
+[Mapping](../../../schema/v0.2.0/capability-mappings/experimental/esx.host_service.json)
 adapts `host_service_test/object/state/item` from [exact pinned XSDs](../../../third_party/oval-6.0-new-tests/README.md).
 Fields follow the declarations; native syntax uses shared NG primitives. Field
 descriptions carry into JSON Schema annotations. Existing 5.12.3 behavior is not
