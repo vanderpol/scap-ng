@@ -324,6 +324,6 @@ semantic/target tests were run in this documentation-only brainstorming wave.
 Provenance: **Inherited** current architecture/terminology and pinned research;
 **Adapted** prior editor/helper/acceptance-case concepts into a portable toolkit
 proposal; **Common** template/recipe lifecycle, multi-frontend and ecosystem ideas;
-**Evidence/Audit** explicit costs, limitations, rejected approaches and handoff.
-See [decision candidates](DECISIONS.md) and [handoff](HANDOFF.md). No Board vote,
+**Evidence/Audit** explicit costs, limitations, and rejected approaches.
+See [decision candidates](DECISIONS.md). No Board vote,
 new backlog issue, accepted design/schema or review-build change was made.
