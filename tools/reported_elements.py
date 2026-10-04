@@ -58,7 +58,7 @@ def source_errors(assessment):
 
 def generate_reporting_capability(mapping, root=ROOT):
     """Versioned Test-schema overlay; Object and State contracts stay identical."""
-    generated = generate(mapping, root)
+    generated = generate(mapping, root, schema_version="0.2.0")
     schema = copy.deepcopy(generated)
     schema["$id"] = f"https://scap-ng.dev/schema/v0.2.0/capabilities/{mapping['capability']}.schema.json"
     known = sorted(capability_fields(mapping["capability"]))
