@@ -56,7 +56,7 @@ SCAP-NG is intended to preserve useful SCAP 1.4 and OVAL assessment semantics wh
 
 - **Publisher extensions are isolated.** Vendor/publisher-specific content is not allowed to silently redefine core semantics.
 
-- **Forward conversion from SCAP 1.4 is a core requirement.** Supported conversion must account for policy, applicability, selectors, defaults, Variables, Sets, Filters, dependencies, datatypes, and evidence-relevant behavior. Unsupported paths must be explicit.
+- **Forward conversion is lossless in semantics, not literal serialization.** Supported SCAP 1.4 conversion must preserve effective policy, applicability, selectors, defaults, Variables, Sets, Filters, dependencies, datatypes, result behavior, evidence-relevant behavior, and source provenance. NG may normalize the representation—for example, multiple source Rules that resolve to the same exact Assessment semantics may reference one shared Assessment instead of carrying duplicate Assessment definitions. That deduplication is permitted only when semantic equivalence is proven; every original Rule/check binding remains represented. Unsupported or non-lossless paths must be explicit blockers rather than guessed conversions.
 
 - **Conformance requires more than schema validation.** Structural validation, semantic validation, known-result evaluation, collection/acquisition conformance, live-target behavior, and migration equivalence are separate evidence layers.
 
