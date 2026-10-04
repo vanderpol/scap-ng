@@ -1,14 +1,14 @@
-> **Temporary hold:** Do not start this task until the 0.2.0 version-promotion reconciliation completes and a new exact-main freeze SHA is recorded. The former a0fe3abf checkpoint is semantic/integration evidence, not the final authoring-schema baseline.
+> **0.2.0 freeze complete:** The version-promotion reconciliation is merged and the technical baseline below is frozen for the Codex content-development pilot. The former `a0fe3abf` checkpoint remains historical semantic/integration evidence only.
 
 # Codex task: SCAP-NG 0.2.0 content development and conformance corpus
 
-Status: **HOLD — pilot only after the exact 0.2.0 main freeze is recorded.**
+Status: **READY — begin only with the 5–10 case Codex pilot defined below.**
 
-Frozen 0.2.0 technical baseline: **PENDING**. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting SHA; it predates the self-contained 0.2.0 version-promotion reconciliation.
+Frozen 0.2.0 technical baseline: `e7dcedfc467592fb27446f4a30c50ea82042d0fc`. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting baseline; it predates the self-contained 0.2.0 version-promotion reconciliation.
 
 Historical freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md). It remains semantic/integration evidence only.
 
-Start only from the exact `main` SHA that replaces this PENDING marker after the 0.2.0 reconciliation PR is merged and its required validation is green. A later documentation-only descendant does not change the frozen technical meaning unless an explicitly authorized post-freeze semantic change is recorded.
+The frozen technical meaning is the exact `main` SHA above. Codex MAY start from a later `main` descendant only when the intervening commits are documentation/handoff-only and do not change 0.2.0 semantics. Any post-freeze semantic change requires explicit authorization and a new recorded baseline.
 
 This task is intentionally detailed. It is content/conformance development, not language redesign and not editor development.
 
@@ -21,7 +21,7 @@ Work in `vanderpol/scap-ng`.
 Before modifying anything:
 
 - verify repository, branch and exact commit SHA;
-- confirm this file contains a concrete post-reconciliation `main` freeze SHA rather than the PENDING marker; if it is still PENDING, stop before content work because the handoff gate has not opened;
+- confirm this file records frozen technical baseline `e7dcedfc467592fb27446f4a30c50ea82042d0fc`; verify the checked-out `main` is that commit or a documented non-semantic descendant before content work;
 - read every applicable `AGENTS.md`;
 - read `START-HERE.md`;
 - read `research/iterations/003/design/CURRENT-DESIGN.md`;
