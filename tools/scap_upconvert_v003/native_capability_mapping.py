@@ -489,7 +489,14 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             obj["select"]=renamed
 
         _materialize_file_traversal(obj,mapping)
-        _materialize_behavior_collection_parameters(obj,mapping)
+        if isinstance(obj.get("set"),dict):
+            if obj.get("behaviors"):
+                raise ValueError(
+                    "Set Object carries unexpected capability behaviors that require explicit migration"
+                )
+            obj.pop("behaviors",None)
+        else:
+            _materialize_behavior_collection_parameters(obj,mapping)
 
         if isinstance(obj.get("set"),dict):
             obj["set"]=_transform_set(obj["set"])
