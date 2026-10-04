@@ -1,0 +1,105 @@
+{
+  "sample": "constants",
+  "oracle_kind": "independently authored semantic expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Both source Tests are retained. Values form one multi-valued variable Item, not one Item per scalar. Boundary/mismatch cases are separately authored content variants; they do not change publisher content through Organizational Input.",
+  "cases": [
+    {
+      "id": "published",
+      "synthetic": true,
+      "input": {},
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.constants:test-single": "true",
+          "board.constants:test-many": "true"
+        },
+        "resolved_variables": {
+          "single": [
+            9
+          ],
+          "many": [
+            15,
+            18,
+            20,
+            24,
+            30,
+            36,
+            40,
+            48
+          ]
+        }
+      },
+      "rationale": "9 equals 9, and all eight source values are strictly greater than 7."
+    },
+    {
+      "id": "boundary-seven",
+      "synthetic": true,
+      "input": {
+        "variant": {
+          "variables": {
+            "many": {
+              "value": [
+                15,
+                7
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.constants:test-single": "true",
+          "board.constants:test-many": "false"
+        },
+        "resolved_variables": {
+          "single": [
+            9
+          ],
+          "many": [
+            15,
+            7
+          ]
+        }
+      },
+      "rationale": "An authored variant adds 7; strict greater-than is false for that value, so all is false."
+    },
+    {
+      "id": "single-mismatch",
+      "synthetic": true,
+      "input": {
+        "variant": {
+          "variables": {
+            "single": {
+              "value": 8
+            }
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.constants:test-single": "false",
+          "board.constants:test-many": "true"
+        },
+        "resolved_variables": {
+          "single": [
+            8
+          ],
+          "many": [
+            15,
+            18,
+            20,
+            24,
+            30,
+            36,
+            40,
+            48
+          ]
+        }
+      },
+      "rationale": "An authored integer value 8 does not equal the State value 9; the other Test still succeeds. No empty constant Variable is assumed valid."
+    }
+  ]
+}

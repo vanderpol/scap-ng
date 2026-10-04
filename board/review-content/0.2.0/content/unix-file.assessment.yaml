@@ -1,0 +1,42 @@
+assessment:
+  id: board.unix-file
+  version: 3
+  assessment_title: The selected UNIX file exists and reports its full path
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    file:
+      object_title: One exact source file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /opt/support/txt/txtfile/build.win32.txt
+      filesystem: any
+  states:
+    path:
+      state_title: Full path equals the source path
+      capability: unix.file
+      state:
+        field: full_path
+        datatype: string
+        operation: equal
+        value: /opt/support/txt/txtfile/build.win32.txt
+        match: all
+        existence: some
+  tests:
+    test-path:
+      test_title: Compare the exact file path
+      capability: unix.file
+      object: file
+      states:
+      - path
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-path

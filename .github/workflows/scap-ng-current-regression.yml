@@ -15,6 +15,8 @@ on:
       - tests/result-package-0.2.0/**
       - tests/collected-items-0.2.0/**
       - tests/esx-host-0.2.0/**
+      - board/review-content/0.2.0/**
+      - tests/focused-regressions/board-pilot/**
       - third_party/oval-6.0-new-tests/**
       - .github/workflows/scap-ng-current-regression.yml
   push:
@@ -33,6 +35,8 @@ on:
       - tools/check_assessment_reference.py
       - tools/capability_registry.py
       - tests/esx-host-0.2.0/**
+      - board/review-content/0.2.0/**
+      - tests/focused-regressions/board-pilot/**
       - third_party/oval-6.0-new-tests/**
       - specification/assessment/reference/**
       - tools/reported_elements.py
@@ -92,6 +96,9 @@ jobs:
         run: python tools/audit_oval_new_tests.py --upstream-repo work/oval60 --check
       - name: Current source graph and actual corpus CLI
         run: |
+          python tools/test_board_samples_v02.py --report work/board-pilot-validation.json
+          python tools/validate_native_json_schemas.py board/review-content/0.2.0/content --schema-dir schema/v0.2.0
+          python tools/check_current_authoring_contract.py board/review-content/0.2.0/content
           python tools/check_assessment_reference.py
           python tools/test_esx_host_capabilities_v02.py
           python tools/test_esx_identity_software_v02.py
@@ -187,6 +194,12 @@ jobs:
         with:
           name: conditional-known-results-${{ matrix.os }}
           path: work/conditional-results.json
+
+      - name: Upload Board pilot validation receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: board-pilot-validation-${{ matrix.os }}
+          path: work/board-pilot-validation.json
 
       - name: Repository normalization and content compiler
         run: |

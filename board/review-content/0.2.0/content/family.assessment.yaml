@@ -1,0 +1,39 @@
+assessment:
+  id: board.family
+  version: 1
+  assessment_title: System family matches the source family expression
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    families:
+      variable_title: Source family pattern
+      kind: constant
+      datatype: string
+      value: (vmware_infrastructure|panos|aix|junos|aws|iosxe|ios|macos|unix|windows)
+  states:
+    supported:
+      state_title: Match the source pattern
+      capability: independent.family
+      state:
+        field: family
+        datatype: string
+        operation: match
+        value:
+          variable: families
+        match: all
+        existence: some
+        variable_match: all
+  tests:
+    test-family:
+      test_title: Compare the system family
+      capability: independent.family
+      states:
+      - supported
+      check_existence: some
+      check: any
+  evaluate:
+    test: test-family

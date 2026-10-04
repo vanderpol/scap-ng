@@ -1,0 +1,154 @@
+{
+  "sample": "unix-file",
+  "oracle_kind": "independently authored semantic expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Only source criterion tst:9 is selected. No traversal or shellcommand is used. Synthetic observations exercise Test control flow; no Linux collector is implemented or tested.",
+  "cases": [
+    {
+      "id": "present",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "source-file",
+                "capability": "unix.file",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/txt/txtfile/build.win32.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.unix-file:test-path": "true"
+        }
+      },
+      "rationale": "The exact selected file exists and its observed full path equals the source State."
+    },
+    {
+      "id": "absent",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "does not exist",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.unix-file:test-path": "false"
+        }
+      },
+      "rationale": "At least one existing file is required; confirmed absence fails before State evaluation."
+    },
+    {
+      "id": "permission-denied",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "error",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.unix-file:test-path": "error"
+        }
+      },
+      "rationale": "The collector explicitly errored; treating it as empty would hide a failure."
+    },
+    {
+      "id": "not-collected",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "not collected",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.unix-file:test-path": "unknown"
+        }
+      },
+      "rationale": "Collection was not performed; absence is not established."
+    },
+    {
+      "id": "incomplete",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "incomplete",
+            "items": [
+              {
+                "id": "source-file",
+                "capability": "unix.file",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/txt/txtfile/build.win32.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.unix-file:test-path": "unknown"
+        }
+      },
+      "rationale": "The observed matching file does not prove all Items satisfy the State when population collection is incomplete."
+    },
+    {
+      "id": "platform-na",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "file": {
+            "flag": "not applicable",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "not_applicable",
+        "test_outcomes": {
+          "board.unix-file:test-path": "not_applicable"
+        }
+      },
+      "rationale": "The capability explicitly reports target collection not applicable."
+    }
+  ]
+}

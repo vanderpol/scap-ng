@@ -1,0 +1,89 @@
+{
+  "sample": "registry",
+  "oracle_kind": "independently authored semantic expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Only source criterion tst:1020 is selected. HKEY_LOCAL_MACHINE becomes local_machine through the reviewed mapping. No OS version value is compared: this source State tests the registry address, not hardening or Windows edition. The lower-case returned key is a synthetic State-comparison case, not proof of acquisition case handling.",
+  "cases": [
+    {
+      "id": "one-value",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "version": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "version-value",
+                "capability": "windows.registry",
+                "status": "exists",
+                "fields": {
+                  "hive": {
+                    "datatype": "string",
+                    "value": "local_machine"
+                  },
+                  "key": {
+                    "datatype": "string",
+                    "value": "software\\microsoft\\windows nt\\currentversion"
+                  },
+                  "name": {
+                    "datatype": "string",
+                    "value": "CurrentVersion"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.registry:test-address": "true"
+        }
+      },
+      "rationale": "The sole Item satisfies hive, case-insensitive key, and exact name; check=one succeeds."
+    },
+    {
+      "id": "absent",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "version": {
+            "flag": "does not exist",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.registry:test-address": "false"
+        }
+      },
+      "rationale": "check_existence=some fails on confirmed absence."
+    },
+    {
+      "id": "denied",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "version": {
+            "flag": "error",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.registry:test-address": "error"
+        }
+      },
+      "rationale": "Registry access failure remains error, not absence."
+    }
+  ]
+}

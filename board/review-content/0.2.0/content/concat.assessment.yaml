@@ -1,0 +1,66 @@
+assessment:
+  id: board.concat
+  version: 1
+  assessment_title: Compare all Cartesian concat values with the source expected set
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    letters:
+      variable_title: Two prefixes
+      kind: constant
+      datatype: string
+      value:
+      - abc
+      - def
+    digits:
+      variable_title: Two suffixes
+      kind: constant
+      datatype: string
+      value:
+      - '123'
+      - '456'
+    joined:
+      variable_title: Cartesian concatenation
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: letters
+        - variable: digits
+    expected:
+      variable_title: Four expected strings
+      kind: constant
+      datatype: string
+      value:
+      - abc123
+      - abc456
+      - def123
+      - def456
+  states:
+    one-match:
+      state_title: Each produced value matches exactly one expected value
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value:
+          variable: expected
+        match: all
+        existence: some
+        variable_match: one
+  tests:
+    test-concat:
+      test_title: Compare the produced Variable values
+      capability: variable.value
+      variable: joined
+      states:
+      - one-match
+      check_existence: some
+      check: any
+  evaluate:
+    test: test-concat

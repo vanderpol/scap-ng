@@ -1,0 +1,145 @@
+assessment:
+  id: board.filter
+  version: 1
+  assessment_title: Chained observed Variables drive a filter before nested Set intersection
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    a:
+      object_title: Fixture file a
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/a
+      filesystem: local
+    b:
+      object_title: Fixture file b
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/b
+      filesystem: local
+    c:
+      object_title: Fixture file c
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/c
+      filesystem: local
+    candidates:
+      object_title: Union of three explicit native file Objects
+      capability: unix.file
+      set:
+        operator: union
+        operands:
+        - object: a
+          filters: []
+        - object: b
+          filters: []
+        - object: c
+          filters: []
+    remaining:
+      object_title: Intersect filtered candidates with the nested a/b union
+      capability: unix.file
+      set:
+        operator: intersection
+        operands:
+        - object: candidates
+          filters:
+          - action: exclude
+            state: owner-band
+        - set:
+            operator: union
+            operands:
+            - object: a
+              filters: []
+            - object: b
+              filters: []
+    reference:
+      object_title: Independent UID reference file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/reference
+      filesystem: local
+  variables:
+    reference-uid:
+      variable_title: Extract UID from the independent reference Object
+      kind: local
+      datatype: integer
+      expression:
+        values:
+          object: reference
+          field: owner_uid
+    increment:
+      variable_title: One UID step
+      kind: constant
+      datatype: integer
+      value: 1
+    next-uid:
+      variable_title: Reference UID plus one
+      kind: local
+      datatype: integer
+      expression:
+        arithmetic:
+          operation: add
+          operands:
+          - variable: reference-uid
+          - variable: increment
+    offsets:
+      variable_title: Two positions in the exclusion band
+      kind: constant
+      datatype: integer
+      value:
+      - 0
+      - 1
+    owner-band:
+      variable_title: Cartesian addition of next UID and the two offsets
+      kind: local
+      datatype: integer
+      expression:
+        arithmetic:
+          operation: add
+          operands:
+          - variable: next-uid
+          - variable: offsets
+    exclusion-values:
+      variable_title: Shared Variable-component view used for each filter comparison
+      kind: local
+      datatype: integer
+      expression:
+        variable: owner-band
+  states:
+    owner-band:
+      state_title: Owner matches any computed exclusion value
+      capability: unix.file
+      state:
+        field: owner_uid
+        datatype: integer
+        operation: equal
+        value:
+          variable: exclusion-values
+        variable_match: any
+        match: all
+        existence: some
+  tests:
+    test-one:
+      test_title: Exactly one file survives
+      capability: unix.file
+      object: remaining
+      check_existence: one
+      check: all
+  evaluate:
+    test: test-one

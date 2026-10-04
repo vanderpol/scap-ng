@@ -1,0 +1,45 @@
+assessment:
+  id: pilot.variable-cycle
+  version: 1
+  assessment_title: A single integer equals 9 and every listed integer exceeds 7
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    a:
+      variable_title: A depends on B
+      kind: local
+      datatype: integer
+      expression:
+        variable: b
+    b:
+      variable_title: B depends on A
+      kind: local
+      datatype: integer
+      expression:
+        variable: a
+  states:
+    nine:
+      state_title: Exactly 9
+      capability: variable.value
+      state:
+        field: value
+        datatype: integer
+        operation: equal
+        value: 9
+        match: all
+        existence: some
+  tests:
+    test-cycle:
+      test_title: Invalid cycle source
+      capability: variable.value
+      variable: a
+      states:
+      - nine
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-cycle

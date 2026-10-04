@@ -1,0 +1,110 @@
+{
+  "sample": "concat",
+  "oracle_kind": "independently authored semantic expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "This is only source criterion tst:722, not all of Definition 65. Concat is Cartesian, not positional zip. variable_match=one applies within each value; State match=all applies to all produced values. The zero-derived-values case is a native Object-component edge variant, not an empty authored constant or a claim that published source constants resolve empty.",
+  "cases": [
+    {
+      "id": "cartesian",
+      "synthetic": true,
+      "input": {},
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.concat:test-concat": "true"
+        },
+        "resolved_variables": {
+          "joined": [
+            "abc123",
+            "abc456",
+            "def123",
+            "def456"
+          ]
+        }
+      },
+      "rationale": "[abc,def] \u00d7 [123,456] yields abc123, abc456, def123, def456. Each matches exactly one expected entry."
+    },
+    {
+      "id": "one-bad-prefix",
+      "synthetic": true,
+      "input": {
+        "variant": {
+          "variables": {
+            "letters": {
+              "value": [
+                "abc",
+                "xyz"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.concat:test-concat": "false"
+        },
+        "resolved_variables": {
+          "joined": [
+            "abc123",
+            "abc456",
+            "xyz123",
+            "xyz456"
+          ]
+        }
+      },
+      "rationale": "def is replaced with xyz; two derived strings have no expected match. Source entity_check=all fails even though two values still match."
+    },
+    {
+      "id": "zero-derived-values",
+      "synthetic": true,
+      "input": {
+        "variant": {
+          "objects": {
+            "missing": {
+              "object_title": "Native edge variant: one absent file",
+              "capability": "unix.file",
+              "select": {
+                "full_path": {
+                  "datatype": "string",
+                  "operation": "equal",
+                  "value": "/fixture/missing"
+                }
+              },
+              "filesystem": "local"
+            }
+          },
+          "variables": {
+            "letters": {
+              "variable_title": "Native edge variant: names from the absent Object",
+              "kind": "local",
+              "datatype": "string",
+              "expression": {
+                "values": {
+                  "object": "missing",
+                  "field": "name"
+                }
+              }
+            }
+          }
+        },
+        "objects": {
+          "missing": {
+            "flag": "does not exist",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.concat:test-concat": "error"
+        },
+        "resolved_variables": {
+          "joined": []
+        }
+      },
+      "rationale": "In a separately authored native edge variant, a named Object for one absent file produces no Items. Its name extraction yields zero values, and concat consequently yields zero values. Direct Variable testing errors before State comparison."
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "sample": "family",
+  "oracle_kind": "independently authored semantic expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Use the complete source Definition. Its empty singleton Object is removed under the reviewed objectless capability mapping; the regex Variable is retained.",
+  "cases": [
+    {
+      "id": "unix",
+      "synthetic": true,
+      "input": {
+        "system_items": [
+          {
+            "id": "system",
+            "capability": "independent.family",
+            "status": "exists",
+            "fields": {
+              "family": {
+                "datatype": "string",
+                "value": "unix"
+              }
+            },
+            "provenance": {
+              "target_ref": "synthetic-board-target",
+              "source_execution_ref": "synthetic-fixture"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.family:test-family": "true"
+        }
+      },
+      "rationale": "unix matches one alternative in the source regex."
+    },
+    {
+      "id": "undefined",
+      "synthetic": true,
+      "input": {
+        "system_items": [
+          {
+            "id": "system",
+            "capability": "independent.family",
+            "status": "exists",
+            "fields": {
+              "family": {
+                "datatype": "string",
+                "value": "undefined"
+              }
+            },
+            "provenance": {
+              "target_ref": "synthetic-board-target",
+              "source_execution_ref": "synthetic-fixture"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.family:test-family": "false"
+        }
+      },
+      "rationale": "undefined is valid family vocabulary but absent from this source pattern."
+    },
+    {
+      "id": "acquisition-error",
+      "synthetic": true,
+      "input": {
+        "system_flag": "error"
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.family:test-family": "error"
+        }
+      },
+      "rationale": "Failed family acquisition is not an ordinary unmatched family."
+    },
+    {
+      "id": "unavailable",
+      "synthetic": true,
+      "input": {
+        "system_flag": "not collected"
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.family:test-family": "unknown"
+        }
+      },
+      "rationale": "A not-collected singleton is unavailable, not Boolean false."
+    }
+  ]
+}

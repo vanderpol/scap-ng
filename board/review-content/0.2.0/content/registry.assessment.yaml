@@ -1,0 +1,59 @@
+assessment:
+  id: board.registry
+  version: 1
+  assessment_title: Exactly one registry Item satisfies the source address State
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    version:
+      object_title: Windows CurrentVersion value
+      capability: windows.registry
+      select:
+        hive: local_machine
+        key:
+          datatype: string
+          operation: equal
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        name:
+          datatype: string
+          operation: equal
+          value: CurrentVersion
+  states:
+    address:
+      state_title: Hive, case-insensitive key, and value name match
+      capability: windows.registry
+      state:
+        all:
+        - field: hive
+          datatype: string
+          operation: equal
+          value: local_machine
+          match: all
+          existence: some
+        - field: key
+          datatype: string
+          operation: equal_ci
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+          match: all
+          existence: some
+        - field: name
+          datatype: string
+          operation: equal
+          value: CurrentVersion
+          match: all
+          existence: some
+  tests:
+    test-address:
+      test_title: One Item satisfies the complete address State
+      capability: windows.registry
+      object: version
+      states:
+      - address
+      check_existence: some
+      check: one
+  evaluate:
+    test: test-address

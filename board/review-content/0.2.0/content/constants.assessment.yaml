@@ -1,0 +1,71 @@
+assessment:
+  id: board.constants
+  version: 1
+  assessment_title: A single integer equals 9 and every listed integer exceeds 7
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    single:
+      variable_title: One integer
+      kind: constant
+      datatype: integer
+      value: 9
+    many:
+      variable_title: Eight integers
+      kind: constant
+      datatype: integer
+      value:
+      - 15
+      - 18
+      - 20
+      - 24
+      - 30
+      - 36
+      - 40
+      - 48
+  states:
+    nine:
+      state_title: Exactly 9
+      capability: variable.value
+      state:
+        field: value
+        datatype: integer
+        operation: equal
+        value: 9
+        match: all
+        existence: some
+    above-seven:
+      state_title: Greater than 7
+      capability: variable.value
+      state:
+        field: value
+        datatype: integer
+        operation: greater_than
+        value: 7
+        match: all
+        existence: some
+  tests:
+    test-single:
+      test_title: Compare the single value
+      capability: variable.value
+      variable: single
+      states:
+      - nine
+      check_existence: some
+      check: all
+    test-many:
+      test_title: Compare every value
+      capability: variable.value
+      variable: many
+      states:
+      - above-seven
+      check_existence: some
+      check: all
+  evaluate:
+    all:
+    - test: test-single
+    - test: test-many
