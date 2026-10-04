@@ -1,3 +1,10 @@
+## Human-auditable maintenance invariant
+
+- At the start of every repository task, read `MAINTAINING.md` in addition to the normal repository preflight files.
+- Passing automated tests SHALL NOT by itself establish that a semantic language change is accepted.
+- Any change to language/schema meaning, result semantics, capability semantics, or conversion semantics SHALL have the human review packet defined in `MAINTAINING.md` before it is treated as accepted current design.
+- Agents may investigate, implement already accepted behavior, add focused tests, and prepare review material, but SHALL NOT silently resolve a materially ambiguous semantic choice through implementation alone.
+
 ## Branch management invariant
 
 Branch state is part of the durable repository record.
