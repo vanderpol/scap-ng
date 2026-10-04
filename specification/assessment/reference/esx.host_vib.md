@@ -58,7 +58,7 @@ These are synthetic equality/status cases, not acquisition or signature evidence
 
 ## Provenance and gaps
 
-[Mapping](../../../schema/v0.2.0/capability-mappings/esx.host_vib.json)
+[Mapping](../../../schema/v0.2.0/capability-mappings/experimental/esx.host_vib.json)
 adapts `host_vib_test/object/state/item` and the named acceptance-level types
 from the [pinned new-Test source](../../../third_party/oval-6.0-new-tests/README.md).
 The explicit Item enum/type overlay is confined to reviewed mapping inputs;
