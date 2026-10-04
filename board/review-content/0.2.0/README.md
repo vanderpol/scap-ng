@@ -2,17 +2,6 @@
 
 Status: **six-case converter pilot; pending human review**.
 
-This small Board checkpoint package proves a bounded conversion path and seeds
-native conformance content. It is SCAP-NG Assessment content; XML files are pinned
-source evidence. No schema feature, editor, broad conversion or live collector is
-part of this pilot. Machine validation does not make a sample accepted.
-
-Starting checkout: clean `/workspace/scap-ng`, `main`,
-`345d8de7436adbba15cf0fe546684dbc4ba8ef5d`. Frozen technical baseline:
-`7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. The newer checkout's existing maintenance
-commits remain. Self-Assertion source is pinned to
-`e3538595c5083b9c34d937a81d319234df9bbfaa`, verified locally and through GitHub.
-
 ## View the sample content
 
 If you only want to see what SCAP-NG Assessment content looks like, start here. **Refined NG** is the human-review form. **Mechanical NG** is the direct converter output before presentation cleanup. **Source XML** is the pinned SCAP 1.4/OVAL evidence used for comparison.
