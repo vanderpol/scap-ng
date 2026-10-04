@@ -1,0 +1,74 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "linux.dpkginfo",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/linux-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+    "test": "dpkginfo_test",
+    "object": "dpkginfo_object",
+    "state": "dpkginfo_state",
+    "item": "dpkginfo_item"
+  },
+  "native": {
+    "selector_map": {
+      "name": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "name"
+      ]
+    ],
+    "state_field_map": {
+      "name": "name",
+      "arch": "arch",
+      "epoch": "epoch",
+      "release": "release",
+      "version": "version",
+      "evr": "evr"
+    },
+    "field_datatypes": {
+      "name": [
+        "string"
+      ],
+      "arch": [
+        "string"
+      ],
+      "epoch": [
+        "string",
+        "integer"
+      ],
+      "release": [
+        "string",
+        "version"
+      ],
+      "version": [
+        "string",
+        "version"
+      ],
+      "evr": [
+        "rpm_evr",
+        "debian_evr"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "dpkginfo": "linux.dpkginfo"
+    },
+    "object": {
+      "name": "select.name"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "linux.dpkginfo.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability linux.dpkginfo."
+    },
+    {
+      "id": "linux.dpkginfo.debian_evr",
+      "rule": "debian_evr is the preferred native comparison datatype for Debian package EVR values; rpm_evr remains accepted only to preserve valid source semantics."
+    }
+  ]
+}

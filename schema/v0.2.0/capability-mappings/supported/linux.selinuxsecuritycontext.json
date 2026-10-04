@@ -1,0 +1,148 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "linux.selinuxsecuritycontext",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/linux-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+    "test": "selinuxsecuritycontext_test",
+    "object": "selinuxsecuritycontext_object",
+    "state": "selinuxsecuritycontext_state",
+    "item": "selinuxsecuritycontext_item"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "pid": "pid"
+    },
+    "object_selector_alternatives": [
+      [
+        "full_path"
+      ],
+      [
+        "directory",
+        "name"
+      ],
+      [
+        "pid"
+      ]
+    ],
+    "nullable_selectors": [
+      "name",
+      "pid"
+    ],
+    "traversal_definition": "file_traversal",
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "pid": "pid",
+      "user": "user",
+      "role": "role",
+      "type": "type",
+      "low_sensitivity": "low_sensitivity",
+      "low_category": "low_category",
+      "high_sensitivity": "high_sensitivity",
+      "high_category": "high_category",
+      "rawlow_sensitivity": "rawlow_sensitivity",
+      "rawlow_category": "rawlow_category",
+      "rawhigh_sensitivity": "rawhigh_sensitivity",
+      "rawhigh_category": "rawhigh_category"
+    },
+    "field_datatypes": {
+      "full_path": [
+        "string"
+      ],
+      "directory": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "pid": [
+        "integer"
+      ],
+      "user": [
+        "string"
+      ],
+      "role": [
+        "string"
+      ],
+      "type": [
+        "string"
+      ],
+      "low_sensitivity": [
+        "string"
+      ],
+      "low_category": [
+        "string"
+      ],
+      "high_sensitivity": [
+        "string"
+      ],
+      "high_category": [
+        "string"
+      ],
+      "rawlow_sensitivity": [
+        "string"
+      ],
+      "rawlow_category": [
+        "string"
+      ],
+      "rawhigh_sensitivity": [
+        "string"
+      ],
+      "rawhigh_category": [
+        "string"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "selinuxsecuritycontext": "linux.selinuxsecuritycontext"
+    },
+    "object": {
+      "filepath": "select.full_path",
+      "path": "select.directory",
+      "filename": "select.name",
+      "pid": "select.pid"
+    },
+    "traversal": {
+      "max_depth_-1": "max_depth_null",
+      "recurse.directories": "directories",
+      "recurse.symlinks": "symlinks",
+      "recurse.symlinks and directories": "symlinks_and_directories",
+      "recurse_direction.none": "no_traversal",
+      "recurse_direction.down": "implicit_downward_traversal",
+      "recurse_direction.up": "migration_error_deprecated",
+      "recurse_file_system.all": "any",
+      "recurse_file_system.local": "local",
+      "recurse_file_system.defined": "same"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "linux.selinuxsecuritycontext.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability linux.selinuxsecuritycontext."
+    },
+    {
+      "id": "linux.selinuxsecuritycontext.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "linux.selinuxsecuritycontext.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    },
+    {
+      "id": "linux.selinuxsecuritycontext.pid_no_file_traversal",
+      "rule": "Traversal is not applicable when selecting a process by pid."
+    },
+    {
+      "id": "linux.selinuxsecuritycontext.null_pid",
+      "rule": "A null pid preserves source xsi:nil semantics selecting the assessment tool's running process."
+    }
+  ]
+}
