@@ -34,6 +34,22 @@ _NATIVE_DATATYPE_MAP = {
     "record": "record",
 }
 
+_OVAL_DATATYPE_MAP = {
+    "string": "string",
+    "boolean": "boolean",
+    "integer": "int",
+    "float": "float",
+    "binary": "binary",
+    "version": "version",
+    "ipv4": "ipv4_address",
+    "ipv6": "ipv6_address",
+    "rpm_evr": "evr_string",
+    "debian_evr": "debian_evr_string",
+    "fileset_revision": "fileset_revision",
+    "ios_version": "ios_version",
+    "record": "record",
+}
+
 
 def _normalize_native_scalar_literals(value):
     """Normalize OVAL lexical scalar datatypes/values into native JSON forms."""
@@ -65,6 +81,19 @@ def _normalize_native_scalar_literals(value):
                     out["value"]=float(raw)
                 except ValueError:
                     pass
+    return out
+
+
+def _restore_oval_scalar_datatypes(value):
+    """Restore native datatype names to the OVAL lexical vocabulary for reverse emission."""
+    if isinstance(value, list):
+        return [_restore_oval_scalar_datatypes(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    out={k:_restore_oval_scalar_datatypes(v) for k,v in value.items()}
+    datatype=out.get("datatype")
+    if datatype in _OVAL_DATATYPE_MAP:
+        out["datatype"]=_OVAL_DATATYPE_MAP[datatype]
     return out
 
 
@@ -311,7 +340,7 @@ def legacy_intermediate_vocabulary(document: dict) -> dict:
     round-trip machinery can consume the authoritative OVAL-aligned authored
     vocabulary without making Collection an authored native concept again.
     """
-    result = copy.deepcopy(document)
+    result = _restore_oval_scalar_datatypes(copy.deepcopy(document))
     assessment = result.get("assessment")
     if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
         return result
