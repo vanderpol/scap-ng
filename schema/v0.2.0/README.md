@@ -1,126 +1,183 @@
-# SCAP-NG schema v0.2.0 draft
+# SCAP-NG 0.2.0 schema
 
-This directory is the complete versioned 0.2.0 schema snapshot used for authoring
-and result validation. Unchanged 0.1.0 authoring contracts are promoted here with
-0.2.0 schema identities rather than being resolved silently from the older
-directory.
+**Status:** frozen pre-alpha technical baseline for human and OVAL Board review.
 
-The reviewed OVAL 5.12.3 capability mappings are copied forward under\n`schema/v0.2.0/capability-mappings/supported/`. Version 0.2.0 never resolves\nnormative capability mappings from the 0.1.0 schema tree. This makes the complete\n0.2.0 contract self-contained, independently testable, and directly diffable.\n\nEach capability mapping's embedded `source` block is durable provenance and migration-crosswalk metadata, not temporary generation scaffolding. It records the OVAL source language/version, schema/namespace, and source Test/Object/State/Item identities from which the native capability was derived. Native SCAP-NG authoring and scanner execution SHALL NOT depend on the referenced OVAL XSD at runtime; the reference is retained for historical traceability, converter auditing, semantic comparison, and future standards review. Removing or rewriting a source reference therefore requires provenance review rather than ordinary schema cleanup.\n\nMappings under `schema/v0.2.0/capability-mappings/experimental/` are retained ESX research artifacts. ESX adoption is deferred pending upstream
-guidance and is not part of the supported 0.2.0 content-development scope.
-The OVAL 6.0 Kubernetes Tests are likewise deferred.
+This directory contains the complete SCAP-NG **0.2.0** schema snapshot: Benchmark and Rule policy structures, automated and manual Assessment structures, result schemas, packaging schemas, shared capability contracts, and reviewed OVAL-to-NG capability mappings.
 
-## Version metadata convention
+Technical baseline commit: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
 
-Version-local JSON artifacts carry explicit human-visible version and modification metadata.
+Later commits may improve documentation, examples, tests, and Board-review material without changing the frozen 0.2.0 schema meaning unless a focused defect is explicitly accepted.
 
-- JSON Schema documents place `x-scap-ng-version` and `x-last-modified` immediately after `$id`. The `x-` prefix marks these as SCAP-NG-specific JSON Schema annotations rather than standard JSON Schema validation keywords.
-- Capability mappings and other non-schema support JSON use `specification_version` and `last_modified` near the top of the document.
-- `last_modified` records the file's last substantive or normalization change date; it is not a release date.
-- CI regression tests enforce presence, version identity, and date shape.
+## Start here
 
-Read the [Assessment author and assessor reference](../../specification/assessment/reference/README.md)
-for shared behavior and examples. Structural/schema and synthetic known-result
-validation do not establish live collector conformance.
+If you are new to SCAP-NG, read these in order:
 
-Automated Assessments identify `scap-ng.pre-alpha.assessment` version `0.2.0`.
-The identifier remains provisional pending Board naming. This does not change
-the meaning of an Assessment's own integer revision `version`.
+1. **[SCAP 1.4 → SCAP-NG key changes](../../board/SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)** — the shortest explanation of what changed and why.
+2. **[Assessment reference](../../specification/assessment/reference/README.md)** — author/implementer guidance for automated Assessment semantics.
+3. **[`benchmark.schema.json`](benchmark.schema.json)** — top-level Benchmark policy structure.
+4. **[`rule.schema.json`](rule.schema.json)** — Rule requirements and Assessment selections.
+5. **[`assessment.schema.json`](assessment.schema.json)** — automated Assessment structure.
+6. **[`capability-mappings/supported/`](capability-mappings/supported/)** — reviewed native capability contracts mapped from supported OVAL semantics.
+7. **[`assessment-result.schema.json`](assessment-result.schema.json)** and **[`scan-result.schema.json`](scan-result.schema.json)** — execution/result structures.
 
-Expressions support Test/dependency leaves, `all`, `any`, `one`, `odd`, `not`,
-`if`/`then`/`else`, and `not_applicable: {reason: ...}`. All three conditional
-parts are mandatory; use nested conditions instead of a separate elseif form.
-All references, including unselected branches and unused declared dependencies,
-are validated before execution. Arbitrary expressions/Variables are not silently
-coerced into Boolean guards; reference a Test that provides the desired comparison.
+For a small source-to-NG example rather than reading schemas first, use the **[0.2.0 Board review examples](../../board/review-content/0.2.0/README.md)**.
 
-| Guard outcome | Execution | Conditional outcome |
-| --- | --- | --- |
-| `true` | Only `then` | Selected expression outcome |
-| `false` | Only `else` | Selected expression outcome |
-| `error` | Neither branch | `error` |
-| `unknown` | Neither branch | `unknown` |
-| `not_evaluated` | Neither branch | `not_evaluated` |
-| `not_applicable` | Neither branch | `not_applicable` |
+## How the main pieces fit together
 
-Explicit N/A is an expression leaf with a nonblank reason, not a synthetic Test
-or collector capability. It has no technical resource observation and applies
-at its position in the expression. It is not an unconditional Assessment-wide
-early return. Surrounding operators retain their six-state aggregation semantics;
-for example, N/A plus a Boolean sibling can aggregate to that Boolean outcome.
-Intrinsic applicability executes before `evaluate`: false yields Assessment N/A;
-other nontrue outcomes propagate without executing the main expression.
+The policy path is:
 
-The evaluator uses eager sibling evaluation for `all`/`any`/`one`/`odd`; only the
-conditional and intrinsic applicability select execution paths. This keeps
-ordinary sibling diagnostics and does not invent a broader short-circuit policy.
-Skipped expression occurrences have `not_evaluated` traces with a reason. This
-does not overwrite a shared Test result acquired through another executed path.
+```text
+Benchmark
+  └─ Rule
+      └─ selected Assessment
+```
 
-`tools/assessment_expression.py` provides `AssessmentExpressionEvaluator`.
-Construct it from the complete, resolved Assessment graph and call
-`run(entry, evaluate_test, target=..., bindings=..., evaluate_manual=...)`.
-The Test callback receives `(assessment_id, test_id, context)` only when its leaf
-is executed, and supplies one of the six normalized technical outcomes.
-The optional manual callback receives `(assessment_id, context)` and supplies
-the normalized manual Assessment result. The caller owns authorization, provenance,
-acquisition, State/Test evaluation and manual lifecycle. An absent manual provider
-fails explicitly when invoked. Callback contexts are copies; returned traces do
-not disclose binding values. Reuse is scoped to one run, target and effective
-binding context, with dependent identity and invocation reference retained.
+A **Benchmark** organizes policy. A **Rule** states a requirement and identifies one or more Assessment choices. An **Assessment** defines how the requirement is evaluated.
 
-The compiler includes complete static dependency closure, verifies declared
-identity/version/purpose expectations, rejects cycles and duplicate identities,
-and binds dependencies to logical manifest objects with explicit identity/version
-pins and content digests. The bundle verifier checks those bindings and validates
-the draft expression slice again. It does not dynamically load unsigned sources
-to resolve branches. Dependency composition does not implicitly import Items.
+Automated Assessments are independently valid executable units. They do not require a Benchmark or Rule wrapper to express their technical assessment semantics.
 
-0.1.0 schemas and conversion output remain unchanged. In particular, current
-OVAL-compatible `applicability_check` wrappers and historical `xor` aliases are
-not automatically renamed or upgraded into this grammar. Source conversion to
-0.2.0 remains blocked for unsupported expression forms until semantic lowering
-is reviewed and tested; preserve the original 0.1.0 source rather than dropping
-behavior. Automatic conditional normalization and candidate detection are removed from the
-planned features; #126 is closed as not planned by owner direction on 2026-10-03.
+The Assessment language retains recognizable OVAL concepts such as **Test, Object, State, Variable, and Item**, while avoiding a literal recreation of the OVAL XML type hierarchy.
 
-An expression-stage result is not a complete Assessment Result. Connecting its
-trace to the complete 0.2.0 Item/Test/State/result-package graph, target acquisition
-conformance, and the remaining release features still precede 0.2.0 promotion.
-See [the integration checkpoint](../../transition/conditional-integration-2026-10-03.md).
+## Schema groups
 
-## Reported elements draft
+### Policy and authoring
 
-The [single-commit reporting checkpoint](../../transition/reported-elements-2026-10-03.md) adds Test-only `reported_elements`: `all` by default, `compared`, or a unique array of top-level Item field names. It provides generated capability overlays and a marked derived Item report, preserves canonical truth and source completeness, and keeps `redact_result` as the separate cross-result confidentiality control. Full Assessment Result integration and actual field-use lineage production remain release prerequisites.
+- [`benchmark.schema.json`](benchmark.schema.json) — Benchmark metadata, Rules, Profiles, grouping, and policy structure.
+- [`rule.schema.json`](rule.schema.json) — individual policy requirements and Assessment choices.
+- [`applicability.schema.json`](applicability.schema.json) — policy-level applicability references.
+- [`tailoring.schema.json`](tailoring.schema.json) — organization-specific Rule selection and permitted tailoring.
+- [`organizational-input.schema.json`](organizational-input.schema.json) — typed organization-supplied values intentionally delegated by the publisher.
+- [`manual-assessment.schema.json`](manual-assessment.schema.json) — first-class human/manual assessment procedures.
 
-## Assessment Result integration
+### Automated Assessment
 
-The [result integration checkpoint](../../transition/assessment-results-2026-10-03.md)
-adds a canonical draft Assessment Result graph with per-invocation expression
-records, local Test/Object/Item/Variable evidence, dependency execution IDs and
-optional derived Item reports. Shared Item/result types now have v0.2.0 IDs.
-The source-aware helper validates capability Item contracts and recorded
-scheduling offline. The result-set wrapper is development transport, not a final
-result package. See the [known-result examples](../../tests/assessment-results-0.2.0/README.md).
+- [`assessment.schema.json`](assessment.schema.json) — top-level automated Assessment document.
+- [`expression.schema.json`](expression.schema.json) — Assessment evaluation expressions.
+- [`capability-common.schema.json`](capability-common.schema.json) — shared native capability primitives.
+- [`capability-scope.json`](capability-scope.json) — capability support/scope metadata.
+- [`capability-mappings/supported/`](capability-mappings/supported/) — supported native Test/Object/State/Item mappings.
+- [`capability-mappings/experimental/`](capability-mappings/experimental/) — research mappings not in the supported 0.2.0 content-development scope.
 
-## Item inclusion and import provenance
+### Results and evidence
 
-The [materialization checkpoint](../../transition/item-materialization-2026-10-03.md)
-adds producer-side `all`/`consumed` Item scope with explicit availability accounting,
-local Variable Item references and verified source-byte observation imports.
-`all` is the default; consumed/decisive evidence remains mandatory. Source context,
-origin history and incompleteness survive copying. This does not implement a
-collection cache or invent a content-authored inclusion control. See
-[standalone expected results](../../tests/item-materialization-0.2.0/README.md).
+- [`assessment-result.schema.json`](assessment-result.schema.json) — one automated Assessment execution.
+- [`manual-assessment-result.schema.json`](manual-assessment-result.schema.json) — one manual Assessment result.
+- [`test-result.schema.json`](test-result.schema.json), [`state-result.schema.json`](state-result.schema.json), [`variable-result.schema.json`](variable-result.schema.json), and [`entity-result.schema.json`](entity-result.schema.json) — lower-level execution evidence.
+- [`collected-item.schema.json`](collected-item.schema.json) and [`collection-result.schema.json`](collection-result.schema.json) — collected target data and collection status/completeness.
+- [`expression-invocation.schema.json`](expression-invocation.schema.json) and [`expression-result.schema.json`](expression-result.schema.json) — evaluation trace.
+- [`rule-result.schema.json`](rule-result.schema.json), [`benchmark-result.schema.json`](benchmark-result.schema.json), and [`scan-result.schema.json`](scan-result.schema.json) — policy-facing result hierarchy.
+- [`item-materialization.schema.json`](item-materialization.schema.json), [`item-report.schema.json`](item-report.schema.json), and [`reported-elements.schema.json`](reported-elements.schema.json) — bounded evidence/materialization controls.
+- [`result-types.schema.json`](result-types.schema.json) and [`result-field-extensions.json`](result-field-extensions.json) — shared result definitions and extension metadata.
 
-The unsigned result-package draft adds Scan/Benchmark/Rule Result schemas and a
-closed exact-byte manifest connecting logical Assessment execution references.
-See [the checkpoint](../../transition/result-package-2026-10-03.md) for scope,
-validation limits and [the known result](../../tests/result-package-0.2.0/README.md).
+### Packaging
 
-Host account and installed VIB additions are documented in the
-[capability reference](../../specification/assessment/reference/README.md), with
-[synthetic known results](../../tests/esx-host-0.2.0/README.md). Four of the 22
-OVAL 6.0-only Test contracts have draft native mappings. The remaining count is
-**not** an active 0.2.0 backlog: ESX expansion is deferred pending upstream
-guidance, and both Kubernetes Tests are reviewed/deferred for 0.2.0 in
-[the disposition](../../transition/kubernetes-oval6-disposition-2026-10-03.md).
+- [`package-manifest.schema.json`](package-manifest.schema.json) — compiled SCAP-NG content package manifest.
+- [`result-package-manifest.schema.json`](result-package-manifest.schema.json) — result-package manifest.
+- [`assessment-result-set.schema.json`](assessment-result-set.schema.json) — development/result-set transport wrapper; not the final package architecture.
+
+## Conditional evaluation
+
+Version 0.2.0 supports structured conditional evaluation in `evaluate`:
+
+```yaml
+evaluate:
+  if:
+    test: is-server
+  then:
+    test: server-setting
+  else:
+    test: workstation-setting
+```
+
+The condition is evaluated first. Only the selected branch executes.
+
+The complete technical result domain is preserved:
+
+| Condition outcome | Behavior |
+| --- | --- |
+| `true` | execute `then` only |
+| `false` | execute `else` only |
+| `error` | execute neither branch; result is `error` |
+| `unknown` | execute neither branch; result is `unknown` |
+| `not_evaluated` | execute neither branch; result is `not_evaluated` |
+| `not_applicable` | execute neither branch; result is `not_applicable` |
+
+All references are validated before execution, including references in an unselected branch. Ordinary `all`, `any`, `one`, and `odd` expressions remain logical aggregation; they are not silently rewritten as conditional control flow.
+
+## Capability mapping provenance
+
+The files under `capability-mappings/supported/` contain durable source provenance for the OVAL semantics from which each native capability was derived.
+
+That source information is **not** a runtime dependency on OVAL XML or XSD files. It exists so reviewers and migration tools can answer questions such as:
+
+- Which OVAL Test/Object/State/Item semantics produced this native capability?
+- Which OVAL version and namespace were reviewed?
+- Did a native name intentionally remove a historical numeric/version suffix?
+- Can a future standards reviewer trace a native field back to its source semantics?
+
+Removing or materially rewriting those source references therefore requires provenance review rather than ordinary documentation cleanup.
+
+Mappings under `capability-mappings/experimental/` are research artifacts. In particular, ESX/VMware expansion remains deferred pending upstream semantic guidance. Deferred experimental mappings are not part of the supported 0.2.0 content-development scope.
+
+## Version metadata
+
+Every version-local JSON artifact carries human-visible version metadata.
+
+JSON Schema files use:
+
+```json
+"x-scap-ng-version": "0.2.0",
+"x-last-modified": "YYYY-MM-DD"
+```
+
+Non-schema support JSON uses:
+
+```json
+"specification_version": "0.2.0",
+"last_modified": "YYYY-MM-DD"
+```
+
+The `x-` prefix identifies SCAP-NG-specific JSON Schema annotations rather than JSON Schema validation keywords. `last_modified` records the most recent substantive or normalization change to that file; it is not a release date.
+
+Automated Assessments currently identify the provisional assessment specification as `scap-ng.pre-alpha.assessment` version `0.2.0`. The final standards name and identifier remain an OVAL Board decision.
+
+## Validate content yourself
+
+From the repository root:
+
+```powershell
+python -m pip install PyYAML==6.0.3 lxml==6.1.1 jsonschema cryptography
+
+python tools/validate_native_json_schemas.py PATH_TO_CONTENT --schema-dir schema/v0.2.0
+python tools/validate_native_semantics.py PATH_TO_CONTENT
+python tools/validate_native_package_graph.py PATH_TO_CONTENT
+```
+
+For conversion, normalization, packaging, and other human-runnable commands, see **[Human-runnable SCAP-NG tools](../../tools/HUMAN-RUNNABLE-SCRIPTS.md)**.
+
+## What schema validation does — and does not — prove
+
+A document passing JSON Schema validation means its structure conforms to the 0.2.0 structural contract.
+
+It does **not** by itself prove:
+
+- semantic equivalence to the original SCAP 1.4 content;
+- correct collector implementation;
+- correct behavior on a live target;
+- interoperability with an independent scanner;
+- OVAL Board approval.
+
+Those require separate semantic, conversion, known-result, round-trip, collection, and live/runtime evidence.
+
+## Review status
+
+0.2.0 is intentionally frozen for review rather than presented as a finished standard.
+
+The current review goals are to identify demonstrated semantic gaps, confirm that used non-deprecated OVAL semantics are preserved, verify that normalization does not change assessment meaning, and obtain Board guidance on the remaining standards decisions.
+
+See:
+
+- **[OVAL Board review landing page](../../board/README.md)**
+- **[0.2.0 review checkpoint](../../board/SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)**
+- **[Proposal coverage audit](../../board/PROPOSAL-COVERAGE-AUDIT.md)**
+- **[OVAL 5.12.3 capability crosswalk](../../specification/migration/oval-5.12.3-capability-crosswalk.md)**
