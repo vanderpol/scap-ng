@@ -1,18 +1,25 @@
-# Draft 0.2.0 Assessment expression slice
+# SCAP-NG schema v0.2.0 draft
+
+This directory is the complete versioned 0.2.0 schema snapshot used for authoring
+and result validation. Unchanged 0.1.0 authoring contracts are promoted here with
+0.2.0 schema identities rather than being resolved silently from the older
+directory.
+
+The reviewed OVAL 5.12.3 capability mappings remain single-source under
+`schema/v0.1.0/capability-mappings/` when their semantics are unchanged. When
+used by a 0.2.0 Assessment, the generator and validator SHALL resolve those
+mappings against the 0.2.0 common, Item and result contracts. This avoids
+duplicating one hundred mappings while still making the effective 0.2.0 schema
+surface explicit and testable.
+
+The mappings physically present under `schema/v0.2.0/capability-mappings/` are
+retained ESX research artifacts. ESX adoption is deferred pending upstream
+guidance and is not part of the supported 0.2.0 content-development scope.
+The OVAL 6.0 Kubernetes Tests are likewise deferred.
 
 Read the [Assessment author and assessor reference](../../specification/assessment/reference/README.md)
-for shared behavior, initial capability field guides, and linked expected-result
-examples. Its coverage is incomplete; it does not turn this partial draft into
-a released specification or claim live collector conformance.
-
-This is a partial versioned draft, not a complete 0.2.0 release schema set.
-The [draft capability additions](capability-mappings/README.md) include ESXi host
-services and named advanced settings with typed repeated values, field
-annotations and synthetic known-result cases. They do not expand 0.1.0.
-It adds `assessment.schema.json`, recursive `expression.schema.json`, and an
-expression-stage `expression-result.schema.json`. Unchanged manual authoring is
-explicitly pinned to the 0.1.0 manual schema. Use the maintained schema harness
-to resolve these local references without retrieving schemas over the network.
+for shared behavior and examples. Structural/schema and synthetic known-result
+validation do not establish live collector conformance.
 
 Automated Assessments identify `scap-ng.pre-alpha.assessment` version `0.2.0`.
 The identifier remains provisional pending Board naming. This does not change
