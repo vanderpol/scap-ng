@@ -11,6 +11,7 @@ under design.
 | Area | Specification section | Status |
 | --- | --- | --- |
 | Conformance roles and validation | `core/conformance.md` | draft |
+| Version promotion and freeze | `version-promotion-and-freeze.md` | draft |
 | Benchmark / Rule / Group structure | `policy/benchmark.md` | draft |
 | Platform specification and applicability | `policy/platform-and-applicability.md` | draft |
 | Profiles and Tailoring | `policy/profiles-and-tailoring.md` | draft |
