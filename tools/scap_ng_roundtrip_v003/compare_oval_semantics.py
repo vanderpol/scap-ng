@@ -26,6 +26,17 @@ def typed(el,suffix):
 def sval(v):
     return "" if v is None else v
 
+def semantic_scalar(datatype, value):
+    """Canonicalize lexical aliases that are semantically identical in OVAL."""
+    text=sval(value)
+    if datatype=="boolean":
+        normalized=str(text).strip().lower()
+        if normalized in {"true","1"}:
+            return "true"
+        if normalized in {"false","0"}:
+            return "false"
+    return text
+
 class Model:
     def __init__(self,path):
         self.root=ET.parse(path).getroot()
@@ -63,7 +74,7 @@ class Model:
                 if vr:
                     records.append(fbase+("var",self.variable(vr)))
                 else:
-                    records.append(fbase+("value",sval(field.text)))
+                    records.append(fbase+("value",semantic_scalar(field.attrib.get("datatype","string"),field.text)))
             return base+("record",tuple(sorted(records,key=repr)))
         if nil:
             return base+("nil",)
@@ -74,13 +85,14 @@ class Model:
         # instead of the ordinary var_ref attribute form.
         if local=="var_ref" and text in self.vars:
             return base+("var",self.variable(text))
-        return base+("value",sval(e.text))
+        return base+("value",semantic_scalar(e.attrib.get("datatype","string"),e.text))
 
     def component(self,e):
         ns,local=split(e.tag)
         if ns!=OD: raise ValueError(f"unsupported component ns {ns}")
         if local=="literal_component":
-            return ("literal",e.attrib.get("datatype","string"),sval(e.text))
+            datatype=e.attrib.get("datatype","string")
+            return ("literal",datatype,semantic_scalar(datatype,e.text))
         if local=="variable_component":
             return ("variable",self.variable(e.attrib["var_ref"]))
         if local=="object_component":
@@ -118,7 +130,7 @@ class Model:
         head=(local,e.attrib["datatype"])
         self.memo[key]=("recursion",vid)
         if local=="constant_variable":
-            out=head+(tuple(sval(x.text) for x in e.findall(f"{{{OD}}}value")),)
+            out=head+(tuple(semantic_scalar(e.attrib["datatype"],x.text) for x in e.findall(f"{{{OD}}}value")),)
         elif local=="local_variable":
             kids=[x for x in e if split(x.tag)[1]!="notes"]
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
@@ -133,7 +145,7 @@ class Model:
                     alternatives.append((
                         "possible_value",
                         child.attrib.get("hint",""),
-                        sval(child.text),
+                        semantic_scalar(e.attrib["datatype"],child.text),
                     ))
                 elif child_local=="possible_restriction":
                     restrictions=[]
@@ -145,7 +157,7 @@ class Model:
                             )
                         restrictions.append((
                             item.attrib.get("operation"),
-                            sval(item.text),
+                            semantic_scalar(e.attrib["datatype"],item.text),
                         ))
                     alternatives.append((
                         "possible_restriction",
