@@ -366,6 +366,10 @@ def _transform_state_payload(value, mapping: dict):
         }
 
     predicate=_native_scalar_predicate(value,mapping)
+    state_value_crosswalk=(mapping.get("native") or {}).get("state_value_crosswalk") or {}
+    group=state_value_crosswalk.get(native_field)
+    if group and not isinstance(predicate.get("value"),dict):
+        predicate["value"]=_translate(mapping,group,predicate.get("value"))
     return {"field":native_field,**predicate}
 
 
@@ -475,6 +479,8 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
         selector_map=native_cfg.get("selector_map") or {}
         if isinstance(obj.get("select"),dict) and selector_map:
             renamed={}
+            enum_selectors=set((native_cfg.get("selector_value_enums") or {}).keys())
+            selector_value_crosswalk=native_cfg.get("selector_value_crosswalk") or {}
             for key,value in obj["select"].items():
                 native_key=selector_map.get(key,key)
                 if isinstance(value,dict) and bool(value.get("nil",False)):
@@ -484,6 +490,17 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
                             f"legacy nil Object entity has no reviewed native mapping: {key}"
                         )
                     renamed[native_key]=None
+                    continue
+                if native_key in enum_selectors:
+                    if isinstance(value,dict) and "variable" in value:
+                        renamed[native_key]=copy.deepcopy(value)
+                    elif isinstance(value,dict) and "value" in value:
+                        raw=_extract_collector_value(value,mapping)
+                        group=selector_value_crosswalk.get(native_key)
+                        renamed[native_key]=_translate(mapping,group,raw) if group else raw
+                    else:
+                        group=selector_value_crosswalk.get(native_key)
+                        renamed[native_key]=_translate(mapping,group,value) if group else copy.deepcopy(value)
                     continue
                 renamed[native_key]=_native_object_predicate(value,mapping)
             obj["select"]=renamed
