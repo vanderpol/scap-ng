@@ -148,7 +148,18 @@ def document_errors(v, doc):
             seen[value] = index
 
 
-def diagnostic_value(value):\n    """Return a stable JSON-safe representation for jsonschema diagnostics."""\n    if value is None or isinstance(value, (str, int, float, bool)):\n        return value\n    if isinstance(value, (list, tuple)):\n        return [diagnostic_value(item) for item in value]\n    if isinstance(value, dict):\n        return {str(key): diagnostic_value(item) for key, item in value.items()}\n    return str(value)\n\n\ndef main():
+def diagnostic_value(value):
+    """Return a stable JSON-safe representation for jsonschema diagnostics."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [diagnostic_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): diagnostic_value(item) for key, item in value.items()}
+    return str(value)
+
+
+def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("corpus_root",type=Path)
     ap.add_argument("--schema-dir",type=Path,required=True)
