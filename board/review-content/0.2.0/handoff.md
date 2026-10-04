@@ -1,72 +1,79 @@
-# Board pilot handoff — stop for human review
+# Converter-first Board pilot handoff — stop for human review
 
-Date: 2026-10-04. Status: **pending-review**. Seven Assessments, five converted
-source cases, two original native cases. No sample is accepted by Codex.
+Date: 2026-10-04. Status: **pending-review**. Six mechanically converted review
+cases, plus four earlier supporting seeds retained separately. All ten native
+files remain pending; Codex accepts none of them.
+
+Start: `/workspace/scap-ng`, clean `main`,
+`345d8de7436adbba15cf0fe546684dbc4ba8ef5d`. Frozen technical SHA:
+`7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Existing checkout and later maintenance
+commits were kept; no reset, clone or alternate SCAP-NG repository was created.
+The final publication SHA is supplied in the user report and exact-commit CI
+receipt. `git log` identifies this handoff's commit without a self-referential SHA.
 
 Entry points: [README](README.md), [manifest](manifest.json),
-[coverage inventory](coverage.json), [validation evidence](validation.md),
-[findings/questions](questions.md). The next action is owner/Board review of
-the seven examples and independent expectations. Do not automatically expand
-the corpus after a green run.
+[conversion plan](conversion-plan.json), [coverage](coverage.json),
+[validation](validation.md), [findings](questions.md).
+The next action is human review of these six cases, not the next conversion batch.
 
-Starting SHA: `6ba41d4e9e34a88ced8d930d9f3126738350b65d`, clean `main`.
-Frozen schema baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
-The final publication commit is identified by `git rev-parse HEAD` and the
-exact-commit CI receipt; the final user report supplies its literal SHA.
+Preflight read root AGENTS, BRANCH-MANAGEMENT, MAINTAINING, START-HERE,
+CURRENT-DESIGN, repository map/policy, versioned schema/capability documentation,
+Board checkpoint/sample instructions, maintained content-development task/handoff,
+October 4 freeze record, requirements index, terminology/glossary, Assessment
+specification and current provenance/conversion references. Existing test-content
+findings and Issues #50/#128/#131 scope were reviewed in this session; historical
+manual output was not treated as proof of the current conversion path.
 
-Before implementation the session read the applicable root AGENTS instructions,
-BRANCH-MANAGEMENT, MAINTAINING, START-HERE, CURRENT-DESIGN, versioned schema and
-capability README files, Board checkpoint and sample README, content-development
-handoff/task, October 4 freeze record and freeze criteria. Supporting reading
-included the terminology/glossary, requirements index, Assessment specification
-sections on graph/source/type/dependency/applicability/provenance semantics, shared
-behavior and Variable references, evaluation-semantics decision record, capability
-scope/coverage inventory, migration provenance requirements, and Issues #50,
-#128, #131 with their owner scope corrections. Historical scope prose was not
-treated as authorization to resume ESX or alter the frozen semantic baseline.
+Pinned Self-Assertion `e3538595c5083b9c34d937a81d319234df9bbfaa` is accessible;
+local checkout `/workspace/scratch/self-assertion-e353` and GitHub commit API agree.
+The adapter verifies original whole-file hashes and complete extracted closures.
+Source tree SHA: `d0b680aa781cde9e55ad8778b71ee82da37ebab3`.
 
-Independent reasoning precedes the synthetic harness: the expected case tables
-specify final and Test outcomes, relevant intermediate Variables and dependency
-scheduling. One canonical linked result explains complete UNIX file evidence.
-The helper computes a bounded comparison/Variable/nested-Set/filter slice; it is not
-a new assessment language, collector, general evaluator or editor.
+Current work replaces the earlier manual family/file/registry transcriptions with
+actual converter-generated native content, retaining their meaningful identities
+and independent oracle cases. Directory filtering, WMI records and symlink criteria
+are added. Four previous constant/concat/owner-filter/dependency examples remain
+supporting seeds, not mechanically converted successes. No preserved research or
+source identity was deleted.
 
-Three minimal reproducers are retained under
-`tests/focused-regressions/board-pilot/`: probable binary/Boolean source content
-defect, the documented strict-native converter gap, and a native local-Variable
-cycle missed by the core semantic validator. The helper adds a test-only graph
-guard; shared validators and frozen schemas remain unchanged. The filter source's
-misleading traversal comments are documented. No schema defect was established
-by this pilot and no materially ambiguous semantic choice was silently resolved.
+The adapter calls the existing lower/roundtrip/align/mapping libraries. It does
+not reimplement source predicates or add a converter. UNIX file and registry use
+explicit case-scoped existing mapping calls; their automatic readiness remains
+unchanged. Local presentation names are keyed by exact source IDs. Mechanical and
+native files differ only in titles and supported Constant literal presentation.
+The exact pipeline/components, paths, scope and crosswalks are recorded durably.
 
-For review, check the selected-criterion scope, source-to-native bindings, inner
-versus outer quantifiers, and the boundary/zero/incomplete/error cases. Synthetic
-guard not-evaluated is a provider lifecycle case, not a collected-object flag.
-Reject any reading of a miscellaneous technical true as policy pass or of source
-round-trip equality as live scanner equivalence.
+There are 31 independently reasoned primary-case outcomes and 17 supporting
+outcomes, including native edge variants. The bounded helper handles correlated
+records in addition to the previous scalar/Variable/Set slice; missing expected
+record fields follow the inherited OVAL error rule. It acquires nothing. The
+linked UNIX result remains a source-aware evidence example. Green schemas,
+roundtrips or model checks are not a claim of independent scanner equivalence.
 
-Authoring observations: typed constants need obvious diagnostics; reusable local
-IDs make reference navigation easier; predicate and Test quantifiers need visible
-scope; source comments cannot be used as executable selection authority. These
-are content-review observations, not permission to build an editor.
+Four minimal reproducer groups remain under `tests/focused-regressions/board-pilot/`:
+binary/Boolean source disagreement, direct-Variable converter limitation, native
+Variable cycle missing a shared diagnostic, and the new uncommented-State naming
+limitation. Directory-filter executable/comment inconsistency is independently
+reviewable in the already minimal source closure. No schema semantics were changed.
 
-After human acceptance only, the recommended next bounded content group is
-broader Object-component extraction/status cases plus directional Set
-difference and incomplete-filter/Set flag interactions. Pin compact upstream closures and keep native
-and converted evidence distinct. Human review remains the immediate next step.
+Validation commands are in validation.md. Both platform CI jobs additionally
+checkout the pinned Self-Assertion revision, reproduce only these six conversions,
+check committed bytes and run focused regression tests. No 65-benchmark workflow
+was launched. Smoke/fast-five regression do not expand this pilot's source scope.
 
-## Identifier readability revision
+If interrupted before publication, run the two focused test modules and
+`convert_board_pilot_v02.py --source-root <pinned-checkout> --check`, verify manifest
+hashes and the intended diff, commit/push on main per branch policy, then await the
+Ubuntu/Windows contract, smoke and fast-five results. Do not recreate source oracles
+from implementation output. Do not change the frozen schema to fix a fixture.
 
-Owner feedback on 2026-10-04 requested intuitive local IDs. Starting at
-`d720d2c4103450f48574bf7f8adf2f2539cdfb68`, all seven samples were reviewed:
-Objects, Variables, States, Tests and the dependency alias now identify their
-resource/dataflow/comparison roles. Synthetic Item IDs, case references, linked
-result evidence and source-to-native bindings follow those names. Original
-Self-Assertion IDs, source extracts/hashes, selectors, literals, quantifiers and
-independent expected outcomes remain unchanged. Sample/file identities remain
-stable, and every sample remains `pending-review`.
+After human acceptance only, a sensible next bounded task is the direct-Variable
+converter gap plus source-backed Object-component/function chains and directional
+Set difference. That work is not authorized by this handoff. The immediate next
+step remains review, with no editor or broad corpus conversion.
 
-Reversing the identifier mapping reproduces each original executable Assessment
-graph exactly, apart from human titles. All 30 independent case outcomes and
-intermediate Variable values are retained. Run the bounded Board regression,
-strict native validation and presentation check described in validation.md.
+History: initial manual/native pilot started at `6ba41d4e9e34a88ced8d930d9f3126738350b65d`
+and appeared in `d720d2c4103450f48574bf7f8adf2f2539cdfb68`. Owner feedback produced
+meaningful local identities in `345d8de7436adbba15cf0fe546684dbc4ba8ef5d`; the present
+converter-first task starts from that preserved result. Earlier validation is
+historical evidence, not certification of this new adapter.

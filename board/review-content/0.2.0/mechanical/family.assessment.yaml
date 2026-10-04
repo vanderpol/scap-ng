@@ -1,7 +1,7 @@
 assessment:
   id: board.family
   version: 1
-  assessment_title: System family matches the source family expression
+  assessment_title: Evaluate to true if the ind-def:family_test is properly supported
   mode: automated
   class: miscellaneous
   purpose: assessment
@@ -10,13 +10,16 @@ assessment:
     version: 0.2.0
   variables:
     family-pattern:
+      title: This variable contains a regular expression that matches the regular
+        expression '(vmware_infrastructure|panos|aix|junos|aws|iosxe|ios|macos|unix|windows)'.
       kind: constant
       datatype: string
-      variable_title: Family pattern
-      value: (vmware_infrastructure|panos|aix|junos|aws|iosxe|ios|macos|unix|windows)
+      expression:
+        literal: (vmware_infrastructure|panos|aix|junos|aws|iosxe|ios|macos|unix|windows)
   states:
     family-matches-pattern:
-      state_title: Family matches pattern
+      state_title: This variable_state represents any family that is in the EntityStateFamilyType
+        (ios, macos, unix, windows).
       capability: independent.family
       state:
         field: family
@@ -29,7 +32,7 @@ assessment:
         existence: some
   tests:
     test-system-family:
-      test_title: Test system family
+      test_title: Test that the family_object is supported.
       capability: independent.family
       check_existence: some
       check: any

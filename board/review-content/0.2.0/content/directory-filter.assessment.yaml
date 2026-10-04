@@ -1,0 +1,73 @@
+assessment:
+  id: board.directory-filter
+  version: 1
+  assessment_title: Select the support directory and exclude named directories
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    filtered-support-directory-object:
+      capability: unix.file
+      set:
+        operator: union
+        operands:
+        - object: support-directory-object
+          filters:
+          - action: exclude
+            state: excluded-directory-state
+      object_title: Filtered support directory object
+    support-directory-object:
+      capability: unix.file
+      select:
+        directory:
+          value: /opt/support/txt
+          operation: equal
+          datatype: string
+        name: null
+      object_title: Support directory object
+      filesystem: local
+  variables:
+    excluded-directories-variable:
+      kind: constant
+      datatype: string
+      variable_title: Excluded directories variable
+      value:
+      - /opt/support/txt/txtfile
+      - /opt/support/txt/txtfile/subtxtfile
+  states:
+    excluded-directory-state:
+      state_title: Excluded directory state
+      capability: unix.file
+      state:
+        field: directory
+        value:
+          variable: excluded-directories-variable
+        operation: equal
+        datatype: string
+        match: all
+        variable_match: one
+        existence: some
+    support-directory-state:
+      state_title: Support directory state
+      capability: unix.file
+      state:
+        field: directory
+        value: /opt/support/txt
+        operation: equal
+        datatype: string
+        match: all
+        existence: some
+  tests:
+    test-filtered-support-directory:
+      test_title: Test filtered support directory
+      capability: unix.file
+      object: filtered-support-directory-object
+      check_existence: one
+      check: all
+      states:
+      - support-directory-state
+  evaluate:
+    test: test-filtered-support-directory

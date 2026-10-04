@@ -1,0 +1,318 @@
+{
+  "sample": "symlink-resolution",
+  "oracle_kind": "independently authored source/specification expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Complete source Def1 is AND(tst1, NOT tst3, NOT tst5, tst6). Objects represent a chain, a regular file, a missing path, and a working link. No-State Tests check symlink existence; the regular file is not a symlink Item. Only tst6 compares the canonical target. Resolving a chain is scanner-native behavior, not a shell filesystem search. This harness receives resolved synthetic Items and does not resolve actual links.",
+  "cases": [
+    {
+      "id": "links-resolve-and-negative-leaves-hold",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "link-chain-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "chain-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/daisyChain2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          },
+          "regular-file-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "missing-link-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "working-link-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "working-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir2/link2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.symlink-resolution:test-link-chain-exists": "true",
+          "board.symlink-resolution:test-regular-file-is-link": "false",
+          "board.symlink-resolution:test-missing-link-exists": "false",
+          "board.symlink-resolution:test-working-link-target": "true"
+        }
+      },
+      "rationale": "Source Test results are true,false,false,true. Negation turns both negative leaves into true, so the complete AND is true."
+    },
+    {
+      "id": "working-link-wrong-target",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "link-chain-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "chain-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/daisyChain2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          },
+          "regular-file-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "missing-link-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "working-link-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "working-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir2/link2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/other-target.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.symlink-resolution:test-link-chain-exists": "true",
+          "board.symlink-resolution:test-regular-file-is-link": "false",
+          "board.symlink-resolution:test-missing-link-exists": "false",
+          "board.symlink-resolution:test-working-link-target": "false"
+        }
+      },
+      "rationale": "The canonical target comparison fails; the other leaves still satisfy their source requirements."
+    },
+    {
+      "id": "chain-collection-error",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "link-chain-object": {
+            "flag": "error",
+            "items": []
+          },
+          "regular-file-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "missing-link-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "working-link-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "working-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir2/link2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.symlink-resolution:test-link-chain-exists": "error",
+          "board.symlink-resolution:test-regular-file-is-link": "false",
+          "board.symlink-resolution:test-missing-link-exists": "false",
+          "board.symlink-resolution:test-working-link-target": "true"
+        }
+      },
+      "rationale": "An error collecting the chain propagates through AND with otherwise true criteria."
+    },
+    {
+      "id": "chain-not-collected",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "link-chain-object": {
+            "flag": "not collected",
+            "items": []
+          },
+          "regular-file-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "missing-link-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "working-link-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "working-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir2/link2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.symlink-resolution:test-link-chain-exists": "unknown",
+          "board.symlink-resolution:test-regular-file-is-link": "false",
+          "board.symlink-resolution:test-missing-link-exists": "false",
+          "board.symlink-resolution:test-working-link-target": "true"
+        }
+      },
+      "rationale": "An uncollected chain remains unknown, while all other criteria are true."
+    },
+    {
+      "id": "working-link-missing",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "link-chain-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "chain-link-item",
+                "capability": "unix.symlink",
+                "status": "exists",
+                "fields": {
+                  "full_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/daisyChain2targetfile.txt"
+                  },
+                  "canonical_path": {
+                    "datatype": "string",
+                    "value": "/opt/support/symlinks/symlinks_dir1/targetfile.txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          },
+          "regular-file-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "missing-link-object": {
+            "flag": "does not exist",
+            "items": []
+          },
+          "working-link-object": {
+            "flag": "does not exist",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.symlink-resolution:test-link-chain-exists": "true",
+          "board.symlink-resolution:test-regular-file-is-link": "false",
+          "board.symlink-resolution:test-missing-link-exists": "false",
+          "board.symlink-resolution:test-working-link-target": "false"
+        }
+      },
+      "rationale": "Confirmed absence fails tst6 at existence before any canonical target comparison."
+    }
+  ]
+}

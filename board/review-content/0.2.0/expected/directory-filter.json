@@ -1,0 +1,208 @@
+{
+  "sample": "directory-filter",
+  "oracle_kind": "independently authored source/specification expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Source tst:451 uses only_one_exists and all. obj:189 selects the directory /opt/support/txt with nil filename, local filesystems and no recursion. Neither exclusion Variable value equals that directory. Filter EXCLUDE retains it, and ste:196 matches its directory. Source comments describing recursive three-member collection are inaccurate; executable selectors control this oracle.",
+  "cases": [
+    {
+      "id": "directory-retained",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "support-directory-item",
+                "capability": "unix.file",
+                "status": "exists",
+                "fields": {
+                  "directory": {
+                    "datatype": "string",
+                    "value": "/opt/support/txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "true"
+        },
+        "resolved_variables": {
+          "excluded-directories-variable": [
+            "/opt/support/txt/txtfile",
+            "/opt/support/txt/txtfile/subtxtfile"
+          ]
+        }
+      },
+      "rationale": "The filter State compares /opt/support/txt against two unequal Variable values. variable_match=one is false (zero equalities), EXCLUDE retains the Item; exactly one Item satisfies the final State."
+    },
+    {
+      "id": "directory-absent",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "does not exist",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "false"
+        }
+      },
+      "rationale": "Confirmed absence provides zero Items, failing only_one_exists."
+    },
+    {
+      "id": "directory-collection-error",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "error",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "error"
+        }
+      },
+      "rationale": "The selected Object collection is in error; its single-operand Set cannot hide the error."
+    },
+    {
+      "id": "directory-not-collected",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "not collected",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "unknown"
+        }
+      },
+      "rationale": "No collection evidence is available; lack of collection is unknown, not confirmed absence."
+    },
+    {
+      "id": "directory-listed-once-is-excluded",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "support-directory-item",
+                "capability": "unix.file",
+                "status": "exists",
+                "fields": {
+                  "directory": {
+                    "datatype": "string",
+                    "value": "/opt/support/txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        },
+        "variant": {
+          "variables": {
+            "excluded-directories-variable": {
+              "value": [
+                "/opt/support/txt",
+                "/opt/support/txt/txtfile"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "false"
+        },
+        "resolved_variables": {
+          "excluded-directories-variable": [
+            "/opt/support/txt",
+            "/opt/support/txt/txtfile"
+          ]
+        }
+      },
+      "rationale": "Native edge variant: exactly one exclusion value equals the collected directory. variable_match=one is true, EXCLUDE removes it, and only_one_exists fails on the empty filtered population."
+    },
+    {
+      "id": "duplicate-exclusions-do-not-satisfy-one",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "support-directory-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "support-directory-item",
+                "capability": "unix.file",
+                "status": "exists",
+                "fields": {
+                  "directory": {
+                    "datatype": "string",
+                    "value": "/opt/support/txt"
+                  }
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        },
+        "variant": {
+          "variables": {
+            "excluded-directories-variable": {
+              "value": [
+                "/opt/support/txt",
+                "/opt/support/txt"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.directory-filter:test-filtered-support-directory": "true"
+        },
+        "resolved_variables": {
+          "excluded-directories-variable": [
+            "/opt/support/txt",
+            "/opt/support/txt"
+          ]
+        }
+      },
+      "rationale": "Native edge variant: two Variable values equal the directory. variable_match=one is false, so EXCLUDE retains it. An incorrect any/all substitution would remove it and change the result."
+    }
+  ]
+}

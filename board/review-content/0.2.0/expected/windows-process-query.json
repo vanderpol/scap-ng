@@ -1,0 +1,408 @@
+{
+  "sample": "windows-process-query",
+  "oracle_kind": "independently authored source/specification expectations, not scanner output",
+  "result_version": "0.2.0",
+  "reasoning": "Source Def10 selects a fixed WQL query in root\\cimv2. Namespace and query match exactly. Result entity_check=at least one: at least one record must satisfy ALL its named field comparisons: processid >= 0, name = explorer.exe, description matches .*. Different records must never satisfy each other's fields. OVAL EntityStateFieldType specifies error for an absent required record field. The observations are synthetic preselected WMI output; no Windows query was executed.",
+  "cases": [
+    {
+      "id": "explorer-record-present",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": 42
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "value": "Explorer process"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "true"
+        },
+        "record_outcomes": [
+          "true"
+        ]
+      },
+      "rationale": "One Explorer record contains all three required fields and 42 >= 0."
+    },
+    {
+      "id": "split-records-do-not-correlate",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": 42
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "other.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "value": "Explorer process"
+                        }
+                      }
+                    },
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": -1
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "value": "Explorer process"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "false"
+        },
+        "record_outcomes": [
+          "false",
+          "false"
+        ]
+      },
+      "rationale": "First record fails name; second fails processid. Neither whole record matches. Flattening fields across records would incorrectly produce true."
+    },
+    {
+      "id": "process-id-zero-boundary",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": 0
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "value": "Explorer process"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "true",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "true"
+        },
+        "record_outcomes": [
+          "true"
+        ]
+      },
+      "rationale": "Greater-than-or-equal includes zero; the other fields match in the same record."
+    },
+    {
+      "id": "process-id-negative",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": -1
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "value": "Explorer process"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "false",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "false"
+        },
+        "record_outcomes": [
+          "false"
+        ]
+      },
+      "rationale": "-1 is below zero even though name and description match."
+    },
+    {
+      "id": "description-not-collected",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": 42
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        },
+                        "description": {
+                          "datatype": "string",
+                          "status": "not_collected"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "unknown",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "unknown"
+        },
+        "record_outcomes": [
+          "unknown"
+        ]
+      },
+      "rationale": "The record has an uncollected required description; its other comparisons are true, so the record and Test remain unknown."
+    },
+    {
+      "id": "description-field-missing",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "complete",
+            "items": [
+              {
+                "id": "process-query-item",
+                "capability": "windows.wmi.query",
+                "status": "exists",
+                "fields": {
+                  "namespace": {
+                    "datatype": "string",
+                    "value": "root\\cimv2"
+                  },
+                  "query": {
+                    "datatype": "string",
+                    "value": "SELECT ProcessId, Name, Description FROM Win32_Process"
+                  },
+                  "result": [
+                    {
+                      "datatype": "record",
+                      "value": {
+                        "processid": {
+                          "datatype": "integer",
+                          "value": 42
+                        },
+                        "name": {
+                          "datatype": "string",
+                          "value": "explorer.exe"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "target_ref": "synthetic-board-target",
+                  "source_execution_ref": "synthetic-fixture"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "error"
+        },
+        "record_outcomes": [
+          "error"
+        ]
+      },
+      "rationale": "A missing expected record field produces error under OVAL 5.12.3 EntityStateFieldType, rather than treating an incomplete record as a clean mismatch."
+    },
+    {
+      "id": "query-collection-error",
+      "synthetic": true,
+      "input": {
+        "objects": {
+          "process-query-object": {
+            "flag": "error",
+            "items": []
+          }
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "test_outcomes": {
+          "board.windows-process-query:test-explorer-process-record": "error"
+        },
+        "record_outcomes": []
+      },
+      "rationale": "Collection failed before record comparison; the outcome is error."
+    }
+  ]
+}

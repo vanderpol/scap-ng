@@ -65,3 +65,28 @@ Run the three focused regressions and Board samples with:
 ```sh
 python tools/test_board_samples_v02.py
 ```
+
+## Uncommented State naming
+
+`symlink-name-source.xml` reduces the pinned symlink source to its working-link
+criterion `tst:6`, Object `obj:6` and State `ste:6`; accompanying provenance keeps
+exact original identities and hashes. The missing State comment causes the
+maintained lower/align/mapping pipeline to produce `state-no-comment`, which does
+not explain the canonical-target comparison. WMI comments also produce long,
+truncated default names. Classification: **converter identifier-generation
+limitation**, not a semantic/schema defect.
+
+The six-case conversion adapter applies a deterministic naming plan keyed by
+exact source IDs, producing `canonical-target-state` without changing the
+comparison. This is a bounded presentation correction, not a global naming
+algorithm or a second semantic converter. General automatic naming remains
+unproven; source IDs/comments stay in separate provenance. The regression shows
+both the default limitation and the readable pilot result:
+
+```sh
+python tools/test_board_conversion_v02.py
+```
+
+The current converter-first pilot does not count the earlier manually transcribed
+constant/concat examples as mechanically converted. They remain supporting seeds;
+the direct-Variable conversion gap above remains unresolved.

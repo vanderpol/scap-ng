@@ -33,3 +33,11 @@ error; not-collected gives unknown. Incomplete population plus one matching Item
 does not establish `check: all`, so remains unknown. An explicit platform N/A
 collection status gives not_applicable. No collector was run; these are synthetic
 collection-control-flow cases, not filesystem or permission acquisition proof.
+
+Mechanical comparison: [converter output](../mechanical/unix-file.assessment.yaml)
+now comes from the maintained lower/align/mapping API path, with a source-ID-keyed
+local naming plan. The readable native file only shortens titles and, where
+applicable, uses Constant `value` syntax. Executable selectors, State predicates,
+quantifiers and criteria are identical between forms. No manual semantic fix is
+applied. File/registry mapping calls are explicitly case-scoped; their general
+automatic converter readiness remains unchanged.

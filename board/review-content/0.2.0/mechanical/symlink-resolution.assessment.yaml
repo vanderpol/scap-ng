@@ -1,0 +1,91 @@
+assessment:
+  id: board.symlink-resolution
+  version: 1
+  assessment_title: Evaluate to true if the unix-def:symlink_test is properly supported
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    link-chain-object:
+      capability: unix.symlink
+      select:
+        full_path:
+          value: /opt/support/symlinks/symlinks_dir1/daisyChain2targetfile.txt
+          operation: equal
+          datatype: string
+      object_title: Resolve a chain of links.
+    missing-link-object:
+      capability: unix.symlink
+      select:
+        full_path:
+          value: /tmp/fileDoesNotExist
+          operation: equal
+          datatype: string
+      object_title: Attempt to resolve a non-existent file.
+    regular-file-object:
+      capability: unix.symlink
+      select:
+        full_path:
+          value: /opt/support/symlinks/symlinks_dir1/targetfile.txt
+          operation: equal
+          datatype: string
+      object_title: Attempt to resolve a regular file.
+    working-link-object:
+      capability: unix.symlink
+      select:
+        full_path:
+          value: /opt/support/symlinks/symlinks_dir2/link2targetfile.txt
+          operation: equal
+          datatype: string
+      object_title: Resolve a working symbolic link.
+  states:
+    canonical-target-state:
+      state_title: No comment.
+      capability: unix.symlink
+      state:
+        field: canonical_path
+        value: /opt/support/symlinks/symlinks_dir1/targetfile.txt
+        operation: equal
+        datatype: string
+        match: all
+        existence: some
+  tests:
+    test-link-chain-exists:
+      test_title: 'Expected Result: ''true''. Resolve a working chain of links.'
+      capability: unix.symlink
+      object: link-chain-object
+      check_existence: some
+      check: all
+    test-missing-link-exists:
+      test_title: 'Expected Result: ''false''(negates to ''true'' in criterion). Resolve
+        a non-existent file.'
+      capability: unix.symlink
+      object: missing-link-object
+      check_existence: some
+      check: all
+    test-regular-file-is-link:
+      test_title: 'Expected Result: ''false''(negates to ''true'' in criterion). Resolve
+        a regular file.'
+      capability: unix.symlink
+      object: regular-file-object
+      check_existence: some
+      check: all
+    test-working-link-target:
+      test_title: 'Expected Result: ''true''. Resolve a working symbolic link.'
+      capability: unix.symlink
+      object: working-link-object
+      check_existence: some
+      check: all
+      states:
+      - canonical-target-state
+  evaluate:
+    all:
+    - test: test-link-chain-exists
+    - not:
+        test: test-regular-file-is-link
+    - not:
+        test: test-missing-link-exists
+    - test: test-working-link-target

@@ -23,3 +23,11 @@ retain the source scopes, even though this particular Variable has one value.
 The supplied Item is synthetic. The helper compares the observed family and
 the source's simple alternative regex; it does not implement family acquisition
 or prove general OVAL regex equivalence.
+
+Mechanical comparison: [converter output](../mechanical/family.assessment.yaml)
+now comes from the maintained lower/align/mapping API path, with a source-ID-keyed
+local naming plan. The readable native file only shortens titles and, where
+applicable, uses Constant `value` syntax. Executable selectors, State predicates,
+quantifiers and criteria are identical between forms. No manual semantic fix is
+applied. File/registry mapping calls are explicitly case-scoped; their general
+automatic converter readiness remains unchanged.

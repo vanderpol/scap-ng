@@ -1,7 +1,8 @@
 """Bounded Board-pilot checks, not a collector or general reference scanner.
 
 The checked-in case tables are the oracle. This helper implements only the
-operations actually used by the seven samples and fails on unsupported forms.
+operations used by the converter pilot and its supporting examples. It fails
+on unsupported forms.
 Run directly on Windows or Linux; it does not download or expand any corpus.
 """
 from pathlib import Path
@@ -24,6 +25,7 @@ from validate_generated_capability_semantics import validate_assessment_capabili
 from oval_result_truth_tables import (
     aggregate_check, aggregate_operator, aggregate_existence,
     evaluate_collected_object_test, apply_filter_state_result, combine_set_flags,
+    evaluate_record_field, evaluate_record_entity,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,6 +46,8 @@ def merged(source, variant):
                 out[section][name] = copy.deepcopy(fields)
             else:
                 out[section][name] = {**current, **copy.deepcopy(fields)}
+                if current.get('kind') == 'constant' and 'value' in fields:
+                    out[section][name].pop('expression', None)
     return out
 
 def validate_pilot_dataflow(source):
@@ -90,6 +94,7 @@ class PilotModel:
         self.sources, self.inputs = sources, inputs
         self.variables, self.objects, self.comparisons = {}, {}, []
         self.test_results = {}
+        self.record_results = []
 
     def input(self, identity):
         if identity == 'board.dependency':
@@ -102,7 +107,7 @@ class PilotModel:
             return self.variables[key]
         source = self.sources[identity]['variables'][name]
         if source['kind'] == 'constant':
-            value = source['value']
+            value = source['value'] if 'value' in source else source['expression']['literal']
             result = ('complete', value if isinstance(value, list) else [value])
         elif source['kind'] == 'external':
             record = self.input(identity)['variables'][name]
@@ -147,6 +152,8 @@ class PilotModel:
     def state(self, identity, predicate, item):
         if 'all' in predicate:
             return aggregate_operator('AND', [self.state(identity, p, item) for p in predicate['all']])
+        if 'record' in predicate:
+            return self.record_state(identity, predicate, item)
         field = predicate['field']
         observed = item['fields'].get(field, {'status': 'does_not_exist'})
         values = observed if isinstance(observed, list) else [observed]
@@ -190,6 +197,8 @@ class PilotModel:
                     match = observed_value.lower() == expected_value.lower()
                 elif operation == 'greater_than':
                     match = observed_value > expected_value
+                elif operation == 'greater_or_equal':
+                    match = observed_value >= expected_value
                 elif operation == 'match':
                     # Selected source pattern is simple literal alternatives;
                     # this is not a general OVAL/POSIX regex conformance claim.
@@ -200,6 +209,49 @@ class PilotModel:
                 self.comparisons.append(dict(assessment=identity, item=item['id'], field=field, observed=observed_value, expected=expected_value, operation=operation, outcome=comparisons[-1]))
             rows.append(aggregate_check(CHECK[predicate.get('variable_match', 'all')], comparisons))
         return aggregate_check(CHECK[predicate['match']], rows)
+
+    def record_state(self, identity, predicate, item):
+        """Keep fields correlated within each supplied record entity.
+
+        Missing expected fields follow inherited OVAL EntityStateFieldType:
+        error, rather than a false scalar existence predicate. This helper
+        models only the selected WMI State; acquisition remains untested.
+        """
+        field, requirements = predicate['field'], predicate['record']
+        records = item['fields'].get(field, [])
+        records = records if isinstance(records, list) else [records]
+        counts = dict(exists=0, does_not_exist=0, error=0, not_collected=0)
+        for record in records:
+            counts[record.get('status', 'exists')] += 1
+        existence = aggregate_existence(EXISTENCE[requirements['existence']], **counts)
+        if existence != 'true':
+            return existence
+        outcomes = []
+        for index, record in enumerate(records):
+            status = record.get('status', 'exists')
+            if status == 'does_not_exist':
+                continue
+            if status in ('error', 'not_collected'):
+                outcome = 'error' if status == 'error' else 'unknown'
+            elif record.get('datatype') != 'record' or 'value' not in record:
+                outcome = 'error'
+            else:
+                fields = record['value']
+                results = []
+                for name, comparison in requirements['fields'].items():
+                    if name not in fields:
+                        results.append(evaluate_record_field(name, []))
+                    else:
+                        nested_item = {**item, 'fields': {name: fields[name]}}
+                        start = len(self.comparisons)
+                        results.append(self.state(identity, {'field': name, **comparison}, nested_item))
+                        for row in self.comparisons[start:]:
+                            row['record_index'] = index
+                outcome = evaluate_record_entity(results)
+            outcomes.append(outcome)
+            self.record_results.append(dict(assessment=identity, item=item['id'], field=field,
+                                            record_index=index, outcome=outcome))
+        return aggregate_check(CHECK[requirements['match']], outcomes)
 
     def object(self, identity, name):
         key = (identity, name)
@@ -285,6 +337,7 @@ class BoardSamples(unittest.TestCase):
     def setUpClass(cls):
         cls.sources = load_assessments(PACKAGE / 'content')
         cls.manifest = json.loads((PACKAGE / 'manifest.json').read_text())
+        cls.entries = cls.manifest['samples'] + cls.manifest.get('supporting_examples', [])
 
     def test_strict_schemas_semantics_and_source_presentation(self):
         validator = build_validators(ROOT / 'schema/v0.2.0')['assessment.schema.json']
@@ -295,7 +348,7 @@ class BoardSamples(unittest.TestCase):
                 self.assertEqual(validate_assessment_capability_semantics(doc), [])
                 self.assertEqual(violations(doc), [])
                 validate_pilot_dataflow(source)
-        for sample in self.manifest['samples']:
+        for sample in self.entries:
             table = json.loads((PACKAGE/sample['expected']).read_text())
             for case in table['cases']:
                 source = merged(self.sources['board.'+sample['name']], case['input'].get('variant', {}))
@@ -306,7 +359,7 @@ class BoardSamples(unittest.TestCase):
 
     def test_independent_known_results_and_scheduling(self):
         count = 0
-        for sample in self.manifest['samples']:
+        for sample in self.entries:
             table = json.loads((PACKAGE / sample['expected']).read_text())
             for case in table['cases']:
                 with self.subTest(sample=sample['name'], case=case['id']):
@@ -316,6 +369,8 @@ class BoardSamples(unittest.TestCase):
                     self.assertEqual(model.test_results, case['expected']['test_outcomes'])
                     for variable, values in case['expected'].get('resolved_variables', {}).items():
                         self.assertEqual(model.variables[('board.'+sample['name'], variable)][1], values)
+                    if 'record_outcomes' in case['expected']:
+                        self.assertEqual([row['outcome'] for row in model.record_results], case['expected']['record_outcomes'])
                     if 'executed_tests' in case['expected']:
                         self.assertEqual(result['executed_tests'], case['expected']['executed_tests'])
                         self.assertEqual(len(result['invocations']) - 1, case['expected']['dependency_invocations'])
@@ -329,7 +384,7 @@ class BoardSamples(unittest.TestCase):
                         for obj in record.get('objects', {}).values(): items.extend(obj['items'])
                         for item in items: item_validator(item['capability']).validate(item)
                     count += 1
-        self.assertEqual(count, 30)
+        self.assertEqual(count, 48)
 
     def test_variable_multivalues_are_not_independent_items(self):
         case = json.loads((PACKAGE/'expected/concat.json').read_text())['cases'][1]
@@ -338,8 +393,9 @@ class BoardSamples(unittest.TestCase):
         self.assertEqual(model.variables[('board.concat','combined-values')][1], ['abc123','abc456','xyz123','xyz456'])
 
     def test_inventory_and_pinned_extract_hashes(self):
-        self.assertEqual(len(self.manifest['samples']), 7)
-        for sample in self.manifest['samples']:
+        self.assertEqual(len(self.manifest['samples']), 6)
+        self.assertEqual(len(self.manifest['supporting_examples']), 4)
+        for sample in self.entries:
             self.assertEqual(sample['human_review_status'], 'pending-review')
             for key in ('assessment','expected','provenance','explanation'):
                 self.assertTrue((PACKAGE/sample[key]).is_file(), sample[key])
@@ -348,7 +404,7 @@ class BoardSamples(unittest.TestCase):
             provenance = json.loads((PACKAGE/sample['provenance']).read_text())
             if 'revision' in provenance:
                 self.assertEqual(provenance['revision'], 'e3538595c5083b9c34d937a81d319234df9bbfaa')
-                data = (PACKAGE/'sources'/f"{sample['name']}.xml").read_bytes()
+                data = (PACKAGE/sample['source_extract']).read_bytes()
                 self.assertEqual(hashlib.sha256(data).hexdigest(), provenance['extract_sha256'])
                 root = ET.fromstring(data)
                 ids = {n.get('id') for n in root.iter() if n.get('id')}
@@ -358,10 +414,10 @@ class BoardSamples(unittest.TestCase):
         from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
         from scap_ng_roundtrip_v003.native_assessment_to_oval import build
         from scap_ng_roundtrip_v003.compare_oval_semantics import compare
-        for sample in self.manifest['samples']:
-            if sample['origin'] != 'converted': continue
+        for sample in self.entries:
+            if sample['origin'] not in ('converted', 'manual-source-transcription'): continue
             with self.subTest(sample=sample['name']), tempfile.TemporaryDirectory() as temp:
-                path = PACKAGE/'sources'/f"{sample['name']}.xml"
+                path = PACKAGE/sample['source_extract']
                 root = ET.parse(path).getroot()
                 lowered, error = lower_definition(root, sample['source_definition'], 'source-roundtrip', collection_graph=True)
                 self.assertIsNone(error)
@@ -369,9 +425,8 @@ class BoardSamples(unittest.TestCase):
                 reverse = Path(temp)/'reverse.xml'; tree.write(reverse, encoding='utf-8')
                 parity = compare(path, reverse, sample['source_definition'], regenerated_id, root_only=True)
                 self.assertTrue(parity['equal'], parity)
-        # This gate covers the maintained intermediate converter. The Board
-        # Assessments are separate manual semantic transcriptions, not output
-        # certified by this round-trip comparison.
+        # Intermediate parity is one gate, not scanner equivalence. The
+        # companion conversion tests also reproduce strict native output.
 
     def test_selected_source_extracts_are_schema_valid(self):
         from lxml import etree
@@ -380,14 +435,14 @@ class BoardSamples(unittest.TestCase):
             with self.subTest(source=path.name):
                 schema.assertValid(etree.parse(str(path)))
 
-    def test_manual_native_comparison_crosswalks_match_source(self):
+    def test_source_comparison_crosswalks_match_source(self):
         from capability_registry import load_mapping
         from scap_upconvert_v003.native_capability_mapping import COMMON_CROSSWALK
         def scalar(text, datatype):
             return int(text) if datatype == 'int' else text
-        for sample in self.manifest['samples']:
-            if sample['origin'] != 'converted': continue
-            source = ET.parse(PACKAGE/'sources'/f"{sample['name']}.xml").getroot()
+        for sample in self.entries:
+            if sample['origin'] not in ('converted', 'manual-source-transcription'): continue
+            source = ET.parse(PACKAGE/sample['source_extract']).getroot()
             nodes = {n.get('id'):n for n in source.iter() if n.get('id')}
             provenance = json.loads((PACKAGE/sample['provenance']).read_text())
             native = self.sources[sample['assessment_id']]
@@ -406,6 +461,14 @@ class BoardSamples(unittest.TestCase):
                     for entity in node:
                         name = entity.tag.rsplit('}', 1)[-1]
                         predicate = fields[mapping['native']['state_field_map'][name]]
+                        if 'record' in predicate:
+                            self.assertEqual(predicate['record']['match'], COMMON_CROSSWALK['check'][entity.get('entity_check', 'all')])
+                            for field in entity:
+                                actual = predicate['record']['fields'][field.get('name')]
+                                self.assertEqual(actual['operation'], COMMON_CROSSWALK['operation'][field.get('operation', 'equals')])
+                                self.assertEqual(actual['value'], scalar(field.text, field.get('datatype', 'string')))
+                                self.assertEqual(actual['match'], COMMON_CROSSWALK['check'][field.get('entity_check', 'all')])
+                            continue
                         self.assertEqual(predicate['operation'], COMMON_CROSSWALK['operation'][entity.get('operation', 'equals')])
                         self.assertEqual(predicate['match'], COMMON_CROSSWALK['check'][entity.get('entity_check', 'all')])
                         self.assertEqual(predicate['existence'], COMMON_CROSSWALK['existence'][entity.get('check_existence', 'at_least_one_exists')])
@@ -486,8 +549,11 @@ if __name__ == '__main__':
     if args.report:
         commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
         report = dict(source_commit=commit, status='passed' if result.wasSuccessful() else 'failed', tests_run=result.testsRun,
-                      sample_count=7, independent_semantic_cases=30, converted_source_roundtrips=5,
-                      source_extracts_xsd_validated=6, minimal_reproducers=3,
+                      tracked_worktree_clean=subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--'], cwd=ROOT).returncode == 0,
+                      sample_count=6, supporting_examples=4, independent_semantic_cases=48,
+                      primary_semantic_cases=31, supporting_semantic_cases=17, converted_source_roundtrips=6,
+                      supporting_manual_source_roundtrips=2,
+                      source_extracts_xsd_validated=8, minimal_reproducers=4,
                       source_revision='e3538595c5083b9c34d937a81d319234df9bbfaa',
                       human_review_status='pending-review', live_collectors_run=False,
                       scanner_equivalence_claimed=False, niwc_65_corpus_run=False)

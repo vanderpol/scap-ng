@@ -1,34 +1,51 @@
 # Pilot findings and questions for human review
 
-Status: **pending-review**. These findings do not authorize semantic changes.
+Status: **pending-review**. Findings do not authorize semantic changes.
 
-| Finding | Classification | Disposition |
+| Finding | Classification | Disposition / reproducer |
 | --- | --- | --- |
-| Dependency analog declares binary `true`, compares Boolean | Probable source content defect | Original minimal closure preserved under `tests/focused-regressions/board-pilot/`; do not silently change datatype |
-| Filter analog comments imply three traversed directories, but executable Object selects one without recursion | Source content documentation defect | Preserve extract and explain actual selection; native filter sample is explicitly inspiration only |
-| Native mutually referencing local Variable cycle receives no core semantic diagnostic | Semantic-validator defect/gap | Minimal native reproducer; pilot-local guard rejects cycles without changing shared semantics |
-| Legacy intermediate converter does not supply a strict native direct-Variable 0.2.0 authoring path | Converter limitation (documented legacy bridge) | Minimal constant-source reproducer; Board conversions are explicit manual transcriptions, no converter/schema edits |
+| Direct Variable Tests remain `independent.variable` after automatic mapping and fail strict 0.2.0 | Converter limitation | `tests/focused-regressions/board-pilot/constant-source.xml`; earlier constant/concat manual seeds stay outside the six converter cases |
+| UNIX file and registry are excluded from the batch automatic-ready list, but selected shapes pass explicit existing mapping calls | Converter capability readiness limitation | Plan records case-scoped calls; strict checks do not change readiness flags or certify all such source shapes |
+| Symlink State with no comment becomes `state-no-comment`; long WMI comments produce truncated labels | Identifier-generation limitation | `tests/focused-regressions/board-pilot/symlink-name-source.xml`; pilot fixes only presentation through a deterministic source-ID plan, not a competing converter |
+| Directory-filter comments imply three traversed directories and Windows paths, while UNIX Object selects one directory without recursion | Source content documentation defect | Small selected closure `sources/filter.xml`; actual selectors/values/behaviors preserved and source comments retained |
+| Earlier dependency analog declares binary `true` but compares Boolean | Probable source content defect | `tests/focused-regressions/board-pilot/binary-source.xml`; no silent datatype correction or implicit coercion |
+| Native local Variable cycle receives no core capability-semantic diagnostic | Semantic-validator defect/gap | `tests/focused-regressions/board-pilot/variable-cycle.assessment.yaml`; independent pilot guard rejects it, shared validator unchanged |
 
-Expected OVAL behavior follows typed Variable value and comparison contracts;
-the dependency source's description “always true” is not an independent oracle.
-The binary `true` text is not a valid hexadecimal binary value. The source XSD's
-generic string content may not catch this semantic problem. The proposed upstream
-question is whether the author intended Boolean; changing it is an upstream
-content correction, not a Board decision to add coercion to native NG.
+No schema defect or unclear capability rename was established for the six selected
+closures. Supported mappings are used exactly, including the specifically reviewed
+`wmi57_test` → `windows.wmi.query`; no other suffix normalization is inferred.
+Deprecated Tests and ESX/deferred Kubernetes capabilities are absent.
 
-Questions remaining for acceptance:
+Upstream source questions are separate from native language design. For the binary
+case, `true` is not valid hexadecimal binary content; the proposed upstream question
+is whether Boolean was intended. For the directory filter, should comments be fixed,
+or was recursive selection intended? The conversion follows current executable
+content. Neither question grants permission to repair upstream semantics silently.
 
-- Confirm the five manual transcriptions, especially direct Variable Item/value
-  aggregation, against the source closures and the frozen mappings.
-- Confirm that the selected-criterion scope is suitable for the Board package;
-  none of the three fragments claims complete source Definition equivalence.
-- Independently corroborate collector defaults and acquisition behavior for
-  exact file and registry selection. The pilot covers supplied observations only.
-- Review and repair the shared local dataflow-cycle validation gap in a separate
-  bounded task. Existing acyclic semantics apply; no new schema capability is needed.
-- Decide when a strict native converter path should replace manual transcription;
-  this is separate converter work after review, not permission to expand this pilot.
+The six cases passed intermediate source parity, strict validation, independent
+synthetic known-result checks and stable-ID checks. These do not prove live collector
+or independent scanner equivalence. Record missing-field behavior follows OVAL
+5.12.3 `EntityStateFieldType` (missing expected field = error); it is not guessed from
+implementation output. A record's fields remain correlated under the current native
+specification. The fixed WMI query and scanner-native symlink collection are untested
+on live targets.
 
-No new normative requirements or yes/no semantic decision are proposed here.
-No accepted decision record is created by machine-green validation. Existing
-post-freeze semantic authority remains unchanged.
+Questions for human acceptance:
+
+- Are the three complete Definitions and three expressly scoped criterion fragments
+  suitable Board examples? Review exact source-to-native crosswalks and both forms.
+- Corroborate the source/NG quantifiers: WMI `any` across records versus AND within
+  each record; filter Variable `one` versus Object existence `one`; registry Test
+  `one` versus existence `some`; symlink negations without States.
+- Confirm the typed synthetic observations and independent result rationales,
+  including WMI missing/uncollected fields and native duplicate-exclusion variants.
+- Review the fixed source-ID naming plan and metadata-only native refinements.
+  General automatic naming and broad file/registry converter readiness remain unproven.
+- After this review gate, decide the scope of a separate converter task for direct
+  Variable Tests, especially the retained concat/complex filter seeds. Do not expand
+  this pilot merely because the six selected conversions are green.
+- Review the shared local-dataflow diagnostic gap separately, and validate actual
+  acquisition behavior on appropriate platform collectors when available.
+
+No new normative requirement or yes/no semantic decision is proposed. No accepted
+Board decision record is created by machine validation. All samples remain pending.

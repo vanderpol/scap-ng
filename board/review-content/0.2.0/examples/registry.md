@@ -26,3 +26,11 @@ No deprecated windows_view behavior is added to native content.
 The source State does **not** compare the registry value's data. This sample
 therefore makes no claim about Windows edition, OS version or a security setting.
 The file name `CurrentVersion` must not tempt readers to infer an absent value Test.
+
+Mechanical comparison: [converter output](../mechanical/registry.assessment.yaml)
+now comes from the maintained lower/align/mapping API path, with a source-ID-keyed
+local naming plan. The readable native file only shortens titles and, where
+applicable, uses Constant `value` syntax. Executable selectors, State predicates,
+quantifiers and criteria are identical between forms. No manual semantic fix is
+applied. File/registry mapping calls are explicitly case-scoped; their general
+automatic converter readiness remains unchanged.

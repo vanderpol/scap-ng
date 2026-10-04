@@ -1,0 +1,69 @@
+assessment:
+  id: board.windows-process-query
+  version: 1
+  assessment_title: Find an Explorer process record with a nonnegative process ID
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    process-query-object:
+      capability: windows.wmi.query
+      object_title: Process query object
+      collect:
+        namespace: root\cimv2
+        query: SELECT ProcessId, Name, Description FROM Win32_Process
+  states:
+    explorer-process-record-state:
+      state_title: Explorer process record state
+      capability: windows.wmi.query
+      state:
+        all:
+        - field: namespace
+          value: root\cimv2
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: query
+          value: SELECT ProcessId, Name, Description FROM Win32_Process
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: result
+          record:
+            match: any
+            existence: some
+            fields:
+              processid:
+                value: 0
+                operation: greater_or_equal
+                datatype: integer
+                match: all
+                existence: some
+              name:
+                value: explorer.exe
+                operation: equal
+                datatype: string
+                match: all
+                existence: some
+              description:
+                value: .*
+                operation: match
+                datatype: string
+                match: all
+                existence: some
+  tests:
+    test-explorer-process-record:
+      test_title: Test explorer process record
+      capability: windows.wmi.query
+      object: process-query-object
+      check_existence: some
+      check: all
+      states:
+      - explorer-process-record-state
+  evaluate:
+    test: test-explorer-process-record

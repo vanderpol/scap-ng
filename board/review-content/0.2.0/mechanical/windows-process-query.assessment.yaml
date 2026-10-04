@@ -1,0 +1,74 @@
+assessment:
+  id: board.windows-process-query
+  version: 1
+  assessment_title: Evaluate to true if the win-def:wmi57_test is properly supported.
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    process-query-object:
+      capability: windows.wmi.query
+      object_title: Retrieves a wmi57_object with a namespace that equals 'root\cimv2'
+        and a wql that equals 'SELECT ProcessId, Name, Description FROM Win32_Process'.
+      collect:
+        namespace: root\cimv2
+        query: SELECT ProcessId, Name, Description FROM Win32_Process
+  states:
+    explorer-process-record-state:
+      state_title: This state represents a wmi57_object that has a namespace that
+        equals 'root\cimv2', a wql equal that equals 'SELECT ProcessId, Name, Description
+        FROM Win32_Process', and has at least one result with a 'processid' field
+        greater than or equal to '0', a 'name' field equal to 'explorer.exe', and
+        a 'description' field that matches the regular expression '.*'.
+      capability: windows.wmi.query
+      state:
+        all:
+        - field: namespace
+          value: root\cimv2
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: query
+          value: SELECT ProcessId, Name, Description FROM Win32_Process
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: result
+          record:
+            match: any
+            existence: some
+            fields:
+              processid:
+                value: 0
+                operation: greater_or_equal
+                datatype: integer
+                match: all
+                existence: some
+              name:
+                value: explorer.exe
+                operation: equal
+                datatype: string
+                match: all
+                existence: some
+              description:
+                value: .*
+                operation: match
+                datatype: string
+                match: all
+                existence: some
+  tests:
+    test-explorer-process-record:
+      test_title: Test that a wmi57_object with a namespace and wql is supported.
+      capability: windows.wmi.query
+      object: process-query-object
+      check_existence: some
+      check: all
+      states:
+      - explorer-process-record-state
+  evaluate:
+    test: test-explorer-process-record
