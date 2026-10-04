@@ -30,6 +30,15 @@ The technical schema baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Lat
 
 The six converter-produced Board cases are present and validated, but still **pending human acceptance**. Schema/round-trip tests do not prove independent scanner or live-target equivalence.
 
+## Full 65-package conversion build
+
+A fresh conversion of all **65 pinned NIWC Current SCAP 1.4 packages** is being generated from the checked-in converter and normalizer pipeline for Board review:
+
+- **[Full 65-package SCAP 1.4 → SCAP-NG build — GitHub Actions run 37242380664](https://github.com/vanderpol/scap-ng/actions/runs/37242380664)**
+- Primary artifact: `niwc-current-full-review` (available on the run page after artifact publication)
+
+The build preserves the fresh source-derived NG trees, exact-semantics normalized trees, compiled `.scapng` packages, conversion/blocker status for every source package, and before/after validation evidence. Normalization may replace exact duplicate Assessment definitions with one shared Assessment only when semantic equivalence is proven; Rule/check bindings and source provenance remain represented.
+
 ## Reproduce the conversion
 
 The published review builds are generated from checked-in tools and pinned source packages; they are not hand-edited exports. A reviewer can run the same pipeline locally:
