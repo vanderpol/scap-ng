@@ -54,7 +54,7 @@ class EsxHostCapabilityTests(unittest.TestCase):
     def test_registry_rejects_shadowing_and_mapping_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            stable = root / "schema/v0.1.0/capability-mappings"
+            stable = root / "schema/v0.2.0/capability-mappings/supported"
             experimental = root / "schema/v0.2.0/capability-mappings/experimental"
             stable.mkdir(parents=True)
             experimental.mkdir(parents=True)

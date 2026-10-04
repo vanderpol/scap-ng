@@ -1,0 +1,112 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "linux.rpmverifypackage",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/linux-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+    "test": "rpmverifypackage_test",
+    "object": "rpmverifypackage_object",
+    "state": "rpmverifypackage_state",
+    "item": "rpmverifypackage_item"
+  },
+  "native": {
+    "selector_map": {
+      "name": "name",
+      "epoch": "epoch",
+      "version": "version",
+      "release": "release",
+      "arch": "arch"
+    },
+    "object_selector_alternatives": [
+      [
+        "name",
+        "epoch",
+        "version",
+        "release",
+        "arch"
+      ]
+    ],
+    "collection_parameters": {
+      "skip_dependencies": {
+        "type": "boolean",
+        "required": true,
+        "description": "Whether RPM dependency verification is skipped; importers materialize OVAL nodeps, default false."
+      },
+      "skip_scripts": {
+        "type": "boolean",
+        "required": true,
+        "description": "Whether RPM verification scripts are skipped; importers materialize OVAL noscripts, default false."
+      }
+    },
+    "state_field_map": {
+      "name": "name",
+      "epoch": "epoch",
+      "version": "version",
+      "release": "release",
+      "arch": "arch",
+      "extended_name": "extended_name",
+      "dependency_check_passed": "dependency_check_passed",
+      "verification_script_successful": "verification_script_successful"
+    },
+    "field_datatypes": {
+      "name": [
+        "string"
+      ],
+      "epoch": [
+        "string",
+        "integer"
+      ],
+      "version": [
+        "string",
+        "version"
+      ],
+      "release": [
+        "string",
+        "version"
+      ],
+      "arch": [
+        "string"
+      ],
+      "extended_name": [
+        "string"
+      ],
+      "dependency_check_passed": [
+        "boolean"
+      ],
+      "verification_script_successful": [
+        "boolean"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "rpmverifypackage": "linux.rpmverifypackage"
+    },
+    "deprecated": {
+      "nodigest": "migration_error_deprecated",
+      "nosignature": "migration_error_deprecated",
+      "digest_check_passed": "migration_error_deprecated",
+      "signature_check_passed": "migration_error_deprecated"
+    },
+    "behaviors": {
+      "nodeps": "collect.skip_dependencies",
+      "noscripts": "collect.skip_scripts"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "linux.rpmverifypackage.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability linux.rpmverifypackage."
+    },
+    {
+      "id": "linux.rpmverifypackage.materialized_behaviors",
+      "rule": "Direct native Objects explicitly carry every non-deprecated verification switch; importers SHALL materialize OVAL default false values."
+    },
+    {
+      "id": "linux.rpmverifypackage.skipped_results",
+      "rule": "dependency_check_passed is absent when dependency verification is skipped; verification_script_successful is absent when verification scripts are skipped."
+    }
+  ]
+}

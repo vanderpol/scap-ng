@@ -74,6 +74,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -162,11 +164,14 @@ jobs:
           python tools/test_current_authoring_contract.py
           python tools/test_full_review_contract.py
           python tools/test_tailoring_example.py
+      - name: Validate 0.2.0 promotion invariants
+        run: python tools/test_schema_v02_promotion.py
+
       - name: Generate reviewed capability schema slice
         run: |
           mkdir -p work/generated-capability-schemas
           python tools/generate_capability_schema.py \
-            --mapping schema/v0.1.0/capability-mappings/unix.file.json \
+            --mapping schema/v0.2.0/capability-mappings/supported/unix.file.json \
             --output work/generated-capability-schemas/unix.file.schema.json
           python -m json.tool work/generated-capability-schemas/unix.file.schema.json > /dev/null
 

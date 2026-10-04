@@ -80,11 +80,43 @@ def _translate(mapping: dict, group: str, value):
     return value
 
 
+def _normalize_legacy_literal(value, datatype):
+    """Convert XML lexical scalar values to native JSON/YAML scalar types."""
+    if isinstance(value, dict):
+        return copy.deepcopy(value)
+    if datatype == "boolean":
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"true", "1"}:
+                return True
+            if normalized in {"false", "0"}:
+                return False
+        raise ValueError(f"invalid legacy boolean literal: {value!r}")
+    if datatype == "integer":
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return int(value, 10)
+        raise ValueError(f"invalid legacy integer literal: {value!r}")
+    if datatype == "float":
+        if isinstance(value, bool):
+            raise ValueError(f"invalid legacy float literal: {value!r}")
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            return float(value)
+        raise ValueError(f"invalid legacy float literal: {value!r}")
+    return copy.deepcopy(value)
+
+
 def _native_scalar_predicate(payload: dict, mapping: dict, *, record_field=False):
+    datatype = _translate(mapping,"datatype",payload.get("datatype","string"))
     out={
-        "value": copy.deepcopy(payload.get("value")),
+        "value": _normalize_legacy_literal(payload.get("value"), datatype),
         "operation": _translate(mapping,"operation",payload.get("operation","equals")),
-        "datatype": _translate(mapping,"datatype",payload.get("datatype","string")),
+        "datatype": datatype,
         "match": _translate(mapping,"check",payload.get("entity_check","all")),
     }
     if bool(payload.get("mask",False)):
@@ -108,10 +140,11 @@ def _native_object_predicate(payload: dict, mapping: dict):
     """Translate one aligned OVAL Object entity into the shared native predicate."""
     if not isinstance(payload,dict) or "value" not in payload:
         raise ValueError("native Object selector requires an entity payload with value")
+    datatype = _translate(mapping,"datatype",payload.get("datatype","string"))
     out={
-        "value":copy.deepcopy(payload.get("value")),
+        "value":_normalize_legacy_literal(payload.get("value"), datatype),
         "operation":_translate(mapping,"operation",payload.get("operation","equals")),
-        "datatype":_translate(mapping,"datatype",payload.get("datatype","string")),
+        "datatype":datatype,
     }
     if bool(payload.get("mask",False)) or bool(payload.get("redact_result",False)):
         out["redact_result"]=True
@@ -248,11 +281,14 @@ def _materialize_behavior_collection_parameters(obj: dict, mapping: dict):
     for name,spec in specs.items():
         default_key=f"behaviors.{name}"
         source_name=source_for_collect.get(name,name)
+        source_default_key=f"behaviors.{source_name}"
         if source_name in behaviors:
             collect[name]=_coerce_collection_parameter(behaviors[source_name],spec)
             consumed.add(source_name)
         elif default_key in defaults:
             collect[name]=_coerce_collection_parameter(defaults[default_key],spec)
+        elif source_default_key in defaults:
+            collect[name]=_coerce_collection_parameter(defaults[source_default_key],spec)
         elif name in source_for_collect and spec.get("required") and spec.get("type")=="boolean":
             # Reviewed OVAL behavior mappings are XSD-defaulted false unless the
             # mapping explicitly supplies a different materialized default.
@@ -330,6 +366,10 @@ def _transform_state_payload(value, mapping: dict):
         }
 
     predicate=_native_scalar_predicate(value,mapping)
+    state_value_crosswalk=(mapping.get("native") or {}).get("state_value_crosswalk") or {}
+    group=state_value_crosswalk.get(native_field)
+    if group and not isinstance(predicate.get("value"),dict):
+        predicate["value"]=_translate(mapping,group,predicate.get("value"))
     return {"field":native_field,**predicate}
 
 
@@ -371,7 +411,25 @@ def _transform_set(expression):
     return {"operator":operator,"operands":operands}
 
 
+def _native_object_record(record_value, mapping: dict):
+    fields={}
+    for field in record_value.get("record") or []:
+        name=field.get("name")
+        if not isinstance(name,str) or not name:
+            raise ValueError("record field missing name")
+        if name in fields:
+            raise ValueError(f"legacy Object record contains duplicate field {name!r}")
+        predicate=_native_object_predicate(field,mapping)
+        predicate["match"]=_translate(
+            mapping,"check",field.get("entity_check","all")
+        )
+        fields[name]=predicate
+    return {"fields":fields}
+
+
 def _extract_collector_value(source_value, mapping: dict):
+    if isinstance(source_value,dict) and bool(source_value.get("nil",False)):
+        return None
     if isinstance(source_value,dict) and "value" in source_value:
         op=source_value.get("operation","equals")
         if _translate(mapping,"operation",op) != "equal":
@@ -380,7 +438,11 @@ def _extract_collector_value(source_value, mapping: dict):
             raise ValueError(
                 "collector input redaction cannot be preserved by scalar collection-parameter lowering"
             )
-        source_value=source_value["value"]
+        datatype=_translate(mapping,"datatype",source_value.get("datatype","string"))
+        raw=source_value["value"]
+        if datatype=="record" and isinstance(raw,dict) and "record" in raw:
+            return _native_object_record(raw,mapping)
+        return _normalize_legacy_literal(raw,datatype)
     return copy.deepcopy(source_value)
 
 
@@ -417,6 +479,8 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
         selector_map=native_cfg.get("selector_map") or {}
         if isinstance(obj.get("select"),dict) and selector_map:
             renamed={}
+            enum_selectors=set((native_cfg.get("selector_value_enums") or {}).keys())
+            selector_value_crosswalk=native_cfg.get("selector_value_crosswalk") or {}
             for key,value in obj["select"].items():
                 native_key=selector_map.get(key,key)
                 if isinstance(value,dict) and bool(value.get("nil",False)):
@@ -427,11 +491,29 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
                         )
                     renamed[native_key]=None
                     continue
+                if native_key in enum_selectors:
+                    if isinstance(value,dict) and "variable" in value:
+                        renamed[native_key]=copy.deepcopy(value)
+                    elif isinstance(value,dict) and "value" in value:
+                        raw=_extract_collector_value(value,mapping)
+                        group=selector_value_crosswalk.get(native_key)
+                        renamed[native_key]=_translate(mapping,group,raw) if group else raw
+                    else:
+                        group=selector_value_crosswalk.get(native_key)
+                        renamed[native_key]=_translate(mapping,group,value) if group else copy.deepcopy(value)
+                    continue
                 renamed[native_key]=_native_object_predicate(value,mapping)
             obj["select"]=renamed
 
         _materialize_file_traversal(obj,mapping)
-        _materialize_behavior_collection_parameters(obj,mapping)
+        if isinstance(obj.get("set"),dict):
+            if obj.get("behaviors"):
+                raise ValueError(
+                    "Set Object carries unexpected capability behaviors that require explicit migration"
+                )
+            obj.pop("behaviors",None)
+        else:
+            _materialize_behavior_collection_parameters(obj,mapping)
 
         if isinstance(obj.get("set"),dict):
             obj["set"]=_transform_set(obj["set"])
@@ -450,11 +532,11 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             continue
         test["capability"]=native
         if "check_existence" in test:
-            test["existence"]=_translate(
-                mapping,"existence",test.pop("check_existence")
+            test["check_existence"]=_translate(
+                mapping,"existence",test["check_existence"]
             )
         if "check" in test:
-            test["match"]=_translate(mapping,"check",test.pop("check"))
+            test["check"]=_translate(mapping,"check",test["check"])
         if "state_operator" in test:
             legacy_operator=test.pop("state_operator")
             test["states_match"]=LOGICAL_OPERATOR.get(
@@ -503,4 +585,14 @@ def apply_ready_capability_mappings(document: dict, mapping_dir: Path) -> dict:
     result=copy.deepcopy(document)
     for mapping in ready_capability_mappings(mapping_dir):
         result=apply_capability_mapping(result,mapping)
+    assessment=result.get("assessment",result)
+    for section in ("objects","states","tests"):
+        for identity,node in (assessment.get(section) or {}).items():
+            if not isinstance(node,dict):
+                continue
+            capability=node.get("capability")
+            if capability == "windows.wmi":
+                raise ValueError(f"deprecated source capability windows.wmi at {section}.{identity}; use reviewed windows.wmi.query only for wmi57 source")
+            if capability == "independent.sqlext":
+                raise ValueError(f"nonstandard source capability independent.sqlext at {section}.{identity}; publisher extension requires source remediation")
     return result

@@ -16,7 +16,56 @@ import re
 # Pre-alpha implementation identity only. This is deliberately NOT the final
 # OVAL-successor standards name/identifier; that remains an OVAL Board decision.
 WORKING_ASSESSMENT_SPECIFICATION_ID = "scap-ng.pre-alpha.assessment"
-WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.1.0"
+WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.2.0"
+
+_NATIVE_DATATYPE_MAP = {
+    "string": "string",
+    "boolean": "boolean",
+    "int": "integer",
+    "float": "float",
+    "binary": "binary",
+    "version": "version",
+    "ipv4_address": "ipv4",
+    "ipv6_address": "ipv6",
+    "evr_string": "rpm_evr",
+    "debian_evr_string": "debian_evr",
+    "fileset_revision": "fileset_revision",
+    "ios_version": "ios_version",
+    "record": "record",
+}
+
+
+def _normalize_native_scalar_literals(value):
+    """Normalize OVAL lexical scalar datatypes/values into native JSON forms."""
+    if isinstance(value, list):
+        return [_normalize_native_scalar_literals(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+
+    out={k:_normalize_native_scalar_literals(v) for k,v in value.items()}
+    datatype=out.get("datatype")
+    if datatype in _NATIVE_DATATYPE_MAP:
+        datatype=_NATIVE_DATATYPE_MAP[datatype]
+        out["datatype"]=datatype
+        raw=out.get("value")
+        if not isinstance(raw, dict):
+            if datatype=="boolean" and isinstance(raw,str):
+                normalized=raw.strip().lower()
+                if normalized in {"true","1"}:
+                    out["value"]=True
+                elif normalized in {"false","0"}:
+                    out["value"]=False
+            elif datatype=="integer" and isinstance(raw,str):
+                try:
+                    out["value"]=int(raw,10)
+                except ValueError:
+                    pass
+            elif datatype=="float" and isinstance(raw,str):
+                try:
+                    out["value"]=float(raw)
+                except ValueError:
+                    pass
+    return out
 
 
 def _slug(value: str | None, fallback: str) -> str:
@@ -99,7 +148,7 @@ def align_assessment_vocabulary(document: dict) -> dict:
     Output uses:
     objects / states / tests / check_existence / check / state_operator.
     """
-    result = copy.deepcopy(document)
+    result = _normalize_native_scalar_literals(copy.deepcopy(document))
     assessment = result.get("assessment")
     if not isinstance(assessment, dict):
         return result

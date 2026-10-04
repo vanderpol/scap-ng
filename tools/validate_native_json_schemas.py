@@ -82,7 +82,7 @@ def classify(path: Path):
     return None
 
 
-def document_errors(v, doc):
+def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
     """Structural errors plus required semantic uniqueness of manual answers.
 
     JSON Schema uniqueItems cannot enforce uniqueness by one object property.
@@ -113,7 +113,23 @@ def document_errors(v, doc):
                 try:
                     mapping = load_mapping(capability, "0.2.0")
                 except ValueError:
+                    mapping = None
+                    if allow_unpromoted_conversion_vocabulary:
+                        from capability_registry import mappings
+                        from scap_upconvert_v003.native_capability_mapping import source_capability
+                        candidates = [
+                            candidate for candidate in mappings("0.2.0")
+                            if source_capability(candidate) == capability
+                            and not (candidate.get("native") or {}).get("post_alignment_ready", False)
+                        ]
+                        if len(candidates) == 1:
+                            continue
                     yield ValidationError(f"Unknown 0.2.0 capability: {capability}", path=["assessment", section, identity, "capability"])
+                    continue
+                if (
+                    allow_unpromoted_conversion_vocabulary
+                    and not (mapping.get("native") or {}).get("post_alignment_ready", False)
+                ):
                     continue
                 generated = generate_reporting_capability(mapping) if kind == "test" else generate(mapping, Path(__file__).resolve().parents[1], schema_version="0.2.0")
                 if kind not in generated["$defs"]:
@@ -148,11 +164,24 @@ def document_errors(v, doc):
             seen[value] = index
 
 
+def diagnostic_value(value):
+    """Return a stable JSON-safe representation for jsonschema diagnostics."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [diagnostic_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): diagnostic_value(item) for key, item in value.items()}
+    return str(value)
+
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("corpus_root",type=Path)
     ap.add_argument("--schema-dir",type=Path,required=True)
     ap.add_argument("--report",type=Path)
+    ap.add_argument("--allow-unpromoted-conversion-vocabulary", action="store_true",
+                    help="Accept lossless aligned OVAL vocabulary only for known 0.2.0 mappings not yet promoted by the legacy converter; strict native validation remains the default.")
     args=ap.parse_args()
 
     validators=build_validators(args.schema_dir)
@@ -168,7 +197,10 @@ def main():
             continue
         v=validators[schema_name]
         doc=load_yaml(path)
-        errors=sorted(document_errors(v, doc),key=lambda e:tuple(map(str,e.absolute_path)))
+        errors=sorted(document_errors(
+            v, doc,
+            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
+        ),key=lambda e:tuple(map(str,e.absolute_path)))
         results.append({
             "path":path.relative_to(args.corpus_root).as_posix(),
             "kind":kind,
@@ -176,7 +208,7 @@ def main():
             "errors":[{
                 "path":"/".join(map(str,e.absolute_path)),
                 "schema_path":"/".join(map(str,e.absolute_schema_path)),
-                "validator":e.validator,
+                "validator":diagnostic_value(e.validator),
                 "message":e.message,
                 "classification":"semantic" if e.validator == "unique_response_value" else "untriaged",
             } for e in errors[:50]],

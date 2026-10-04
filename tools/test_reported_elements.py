@@ -56,7 +56,7 @@ class ReportedElementsTests(unittest.TestCase):
 
     def test_all_capability_overlays_only_change_test_reporting(self):
         count = 0
-        for path in (ROOT / "schema/v0.1.0/capability-mappings").glob("*.json"):
+        for path in (ROOT / "schema/v0.2.0/capability-mappings/supported").glob("*.json"):
             mapping = json.loads(path.read_text())
             if "capability" not in mapping:
                 continue
@@ -69,7 +69,7 @@ class ReportedElementsTests(unittest.TestCase):
         self.assertEqual(count, 100)
 
     def test_closed_generated_test_schema_accepts_control(self):
-        mapping = json.loads((ROOT / "schema/v0.1.0/capability-mappings/unix.file.json").read_text())
+        mapping = json.loads((ROOT / "schema/v0.2.0/capability-mappings/supported/unix.file.json").read_text())
         schema = generate_reporting_capability(mapping)
         common = json.loads((ROOT / "schema/v0.2.0/capability-common.schema.json").read_text())
         registry = Registry().with_resource(common["$id"], Resource.from_contents(common))

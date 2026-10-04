@@ -226,7 +226,7 @@ def resolve_assessment(source_root: Path, rule_path: Path, ref: str) -> tuple[Pa
     return target, doc
 
 
-def validate_draft_expression_assessments(assessments):
+def validate_draft_expression_assessments(assessments, *, allow_unpromoted_conversion_vocabulary=False):
     """Validate the explicit 0.2.0 slice after dependency binding, not 0.1.0."""
     from validate_native_json_schemas import build_validators, document_errors
     from assessment_expression import AssessmentExpressionEvaluator
@@ -247,7 +247,11 @@ def validate_draft_expression_assessments(assessments):
             continue
         if validators is None:
             validators = build_validators(Path(__file__).resolve().parents[1] / "schema/v0.2.0")
-        errors = list(document_errors(validators["assessment.schema.json"], {"assessment": assessment}))
+        errors = list(document_errors(
+            validators["assessment.schema.json"],
+            {"assessment": assessment},
+            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+        ))
         if errors:
             raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
         if has_new_capability:
@@ -269,7 +273,7 @@ def validate_draft_expression_assessments(assessments):
         AssessmentExpressionEvaluator(graph)
 
 
-def compile_benchmark(source_root: Path, benchmark_dir: Path):
+def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromoted_conversion_vocabulary=False):
     benchmark_path = benchmark_dir / "benchmark.yaml"
     benchmark_doc = load_yaml(benchmark_path)
     benchmark = benchmark_doc.get("benchmark")
@@ -428,9 +432,10 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path):
     for aid in list(assessment_docs):
         close_dependencies(aid)
 
-    validate_draft_expression_assessments({
-        aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()
-    })
+    validate_draft_expression_assessments(
+        {aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()},
+        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+    )
 
     for aid, (source_path, doc) in sorted(assessment_docs.items()):
         add_object(
@@ -460,6 +465,7 @@ def write_bundle(
     *,
     sign_self_signed: bool,
     provenance: dict,
+    allow_unpromoted_conversion_vocabulary: bool = False,
 ):
     manifest = {
         "format": "scap-ng-package-manifest",
@@ -508,7 +514,11 @@ def write_bundle(
         for name, data in sorted(members.items()):
             deterministic_zip_add(zf, name, data)
 
-    verification = verify_bundle(output, verify_signature=sign_self_signed)
+    verification = verify_bundle(
+        output,
+        verify_signature=sign_self_signed,
+        allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+    )
     return {
         "benchmark_id": benchmark["id"],
         "file": output.name,
@@ -524,7 +534,12 @@ def write_bundle(
     }
 
 
-def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
+def verify_bundle(
+    package: Path,
+    *,
+    verify_signature: bool = False,
+    allow_unpromoted_conversion_vocabulary: bool = False,
+) -> dict:
     """Verify archive profile, manifest integrity and logical package references."""
     with zipfile.ZipFile(package, "r") as zf:
         infos = zf.infolist()
@@ -688,7 +703,10 @@ def verify_bundle(package: Path, *, verify_signature: bool = False) -> dict:
         for identity in assessments:
             verify_dependencies(identity)
 
-        validate_draft_expression_assessments(assessments)
+        validate_draft_expression_assessments(
+            assessments,
+            allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+        )
 
         if verify_signature and sig.get("format") == "cms-detached-der":
             verify_cms_signature(
@@ -713,6 +731,11 @@ def main() -> int:
     ap.add_argument("--sign-self-signed-test-cert", action="store_true")
     ap.add_argument("--source-revision")
     ap.add_argument("--scap-ng-revision")
+    ap.add_argument(
+        "--allow-unpromoted-conversion-vocabulary",
+        action="store_true",
+        help="Migration-only: permit known 0.2.0 mappings still using the explicit legacy conversion bridge. Strict native compilation remains the default.",
+    )
     args = ap.parse_args()
 
     source_root = _lexical_abs(args.corpus_root)
@@ -727,7 +750,11 @@ def main() -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     metrics = []
     for benchmark_dir in benchmark_dirs:
-        benchmark, members, object_index = compile_benchmark(source_root, benchmark_dir)
+        benchmark, members, object_index = compile_benchmark(
+            source_root,
+            benchmark_dir,
+            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
+        )
         filename = f"{safe_name(benchmark['id'])}.scapng"
         metrics.append(
             write_bundle(
@@ -736,6 +763,7 @@ def main() -> int:
                 members,
                 object_index,
                 sign_self_signed=args.sign_self_signed_test_cert,
+                allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
                 provenance={
                     "authoring_source_root": source_root.name,
                     "niwc_source_revision": args.source_revision,

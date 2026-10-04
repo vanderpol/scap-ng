@@ -4,9 +4,9 @@
 
 Date: 2026-10-03
 
-Status: **READY — 0.2.0 FROZEN FOR CONTENT DEVELOPMENT**.
+Status: **HOLD — superseded as a receiving baseline pending post-reconciliation main freeze.**
 
-Frozen technical baseline: `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
+Historical technical checkpoint: `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` (semantic/integration evidence only; not the current Codex starting SHA).
 
 Final freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
 
@@ -60,7 +60,7 @@ These are the current handoff gates. Complete live collector execution, full ven
 
 ## Codex content-development sequence
 
-The checkpoint above is now frozen. Give Codex the maintained task in [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md).
+Do not start Codex content development from this historical checkpoint. After the 0.2.0 version-promotion reconciliation is merged and exact-head validation is green on `main`, record the new freeze SHA and then give Codex the maintained task in [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md).
 
 The intended order is:
 

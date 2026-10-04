@@ -2,16 +2,13 @@
 
 # Codex task: SCAP-NG 0.2.0 content development and conformance corpus
 
-Status: **READY TO USE**.
+Status: **HOLD — pilot only after the exact 0.2.0 main freeze is recorded.**
 
-Frozen 0.2.0 technical baseline:
-`a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
+Frozen 0.2.0 technical baseline: **PENDING**. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting SHA; it predates the self-contained 0.2.0 version-promotion reconciliation.
 
-Freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
+Historical freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md). It remains semantic/integration evidence only.
 
-Start from that exact semantic baseline. A later documentation-only descendant
-does not change the frozen technical meaning unless an explicitly authorized
-post-freeze semantic change is recorded.
+Start only from the exact `main` SHA that replaces this PENDING marker after the 0.2.0 reconciliation PR is merged and its required validation is green. A later documentation-only descendant does not change the frozen technical meaning unless an explicitly authorized post-freeze semantic change is recorded.
 
 This task is intentionally detailed. It is content/conformance development, not language redesign and not editor development.
 
@@ -24,7 +21,7 @@ Work in `vanderpol/scap-ng`.
 Before modifying anything:
 
 - verify repository, branch and exact commit SHA;
-- confirm the frozen semantic baseline is `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`; if working from a later descendant, verify that intervening commits are documentation/handoff-only or are explicitly authorized post-freeze changes;
+- confirm this file contains a concrete post-reconciliation `main` freeze SHA rather than the PENDING marker; if it is still PENDING, stop before content work because the handoff gate has not opened;
 - read every applicable `AGENTS.md`;
 - read `START-HERE.md`;
 - read `research/iterations/003/design/CURRENT-DESIGN.md`;
@@ -37,6 +34,24 @@ Report any contradiction between the frozen checkpoint and current repository be
 Do not start by modifying schemas.
 
 Historical iteration-001 and early iteration-002 generated content is evidence, not current architecture.
+
+### Capability naming discipline
+
+Use the exact native capability names defined by the versioned 0.2.0 capability mappings. Do not derive names mechanically from OVAL Test names and do not independently strip or preserve historical numeric suffixes. Historical OVAL Test/Object/State identities remain in each mapping's durable source/migration provenance.
+
+Where a reviewed semantic rename exists, use it. In particular, OVAL `windows:wmi57_test` maps to native `windows.wmi.query`; deprecated `windows:wmi_test` is not interchangeable and must remain a migration blocker. NIWC/SCC `independent:sqlext` is publisher-extension vocabulary and is not a standard native capability. For other suffix-bearing names, use the currently mapped 0.2.0 name until a separate reviewed naming decision changes it.
+
+## Pilot-first execution gate
+
+Codex SHALL NOT begin with the full corpus described below. The first execution is a deliberately small pilot of **5–10 cases** selected to cover distinct 0.2.0 semantics and source types without maximizing volume.
+
+The pilot SHALL produce the same quality of deliverables required by the full task: native content, independent expected results, provenance, coverage/inventory records, validation commands, and captured validation evidence. It SHALL include enough variety to expose misunderstandings in schema usage, directory/naming conventions, expected-result modeling, dependency/reference handling, and source provenance.
+
+After producing the pilot, **STOP**. Do not expand, batch-convert additional content, or generalize the pilot mechanically. The pilot must first be independently reviewed against the frozen 0.2.0 schemas/specification and rerun through maintained validation by the project owner/ChatGPT workflow. Any misunderstanding found in the pilot SHALL be corrected in the pilot before scale-out.
+
+Expansion requires explicit approval after that review. Once approved, the accepted pilot files become canonical worked examples for subsequent batches. Scale-out SHALL proceed in bounded batches with validation between batches so that a minor interpretation error cannot contaminate the entire corpus.
+
+This pilot gate is normative for this handoff and overrides any later wording that could be read as permission to immediately create the full corpus.
 
 ## 2. Objective
 
@@ -77,6 +92,8 @@ Preserve meaningful SCAP 1.4 semantics without reproducing XML structure.
 ## 4. Evidence sources and their roles
 
 Use three complementary content sources.
+
+The embedded OVAL `source` metadata in versioned capability mappings is part of the durable provenance/migration crosswalk. Codex SHALL preserve it when authoring or updating native capability/content fixtures. It is not a runtime dependency and SHALL NOT be copied into native assessment instances as legacy serialization residue.
 
 ### Minimal native fixtures
 

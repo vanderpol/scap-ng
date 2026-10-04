@@ -87,7 +87,7 @@ def deprecated_test_types():
             if any(local(node.tag) == "deprecated_info" for node in child.iter()):
                 deprecated.add((target, name))
 
-    override_path = ROOT / "research" / "iterations" / "001" / "oval-test-support-overrides.json"
+    override_path = ROOT / "specification" / "migration" / "oval-test-support-overrides.json"
     if override_path.exists():
         try:
             doc = json.loads(override_path.read_text(encoding="utf-8"))
@@ -1792,7 +1792,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         elif operator == "ONE":
             expr = {"one": terms}
         elif operator == "XOR":
-            expr = {"xor": terms}
+            expr = {"odd": terms}
         else:
             return None, f"unsupported_criteria_operator:{operator}"
 

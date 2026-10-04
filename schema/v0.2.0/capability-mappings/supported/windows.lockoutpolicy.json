@@ -1,0 +1,56 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "capability": "windows.lockoutpolicy",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "lockoutpolicy_test",
+    "object": "lockoutpolicy_object",
+    "state": "lockoutpolicy_state"
+  },
+  "native": {
+    "test_source": {
+      "kind": "none"
+    },
+    "state_field_map": {
+      "force_logoff": "force_logoff",
+      "lockout_duration": "lockout_duration",
+      "lockout_observation_window": "lockout_observation_window",
+      "lockout_threshold": "lockout_threshold"
+    },
+    "field_datatypes": {
+      "force_logoff": [
+        "integer"
+      ],
+      "lockout_duration": [
+        "integer"
+      ],
+      "lockout_observation_window": [
+        "integer"
+      ],
+      "lockout_threshold": [
+        "integer"
+      ]
+    },
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "lockoutpolicy": "windows.lockoutpolicy"
+    },
+    "object": {
+      "lockoutpolicy_object": "omitted_native_singleton_system_source"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.lockoutpolicy.singleton_source",
+      "rule": "The capability evaluates the current Windows system lockout policy directly; native content SHALL NOT introduce a meaningless singleton Object."
+    },
+    {
+      "id": "windows.lockoutpolicy.nonnegative_time_values",
+      "rule": "Literal force_logoff and lockout_duration values preserve the source non-negative value constraints; variable-supplied values are checked at evaluation."
+    }
+  ]
+}

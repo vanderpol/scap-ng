@@ -8,6 +8,31 @@ Historical sections titled Iteration 002 source-only checkpoint, OVAL-aligned NG
 
 
 
+## Continuous task execution invariant
+
+This is a hard repository operating rule for ChatGPT, Codex, and other autonomous agents working an active task.
+
+- Once an agent begins an approved task, it SHALL continue executing the task through all safe, available, in-scope next steps until the task is complete or a genuine project-owner decision is required.
+- A progress/status update SHALL NOT terminate execution. After giving an update, the agent SHALL immediately continue with the next safe step.
+- A long-running CI job, external workflow, build, validation, or other wait state SHALL NOT by itself justify stopping. The agent SHALL continue useful independent or preparatory work in parallel when doing so is safe and cannot invalidate the running work, and SHALL return to the waiting gate when its result becomes available.
+- The agent SHALL NOT stop merely because a subtask completed, a checkpoint was reached, the next step is obvious, a tool call returned successfully, or additional verification remains.
+- The agent MAY stop before task completion only when a required decision, authorization, missing prerequisite, ambiguous requirement with materially different consequences, or other genuine blocker requires project-owner input. When stopping for such a blocker, the agent SHALL state the exact decision or information required.
+- If no owner decision is required, the default action is **continue executing**.
+- Completion claims SHALL describe the actual completed task and its verification state; partial progress SHALL be labeled as partial and SHALL NOT be used as a reason to end execution.
+
+## Versioned schema snapshot invariant
+
+This is a hard repository rule for every SCAP-NG schema version.
+
+- Every `schema/vX.Y.Z/` SHALL be a complete, self-contained snapshot. It SHALL NOT resolve normative schemas, capability mappings, registries, or support data from another SCAP-NG version directory.
+- Starting a new schema version SHALL copy forward the complete preceding schema surface. Unchanged files still belong physically to the new version.
+- Every JSON Schema file in a versioned schema directory SHALL carry explicit human-visible SCAP-NG version metadata matching its directory and explicit last-modified metadata. Its `$id`, where present, SHALL identify the same version.
+- Last-modified records the individual schema's last substantive modification; copy-forward alone changes version identity, not that semantic-modification date. Release/incorporation dates, when needed, are separate metadata.
+- Local `$ref` and equivalent generated references SHALL remain within the same version. Truly external standards are allowed; another `schema/vX.Y.Z/` is never an external/shared dependency.
+- Capability mappings, scope/registry data, and normative schema-support files SHALL be version-local even when byte-identical to the previous version.
+- CI SHALL recursively enforce version identity, required metadata, complete version-local dependencies, and absence of cross-version references. A version is not freeze-ready while any violation exists.
+- Version directories SHALL be directly and meaningfully diffable without hidden inheritance.
+
 ## Review-surface lifecycle invariant
 
 This is a hard repository rule.

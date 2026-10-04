@@ -26,7 +26,7 @@ from scap_upconvert_v003.native_capability_mapping import apply_ready_capability
 import yaml
 
 NATIVE_CAPABILITY_MAPPING_DIR = (
-    Path(__file__).resolve().parents[2] / "schema/v0.1.0/capability-mappings"
+    Path(__file__).resolve().parents[2] / "schema/v0.2.0/capability-mappings/supported"
 )
 
 def source_benchmark(package):
