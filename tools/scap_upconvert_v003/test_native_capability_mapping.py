@@ -141,8 +141,8 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         out=apply_capability_mapping(self.aligned_wmi_document(),self.mapping)
         test=out["assessment"]["tests"]["test-query"]
         self.assertEqual(test["capability"],"windows.wmi.query")
-        self.assertEqual(test["existence"],"some")
-        self.assertEqual(test["match"],"all")
+        self.assertEqual(test["check_existence"],"some")
+        self.assertEqual(test["check"],"all")
 
     def test_legacy_set_shape_becomes_native_operands(self):
         doc=self.aligned_wmi_document()
@@ -285,8 +285,8 @@ class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
         out=apply_capability_mapping(doc,mapping)
         self.assertNotIn("o",out["assessment"]["objects"])
         self.assertNotIn("object",out["assessment"]["tests"]["t"])
-        self.assertEqual(out["assessment"]["tests"]["t"]["existence"],"some")
-        self.assertEqual(out["assessment"]["tests"]["t"]["match"],"all")
+        self.assertEqual(out["assessment"]["tests"]["t"]["check_existence"],"some")
+        self.assertEqual(out["assessment"]["tests"]["t"]["check"],"all")
 
     def test_singleton_source_fails_closed_on_meaningful_object(self):
         mapping=self.mapping("windows.auditeventpolicysubcategories.json")
