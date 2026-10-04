@@ -449,17 +449,19 @@ def generate(mapping, repo_root, schema_version=None):
 
     object_required = ["object_title", "capability"]
 
+    existence_field = "check_existence" if version == "0.2.0" else "existence"
+    match_field = "check" if version == "0.2.0" else "match"
     test_required = [
         "test_title", "capability",
-        "existence", "match",
+        existence_field, match_field,
     ]
     test_properties = {
         "test_title": {"type": ["string", "null"]},
         "capability": {"const": capability},
-        "existence": {
+        existence_field: {
             "$ref": f"{common_capability_schema_id}#/$defs/existence_requirement"
         },
-        "match": {
+        match_field: {
             "$ref": f"{common_capability_schema_id}#/$defs/match_quantifier"
         },
         "states_match": {
