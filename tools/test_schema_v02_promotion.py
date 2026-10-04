@@ -35,7 +35,10 @@ class Version020PromotionTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             data = json.loads(text)
             Draft202012Validator.check_schema(data)
-            self.assertNotIn("https://scap-ng.dev/schema/v0.1.0/", text, path.name)\n            self.assertEqual(data.get("x-scap-ng-version"), "0.2.0", path.name)\n            self.assertRegex(data.get("x-last-modified", ""), r"^\\d{4}-\\d{2}-\\d{2}$", path.name)\n            self.assertIn("/schema/v0.2.0/", data.get("$id", ""), path.name)
+            self.assertNotIn("https://scap-ng.dev/schema/v0.1.0/", text, path.name)
+            self.assertEqual(data.get("x-scap-ng-version"), "0.2.0", path.name)
+            self.assertRegex(data.get("x-last-modified", ""), r"^\\d{4}-\\d{2}-\\d{2}$", path.name)
+            self.assertIn("/schema/v0.2.0/", data.get("$id", ""), path.name)
 
     def test_all_supported_capabilities_generate_from_020(self):
         inherited = mappings("0.2.0")
