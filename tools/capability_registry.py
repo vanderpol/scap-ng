@@ -12,7 +12,7 @@ def mapping_path(capability, version="0.2.0", root=ROOT):
     if version not in {"0.1.0", "0.2.0"}:
         raise ValueError(f"Unsupported capability specification version: {version}")
     baseline = root / "schema/v0.1.0/capability-mappings" / (capability + ".json")
-    draft = root / "schema/v0.2.0/capability-mappings" / (capability + ".json")
+    draft = root / "schema/v0.2.0/capability-mappings/experimental" / (capability + ".json")
     if draft.is_file() and baseline.is_file():
         raise ValueError(f"Draft capability must not shadow the stable mapping: {capability}")
     if version == "0.2.0" and draft.is_file():
@@ -27,13 +27,13 @@ def load_mapping(capability, version="0.2.0", root=ROOT):
     mapping = json.loads(path.read_text(encoding="utf-8"))
     if mapping.get("capability") != capability:
         raise ValueError(f"Capability mapping identity differs: {capability}")
-    if path.parent.parent.name == "v0.2.0" and mapping.get("specification_version") != "0.2.0":
+    if path.is_relative_to(root / "schema/v0.2.0") and mapping.get("specification_version") != "0.2.0":
         raise ValueError(f"Draft mapping requires explicit specification version: {capability}")
     return mapping
 
 
 def draft_capabilities(root=ROOT):
-    return frozenset(p.stem for p in (root / "schema/v0.2.0/capability-mappings").glob("*.json"))
+    return frozenset(p.stem for p in (root / "schema/v0.2.0/capability-mappings/experimental").glob("*.json"))
 
 
 def mappings(version="0.2.0", root=ROOT):
