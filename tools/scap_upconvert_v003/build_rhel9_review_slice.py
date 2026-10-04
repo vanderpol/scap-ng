@@ -87,7 +87,7 @@ def deprecated_test_types():
             if any(local(node.tag) == "deprecated_info" for node in child.iter()):
                 deprecated.add((target, name))
 
-    override_path = ROOT / "research" / "iterations" / "001" / "oval-test-support-overrides.json"
+    override_path = ROOT / "specification" / "migration" / "oval-test-support-overrides.json"
     if override_path.exists():
         try:
             doc = json.loads(override_path.read_text(encoding="utf-8"))
