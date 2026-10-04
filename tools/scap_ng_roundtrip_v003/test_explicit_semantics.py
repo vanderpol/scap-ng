@@ -109,5 +109,19 @@ class ExplicitSemanticsTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             module.build(fixture)
 
+    def test_float_lexical_forms_compare_by_value(self):
+        self.assertEqual(
+            comparator.semantic_scalar("float", "-12432.559e-3"),
+            comparator.semantic_scalar("float", "-12.432559"),
+        )
+        self.assertEqual(
+            comparator.semantic_scalar("float", "0.0"),
+            comparator.semantic_scalar("float", "-0"),
+        )
+        self.assertNotEqual(
+            comparator.semantic_scalar("float", "1.0"),
+            comparator.semantic_scalar("float", "1.0001"),
+        )
+
 if __name__ == "__main__":
     unittest.main()
