@@ -21,7 +21,7 @@ Source: OVAL-Community/SCAP-Self-Assertion at
 | [UNIX file](examples/unix-file.md) | Converted, `def:1`, criterion `tst:9` | Small Object/State/Test graph; linked result evidence | true, false, error, unknown, not_applicable |
 | [Registry](examples/registry.md) | Converted, `def:38`, criterion `tst:1020` | Reviewed hive name; case-insensitive State; exactly one satisfying Item | true, false, error |
 | [Filter](examples/filter.md) | Native; source `def:276` / `tst:451` is inspiration | Object-component and Variable chains, arithmetic, operand filter, nested intersection | true, false, error |
-| [Dependency](examples/dependency.md) | Native | Platform guard; conditional scheduling; repeated dependency reuse | All six states |
+| [Dependency](examples/dependency.md) | Native | Platform guard; conditional scheduling; repeated dependency reuse | Six guard states; false guard produces not_applicable |
 
 The table abbreviates source IDs only for reading. [Provenance](provenance/)
 records full original IDs, source versions, original-file hashes, extracted-node
