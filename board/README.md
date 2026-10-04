@@ -9,9 +9,8 @@
 3. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
 4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
 5. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37242380664/artifacts/11318411057)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
-6. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
+6. Review the **[Board proposals and votes](VOTES.md)** — one maintained index for proposal records, Discussion vote links, and the small set of current design decisions that still need new proposals.
 7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
-8. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
 
 ## Current working direction
 
@@ -55,6 +54,4 @@ The conversion goal is **semantic losslessness for supported SCAP 1.4 paths, wit
 
 ## Voting
 
-Published proposal text is versioned. React to the opening Discussion post with 👍 Yes or 👎 No; comments explain a vote. A substantive change requires a new proposal version rather than silently editing the voted text.
-
-Eligibility, quorum, voting duration, abstention/conflict handling, and official disposition still require Board agreement before reactions are binding.
+See **[Board proposals and votes](VOTES.md)** for the complete maintained proposal index, individual immutable proposal records, Discussion vote links, current proposal gaps, and voting-governance caveats.
