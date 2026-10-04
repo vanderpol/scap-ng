@@ -1,6 +1,15 @@
 # Codex task: SCAP-NG 0.2.0 content development and conformance corpus
 
-Status: **ready-to-use task after the frozen 0.2.0 checkpoint is identified**.
+Status: **READY TO USE**.
+
+Frozen 0.2.0 technical baseline:
+`a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
+
+Freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
+
+Start from that exact semantic baseline. A later documentation-only descendant
+does not change the frozen technical meaning unless an explicitly authorized
+post-freeze semantic change is recorded.
 
 This task is intentionally detailed. It is content/conformance development, not language redesign and not editor development.
 
@@ -13,7 +22,7 @@ Work in `vanderpol/scap-ng`.
 Before modifying anything:
 
 - verify repository, branch and exact commit SHA;
-- confirm the commit is the designated frozen 0.2.0 checkpoint or a descendant explicitly authorized for this task;
+- confirm the frozen semantic baseline is `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`; if working from a later descendant, verify that intervening commits are documentation/handoff-only or are explicitly authorized post-freeze changes;
 - read every applicable `AGENTS.md`;
 - read `START-HERE.md`;
 - read `research/iterations/003/design/CURRENT-DESIGN.md`;
