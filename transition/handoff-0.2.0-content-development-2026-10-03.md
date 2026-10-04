@@ -1,14 +1,14 @@
-> **Correction / hold:** Content-development handoff is temporarily blocked until the 0.2.0 version-promotion reconciliation completes and a new exact-main freeze SHA is recorded. The former a0fe3abf checkpoint remains valid semantic/integration evidence only.
+> **Current status:** 0.2.0 is frozen for bounded content/conformance development. The authoritative technical baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Automated success is evidence, not a substitute for the human-review process in `MAINTAINING.md`.
 
 # SCAP-NG 0.2.0 handoff checkpoint — content development
 
 Date: 2026-10-03
 
-Status: **HOLD — superseded as a receiving baseline pending post-reconciliation main freeze.**
+Status: **READY — bounded Codex content pilot authorized; human review required before scale-out.**
 
-Historical technical checkpoint: `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` (semantic/integration evidence only; not the current Codex starting SHA).
+Frozen technical baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Historical checkpoints remain evidence only.
 
-Final freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
+Final freeze evidence: [0.2.0-freeze-record-2026-10-04.md](0.2.0-freeze-record-2026-10-04.md).
 
 Provenance: Evidence/Audit plus owner direction. This checkpoint records the current owner-approved sequencing and bounded remaining work. It does not claim that 0.2.0 is released, Board-ratified, or target-runtime conformant.
 
@@ -60,7 +60,7 @@ These are the current handoff gates. Complete live collector execution, full ven
 
 ## Codex content-development sequence
 
-Do not start Codex content development from this historical checkpoint. After the 0.2.0 version-promotion reconciliation is merged and exact-head validation is green on `main`, record the new freeze SHA and then give Codex the maintained task in [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md).
+Start the bounded Codex pilot from frozen technical baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d` or from a documented non-semantic descendant. Use [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md). The pilot must stop for human audit before scale-out.
 
 The intended order is:
 
@@ -107,7 +107,7 @@ The editor teaches and enforces SCAP-NG; it does not define SCAP-NG.
 ## Receiving-session first action
 
 A receiving session should:
-1. read `AGENTS.md`, `START-HERE.md`, CURRENT-DESIGN and this checkpoint;
+1. read `AGENTS.md`, `BRANCH-MANAGEMENT.md`, `MAINTAINING.md`, `START-HERE.md`, CURRENT-DESIGN and this checkpoint;
 2. report exact repository/branch/SHA;
 3. verify whether the five 0.2.0 closure items above are complete at that SHA;
 4. reproduce the documented baseline validation before changing content;
