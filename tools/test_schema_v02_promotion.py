@@ -84,5 +84,14 @@ class Version020PromotionTests(unittest.TestCase):
         }
         self.assertTrue(list(document_errors(validators["assessment.schema.json"], invalid)))
 
+
+    def test_schema_diagnostics_are_json_safe(self):
+        class Sentinel:
+            def __str__(self):
+                return "<unset>"
+
+        payload = {"validator": diagnostic_value(Sentinel())}
+        self.assertEqual(json.loads(json.dumps(payload)), {"validator": "<unset>"})
+
 if __name__ == "__main__":
     unittest.main()
