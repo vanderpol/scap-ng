@@ -1,6 +1,6 @@
 # Current local conversion for SCAP-NG review
 
-Use `convert_full_review.py` with a pinned original SCAP 1.4 ZIP. The original `run_local.py` below reproduces an earlier generation path and is historical.
+Use `convert_full_review.py` with a pinned original SCAP 1.4 ZIP. For the full operator catalog, see [`../HUMAN-RUNNABLE-SCRIPTS.md`](../HUMAN-RUNNABLE-SCRIPTS.md). The original `run_local.py` section below is retained only for historical reproduction.
 
 From the repository root, using Python 3.12:
 
@@ -17,10 +17,10 @@ Structural validation can be repeated with:
 
 ```powershell
 python -m pip install jsonschema
-python tools/validate_native_json_schemas.py work/review --schema-dir schema/v0.1.0 --report work/schema-validation.json
+python tools/validate_native_json_schemas.py work/review --schema-dir schema/v0.2.0 --report work/schema-validation.json
 ```
 
-This is a maintained research command, not a finalized language implementation or proof of target-runtime equivalence. Native capability normalization is still incomplete outside the reviewed slices.
+This is the maintained local full-review conversion command for the frozen 0.2.0 review phase. It is not proof of target-runtime equivalence; unsupported or unresolved source semantics must remain explicit.
 
 ## Preserved historical instructions
 
