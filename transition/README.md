@@ -1,3 +1,6 @@
+
+> **0.2.0 reconciliation hold (2026-10-03):** The former `a0fe3abf...` freeze is reclassified as a semantic/integration checkpoint. Broad feature work was merged and tested on main, but the complete v0.2.0 authoring schema surface had not yet been promoted. Do not start the Codex content task until the version-promotion gates pass on a new exact-main SHA. See [version promotion and freeze requirements](../specification/version-promotion-and-freeze.md) and the reopened [0.2.0 freeze criteria](0.2.0-freeze-criteria-2026-10-03.md).
+
 # Current 0.2.0 handoff status
 
 The active handoff is now [SCAP-NG 0.2.0 content-development handoff](handoff-0.2.0-content-development-2026-10-03.md).
