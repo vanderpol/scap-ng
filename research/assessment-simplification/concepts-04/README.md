@@ -307,7 +307,7 @@ may reduce author effort. Unresolved: actual author comprehension, target agreem
 helper completeness/version portability, conformance cost and time saved. No
 measured advantage or new executable result is claimed by this concept wave.
 
-See [decision candidates](DECISIONS.md) and [handoff](HANDOFF.md). An initial author
+See [decision candidates](DECISIONS.md). An initial author
 trial SHOULD measure ability to write a new check, explain absent/error behavior,
 spot wrong-parent/duplicate/boundary cases and repair a policy error. Do not measure
 only source line counts. No source/schema stabilization or review-build work was
