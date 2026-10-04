@@ -40,6 +40,25 @@ class Version020PromotionTests(unittest.TestCase):
             self.assertRegex(data.get("x-last-modified", ""), r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", path.name)
             self.assertIn("/schema/v0.2.0/", data.get("$id", ""), path.name)
 
+    def test_versioned_schema_metadata_is_complete(self):
+        for path in sorted(V02.glob("*.schema.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(data.get("x-scap-ng-version"), "0.2.0", path.name)
+            self.assertRegex(data.get("x-last-modified", ""), r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", path.name)
+
+        mapping_paths = sorted((V02 / "capability-mappings" / "supported").glob("*.json"))
+        mapping_paths += sorted((V02 / "capability-mappings" / "experimental").glob("*.json"))
+        self.assertGreaterEqual(len(mapping_paths), 104)
+        for path in mapping_paths:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(data.get("specification_version"), "0.2.0", path.name)
+            self.assertRegex(data.get("last_modified", ""), r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", path.name)
+
+        for name in ("capability-scope.json", "result-field-extensions.json"):
+            data = json.loads((V02 / name).read_text(encoding="utf-8"))
+            self.assertEqual(data.get("specification_version"), "0.2.0", name)
+            self.assertRegex(data.get("last_modified", ""), r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", name)
+
     def test_all_supported_capabilities_generate_from_020(self):
         inherited = mappings("0.2.0")
         self.assertGreaterEqual(len(inherited), 100)
