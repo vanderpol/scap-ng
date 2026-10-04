@@ -59,7 +59,7 @@ class Version020PromotionTests(unittest.TestCase):
         self.assertEqual(len(inherited), scope["supported"]["expected_count"])
         self.assertFalse(inherited & experimental)
         actual_experimental = {
-            p.stem for p in (V02 / "capability-mappings").glob("*.json")
+            p.stem for p in (V02 / "capability-mappings" / "experimental").glob("*.json")
             if p.name != "README.md"
         }
         self.assertEqual(actual_experimental, experimental)
