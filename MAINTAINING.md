@@ -160,6 +160,8 @@ Keep these concepts separate:
 
 No one status implies the others.
 
+Large/exhaustive generated proof belongs in `vanderpol/scap-ng-evidence`, not in the maintained standards repository merely for convenience. Keep compact summaries, source pins, hashes/provenance, representative examples, and links in `scap-ng`. Before removing a generated/evidence tree from the active repository, record its source commit/path, copy it to a stable evidence-run location, verify bytes/hashes, update references, and run dependency/link/regression checks. Git history and the preserved pre-rebaseline tag remain recovery sources.
+
 ## 0.2.0 maintenance baseline
 
 The frozen 0.2.0 technical baseline is recorded in:
