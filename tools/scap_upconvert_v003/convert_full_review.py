@@ -307,8 +307,35 @@ def main(argv=None):
             write_json(rule_list,[r['id'] for r in rs])
             status=review.main(['--input',str(args.input),'--sha256',actual_sha256,'--output',str(args.output),
                                 '--rules-file',str(rule_list),'--schema',str(args.schema)])
-            if status: raise ValueError('Assessment conversion blocked; see evidence.json')
             evidence=json.loads((args.output/'evidence.json').read_text(encoding='utf-8'))
+            if status:
+                blocked_rows=[]
+                unexpected=[]
+                for row in evidence.get('rules',[]):
+                    for assessment in row.get('assessments',[]):
+                        if assessment.get('status')!='blocked':
+                            continue
+                        unsupported=assessment.get('unsupported') or []
+                        reason=review.source_defect_features_reason(unsupported)
+                        if reason and row.get('selectors',{}).get('manual'):
+                            blocked_rows.append({
+                                'rule_id':row.get('rule_id'),
+                                'source_definition':assessment.get('source_definition'),
+                                'reason':reason,
+                                'unsupported':unsupported,
+                                'manual_assessment':row['selectors']['manual'],
+                            })
+                        else:
+                            unexpected.append({
+                                'rule_id':row.get('rule_id'),
+                                'assessment':assessment,
+                            })
+                if unexpected or not blocked_rows:
+                    raise ValueError('Assessment conversion blocked; see evidence.json')
+                evidence['source_defect_quarantine_count']=len(blocked_rows)
+                evidence['source_defect_quarantine']=blocked_rows
+                evidence['status']='converted_with_source_defect_quarantine'
+                write_json(args.output/'evidence.json',evidence)
         results={r['rule_id']:r for r in evidence['rules']}
         if args.split_root:
             app_split=args.split_root/'applicability'/'oval.xml'
