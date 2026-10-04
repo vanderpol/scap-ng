@@ -389,6 +389,20 @@ def main(argv=None):
                             'unsupported':unsupported,
                         })
                         continue
+                    defect=source_defect_features_reason(unsupported)
+                    if defect and has_manual:
+                        error=defect+":"+json.dumps(unsupported,sort_keys=True,separators=(",",":"))
+                        source_defect_selector_fallbacks.append(
+                            source_defect_fallback(selector,did,error)
+                        )
+                        result['assessments'].append({
+                            'status':'skipped_source_defect_manual_fallback',
+                            'source_definition':did,
+                            'classification':'source_content_defect',
+                            'reason':defect,
+                            'unsupported':unsupported,
+                        })
+                        continue
                     failed=True;result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported});continue
                 native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
                 if error:

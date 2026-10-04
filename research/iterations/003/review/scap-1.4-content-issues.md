@@ -78,3 +78,19 @@ When confidence is high, create or link a GitHub Issue for the content owner and
 **SCAP-NG disposition:** include `source_path` in the native canonical Item/State model so it is filterable. Preserve migration provenance noting that legacy OVAL 5.12.3 State could not express the predicate.
 
 **Upstream recommendation:** add matching `source_path` to `wuaupdatesearcher_state` in a future OVAL maintenance release (candidate 5.12.4) if the Board agrees.
+
+## SCAP14-CONTENT-003 — RHEL 9 textfilecontent54 pattern omits required pattern-match operation
+
+**Status:** confirmed; quarantined during SCAP-NG conversion  
+**Source:** pinned NIWC RHEL 9 package `U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip` at source revision `8c8e5dff860af6b1290ee9273a282db24278f8d5`; affected Rule `SV-270174`.  
+**OVAL surface:** automated OVAL checks for this Rule use `independent:textfilecontent54` pattern content without the required explicit `operation="pattern match"` semantics.
+
+**Observed:** the source pattern is authored in a form that the SCAP-NG source audit classifies as `invalid_textfilecontent54_pattern_operation`. Treating the omitted operation as the ordinary default equality operation would change the meaning of the regular-expression pattern rather than faithfully converting it.
+
+**Impact:** both automated source selectors for `SV-270174` are unsuitable for lossless automated migration. A converter that silently inserts `pattern match` would repair publisher content during conversion and hide the original defect.
+
+**SCAP-NG disposition:** quarantine the invalid automated OVAL paths, retain the verified source manual check as the usable Assessment fallback, preserve the source-defect evidence, and do not silently repair the OVAL.
+
+**Content-owner recommendation:** correct the published OVAL so the textfilecontent54 pattern entity explicitly declares the intended pattern-match operation, then revalidate the affected Definition/Test/Object graph against the authoritative OVAL 5.12.3 validation rules.
+
+**Regression:** `tools/scap_upconvert_v003/test_source_defect_quarantine.py` plus the current RHEL 9 full-source-review workflow. The full-review audit SHALL account for quarantined source selectors rather than demanding invalid automation be emitted natively.
