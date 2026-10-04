@@ -1,29 +1,26 @@
-# Draft 0.2.0 capability additions
+# SCAP-NG 0.2.0 capability mappings
 
-`esx.host_service` and `esx.host_advancedsetting` are reviewed native structural
-mappings for newly added OVAL 6.0 Tests. They describe an ESXi **host** target;
-VM and management-plane resources are separate upcoming capability groups.
+This directory is the human review entry point for the complete effective
+SCAP-NG 0.2.0 capability catalog.
 
-The mappings preserve named Object selectors, State/Item fields, Boolean
-service observations, and all simple datatypes/multiple advanced-setting Item
-values. They reuse existing shared native primitives. `specification_version`
-pins these additions to 0.2.0; they are not inserted into the stable 0.1.0 catalog.
+- **[supported/](supported/README.md)** — all 100 supported, non-deprecated
+  OVAL 5.12.3-derived capabilities. Their canonical mapping JSON remains
+  single-source under `schema/v0.1.0/capability-mappings/`, and each capability
+  is linked individually from the supported catalog. Under a 0.2.0 Assessment,
+  the generator and validator resolve them exclusively against 0.2.0 shared
+  schema/result contracts.
+- **[experimental/](experimental/README.md)** — retained 0.2.0 research mappings
+  that are not part of the supported content-development baseline. This currently
+  contains the four ESX drafts.
+- **Kubernetes OVAL 6.0 Tests** — explicitly deferred for 0.2.0; no native
+  capability mappings are present.
 
-Generate a fragment with `tools/generate_capability_schema.py --mapping <path>
---output <path>`. The 0.2.0 validation harness checks these node contracts even
-in skipped branches. Draft reporting/result helpers use the same versioned
-registry. Existing JSON mappings remain generator inputs; field descriptions
-are carried into the new JSON Schema annotations.
+The machine-readable scope is
+[`../capability-scope.json`](../capability-scope.json). The permanent
+`tools/test_schema_v02_promotion.py` regression verifies the supported count,
+the experimental inventory, schema-version isolation, and generation of every
+supported inherited capability against 0.2.0 schema IDs.
 
-[Known-result content](../../../tests/esx-host-0.2.0/README.md) and [capability
-references](../../../specification/assessment/reference/README.md) explain the
-source contract and evidence limits. No live collector, mandatory PowerCLI
-backend, OVAL 6.0 importer, or finalized 0.2.0 release is claimed.
-
-The next host slice adds `esx.host_account` and `esx.host_vib`. Account shell
-access is Boolean; VIB acceptance categories retain their exact five values.
-VIB versions and creation dates remain strings. Explicit `item_value_types`
-and `item_value_enums` restrict present observed payloads without requiring
-payloads for redacted/unavailable entities. Their opt-in generator behavior
-does not alter stable mappings. See the linked capability references and
-`tools/test_esx_identity_software_v02.py`.
+Do not infer support from physical placement alone. A capability is supported
+only when listed by the 0.2.0 scope contract and accepted by the versioned
+registry/validation gates.
