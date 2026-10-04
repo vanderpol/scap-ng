@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# 0.2.0 reconciliation exact-head validation trigger: schema promotion complete; semantics unchanged.
 # 0.2.0 freeze validation trigger: semantics unchanged; see transition freeze criteria.
 """Semantic validation that complements generated capability JSON Schemas.
 
