@@ -1,3 +1,14 @@
+## Branch management invariant
+
+Branch state is part of the durable repository record.
+
+- Read `BRANCH-MANAGEMENT.md` during repository preflight whenever branch state could affect the task.
+- Do not create a non-`main` branch without immediately recording its purpose, status, relationship to `main`, and intended disposition in `BRANCH-MANAGEMENT.md`.
+- Update that entry when the branch is merged, held/deferred, superseded, abandoned, or becomes ready to merge.
+- Before a freeze, handoff, release, or major review build, audit all non-`main` branches against `main` and resolve or explicitly classify every branch that is ahead/diverged.
+- A branch name, old green workflow, or ahead/diverged count is not proof that work belongs on `main`; inspect the actual commits/files and current project decisions.
+- Accepted work SHALL NOT be left only on an untracked branch. Deferred/historical branches SHALL NOT be merged wholesale merely to eliminate divergence.
+
 ## Repository boundary and preservation preflight
 
 Read START-HERE.md, docs/repository-policy.json, docs/repository-map.md and the current design below. Only current entry points/workflows are current generation authority. Do not select a tool merely because it is under tools/ or contains v003 in its name. Historical generation requires an explicit reproduction task and allow_historical workflow opt-in; held workflows remain held.
