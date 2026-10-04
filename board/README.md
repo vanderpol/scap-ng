@@ -7,12 +7,11 @@
 1. Read **[SCAP 1.4 → SCAP-NG: key changes](SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)**.
 2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the frozen schema set, capability mappings, validation commands, and newcomer guide are all there.
 3. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
-4. Use the **[0.2.0 review checkpoint](SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)** for scope, evidence, and open Board questions.
-5. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
-6. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37242380664/artifacts/11318411057)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
-7. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
-8. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
-9. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
+4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
+5. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37242380664/artifacts/11318411057)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
+6. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
+7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
+8. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
 
 ## Current working direction
 
@@ -29,7 +28,9 @@
 
 The technical schema baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Later commits may add Board samples, documentation, CI, or maintenance without changing that frozen schema meaning.
 
-The six converter-produced Board cases are present and validated, but still **pending human acceptance**. Schema/round-trip tests do not prove independent scanner or live-target equivalence.
+The six converter-produced Board cases are present and validated, but still **pending human acceptance**. The six-case publication commit is `8262e7e03418c229b85db6fe5cab600c9b92b8e9`; its repository-boundary, rebaseline-smoke, current-design-regression, and fast-five conversion workflows completed successfully. The frozen 0.2.0 baseline also passed broader Self-Assertion and full-corpus validation gates.
+
+These checks establish structural, conversion, and known-result evidence. They do **not** establish independent scanner equivalence, complete collector coverage, or live-target conformance. ESX/VMware and Kubernetes semantics that still need upstream guidance remain deferred rather than being guessed into the frozen design.
 
 ## Full 65-package conversion build
 
