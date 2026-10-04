@@ -16,7 +16,7 @@ import re
 # Pre-alpha implementation identity only. This is deliberately NOT the final
 # OVAL-successor standards name/identifier; that remains an OVAL Board decision.
 WORKING_ASSESSMENT_SPECIFICATION_ID = "scap-ng.pre-alpha.assessment"
-WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.1.0"
+WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.2.0"
 
 
 def _slug(value: str | None, fallback: str) -> str:
