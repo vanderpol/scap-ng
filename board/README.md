@@ -1,36 +1,34 @@
 # OVAL Board review of SCAP-NG
 
-**Status:** pre-alpha working design for review. No proposal is Board-approved merely because its code, schema or CI exists.
+**Status:** SCAP-NG 0.2.0 is a frozen pre-alpha working design for human/OVAL Board review. Nothing is Board-approved merely because code, schema, examples, or CI are green.
 
-## Review in about 20 minutes
+## Start here
 
-1. Read the [visitor overview](../START-HERE.md) and [current working design](../research/iterations/003/design/CURRENT-DESIGN.md).
-2. Browse a [RHEL 9 full-review summary](../review/current/examples/rhel9-full.md), then the [Windows 11 full-review summary](../review/current/examples/windows11-full.md).
-3. Compare the [draft specification](../specification/README.md) and [OVAL-to-NG crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md). Reviewed mappings take precedence over provisional suffix-preserving inventory rows.
-4. Read the [individual yes/no proposals](proposals/README.md) and use the [published Discussion links](VOTES.md) to vote with reactions.
-5. Consult [decision reconciliation](../docs/decision-reconciliation.md) for original questions and [archives](../archive/README.md) for evidence behind earlier experiments.
+1. Read **[SCAP 1.4 → SCAP-NG: key changes](SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)**.
+2. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
+3. Use the **[0.2.0 review checkpoint](SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)** for scope, evidence, and open Board questions.
+4. Consult the detailed **[OVAL-to-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** only when deeper mapping detail is needed.
+5. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
 
-## Current direction
+## Current working direction
 
-- Benchmark → Rule → selected Assessment; no separate Policy object.
-- Authored Tests, Objects, States and Variables preserve required semantics; native capabilities share clear primitives rather than reproduce OVAL XML in JSON.
-- Publisher Profiles only disable Rules. External Tailoring may select published choices and enable/disable Rules, but cannot override publisher Parameter values. Organizational Input supplies delegated values.
-- Manual checks remain essential. Informational policy use retains Rule role while technical truth remains separate.
-- Compiled content uses logical manifest bindings and a self-contained ZIP prototype. Migration evidence stays outside executable native source.
-- Results separate policy context from Assessment execution details, with bounded evidence and explicit completeness.
+- Benchmark → Rule → Assessment; no separate Policy object.
+- Preserve used, non-deprecated OVAL semantics without reproducing OVAL XML structure.
+- Keep Test, Object, State, Variable, and Item concepts where their semantics remain useful.
+- Keep applicability explicit and authored.
+- Keep manual assessment first-class.
+- Keep migration provenance separate from executable native content.
+- Produce smaller, explainable Results with bounded evidence and explicit completeness.
+- Use a self-contained manifest-based package for compiled content.
 
-These are working requirements proposed for ratification, not announcements of a finished standard.
+## Review boundary
 
-## What is demonstrated
+The technical schema baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Later commits may add Board samples, documentation, CI, or maintenance without changing that frozen schema meaning.
 
-The [fresh pinned-corpus normalization/compiler run](https://github.com/vanderpol/scap-ng/actions/runs/37004465863) passes: 65 source packages, 25,147 documents schema-valid before normalization, 19,655 afterward, and 65 compiled bundles. Self-signed CMS experiments demonstrate mechanics, not publisher trust. Current regression CI passes on Windows and Linux; Self-Assertion evidence remains separate from production migration.
+The six converter-produced Board cases are present and validated, but still **pending human acceptance**. Schema/round-trip tests do not prove independent scanner or live-target equivalence.
 
-Representation/round-trip comparisons, structural schemas and packaging do not establish target-runtime evaluator equivalence. Full-review examples include explicit warnings, exclusions and older generic capability shapes. Final grammar, broad capability normalization, cryptographic profiles and runtime conformance remain work in progress.
+## Voting
 
-## How voting works
+Published proposal text is versioned. React to the opening Discussion post with 👍 Yes or 👎 No; comments explain a vote. A substantive change requires a new proposal version rather than silently editing the voted text.
 
-Each decision has one versioned yes/no proposition in its own GitHub Discussion. React to the opening post: 👍 Yes, 👎 No. Comments explain or clarify votes. A substantial change requires a new version and fresh votes; automation does not rewrite existing voting text or create duplicate versions.
-
-Eligibility, quorum, voting duration, abstention/conflict handling and official disposition must be approved before votes are binding. The earlier TEST-VOTE-001 connectivity topic is a test, and the historical canonical-JSON research discussion is not a vote. New concrete proposals address those directions without deleting their history.
-
-The [publication index](discussion-index.json) records Discussion URLs, proposal versions and body hashes. Its absence or a missing row means an item has not yet been successfully published. [Proposal source manifest](proposals/manifest.json).
+Eligibility, quorum, voting duration, abstention/conflict handling, and official disposition still require Board agreement before reactions are binding.
