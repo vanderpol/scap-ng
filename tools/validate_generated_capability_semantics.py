@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # 0.2.0 reconciliation exact-head validation trigger: schema promotion complete; semantics unchanged.
 # 0.2.0 freeze validation trigger: semantics unchanged; see transition freeze criteria.
+# 0.2.0 final mainline reconciliation trigger: semantics unchanged; validates promoted schema/capability layout.
 """Semantic validation that complements generated capability JSON Schemas.
 
 JSON Schema handles structural/native vocabulary constraints. This module
