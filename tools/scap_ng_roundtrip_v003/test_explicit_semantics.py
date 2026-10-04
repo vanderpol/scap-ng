@@ -102,6 +102,18 @@ class ExplicitSemanticsTests(unittest.TestCase):
             self.assertEqual(omitted, explicit_default)
             self.assertNotEqual(omitted, explicit_different)
 
+    def test_numeric_oval_lexical_aliases_compare_semantically(self):
+        self.assertEqual(comparator.semantic_scalar("int", "000500"), "500")
+        self.assertEqual(comparator.semantic_scalar("int", "+000500"), "500")
+        self.assertEqual(
+            comparator.semantic_scalar("float", "-12432.559e-3"),
+            comparator.semantic_scalar("float", "-12.432559"),
+        )
+        self.assertEqual(
+            comparator.semantic_scalar("float", "0.0"),
+            comparator.semantic_scalar("float", "-0"),
+        )
+
     def test_missing_required_existence_is_not_silently_guessed(self):
         fixture = {"id": "missing-001", "ng_semantics": {
             "checks": [{"id": "c1", "type": "unix.file", "check": "all",
