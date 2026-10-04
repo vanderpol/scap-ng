@@ -4,14 +4,11 @@
 
 Status: **HOLD — pilot only after the exact 0.2.0 main freeze is recorded.**
 
-Frozen 0.2.0 technical baseline:
-`a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
+Frozen 0.2.0 technical baseline: **PENDING**. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting SHA; it predates the self-contained 0.2.0 version-promotion reconciliation.
 
-Freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
+Historical freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md). It remains semantic/integration evidence only.
 
-Start from that exact semantic baseline. A later documentation-only descendant
-does not change the frozen technical meaning unless an explicitly authorized
-post-freeze semantic change is recorded.
+Start only from the exact `main` SHA that replaces this PENDING marker after the 0.2.0 reconciliation PR is merged and its required validation is green. A later documentation-only descendant does not change the frozen technical meaning unless an explicitly authorized post-freeze semantic change is recorded.
 
 This task is intentionally detailed. It is content/conformance development, not language redesign and not editor development.
 
@@ -24,7 +21,7 @@ Work in `vanderpol/scap-ng`.
 Before modifying anything:
 
 - verify repository, branch and exact commit SHA;
-- confirm the frozen semantic baseline is `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`; if working from a later descendant, verify that intervening commits are documentation/handoff-only or are explicitly authorized post-freeze changes;
+- confirm this file contains a concrete post-reconciliation `main` freeze SHA rather than the PENDING marker; if it is still PENDING, stop before content work because the handoff gate has not opened;
 - read every applicable `AGENTS.md`;
 - read `START-HERE.md`;
 - read `research/iterations/003/design/CURRENT-DESIGN.md`;
