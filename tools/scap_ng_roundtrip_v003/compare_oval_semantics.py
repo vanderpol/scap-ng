@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ID-independent semantic comparator for OVAL 5.12.3 stress cases."""
 from __future__ import annotations
-import argparse, collections, json
+import argparse, collections, json\nfrom decimal import Decimal, InvalidOperation
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -35,6 +35,20 @@ def semantic_scalar(datatype, value):
             return "true"
         if normalized in {"false","0"}:
             return "false"
+    if datatype=="float":
+        normalized=str(text).strip()
+        # OVAL float values are values, not lexical identities. Preserve
+        # non-finite spellings conservatively, but canonicalize ordinary
+        # decimal/exponent forms exactly so -12432.559e-3 == -12.432559.
+        if normalized in {"INF","+INF","-INF","NaN"}:
+            return normalized
+        try:
+            number=Decimal(normalized)
+        except InvalidOperation:
+            return text
+        if number.is_zero():
+            return "0"
+        return format(number.normalize(),"f")
     return text
 
 class Model:
