@@ -8,7 +8,7 @@ from jsonschema import Draft202012Validator
 from capability_registry import mappings
 from generate_capability_schema import generate
 from reported_elements import generate_reporting_capability
-from validate_native_json_schemas import build_validators, document_errors
+from validate_native_json_schemas import build_validators, diagnostic_value, document_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 V02 = ROOT / "schema/v0.2.0"
