@@ -4,6 +4,7 @@
 # 0.2.0 final mainline reconciliation trigger: semantics unchanged; validates promoted schema/capability layout.
 # 0.2.0 exact-head all-gates trigger: no semantic change.
 # 0.2.0 post-layout-fix all-gates trigger: no semantic change.
+# 0.2.0 post-registry-test-fix all-gates trigger: no semantic change.
 """Semantic validation that complements generated capability JSON Schemas.
 
 JSON Schema handles structural/native vocabulary constraints. This module
