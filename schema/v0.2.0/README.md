@@ -9,6 +9,15 @@ The reviewed OVAL 5.12.3 capability mappings are copied forward under\n`schema/v
 guidance and is not part of the supported 0.2.0 content-development scope.
 The OVAL 6.0 Kubernetes Tests are likewise deferred.
 
+## Version metadata convention
+
+Version-local JSON artifacts carry explicit human-visible version and modification metadata.
+
+- JSON Schema documents place `x-scap-ng-version` and `x-last-modified` immediately after `$id`. The `x-` prefix marks these as SCAP-NG-specific JSON Schema annotations rather than standard JSON Schema validation keywords.
+- Capability mappings and other non-schema support JSON use `specification_version` and `last_modified` near the top of the document.
+- `last_modified` records the file's last substantive or normalization change date; it is not a release date.
+- CI regression tests enforce presence, version identity, and date shape.
+
 Read the [Assessment author and assessor reference](../../specification/assessment/reference/README.md)
 for shared behavior and examples. Structural/schema and synthetic known-result
 validation do not establish live collector conformance.
