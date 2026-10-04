@@ -9,11 +9,11 @@
       "synthetic": true,
       "input": {
         "objects": {
-          "a": {
+          "primary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "a",
+                "id": "item-primary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -33,11 +33,11 @@
               }
             ]
           },
-          "b": {
+          "secondary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "b",
+                "id": "item-secondary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -57,11 +57,11 @@
               }
             ]
           },
-          "c": {
+          "extra-candidate-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "c",
+                "id": "item-extra-candidate-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -81,11 +81,11 @@
               }
             ]
           },
-          "reference": {
+          "owner-reference-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "reference",
+                "id": "item-owner-reference-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -110,44 +110,44 @@
       "expected": {
         "outcome": "true",
         "test_outcomes": {
-          "board.filter:test-one": "true"
+          "board.filter:test-one-filtered-file": "true"
         },
         "resolved_variables": {
           "reference-uid": [
             1000
           ],
-          "increment": [
+          "uid-step": [
             1
           ],
-          "next-uid": [
+          "first-excluded-uid": [
             1001
           ],
-          "offsets": [
+          "uid-band-offsets": [
             0,
             1
           ],
-          "owner-band": [
+          "excluded-owner-uids": [
             1001,
             1002
           ],
-          "exclusion-values": [
+          "filter-owner-uids": [
             1001,
             1002
           ]
         }
       },
-      "rationale": "Union produces a,b,c; exclude removes computed UID-band Items b,c (1001,1002). Exactly a survives. The nested right-hand union is {a,b}; intersection is applied after the left operand filter."
+      "rationale": "candidate-files unions the primary, secondary and extra Items. The owner-in-excluded-band filter excludes secondary and extra (1001,1002), leaving primary. Intersection with the nested target pair retains primary; exactly-one existence is true."
     },
     {
       "id": "two-root-files",
       "synthetic": true,
       "input": {
         "objects": {
-          "a": {
+          "primary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "a",
+                "id": "item-primary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -167,11 +167,11 @@
               }
             ]
           },
-          "b": {
+          "secondary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "b",
+                "id": "item-secondary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -191,11 +191,11 @@
               }
             ]
           },
-          "c": {
+          "extra-candidate-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "c",
+                "id": "item-extra-candidate-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -215,11 +215,11 @@
               }
             ]
           },
-          "reference": {
+          "owner-reference-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "reference",
+                "id": "item-owner-reference-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -244,44 +244,44 @@
       "expected": {
         "outcome": "false",
         "test_outcomes": {
-          "board.filter:test-one": "false"
+          "board.filter:test-one-filtered-file": "false"
         },
         "resolved_variables": {
           "reference-uid": [
             1000
           ],
-          "increment": [
+          "uid-step": [
             1
           ],
-          "next-uid": [
+          "first-excluded-uid": [
             1001
           ],
-          "offsets": [
+          "uid-band-offsets": [
             0,
             1
           ],
-          "owner-band": [
+          "excluded-owner-uids": [
             1001,
             1002
           ],
-          "exclusion-values": [
+          "filter-owner-uids": [
             1001,
             1002
           ]
         }
       },
-      "rationale": "a and b both survive; existence=one is false before any State comparison. The nested right-hand union is {a,b}; intersection is applied after the left operand filter."
+      "rationale": "Primary and secondary both survive owner exclusion and the target-pair intersection. Exactly-one existence is false before any Test State comparison."
     },
     {
       "id": "filter-indeterminate",
       "synthetic": true,
       "input": {
         "objects": {
-          "a": {
+          "primary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "a",
+                "id": "item-primary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -301,11 +301,11 @@
               }
             ]
           },
-          "b": {
+          "secondary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "b",
+                "id": "item-secondary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -325,11 +325,11 @@
               }
             ]
           },
-          "c": {
+          "extra-candidate-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "c",
+                "id": "item-extra-candidate-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -349,11 +349,11 @@
               }
             ]
           },
-          "reference": {
+          "owner-reference-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "reference",
+                "id": "item-owner-reference-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -378,44 +378,44 @@
       "expected": {
         "outcome": "error",
         "test_outcomes": {
-          "board.filter:test-one": "error"
+          "board.filter:test-one-filtered-file": "error"
         },
         "resolved_variables": {
           "reference-uid": [
             1000
           ],
-          "increment": [
+          "uid-step": [
             1
           ],
-          "next-uid": [
+          "first-excluded-uid": [
             1001
           ],
-          "offsets": [
+          "uid-band-offsets": [
             0,
             1
           ],
-          "owner-band": [
+          "excluded-owner-uids": [
             1001,
             1002
           ],
-          "exclusion-values": [
+          "filter-owner-uids": [
             1001,
             1002
           ]
         }
       },
-      "rationale": "UID for b is unavailable, so the filter State is unknown. Native non-Boolean filter handling makes the enclosing Object error. The nested right-hand union is {a,b}; intersection is applied after the left operand filter."
+      "rationale": "The secondary-target-file owner UID is unavailable, so owner-in-excluded-band is unknown. Native non-Boolean filter handling makes the enclosing Object error; the target-pair intersection does not hide it."
     },
     {
       "id": "outside-right-population",
       "synthetic": true,
       "input": {
         "objects": {
-          "a": {
+          "primary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "a",
+                "id": "item-primary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -435,11 +435,11 @@
               }
             ]
           },
-          "b": {
+          "secondary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "b",
+                "id": "item-secondary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -459,11 +459,11 @@
               }
             ]
           },
-          "c": {
+          "extra-candidate-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "c",
+                "id": "item-extra-candidate-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -483,11 +483,11 @@
               }
             ]
           },
-          "reference": {
+          "owner-reference-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "reference",
+                "id": "item-owner-reference-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -512,44 +512,44 @@
       "expected": {
         "outcome": "true",
         "test_outcomes": {
-          "board.filter:test-one": "true"
+          "board.filter:test-one-filtered-file": "true"
         },
         "resolved_variables": {
           "reference-uid": [
             1000
           ],
-          "increment": [
+          "uid-step": [
             1
           ],
-          "next-uid": [
+          "first-excluded-uid": [
             1001
           ],
-          "offsets": [
+          "uid-band-offsets": [
             0,
             1
           ],
-          "owner-band": [
+          "excluded-owner-uids": [
             1001,
             1002
           ],
-          "exclusion-values": [
+          "filter-owner-uids": [
             1001,
             1002
           ]
         }
       },
-      "rationale": "The Variable chain computes [1001,1002]. Exclusion leaves a,c because both have UID 0; the nested right-hand union is a,b. Intersection leaves only a, so exact-one existence is true. Applying only the filter would incorrectly yield two Items."
+      "rationale": "The Variable chain computes [1001,1002]. Exclusion leaves primary and extra because both have UID 0; the nested right-hand union contains primary and secondary. Intersection retains only primary, so exactly-one existence is true. Applying only the filter would incorrectly yield two Items."
     },
     {
       "id": "reference-acquisition-error",
       "synthetic": true,
       "input": {
         "objects": {
-          "a": {
+          "primary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "a",
+                "id": "item-primary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -569,11 +569,11 @@
               }
             ]
           },
-          "b": {
+          "secondary-target-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "b",
+                "id": "item-secondary-target-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -593,11 +593,11 @@
               }
             ]
           },
-          "c": {
+          "extra-candidate-file": {
             "flag": "complete",
             "items": [
               {
-                "id": "c",
+                "id": "item-extra-candidate-file",
                 "capability": "unix.file",
                 "status": "exists",
                 "fields": {
@@ -617,7 +617,7 @@
               }
             ]
           },
-          "reference": {
+          "owner-reference-file": {
             "flag": "error",
             "items": []
           }
@@ -626,10 +626,10 @@
       "expected": {
         "outcome": "error",
         "test_outcomes": {
-          "board.filter:test-one": "error"
+          "board.filter:test-one-filtered-file": "error"
         }
       },
-      "rationale": "The independently collected reference Object errors. UID extraction and downstream arithmetic/Variable components cannot supply expected values. The filter cannot classify candidates and the enclosing collection/Test stays error; the unrelated right-hand union must not turn it into successful empty selection."
+      "rationale": "owner-reference-file collection errors. UID extraction and downstream arithmetic/Variable components cannot supply expected values. The filter cannot classify candidates and the enclosing collection/Test stays error; the unrelated target-pair union must not turn it into successful empty selection."
     }
   ]
 }

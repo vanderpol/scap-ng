@@ -335,7 +335,7 @@ class BoardSamples(unittest.TestCase):
         case = json.loads((PACKAGE/'expected/concat.json').read_text())['cases'][1]
         result, model = run_case(self.sources, 'concat', case)
         self.assertEqual(result['outcome'], 'false')
-        self.assertEqual(model.variables[('board.concat','joined')][1], ['abc123','abc456','xyz123','xyz456'])
+        self.assertEqual(model.variables[('board.concat','combined-values')][1], ['abc123','abc456','xyz123','xyz456'])
 
     def test_inventory_and_pinned_extract_hashes(self):
         self.assertEqual(len(self.manifest['samples']), 7)
@@ -427,7 +427,7 @@ class BoardSamples(unittest.TestCase):
         missing['board.dependency']['evaluate']['else'] = {'test':'test-missing'}
         with self.assertRaises(ContentError): AssessmentExpressionEvaluator(missing)
         doc = {'assessment':copy.deepcopy(self.sources['board.constants'])}
-        doc['assessment']['states']['nine']['state']['value'] = '9'
+        doc['assessment']['states']['equals-nine']['state']['value'] = '9'
         diagnostics = validate_assessment_capability_semantics(doc)
         self.assertTrue(any(row['code'] == 'assessment.native_literal_datatype' for row in diagnostics), diagnostics)
 

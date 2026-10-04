@@ -10,8 +10,8 @@ to be covered. The extract retains the selected criterion's complete closure.
 
 Before: Test → Object `obj:793` → local Variable `var:885` → concat of `var:443`
 and `var:711`; State `ste:796` compares with expected Variable `var:322`.
-After: `test-concat → joined → concat(letters, digits)` and State `one-match`
-compares with `expected`. The direct Test removes only the Variable Object wrapper.
+After: `test-combined-values → combined-values → concat(prefixes, suffixes)` and State `matches-one-expected-value`
+compares with `expected-combinations`. The direct Test removes only the Variable Object wrapper.
 
 | Prefix | Suffix | Derived value |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ it does not replace this inner `all` across the Variable Item's value entities.
 
 The published case is true. Replacing `def` with `xyz` yields two matches and two
 nonmatches: the Assessment is false, even though some derived values are correct.
-The zero-value case is a separate native edge variant: `letters` becomes a local
+The zero-value case is a separate native edge variant: `prefixes` becomes a local
 Variable extracting `name` from a named exact-file Object whose collection
 confirms absence. No Items means zero extracted values; concat produces zero
 values, and the direct Test errors before comparison. It does not assume an

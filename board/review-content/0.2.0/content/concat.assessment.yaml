@@ -9,29 +9,29 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   variables:
-    letters:
+    prefixes:
       variable_title: Two prefixes
       kind: constant
       datatype: string
       value:
       - abc
       - def
-    digits:
+    suffixes:
       variable_title: Two suffixes
       kind: constant
       datatype: string
       value:
       - '123'
       - '456'
-    joined:
+    combined-values:
       variable_title: Cartesian concatenation
       kind: local
       datatype: string
       expression:
         concat:
-        - variable: letters
-        - variable: digits
-    expected:
+        - variable: prefixes
+        - variable: suffixes
+    expected-combinations:
       variable_title: Four expected strings
       kind: constant
       datatype: string
@@ -41,7 +41,7 @@ assessment:
       - def123
       - def456
   states:
-    one-match:
+    matches-one-expected-value:
       state_title: Each produced value matches exactly one expected value
       capability: variable.value
       state:
@@ -49,18 +49,18 @@ assessment:
         datatype: string
         operation: equal
         value:
-          variable: expected
+          variable: expected-combinations
         match: all
         existence: some
         variable_match: one
   tests:
-    test-concat:
+    test-combined-values:
       test_title: Compare the produced Variable values
       capability: variable.value
-      variable: joined
+      variable: combined-values
       states:
-      - one-match
+      - matches-one-expected-value
       check_existence: some
       check: any
   evaluate:
-    test: test-concat
+    test: test-combined-values

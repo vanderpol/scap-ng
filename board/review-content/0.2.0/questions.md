@@ -6,7 +6,7 @@ Status: **pending-review**. These findings do not authorize semantic changes.
 | --- | --- | --- |
 | Dependency analog declares binary `true`, compares Boolean | Probable source content defect | Original minimal closure preserved under `tests/focused-regressions/board-pilot/`; do not silently change datatype |
 | Filter analog comments imply three traversed directories, but executable Object selects one without recursion | Source content documentation defect | Preserve extract and explain actual selection; native filter sample is explicitly inspiration only |
-| Native `a → b → a` local Variable cycle receives no core semantic diagnostic | Semantic-validator defect/gap | Minimal native reproducer; pilot-local guard rejects cycles without changing shared semantics |
+| Native mutually referencing local Variable cycle receives no core semantic diagnostic | Semantic-validator defect/gap | Minimal native reproducer; pilot-local guard rejects cycles without changing shared semantics |
 | Legacy intermediate converter does not supply a strict native direct-Variable 0.2.0 authoring path | Converter limitation (documented legacy bridge) | Minimal constant-source reproducer; Board conversions are explicit manual transcriptions, no converter/schema edits |
 
 Expected OVAL behavior follows typed Variable value and comparison contracts;

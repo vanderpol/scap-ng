@@ -9,20 +9,20 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   variables:
-    a:
-      variable_title: A depends on B
+    left-cycle-value:
+      variable_title: Left cycle value depends on right cycle value
       kind: local
       datatype: integer
       expression:
-        variable: b
-    b:
-      variable_title: B depends on A
+        variable: right-cycle-value
+    right-cycle-value:
+      variable_title: Right cycle value depends on left cycle value
       kind: local
       datatype: integer
       expression:
-        variable: a
+        variable: left-cycle-value
   states:
-    nine:
+    equals-nine:
       state_title: Exactly 9
       capability: variable.value
       state:
@@ -36,9 +36,9 @@ assessment:
     test-cycle:
       test_title: Invalid cycle source
       capability: variable.value
-      variable: a
+      variable: left-cycle-value
       states:
-      - nine
+      - equals-nine
       check_existence: some
       check: all
   evaluate:

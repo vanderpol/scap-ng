@@ -9,7 +9,7 @@ Scope: criterion `oval:org.mitre.oval.test:tst:1020` within Definition
 `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion`.
 
 Before: Test `tst:1020` → Object `obj:1020` / State `ste:1020`.
-After: `test-address → version / address`. The versioned mapping changes the hive
+After: `test-windows-version-address → windows-version-entry / expected-version-address`. The versioned mapping changes the hive
 literal to `local_machine`. It preserves the State's case-insensitive key
 comparison as `equal_ci` and the exact name comparison as `equal`.
 

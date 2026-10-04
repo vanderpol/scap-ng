@@ -9,12 +9,12 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   variables:
-    single:
+    reference-integer:
       variable_title: One integer
       kind: constant
       datatype: integer
       value: 9
-    many:
+    candidate-integers:
       variable_title: Eight integers
       kind: constant
       datatype: integer
@@ -28,7 +28,7 @@ assessment:
       - 40
       - 48
   states:
-    nine:
+    equals-nine:
       state_title: Exactly 9
       capability: variable.value
       state:
@@ -38,7 +38,7 @@ assessment:
         value: 9
         match: all
         existence: some
-    above-seven:
+    greater-than-seven:
       state_title: Greater than 7
       capability: variable.value
       state:
@@ -49,23 +49,23 @@ assessment:
         match: all
         existence: some
   tests:
-    test-single:
+    test-reference-integer:
       test_title: Compare the single value
       capability: variable.value
-      variable: single
+      variable: reference-integer
       states:
-      - nine
+      - equals-nine
       check_existence: some
       check: all
-    test-many:
+    test-candidate-integers:
       test_title: Compare every value
       capability: variable.value
-      variable: many
+      variable: candidate-integers
       states:
-      - above-seven
+      - greater-than-seven
       check_existence: some
       check: all
   evaluate:
     all:
-    - test: test-single
-    - test: test-many
+    - test: test-reference-integer
+    - test: test-candidate-integers

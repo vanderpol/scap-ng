@@ -64,3 +64,15 @@ deprecated Test, ESX/Kubernetes expansion, editor, full STIG conversion, or
 65-benchmark NIWC run was performed. No live scanner or independent evaluator
 was run. Signing/trust, source compilation into a Benchmark package, collection
 defaults/execution and exhaustive capability conformance remain outside this pilot.
+
+## Identifier readability follow-up
+
+All seven local graphs were compared with the pilot at
+`d720d2c4103450f48574bf7f8adf2f2539cdfb68` after reversing the local identifier
+renames; they are identical apart from explanatory titles. No selector,
+comparison value, quantifier, Set/function operator or dependency identity/version
+changed. All 30 independent outcome/value expectations were retained. Native
+bindings, synthetic Item/result references and manifest hashes were updated.
+The same 12 bounded tests, seven strict schemas, presentation check and linked
+result validation apply to this revision. Exact-head Ubuntu/Windows CI and the
+maintained smoke/fast-five runs are reported with the publication commit.

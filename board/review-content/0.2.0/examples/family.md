@@ -11,8 +11,8 @@ is supported by every scanner. Its source regex does not include every family
 allowed by the broader capability vocabulary.
 
 Before: `tst:906 → obj:427` (empty singleton Object), `ste:429 → var:403`.
-After: `test-family` uses `independent.family` directly; `supported` still references
-the named `families` Variable. The reviewed mapping removes only the meaningless
+After: `test-system-family` uses `independent.family` directly; `family-matches-pattern` still references
+the named `family-pattern` Variable. The reviewed mapping removes only the meaningless
 singleton Object, not the comparison or its Variable dependency.
 
 `unix` matches; the valid vocabulary value `undefined` does not. An acquisition

@@ -10,23 +10,33 @@ describe three directories, but `obj:189` selects `/opt/support/txt` with nil
 filename and `recurse_direction="none"`; `max_depth="-1"` does not turn recursion
 on. Executable selection is authority, rather than the misleading comments.
 
-The native example selects four explicit paths with `filesystem: local`: files
-`a`, `b`, `c`, and an independent `reference` file. There is no traversal or
-shellcommand. The reference file supplies the observed UID; it is not an
-Organizational Input and cannot change which Tests execute.
+The Object IDs describe their collection roles; they do not imply that an
+observed owner already satisfies a requirement. The literal fixture paths stay
+unchanged so this revision changes naming alone.
+
+| Object ID | Exact selected path | Role |
+| --- | --- | --- |
+| `primary-target-file` | `/fixture/a` | First member of the target-file pair |
+| `secondary-target-file` | `/fixture/b` | Second member of the target-file pair |
+| `extra-candidate-file` | `/fixture/c` | Candidate outside that pair; exercises intersection |
+| `owner-reference-file` | `/fixture/reference` | Supplies the observed UID for the Variable chain |
+
+All four selectors use `filesystem: local`. There is no traversal or
+shellcommand. The reference file supplies an observation, not an Organizational
+Input, and cannot change which Tests execute.
 
 ```mermaid
 flowchart LR
-  reference[Reference Object UID: 1000] --> extracted[reference-uid: 1000]
-  extracted --> next[next-uid: UID + 1 = 1001]
-  next --> band[owner-band: add offsets 0,1 = 1001,1002]
-  band --> values[exclusion-values: Variable component]
-  values --> predicate[State: owner equals any band value]
-  abc[Union: a,b,c] --> filtered[Exclude matching owners]
-  predicate --> filtered
-  filtered --> remaining[Intersection]
-  ab[Nested union: a,b] --> remaining
-  remaining --> test[Exactly one Item?]
+  ownerReference[owner-reference-file: UID 1000] --> referenceUid[reference-uid: 1000]
+  referenceUid --> firstExcludedUid[first-excluded-uid: UID + uid-step = 1001]
+  firstExcludedUid --> excludedOwnerUids[excluded-owner-uids: add uid-band-offsets = 1001,1002]
+  excludedOwnerUids --> filterOwnerUids[filter-owner-uids: Variable component]
+  filterOwnerUids --> ownerPredicate[owner-in-excluded-band: compare any band value]
+  candidateFiles[candidate-files: union of primary, secondary, extra] --> filteredPopulation[Exclude matching owners]
+  ownerPredicate --> filteredPopulation
+  filteredPopulation --> filteredTargets[filtered-target-files: intersection]
+  targetPair[Nested union of primary-target-file and secondary-target-file] --> filteredTargets
+  filteredTargets --> singleFileTest[test-one-filtered-file: exactly one Item?]
 ```
 
 This deliberately exercises an Object component, four dependent local Variables,
@@ -39,17 +49,20 @@ itself would create a forbidden collection/Variable dependency cycle.
 
 `variable_match: any` compares each observed owner with either computed UID.
 The operand filter excludes matching Items **before** intersection with the
-nested union of `a` and `b`. Item identities are reused across Objects, so
-Set membership does not duplicate observations. The final Test has no State:
+nested union of `primary-target-file` and `secondary-target-file`. Item identities
+are reused across Objects, so Set membership does not duplicate observations. The final Test has no State:
 its `check_existence: one` asks whether exactly one Item survives selection.
 This sample makes no general ownership-hardening claim.
 
+In this table, primary, secondary and extra refer to the corresponding named
+file Objects above; the numbers are observed owner UIDs.
+
 | Synthetic case | Independent reasoning | Result |
 | --- | --- | --- |
-| a=0, b=1001, c=1002; reference=1000 | Exclude b,c; `{a}` intersect `{a,b}` is `{a}` | true |
-| b changed to 0 | a,b survive both operands; two Items | false |
-| b owner not collected | Filter State unknown cannot be coerced to include/exclude; filtered Object error | error |
-| c changed to 0 | a,c survive filtering; intersection removes c, leaving a | true |
+| Primary=0, secondary=1001, extra=1002; reference=1000 | Exclude secondary and extra; intersection retains primary | true |
+| Secondary changed to 0 | Primary and secondary survive both operands; two Items | false |
+| Secondary owner not collected | Filter State unknown cannot be coerced to include/exclude; filtered Object error | error |
+| Extra changed to 0 | Primary and extra survive filtering; intersection removes extra | true |
 | Reference acquisition error | Object-component error propagates through the Variable chain and filter | error |
 
 The fourth case distinguishes nested intersection from simply counting the

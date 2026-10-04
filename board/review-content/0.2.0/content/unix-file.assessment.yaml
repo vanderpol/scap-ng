@@ -9,8 +9,8 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   objects:
-    file:
-      object_title: One exact source file
+    support-build-file:
+      object_title: Support build file at the exact source path
       capability: unix.file
       select:
         full_path:
@@ -19,7 +19,7 @@ assessment:
           value: /opt/support/txt/txtfile/build.win32.txt
       filesystem: any
   states:
-    path:
+    expected-build-file-path:
       state_title: Full path equals the source path
       capability: unix.file
       state:
@@ -30,13 +30,13 @@ assessment:
         match: all
         existence: some
   tests:
-    test-path:
+    test-build-file-path:
       test_title: Compare the exact file path
       capability: unix.file
-      object: file
+      object: support-build-file
       states:
-      - path
+      - expected-build-file-path
       check_existence: some
       check: all
   evaluate:
-    test: test-path
+    test: test-build-file-path

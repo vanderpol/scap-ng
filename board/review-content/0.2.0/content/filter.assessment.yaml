@@ -9,8 +9,8 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   objects:
-    a:
-      object_title: Fixture file a
+    primary-target-file:
+      object_title: Primary target file
       capability: unix.file
       select:
         full_path:
@@ -18,8 +18,8 @@ assessment:
           operation: equal
           value: /fixture/a
       filesystem: local
-    b:
-      object_title: Fixture file b
+    secondary-target-file:
+      object_title: Secondary target file
       capability: unix.file
       select:
         full_path:
@@ -27,8 +27,8 @@ assessment:
           operation: equal
           value: /fixture/b
       filesystem: local
-    c:
-      object_title: Fixture file c
+    extra-candidate-file:
+      object_title: Additional candidate outside the target pair
       capability: unix.file
       select:
         full_path:
@@ -36,37 +36,37 @@ assessment:
           operation: equal
           value: /fixture/c
       filesystem: local
-    candidates:
-      object_title: Union of three explicit native file Objects
+    candidate-files:
+      object_title: Union of the three candidate file Objects
       capability: unix.file
       set:
         operator: union
         operands:
-        - object: a
+        - object: primary-target-file
           filters: []
-        - object: b
+        - object: secondary-target-file
           filters: []
-        - object: c
+        - object: extra-candidate-file
           filters: []
-    remaining:
-      object_title: Intersect filtered candidates with the nested a/b union
+    filtered-target-files:
+      object_title: Exclude matching owners, then intersect with the target-file pair
       capability: unix.file
       set:
         operator: intersection
         operands:
-        - object: candidates
+        - object: candidate-files
           filters:
           - action: exclude
-            state: owner-band
+            state: owner-in-excluded-band
         - set:
             operator: union
             operands:
-            - object: a
+            - object: primary-target-file
               filters: []
-            - object: b
+            - object: secondary-target-file
               filters: []
-    reference:
-      object_title: Independent UID reference file
+    owner-reference-file:
+      object_title: Independent file supplying the reference owner UID
       capability: unix.file
       select:
         full_path:
@@ -81,14 +81,14 @@ assessment:
       datatype: integer
       expression:
         values:
-          object: reference
+          object: owner-reference-file
           field: owner_uid
-    increment:
+    uid-step:
       variable_title: One UID step
       kind: constant
       datatype: integer
       value: 1
-    next-uid:
+    first-excluded-uid:
       variable_title: Reference UID plus one
       kind: local
       datatype: integer
@@ -97,15 +97,15 @@ assessment:
           operation: add
           operands:
           - variable: reference-uid
-          - variable: increment
-    offsets:
+          - variable: uid-step
+    uid-band-offsets:
       variable_title: Two positions in the exclusion band
       kind: constant
       datatype: integer
       value:
       - 0
       - 1
-    owner-band:
+    excluded-owner-uids:
       variable_title: Cartesian addition of next UID and the two offsets
       kind: local
       datatype: integer
@@ -113,16 +113,16 @@ assessment:
         arithmetic:
           operation: add
           operands:
-          - variable: next-uid
-          - variable: offsets
-    exclusion-values:
+          - variable: first-excluded-uid
+          - variable: uid-band-offsets
+    filter-owner-uids:
       variable_title: Shared Variable-component view used for each filter comparison
       kind: local
       datatype: integer
       expression:
-        variable: owner-band
+        variable: excluded-owner-uids
   states:
-    owner-band:
+    owner-in-excluded-band:
       state_title: Owner matches any computed exclusion value
       capability: unix.file
       state:
@@ -130,16 +130,16 @@ assessment:
         datatype: integer
         operation: equal
         value:
-          variable: exclusion-values
+          variable: filter-owner-uids
         variable_match: any
         match: all
         existence: some
   tests:
-    test-one:
+    test-one-filtered-file:
       test_title: Exactly one file survives
       capability: unix.file
-      object: remaining
+      object: filtered-target-files
       check_existence: one
       check: all
   evaluate:
-    test: test-one
+    test: test-one-filtered-file

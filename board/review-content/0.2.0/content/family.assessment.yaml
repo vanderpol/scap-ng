@@ -9,13 +9,13 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   variables:
-    families:
+    family-pattern:
       variable_title: Source family pattern
       kind: constant
       datatype: string
       value: (vmware_infrastructure|panos|aix|junos|aws|iosxe|ios|macos|unix|windows)
   states:
-    supported:
+    family-matches-pattern:
       state_title: Match the source pattern
       capability: independent.family
       state:
@@ -23,17 +23,17 @@ assessment:
         datatype: string
         operation: match
         value:
-          variable: families
+          variable: family-pattern
         match: all
         existence: some
         variable_match: all
   tests:
-    test-family:
+    test-system-family:
       test_title: Compare the system family
       capability: independent.family
       states:
-      - supported
+      - family-matches-pattern
       check_existence: some
       check: any
   evaluate:
-    test: test-family
+    test: test-system-family

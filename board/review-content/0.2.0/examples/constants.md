@@ -9,8 +9,8 @@ against 9 and eight integers against a strict lower bound of 7. Both Tests must
 be true. There are no external inputs or target resources.
 
 Before: each Test references a `variable_object`, which references a constant
-Variable. After: `test-single → single` and `test-many → many` use `variable.value`.
-States `nine` and `above-seven` remain separate named comparison nodes. Native
+Variable. After: `test-reference-integer → reference-integer` and `test-candidate-integers → candidate-integers` use `variable.value`.
+States `equals-nine` and `greater-than-seven` remain separate named comparison nodes. Native
 integers are numbers, not XML lexical strings. The removed Object IDs remain
 in separate provenance; an Object wrapper is not recreated for visual similarity.
 

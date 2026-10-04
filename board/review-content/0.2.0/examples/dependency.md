@@ -10,7 +10,7 @@ when that Test is true. A Windows family chooses explicit N/A. Platform
 applicability evidence remains distinct from the file configuration/resource Test.
 No Organizational Input selects Tests or injects executable content.
 
-The dependency declares its relative file path, exact logical identity
+The dependency alias `support-build-check` declares its relative file path, exact logical identity
 `board.unix-file` and revision 3. The two references in `then/all` consume one
 dependency execution for the same target/bindings. Reuse retains both references
 and the execution identity; it does not import the dependency's Items locally.

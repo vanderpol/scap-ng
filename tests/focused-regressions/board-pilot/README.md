@@ -44,8 +44,9 @@ and records original IDs separately. No converter changes are made in this task.
 ## Native local Variable cycle
 
 `variable-cycle.assessment.yaml` is an original native, schema-valid minimal
-Assessment: integer local Variable `a` references `b`, and `b` references `a`.
-A direct Variable Test consumes `a`. The settled dependency-graph requirement
+Assessment: integer local Variable `left-cycle-value` references `right-cycle-value`, and
+`right-cycle-value` references `left-cycle-value`.
+A direct Variable Test consumes `left-cycle-value`. The settled dependency-graph requirement
 rejects static cycles before execution; there is no legitimate result to guess
 by recursing, truncating the chain or treating it as an empty collection.
 

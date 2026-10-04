@@ -9,7 +9,7 @@ assessment:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
   states:
-    unix:
+    family-is-unix:
       state_title: The observed system family is UNIX
       capability: independent.family
       state:
@@ -20,25 +20,25 @@ assessment:
         match: all
         existence: some
   tests:
-    test-unix:
+    test-unix-family:
       test_title: Establish target family before invoking the file check
       capability: independent.family
       states:
-      - unix
+      - family-is-unix
       check_existence: some
       check: all
   evaluate:
     if:
-      test: test-unix
+      test: test-unix-family
     then:
       all:
-      - assessment: file
-      - assessment: file
+      - assessment: support-build-check
+      - assessment: support-build-check
     else:
       not_applicable:
         reason: This UNIX file example does not apply to the observed family
   dependencies:
-    file:
+    support-build-check:
       assessment: unix-file.assessment.yaml
       expected_id: board.unix-file
       expected_version: 3

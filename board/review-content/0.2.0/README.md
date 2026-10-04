@@ -39,6 +39,12 @@ These five conversions are manually transcribed against frozen versioned mapping
 The maintained converter's intermediate round trips are separately tested; they
 do not certify the strict native Board files. The pilot does not alter the converter.
 
+Local IDs describe the selected resource, derived values, comparison or Test
+purpose. For example, `owner-reference-file` supplies `reference-uid`, while
+`filtered-target-files` represents selection after owner exclusion and
+intersection. Object names describe collection roles without assuming a passing
+result. Names and titles are explanatory; they do not add executable semantics.
+
 All observations are **synthetic**. The bounded test helper computes Variables,
 scalar State comparisons, Test aggregation, and native nested Set/filter selection
 from supplied observations. It acquires no resources and does not execute Object

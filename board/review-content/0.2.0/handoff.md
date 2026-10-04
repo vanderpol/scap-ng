@@ -54,3 +54,19 @@ After human acceptance only, the recommended next bounded content group is
 broader Object-component extraction/status cases plus directional Set
 difference and incomplete-filter/Set flag interactions. Pin compact upstream closures and keep native
 and converted evidence distinct. Human review remains the immediate next step.
+
+## Identifier readability revision
+
+Owner feedback on 2026-10-04 requested intuitive local IDs. Starting at
+`d720d2c4103450f48574bf7f8adf2f2539cdfb68`, all seven samples were reviewed:
+Objects, Variables, States, Tests and the dependency alias now identify their
+resource/dataflow/comparison roles. Synthetic Item IDs, case references, linked
+result evidence and source-to-native bindings follow those names. Original
+Self-Assertion IDs, source extracts/hashes, selectors, literals, quantifiers and
+independent expected outcomes remain unchanged. Sample/file identities remain
+stable, and every sample remains `pending-review`.
+
+Reversing the identifier mapping reproduces each original executable Assessment
+graph exactly, apart from human titles. All 30 independent case outcomes and
+intermediate Variable values are retained. Run the bounded Board regression,
+strict native validation and presentation check described in validation.md.
