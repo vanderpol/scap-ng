@@ -1,34 +1,12 @@
 # SCAP-NG research and evidence
 
-Start with the [visitor guide](../START-HERE.md), [current design](iterations/003/design/CURRENT-DESIGN.md) or [Board review packet](../board/README.md).
+This directory preserves design rationale, experiments, generated-review evidence, and research history. It is **not** the first-visit or current-status documentation layer.
 
-- Iterations 001 and 002 were removed from the active working tree during the lossless rebaseline. Their exact trees remain available from tag `pre-rebaseline-2026-10-02` and are indexed in `archive/README.md`.
-- Iteration 003: mixed current design, current generated review candidates, earlier slices and historical source/package snapshots. Read its [status guide](iterations/003/README.md) before selecting content.
-- [Assessment simplification research handoff](assessment-simplification/README.md): 12 pinned Rule/Assessment cases and staged Codex instructions for discovering clearer, equally accurate methods. Research inputs, not accepted new syntax.
-- Datastream/vulnerability directories: retained topic research, not current implementation or source-generation acceptance evidence.
+Use [the root README](../README.md) for current navigation, [the Board review page](../board/README.md) for external review, and [CURRENT-DESIGN.md](iterations/003/design/CURRENT-DESIGN.md) when implementation/design details are required.
 
-[Complete inventory](../docs/audit/repository-inventory.tsv.gz) · [Decision reconciliation](../docs/decision-reconciliation.md) · [Archives](../archive/README.md).
+- **Iterations 001/002:** removed from the active tree during the lossless rebaseline; exact history is available from tag `pre-rebaseline-2026-10-02` and [archive/README.md](../archive/README.md).
+- **Iteration 003:** contains the current design plus dated evidence and earlier generated/review slices. Use its local status guidance before treating an artifact as current.
+- **Assessment simplification:** [research handoff](assessment-simplification/README.md) contains exploratory cases and findings; it does not define accepted syntax.
+- **Other topic directories:** retained research/evidence only unless a current specification/design page explicitly references them.
 
-Original historical introduction follows; its iteration list is not the current navigation authority.
-
----
-
-# SCAP Next Gen Research
-
-This directory preserves R&D related to the creation of the SCAP next-generation specification and is intended to help future users understand **how and why** the specification was created.
-
-Research is organized into numbered iterations so the directory root remains stable and earlier reasoning remains reviewable.
-
-## Iterations
-
-- Historical iterations 001/002 are no longer carried in the active working tree; use the preserved tag and archive index for those materials.
-
-Each iteration should preserve:
-
-- the architectural assumptions being tested;
-- prototype content and corresponding results;
-- relevant measurements/observations;
-- reviewer questions and unmodified returned feedback;
-- explicit decisions and unresolved requirements.
-
-Reusable research/conversion utilities belong in the repository-level `tools/` directory rather than being copied into every iteration.
+[Decision reconciliation](../docs/decision-reconciliation.md) · [Archives](../archive/README.md)
