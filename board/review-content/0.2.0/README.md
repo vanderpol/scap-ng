@@ -130,16 +130,16 @@ extract's unchanged nodes/criterion scope/complete dependency closure. Offline
 full pinned-source check on Ubuntu and Windows. Output writes only six mechanical
 and refined pairs, never expected results or the supporting seeds.
 
-See [validation](validation.md), [coverage](coverage.json), [questions](questions.md)
-and [handoff](handoff.md). Pinned source notices and [MITRE terms](sources/MITRE-terms.txt)
+See [validation](validation.md), [coverage](coverage.json), and [questions](questions.md). Pinned source notices and [MITRE terms](sources/MITRE-terms.txt)
 remain. Paths are short and descriptive; LF checkout rules preserve source hashes
 on Windows. No single-letter/generic numbered native IDs or random filenames are
 used. WMI/WQL, UNIX and SCAP/OVAL are established terms, not unexplained path codes.
 
 ## Human review gate
 
-All cases remain `pending-review`. Review source fidelity, selected scope,
-quantifiers, expected results and evidence before considering canonical acceptance.
-**Stop at this pilot.** The next action is human review, not conversion of the
-remaining corpus, STIGs or editor work. No language decision is ratified by a green
-run. See the Board checkpoint, maintained content-development task and MAINTAINING.
+All six pilot cases remain `pending-review`. Review source fidelity, selected scope,
+quantifiers, expected results, and evidence before considering canonical acceptance.
+The separate 65-package conversion build is broader migration evidence; it does not
+replace human review of these small examples or ratify any language decision. See the
+[Board review page](../../README.md) for the current full-corpus artifact and
+[MAINTAINING](../../../MAINTAINING.md) for acceptance/change discipline.
