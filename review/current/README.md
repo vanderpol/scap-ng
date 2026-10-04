@@ -6,6 +6,5 @@ This directory contains only supporting summaries that are useful to reviewers b
 
 - [RHEL 9 full-review summary](examples/rhel9-full.md)
 - [Windows 11 full-review summary](examples/windows11-full.md)
-- [Full-current normalization evidence](evidence/full-current-normalization.md)
 
 Reproduction commands are documented in [Human-runnable SCAP-NG tools](../../tools/HUMAN-RUNNABLE-SCRIPTS.md). Earlier review states are indexed under [`review/iterations/`](../iterations/).
