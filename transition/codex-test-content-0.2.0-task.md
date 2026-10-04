@@ -90,6 +90,8 @@ Preserve meaningful SCAP 1.4 semantics without reproducing XML structure.
 
 Use three complementary content sources.
 
+The embedded OVAL `source` metadata in versioned capability mappings is part of the durable provenance/migration crosswalk. Codex SHALL preserve it when authoring or updating native capability/content fixtures. It is not a runtime dependency and SHALL NOT be copied into native assessment instances as legacy serialization residue.
+
 ### Minimal native fixtures
 
 Create small intentionally designed Assessments/Benchmarks that isolate one semantic feature or interaction at a time.
