@@ -8,7 +8,8 @@
 2. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
 3. Use the **[0.2.0 review checkpoint](SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)** for scope, evidence, and open Board questions.
 4. Consult the detailed **[OVAL-to-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** only when deeper mapping detail is needed.
-5. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
+5. Review the **[proposal coverage audit](PROPOSAL-COVERAGE-AUDIT.md)** for current-design gaps and stale voting questions.
+6. Review or vote on individual **[Board proposals](proposals/README.md)** through the published **[Discussion links](VOTES.md)**.
 
 ## Current working direction
 
