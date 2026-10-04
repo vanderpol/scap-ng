@@ -97,20 +97,46 @@ jobs:
               })
               shutil.rmtree(split,ignore_errors=True)
               print(name,rows[-1]["status"])
+          expected_blockers={
+              "U_MS_SQL_Server_2016_Database_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2016_Instance_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV14-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Database_V1R2_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Instance_V1R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_Windows_Server_2016_V2R8_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip":"deprecated source capability windows.wmi",
+              "U_F5_NGINX_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip":"collector input cannot use comparison semantics",
+              "U_RHEL_7_V3R15_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip":"collector input cannot use comparison semantics",
+          }
+          unexpected=[]
+          for row in rows:
+              marker=expected_blockers.get(row["artifact"])
+              if row["status"]=="blocked":
+                  if not marker or marker not in row["log_tail"]:
+                      unexpected.append(row)
+              elif marker:
+                  unexpected.append({
+                      "artifact":row["artifact"],
+                      "status":row["status"],
+                      "reason":"expected blocker disappeared; review before changing baseline",
+                  })
           report={
               "packages":len(rows),
               "generated":sum(x["status"]=="generated" for x in rows),
               "expected_deprecated_source":sum(
                   x["status"]=="expected_deprecated_source" for x in rows
               ),
-              "blocked":sum(x["status"]=="blocked" for x in rows),
+              "known_blocked":sum(
+                  x["status"]=="blocked" and x["artifact"] in expected_blockers for x in rows
+              ),
+              "unexpected_blocked":len(unexpected),
+              "expected_blockers":expected_blockers,
               "results":rows,
           }
           Path("work/blocked-package-regression.json").write_text(
               json.dumps(report,indent=2,sort_keys=True)+"\n"
           )
           print(json.dumps({k:v for k,v in report.items() if k!="results"},indent=2))
-          if report["blocked"]:
+          if unexpected:
+              print(json.dumps({"unexpected":unexpected},indent=2))
               raise SystemExit(1)
           PY
       - uses: actions/upload-artifact@v4
