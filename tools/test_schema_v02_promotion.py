@@ -54,6 +54,10 @@ class Version020PromotionTests(unittest.TestCase):
                 self.assertIn("/schema/v0.2.0/", overlay_text)
                 self.assertNotIn("/schema/v0.1.0/", overlay_text)
                 self.assertIn("reported_elements", overlay["$defs"]["test"]["properties"])
+                self.assertIn("check_existence", generated["$defs"]["test"]["required"])
+                self.assertIn("check", generated["$defs"]["test"]["required"])
+                self.assertNotIn("existence", generated["$defs"]["test"]["properties"])
+                self.assertNotIn("match", generated["$defs"]["test"]["properties"])
 
     def test_capability_scope_separates_supported_from_experimental(self):
         scope = json.loads((V02 / "capability-scope.json").read_text(encoding="utf-8"))
