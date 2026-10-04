@@ -8,6 +8,19 @@ Historical sections titled Iteration 002 source-only checkpoint, OVAL-aligned NG
 
 
 
+## Versioned schema snapshot invariant
+
+This is a hard repository rule for every SCAP-NG schema version.
+
+- Every `schema/vX.Y.Z/` SHALL be a complete, self-contained snapshot. It SHALL NOT resolve normative schemas, capability mappings, registries, or support data from another SCAP-NG version directory.
+- Starting a new schema version SHALL copy forward the complete preceding schema surface. Unchanged files still belong physically to the new version.
+- Every JSON Schema file in a versioned schema directory SHALL carry explicit human-visible SCAP-NG version metadata matching its directory and explicit last-modified metadata. Its `$id`, where present, SHALL identify the same version.
+- Last-modified records the individual schema's last substantive modification; copy-forward alone changes version identity, not that semantic-modification date. Release/incorporation dates, when needed, are separate metadata.
+- Local `$ref` and equivalent generated references SHALL remain within the same version. Truly external standards are allowed; another `schema/vX.Y.Z/` is never an external/shared dependency.
+- Capability mappings, scope/registry data, and normative schema-support files SHALL be version-local even when byte-identical to the previous version.
+- CI SHALL recursively enforce version identity, required metadata, complete version-local dependencies, and absence of cross-version references. A version is not freeze-ready while any violation exists.
+- Version directories SHALL be directly and meaningfully diffable without hidden inheritance.
+
 ## Review-surface lifecycle invariant
 
 This is a hard repository rule.
