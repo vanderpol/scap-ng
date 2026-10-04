@@ -197,7 +197,10 @@ def main():
             continue
         v=validators[schema_name]
         doc=load_yaml(path)
-        errors=sorted(document_errors(\n            v, doc,\n            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,\n        ),key=lambda e:tuple(map(str,e.absolute_path)))
+        errors=sorted(document_errors(
+            v, doc,
+            allow_unpromoted_conversion_vocabulary=args.allow_unpromoted_conversion_vocabulary,
+        ),key=lambda e:tuple(map(str,e.absolute_path)))
         results.append({
             "path":path.relative_to(args.corpus_root).as_posix(),
             "kind":kind,
