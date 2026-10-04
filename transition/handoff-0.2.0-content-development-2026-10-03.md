@@ -2,7 +2,11 @@
 
 Date: 2026-10-03
 
-Status: **handoff preparation, pending final 0.2.0 semantic closure and exact-head validation**.
+Status: **READY — 0.2.0 FROZEN FOR CONTENT DEVELOPMENT**.
+
+Frozen technical baseline: `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`.
+
+Final freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md).
 
 Provenance: Evidence/Audit plus owner direction. This checkpoint records the current owner-approved sequencing and bounded remaining work. It does not claim that 0.2.0 is released, Board-ratified, or target-runtime conformant.
 
@@ -20,14 +24,14 @@ For OVAL 6.0, focus only on genuinely **new Tests/capabilities**. Preserve the O
 
 Before handing broad content expansion to Codex, complete and record these bounded items.
 
-Current progress at the latest documentation checkpoint: items 1–4 are dispositioned. Item 2 has semantic-validator regressions and item 1 has a focused truth-table regression. Current design, schema README, coverage audit and historical ESX checkpoints have been reconciled with the deferred scope. Item 5 remains the final gate.
+All five closure items are complete for the 0.2.0 content-development freeze. Item 1 has focused truth-table regression coverage; item 2 has semantic-validator regressions; item 3 has explicit ESX/Kubernetes dispositions; item 4 is reconciled across current design/schema/coverage/history; item 5 passed exact-head CI and is recorded in the final freeze record.
 
-1. **Direct Variable zero-value semantics — DISPOSITIONED, CI EVIDENCE PENDING**
+1. **Direct Variable zero-value semantics — COMPLETE**
    - Specify the expected Test behavior when a directly tested Variable resolves to zero values.
    - Add focused positive/negative/six-state conformance cases as applicable.
    - Make the result deterministic enough that downstream content authors do not invent different interpretations.
 
-2. **Typed authored-literal policy — DISPOSITIONED/ENFORCED, CI EVIDENCE PENDING**
+2. **Typed authored-literal policy — COMPLETE**
    - Resolve the representation/validation boundary for typed authored values, especially boolean textual values such as `"false"` versus native JSON boolean `false`.
    - Define when lexical conversion is permitted and when authoring is invalid.
    - Add independent semantic/validation tests.
@@ -43,7 +47,7 @@ Current progress at the latest documentation checkpoint: items 1–4 are disposi
    - Reconcile schema/reference/result/result-package documentation and capability matrices with the final owner-approved scope.
    - Preserve 0.1.0 behavior and historical checkpoints.
 
-5. **Exact-head validation and freeze checkpoint**
+5. **Exact-head validation and freeze checkpoint — COMPLETE**
    - Follow [the explicit freeze criteria](0.2.0-freeze-criteria-2026-10-03.md); do not broaden the claim beyond those evidence layers.
    - Run the maintained schema/meta-validation, semantic validation, authoring-contract, result-package, preservation and relevant bundle/compiler tests on one exact commit.
    - Require successful Windows and Linux CI for that exact technical checkpoint.
@@ -54,7 +58,7 @@ These are the current handoff gates. Complete live collector execution, full ven
 
 ## Codex content-development sequence
 
-After the checkpoint above is frozen, give Codex the maintained task in [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md).
+The checkpoint above is now frozen. Give Codex the maintained task in [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md).
 
 The intended order is:
 
