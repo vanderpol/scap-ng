@@ -16,6 +16,12 @@ def audit(package, output):
     xr=source_benchmark(package)
     evidence=json.loads((output/'evidence.json').read_text(encoding='utf-8'))
     bindings={r['rule_id']:r for r in evidence['rules']}
+    quarantined_by_rule={}
+    for row in evidence.get('source_defect_quarantine',[]):
+        rid=row.get('rule_id')
+        did=row.get('source_definition')
+        if rid and did:
+            quarantined_by_rule.setdefault(rid,set()).add(did)
     issues=[]; comparisons=[]
     source_rules=xr.findall('.//x:Rule',NS)
     paths=list((output/'rules').glob('*.rule.yaml'))
@@ -36,6 +42,20 @@ def audit(package, output):
             + bindings[rid].get('source_defect_fallbacks',[])
         )
         fallbacks={row['selector']:row for row in fallback_rows}
+        quarantined_definitions=quarantined_by_rule.get(rid,set())
+        if quarantined_definitions:
+            for selector,check in expected.items():
+                if selector in fallbacks or check.get('system')=='http://scap.nist.gov/schema/ocil/2':
+                    continue
+                source_ref=check.find('x:check-content-ref',NS)
+                did=source_ref.get('name') if source_ref is not None else None
+                if did in quarantined_definitions:
+                    fallbacks[selector]={
+                        'selector':selector,
+                        'source_definition':did,
+                        'classification':'source_content_defect',
+                        'reason':'quarantined_source_definition',
+                    }
         expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
         if set(choices)!=expected_native: issues.append(rid+': selector set differs')
         default_fallback = fallbacks.get('default')
