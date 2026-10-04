@@ -128,6 +128,12 @@ jobs:
           Path("work/evidence").mkdir(parents=True,exist_ok=True)
           Path("work/evidence/generation-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
           print(json.dumps({k:v for k,v in summary.items() if k!="blocked_packages"},indent=2))
+          if summary["generated"] != 65 or summary["blocked"] != 0:
+              blocked_names=", ".join(x["artifact"] for x in summary["blocked_packages"])
+              raise SystemExit(
+                  f"Full review artifact requires 65/65 generated benchmarks; "
+                  f"got {summary['generated']}/65 with {summary['blocked']} blocked: {blocked_names}"
+              )
           PY
       - name: Preserve conversion output for review
         run: |
@@ -302,7 +308,6 @@ jobs:
           print(json.dumps(summary,indent=2,sort_keys=True))
           PY
       - name: Stage complete NIWC Current review artifact
-        if: always()
         run: |
           python - <<'PY'
           import json, shutil
@@ -351,7 +356,6 @@ jobs:
           PY
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: niwc-current-full-review
           path: work/niwc-current-review
