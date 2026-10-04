@@ -427,13 +427,17 @@ def _native_object_record(record_value, mapping: dict):
     return {"fields":fields}
 
 
-def _extract_collector_value(source_value, mapping: dict):
+def _extract_collector_value(source_value, mapping: dict, *, allowed_source_operations=None):
     if isinstance(source_value,dict) and bool(source_value.get("nil",False)):
         return None
     if isinstance(source_value,dict) and "value" in source_value:
         op=source_value.get("operation","equals")
-        if _translate(mapping,"operation",op) != "equal":
-            raise ValueError("collector input cannot use comparison semantics")
+        allowed=set(allowed_source_operations or ("equals",))
+        if op not in allowed:
+            raise ValueError(
+                "collector input cannot use comparison semantics: "
+                f"operation={op!r}, allowed={sorted(allowed)!r}"
+            )
         if bool(source_value.get("mask",False)) or bool(source_value.get("redact_result",False)):
             raise ValueError(
                 "collector input redaction cannot be preserved by scalar collection-parameter lowering"
@@ -464,9 +468,14 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
         if isinstance(select,dict) and collector_map:
             collect={}
             remaining={}
+            source_operations=native_cfg.get("collection_parameter_source_operations") or {}
             for key,value in select.items():
                 if key in collector_map:
-                    collect[collector_map[key]]=_extract_collector_value(value,mapping)
+                    collect[collector_map[key]]=_extract_collector_value(
+                        value,
+                        mapping,
+                        allowed_source_operations=source_operations.get(key),
+                    )
                 else:
                     remaining[key]=value
             if collect:
