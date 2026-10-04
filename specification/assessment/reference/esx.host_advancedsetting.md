@@ -50,7 +50,7 @@ implement every State operation or query VMware.
 
 ## Provenance and gaps
 
-[Mapping](../../../schema/v0.2.0/capability-mappings/esx.host_advancedsetting.json)
+[Mapping](../../../schema/v0.2.0/capability-mappings/experimental/esx.host_advancedsetting.json)
 adapts `host_advancedsetting_test/object/state/item` from [pinned XSDs](../../../third_party/oval-6.0-new-tests/README.md).
 Some source prose says `host_advancedconfig`, but the declared global names are
 `host_advancedsetting`; native identity follows the declarations. Field
