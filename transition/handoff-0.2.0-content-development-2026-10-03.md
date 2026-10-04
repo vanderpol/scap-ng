@@ -1,3 +1,5 @@
+> **Correction / hold:** Content-development handoff is temporarily blocked until the 0.2.0 version-promotion reconciliation completes and a new exact-main freeze SHA is recorded. The former a0fe3abf checkpoint remains valid semantic/integration evidence only.
+
 # SCAP-NG 0.2.0 handoff checkpoint — content development
 
 Date: 2026-10-03
