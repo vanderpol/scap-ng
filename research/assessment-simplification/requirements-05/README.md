@@ -8,8 +8,7 @@ requirements interpretation, not another XML-to-JSON assessment conversion.
 
 Receiving checkout: `vanderpol/scap-ng`, `main`,
 `c802b9dac9a0b7c846e18389c24ea417d15d7b74`, initially clean/equal to upstream.
-Current AGENTS/design/requirements/glossary/provenance and research/handoff
-instructions were consulted. No established schema, converter or review-build
+Current AGENTS/design/requirements/glossary/provenance instructions were consulted. No established schema, converter or review-build
 content was changed. `review/current/` remains the sole external review surface.
 
 ## Read the results
@@ -19,7 +18,6 @@ content was changed. `review/current/` remains the sole external review surface.
 - [Expanded examples and recommendations](RECOMMENDATIONS.md): twelve problem
   families, readable requirement sketches, adversarial acceptance cases and costs.
 - [Decision candidates](DECISIONS.md): unpublished versioned yes/no questions.
-- [Handoff](HANDOFF.md): reproducible steps, limits and the next bounded experiments.
 - Exact original requirements: [RHEL 9](evidence/rhel_9.json) and
   [Windows Server 2025](evidence/ms_windows_server_2025.json). Search `id` for a
   cited SV number; `checks[].content` retains the full original Check Text.
