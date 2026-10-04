@@ -36,11 +36,30 @@ def audit(package, output):
             + bindings[rid].get('source_defect_fallbacks',[])
         )
         fallbacks={row['selector']:row for row in fallback_rows}
-        expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
+        automated_selectors={
+            selector for selector, check in expected.items()
+            if check.get('system')!='http://scap.nist.gov/schema/ocil/2'
+        }
+        blocked_assessments=[
+            row for row in bindings[rid].get('assessments',[])
+            if row.get('status')=='blocked'
+        ]
+        fully_quarantined_automated=(
+            automated_selectors
+            and len(blocked_assessments) >= len(automated_selectors)
+            and set(choices)=={'manual'}
+        )
+        expected_native=(
+            {'manual'} if fully_quarantined_automated
+            else set(expected)-{selector for selector in fallbacks if selector!='default'}
+        )
         if set(choices)!=expected_native: issues.append(rid+': selector set differs')
         default_fallback = fallbacks.get('default')
         if 'default' not in expected:
             issues.append(rid+': source default selection is not preserved')
+        elif fully_quarantined_automated:
+            if native['default_assessment_choice']!='manual':
+                issues.append(rid+': quarantined source default did not fall back to manual')
         elif default_fallback:
             if native['default_assessment_choice'] not in choices:
                 issues.append(rid+': source-defect default fallback is unresolved')
@@ -50,6 +69,8 @@ def audit(package, output):
                                 for a in bindings[rid]['assessments']
                                 if a.get('path') and a.get('source_graph_bindings')}
         for selector,check in expected.items():
+            if fully_quarantined_automated and selector in automated_selectors:
+                continue
             if selector in fallbacks:
                 if selector!='default' and selector in choices:
                     issues.append(rid+': excluded automated selector was not skipped: '+selector)

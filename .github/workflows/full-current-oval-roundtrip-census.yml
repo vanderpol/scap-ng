@@ -135,15 +135,16 @@ jobs:
           deprecated=[]
           extensions=[]
           source_defects=[]
+          converter_limitations=[]
           bad=[]
           extension_details=set()
-          source_defect_prefixes=(
-              "invalid_oval_record_datatype",
+          converter_limitation_prefixes=(
               "test_collection_capability_mismatch:",
               "test_state_capability_mismatch:",
               "Filter capability mismatch:",
               "collection_graph_type_binding:Filter capability mismatch:",
           )
+          source_defect_prefixes=("invalid_oval_record_datatype",)
           source_defect_features={"var_ref_datatype_mismatch","invalid_textfilecontent54_pattern_operation"}
           for row in report["results"]:
               if row.get("equal"):
@@ -163,6 +164,8 @@ jobs:
                       x["detail"] for x in features
                       if x.get("feature")=="nonstandard_oval_element" and x.get("detail")
                   )
+              elif isinstance(row.get("error"),str) and row["error"].startswith(converter_limitation_prefixes):
+                  converter_limitations.append(row)
               elif isinstance(row.get("error"),str) and row["error"].startswith(source_defect_prefixes):
                   source_defects.append(row)
               elif names and names <= source_defect_features:
@@ -179,6 +182,7 @@ jobs:
               "publisher_extension_blockers":len(extensions),
               "publisher_extension_elements":sorted(extension_details),
               "source_content_defects":len(source_defects),
+              "converter_limitations":len(converter_limitations),
               "unexpected_failures":len(bad),
               "max_dependency_depth":report.get("max_dependency_depth",0),
           }
