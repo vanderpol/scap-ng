@@ -4,9 +4,9 @@
 
 Status: **READY — begin only with the 5–10 case Codex pilot defined below.**
 
-Frozen 0.2.0 technical baseline: `e7dcedfc467592fb27446f4a30c50ea82042d0fc`. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting baseline; it predates the self-contained 0.2.0 version-promotion reconciliation.
+Frozen 0.2.0 technical baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Do not use the former `a0fe3abf8605b97b0f637a9f9403c31bb329b47f` checkpoint as the Codex starting baseline; it predates the self-contained 0.2.0 version-promotion reconciliation.
 
-Historical freeze evidence: [0.2.0-freeze-record-2026-10-03.md](0.2.0-freeze-record-2026-10-03.md). It remains semantic/integration evidence only.
+Historical freeze evidence: [0.2.0-freeze-record-2026-10-04.md](0.2.0-freeze-record-2026-10-04.md). It remains semantic/integration evidence only.
 
 The frozen technical meaning is the exact `main` SHA above. Codex MAY start from a later `main` descendant only when the intervening commits are documentation/handoff-only and do not change 0.2.0 semantics. Any post-freeze semantic change requires explicit authorization and a new recorded baseline.
 
@@ -21,8 +21,9 @@ Work in `vanderpol/scap-ng`.
 Before modifying anything:
 
 - verify repository, branch and exact commit SHA;
-- confirm this file records frozen technical baseline `e7dcedfc467592fb27446f4a30c50ea82042d0fc`; verify the checked-out `main` is that commit or a documented non-semantic descendant before content work;
+- confirm this file records frozen technical baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`; verify the checked-out `main` is that commit or a documented non-semantic descendant before content work;
 - read every applicable `AGENTS.md`;
+- read `BRANCH-MANAGEMENT.md` and `MAINTAINING.md`;
 - read `START-HERE.md`;
 - read `research/iterations/003/design/CURRENT-DESIGN.md`;
 - read the current glossary, specification, requirements index, transition decisions and 0.2.0 checkpoint;
@@ -40,6 +41,10 @@ Historical iteration-001 and early iteration-002 generated content is evidence, 
 Use the exact native capability names defined by the versioned 0.2.0 capability mappings. Do not derive names mechanically from OVAL Test names and do not independently strip or preserve historical numeric suffixes. Historical OVAL Test/Object/State identities remain in each mapping's durable source/migration provenance.
 
 Where a reviewed semantic rename exists, use it. In particular, OVAL `windows:wmi57_test` maps to native `windows.wmi.query`; deprecated `windows:wmi_test` is not interchangeable and must remain a migration blocker. NIWC/SCC `independent:sqlext` is publisher-extension vocabulary and is not a standard native capability. For other suffix-bearing names, use the currently mapped 0.2.0 name until a separate reviewed naming decision changes it.
+
+## Human review gate for the pilot
+
+Read `MAINTAINING.md` before changing content. Automated validation is evidence, not acceptance. The 5–10 case pilot SHALL be returned for human audit before scale-out. Any discovered semantic ambiguity SHALL be documented as a review question/reproducer; Codex SHALL NOT resolve a materially ambiguous language-design choice merely by changing schemas or expected results until a human accepts that choice.
 
 ## Pilot-first execution gate
 
