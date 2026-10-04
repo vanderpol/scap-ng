@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """ID-independent semantic comparator for OVAL 5.12.3 stress cases."""
 from __future__ import annotations
-import argparse, collections, json\nfrom decimal import Decimal, InvalidOperation
+import argparse, collections, json
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
