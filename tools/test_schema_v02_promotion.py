@@ -52,6 +52,20 @@ class Version020PromotionTests(unittest.TestCase):
                 self.assertNotIn("/schema/v0.1.0/", overlay_text)
                 self.assertIn("reported_elements", overlay["$defs"]["test"]["properties"])
 
+    def test_capability_scope_separates_supported_from_experimental(self):
+        scope = json.loads((V02 / "capability-scope.json").read_text(encoding="utf-8"))
+        inherited = {m["capability"] for m in mappings("0.1.0")}
+        experimental = set(scope["experimental"])
+        self.assertEqual(len(inherited), scope["supported"]["expected_count"])
+        self.assertFalse(inherited & experimental)
+        actual_experimental = {
+            p.stem for p in (V02 / "capability-mappings").glob("*.json")
+            if p.name != "README.md"
+        }
+        self.assertEqual(actual_experimental, experimental)
+        self.assertEqual({row.get("source_test") for row in scope["deferred"] if row.get("source_test")},
+                         {"kubepsp_test", "kubectl_test"})
+
     def test_inherited_capability_is_deep_validated_under_020(self):
         import yaml
         validators = build_validators(V02)
