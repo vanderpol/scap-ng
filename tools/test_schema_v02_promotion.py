@@ -90,8 +90,14 @@ class Version020PromotionTests(unittest.TestCase):
             def __str__(self):
                 return "<unset>"
 
-        payload = {"validator": diagnostic_value(Sentinel())}
-        self.assertEqual(json.loads(json.dumps(payload)), {"validator": "<unset>"})
+        payload = {
+            "validator": diagnostic_value(Sentinel()),
+            "nested": diagnostic_value([Sentinel()]),
+        }
+        self.assertEqual(
+            json.loads(json.dumps(payload)),
+            {"validator": "<unset>", "nested": ["<unset>"]},
+        )
 
 if __name__ == "__main__":
     unittest.main()
