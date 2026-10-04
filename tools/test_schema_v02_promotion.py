@@ -37,7 +37,7 @@ class Version020PromotionTests(unittest.TestCase):
             Draft202012Validator.check_schema(data)
             self.assertNotIn("https://scap-ng.dev/schema/v0.1.0/", text, path.name)
             self.assertEqual(data.get("x-scap-ng-version"), "0.2.0", path.name)
-            self.assertRegex(data.get("x-last-modified", ""), r"^\\d{4}-\\d{2}-\\d{2}$", path.name)
+            self.assertRegex(data.get("x-last-modified", ""), r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", path.name)
             self.assertIn("/schema/v0.2.0/", data.get("$id", ""), path.name)
 
     def test_all_supported_capabilities_generate_from_020(self):
@@ -57,10 +57,10 @@ class Version020PromotionTests(unittest.TestCase):
 
     def test_capability_scope_separates_supported_from_experimental(self):
         scope = json.loads((V02 / "capability-scope.json").read_text(encoding="utf-8"))
-        inherited = {m["capability"] for m in mappings("0.2.0") if m["capability"] not in experimental}
         experimental = set(scope["experimental"])
-        self.assertEqual(len(inherited), scope["supported"]["expected_count"])
-        self.assertFalse(inherited & experimental)
+        supported = {m["capability"] for m in mappings("0.2.0") if m["capability"] not in experimental}
+        self.assertEqual(len(supported), scope["supported"]["expected_count"])
+        self.assertFalse(supported & experimental)
         actual_experimental = {
             p.stem for p in (V02 / "capability-mappings" / "experimental").glob("*.json")
             if p.name != "README.md"
