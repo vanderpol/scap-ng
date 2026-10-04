@@ -54,13 +54,15 @@ class EsxHostCapabilityTests(unittest.TestCase):
     def test_registry_rejects_shadowing_and_mapping_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for v in ["v0.1.0", "v0.2.0"]:
-                p = root / "schema" / v / "capability-mappings"
-                p.mkdir(parents=True)
-                (p / "esx.host_service.json").write_text('{}')
+            stable = root / "schema/v0.1.0/capability-mappings"
+            experimental = root / "schema/v0.2.0/capability-mappings/experimental"
+            stable.mkdir(parents=True)
+            experimental.mkdir(parents=True)
+            (stable / "esx.host_service.json").write_text('{}')
+            (experimental / "esx.host_service.json").write_text('{}')
             with self.assertRaises(ValueError):
                 mapping_path("esx.host_service", root=root)
-            (root / "schema/v0.1.0/capability-mappings/esx.host_service.json").unlink()
+            (stable / "esx.host_service.json").unlink()
             with self.assertRaises(ValueError):
                 load_mapping("esx.host_service", root=root)
 
