@@ -2,7 +2,7 @@
 
 Date: 2026-10-04
 
-Status: **SCHEMA DEVELOPMENT STOPPED / READY FOR HUMAN AND OVAL BOARD REVIEW**
+Status: **SCHEMA DEVELOPMENT STOPPED / BOARD PACKAGE PREPARED — SAMPLE ASSESSMENT CONTENT PENDING**
 
 Technical schema baseline:
 
@@ -16,7 +16,27 @@ This checkpoint deliberately stops further SCAP-NG 0.2.0 schema development and 
 
 The goal is not to claim that 0.2.0 is perfect. The goal is to present a coherent, tested draft that can be independently reviewed before additional language semantics are introduced.
 
-## Human-audit limitation
+## Required sample Assessment content
+
+The OVAL Board checkpoint is **not complete for delivery** until the bounded Codex pilot contributes **5–10 human-reviewable SCAP-NG 0.2.0 sample Assessments** under:
+
+`board/review-content/0.2.0/`
+
+Those samples are part of the Board checkpoint itself, not a later unrelated content-development activity.
+
+The set SHALL include:
+- native-authored examples that are easy for a human reviewer to understand;
+- converted examples that demonstrate preservation of existing OVAL semantics;
+- at least one nontrivial example using references/dependencies such as Variables, Sets, Filters, or equivalent graph behavior;
+- at least one result/evidence example showing why the Assessment reached its expected result;
+- provenance back to the original OVAL/SCAP source where converted;
+- independently stated expected results;
+- concise notes explaining what language feature each sample demonstrates.
+
+Prefer small examples over entire benchmarks. The purpose is to let Board members inspect the proposed language directly without reverse-engineering large generated content.
+
+The sample set SHALL be human-reviewed before the checkpoint is labeled ready for external Board delivery. After acceptance, these same samples SHOULD seed the canonical conformance corpus rather than being re-created independently.
+
 
 The 0.2.0 baseline has substantial automated evidence and targeted semantic review, but it has **not** received an exhaustive independent human audit of every capability and interaction.
 
@@ -117,7 +137,9 @@ This checkpoint does not claim:
 
 ## Next phase
 
-The next implementation activity is the bounded 5–10 case content/conformance pilot in:
+The immediate implementation activity is the bounded 5–10 case content/conformance pilot in:
 `transition/codex-test-content-0.2.0-task.md`
 
-That pilot must stop for human review before scale-out. Schema development remains stopped unless a focused reproducer demonstrates a genuine defect or the OVAL Board/human review accepts a required change.
+The pilot's accepted output is a **required part of this OVAL Board checkpoint** and must be staged under `board/review-content/0.2.0/` with expected results, provenance, and reviewer notes.
+
+The pilot must stop for human review before scale-out. Once the samples are accepted, update this checkpoint to **READY FOR OVAL BOARD DELIVERY**. Schema development remains stopped unless a focused reproducer demonstrates a genuine defect or the OVAL Board/human review accepts a required change.
