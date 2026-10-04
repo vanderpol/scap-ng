@@ -48,7 +48,7 @@ of `reported_elements`. No account data was collected from a real host.
 
 ## Provenance and gaps
 
-[Mapping](../../../schema/v0.2.0/capability-mappings/esx.host_account.json)
+[Mapping](../../../schema/v0.2.0/capability-mappings/experimental/esx.host_account.json)
 adapts `host_account_test/object/state/item` from the [pinned new-Test XSDs](../../../third_party/oval-6.0-new-tests/README.md).
 Descriptions also appear in generated schemas. Native syntax reuses NG
 primitives; existing 5.12.3 behavior and 0.1.0 mappings are unchanged.
