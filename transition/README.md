@@ -2,13 +2,15 @@
 
 The active handoff is now [SCAP-NG 0.2.0 content-development handoff](handoff-0.2.0-content-development-2026-10-03.md).
 
-Broad Codex content development should begin only after the five bounded 0.2.0 closure items in that checkpoint are resolved and an exact-head validation checkpoint is recorded. VMware ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 blocker. Content development precedes editor development.
+The five bounded 0.2.0 closure items are complete. The technical content-development baseline is **frozen** at `a0fe3abf8605b97b0f637a9f9403c31bb329b47f`. Exact-head smoke, Self-Assertion, Ubuntu/Windows current-design regression, and the full NIWC normalize/compile experiment all passed. See [the final freeze record](0.2.0-freeze-record-2026-10-03.md).
 
-The maintained ready-to-use Codex task is [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md). The intended authority order is specification → implementation/reference guidance → conformance content → editor.
+VMware ESX new-Test expansion is deferred pending upstream guidance and is not a 0.2.0 blocker. The two Kubernetes OVAL 6.0-only Tests are also explicitly reviewed/deferred for this freeze. Content development precedes editor development.
+
+The maintained ready-to-use Codex task is [codex-test-content-0.2.0-task.md](codex-test-content-0.2.0-task.md) and is pinned to the frozen semantic baseline. The intended authority order is specification → implementation/reference guidance → conformance content → editor.
 
 The handoff has also been audited against the draft specification in [spec-coverage-audit-0.2.0-2026-10-03.md](spec-coverage-audit-0.2.0-2026-10-03.md). Universal author/processor requirements found during that audit belong in the specification; workflow-only Codex guidance remains outside the normative core.
 
-The explicit freeze gates and claim boundaries are recorded in [0.2.0-freeze-criteria-2026-10-03.md](0.2.0-freeze-criteria-2026-10-03.md). Do not call 0.2.0 frozen until the final exact-head validation record is written against one commit.
+The explicit freeze gates and claim boundaries are recorded in [0.2.0-freeze-criteria-2026-10-03.md](0.2.0-freeze-criteria-2026-10-03.md).
 
 The historical transition material below remains useful provenance. Statements below that describe Codex handoff as merely “preparation only” or identify older repository tasks should be read as dated history rather than the current 0.2.0 handoff state.
 
