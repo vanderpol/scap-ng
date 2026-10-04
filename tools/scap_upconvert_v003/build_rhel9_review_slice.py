@@ -1792,7 +1792,7 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
         elif operator == "ONE":
             expr = {"one": terms}
         elif operator == "XOR":
-            expr = {"xor": terms}
+            expr = {"odd": terms}
         else:
             return None, f"unsupported_criteria_operator:{operator}"
 
