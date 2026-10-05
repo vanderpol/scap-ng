@@ -58,7 +58,7 @@ These examples highlight SCAP-NG capabilities that are not merely one-for-one OV
 | Item materialization and import provenance | [Conformance set](../../../tests/item-materialization-0.2.0/README.md) | Result-side import/materialization contract, explicit scope, local IDs, and source lineage |
 | Bounded evidence/completeness behavior | [Assessment-result conformance set](../../../tests/assessment-results-0.2.0/) | Results distinguish technical truth from how much evidence was retained/materialized |
 
-The first eight rows are current 0.2.0 authoring/result concepts. Collected Item reuse authoring remains a proposal even though the result-side import/materialization contract is already exercised by conformance fixtures. Future-iteration ideas, such as target-scoped Organizational Input resolution, are intentionally excluded from the 0.2.0 sample corpus until their semantics are reviewed.
+Rows describing established 0.2.0 authoring/result semantics are current examples; rows explicitly labeled as proposals or candidate representations remain open design work. In particular, collected Item reuse authoring remains a proposal even though result-side import/materialization semantics already have conformance fixtures, and the Assessment-result dependency sample is only a candidate structural analog for OVAL `extend_definition`. Future-iteration ideas such as target-scoped Organizational Input resolution are intentionally excluded from the 0.2.0 source-sample corpus until their semantics are reviewed.
 
 ## Remaining Assessment-language sample gaps
 
