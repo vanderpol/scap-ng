@@ -163,9 +163,9 @@ class EsxHostCapabilityTests(unittest.TestCase):
             with self.assertRaises(ValidationError):
                 v.validate(bad)
         item = self.item("advancedsetting")
-        item["fields"]["advanced_setting_value"].append({"datatype": "integer", "value": 300})
+        item["fields"]["advanced_setting_value"].append({"datatype": "integer", "value": 300, "status": "exists"})
         item_validator(item["capability"]).validate(item)
-        item["fields"]["advanced_setting_value"] = {"datatype": "integer", "value": 600}
+        item["fields"]["advanced_setting_value"] = {"datatype": "integer", "value": 600, "status": "exists"}
         with self.assertRaises(ValidationError):
             item_validator(item["capability"]).validate(item)
 
