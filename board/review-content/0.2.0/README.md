@@ -34,7 +34,7 @@ The existing UNIX file and Windows registry cases are also representative high-f
 For concepts that are new to SCAP-NG or intentionally more explicit than the SCAP 1.4 model, start with the [New NG feature samples](FEATURE-SAMPLES.md#new-ng-feature-samples). The focused examples now include:
 
 - [conditional evaluation](content/conditional-evaluation.assessment.yaml);
-- [Assessment-result dependency/reuse](content/assessment-result-dependency.assessment.yaml);
+- [Assessment-result dependency / OVAL `extend_definition` analog](content/assessment-result-dependency.assessment.yaml), with the representation question tracked in the [Board discussion](../../discussions/EXTEND-DEFINITION-NATIVE-MODEL.md);
 - [intrinsic applicability](content/intrinsic-applicability.assessment.yaml) and a reusable [standalone applicability Assessment](content/standalone-applicability.assessment.yaml);
 - an explicit conditional [`not_applicable` outcome](content/conditional-not-applicable.assessment.yaml);
 - explicit evidence projection by [field list](content/reported-elements.assessment.yaml) and [`compared`](content/reported-elements-compared.assessment.yaml), alongside existing `all` examples;
@@ -61,7 +61,7 @@ Capability frequency alone is not sufficient for Board review. Real SCAP content
 | Multiple State aggregation | [`multi-state.assessment.yaml`](content/multi-state.assessment.yaml) | Two States with explicit `states_match: all`. |
 | Intrinsic applicability | [`intrinsic-applicability.assessment.yaml`](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability separate from normal evaluation. |
 | Standalone applicability | [`standalone-applicability.assessment.yaml`](content/standalone-applicability.assessment.yaml) | A reusable Assessment whose purpose is applicability and which uses the same ordinary Test/State language. |
-| Assessment-result dependency | [`assessment-result-dependency.assessment.yaml`](content/assessment-result-dependency.assessment.yaml) | Static dependency declaration and consumption of another Assessment's technical result without copying its implementation. |
+| Assessment-result dependency / `extend_definition` analog | [`assessment-result-dependency.assessment.yaml`](content/assessment-result-dependency.assessment.yaml) | Candidate structural analog of OVAL `extend_definition`; current conversion already preserves the same semantic through recursive inlining. See the [Board discussion](../../discussions/EXTEND-DEFINITION-NATIVE-MODEL.md). |
 | Conditional evaluation | [`conditional-evaluation.assessment.yaml`](content/conditional-evaluation.assessment.yaml) | Explicit authored condition, then branch, and else branch. |
 | Explicit not-applicable branch | [`conditional-not-applicable.assessment.yaml`](content/conditional-not-applicable.assessment.yaml) | A reasoned technical `not_applicable` outcome produced by authored evaluation logic. |
 | Explicit reporting projection | [field list](content/reported-elements.assessment.yaml), [`compared`](content/reported-elements-compared.assessment.yaml) | Reporting selection is explicit; together with `all` examples, all three modes are visible. |
