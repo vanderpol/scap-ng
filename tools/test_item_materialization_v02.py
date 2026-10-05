@@ -109,6 +109,14 @@ class MaterializationTests(unittest.TestCase):
         item=self.import_one()[0];del item['context']['origin']['binding_set_id']
         with self.assertRaises(ValidationError):validate_schema('collected-item.schema.json',item)
 
+    def test_board_materialized_item_example_is_valid(self):
+        item=json.loads((ROOT/'board/review-content/0.2.0/proposals/item-reuse-materialized-item.json').read_text())
+        validate_schema('collected-item.schema.json',item)
+        self.assertTrue(item['imported'])
+        self.assertEqual(item['context']['origin']['item_ref'],'configuration-file-001')
+        self.assertEqual(item['context']['origin']['source_execution_ref'],
+                         'shared-file-collection-execution-20261005-001')
+
     def test_committed_import_snapshot_matches_verified_source_bytes(self):
         directory=ROOT/'tests/item-materialization-0.2.0'
         expected=json.loads((directory/'expected-results/imported-items.json').read_text())
