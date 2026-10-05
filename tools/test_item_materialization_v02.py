@@ -38,7 +38,7 @@ class MaterializationTests(unittest.TestCase):
             self.assertEqual(result['item_materialization'],expected[scope]['metadata'])
             self.assertEqual(result['objects'][0]['item_refs'],expected[scope]['items'])
             self.assertTrue(result['population_complete']);self.assertTrue(result['evidence_complete'])
-    def test_default_all_input_not_mutated(self):
+    def test_explicit_all_input_not_mutated(self):
         original=copy.deepcopy(self.observations)
         result=materialize_observations(self.observations,scope='all');self.assertEqual(len(result['items']),2)
         self.assertEqual(self.observations,original)
