@@ -1,0 +1,47 @@
+assessment:
+  id: board.assessment-result-dependency
+  version: 1
+  assessment_title: Combine a local Test with a statically declared dependent Assessment result
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    local-ready-value:
+      variable_title: Local readiness value
+      kind: constant
+      datatype: boolean
+      value: true
+  states:
+    local-ready-is-true:
+      state_title: Local readiness value is true
+      capability: variable.value
+      state:
+        field: value
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+  tests:
+    test-local-ready:
+      test_title: Evaluate the local prerequisite
+      capability: variable.value
+      reported_elements: all
+      variable: local-ready-value
+      states:
+      - local-ready-is-true
+      check_existence: some
+      check: all
+  evaluate:
+    all:
+    - test: test-local-ready
+    - assessment: exact-file-check
+  dependencies:
+    exact-file-check:
+      assessment: unix-file.assessment.yaml
+      expected_id: board.unix-file
+      expected_version: 3
+      purpose: assessment
