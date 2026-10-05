@@ -468,6 +468,10 @@ def main(argv=None):
             if negate: native['assessment']['evaluate']={'not':native['assessment']['evaluate']}
             native['assessment']['purpose']='applicability';native['assessment']['assessment_title']=title
             native=align_assessment_vocabulary(native)
+            # 0.2.0 requires reporting selection to be explicit on every Test.
+            # Preserve the complete SCAP 1.4/OVAL evidence surface.
+            for test in native.get('assessment',{}).get('tests',{}).values():
+                test['reported_elements']='all'
             native=apply_ready_capability_mappings(
                 native, review.NATIVE_CAPABILITY_MAPPING_DIR
             )
