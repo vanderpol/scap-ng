@@ -35,8 +35,13 @@ def capability_fields(capability):
 
 def validate_control(control, capability):
     Draft202012Validator(CONTROL).validate(control)
+    # "all" and "compared" do not name capability fields, so they remain valid
+    # for explicitly permitted conversion-only capability vocabulary. Only an
+    # authored field list needs capability-specific field-name validation.
+    if not isinstance(control, list):
+        return
     known = capability_fields(capability)
-    if isinstance(control, list) and not set(control) <= known:
+    if not set(control) <= known:
         raise ValueError(f"Unknown reported elements for {capability}: {sorted(set(control) - known)}")
 
 
