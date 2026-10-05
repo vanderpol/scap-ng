@@ -32,7 +32,10 @@ XCCDF = """<?xml version="1.0" encoding="UTF-8"?>
       <description><VulnDiscussion xmlns="">Privileged membership discussion.</VulnDiscussion></description>
       <ident system="http://cyber.mil/cci">CCI-000366</ident>
       <check system="http://checklists.nist.gov/xccdf/1.1">
-        <check-content>Inspect Schema Admins. If unauthorized accounts exist, this is a finding.</check-content>
+        <check-content>Inspect Schema Admins.
+Run the administrative review command.
+
+If unauthorized accounts exist, this is a finding.</check-content>
       </check>
       <fixtext>Remove unauthorized members.</fixtext>
     </Rule>
@@ -73,6 +76,8 @@ def main() -> int:
         )["assessment"]
         assert assessment["mode"] == "manual"
         assert "Schema Admins" in assessment["procedure"]
+        assert "\n" in assessment["procedure"]
+        assert "\n\n" in assessment["procedure"]
 
         run(
             str(RENDERER),
