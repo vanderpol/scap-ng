@@ -551,6 +551,10 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             test["states_match"]=LOGICAL_OPERATOR.get(
                 legacy_operator,legacy_operator
             )
+        elif len(test.get("states") or []) > 1:
+            # OVAL's omitted state_operator is AND. SCAP-NG native 0.2.0
+            # forbids hidden semantic defaults, so conversion materializes it.
+            test["states_match"]="all"
 
     test_source=native_cfg.get("test_source") or {}
     if test_source.get("kind")=="none":
