@@ -30,6 +30,7 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Manual Assessment | [Manual review](content/manual.assessment.yaml) | Native human determination without OCIL workflow graphs |
 | Authored result redaction | [Redaction](content/redaction.assessment.yaml) | `redact_result: true` preserves technical truth while suppressing disclosed evidence value |
 | Reporting projection and redaction runtime behavior | [Reported-elements conformance fixture](../../../tests/reported-elements-0.2.0/ownership.assessment.yaml) | Canonical tested reporting source; runtime tests cover projection and redaction preservation |
+| Collected Item reuse/import authoring proposal | [Producer/consumer/request walkthrough](proposals/item-reuse.md) | Shows how an author declares reusable Item input separately from the run-time binding to a concrete prior result |
 | Item import/materialization | [Item-materialization conformance set](../../../tests/item-materialization-0.2.0/README.md) | Imported Item provenance and materialized evidence semantics |
 | Conditional six-state result propagation | [Conditional conformance set](../../../tests/conditional-0.2.0/) | `true`, `false`, `error`, `unknown`, `not_evaluated`, and `not_applicable` scheduling |
 | Assessment Result normalization | [Assessment-result conformance set](../../../tests/assessment-results-0.2.0/) | Test/State/Variable/Item lineage and dependency results |
@@ -41,7 +42,7 @@ These are still required before the Board sample inventory can be called feature
 - current 0.2.0 Organizational Input / typed Assessment input binding;
 - additional Variable functions beyond the current literal, component, concat and arithmetic examples;
 - a concise embedded-Object example if embedded Objects remain in the final 0.2.0 authoring contract;
-- a shared-acquisition example showing reuse of collected Items without conflating that mechanism with Assessment-result dependency reuse;
+- finalize the collected-Item reuse authoring proposal and adopt it into the 0.2.0 schema only after the source identity/binding questions in [the proposal](proposals/item-reuse.md) are resolved;
 - unsupported-capability execution/result behavior, if that remains a native Assessment contract rather than an implementation/reporting-only concern.
 
 Policy-only concepts such as Benchmark Parameters, Profiles, Tailoring, Rule selection/scoring, and package trust are intentionally not duplicated here. Their examples belong with the policy/results specifications, although this index may link to them where an Assessment input binding crosses that boundary.
