@@ -19,8 +19,8 @@ import yaml
 
 
 RESULT_OPTIONS = [
-    ("Pass", "pass"),
-    ("Fail", "fail"),
+    ("Pass", "true"),
+    ("Fail", "false"),
     ("Unknown", "unknown"),
     ("Not Applicable", "not_applicable"),
 ]
