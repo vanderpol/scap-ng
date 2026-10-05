@@ -45,14 +45,14 @@ def validate_local_result(row):
         from collected_item_contract_v02 import context_errors
         if context_errors(item) or item['provenance'].get('target_ref')!=row['target_ref']:raise ValueError('Invalid local Item context/target')
     for obj in objects.values():check_refs(obj['item_refs'],items,'Object/Item')
-    for variable in variables.values():check_refs(variable.get('item_refs',[]),items,'Variable/Item')
+    for variable in variables.values():check_refs(variable['item_refs'],items,'Variable/Item')
     for test in tests.values():
         check_refs(test['object_refs'],objects,'Test/Object');check_refs(test['item_refs'],items,'Test/Item')
         if test['object_refs'] and not set(test['item_refs'])<=set().union(*(set(objects[ref]['item_refs']) for ref in test['object_refs'])):raise ValueError('Test Items outside Object result')
-        for per in test.get('per_item_results',[]):
+        for per in test['per_item_results']:
             if per['item_ref'] not in test['item_refs']:raise ValueError('Per-Item reference outside Test')
             for state in per['state_results']:
-                if state['state_ref'] not in test.get('state_refs',[]):raise ValueError('State result outside Test')
+                if state['state_ref'] not in test['state_refs']:raise ValueError('State result outside Test')
                 for entity in state['entity_results']:check_refs(entity.get('variable_refs',[]),variables,'Entity/Variable')
     for use in row['field_uses']:
         if use['test_ref'] not in tests or use['item_ref'] not in items:raise ValueError('Dangling field-use reference')
@@ -60,7 +60,7 @@ def validate_local_result(row):
         if trace['owner_invocation_ref']!=row['execution_id']:raise ValueError('Trace owner mismatch')
         if trace['kind']=='test' and (trace['assessment']!=row['assessment']['id'] or trace['test'] not in tests or trace['outcome']!=tests[trace['test']]['outcome']):raise ValueError('Trace/Test identity/outcome mismatch')
     recorded=[(t['alias'],t['invocation_ref'],t['outcome'],t['reused']) for t in row['expression_execution']['trace'] if t['kind']=='dependency']
-    linked=[(d['alias'],d['execution_id'],d['outcome'],d.get('reused',False)) for d in row.get('dependent_assessments',[])]
+    linked=[(d['alias'],d['execution_id'],d['outcome'],d['reused']) for d in row['dependent_assessments']]
     if recorded!=linked:raise ValueError('Dependency trace/reference mismatch')
     report=row.get('item_report')
     if report is not None:
