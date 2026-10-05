@@ -417,8 +417,21 @@ def convert(source: Path, output: Path) -> dict:
                 "class": "compliance",
                 "purpose": "assessment",
                 "procedure": procedure,
-                "inputs": {},
-                "evidence": [],
+                "response": {
+                    "type": "compliance",
+                    "choices": [
+                        {"value": "pass", "label": "Pass", "outcome": "true"},
+                        {"value": "fail", "label": "Fail", "outcome": "false"},
+                        {"value": "unknown", "label": "Unknown", "outcome": "unknown"},
+                        {
+                            "value": "not_applicable",
+                            "label": "Not Applicable",
+                            "outcome": "not_applicable",
+                        },
+                    ],
+                    "allow_comment": True,
+                    "allow_evidence": True,
+                },
             },
         }
         dump_yaml(
