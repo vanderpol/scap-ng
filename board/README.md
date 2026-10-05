@@ -1,6 +1,6 @@
 # OVAL Board review of SCAP-NG
 
-**Status:** SCAP-NG 0.2.0 is a frozen pre-alpha working design for human/OVAL Board review. Nothing is Board-approved merely because code, schema, examples, or CI are green.
+**Status:** SCAP-NG 0.2.0 is a versioned pre-alpha working design for human/OVAL Board review. The 0.2.0 label is retained across corrective review changes; reviewers should use the current `main` content. Nothing is Board-approved merely because code, schema, examples, or CI are green.
 
 ## Start here
 
@@ -31,7 +31,7 @@ The six converter-produced Board cases remain **pending human acceptance**, but 
 
 The maintained entry point for that corpus is [`review-content/0.2.0/README.md`](review-content/0.2.0/README.md); the authoritative feature inventory is [`FEATURE-SAMPLES.md`](review-content/0.2.0/FEATURE-SAMPLES.md). The sample corpus is intentionally broader than the six converter-pilot cases, while keeping converter-fidelity evidence separate from native feature-demonstration content.
 
-These checks establish structural, conversion, schema/semantic, and known-result evidence. They do **not** establish independent scanner equivalence, complete collector coverage, or live-target conformance. ESX/VMware and Kubernetes semantics that still need upstream guidance remain deferred rather than being guessed into the frozen design.
+These checks establish structural, conversion, schema/semantic, and known-result evidence. They do **not** establish independent scanner equivalence, complete collector coverage, or live-target conformance. ESX/VMware and Kubernetes semantics that still need upstream guidance remain deferred rather than being guessed into the current design.
 
 ## Full NIWC Current conversion build
 
