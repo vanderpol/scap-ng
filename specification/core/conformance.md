@@ -48,6 +48,22 @@ A build process SHALL reject unresolved required references.
 A processor SHALL NOT silently substitute guessed content for an unresolved
 reference.
 
+### Explicit semantic choices
+
+Native SCAP-NG content SHALL NOT rely on hidden semantic defaults. When two or
+more meaningful behaviors are possible for collection, evaluation, reporting,
+or results, the authored content SHALL state the selected behavior explicitly
+and the governing schema or semantic validator SHALL reject its omission.
+
+A semantic that is inherent in the definition of a construct is not a hidden
+default. For example, a construct with only one defined traversal direction may
+encode that direction in the construct's type rather than repeat a redundant
+field. This exception SHALL NOT be used where omission would choose among
+multiple valid behaviors.
+
+Implementations SHALL NOT invent a fallback value after validation for a
+required semantic choice.
+
 ## 4. Semantic validation
 
 Schema validity alone is insufficient for SCAP-NG conformance.
