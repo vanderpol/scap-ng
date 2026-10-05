@@ -268,6 +268,36 @@ class RepoNormalizerTests(unittest.TestCase):
             ))
 
 
+    def test_cross_benchmark_shared_name_is_platform_neutral(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"source"
+            self.benchmark(root,"ms_windows_11","R1","/etc/example")
+            self.benchmark(root,"ms_windows_server_2025","R2","/etc/example")
+            for name,rule_id in (("ms_windows_11","R1"),("ms_windows_server_2025","R2")):
+                p=root/name/"assessments"/"automated"/f"{rule_id}.automated.assessment.yaml"
+                doc=yaml.safe_load(p.read_text())
+                doc["assessment"]["tests"]["test-file"]["test_title"]="WN11-AU-000084 Windows 11 must be configured to audit registry failures"
+                dump(p,doc)
+            output=Path(td)/"normalized"
+            report=Path(td)/"report.json"
+            old_argv=__import__("sys").argv
+            try:
+                __import__("sys").argv=[
+                    "normalizer",str(root),"--rewrite","--output-root",str(output),
+                    "--report",str(report),"--advisory","none",
+                ]
+                self.assertEqual(normalizer.main(),0)
+            finally:
+                __import__("sys").argv=old_argv
+            shared=list((output/"shared"/"assessments").glob("*.yaml"))
+            self.assertEqual(len(shared),1)
+            self.assertEqual(
+                shared[0].name,
+                "windows-must-be-configured-to-audit-registry-failures.assessment.yaml",
+            )
+            self.assertNotIn("wn11",shared[0].name)
+            self.assertNotIn("windows-11",shared[0].name)
+
     def test_default_mode_is_dry_run(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"source"
