@@ -159,7 +159,7 @@ def validate_result_set(document, assessments):
                                    source_completeness={key: result[key] for key in ('logical_complete','population_complete','evidence_complete')})['item_report']
         if 'item_report' in result and result['item_report'] != projection:
             raise ValueError('Item report differs from canonical Items/actual field uses')
-        dependencies = result.get('dependent_assessments', [])
+        dependencies = result['dependent_assessments']
         for dep in dependencies:
             target = by_execution.get(dep['execution_id'])
             declared = source.get('dependencies', {}).get(dep['alias'])
