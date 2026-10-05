@@ -173,9 +173,69 @@ jobs:
       - name: Validate package graph
         run: |
           python scap-ng/tools/validate_native_package_graph.py work/fast-five             --report work/package-graph.json
-      - name: Compile fast-set corpus
+      - name: Normalize exact duplicate Assessments for Board-readable source
         run: |
-          python scap-ng/tools/scap_ng_content_compiler.py work/fast-five             --output-dir work/compiled             --metrics work/compiler-metrics.json             --source-revision ${{ env.NIWC_REVISION }}             --scap-ng-revision ${{ github.event.pull_request.head.sha || github.sha }}             --allow-unpromoted-conversion-vocabulary
+          python scap-ng/tools/scap_ng_repo_normalizer.py work/fast-five \
+            --rewrite \
+            --output-root work/board-source \
+            --report work/normalizer-report.json \
+            --advisory none
+      - name: Validate normalized Board source
+        run: |
+          python scap-ng/tools/validate_native_json_schemas.py work/board-source \
+            --schema-dir scap-ng/schema/v0.2.0 \
+            --allow-unpromoted-conversion-vocabulary \
+            --report work/board-schema-validation.json
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/board-source \
+            --report work/board-semantic-validation.json
+          python scap-ng/tools/validate_native_package_graph.py work/board-source \
+            --report work/board-package-graph.json
+      - name: Compile representative Board packages
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/board-source \
+            --output-dir work/board-packages \
+            --metrics work/compiler-metrics.json \
+            --source-revision ${{ env.NIWC_REVISION }} \
+            --scap-ng-revision ${{ github.event.pull_request.head.sha || github.sha }} \
+            --allow-unpromoted-conversion-vocabulary
+      - name: Stage compact Board review artifact
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+
+          root=Path("work/board-review")
+          shutil.rmtree(root,ignore_errors=True)
+          root.mkdir(parents=True,exist_ok=True)
+          shutil.copytree("work/board-source",root/"source")
+          shutil.copytree("work/board-packages",root/"packages")
+
+          normalizer=json.loads(Path("work/normalizer-report.json").read_text())
+          review={
+              "artifact":"scap-ng-board-representative-review",
+              "benchmarks":[
+                  "Apache Tomcat 9",
+                  "Windows 11",
+                  "Windows Server DNS",
+                  "Apache 2.4 UNIX Server",
+                  "RHEL 9",
+              ],
+              "layout":{
+                  "source":"Readable normalized native SCAP-NG authoring trees; exact duplicate Assessments are shared under shared/assessments with meaningful names.",
+                  "packages":"Compiled .scapng packages from the same source trees.",
+              },
+              "shared_assessment_groups":normalizer["summary"]["exact_duplicate_groups"],
+              "duplicate_assessment_definitions_avoided":normalizer["summary"]["duplicate_assessment_definitions_avoided"],
+          }
+          (root/"REVIEW.json").write_text(json.dumps(review,indent=2,sort_keys=True)+"\n")
+          (root/"README.md").write_text(
+              "# SCAP-NG representative OVAL Board review build\n\n"
+              "Start with `source/` to review the native authoring model, then inspect `packages/` for compiled distribution examples.\n\n"
+              "This intentionally small review set contains RHEL 9, Windows 11, Windows Server DNS, Apache 2.4 UNIX Server, and Apache Tomcat 9.\n"
+              "The exhaustive 65-package corpus remains regression evidence and is not part of this human-review artifact.\n",
+              encoding="utf-8",
+          )
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -184,5 +244,15 @@ jobs:
             work/schema-validation.json
             work/semantic-validation.json
             work/package-graph.json
+            work/normalizer-report.json
+            work/board-schema-validation.json
+            work/board-semantic-validation.json
+            work/board-package-graph.json
             work/compiler-metrics.json
           if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-board-representative-review
+          path: work/board-review
+          if-no-files-found: error
+          compression-level: 6
