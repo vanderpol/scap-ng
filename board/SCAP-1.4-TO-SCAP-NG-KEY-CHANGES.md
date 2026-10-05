@@ -72,7 +72,7 @@ SCAP-NG does **not** carry forward ARF/OVAL Results as-is. The result redesign i
 
 The practical problem is broader than ARF size alone.
 
-NIST ARF was rarely used directly by end users because complete ARF result packages could become very large. Raw OVAL Results were also rarely an end-user format; they were more useful for developer/debugging work and tended to expose a stove-piped execution view rather than a coherent policy-facing explanation.
+NIST ARF was rarely used directly by end users because complete ARF result packages could become very large, although known vendor implementations such as jOVAL/Arctic Wolf have used ARF and therefore represent an important compatibility/transition case. Raw OVAL Results were also rarely an end-user format; they were more useful for developer/debugging work and tended to expose a stove-piped execution view rather than a coherent policy-facing explanation.
 
 In practice, most end users primarily saw the XCCDF result layer. Many SCAP products reduced that further to little more than **pass/fail**, often without enough detail to answer basic operational questions such as:
 
