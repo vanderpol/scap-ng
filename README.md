@@ -6,10 +6,10 @@ SCAP-NG is research toward a simpler successor to SCAP 1.4, designed to support 
 
 ## Start here
 
+- **Draft specification:** [specification/README.md](specification/README.md)
 - **OVAL Board / external review:** [board/README.md](board/README.md)
 - **SCAP 1.4 → SCAP-NG key changes:** [board/SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md](board/SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)
 - **OVAL 5.12.3 → SCAP-NG capability crosswalk:** [specification/migration/oval-5.12.3-capability-crosswalk.md](specification/migration/oval-5.12.3-capability-crosswalk.md)
-- **Draft specification:** [specification/README.md](specification/README.md)
 - **SCAP-NG 0.2.0 schemas:** [schema/v0.2.0/README.md](schema/v0.2.0/README.md)
 - **Human-runnable tools:** [tools/HUMAN-RUNNABLE-SCRIPTS.md](tools/HUMAN-RUNNABLE-SCRIPTS.md)
 - **Maintenance / semantic-change process:** [MAINTAINING.md](MAINTAINING.md)
