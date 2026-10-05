@@ -117,6 +117,50 @@ def safe_name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("_") or "unnamed"
 
 
+def readable_slug(value: str | None, *, maximum: int = 72) -> str:
+    """Return a short deterministic human-readable filename/id component."""
+    tokens = re.findall(r"[a-z0-9]+", (value or "").lower())
+    slug = "-".join(tokens).strip("-")
+    if len(slug) > maximum:
+        slug = slug[:maximum].rstrip("-")
+    return slug or "shared-assessment"
+
+
+def shared_assessment_base_name(assessment: dict) -> str:
+    """Derive a meaningful shared name from semantic/native authoring text.
+
+    Prefer a single Test title because Test titles participate in the exact
+    semantic fingerprint. Fall back to the Assessment title for manual or
+    title-only content, then capability names, and finally a generic label.
+    """
+    tests = assessment.get("tests") or {}
+    test_titles = sorted({
+        str(row.get("test_title")).strip()
+        for row in tests.values()
+        if isinstance(row, dict) and row.get("test_title")
+    }) if isinstance(tests, dict) else []
+    if len(test_titles) == 1:
+        return readable_slug(test_titles[0])
+
+    assessment_title = assessment.get("assessment_title")
+    if isinstance(assessment_title, str) and assessment_title.strip():
+        return readable_slug(assessment_title)
+
+    if test_titles:
+        return readable_slug(test_titles[0])
+
+    capabilities = sorted({
+        str(row.get("capability")).strip()
+        for registry in ("tests", "objects", "states")
+        for row in (assessment.get(registry) or {}).values()
+        if isinstance(row, dict) and row.get("capability")
+    })
+    if capabilities:
+        return readable_slug("-".join(capabilities))
+
+    return "shared-assessment"
+
+
 def rule_refs(rule_path: Path) -> list[tuple[str, Path]]:
     doc = load_yaml(rule_path)
     rule = doc.get("rule") or {}
@@ -661,18 +705,37 @@ def main() -> int:
     exact_report = []
     duplicate_instances_avoided = 0
 
+    # Human-readable names are part of the review/authoring contract. Derive a
+    # stable semantic label for each exact group first, then add a short digest
+    # only when two distinct semantic groups would otherwise collide.
+    group_base_names: dict[str, str] = {}
+    base_fingerprints: dict[str, set[str]] = defaultdict(set)
+    for group in duplicate_groups:
+        fingerprint = group[0]["exact"]
+        representative = load_yaml(group[0]["path"])
+        assessment = copy.deepcopy(representative.get("assessment") or {})
+        base = shared_assessment_base_name(assessment)
+        group_base_names[fingerprint] = base
+        base_fingerprints[base].add(fingerprint)
+
     for group in sorted(
         duplicate_groups,
         key=lambda g: (-len(g), g[0]["exact"]),
     ):
         fingerprint = group[0]["exact"]
-        shared_id = f"ng.shared.{fingerprint[:24]}"
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
+        base = group_base_names[fingerprint]
+        shared_name = (
+            base
+            if len(base_fingerprints[base]) == 1
+            else f"{base}-{fingerprint[:8]}"
+        )
+        shared_id = f"ng.shared.{shared_name}"
         mode = assessment.get("mode")
         # Preserve the document-kind suffix because schema selection is intentionally filename-based.
         suffix = ".manual.assessment.yaml" if mode == "manual" else ".assessment.yaml"
-        shared_rel_path = shared_rel_dir / f"{safe_name(shared_id)}{suffix}"
+        shared_rel_path = shared_rel_dir / f"{shared_name}{suffix}"
         shared_path = (output / shared_rel_path) if output is not None else None
 
         assessment["id"] = shared_id
