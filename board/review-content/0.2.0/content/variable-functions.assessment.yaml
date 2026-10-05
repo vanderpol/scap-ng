@@ -1,0 +1,112 @@
+# Derived from representative function cases in OVAL-Community/SCAP-Self-Assertion
+# pinned at e3538595c5083b9c34d937a81d319234df9bbfaa.
+# This is a compact native SCAP-NG feature sample, not a full-file conversion.
+assessment:
+  id: board.variable-functions
+  version: 1
+  assessment_title: Exercise representative non-trivial Variable functions
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    split-values:
+      variable_title: Split a-a-a on the dash delimiter
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            literal:
+              value: a-a-a
+              datatype: string
+          delimiter: "-"
+    substring-value:
+      variable_title: Extract characters three and four from abcdefg
+      kind: local
+      datatype: string
+      expression:
+        substring:
+          value:
+            literal:
+              value: abcdefg
+              datatype: string
+          start: "3"
+          length: "2"
+    captured-value:
+      variable_title: Capture the first group from mississippi
+      kind: local
+      datatype: string
+      expression:
+        regex_capture:
+          value:
+            literal:
+              value: mississippi
+              datatype: string
+          pattern: "(i..)+"
+  states:
+    split-values-are-a:
+      state_title: Every split value is a
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: a
+        match: all
+        existence: some
+    substring-is-cd:
+      state_title: Substring result is cd
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: cd
+        match: all
+        existence: some
+    capture-is-ipp:
+      state_title: Regex capture result is ipp
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: ipp
+        match: all
+        existence: some
+  tests:
+    test-split:
+      test_title: Verify split function output
+      capability: variable.value
+      reported_elements: all
+      variable: split-values
+      states:
+      - split-values-are-a
+      check_existence: some
+      check: all
+    test-substring:
+      test_title: Verify substring function output
+      capability: variable.value
+      reported_elements: all
+      variable: substring-value
+      states:
+      - substring-is-cd
+      check_existence: some
+      check: all
+    test-regex-capture:
+      test_title: Verify regex capture output
+      capability: variable.value
+      reported_elements: all
+      variable: captured-value
+      states:
+      - capture-is-ipp
+      check_existence: some
+      check: all
+  evaluate:
+    all:
+    - test: test-split
+    - test: test-substring
+    - test: test-regex-capture
