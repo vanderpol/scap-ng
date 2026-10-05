@@ -602,4 +602,9 @@ def apply_ready_capability_mappings(document: dict, mapping_dir: Path) -> dict:
             capability=node.get("capability")
             if capability == "windows.wmi":
                 raise ValueError(f"deprecated source capability windows.wmi at {section}.{identity}; use reviewed windows.wmi.query only for wmi57 source")
+            if capability == "independent.sqlext":
+                raise ValueError(
+                    f"nonstandard source capability independent.sqlext at {section}.{identity}; "
+                    "publisher extensions outside official SCAP 1.4/OVAL are not convertible to SCAP-NG"
+                )
     return result
