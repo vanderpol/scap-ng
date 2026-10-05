@@ -8,9 +8,10 @@ Board review; 0.1.0 and conversion output remain unchanged.
 
 ## Inclusion scope
 
-Result assembly accepts `item_scope="all"` by default, or `"consumed"`. This is
-an explicit producer serialization control, not a new authored Object selector,
-State predicate, Test execution control or Tailoring/Organizational Input field.
+Result assembly requires an explicit `item_scope` of `"all"` or `"consumed"`.
+This is an explicit producer serialization control, not a new authored Object
+selector, State predicate, Test execution control or Tailoring/Organizational
+Input field. Native result production SHALL NOT infer this choice from omission.
 No content-authored inclusion syntax is invented by this checkpoint.
 
 `all` includes every locally available observation supplied to the invocation.
