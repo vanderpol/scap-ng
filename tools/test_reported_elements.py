@@ -99,7 +99,7 @@ class ReportedElementsTests(unittest.TestCase):
         assessment = copy.deepcopy(self.assessment)
         assessment["tests"]["test-second"] = copy.deepcopy(assessment["tests"]["test-owner"])
         uses = copy.deepcopy(self.fixture["uses"])
-        uses.append({"test_ref": "test-second", "item_ref": "file-1", "used_elements": ["owner_gid"], "required_elements": []})
+        uses.append({"test_ref": "test-second", "item_ref": "file-1", "used_elements": ["owner_gid"], "required_elements": [], "relationship": "direct"})
         assessment["tests"]["test-second"]["reported_elements"] = ["size"]
         fields = self.report(assessment, uses=uses)["items"][0]["item"]["fields"]
         self.assertEqual(set(fields), {"full_path", "owner_uid", "owner_user_name", "owner_gid", "size"})
