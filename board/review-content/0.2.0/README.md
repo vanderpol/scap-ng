@@ -31,7 +31,7 @@ The existing UNIX file and Windows registry cases are also representative high-f
 
 ### Key language-feature examples
 
-Capability frequency alone is not sufficient for Board review. Real SCAP content also depends on Variables, Sets, filters, quantifiers, and multi-step dataflow, so the sample set deliberately includes non-trivial examples that exercise those mechanisms:
+Capability frequency alone is not sufficient for Board review. Real SCAP content also depends on Variables, Sets, filters, quantifiers, multi-step dataflow, applicability, explicit reporting controls, and manual assessment. The [Assessment feature sample index](FEATURE-SAMPLES.md) is the authoritative inventory; this table highlights the most useful non-trivial examples:
 
 | Language feature | Native Assessment | What it demonstrates |
 | --- | --- | --- |
@@ -39,6 +39,11 @@ Capability frequency alone is not sufficient for Board review. Real SCAP content
 | Complex Variable/filter dataflow | [`filter.assessment.yaml`](content/filter.assessment.yaml) | Object-component Variable, chained local Variables, arithmetic, Cartesian multi-values, nested union/intersection, and filtering. |
 | Multi-value Variable functions | [`concat.assessment.yaml`](content/concat.assessment.yaml) | Constant Variables, Variable components, Cartesian concatenation, and quantified comparison of generated values. |
 | Explicit Variable tests | [`constants.assessment.yaml`](content/constants.assessment.yaml) | Direct `variable.value` Tests, integer comparison, and multi-value quantification. |
+| Set difference | [`set-difference.assessment.yaml`](content/set-difference.assessment.yaml) | Reusable Set subtraction with no hidden set behavior. |
+| Multiple State aggregation | [`multi-state.assessment.yaml`](content/multi-state.assessment.yaml) | Two States with explicit `states_match: all`. |
+| Intrinsic applicability | [`intrinsic-applicability.assessment.yaml`](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability separate from normal evaluation. |
+| Explicit reporting projection | [`reported-elements.assessment.yaml`](content/reported-elements.assessment.yaml) | Explicit evidence field selection; omission is not a reporting default. |
+| Manual Assessment | [`manual.assessment.yaml`](content/manual.assessment.yaml) | Native human determination without an OCIL workflow graph. |
 
 These examples are intentionally more complex than the frequency-oriented capability examples. The review set should prove that SCAP-NG remains readable when the source logic is non-trivial, not merely that simple Tests serialize cleanly.
 
@@ -112,7 +117,7 @@ Four earlier examples are retained outside the six-case converter pilot, under
 Direct `variable.value` Test conversion remains a documented gap, with a focused
 reproducer. Keeping these seeds does not conceal that limitation or count them as
 converter successes. The complex native Variable/filter chain remains reviewable.
-There are thirteen native Assessment files in total: six active converter-pilot cases, four earlier supporting seeds, and three frequency-oriented examples.
+The Board directory now also contains focused 0.2.0 feature samples. Treat [FEATURE-SAMPLES.md](FEATURE-SAMPLES.md) as the maintained inventory rather than relying on a hand-maintained file count here.
 
 ## Expected behavior and evidence
 
