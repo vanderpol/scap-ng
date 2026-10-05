@@ -123,13 +123,13 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
     requests = {identity: [] for identity in indexed}
     mandatory = {identity: set() for identity in indexed}
     for use in uses:
-        if set(use) - {"test_ref", "item_ref", "used_elements", "required_elements", "relationship"} or not {"test_ref", "item_ref", "used_elements", "required_elements"} <= set(use):
+        if set(use) - {"test_ref", "item_ref", "used_elements", "required_elements", "relationship"} or not {"test_ref", "item_ref", "used_elements", "required_elements", "relationship"} <= set(use):
             raise ValueError("Complete Test/Item field-use lineage is required")
         test = assessment.get("tests", {}).get(use["test_ref"])
         item = indexed.get(use["item_ref"])
         if test is None or item is None:
             raise ValueError("Field-use lineage references an unknown Test or Item")
-        relationship = use.get("relationship", "direct")
+        relationship = use["relationship"]
         if relationship not in {"direct", "variable", "filter", "selection"}:
             raise ValueError("Unknown field-use relationship")
         if relationship == "direct" and test["capability"] != item["capability"]:
