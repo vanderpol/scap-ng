@@ -86,8 +86,12 @@ def main() -> int:
         assert assessment["mode"] == "manual"
         assert assessment["class"] == "compliance"
         assert assessment["purpose"] == "assessment"
-        assert assessment["inputs"] == {}
-        assert assessment["evidence"] == []
+        assert assessment["response"]["type"] == "stig-manual-compliance"
+        assert [choice["outcome"] for choice in assessment["response"]["choices"]] == [
+            "true", "false", "unknown", "not_applicable"
+        ]
+        assert assessment["response"]["allow_comment"] is True
+        assert assessment["response"]["allow_evidence"] is True
         assert "Schema Admins" in assessment["procedure"]
         assert "\n" in assessment["procedure"]
         assert "\n\n" in assessment["procedure"]
