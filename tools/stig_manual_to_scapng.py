@@ -39,9 +39,34 @@ def descendant(node: ET.Element, name: str) -> ET.Element | None:
 
 
 def text(node: ET.Element | None) -> str | None:
+    """Compact text for identifiers, titles, and short metadata."""
     if node is None:
         return None
     value = " ".join(" ".join(node.itertext()).split())
+    return value or None
+
+
+def prose_text(node: ET.Element | None) -> str | None:
+    """Human prose with meaningful source line/paragraph boundaries retained."""
+    if node is None:
+        return None
+    raw = "".join(node.itertext()).replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.strip() for line in raw.split("\n")]
+    while lines and not lines[0]:
+        lines.pop(0)
+    while lines and not lines[-1]:
+        lines.pop()
+    normalized = []
+    blank = False
+    for line in lines:
+        if not line:
+            if normalized and not blank:
+                normalized.append("")
+            blank = True
+        else:
+            normalized.append(line)
+            blank = False
+    value = "\n".join(normalized).strip()
     return value or None
 
 
@@ -127,13 +152,13 @@ def stig_description_fields(rule: ET.Element) -> dict[str, str | None]:
     try:
         wrapper = ET.fromstring(f"<root>{raw}</root>")
     except ET.ParseError:
-        return {"discussion": text(desc)}
+        return {"discussion": prose_text(desc)}
     result: dict[str, str | None] = {}
     for node in list(wrapper):
         key = STIG_DESCRIPTION_FIELDS.get(lname(node.tag))
         if key:
-            result[key] = text(node)
-    return result or {"discussion": text(desc)}
+            result[key] = prose_text(node)
+    return result or {"discussion": prose_text(desc)}
 
 
 def rule_discussion(rule: ET.Element) -> str | None:
@@ -143,13 +168,13 @@ def rule_discussion(rule: ET.Element) -> str | None:
 def rule_check(rule: ET.Element) -> str | None:
     for check_node in children(rule, "check"):
         content = descendant(check_node, "check-content")
-        if content is not None and text(content):
-            return text(content)
+        if content is not None and prose_text(content):
+            return prose_text(content)
     return None
 
 
 def rule_fix(rule: ET.Element) -> str | None:
-    fixes = [text(x) for x in children(rule, "fixtext")]
+    fixes = [prose_text(x) for x in children(rule, "fixtext")]
     fixes = [x for x in fixes if x]
     return "\n\n".join(fixes) if fixes else None
 
@@ -304,6 +329,11 @@ def convert(source: Path, output: Path) -> dict:
                 source_group_to_native_rules.setdefault(group_id, []).append(native_id)
 
         procedure = rule_check(rule)
+        if not procedure:
+            raise SystemExit(
+                f"Rule {source_rule_id or native_id!r} has no human-readable Check Text; "
+                "refusing to invent a Manual Assessment procedure."
+            )
         description_fields = stig_description_fields(rule)
         assessment_id = f"{native_id}.manual"
         rule_doc = {
@@ -332,7 +362,7 @@ def convert(source: Path, output: Path) -> dict:
             "assessment": {
                 "id": assessment_id,
                 "mode": "manual",
-                "procedure": procedure or "No manual check procedure was present in the source rule.",
+                "procedure": procedure,
             },
         }
         dump_yaml(
