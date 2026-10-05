@@ -1,40 +1,77 @@
+# Real-world privacy example inspired by DISA-style Linux account checks.
+# The Assessment parses /etc/shadow with textfilecontent54. A captured password
+# field may contain a password hash and therefore SHALL NOT be serialized in
+# clear text merely because it participated in evaluation or was requested for
+# reporting. redact_result preserves the comparison truth while suppressing the
+# sensitive captured value in result/evidence paths.
 assessment:
   id: board.redaction
-  version: 1
-  assessment_title: Compare a sensitive value without disclosing it in results
+  version: 2
+  assessment_title: Evaluate an /etc/shadow password field without disclosing the captured hash
   mode: automated
   class: miscellaneous
   purpose: assessment
   specification:
     id: scap-ng.pre-alpha.assessment
     version: 0.2.0
-  variables:
-    sensitive-value:
-      variable_title: Sensitive comparison value
-      kind: constant
-      datatype: string
-      value: example-secret
+
+  objects:
+    shadow-password-fields:
+      object_title: Password fields captured from /etc/shadow entries
+      capability: independent.textfilecontent54
+      select:
+        full_path:
+          value: /etc/shadow
+          operation: equal
+          datatype: string
+        pattern:
+          # Capture only field 2. On ordinary /etc/shadow records this is the
+          # password/lock field and may contain password-hash material.
+          value: '^[^:]+:([^:]+):'
+          operation: match
+          datatype: string
+        instance:
+          value: 1
+          operation: greater_or_equal
+          datatype: integer
+      filesystem: local
+      collect:
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: all_object_elements_fullfilled
+
   states:
-    sensitive-value-matches:
-      state_title: Sensitive value matches
-      capability: variable.value
+    captured-password-field-is-hash-like:
+      state_title: Captured password field contains hash-like material
+      capability: independent.textfilecontent54
       state:
-        field: value
+        field: subexpression
         datatype: string
-        operation: equal
-        value: example-secret
+        operation: match
+        value: '^\$[^$]+\$.+'
         match: all
         existence: some
+        # The comparison result remains authoritative, but the observed
+        # subexpression value must not appear in clear text in results.
         redact_result: true
+
   tests:
-    test-sensitive-value:
-      test_title: Compare while retaining truth but redacting evidence value
-      capability: variable.value
-      reported_elements: all
-      variable: sensitive-value
+    test-shadow-password-field:
+      test_title: Evaluate captured /etc/shadow password material without exposing it
+      capability: independent.textfilecontent54
+      object: shadow-password-fields
       states:
-      - sensitive-value-matches
+      - captured-password-field-is-hash-like
       check_existence: some
       check: all
+      # Intentionally request the sensitive field to demonstrate that redaction
+      # has precedence over reporting projection. A conforming result may retain
+      # a redacted marker for subexpression, never the captured hash value.
+      reported_elements:
+      - full_path
+      - instance
+      - subexpression
+
   evaluate:
-    test: test-sensitive-value
+    test: test-shadow-password-field
