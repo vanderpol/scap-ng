@@ -146,6 +146,11 @@ def main():
 
             if args.layout == "current":
                 native = align_assessment_vocabulary(native)
+                # Native 0.2.0 requires reporting behavior to be authored
+                # explicitly. SCAP 1.4/OVAL conversion preserves the complete
+                # evidence surface by selecting all reported elements.
+                for test in native.get("assessment", {}).get("tests", {}).values():
+                    test["reported_elements"] = "all"
 
             try:
                 assert_native_clean(native)
