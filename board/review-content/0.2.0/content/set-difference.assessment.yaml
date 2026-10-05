@@ -1,0 +1,68 @@
+assessment:
+  id: board.set-difference
+  version: 1
+  assessment_title: Exclude one file from a reusable candidate Set
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    first-file:
+      object_title: First candidate file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/a
+      filesystem: local
+    second-file:
+      object_title: Second candidate file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/b
+      filesystem: local
+    candidate-files:
+      object_title: Reusable candidate Set
+      capability: unix.file
+      set:
+        operator: union
+        operands:
+        - object: first-file
+          filters: []
+        - object: second-file
+          filters: []
+    excluded-file:
+      object_title: File excluded from the candidate Set
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/b
+      filesystem: local
+    remaining-files:
+      object_title: Candidate Set after subtraction
+      capability: unix.file
+      set:
+        operator: difference
+        operands:
+        - object: candidate-files
+          filters: []
+        - object: excluded-file
+          filters: []
+  tests:
+    test-remaining-files:
+      test_title: At least one candidate remains after subtraction
+      capability: unix.file
+      reported_elements: all
+      object: remaining-files
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-remaining-files
