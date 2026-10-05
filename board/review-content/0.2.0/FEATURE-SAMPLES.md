@@ -24,8 +24,8 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Variable comparison quantifier | [Directory filter](content/directory-filter.assessment.yaml) | Explicit `variable_match` |
 | Multiple State aggregation | [Multi-State](content/multi-state.assessment.yaml) | Explicit `states_match`; omission is invalid when multiple States are present |
 | Correlated record fields | [Windows WMI query](content/windows-process-query.assessment.yaml) | Whole-record correlation rather than independent field matching |
-| Assessment-result dependency and reuse | [Dependency](content/dependency.assessment.yaml) | Statically declared dependency, repeated reuse and result provenance |
-| Conditional evaluation | [Dependency](content/dependency.assessment.yaml) | `if/then/else` without hiding which branch is selected |
+| Assessment-result dependency and reuse | [Assessment result dependency](content/assessment-result-dependency.assessment.yaml), [Dependency stress case](content/dependency.assessment.yaml) | Statically declared dependency, simple consumption, repeated reuse and result provenance |
+| Conditional evaluation | [Conditional evaluation](content/conditional-evaluation.assessment.yaml), [Dependency stress case](content/dependency.assessment.yaml) | Focused local conditional plus dependent-Assessment branching without hiding which branch is selected |
 | Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability distinct from Rule applicability |
 | Explicit evidence projection | [Reported elements](content/reported-elements.assessment.yaml) | Explicit field list; no omitted/default reporting behavior |
 | Typed Assessment input / Organizational Input consumption | [Organizational input](content/organizational-input.assessment.yaml) | Declared typed input becomes a Variable used only as expected-state data; no executable behavior is supplied by the input |
@@ -36,6 +36,27 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Item import/materialization | [Item-materialization conformance set](../../../tests/item-materialization-0.2.0/README.md) | Imported Item provenance and materialized evidence semantics |
 | Conditional six-state result propagation | [Conditional conformance set](../../../tests/conditional-0.2.0/) | `true`, `false`, `error`, `unknown`, `not_evaluated`, and `not_applicable` scheduling |
 | Assessment Result normalization | [Assessment-result conformance set](../../../tests/assessment-results-0.2.0/) | Test/State/Variable/Item lineage and dependency results |
+
+
+## New NG feature samples
+
+These examples highlight SCAP-NG capabilities that are not merely one-for-one OVAL Test-family translations. They are the quickest place for a reviewer to see what the NG model adds or makes explicit.
+
+| New NG feature | Focused sample | What to review |
+| --- | --- | --- |
+| Source-authored conditional evaluation | [Conditional evaluation](content/conditional-evaluation.assessment.yaml) | Explicit condition, then, and else branches; branch selection is authored and reviewable rather than inferred by the scanner |
+| Assessment-result dependency/reuse | [Assessment result dependency](content/assessment-result-dependency.assessment.yaml) | Static dependency declaration and consumption of another Assessment's technical result without copying its Tests/Objects |
+| Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Applicability is ordinary authored Assessment logic, separate from Rule/platform naming metadata |
+| Explicit not_applicable result branch | [Dependency/conditional example](content/dependency.assessment.yaml) | Authored branch can produce a reasoned technical not_applicable outcome |
+| Explicit evidence projection | [Reported elements](content/reported-elements.assessment.yaml) | Authors select all, compared, or an explicit field list; omission is not a hidden reporting default |
+| Evidence redaction | [Redaction](content/redaction.assessment.yaml) | Technical truth is retained while a sensitive result value is deliberately withheld |
+| Typed Organizational Input consumption | [Organizational input](content/organizational-input.assessment.yaml) | Organization-supplied policy data is typed and can feed expected State only; it does not alter executable behavior |
+| Manual Assessment | [Manual review](content/manual.assessment.yaml) | Native human determination without carrying forward OCIL workflow structure |
+| Collected Item reuse/import | [Item reuse proposal](proposals/item-reuse.md) | Proposed author/runtime split for reusing collected observations while retaining local evaluation and complete provenance |
+| Item materialization and import provenance | [Conformance set](../../../tests/item-materialization-0.2.0/README.md) | Result-side import/materialization contract, explicit scope, local IDs, and source lineage |
+| Bounded evidence/completeness behavior | [Assessment-result conformance set](../../../tests/assessment-results-0.2.0/) | Results distinguish technical truth from how much evidence was retained/materialized |
+
+The first eight rows are current 0.2.0 authoring/result concepts. Collected Item reuse authoring remains a proposal even though the result-side import/materialization contract is already exercised by conformance fixtures. Future-iteration ideas, such as target-scoped Organizational Input resolution, are intentionally excluded from the 0.2.0 sample corpus until their semantics are reviewed.
 
 ## Remaining Assessment-language sample gaps
 
