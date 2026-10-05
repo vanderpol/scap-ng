@@ -217,6 +217,10 @@ def convert_case(case, source=None):
         if not parity['equal']:
             raise ValueError(f"{case['name']}: intermediate semantic roundtrip: {parity}")
     aligned = align_assessment_vocabulary(intermediate)
+    # 0.2.0 requires an explicit reporting selection on every Test. The
+    # conversion preserves the complete source evidence surface.
+    for test in aligned.get("assessment", {}).get("tests", {}).values():
+        test["reported_elements"] = "all"
     bindings = source_bindings(source, provenance, aligned)
     mapped = apply_ready_capability_mappings(aligned, MAPPINGS)
     for capability in case['explicit_mapping_calls']:
@@ -265,11 +269,14 @@ def main():
     plan = json.loads(PLAN.read_text(encoding='utf-8'))
     components = {**plan['converter_components'], **plan['mapping_components'],
                   'tools/convert_board_pilot_v02.py':plan['conversion_adapter_sha256']}
+    baseline_changes = []
     for path, expected in components.items():
         # Code hashes normalize checkout line endings, not executable text.
         code_hash = hashlib.sha256((ROOT / path).read_text(encoding='utf-8').encode('utf-8')).hexdigest()
         if code_hash != expected:
-            raise ValueError(f'Converter baseline component changed: {path}; review/re-pin the plan explicitly')
+            baseline_changes.append({"path": path, "expected": expected, "actual": code_hash})
+    if baseline_changes:
+        raise ValueError("Converter baseline components changed; review/re-pin the plan explicitly: " + json.dumps(baseline_changes, sort_keys=True))
     if args.source_root:
         verify_source(plan, args.source_root)
     for case in plan['cases']:
