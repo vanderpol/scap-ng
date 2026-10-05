@@ -84,6 +84,22 @@ def benchmark(native_root: Path) -> dict:
     return value
 
 
+def localized_text(value) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        for row in value:
+            if isinstance(row, dict) and row.get("text") is not None:
+                return str(row["text"])
+    return ""
+
+
+def version_text(value) -> str:
+    if isinstance(value, dict):
+        return str(value.get("value") or "")
+    return str(value or "")
+
+
 def identifier_value(rule: dict, scheme: str) -> str:
     for ident in rule.get("identifiers", []) or []:
         if isinstance(ident, dict) and ident.get("scheme") == scheme and ident.get("value"):
@@ -164,7 +180,7 @@ def render_html(native_root: Path, output: Path) -> None:
     assessments = discover_assessments(native_root)
     rules = discover_rules(native_root)
     groups = group_map(bench)
-    title = str(bench.get("title") or bench.get("id") or "SCAP-NG STIG Review")
+    title = localized_text(bench.get("title")) or str(bench.get("id") or "SCAP-NG STIG Review")
     nav = []
     sections = []
     for idx, rule in enumerate(rules, start=1):
@@ -205,8 +221,8 @@ dt{{font-weight:700}} dd{{margin:0}} pre{{white-space:pre-wrap;font:inherit;back
 a{{color:inherit}} small{{color:#555}}
 </style></head><body>
 <header><h1>{html.escape(title)}</h1>
-<p><strong>Version:</strong> {html.escape(str(bench.get("version") or ""))}</p>
-<p>{html.escape(str(bench.get("description") or ""))}</p>
+<p><strong>Version:</strong> {html.escape(version_text(bench.get("version")))}</p>
+<p>{html.escape(localized_text(bench.get("description")))}</p>
 <small>Generated from native SCAP-NG authoring content.</small></header>
 <nav><h2>Rules</h2><ol>{"".join(nav)}</ol></nav>
 {"".join(sections)}
