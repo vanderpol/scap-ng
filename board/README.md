@@ -8,7 +8,7 @@
 2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the current versioned schema set on `main`, capability mappings, validation commands, and newcomer guide are all there.
 3. Review the **[0.2.0 Board review content](review-content/0.2.0/README.md)** — this now includes the six source-to-NG converter pilot cases, frequency-oriented examples, focused New NG feature samples, and supporting/stress examples. For a feature-by-feature inventory, use **[FEATURE-SAMPLES.md](review-content/0.2.0/FEATURE-SAMPLES.md)**.
 4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
-5. Download the compact **[representative OVAL Board review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37321474460/artifacts/11350651969)** (`scap-ng-board-representative-review`). It contains only the primary review surfaces: readable normalized `source/` and compiled `packages/` for six representative benchmarks.
+5. Download the compact **[representative OVAL Board review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37321474460/artifacts/11350651969)** (`scap-ng-board-representative-review`). It contains only the primary review surfaces: maintainable normalized `authoring/` and compiled `packages/` for six representative benchmarks.
 6. Review the **[Board proposals and votes](VOTES.md)** — one maintained index for proposal records, Discussion vote links, and the small set of current design decisions that still need new proposals.
 7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
 
@@ -50,10 +50,10 @@ No Solaris benchmark is present in the pinned NIWC source repository. Solaris ca
 
 The artifact contains only:
 
-- `source/` — readable normalized native SCAP-NG authoring trees;
+- `authoring/` — normalized native SCAP-NG source intended for ongoing human editing and maintenance;
 - `packages/` — compiled `.scapng` packages built from those same source trees.
 
-Exact duplicate Assessments are factored into `shared/assessments/` and use meaningful human-readable names derived from their semantics. Opaque hash-only shared names are prohibited by repository policy.
+The `authoring/` tree is the form NG content developers would maintain after mechanical SCAP 1.4 translation and normalization. Exact duplicate Assessments are factored into `authoring/shared/assessments/` and use meaningful human-readable names derived from their semantics. Opaque hash-only shared names are prohibited by repository policy.
 
 - **[Download `scap-ng-board-representative-review`](https://github.com/vanderpol/scap-ng/actions/runs/37321474460/artifacts/11350651969)**
 - **[GitHub Actions run 37321474460](https://github.com/vanderpol/scap-ng/actions/runs/37321474460)**
