@@ -148,7 +148,67 @@ The current v0.1.0 Assessment schema therefore validates `objects`,
 `states`, `tests`, and `variables`. Older iteration artifacts that use
 authored `collections` are historical baselines, not current schema examples.
 
-## 4. Promotion rule
+
+## 4. Target-scoped Organizational Input resolution
+
+**Status:** deferred design issue for a post-0.2.0 iteration. This section is
+non-normative and does not change the frozen 0.2.0 Organizational Input model.
+
+SCC's experimental NIWC `independent.sqlext` content demonstrates a useful but
+technology-sensitive case: an end user may supply an organization-defined value
+and scope that value to combinations of target identity such as:
+
+- Computer: all computers or selected computers;
+- SQL Server instance: all instances or selected instances;
+- Database: all databases or selected databases.
+
+The underlying problem is broader than SQL Server. A run can legitimately need
+multiple values for the same organization-resolved Parameter, with the effective
+value depending on **which assessed resource instance** is being evaluated. The
+current 0.2.0 contract intentionally avoids implicit Input Set selection from
+hostname, inventory, intended-scope metadata, or scanner-local convention, and
+Organizational Input cannot alter Object targeting or executable Assessment
+semantics. Those protections remain unchanged.
+
+A future design therefore needs to decide whether **target-scoped value
+resolution** is a portable SCAP-NG policy concept or remains an orchestration /
+scanner/vendor responsibility.
+
+Questions to resolve before promotion include:
+
+- Is the portable concept simply a generic resource selector attached to an
+  Organizational Input value, with technology-specific target dimensions defined
+  by the applicable capability or asset model?
+- Should SCAP-NG define only generic dimensions such as host/system identity and
+  allow capability-specific dimensions (for example SQL instance and database)
+  through typed/namespaced extensions?
+- Should SQL instance/database scope remain entirely scanner/vendor-defined
+  because those dimensions are not meaningful across most technologies?
+- How does a processor deterministically resolve overlapping scopes (for example
+  global, host-specific, instance-specific, and database-specific values) without
+  relying on source order or hidden precedence?
+- Must each scoped value identify an explicit resource identity already produced
+  by authored Assessment logic, rather than allowing the Input Set itself to
+  discover or select execution targets?
+- How are missing, duplicate, ambiguous, stale, or conflicting scoped values
+  reported?
+- How is scope provenance represented so results can explain **why this value
+  applied to this resource**?
+- Can the model support analogous non-SQL cases (for example service instance,
+  container, tenant, virtual host, application instance, or named datastore)
+  without building SQL-specific concepts into the core language?
+
+A likely design boundary to preserve is that scoped Organizational Input may
+choose **which policy value applies to an already identified assessment target**,
+while it SHALL NOT create targets, select Objects/Tests, construct SQL or other
+queries, or otherwise change executable Assessment semantics. This boundary is a
+candidate for future review, not an accepted design decision.
+
+The `sqlext` implementation is evidence for the use case only. It is a NIWC/SCC
+publisher extension and SHALL NOT by itself establish a native SCAP-NG SQL
+capability or normative targeting model.
+
+## 5. Promotion rule
 
 A deferred feature should move into normative specification text and executable
 JSON Schema only after:
