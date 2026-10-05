@@ -123,15 +123,6 @@ For specification purposes, an effectively deprecated/out-of-scope Test type:
 This appendix will be regenerated as Capability naming and OVAL-governance
 decisions stabilize.
 
-<!-- spec-nav:start -->
-
----
-
-**Specification navigation:** [← Previous: OVAL 5.12.3 to SCAP-NG Migration](oval-5.12.3-to-ng.md) · [Contents](../README.md) · [Next: Security Considerations →](../security/security-considerations.md)
-
-<!-- spec-nav:end -->
-
-
 ## Publisher extension exclusion: `sqlext`
 
 SCC/NIWC `sqlext_test`, `sqlext_object`, and `sqlext_state` appear
@@ -145,3 +136,14 @@ future content-maintenance effort; this specification does not claim that
 
 See
 [OVAL-derived specification lessons](../../research/iterations/003/design/oval-derived-specification-lessons.md).
+
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: OVAL 5.12.3 to SCAP-NG Migration](oval-5.12.3-to-ng.md) · [Contents](../README.md) · [Next: Security Considerations →](../security/security-considerations.md)
+
+<!-- spec-nav:end -->
+
+
