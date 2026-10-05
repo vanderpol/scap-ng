@@ -25,7 +25,7 @@
 
 ## Review boundary
 
-The technical schema baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Later commits may add Board samples, documentation, CI, or maintenance without changing that frozen schema meaning.
+SCAP-NG remains versioned as **0.2.0** for this Board review, but the current 0.2.0 baseline includes post-freeze corrective changes that made previously implicit/defaulted semantics explicit. Reviewers SHALL use the current `schema/v0.2.0/` content on `main` together with its regression evidence rather than treating the earlier six-case publication SHA as the final technical schema baseline.
 
 The six converter-produced Board cases remain **pending human acceptance**, but they are no longer the whole review surface. The 0.2.0 Board corpus now also includes frequency-oriented examples from the pinned Self-Assertion source, supporting/stress examples for non-trivial Variable/Set/filter/dependency logic, and focused samples for newer NG concepts such as conditional evaluation, Assessment-result dependencies, intrinsic and standalone applicability, explicit `not_applicable`, reporting projection, redaction, Organizational Input, manual Assessment, and the collected-Item reuse proposal.
 
