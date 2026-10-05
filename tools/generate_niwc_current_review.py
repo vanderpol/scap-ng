@@ -27,14 +27,20 @@ def safe(value: str) -> str:
 
 
 def native_artifact_base(stem: str) -> str:
-    """Return a stable native product identity from a NIWC artifact stem.
+    """Return a stable native product identity from a source artifact stem.
 
     Source STIG version/release and enhancement/signing suffixes are provenance,
-    not logical Benchmark identity.
+    not logical Benchmark identity. The source repository/publisher name is also
+    provenance and SHALL NOT be injected into native content IDs.
     """
     artifact_base = re.sub(r"^U_", "", stem)
     artifact_base = re.sub(r"_V\d+R\d+.*$", "", artifact_base)
     return safe(artifact_base)
+
+
+def native_benchmark_id(stem: str) -> str:
+    """Return a publisher-neutral native Benchmark namespace."""
+    return "benchmark." + native_artifact_base(stem)
 
 
 def source_identity(path: Path):
@@ -63,7 +69,7 @@ def source_identity(path: Path):
             native_base = native_artifact_base(path.stem)
             return {
                 "source_benchmark_id": source_id,
-                "benchmark_id": "niwc." + native_base,
+                "benchmark_id": native_benchmark_id(path.stem),
                 "platform_id": "product." + native_base,
                 "platform_title": title,
                 "title": title,
