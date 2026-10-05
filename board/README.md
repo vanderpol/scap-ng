@@ -8,7 +8,7 @@
 2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the frozen schema set, capability mappings, validation commands, and newcomer guide are all there.
 3. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
 4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
-5. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37242380664/artifacts/11318411057)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
+5. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37247949326/artifacts/11320068255)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
 6. Review the **[Board proposals and votes](VOTES.md)** — one maintained index for proposal records, Discussion vote links, and the small set of current design decisions that still need new proposals.
 7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
 
@@ -33,11 +33,11 @@ These checks establish structural, conversion, and known-result evidence. They d
 
 ## Full 65-package conversion build
 
-A fresh conversion of all **65 pinned NIWC Current SCAP 1.4 packages** completed successfully using the checked-in converter and exact-semantics normalizer pipeline for Board review:
+A fresh conversion of all **65 pinned NIWC Current SCAP 1.4 packages** completed successfully using the checked-in converter and exact-semantics normalizer pipeline for Board review. The published artifact contains **65 source trees, 65 compiled packages, and zero blocked source packages**:
 
-- **[Download the normalized 65-package review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37242380664/artifacts/11318411057)** — `niwc-current-full-review`
-- **[GitHub Actions run 37242380664](https://github.com/vanderpol/scap-ng/actions/runs/37242380664)** — build provenance, logs, and all generated artifacts
-- Artifact SHA-256: `fbad06c83a057c20a3348d29590cc3269a431518e44af406bc452a3a92869cd6`
+- **[Download the normalized 65-package review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37247949326/artifacts/11320068255)** — `niwc-current-full-review`
+- **[GitHub Actions run 37242380664](https://github.com/vanderpol/scap-ng/actions/runs/37247949326)** — build provenance, logs, and all generated artifacts
+- Artifact SHA-256: `f57256ef8a9a7696c1170d1594ef34b5ea12bb357d28bf08c2994c2c7c14eeb4`
 
 The build preserves the fresh source-derived NG trees, exact-semantics normalized trees, compiled `.scapng` packages, conversion/blocker status for every source package, and before/after validation evidence. Normalization may replace exact duplicate Assessment definitions with one shared Assessment only when semantic equivalence is proven; Rule/check bindings and source provenance remain represented.
 
