@@ -76,6 +76,23 @@ def safe_id(value: str | None, fallback: str) -> str:
     return cleaned or fallback
 
 
+def native_rule_id(source_rule_id: str | None, vulnerability_id: str | None, fallback: str) -> str:
+    for value in (source_rule_id, vulnerability_id):
+        if not value:
+            continue
+        match = re.search(r"SV-\d+", value, flags=re.I)
+        if match:
+            return match.group(0).upper()
+    if vulnerability_id and re.fullmatch(r"V-\d+", vulnerability_id, flags=re.I):
+        return "SV-" + vulnerability_id.split("-", 1)[1]
+    return safe_id(source_rule_id or vulnerability_id, fallback)
+
+
+def native_rule_version(source_rule_id: str | None) -> str:
+    match = re.search(r"(r\d+)", source_rule_id or "", flags=re.I)
+    return match.group(1).lower() if match else "1"
+
+
 def dump_yaml(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -179,13 +196,32 @@ def rule_fix(rule: ET.Element) -> str | None:
     return "\n\n".join(fixes) if fixes else None
 
 
-def idents(rule: ET.Element) -> list[dict]:
+def identifiers(rule: ET.Element, stig_id: str | None, vulnerability_id: str | None) -> list[dict]:
     out = []
     for node in children(rule, "ident"):
         value = text(node)
-        if value:
-            out.append({"system": node.get("system"), "value": value})
-    return out
+        if not value:
+            continue
+        system = (node.get("system") or "").lower()
+        if "cci" in system:
+            scheme = "cci"
+        elif "legacy" in system:
+            scheme = "disa-legacy-id"
+        else:
+            scheme = "source-ident"
+        out.append({"scheme": scheme, "value": value})
+    if stig_id:
+        out.append({"scheme": "disa-stig-id", "value": stig_id})
+    if vulnerability_id:
+        out.append({"scheme": "disa-vulnerability-id", "value": vulnerability_id})
+    seen = set()
+    unique = []
+    for row in out:
+        key = (row["scheme"], row["value"])
+        if key not in seen:
+            seen.add(key)
+            unique.append(row)
+    return unique
 
 
 def references(rule: ET.Element) -> list[dict]:
@@ -316,7 +352,7 @@ def convert(source: Path, output: Path) -> dict:
         source_rule_id = rule.get("id")
         stig_id = text(child(rule, "version"))
         vuln_id = path[-1].get("id") if path else None
-        base_id = safe_id(stig_id or vuln_id or source_rule_id, f"rule-{idx}")
+        base_id = native_rule_id(source_rule_id, vuln_id, f"rule-{idx}")
         native_id = base_id
         if native_id in used_ids:
             native_id = safe_id(f"{base_id}-{vuln_id or idx}", f"rule-{idx}")
@@ -336,37 +372,57 @@ def convert(source: Path, output: Path) -> dict:
             )
         description_fields = stig_description_fields(rule)
         assessment_id = f"{native_id}.manual"
+        extensions = {
+            key: value for key, value in description_fields.items()
+            if key != "discussion"
+        }
+        if "documentable" in extensions and extensions["documentable"] is not None:
+            extensions["documentable"] = str(extensions["documentable"]).lower() == "true"
+
+        assessment_path = f"../assessments/manual/{assessment_id}.assessment.yaml"
         rule_doc = {
-            "scap_ng": SCAP_NG_VERSION,
             "rule": {
                 "id": native_id,
-                "title": text(child(rule, "title")),
-                "severity": rule.get("severity"),
-                "version": stig_id,
-                "vulnerability_id": vuln_id,
-                "group_path": path,
-                "discussion": description_fields.get("discussion"),
+                "version": native_rule_version(source_rule_id),
+                "title": text(child(rule, "title")) or "",
+                "severity": rule.get("severity") or "unknown",
+                "role": rule.get("role") or "full",
+                "weight": float(rule.get("weight") or 10.0),
+                "discussion": description_fields.get("discussion") or "",
+                "rationale": None,
+                "extensions": {"disa_stig": extensions},
+                "warnings": [],
+                "identifiers": identifiers(rule, stig_id, vuln_id),
                 "references": references(rule),
-                "idents": idents(rule),
-                "fix": rule_fix(rule),
-                "assessment_choices": [
-                    {"name": "manual", "assessment": assessment_id}
-                ],
+                "requires": [],
+                "conflicts": [],
+                "applicability": [],
+                "parameters": {},
+                "remediation": {"guidance": rule_fix(rule) or ""},
+                "organizational_input_requirements": {},
+                "assessment_choices": {
+                    "manual": {"assessment": assessment_path}
+                },
                 "default_assessment_choice": "manual",
             },
         }
-        dump_yaml(output / "rules" / f"{native_id}.yaml", rule_doc)
+        dump_yaml(output / "rules" / f"{native_id}.rule.yaml", rule_doc)
 
         assessment_doc = {
-            "scap_ng": SCAP_NG_VERSION,
             "assessment": {
                 "id": assessment_id,
+                "version": 1,
+                "assessment_title": None,
                 "mode": "manual",
+                "class": "compliance",
+                "purpose": "assessment",
                 "procedure": procedure,
+                "inputs": {},
+                "evidence": [],
             },
         }
         dump_yaml(
-            output / "assessments" / "manual" / f"{assessment_id}.yaml",
+            output / "assessments" / "manual" / f"{assessment_id}.assessment.yaml",
             assessment_doc,
         )
 
@@ -380,15 +436,42 @@ def convert(source: Path, output: Path) -> dict:
             "source_description_fields": description_fields,
         })
 
+    native_groups = []
+    for group in group_rows(root):
+        gid = group.get("id")
+        native_groups.append({
+            "id": gid,
+            "title": group.get("title"),
+            "rules": source_group_to_native_rules.get(str(gid), []),
+        })
+
     benchmark_doc = {
-        "scap_ng": SCAP_NG_VERSION,
         "benchmark": {
             "id": benchmark_id,
-            "title": benchmark_title,
-            "version": benchmark_version,
-            "description": benchmark_description(root),
-            "status": "converted-stig-manual",
-            "groups": group_rows(root),
+            "ng_schema_version": "0.2.0",
+            "use_case": "compliance",
+            "assessment_specifications": [],
+            "title": [{"text": benchmark_title, "language": None}],
+            "description": [{"text": benchmark_description(root) or "", "language": None}],
+            "language": "en",
+            "status": [],
+            "version": {"value": benchmark_version},
+            "metadata": {},
+            "notices": [],
+            "front_matter": [],
+            "rear_matter": [],
+            "references": [],
+            "text_blocks": [],
+            "platform": {
+                "id": "active-directory-forest",
+                "title": "Active Directory Forest",
+                "applicability": {},
+            },
+            "applicability_catalog": "applicability.yaml",
+            "scoring": [],
+            "parameters": [],
+            "default_selection": True,
+            "groups": native_groups,
             "profiles": native_profile_rows(
                 root,
                 source_rule_to_native,
@@ -398,6 +481,7 @@ def convert(source: Path, output: Path) -> dict:
         },
     }
     dump_yaml(output / "benchmark.yaml", benchmark_doc)
+    dump_yaml(output / "applicability.yaml", {"applicability": []})
 
     provenance = {
         "format": "scap-ng-stig-manual-conversion-provenance-0.1",
@@ -409,7 +493,7 @@ def convert(source: Path, output: Path) -> dict:
         },
         "native": {
             "benchmark_id": benchmark_id,
-            "scap_ng": SCAP_NG_VERSION,
+            "ng_schema_version": "0.2.0",
         },
         "profiles": source_profile_rows(root),
         "rules": provenance_rules,
