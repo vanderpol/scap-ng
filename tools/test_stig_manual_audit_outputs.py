@@ -60,19 +60,19 @@ def main() -> int:
         run(str(CONVERTER), str(source), "--output-dir", str(native))
 
         benchmark = yaml.safe_load((native / "benchmark.yaml").read_text(encoding="utf-8"))
-        assert benchmark["benchmark"]["rules"] == ["AD.0017"]
-        assert benchmark["benchmark"]["profiles"][0]["disabled_rules"] == ["AD.0017"]
+        assert benchmark["benchmark"]["rules"] == ["SV-243502"]
+        assert benchmark["benchmark"]["profiles"][0]["disabled_rules"] == ["SV-243502"]
 
-        rule_doc = yaml.safe_load((native / "rules" / "AD.0017.yaml").read_text(encoding="utf-8"))
+        rule_doc = yaml.safe_load((native / "rules" / "SV-243502.rule.yaml").read_text(encoding="utf-8"))
         rule = rule_doc["rule"]
-        assert rule["vulnerability_id"] == "V-243502"
-        assert rule["assessment_choices"][0]["name"] == "manual"
+        assert any(x == {"scheme": "disa-vulnerability-id", "value": "V-243502"} for x in rule["identifiers"])
+        assert rule["assessment_choices"]["manual"]["assessment"].endswith("SV-243502.manual.assessment.yaml")
         assert rule["discussion"] == "Privileged membership discussion."
         assert "<VulnDiscussion>" not in rule["discussion"]
-        assert "CCI-000366" in str(rule["idents"])
+        assert "CCI-000366" in str(rule["identifiers"])
 
         assessment = yaml.safe_load(
-            (native / "assessments" / "manual" / "AD.0017.manual.yaml").read_text(encoding="utf-8")
+            (native / "assessments" / "manual" / "SV-243502.manual.assessment.yaml").read_text(encoding="utf-8")
         )["assessment"]
         assert assessment["mode"] == "manual"
         assert "Schema Admins" in assessment["procedure"]
