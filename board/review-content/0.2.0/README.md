@@ -86,7 +86,7 @@ Three samples preserve complete source Definitions; three are intentionally sele
 
 This review surface contains a bounded six-case converter pilot **plus** frequency-oriented native examples, supporting/stress examples, and focused NG feature samples. The six pilot YAML files are paired with pinned SCAP 1.4/OVAL source evidence; the additional samples exist to exercise current 0.2.0 authoring and result semantics that the six pilot cases alone do not cover. Machine validation does not make any sample accepted, and the combined sample corpus does not by itself establish live collector or independent scanner equivalence.
 
-Frozen technical baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Self-Assertion source is pinned to `e3538595c5083b9c34d937a81d319234df9bbfaa`.
+The historical six-case pilot was first published against technical baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`, but that SHA is **not** the current 0.2.0 schema baseline. Subsequent corrective changes made hidden/defaulted semantics explicit while retaining the 0.2.0 version. Review current `schema/v0.2.0/` on `main` for the Board baseline. Self-Assertion source evidence for the pilot remains pinned to `e3538595c5083b9c34d937a81d319234df9bbfaa`.
 
 [Manifest](manifest.json) records the source → mechanical NG → refined NG → expected-result chain for each case.
 
