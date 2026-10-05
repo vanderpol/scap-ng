@@ -1,0 +1,64 @@
+assessment:
+  id: board.organizational-input
+  version: 1
+  assessment_title: Compare a collected sysctl value with an organization-supplied expected value
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  inputs:
+    expected-kernel-hostname:
+      datatype: string
+      cardinality: one
+      required: true
+      description: Organization-approved kernel hostname expected for this target.
+  objects:
+    kernel-hostname:
+      object_title: kernel.hostname sysctl
+      capability: unix.sysctl
+      select:
+        name:
+          value: kernel.hostname
+          operation: equal
+          datatype: string
+  variables:
+    approved-kernel-hostname:
+      variable_title: Organization-approved kernel hostname
+      datatype: string
+      input: expected-kernel-hostname
+  states:
+    expected-kernel-hostname-state:
+      state_title: kernel.hostname equals the organization-approved value
+      capability: unix.sysctl
+      state:
+        all:
+        - field: name
+          value: kernel.hostname
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: value
+          value:
+            variable: approved-kernel-hostname
+          operation: equal
+          datatype: string
+          match: all
+          variable_match: one
+          existence: some
+  tests:
+    test-kernel-hostname:
+      test_title: Compare kernel.hostname with the bound organizational value
+      capability: unix.sysctl
+      reported_elements:
+      - name
+      - value
+      object: kernel-hostname
+      states:
+      - expected-kernel-hostname-state
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-kernel-hostname
