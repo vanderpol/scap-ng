@@ -1,0 +1,40 @@
+assessment:
+  id: board.redaction
+  version: 1
+  assessment_title: Compare a sensitive value without disclosing it in results
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    sensitive-value:
+      variable_title: Sensitive comparison value
+      kind: constant
+      datatype: string
+      value: example-secret
+  states:
+    sensitive-value-matches:
+      state_title: Sensitive value matches
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: example-secret
+        match: all
+        existence: some
+        redact_result: true
+  tests:
+    test-sensitive-value:
+      test_title: Compare while retaining truth but redacting evidence value
+      capability: variable.value
+      reported_elements: all
+      variable: sensitive-value
+      states:
+      - sensitive-value-matches
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-sensitive-value
