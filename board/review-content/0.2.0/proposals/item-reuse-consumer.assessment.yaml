@@ -1,0 +1,60 @@
+# PROPOSED 0.2.0 syntax for Board review; not yet part of assessment.schema.json.
+assessment:
+  id: board.consume-shared-file-items
+  version: 1
+  assessment_title: Evaluate file ownership using a verified reusable Item population
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+
+  item_inputs:
+    configuration-file-items:
+      capability: unix.file
+      required: true
+      source_contract:
+        assessment_id: board.shared-file-collection
+        assessment_version: 1
+        object: configuration-files
+      reuse_constraints:
+        target: same
+        bindings: exact
+        preserve_source_completeness: true
+
+  objects:
+    imported-configuration-files:
+      object_title: Configuration files supplied through the verified Item input
+      capability: unix.file
+      items:
+        input: configuration-file-items
+
+  states:
+    owned-by-root:
+      state_title: File is owned by root
+      capability: unix.file
+      state:
+        field: owner_uid
+        datatype: integer
+        operation: equal
+        value: 0
+        match: all
+        existence: some
+
+  tests:
+    test-imported-file-ownership:
+      test_title: Every supplied configuration file is owned by root
+      capability: unix.file
+      reported_elements:
+      - full_path
+      - owner_uid
+      - owner_user_name
+      object: imported-configuration-files
+      states:
+      - owned-by-root
+      check_existence: some
+      check: all
+
+  evaluate:
+    test: test-imported-file-ownership
