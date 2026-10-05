@@ -1,6 +1,6 @@
 # SCAP 1.4 → SCAP-NG 0.2.0: key changes
 
-**Status:** concise OVAL Board briefing for the frozen 0.2.0 working design. Nothing here implies Board approval.
+**Status:** concise OVAL Board briefing for the current versioned 0.2.0 working design. Nothing here implies Board approval.
 
 SCAP-NG is intended to preserve useful SCAP 1.4 and OVAL assessment semantics while replacing legacy serialization, packaging, result, and authoring constraints.
 
