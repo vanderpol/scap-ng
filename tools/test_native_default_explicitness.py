@@ -42,6 +42,26 @@ class ExplicitDefaultsTests(unittest.TestCase):
         self.assertFalse(issues, issues)
         self.assertEqual(counts["independent_variable_id_selectors"], 1)
 
+    def test_missing_reported_elements_detected(self):
+        doc = self.fixture()
+        doc["assessment"]["specification"] = {
+            "id": "scap-ng.pre-alpha.assessment",
+            "version": "0.2.0",
+        }
+        doc["assessment"]["tests"] = {
+            "test-x": {
+                "test_title": "x",
+                "capability": "unix.file",
+            }
+        }
+        issues, _ = audit_doc(doc)
+        self.assertIn("HIDDEN_TEST_DEFAULT_REPORTED_ELEMENTS",
+                      [r["code"] for r in issues])
+        doc["assessment"]["tests"]["test-x"]["reported_elements"] = "all"
+        issues, _ = audit_doc(doc)
+        self.assertNotIn("HIDDEN_TEST_DEFAULT_REPORTED_ELEMENTS",
+                         [r["code"] for r in issues])
+
     def test_record_fields(self):
         doc = self.fixture()
         record = {"name": "key", "value": "value", "operation": "equals",
