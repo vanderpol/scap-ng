@@ -108,7 +108,7 @@ class IdentitySoftwareTests(unittest.TestCase):
             for status in ['does_not_exist', 'not_collected', 'error']:
                 changed = copy.deepcopy(item); changed['fields'][field] = {'datatype': dtype, 'status': status}
                 validator.validate(changed)
-            changed = copy.deepcopy(item); changed['fields'][field] = {'datatype': dtype, 'redacted': True}
+            changed = copy.deepcopy(item); changed['fields'][field] = {'datatype': dtype, 'status': 'exists', 'redacted': True}
             validator.validate(changed)
             changed['fields'][field]['value'] = item['fields'][field]['value']
             with self.assertRaises(ValidationError): validator.validate(changed)
@@ -132,8 +132,8 @@ class IdentitySoftwareTests(unittest.TestCase):
             a = self.documents[kind]['assessment']; item = self.item(kind)
             field = a['states']['expected']['state']['field']; identity = 'account_name' if kind == 'account' else 'vib_name'
             required = [identity, 'domain'] if kind == 'account' else [identity]
-            item['fields'][field] = {'datatype': 'boolean' if kind == 'account' else 'string', 'redacted': True}
-            report = project_items(a, [item], [{'test_ref': 'test-check', 'item_ref': item['id'], 'used_elements': [field], 'required_elements': required}], source_execution_ref='fixture-execution', source_completeness={'logical_complete': True, 'population_complete': True, 'evidence_complete': True})
+            item['fields'][field] = {'datatype': 'boolean' if kind == 'account' else 'string', 'status': 'exists', 'redacted': True}
+            report = project_items(a, [item], [{'test_ref': 'test-check', 'item_ref': item['id'], 'used_elements': [field], 'required_elements': required, 'relationship': 'direct'}], source_execution_ref='fixture-execution', source_completeness={'logical_complete': True, 'population_complete': True, 'evidence_complete': True})
             fields = report['item_report']['items'][0]['item']['fields']
             self.assertEqual(set(fields), {field, *required})
             self.assertTrue(fields[field]['redacted']); self.assertNotIn('value', fields[field])
