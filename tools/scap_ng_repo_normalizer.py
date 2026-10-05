@@ -126,13 +126,43 @@ def readable_slug(value: str | None, *, maximum: int = 72) -> str:
     return slug or "shared-assessment"
 
 
-def shared_assessment_base_name(assessment: dict) -> str:
+def neutralize_shared_title(value: str, benchmark_labels: set[str]) -> str:
+    """Remove source-benchmark branding from a cross-benchmark shared filename label.
+
+    This changes only the generated shared filename/ID. Authored Assessment and
+    Test titles remain unchanged. A cross-benchmark shared filename should describe
+    the reusable check rather than whichever source benchmark supplied the title.
+    """
+    text = value.strip()
+    labels = {x.lower() for x in benchmark_labels}
+    if len(labels) < 2:
+        return text
+
+    windows_family = all("windows" in x for x in labels)
+    linux_family = all(("linux" in x) or x.startswith("rhel") for x in labels)
+
+    if windows_family:
+        text = re.sub(r"^\\s*WN\\d+(?:-[A-Z]{2})?-\\d+\\s*[-:]?\\s*", "", text, flags=re.I)
+        text = re.sub(r"\\bWindows\\s+Server\\s+20\\d{2}\\b", "Windows", text, flags=re.I)
+        text = re.sub(r"\\bWindows\\s+(?:10|11)\\b", "Windows", text, flags=re.I)
+
+    if linux_family:
+        text = re.sub(r"\\bRed\\s+Hat\\s+Enterprise\\s+Linux\\s+\\d+\\b", "Linux", text, flags=re.I)
+        text = re.sub(r"\\bRHEL\\s*\\d+\\b", "Linux", text, flags=re.I)
+        text = re.sub(r"\\bOracle\\s+Linux\\s+\\d+\\b", "Linux", text, flags=re.I)
+
+    return re.sub(r"\\s+", " ", text).strip()
+
+
+def shared_assessment_base_name(assessment: dict, benchmark_labels: set[str] | None = None) -> str:
     """Derive a meaningful shared name from semantic/native authoring text.
 
     Prefer a single Test title because Test titles participate in the exact
     semantic fingerprint. Fall back to the Assessment title for manual or
     title-only content, then capability names, and finally a generic label.
+    Cross-benchmark source branding is removed from the filename label only.
     """
+    benchmark_labels = benchmark_labels or set()
     tests = assessment.get("tests") or {}
     test_titles = sorted({
         str(row.get("test_title")).strip()
@@ -140,14 +170,14 @@ def shared_assessment_base_name(assessment: dict) -> str:
         if isinstance(row, dict) and row.get("test_title")
     }) if isinstance(tests, dict) else []
     if len(test_titles) == 1:
-        return readable_slug(test_titles[0])
+        return readable_slug(neutralize_shared_title(test_titles[0], benchmark_labels))
 
     assessment_title = assessment.get("assessment_title")
     if isinstance(assessment_title, str) and assessment_title.strip():
-        return readable_slug(assessment_title)
+        return readable_slug(neutralize_shared_title(assessment_title, benchmark_labels))
 
     if test_titles:
-        return readable_slug(test_titles[0])
+        return readable_slug(neutralize_shared_title(test_titles[0], benchmark_labels))
 
     capabilities = sorted({
         str(row.get("capability")).strip()
@@ -159,7 +189,6 @@ def shared_assessment_base_name(assessment: dict) -> str:
         return readable_slug("-".join(capabilities))
 
     return "shared-assessment"
-
 
 def rule_refs(rule_path: Path) -> list[tuple[str, Path]]:
     doc = load_yaml(rule_path)
@@ -714,7 +743,13 @@ def main() -> int:
         fingerprint = group[0]["exact"]
         representative = load_yaml(group[0]["path"])
         assessment = copy.deepcopy(representative.get("assessment") or {})
-        base = shared_assessment_base_name(assessment)
+        benchmark_labels = {
+            str(consumer.get("benchmark"))
+            for row in group
+            for consumer in row.get("consumers", [])
+            if consumer.get("benchmark")
+        }
+        base = shared_assessment_base_name(assessment, benchmark_labels)
         group_base_names[fingerprint] = base
         base_fingerprints[base].add(fingerprint)
 
