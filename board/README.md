@@ -8,7 +8,7 @@
 2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the current versioned schema set on `main`, capability mappings, validation commands, and newcomer guide are all there.
 3. Review the **[0.2.0 Board review content](review-content/0.2.0/README.md)** — this now includes the six source-to-NG converter pilot cases, frequency-oriented examples, focused New NG feature samples, and supporting/stress examples. For a feature-by-feature inventory, use **[FEATURE-SAMPLES.md](review-content/0.2.0/FEATURE-SAMPLES.md)**.
 4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
-5. Download the compact **[representative OVAL Board review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37326998136/artifacts/11353525428)** (`scap-ng-board-representative-review`). **This is the quickest way to see what SCAP-NG is intended to look like in real use.** It contains six representative DISA-derived benchmarks across Linux, Windows, macOS, web/application-server, and browser content. Open `authoring/` first to see the form a content developer would actually maintain: readable Benchmark, Rule, applicability, Profile, and Assessment files, including exact reusable Assessments factored into `authoring/shared/assessments/` with meaningful names. Then open `packages/` to see the compiled `.scapng` bundles a scanner would distribute and consume. The set is deliberately small enough for human review while still demonstrating cross-platform conversion, native authoring readability, Assessment reuse, normalization, and packaging. The separate 65-package build remains regression evidence rather than Board reading material.
+5. Download the compact **[representative OVAL Board review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37331097116/artifacts/11354861863)** (`scap-ng-board-representative-review`). **This is the quickest way to see what SCAP-NG is intended to look like in real use.** It contains six representative DISA-derived benchmarks across Linux, Windows, macOS, web/application-server, and browser content. Open `authoring/` first to see the form a content developer would actually maintain: readable Benchmark, Rule, applicability, Profile, and Assessment files, including exact reusable Assessments factored into `authoring/shared/assessments/` with meaningful names. Then open `packages/` to see the compiled `.scapng` bundles a scanner would distribute and consume. The set is deliberately small enough for human review while still demonstrating cross-platform conversion, native authoring readability, Assessment reuse, normalization, and packaging. The separate 65-package build remains regression evidence rather than Board reading material.
 6. Review the **[Board proposals and votes](VOTES.md)** — one maintained index for proposal records, Discussion vote links, and the small set of current design decisions that still need new proposals.
 7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
 
@@ -55,11 +55,11 @@ The artifact contains only:
 
 The `authoring/` tree is the form NG content developers would maintain after mechanical SCAP 1.4 translation and normalization. Exact duplicate Assessments are factored into `authoring/shared/assessments/` and use meaningful human-readable names derived from their semantics. Opaque hash-only shared names are prohibited by repository policy.
 
-- **[Download `scap-ng-board-representative-review`](https://github.com/vanderpol/scap-ng/actions/runs/37326998136/artifacts/11353525428)**
-- **[GitHub Actions run 37326998136](https://github.com/vanderpol/scap-ng/actions/runs/37326998136)**
-- Artifact SHA-256: `f18345004a66f4a1d6f40794d8f302102f19bf7d830195650c58e420cdf8e263`
+- **[Download `scap-ng-board-representative-review`](https://github.com/vanderpol/scap-ng/actions/runs/37331097116/artifacts/11354861863)**
+- **[GitHub Actions run 37326998136](https://github.com/vanderpol/scap-ng/actions/runs/37331097116)**
+- Artifact SHA-256: `95a5cf353b5fa82904fdc594af94bd39aea0e9871867666e39aa7c5e135936f6`
 - Approximate artifact size: **8.0 MB**
-- SCAP-NG source revision used by the build: `023a154ba719af842bd0ca037ef5c6759dbd646a`
+- SCAP-NG source revision used by the build: `51e14ecafce66800831951fc485df5928832468a`
 - Pinned NIWC source revision: `8c8e5dff860af6b1290ee9273a282db24278f8d5`
 
 The representative set passed schema validation, Assessment-semantic validation, package-graph validation, exact-duplicate normalization, validation of the normalized authoring source, and package compilation.
@@ -73,6 +73,8 @@ The paired sample also makes reuse concrete rather than theoretical:
 - shared filenames are derived from the reusable check itself rather than retaining source-platform branding, so cross-platform shared content does not misleadingly look Windows-11-, RHEL-, or Oracle-specific.
 
 Unique Assessments remain local to their Benchmark; only proven exact semantic duplicates are promoted into the shared authoring area.
+
+Native Benchmark and Assessment identities in this review build are publisher-neutral. The pinned NIWC repository remains recorded as migration/source provenance, but `niwc.` is not used as a native content namespace because repository custody does not establish authorship.
 
 ### Exhaustive corpus evidence
 
