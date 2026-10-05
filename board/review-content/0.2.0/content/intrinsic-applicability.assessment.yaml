@@ -1,0 +1,59 @@
+assessment:
+  id: board.intrinsic-applicability
+  version: 1
+  assessment_title: Evaluate a local condition only on UNIX systems
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    enabled-value:
+      variable_title: Enabled value
+      kind: constant
+      datatype: boolean
+      value: true
+  states:
+    family-is-unix:
+      state_title: System family is UNIX
+      capability: independent.family
+      state:
+        field: family
+        datatype: string
+        operation: equal
+        value: unix
+        match: all
+        existence: some
+    enabled-is-true:
+      state_title: Enabled value is true
+      capability: variable.value
+      state:
+        field: value
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+  tests:
+    test-unix-family:
+      test_title: Establish intrinsic applicability
+      capability: independent.family
+      reported_elements: all
+      states:
+      - family-is-unix
+      check_existence: some
+      check: all
+    test-enabled:
+      test_title: Evaluate the local value
+      capability: variable.value
+      reported_elements: all
+      variable: enabled-value
+      states:
+      - enabled-is-true
+      check_existence: some
+      check: all
+  applicability:
+    test: test-unix-family
+  evaluate:
+    test: test-enabled
