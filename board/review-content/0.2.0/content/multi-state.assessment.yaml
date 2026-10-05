@@ -1,0 +1,51 @@
+assessment:
+  id: board.multi-state
+  version: 1
+  assessment_title: Require one value to satisfy two explicit States
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    candidate:
+      variable_title: Candidate integer
+      kind: constant
+      datatype: integer
+      value: 10
+  states:
+    greater-than-five:
+      state_title: Value is greater than five
+      capability: variable.value
+      state:
+        field: value
+        datatype: integer
+        operation: greater_than
+        value: 5
+        match: all
+        existence: some
+    less-than-twenty:
+      state_title: Value is less than twenty
+      capability: variable.value
+      state:
+        field: value
+        datatype: integer
+        operation: less_than
+        value: 20
+        match: all
+        existence: some
+  tests:
+    test-range:
+      test_title: Candidate satisfies both range boundaries
+      capability: variable.value
+      reported_elements: all
+      variable: candidate
+      states:
+      - greater-than-five
+      - less-than-twenty
+      states_match: all
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-range
