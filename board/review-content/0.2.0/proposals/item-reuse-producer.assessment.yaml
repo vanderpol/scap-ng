@@ -1,0 +1,38 @@
+# PROPOSED 0.2.0 syntax for Board review; not yet part of assessment.schema.json.
+assessment:
+  id: board.shared-file-collection
+  version: 1
+  assessment_title: Collect reusable configuration-file observations
+  mode: automated
+  class: inventory
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+
+  objects:
+    configuration-files:
+      object_title: Configuration files that may be reused by other Assessments
+      capability: unix.file
+      select:
+        directory:
+          datatype: string
+          operation: equal
+          value: /etc/example
+        name:
+          datatype: string
+          operation: pattern_match
+          value: .+\.conf
+      filesystem: local
+
+  tests:
+    collect-configuration-files:
+      test_title: Establish the reusable observation population
+      capability: unix.file
+      reported_elements: all
+      object: configuration-files
+      check_existence: some
+      check: all
+
+  evaluate:
+    test: collect-configuration-files
