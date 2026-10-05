@@ -110,6 +110,21 @@ class ExplicitDefaultsTests(unittest.TestCase):
         variable_result = json.loads((ROOT / "schema/v0.2.0/variable-result.schema.json").read_text())
         self.assertIn("item_refs", variable_result["required"])
 
+        dependency = assessment["properties"]["assessment"]["properties"]["dependencies"]["additionalProperties"]
+        for field in ("assessment", "expected_id", "expected_version", "purpose"):
+            self.assertIn(field, dependency["required"])
+
+        common = json.loads((ROOT / "schema/v0.2.0/capability-common.schema.json").read_text())
+        object_entity = common["$defs"]["object_entity_base"]
+        state_entity = common["$defs"]["state_entity_base"]
+        scalar_entity = common["$defs"]["scalar_value_predicate"]
+        self.assertTrue(any("variable_match" in branch.get("then", {}).get("required", [])
+                            for branch in object_entity["allOf"]))
+        self.assertTrue(any("variable_match" in branch.get("then", {}).get("required", [])
+                            for branch in state_entity["allOf"]))
+        self.assertTrue(any("variable_match" in branch.get("then", {}).get("required", [])
+                            for branch in scalar_entity["allOf"]))
+
     def test_record_fields(self):
         doc = self.fixture()
         record = {"name": "key", "value": "value", "operation": "equals",
