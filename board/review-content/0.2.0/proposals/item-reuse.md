@@ -117,6 +117,23 @@ item input contract -> local imported Object -> local State/Test -> local result
 
 Only observations cross that boundary. The producer's Test result does not.
 
+### What is referenced where
+
+The example deliberately uses three different identities:
+
+- `result_artifact` in the request locates the exact prior result bytes to load.
+- `source_execution_id` identifies the Assessment execution inside those bytes;
+  the materialized Item records that same value as `context.origin.result_ref`
+  and `source_execution_ref`.
+- `item_refs` names source Item identities. `id_map` gives each imported Item
+  an explicit local identity, such as `configuration-file-001` becoming
+  `imported-configuration-file-001`.
+
+The consumer's Object and Test operate on the locally materialized identities.
+The source IDs remain provenance, not live cross-result references. This is the
+key design choice that keeps a consumer result self-contained and explainable.
+
+
 ## Questions this exposes for Board/design review
 
 - Is `item_inputs` the right native term, or should this be framed as an
