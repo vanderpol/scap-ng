@@ -75,6 +75,10 @@ def main() -> int:
             (native / "assessments" / "manual" / "SV-243502.manual.assessment.yaml").read_text(encoding="utf-8")
         )["assessment"]
         assert assessment["mode"] == "manual"
+        assert assessment["class"] == "compliance"
+        assert assessment["purpose"] == "assessment"
+        assert assessment["inputs"] == {}
+        assert assessment["evidence"] == []
         assert "Schema Admins" in assessment["procedure"]
         assert "\n" in assessment["procedure"]
         assert "\n\n" in assessment["procedure"]
