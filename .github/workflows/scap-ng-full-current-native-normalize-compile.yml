@@ -121,18 +121,42 @@ jobs:
               if target.exists(): raise SystemExit(f"Duplicate generated key: {status['key']}")
               shutil.copytree(source,target)
           if len(statuses)!=65: raise SystemExit(f"Expected 65 package status records, got {len(statuses)}")
+          expected_blockers={
+              "U_MS_SQL_Server_2016_Database_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2016_Instance_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV14-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Database_V1R2_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Instance_V1R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+          }
+          blocked_packages=[x for x in statuses if x["status"]!="generated"]
+          unexpected=[]
+          for row in blocked_packages:
+              marker=expected_blockers.get(row["artifact"])
+              if not marker or marker not in row.get("log_tail",""):
+                  unexpected.append(row)
+          for artifact in expected_blockers:
+              row=next((x for x in statuses if x["artifact"]==artifact),None)
+              if row is None or row["status"]=="generated":
+                  unexpected.append({
+                      "artifact":artifact,
+                      "status":"missing" if row is None else row["status"],
+                      "reason":"expected sqlext blocker disappeared; review before changing baseline",
+                  })
           summary={"source_policy":"fresh_same_run_only","niwc_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
                    "packages":len(statuses),"generated":sum(x["status"]=="generated" for x in statuses),
-                   "blocked":sum(x["status"]!="generated" for x in statuses),
-                   "blocked_packages":[x for x in statuses if x["status"]!="generated"]}
+                   "blocked":len(blocked_packages),
+                   "known_blocked":sum(x["artifact"] in expected_blockers for x in blocked_packages),
+                   "unexpected_blocked":len(unexpected),
+                   "expected_blockers":expected_blockers,
+                   "blocked_packages":blocked_packages}
           Path("work/evidence").mkdir(parents=True,exist_ok=True)
           Path("work/evidence/generation-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
-          print(json.dumps({k:v for k,v in summary.items() if k!="blocked_packages"},indent=2))
-          if summary["generated"] != 65 or summary["blocked"] != 0:
-              blocked_names=", ".join(x["artifact"] for x in summary["blocked_packages"])
+          print(json.dumps({k:v for k,v in summary.items() if k not in {"blocked_packages","expected_blockers"}},indent=2))
+          if summary["packages"] != 65 or summary["generated"] != 61 or summary["known_blocked"] != 4 or unexpected:
               raise SystemExit(
-                  f"Full review artifact requires 65/65 generated benchmarks; "
-                  f"got {summary['generated']}/65 with {summary['blocked']} blocked: {blocked_names}"
+                  "Full review artifact requires all 65 packages accounted for with "
+                  "61 generated, exactly four known independent.sqlext blockers, and zero unexpected blockers; "
+                  f"got packages={summary['packages']} generated={summary['generated']} "
+                  f"known_blocked={summary['known_blocked']} unexpected={len(unexpected)}"
               )
           PY
       - name: Preserve conversion output for review
@@ -259,6 +283,8 @@ jobs:
           pct=round(100.0*delta/before["total_bytes"],2) if before["total_bytes"] else 0.0
           summary={"niwc_revision":generation["niwc_revision"],"source_packages":generation["packages"],
                    "generated_native_benchmarks":generation["generated"],"blocked_source_packages":generation["blocked"],
+              "known_blocked_source_packages":generation.get("known_blocked",0),
+              "unexpected_blocked_source_packages":generation.get("unexpected_blocked",0),
                    **normalizer["summary"],
                    "schema_documents_before":schema_before["documents_checked"],
                    "schema_invalid_before":schema_before["invalid"],
@@ -347,7 +373,7 @@ jobs:
           (root/"README.md").write_text(
               "# NIWC Current full SCAP-NG review build\n\n"
               "This artifact is generated fresh from all 65 pinned NIWC Current SCAP 1.4 packages.\n"
-              "Publication is gated on 65/65 native Benchmark trees with zero blocked source packages.\n\n"
+              "Publication is gated on all 65 source packages being accounted for, with 61 native Benchmark trees, exactly four expected independent.sqlext publisher-extension blockers, and zero unexpected blockers.\n\n"
               "## Layout\n\n"
               "- source/ — fresh generated native SCAP-NG authoring trees\n"
               "- normalized/ — exact-semantics normalized authoring trees\n"
