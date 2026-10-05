@@ -199,33 +199,49 @@ For the current normative draft, see [Results and Evidence](../specification/res
 
 ## What is ready for Board review
 
-The frozen 0.2.0 schema baseline is accompanied by six small converter-produced review cases under [review-content/0.2.0](review-content/0.2.0/): family, UNIX file, Windows registry, directory filter, Windows WMI process query, and symlink resolution. Four earlier native/manual examples remain supporting examples rather than being claimed as converter successes.
+The current 0.2.0 Board review surface is broader than the original six-case converter pilot.
 
-These samples preserve source provenance, independently stated expected outcomes, meaningful IDs, and strict 0.2.0 validation. They are **pending human review**, not Board-approved conformance content.
+Reviewers now have:
+
+- the current versioned 0.2.0 schema and capability mappings on `main`;
+- six compact source-to-NG converter pilot cases with pinned SCAP 1.4/OVAL provenance and independent expected outcomes;
+- frequency-oriented Self-Assertion examples for commonly used OVAL capability families and language mechanisms;
+- focused NG examples for conditional evaluation, applicability, Organizational Input, reporting projection, redaction, manual Assessment, and other current authoring/result concepts;
+- explicit proposal samples for unsettled features such as collected Item reuse;
+- a candidate Assessment-result dependency sample explicitly framed as a possible native structural analog of OVAL `extend_definition`, with the current converter continuing to preserve `extend_definition` semantics by recursive inlining;
+- Benchmark/Rule/Assessment result schemas and examples showing compact summaries, deterministic messages/reasons, bounded evidence, completeness, and redaction;
+- a full NIWC Current migration build that accounts for all 65 pinned source packages, with 61 supported native conversions and four intentional `independent.sqlext` publisher-extension blockers;
+- published proposal/vote records and open-design discussions.
+
+These materials are **pending human/Board review**. Green CI demonstrates structural and semantic regression evidence; it does not make the design Board-approved or prove independent scanner/live-target equivalence.
+
+The maintained review entry points are [board/README.md](README.md), [review-content/0.2.0/README.md](review-content/0.2.0/README.md), and [FEATURE-SAMPLES.md](review-content/0.2.0/FEATURE-SAMPLES.md).
 
 ## What we need from the OVAL Board
 
-- Review the six small source-to-NG examples for semantic fidelity and readability.
-- Confirm whether OVAL 5.12.3 plus explicitly reviewed later fixes/reinstatements is a reasonable baseline.
-- Identify any non-deprecated Test/Object/State/Variable semantics that NG has unintentionally omitted or changed.
+- Review the source-to-NG converter pilot and representative feature samples for semantic fidelity, readability, and authoring clarity.
+- Confirm whether OVAL 5.12.3 plus explicitly reviewed later fixes/reinstatements is a reasonable semantic baseline.
+- Identify any used, non-deprecated Test/Object/State/Variable semantics NG has unintentionally omitted or changed.
 - Confirm or challenge the proposed handling of deprecated Tests and later reinstatements.
-- Review native capability naming where historical numeric/version suffixes are removed but source identity remains in provenance.
-- Advise on genuinely new OVAL 6 Test semantics, especially deferred ESX/VMware work and any known 5.12.3 errata.
-- Review applicability, record/entity, existence/cardinality, Variable/Set/Filter, and six-state result behavior for interoperability concerns.
-- Review the separation of policy, Assessment execution, collected evidence, and Results.
+- Review native capability naming where historical suffixes are removed but source identity remains in provenance.
+- Review applicability, records/entities, existence/cardinality, Variables/Sets/Filters/functions, six-state technical results, and explicit-default behavior for interoperability concerns.
+- Review the proposed result redesign: compact Benchmark/Rule summaries, detailed Assessment evidence, deterministic messages/reasons, bounded evidence, completeness, redaction, and optional compatibility projections.
+- Discuss whether NG should preserve an explicit structural analog of OVAL `extend_definition` or continue using semantic inlining as the canonical representation.
+- Review collected Item reuse separately from Assessment-result reuse so collection optimization is not conflated with logical result composition.
+- Advise on deferred or genuinely new OVAL 6 semantics, especially ESX/VMware and other areas where current source evidence is insufficient.
 - Ratify, reject, or revise the narrow proposals that affect OVAL semantics; published proposal text should not be silently rewritten after voting begins.
 - Tell us where OVAL governance should own a rule versus where SCAP-NG should define a migration/native-language rule.
 
 ## What happens next
 
-After the six-case human review gate:
+After human/Board review of this package:
 
-1. **Fix only demonstrated defects first.** Any issue becomes a small permanent reproducer and regression before broader changes.
-2. **Expand the conformance corpus.** Add more Self-Assertion coverage and representative RHEL, Windows, DNS, Apache, and other content only after the small examples are accepted.
-3. **Close known converter gaps.** Direct Variable Tests, more complex Object-component/function chains, Sets/Filters, and other valid OVAL patterns are next priorities.
-4. **Increase independent runtime evidence.** Add collector/live-target and differential/reference-scanner testing so conversion and schema checks are not the only evidence.
-5. **Build the editor from accepted native content.** The editor should follow the stabilized language rather than drive its semantics.
-6. **Harden packaging/results.** Continue manifest, signing/trust, privacy, evidence-volume, and enterprise-scale work without changing assessment truth semantics.
-7. **Prepare the standards path.** Once semantics and conformance evidence are stable, consolidate normative language, terminology, crosswalks, and Board decisions into a specification suitable for broader SCAP/NIST discussion.
+1. **Fix demonstrated defects first.** Every accepted issue becomes a small permanent reproducer and regression before broader changes.
+2. **Resolve open architecture questions.** In particular: `extend_definition` representation, collected Item reuse binding, embedded Objects if retained, and any unresolved result-projection/compatibility questions.
+3. **Increase independent runtime evidence.** Add collector/live-target and differential/reference-scanner testing so converter/schema evidence is not the only conformance layer.
+4. **Expand conformance coverage deliberately.** Add more representative Self-Assertion and production content only where it exercises a distinct semantic gap.
+5. **Build tooling on accepted semantics.** Editors and additional authoring front ends should follow the stabilized language rather than define it.
+6. **Harden packaging/results interoperability.** Continue signing/trust, privacy, evidence-volume, SIEM projection, and ARF-compatibility research without changing technical truth.
+7. **Prepare the standards path.** Consolidate accepted normative language, terminology, crosswalks, conformance requirements, and Board decisions into a specification suitable for broader SCAP/NIST discussion.
 
 Until that review occurs, 0.2.0 remains a tested working draft, not a finished standard.
