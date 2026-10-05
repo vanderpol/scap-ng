@@ -10,8 +10,10 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import yaml
+from jsonschema import Draft202012Validator
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
 CONVERTER = HERE / "stig_manual_to_scapng.py"
 RENDERER = HERE / "render_stig_audit_outputs.py"
 
@@ -60,10 +62,14 @@ def main() -> int:
         run(str(CONVERTER), str(source), "--output-dir", str(native))
 
         benchmark = yaml.safe_load((native / "benchmark.yaml").read_text(encoding="utf-8"))
+        benchmark_schema = yaml.safe_load((ROOT / "schema/v0.2.0/benchmark.schema.json").read_text(encoding="utf-8"))
+        assert not list(Draft202012Validator(benchmark_schema).iter_errors(benchmark))
         assert benchmark["benchmark"]["rules"] == ["SV-243502"]
         assert benchmark["benchmark"]["profiles"][0]["disabled_rules"] == ["SV-243502"]
 
         rule_doc = yaml.safe_load((native / "rules" / "SV-243502.rule.yaml").read_text(encoding="utf-8"))
+        rule_schema = yaml.safe_load((ROOT / "schema/v0.2.0/rule.schema.json").read_text(encoding="utf-8"))
+        assert not list(Draft202012Validator(rule_schema).iter_errors(rule_doc))
         rule = rule_doc["rule"]
         assert any(x == {"scheme": "disa-vulnerability-id", "value": "V-243502"} for x in rule["identifiers"])
         assert rule["assessment_choices"]["manual"]["assessment"].endswith("SV-243502.manual.assessment.yaml")
@@ -71,9 +77,12 @@ def main() -> int:
         assert "<VulnDiscussion>" not in rule["discussion"]
         assert "CCI-000366" in str(rule["identifiers"])
 
-        assessment = yaml.safe_load(
+        assessment_doc = yaml.safe_load(
             (native / "assessments" / "manual" / "SV-243502.manual.assessment.yaml").read_text(encoding="utf-8")
-        )["assessment"]
+        )
+        assessment_schema = yaml.safe_load((ROOT / "schema/v0.2.0/assessment.schema.json").read_text(encoding="utf-8"))
+        assert not list(Draft202012Validator(assessment_schema).iter_errors(assessment_doc))
+        assessment = assessment_doc["assessment"]
         assert assessment["mode"] == "manual"
         assert assessment["class"] == "compliance"
         assert assessment["purpose"] == "assessment"
