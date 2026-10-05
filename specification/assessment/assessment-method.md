@@ -829,24 +829,26 @@ Assessment semantics.
 coverage is still open.**
 
 Each supported native Object capability SHALL define a typed, versioned
-behavior contract: its allowed settings, allowed values, effective defaults,
-validity conditions, Object collection/existence/error effects and supported
-combinations. SCAP-NG SHALL NOT make authors rely on undocumented
-collector-specific defaults.
+behavior contract: its allowed settings, allowed values, validity conditions,
+Object collection/existence/error effects and supported combinations. Native
+SCAP-NG SHALL NOT define a behavior choice by omission. When two or more
+behavior values are semantically possible, authored content SHALL state the
+effective value explicitly and schema validation SHALL reject its absence.
 
 Stage-1 migration SHALL preserve all behavior settings explicitly provided by
-the source and SHALL materialize behavior defaults **only when their effective
-meaning is established for the relevant OVAL Object type**. Absence of the
-optional `behaviors` element SHALL NOT automatically be assumed equivalent to
-an empty element or a partially specified element without verifying the source
-language's omission semantics.
+the source and SHALL materialize every applicable OVAL default as an explicit
+native value **only when its effective meaning is established for the relevant
+OVAL Object type**. Absence of the optional `behaviors` element SHALL NOT
+automatically be assumed equivalent to an empty element or a partially
+specified element without verifying the source language's omission semantics.
 
-Native Object authoring SHOULD expose applicable effective behaviors with
+Native Object authoring SHALL expose applicable effective behaviors with
 concrete values. Conversion provenance SHALL distinguish values explicitly
-authored in OVAL from values inferred through a documented default. If a
+authored in OVAL from values materialized from a documented OVAL default. If a
 behavior is unsupported or its effective semantics cannot be established,
 migration SHALL report the affected Definition instead of silently choosing a
-default.
+value. A behavior that has exactly one possible meaning because it is intrinsic
+to the native construct is not a default and need not be redundantly authored.
 
 Conformance tests SHALL distinguish XML attribute preservation from actual
 collector behavior and SHALL cover conditional semantics (for example,
