@@ -199,7 +199,7 @@ def validate_result_set(document, assessments):
             raise ValueError('Expression replay differs from recorded scheduling')
     return document
 
-def assemble_result_set(assessments, expression, observations, *, include_reports=True, item_scope='all'):
+def assemble_result_set(assessments, expression, observations, *, include_reports=True, item_scope):
     """Observations are per-invocation evidence, supplied by a trusted producer.
 
     This evaluator supports one target and one shared binding context per run.
