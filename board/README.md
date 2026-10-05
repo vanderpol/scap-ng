@@ -40,13 +40,13 @@ The primary OVAL Board artifact is intentionally small and optimized for human r
 It contains six representative benchmarks:
 
 - RHEL 9;
+- Oracle Linux 9;
 - Windows 11;
-- Apple macOS 15;
+- Windows Server 2025;
 - Apache 2.4 UNIX Server;
-- Apache Tomcat 9;
-- Google Chrome.
+- Apache Tomcat 9.
 
-No Solaris benchmark is present in the pinned NIWC source repository. Solaris can be added later when a pinned SCAP 1.4 source is available.
+The two Linux and two Windows benchmarks are intentionally paired so reviewers can see cross-benchmark Assessment reuse in practice. Apache and Tomcat retain application-server coverage.
 
 The artifact contains only:
 
