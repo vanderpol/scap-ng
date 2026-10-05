@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Convert standalone DISA STIG manual XCCDF into native SCAP-NG authoring YAML.
+"""Convert standalone DISA STIG manual XCCDF into current native SCAP-NG authoring YAML.
 
-This is the older-XCCDF/manual source adapter tracked by issue #157.  It is
-intentionally source-version-aware and does not assume XCCDF 1.2 ID prefixes.
-Historical XCCDF identities are written to provenance.json, not required as
-native execution semantics.
+The source adapter accepts older DISA standalone XCCDF without assuming XCCDF
+1.2 ID constraints. Legacy identities and source-only metadata are retained in
+provenance; native Rule/Assessment documents follow the current file-backed
+Benchmark -> Rule -> Assessment model.
 """
 from __future__ import annotations
 
@@ -18,8 +18,6 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import yaml
-
-SCAP_NG_VERSION = "0.3.0-development"
 
 
 def lname(tag: str) -> str:
@@ -39,7 +37,6 @@ def descendant(node: ET.Element, name: str) -> ET.Element | None:
 
 
 def text(node: ET.Element | None) -> str | None:
-    """Compact text for identifiers, titles, and short metadata."""
     if node is None:
         return None
     value = " ".join(" ".join(node.itertext()).split())
@@ -47,7 +44,6 @@ def text(node: ET.Element | None) -> str | None:
 
 
 def prose_text(node: ET.Element | None) -> str | None:
-    """Human prose with meaningful source line/paragraph boundaries retained."""
     if node is None:
         return None
     raw = "".join(node.itertext()).replace("\r\n", "\n").replace("\r", "\n")
@@ -56,7 +52,7 @@ def prose_text(node: ET.Element | None) -> str | None:
         lines.pop(0)
     while lines and not lines[-1]:
         lines.pop()
-    normalized = []
+    normalized: list[str] = []
     blank = False
     for line in lines:
         if not line:
@@ -72,31 +68,14 @@ def prose_text(node: ET.Element | None) -> str | None:
 
 def safe_id(value: str | None, fallback: str) -> str:
     raw = value or fallback
-    cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "_", raw).strip("_.-")
+    cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "-", raw).strip("-.")
     return cleaned or fallback
-
-
-def native_rule_id(source_rule_id: str | None, vulnerability_id: str | None, fallback: str) -> str:
-    for value in (source_rule_id, vulnerability_id):
-        if not value:
-            continue
-        match = re.search(r"SV-\d+", value, flags=re.I)
-        if match:
-            return match.group(0).upper()
-    if vulnerability_id and re.fullmatch(r"V-\d+", vulnerability_id, flags=re.I):
-        return "SV-" + vulnerability_id.split("-", 1)[1]
-    return safe_id(source_rule_id or vulnerability_id, fallback)
-
-
-def native_rule_version(source_rule_id: str | None) -> str:
-    match = re.search(r"(r\d+)", source_rule_id or "", flags=re.I)
-    return match.group(1).lower() if match else "1"
 
 
 def dump_yaml(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        yaml.safe_dump(value, sort_keys=False, allow_unicode=True, width=120),
+        yaml.safe_dump(value, sort_keys=False, allow_unicode=True, width=100),
         encoding="utf-8",
     )
 
@@ -109,7 +88,6 @@ def dump_json(path: Path, value: object) -> None:
 def extract_xccdf(source: Path, work: Path) -> tuple[Path, dict]:
     if source.suffix.lower() != ".zip":
         return source, {"source_file": source.name, "archive_sha256": None}
-
     sha = hashlib.sha256(source.read_bytes()).hexdigest()
     with zipfile.ZipFile(source) as zf:
         candidates = [
@@ -117,7 +95,7 @@ def extract_xccdf(source: Path, work: Path) -> tuple[Path, dict]:
             if n.lower().endswith(".xml") and "xccdf" in n.lower()
         ]
         manual = [n for n in candidates if "manual" in n.lower()]
-        selected = (manual or candidates)
+        selected = manual or candidates
         if not selected:
             raise SystemExit("No XCCDF XML found in source ZIP")
         name = sorted(selected, key=lambda x: (len(x), x.lower()))[0]
@@ -138,11 +116,6 @@ def xccdf_namespace(root: ET.Element) -> str | None:
     return None
 
 
-def benchmark_description(root: ET.Element) -> str | None:
-    desc = child(root, "description")
-    return text(desc)
-
-
 STIG_DESCRIPTION_FIELDS = {
     "VulnDiscussion": "discussion",
     "FalsePositives": "false_positives",
@@ -159,7 +132,6 @@ STIG_DESCRIPTION_FIELDS = {
 
 
 def stig_description_fields(rule: ET.Element) -> dict[str, str | None]:
-    """Parse DISA's escaped XML fragment carried inside xccdf:description."""
     desc = child(rule, "description")
     if desc is None:
         return {}
@@ -178,65 +150,18 @@ def stig_description_fields(rule: ET.Element) -> dict[str, str | None]:
     return result or {"discussion": prose_text(desc)}
 
 
-def rule_discussion(rule: ET.Element) -> str | None:
-    return stig_description_fields(rule).get("discussion")
-
-
 def rule_check(rule: ET.Element) -> str | None:
     for check_node in children(rule, "check"):
         content = descendant(check_node, "check-content")
-        if content is not None and prose_text(content):
-            return prose_text(content)
+        value = prose_text(content)
+        if value:
+            return value
     return None
 
 
 def rule_fix(rule: ET.Element) -> str | None:
     fixes = [prose_text(x) for x in children(rule, "fixtext")]
-    fixes = [x for x in fixes if x]
-    return "\n\n".join(fixes) if fixes else None
-
-
-def identifiers(rule: ET.Element, stig_id: str | None, vulnerability_id: str | None) -> list[dict]:
-    out = []
-    for node in children(rule, "ident"):
-        value = text(node)
-        if not value:
-            continue
-        system = (node.get("system") or "").lower()
-        if "cci" in system:
-            scheme = "cci"
-        elif "legacy" in system:
-            scheme = "disa-legacy-id"
-        else:
-            scheme = "source-ident"
-        out.append({"scheme": scheme, "value": value})
-    if stig_id:
-        out.append({"scheme": "disa-stig-id", "value": stig_id})
-    if vulnerability_id:
-        out.append({"scheme": "disa-vulnerability-id", "value": vulnerability_id})
-    seen = set()
-    unique = []
-    for row in out:
-        key = (row["scheme"], row["value"])
-        if key not in seen:
-            seen.add(key)
-            unique.append(row)
-    return unique
-
-
-def references(rule: ET.Element) -> list[dict]:
-    out = []
-    for ref in children(rule, "reference"):
-        entry = {}
-        for node in list(ref):
-            value = text(node)
-            if value:
-                entry[lname(node.tag)] = value
-        if not entry and text(ref):
-            entry["text"] = text(ref)
-        if entry:
-            out.append(entry)
-    return out
+    return "\n\n".join(x for x in fixes if x) or None
 
 
 def profile_description(profile: ET.Element) -> str | None:
@@ -244,14 +169,12 @@ def profile_description(profile: ET.Element) -> str | None:
     if desc is None:
         return None
     raw = "".join(desc.itertext()).strip()
-    if raw == "<ProfileDescription></ProfileDescription>":
-        return None
     if raw.startswith("<ProfileDescription>") and raw.endswith("</ProfileDescription>"):
         try:
-            return text(ET.fromstring(raw))
+            return prose_text(ET.fromstring(raw))
         except ET.ParseError:
             pass
-    return text(desc)
+    return prose_text(desc)
 
 
 def source_profile_rows(root: ET.Element) -> list[dict]:
@@ -261,6 +184,7 @@ def source_profile_rows(root: ET.Element) -> list[dict]:
             "id": profile.get("id"),
             "title": text(child(profile, "title")),
             "description": profile_description(profile),
+            "extends": profile.get("extends"),
             "select": [
                 {"idref": x.get("idref"), "selected": x.get("selected")}
                 for x in children(profile, "select")
@@ -274,28 +198,31 @@ def native_profile_rows(
     source_rule_to_native: dict[str, str],
     source_group_to_native_rules: dict[str, list[str]],
 ) -> list[dict]:
-    """Resolve old XCCDF profile selections into NG's subtractive profile model."""
     rows = []
     for profile in source_profile_rows(root):
         disabled: list[str] = []
         for action in profile["select"]:
             if str(action.get("selected")).lower() != "false":
                 continue
-            target = action.get("idref")
-            expanded = []
-            if target in source_rule_to_native:
-                expanded = [source_rule_to_native[target]]
-            else:
-                expanded = source_group_to_native_rules.get(str(target), [])
+            target = str(action.get("idref") or "")
+            expanded = (
+                [source_rule_to_native[target]]
+                if target in source_rule_to_native
+                else source_group_to_native_rules.get(target, [])
+            )
             for rule_id in expanded:
                 if rule_id not in disabled:
                     disabled.append(rule_id)
-        rows.append({
-            "id": profile.get("id"),
+        row = {
+            "id": safe_id(profile.get("id"), "profile"),
             "title": profile.get("title"),
             "description": profile.get("description"),
             "disabled_rules": disabled,
-        })
+            "parameters": {},
+        }
+        if profile.get("extends"):
+            row["extends"] = safe_id(str(profile["extends"]), str(profile["extends"]))
+        rows.append(row)
     return rows
 
 
@@ -306,25 +233,96 @@ def iter_rules(node: ET.Element, group_path: list[dict] | None = None):
         if kind == "Rule":
             yield item, group_path
         elif kind == "Group":
-            g = {
-                "id": item.get("id"),
-                "title": text(child(item, "title")),
-            }
+            g = {"id": item.get("id"), "title": text(child(item, "title"))}
             yield from iter_rules(item, group_path + [g])
 
 
-def group_rows(root: ET.Element) -> list[dict]:
-    rows = []
-    def walk(node: ET.Element, parent: str | None = None):
-        for item in children(node, "Group"):
-            rows.append({
-                "id": item.get("id"),
-                "title": text(child(item, "title")),
-                "parent": parent,
-            })
-            walk(item, item.get("id"))
-    walk(root)
-    return rows
+def native_identity(rule: ET.Element, path: list[dict], index: int) -> tuple[str, str]:
+    source_rule_id = rule.get("id") or ""
+    match = re.search(r"(SV-\d+)(r\d+)?", source_rule_id, re.I)
+    if match:
+        return match.group(1).upper(), (match.group(2) or "1")
+    vuln = str(path[-1].get("id") or "") if path else ""
+    match = re.fullmatch(r"V-(\d+)", vuln, re.I)
+    if match:
+        return f"SV-{match.group(1)}", "1"
+    return safe_id(source_rule_id, f"rule-{index}"), "1"
+
+
+def identifiers(rule: ET.Element, path: list[dict]) -> list[dict]:
+    out: list[dict] = []
+    stig_id = text(child(rule, "version"))
+    if stig_id:
+        out.append({"scheme": "disa-stig-id", "value": stig_id})
+    if path and path[-1].get("id"):
+        out.append({"scheme": "disa-vulnerability-id", "value": path[-1]["id"]})
+    for node in children(rule, "ident"):
+        value = text(node)
+        if not value:
+            continue
+        system = str(node.get("system") or "").lower()
+        scheme = "cci" if "cci" in system or value.upper().startswith("CCI-") else "source-ident"
+        item = {"scheme": scheme, "value": value}
+        if scheme == "source-ident" and node.get("system"):
+            item["system"] = node.get("system")
+        out.append(item)
+    unique = []
+    seen = set()
+    for item in out:
+        key = (item.get("scheme"), item.get("value"), item.get("system"))
+        if key not in seen:
+            unique.append(item)
+            seen.add(key)
+    return unique
+
+
+def references(rule: ET.Element) -> list[dict]:
+    out = []
+    for ref in children(rule, "reference"):
+        entry = {}
+        for node in list(ref):
+            value = text(node)
+            if value:
+                entry[lname(node.tag).lower()] = value
+        if not entry and text(ref):
+            entry["text"] = text(ref)
+        if entry:
+            out.append(entry)
+    return out
+
+
+def metadata(root: ET.Element) -> dict:
+    result: dict[str, list[str]] = {}
+    for block in children(root, "metadata"):
+        for node in list(block):
+            value = text(node)
+            if value:
+                result.setdefault(lname(node.tag).lower(), []).append(value)
+    return result
+
+
+def localized(node: ET.Element | None) -> list[dict]:
+    value = prose_text(node)
+    if not value:
+        return []
+    language = None if node is None else (
+        node.get("{http://www.w3.org/XML/1998/namespace}lang") or node.get("lang")
+    )
+    return [{"text": value, "language": language}]
+
+
+def benchmark_platform(root: ET.Element, benchmark_id: str, title: str) -> tuple[dict, list[str]]:
+    source_ids = [
+        x.get("idref") for x in children(root, "platform") if x.get("idref")
+    ]
+    platform_id = safe_id(source_ids[0] if source_ids else benchmark_id, benchmark_id)
+    return {
+        "id": platform_id,
+        "title": title,
+        # Standalone STIG manuals normally state scope but do not provide an
+        # executable platform assessment. Do not invent one.
+        "applicability": {},
+    }, source_ids
 
 
 def convert(source: Path, output: Path) -> dict:
@@ -341,28 +339,25 @@ def convert(source: Path, output: Path) -> dict:
     benchmark_id = safe_id(source_benchmark_id, "stig-manual")
     benchmark_title = text(child(root, "title")) or benchmark_id
     benchmark_version = text(child(root, "version"))
+    platform, source_platform_ids = benchmark_platform(root, benchmark_id, benchmark_title)
 
-    converted_rules = []
-    provenance_rules = []
+    converted_rules: list[str] = []
+    provenance_rules: list[dict] = []
     source_rule_to_native: dict[str, str] = {}
     source_group_to_native_rules: dict[str, list[str]] = {}
     used_ids: set[str] = set()
 
     for idx, (rule, path) in enumerate(iter_rules(root), start=1):
         source_rule_id = rule.get("id")
-        stig_id = text(child(rule, "version"))
-        vuln_id = path[-1].get("id") if path else None
-        base_id = native_rule_id(source_rule_id, vuln_id, f"rule-{idx}")
-        native_id = base_id
+        native_id, native_version = native_identity(rule, path, idx)
         if native_id in used_ids:
-            native_id = safe_id(f"{base_id}-{vuln_id or idx}", f"rule-{idx}")
+            raise SystemExit(f"Duplicate native Rule identity {native_id!r}")
         used_ids.add(native_id)
         if source_rule_id:
             source_rule_to_native[source_rule_id] = native_id
         for group in path:
-            group_id = group.get("id")
-            if group_id:
-                source_group_to_native_rules.setdefault(group_id, []).append(native_id)
+            if group.get("id"):
+                source_group_to_native_rules.setdefault(str(group["id"]), []).append(native_id)
 
         procedure = rule_check(rule)
         if not procedure:
@@ -370,41 +365,50 @@ def convert(source: Path, output: Path) -> dict:
                 f"Rule {source_rule_id or native_id!r} has no human-readable Check Text; "
                 "refusing to invent a Manual Assessment procedure."
             )
-        description_fields = stig_description_fields(rule)
+        fields = stig_description_fields(rule)
+        discussion = fields.get("discussion") or ""
+        fix = rule_fix(rule)
         assessment_id = f"{native_id}.manual"
-        extensions = {
-            key: value for key, value in description_fields.items()
-            if key != "discussion"
-        }
-        if "documentable" in extensions and extensions["documentable"] is not None:
-            extensions["documentable"] = str(extensions["documentable"]).lower() == "true"
+        assessment_rel = f"../assessments/manual/{assessment_id}.assessment.yaml"
 
-        assessment_path = f"../assessments/manual/{assessment_id}.assessment.yaml"
+        extension_fields = {
+            k: v for k, v in fields.items() if k != "discussion"
+        }
+        if "documentable" in extension_fields and isinstance(extension_fields["documentable"], str):
+            value = extension_fields["documentable"].strip().lower()
+            if value in ("true", "false"):
+                extension_fields["documentable"] = value == "true"
+
+        role_explicit = rule.get("role")
+        weight_explicit = rule.get("weight")
+        effective_role = role_explicit or "full"
+        effective_weight = float(weight_explicit) if weight_explicit is not None else 1.0
+
         rule_doc = {
             "rule": {
                 "id": native_id,
-                "version": native_rule_version(source_rule_id),
-                "title": text(child(rule, "title")) or "",
+                "version": native_version,
+                "title": text(child(rule, "title")) or native_id,
                 "severity": rule.get("severity") or "unknown",
-                "role": rule.get("role") or "full",
-                "weight": float(rule.get("weight") or 10.0),
-                "discussion": description_fields.get("discussion") or "",
+                "role": effective_role,
+                "weight": effective_weight,
+                "discussion": discussion,
                 "rationale": None,
-                "extensions": {"disa_stig": extensions},
+                "extensions": {"disa_stig": extension_fields},
                 "warnings": [],
-                "identifiers": identifiers(rule, stig_id, vuln_id),
+                "identifiers": identifiers(rule, path),
                 "references": references(rule),
                 "requires": [],
                 "conflicts": [],
                 "applicability": [],
                 "parameters": {},
-                "remediation": {"guidance": rule_fix(rule) or ""},
+                "remediation": {"guidance": fix} if fix else {},
                 "organizational_input_requirements": {},
                 "assessment_choices": {
-                    "manual": {"assessment": assessment_path}
+                    "manual": {"assessment": assessment_rel}
                 },
                 "default_assessment_choice": "manual",
-            },
+            }
         }
         dump_yaml(output / "rules" / f"{native_id}.rule.yaml", rule_doc)
 
@@ -417,22 +421,9 @@ def convert(source: Path, output: Path) -> dict:
                 "class": "compliance",
                 "purpose": "assessment",
                 "procedure": procedure,
-                "response": {
-                    "type": "compliance",
-                    "choices": [
-                        {"value": "pass", "label": "Pass", "outcome": "true"},
-                        {"value": "fail", "label": "Fail", "outcome": "false"},
-                        {"value": "unknown", "label": "Unknown", "outcome": "unknown"},
-                        {
-                            "value": "not_applicable",
-                            "label": "Not Applicable",
-                            "outcome": "not_applicable",
-                        },
-                    ],
-                    "allow_comment": True,
-                    "allow_evidence": True,
-                },
-            },
+                "inputs": {},
+                "evidence": [],
+            }
         }
         dump_yaml(
             output / "assessments" / "manual" / f"{assessment_id}.assessment.yaml",
@@ -444,71 +435,66 @@ def convert(source: Path, output: Path) -> dict:
             "native_rule_id": native_id,
             "native_assessment_id": assessment_id,
             "source_rule_id": source_rule_id,
-            "source_group_id": vuln_id,
-            "source_stig_id": stig_id,
-            "source_description_fields": description_fields,
+            "source_group_ancestry": path,
+            "source_stig_id": text(child(rule, "version")),
+            "source_description_fields": fields,
+            "source_attributes": {
+                "role": {"explicit": role_explicit, "effective": effective_role},
+                "weight": {"explicit": weight_explicit, "effective": effective_weight},
+            },
         })
 
-    native_groups = []
-    for group in group_rows(root):
-        gid = group.get("id")
-        native_groups.append({
-            "id": gid,
-            "title": group.get("title"),
-            "rules": source_group_to_native_rules.get(str(gid), []),
-        })
-
+    profiles = native_profile_rows(root, source_rule_to_native, source_group_to_native_rules)
     benchmark_doc = {
         "benchmark": {
             "id": benchmark_id,
-            "ng_schema_version": "0.2.0",
+            "ng_schema_version": None,
             "use_case": "compliance",
             "assessment_specifications": [],
-            "title": [{"text": benchmark_title, "language": None}],
-            "description": [{"text": benchmark_description(root) or "", "language": None}],
-            "language": "en",
-            "status": [],
+            "title": localized(child(root, "title")),
+            "description": localized(child(root, "description")),
+            "language": root.get("{http://www.w3.org/XML/1998/namespace}lang"),
+            "status": [
+                {"value": x.get("status") or text(x)}
+                for x in children(root, "status") if (x.get("status") or text(x))
+            ],
             "version": {"value": benchmark_version},
-            "metadata": {},
+            "metadata": metadata(root),
             "notices": [],
-            "front_matter": [],
-            "rear_matter": [],
+            "front_matter": localized(child(root, "front-matter")),
+            "rear_matter": localized(child(root, "rear-matter")),
             "references": [],
             "text_blocks": [],
-            "platform": {
-                "id": "active-directory-forest",
-                "title": "Active Directory Forest",
-                "applicability": {},
-            },
+            "platform": platform,
             "applicability_catalog": "applicability.yaml",
             "scoring": [],
             "parameters": [],
             "default_selection": True,
-            "groups": native_groups,
-            "profiles": native_profile_rows(
-                root,
-                source_rule_to_native,
-                source_group_to_native_rules,
-            ),
+            # Legacy DISA vulnerability wrapper Groups are not meaningful NG
+            # authoring taxonomy, so do not recreate one Group per Rule.
+            "groups": [],
+            "profiles": profiles,
             "rules": converted_rules,
-        },
+        }
     }
     dump_yaml(output / "benchmark.yaml", benchmark_doc)
-    dump_yaml(output / "applicability.yaml", {"applicability": []})
+    dump_yaml(output / "applicability.yaml", {"applicability": {}})
 
     provenance = {
-        "format": "scap-ng-stig-manual-conversion-provenance-0.1",
+        "format": "scap-ng-stig-manual-conversion-provenance-0.2",
         "source": {
             **archive_meta,
             "xccdf_namespace": namespace,
             "benchmark_id": source_benchmark_id,
             "benchmark_version": benchmark_version,
+            "platform_ids": source_platform_ids,
+            "profiles": source_profile_rows(root),
         },
         "native": {
             "benchmark_id": benchmark_id,
-            "ng_schema_version": "0.2.0",
+            "rules": len(converted_rules),
+            "manual_assessments": len(converted_rules),
         },
-        "profiles": source_profile_rows(root),
         "rules": provenance_rules,
     }
     dump_json(output / "provenance.json", provenance)
@@ -521,6 +507,7 @@ def convert(source: Path, output: Path) -> dict:
         "source_version": benchmark_version,
         "rules": len(converted_rules),
         "manual_assessments": len(converted_rules),
+        "profiles": len(profiles),
         "output_dir": str(output),
     }
     dump_json(output / "conversion-summary.json", summary)
@@ -534,8 +521,7 @@ def main() -> int:
     ap.add_argument("source", type=Path, help="Manual XCCDF XML or DISA STIG ZIP")
     ap.add_argument("--output-dir", type=Path, required=True)
     args = ap.parse_args()
-    summary = convert(args.source, args.output_dir)
-    print(json.dumps(summary, indent=2, sort_keys=True))
+    print(json.dumps(convert(args.source, args.output_dir), indent=2, sort_keys=True))
     return 0
 
 
