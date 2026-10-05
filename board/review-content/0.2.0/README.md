@@ -1,6 +1,6 @@
 # SCAP-NG 0.2.0 Board review content
 
-Status: **six-case converter pilot; pending human review**.
+Status: **0.2.0 Board review corpus: six-case converter pilot plus frequency-oriented, supporting, and focused NG feature samples; pending human review**.
 
 ## View the sample content
 
@@ -29,11 +29,23 @@ The six-case pilot above was chosen for semantic coverage, not prevalence. To ma
 
 The existing UNIX file and Windows registry cases are also representative high-frequency families. The Windows process/WMI example remains because it exercises correlated-record semantics; it should be read as a useful semantic stress case, not as evidence that process queries themselves are common DISA checks.
 
-### New NG features
+### New NG feature samples
 
-For concepts that are new to SCAP-NG or intentionally more explicit than the SCAP 1.4 model, start with the [New NG feature samples](FEATURE-SAMPLES.md#new-ng-feature-samples). That section gives focused examples for conditional evaluation, Assessment-result dependency/reuse, intrinsic applicability, explicit `not_applicable`, evidence projection, redaction, typed Organizational Input, manual Assessment, and the collected-Item reuse proposal.
+For concepts that are new to SCAP-NG or intentionally more explicit than the SCAP 1.4 model, start with the [New NG feature samples](FEATURE-SAMPLES.md#new-ng-feature-samples). The focused examples now include:
 
-These are kept distinct from the frequency-oriented OVAL capability examples below so a reviewer can tell **new NG language features** from **common migrated OVAL patterns**.
+- [conditional evaluation](content/conditional-evaluation.assessment.yaml);
+- [Assessment-result dependency/reuse](content/assessment-result-dependency.assessment.yaml);
+- [intrinsic applicability](content/intrinsic-applicability.assessment.yaml) and a reusable [standalone applicability Assessment](content/standalone-applicability.assessment.yaml);
+- an explicit conditional [`not_applicable` outcome](content/conditional-not-applicable.assessment.yaml);
+- explicit evidence projection by [field list](content/reported-elements.assessment.yaml) and [`compared`](content/reported-elements-compared.assessment.yaml), alongside existing `all` examples;
+- [result redaction](content/redaction.assessment.yaml);
+- typed [Organizational Input consumption](content/organizational-input.assessment.yaml);
+- [manual Assessment](content/manual.assessment.yaml);
+- the proposed end-to-end [collected Item reuse/import model](proposals/item-reuse.md), including producer, consumer, request binding, and materialized Item provenance.
+
+The same index also highlights the cross-cutting **no hidden defaults** requirement: semantically meaningful choices such as quantifiers, collection behaviors, set/filter operations, Item materialization scope, and reporting projection are expected to be explicit rather than inferred by omission.
+
+These samples are intentionally separated from the frequency-oriented OVAL capability examples so reviewers can distinguish **new NG language features** from **common migrated OVAL patterns**. Future-iteration proposals such as target-scoped Organizational Input resolution are not presented as 0.2.0 source syntax.
 
 ### Key language-feature examples
 
@@ -48,12 +60,18 @@ Capability frequency alone is not sufficient for Board review. Real SCAP content
 | Set difference | [`set-difference.assessment.yaml`](content/set-difference.assessment.yaml) | Reusable Set subtraction with no hidden set behavior. |
 | Multiple State aggregation | [`multi-state.assessment.yaml`](content/multi-state.assessment.yaml) | Two States with explicit `states_match: all`. |
 | Intrinsic applicability | [`intrinsic-applicability.assessment.yaml`](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability separate from normal evaluation. |
-| Explicit reporting projection | [`reported-elements.assessment.yaml`](content/reported-elements.assessment.yaml) | Explicit evidence field selection; omission is not a reporting default. |
+| Standalone applicability | [`standalone-applicability.assessment.yaml`](content/standalone-applicability.assessment.yaml) | A reusable Assessment whose purpose is applicability and which uses the same ordinary Test/State language. |
+| Assessment-result dependency | [`assessment-result-dependency.assessment.yaml`](content/assessment-result-dependency.assessment.yaml) | Static dependency declaration and consumption of another Assessment's technical result without copying its implementation. |
+| Conditional evaluation | [`conditional-evaluation.assessment.yaml`](content/conditional-evaluation.assessment.yaml) | Explicit authored condition, then branch, and else branch. |
+| Explicit not-applicable branch | [`conditional-not-applicable.assessment.yaml`](content/conditional-not-applicable.assessment.yaml) | A reasoned technical `not_applicable` outcome produced by authored evaluation logic. |
+| Explicit reporting projection | [field list](content/reported-elements.assessment.yaml), [`compared`](content/reported-elements-compared.assessment.yaml) | Reporting selection is explicit; together with `all` examples, all three modes are visible. |
+| Result redaction | [`redaction.assessment.yaml`](content/redaction.assessment.yaml) | Preserve technical truth while suppressing a sensitive disclosed value. |
+| Organizational Input | [`organizational-input.assessment.yaml`](content/organizational-input.assessment.yaml) | Typed organization-supplied policy data feeds expected State only and does not alter executable Assessment behavior. |
 | Manual Assessment | [`manual.assessment.yaml`](content/manual.assessment.yaml) | Native human determination without an OCIL workflow graph. |
 
 These examples are intentionally more complex than the frequency-oriented capability examples. The review set should prove that SCAP-NG remains readable when the source logic is non-trivial, not merely that simple Tests serialize cleanly.
 
-## What these six samples cover
+## What the six converter-pilot samples cover
 
 - **Family:** singleton Object removal and regex Variable behavior.
 - **UNIX file:** exact file selection, existence/completeness, and linked evidence.
@@ -66,7 +84,7 @@ Three samples preserve complete source Definitions; three are intentionally sele
 
 ## About this review set
 
-This is a bounded six-case converter pilot for human/OVAL Board review. The YAML files are native SCAP-NG Assessment content; the XML files are pinned source evidence. Machine validation does not make a sample accepted, and this pilot does not by itself establish live collector or independent scanner equivalence.
+This review surface contains a bounded six-case converter pilot **plus** frequency-oriented native examples, supporting/stress examples, and focused NG feature samples. The six pilot YAML files are paired with pinned SCAP 1.4/OVAL source evidence; the additional samples exist to exercise current 0.2.0 authoring and result semantics that the six pilot cases alone do not cover. Machine validation does not make any sample accepted, and the combined sample corpus does not by itself establish live collector or independent scanner equivalence.
 
 Frozen technical baseline: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Self-Assertion source is pinned to `e3538595c5083b9c34d937a81d319234df9bbfaa`.
 
@@ -108,10 +126,9 @@ an unrelated Object produce the same named files/graphs. A fixed reviewed source
 ID plan is proven for these six cases; a general automatic naming algorithm is
 not claimed. Original numeric OVAL IDs are preserved verbatim as source identity.
 
-## Existing supporting seeds
+## Supporting and focused examples
 
-Four earlier examples are retained outside the six-case converter pilot, under
-`supporting_examples` in the manifest. They are not newly converted outputs:
+Four earlier examples remain listed under `supporting_examples` in the manifest. They are not newly converted outputs and continue to serve as non-trivial stress cases:
 
 | Supporting example | Origin and purpose |
 | --- | --- |
@@ -120,18 +137,25 @@ Four earlier examples are retained outside the six-case converter pilot, under
 | [Owner filter](examples/filter.md) | Native inspiration; Object component, four-level Variable chain, arithmetic, nested Sets/filters |
 | [Dependency](examples/dependency.md) | Native; platform guard, repeated dependency reuse and six guard states |
 
-Direct `variable.value` Test conversion remains a documented gap, with a focused
-reproducer. Keeping these seeds does not conceal that limitation or count them as
-converter successes. The complex native Variable/filter chain remains reviewable.
-The Board directory now also contains focused 0.2.0 feature samples. Treat [FEATURE-SAMPLES.md](FEATURE-SAMPLES.md) as the maintained inventory rather than relying on a hand-maintained file count here.
+Direct `variable.value` Test conversion remains a documented gap, with a focused reproducer. Keeping these seeds does not conceal that limitation or count them as converter successes.
+
+Beyond those four seeds, the Board directory now contains frequency-oriented examples and focused 0.2.0 feature samples for Variable functions, Set difference, multi-State aggregation, conditional execution, Assessment dependencies, applicability, reporting projection, redaction, Organizational Input, manual Assessment, and other current language surfaces. Treat [FEATURE-SAMPLES.md](FEATURE-SAMPLES.md) as the maintained canonical inventory rather than relying on a duplicated file list or hand-maintained total here.
+
+## Current sample-coverage gaps
+
+The current inventory is intentionally explicit about what is **not** yet feature-complete:
+
+- an embedded-Object example is still needed if embedded Objects remain in the final authoring contract;
+- automated Assessment `evidence` authoring is schema-visible but does not yet have a sufficiently explicit normative processor/result contract to justify inventing a Board sample;
+- collected-Item reuse authoring remains a proposal pending resolution of its source identity/binding questions, even though Item import/materialization result semantics already have conformance fixtures.
+
+These are tracked in [FEATURE-SAMPLES.md](FEATURE-SAMPLES.md). Unsupported-runtime conditions belong in Result conformance, not fake Assessment source syntax.
 
 ## Expected behavior and evidence
 
-All observations are **synthetic**. Independently authored case tables establish
-31 primary-case expectations and 17 supporting expectations. Results were reasoned
-from source/specification contracts before executing the helper. Native boundary
-variants are labeled and authored in fixtures; they are not Organizational Inputs
-that change Tests or commands.
+For the six converter-pilot cases and four manifest-backed supporting examples, all observations are **synthetic**. Independently authored case tables establish 31 primary-case expectations and 17 supporting expectations. Results were reasoned from source/specification contracts before executing the helper. Native boundary variants are labeled and authored in fixtures; they are not Organizational Inputs that change Tests or commands.
+
+The newer focused feature samples are primarily schema/semantic review examples and are indexed separately in [FEATURE-SAMPLES.md](FEATURE-SAMPLES.md); where runtime behavior is already standardized, that index links to the corresponding conformance fixtures.
 
 The bounded test helper computes only the used Variable functions, scalar/record
 comparisons, Test aggregation, conditional scheduling and native Set/filter
@@ -159,6 +183,8 @@ python tools/validate_native_json_schemas.py board/review-content/0.2.0/content 
 python tools/check_current_authoring_contract.py board/review-content/0.2.0/content
 python tools/assessment_results_v02.py --assessments board/review-content/0.2.0/content --result-set board/review-content/0.2.0/expected/unix-file.result-set.json
 ```
+
+The converter-pilot commands above reproduce and validate the six pinned source-derived cases. The content-wide schema and authoring-contract commands also cover the focused 0.2.0 samples.
 
 `--source-root` verifies the exact upstream commit, full-file hashes and each
 extract's unchanged nodes/criterion scope/complete dependency closure. Offline
