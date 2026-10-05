@@ -304,13 +304,13 @@ For every vocabulary reviewed in 0.3.0:
 Concrete changes are tracked independently from this crosswalk. This document is
 the comparison/reference surface, not the implementation backlog.
 
-At minimum:
+Current tracked issues:
 
-- existence `some` vs `one_or_more`;
-- check/match `any` vs OVAL `at least one`;
-- comparison-operation naming family;
-- filesystem-scope naming family;
-- explicit native coverage for OVAL variable-function choice vocabularies.
+- #152 — existence `some` vs `one_or_more`;
+- #153 — check/match `any` vs OVAL `at least one`;
+- #154 — comparison-operation naming family;
+- #155 — filesystem-scope naming family;
+- #156 — explicit native coverage for OVAL variable-function choice vocabularies.
 
 The crosswalk SHALL be updated when those issues are resolved.
 
