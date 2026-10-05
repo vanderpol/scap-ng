@@ -84,22 +84,20 @@ def benchmark(native_root: Path) -> dict:
     return value
 
 
-def first_stig_id(rule: dict) -> str:
-    if rule.get("version"):
-        return str(rule["version"])
-    for ident in rule.get("idents", []) or []:
-        if not isinstance(ident, dict):
-            continue
-        system = str(ident.get("system") or "").lower()
-        value = str(ident.get("value") or "")
-        if "stig" in system or re.match(r"^[A-Za-z][A-Za-z0-9_.-]+$", value):
-            return value
+def identifier_value(rule: dict, scheme: str) -> str:
+    for ident in rule.get("identifiers", []) or []:
+        if isinstance(ident, dict) and ident.get("scheme") == scheme and ident.get("value"):
+            return str(ident["value"])
     return ""
+
+
+def first_stig_id(rule: dict) -> str:
+    return identifier_value(rule, "disa-stig-id")
 
 
 def cci_and_references(rule: dict) -> str:
     values = []
-    for ident in rule.get("idents", []) or []:
+    for ident in rule.get("identifiers", []) or []:
         if isinstance(ident, dict):
             value = ident.get("value")
             if value:
@@ -114,41 +112,44 @@ def cci_and_references(rule: dict) -> str:
     return "; ".join(dict.fromkeys(values))
 
 
-def group_label(rule: dict) -> str:
-    path = rule.get("group_path") or []
-    labels = []
-    for row in path:
-        if isinstance(row, dict):
-            labels.append(str(row.get("title") or row.get("id") or ""))
-        elif row:
-            labels.append(str(row))
-    return " / ".join(x for x in labels if x)
+def group_map(bench: dict) -> dict[str, str]:
+    out = {}
+    def walk(groups):
+        for group in groups or []:
+            if not isinstance(group, dict):
+                continue
+            label = str(group.get("title") or group.get("id") or "")
+            for rid in group.get("rules", []) or []:
+                out.setdefault(str(rid), label)
+            walk(group.get("groups", []))
+    walk(bench.get("groups", []))
+    return out
 
 
 def procedure_for(rule: dict, assessments: dict[str, dict]) -> str:
     if rule.get("check"):
         return str(rule["check"])
-    for choice in rule.get("assessment_choices", []) or []:
+    for choice in (rule.get("assessment_choices") or {}).values():
         if not isinstance(choice, dict):
             continue
-        aid = choice.get("assessment")
-        assessment = assessments.get(str(aid))
+        aid = Path(str(choice.get("assessment") or "")).name.replace(".assessment.yaml", "")
+        assessment = assessments.get(aid)
         if assessment and assessment.get("mode") == "manual":
             return str(assessment.get("procedure") or "")
     return ""
 
 
-def row_for(rule: dict, assessments: dict[str, dict]) -> list[str]:
+def row_for(rule: dict, assessments: dict[str, dict], groups: dict[str, str]) -> list[str]:
     return [
-        str(rule.get("vulnerability_id") or ""),
+        identifier_value(rule, "disa-vulnerability-id"),
         str(rule.get("id") or ""),
         first_stig_id(rule),
         str(rule.get("title") or ""),
         str(rule.get("severity") or ""),
-        group_label(rule),
+        groups.get(str(rule.get("id") or ""), ""),
         str(rule.get("discussion") or rule.get("description") or ""),
         procedure_for(rule, assessments),
-        str(rule.get("fix") or ""),
+        str((rule.get("remediation") or {}).get("guidance") or ""),
         cci_and_references(rule),
         "",
         "",
@@ -162,6 +163,7 @@ def render_html(native_root: Path, output: Path) -> None:
     bench = benchmark(native_root)
     assessments = discover_assessments(native_root)
     rules = discover_rules(native_root)
+    groups = group_map(bench)
     title = str(bench.get("title") or bench.get("id") or "SCAP-NG STIG Review")
     nav = []
     sections = []
@@ -171,10 +173,10 @@ def render_html(native_root: Path, output: Path) -> None:
         label = str(rule.get("title") or rid)
         nav.append(f'<li><a href="#{html.escape(anchor)}">{html.escape(rid)} — {html.escape(label)}</a></li>')
         fields = [
-            ("Vulnerability ID", str(rule.get("vulnerability_id") or "")),
+            ("Vulnerability ID", identifier_value(rule, "disa-vulnerability-id")),
             ("STIG ID", first_stig_id(rule)),
             ("Severity", str(rule.get("severity") or "")),
-            ("Group", group_label(rule)),
+            ("Group", groups.get(rid, "")),
             ("CCI / References", cci_and_references(rule)),
         ]
         meta = "".join(
@@ -187,7 +189,7 @@ def render_html(native_root: Path, output: Path) -> None:
 <dl>{meta}</dl>
 <h3>Discussion</h3><pre>{html.escape(str(rule.get("discussion") or rule.get("description") or ""))}</pre>
 <h3>Check Procedure</h3><pre>{html.escape(procedure_for(rule, assessments))}</pre>
-<h3>Fix / Remediation</h3><pre>{html.escape(str(rule.get("fix") or ""))}</pre>
+<h3>Fix / Remediation</h3><pre>{html.escape(str((rule.get("remediation") or {}).get("guidance") or ""))}</pre>
 </article>"""
         )
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -277,8 +279,10 @@ def styles_xml() -> str:
 
 
 def write_xlsx(native_root: Path, output: Path) -> None:
+    bench = benchmark(native_root)
     assessments = discover_assessments(native_root)
-    rows = [row_for(rule, assessments) for rule in discover_rules(native_root)]
+    groups = group_map(bench)
+    rows = [row_for(rule, assessments, groups) for rule in discover_rules(native_root)]
     output.parent.mkdir(parents=True, exist_ok=True)
     files = {
         "[Content_Types].xml": '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>''',
