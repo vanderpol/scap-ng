@@ -287,8 +287,6 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
             fallback_reason=None
             if mapping_error.startswith("deprecated source capability windows.wmi"):
                 fallback_reason="deprecated_or_legacy_wmi_source"
-            elif mapping_error.startswith("nonstandard source capability independent.sqlext"):
-                fallback_reason="publisher_extension_independent_sqlext"
             elif mapping_error.startswith("unsupported deprecated OVAL behavior semantics:"):
                 fallback_reason="deprecated_oval_behavior"
             if fallback_reason and has_manual:
