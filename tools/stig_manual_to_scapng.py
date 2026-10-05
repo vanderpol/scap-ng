@@ -193,7 +193,7 @@ def profile_description(profile: ET.Element) -> str | None:
     return text(desc)
 
 
-def profile_rows(root: ET.Element) -> list[dict]:
+def source_profile_rows(root: ET.Element) -> list[dict]:
     rows = []
     for profile in children(root, "Profile"):
         rows.append({
@@ -204,6 +204,36 @@ def profile_rows(root: ET.Element) -> list[dict]:
                 {"idref": x.get("idref"), "selected": x.get("selected")}
                 for x in children(profile, "select")
             ],
+        })
+    return rows
+
+
+def native_profile_rows(
+    root: ET.Element,
+    source_rule_to_native: dict[str, str],
+    source_group_to_native_rules: dict[str, list[str]],
+) -> list[dict]:
+    """Resolve old XCCDF profile selections into NG's subtractive profile model."""
+    rows = []
+    for profile in source_profile_rows(root):
+        disabled: list[str] = []
+        for action in profile["select"]:
+            if str(action.get("selected")).lower() != "false":
+                continue
+            target = action.get("idref")
+            expanded = []
+            if target in source_rule_to_native:
+                expanded = [source_rule_to_native[target]]
+            else:
+                expanded = source_group_to_native_rules.get(str(target), [])
+            for rule_id in expanded:
+                if rule_id not in disabled:
+                    disabled.append(rule_id)
+        rows.append({
+            "id": profile.get("id"),
+            "title": profile.get("title"),
+            "description": profile.get("description"),
+            "disabled_rules": disabled,
         })
     return rows
 
@@ -253,6 +283,8 @@ def convert(source: Path, output: Path) -> dict:
 
     converted_rules = []
     provenance_rules = []
+    source_rule_to_native: dict[str, str] = {}
+    source_group_to_native_rules: dict[str, list[str]] = {}
     used_ids: set[str] = set()
 
     for idx, (rule, path) in enumerate(iter_rules(root), start=1):
@@ -264,6 +296,12 @@ def convert(source: Path, output: Path) -> dict:
         if native_id in used_ids:
             native_id = safe_id(f"{base_id}-{vuln_id or idx}", f"rule-{idx}")
         used_ids.add(native_id)
+        if source_rule_id:
+            source_rule_to_native[source_rule_id] = native_id
+        for group in path:
+            group_id = group.get("id")
+            if group_id:
+                source_group_to_native_rules.setdefault(group_id, []).append(native_id)
 
         procedure = rule_check(rule)
         description_fields = stig_description_fields(rule)
@@ -321,7 +359,11 @@ def convert(source: Path, output: Path) -> dict:
             "description": benchmark_description(root),
             "status": "converted-stig-manual",
             "groups": group_rows(root),
-            "profiles": profile_rows(root),
+            "profiles": native_profile_rows(
+                root,
+                source_rule_to_native,
+                source_group_to_native_rules,
+            ),
             "rules": converted_rules,
         },
     }
@@ -339,6 +381,7 @@ def convert(source: Path, output: Path) -> dict:
             "benchmark_id": benchmark_id,
             "scap_ng": SCAP_NG_VERSION,
         },
+        "profiles": source_profile_rows(root),
         "rules": provenance_rules,
     }
     dump_json(output / "provenance.json", provenance)
