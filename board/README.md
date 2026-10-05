@@ -58,6 +58,10 @@ The review builds are generated from checked-in tools and pinned source packages
 
 The conversion goal is **semantic losslessness for supported SCAP 1.4 paths, with a normalized native representation**. Exact duplicate Assessment definitions may be replaced by one shared Assessment only when semantic equivalence is proven; Rule/check bindings and source provenance remain represented. Similar or near-duplicate Assessments are not merged automatically.
 
+## Open design discussions
+
+- **[Native representation of OVAL `extend_definition`](discussions/EXTEND-DEFINITION-NATIVE-MODEL.md)** — current conversion preserves the semantic by recursive inlining; the Board still needs to decide whether native NG should preserve an explicit Assessment-result reference and, if so, where that binding belongs.
+
 ## Voting
 
 See **[Board proposals and votes](VOTES.md)** for the complete maintained proposal index, individual immutable proposal records, Discussion vote links, current proposal gaps, and voting-governance caveats.
