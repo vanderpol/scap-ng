@@ -70,11 +70,30 @@ SCAP-NG does **not** carry forward ARF/OVAL Results as-is. The result redesign i
 
 ### What is difficult about SCAP 1.4 results
 
-In SCAP 1.4, useful policy context, OVAL execution detail, system-characteristic data, result directives, and reporting wrappers are spread across several related structures. Large assessments can repeat substantial context and can emit very large collections of system-characteristic Items even when a small number of concrete examples are sufficient to explain the result.
+The practical problem is broader than ARF size alone.
 
-For common consumers—dashboards, APIs, SIEMs, compliance summaries, and human reviewers—SCAP 1.4 also does not provide the compact policy-facing summary that is usually wanted first. Consumers often have to walk the result hierarchy and reconstruct basic information such as pass/fail counts, the effective check, which concrete value caused a failure, and whether the scanner stopped collecting after the answer was already known.
+NIST ARF was rarely used directly by end users because complete ARF result packages could become very large. Raw OVAL Results were also rarely an end-user format; they were more useful for developer/debugging work and tended to expose a stove-piped execution view rather than a coherent policy-facing explanation.
 
-The result can therefore be **high-volume but low-convenience**: a great deal of serialized execution data, while ordinary questions still require significant post-processing.
+In practice, most end users primarily saw the XCCDF result layer. Many SCAP products reduced that further to little more than **pass/fail**, often without enough detail to answer basic operational questions such as:
+
+- What value actually failed?
+- What value was expected?
+- Why did this Rule fail?
+- How many failures were observed?
+- Was the full target population examined?
+- Did the scanner stop after the result was already known?
+- Were only a bounded number of examples returned?
+- Which Assessment invocation and evidence produced this Rule result?
+
+SCC historically used XCCDF informational/message fields to carry additional useful detail, but that was effectively a workaround: valuable explanation was being shoehorned into a field that was not a complete structured result model.
+
+SCAP 1.4 therefore created an awkward spectrum:
+
+- **ARF:** potentially comprehensive, but often too large and cumbersome for routine consumption;
+- **OVAL Results:** useful low-level execution/debug data, but fragmented and not a complete end-user policy result;
+- **XCCDF Results:** practical for users, but commonly reduced to pass/fail with little structured explanation.
+
+SCAP-NG is intended to remove that tradeoff: retain enough structured technical evidence to explain the result, while making the ordinary policy-facing result compact and directly useful.
 
 ### What NG changes
 
