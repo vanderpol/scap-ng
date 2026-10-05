@@ -7,8 +7,8 @@ collection, collection-cache reuse authorization, or production STIG conversion.
 Two file Items are available; only `file-config` contributes to the Test.
 `expected-results/scopes.json` specifies the independent scope/count oracle:
 
-- `all` (default): retain both available Items and both Object references.
-- `consumed`: retain `file-config`, omit the unused Item, and record the original
+- `all`: explicitly retain both available Items and both Object references.
+- `consumed`: explicitly retain `file-config`, omit the unused Item, and record the original
   available and included/omitted counts. The original collection status and
   completeness flags retain their acquisition meaning.
 
