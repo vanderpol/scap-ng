@@ -98,6 +98,7 @@ class IdentitySoftwareTests(unittest.TestCase):
         # NG references a Variable directly; XML's empty placeholder is unnecessary.
         doc['assessment']['variables'] = {'required-level': {'variable_title': 'Expected category', 'constant': {'datatype': 'string', 'values': ['VMwareCertified']}}}
         doc['assessment']['states']['expected']['state']['value'] = {'variable': 'required-level'}
+        doc['assessment']['states']['expected']['state']['variable_match'] = 'all'
         self.assertFalse(self.errors(doc))
 
     def test_items_status_redaction_and_types(self):
