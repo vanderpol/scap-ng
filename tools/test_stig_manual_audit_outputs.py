@@ -20,6 +20,10 @@ XCCDF = """<?xml version="1.0" encoding="UTF-8"?>
   <title>Active Directory Forest Test STIG</title>
   <description>Small regression fixture.</description>
   <version>3.2</version>
+  <Profile id="test-profile">
+    <title>Test Profile</title>
+    <select idref="V-243502" selected="false"/>
+  </Profile>
   <Group id="V-243502">
     <title>V-243502</title>
     <Rule id="SV-243502r1026198_rule" severity="medium">
@@ -54,6 +58,7 @@ def main() -> int:
 
         benchmark = yaml.safe_load((native / "benchmark.yaml").read_text(encoding="utf-8"))
         assert benchmark["benchmark"]["rules"] == ["AD.0017"]
+        assert benchmark["benchmark"]["profiles"][0]["disabled_rules"] == ["AD.0017"]
 
         rule_doc = yaml.safe_load((native / "rules" / "AD.0017.yaml").read_text(encoding="utf-8"))
         rule = rule_doc["rule"]
