@@ -527,6 +527,17 @@ def generate(mapping, repo_root, schema_version=None):
             "type": "object",
             "required": test_required,
             "properties": test_properties,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "states": {"type": "array", "minItems": 2}
+                        },
+                        "required": ["states"],
+                    },
+                    "then": {"required": ["states_match"]},
+                }
+            ],
             "additionalProperties": False,
         },
         "state_predicate": {
