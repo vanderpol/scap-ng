@@ -1,0 +1,45 @@
+assessment:
+  id: board.reported-elements
+  version: 1
+  assessment_title: Compare numeric ownership while reporting selected identity evidence
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    configuration-file:
+      object_title: Configuration file
+      capability: unix.file
+      select:
+        full_path:
+          datatype: string
+          operation: equal
+          value: /fixture/config
+      filesystem: any
+  states:
+    owned-by-root:
+      state_title: File is owned by UID 0
+      capability: unix.file
+      state:
+        field: owner_uid
+        datatype: integer
+        operation: equal
+        value: 0
+        match: all
+        existence: some
+  tests:
+    test-owner:
+      test_title: Compare numeric owner and retain useful identity evidence
+      capability: unix.file
+      reported_elements:
+      - owner_uid
+      - owner_user_name
+      object: configuration-file
+      states:
+      - owned-by-root
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-owner
