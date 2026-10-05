@@ -457,6 +457,10 @@ def main(argv=None):
                 if not parity['equal']:
                     failed=True;result['assessments'].append({'status':'blocked','parity':parity});continue
                 native=align_assessment_vocabulary(native)
+                # SCAP-NG 0.2.0 requires reporting selection to be explicit.
+                # Preserve the complete SCAP 1.4/OVAL evidence surface.
+                for test in native.get('assessment',{}).get('tests',{}).values():
+                    test['reported_elements']='all'
                 errors=violations(native)
                 if errors:raise ValueError('Current vocabulary guard: '+str(errors))
                 ref='assessments/automated/'+aid+'.assessment.yaml'
