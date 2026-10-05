@@ -1,0 +1,88 @@
+# Source: OVAL-Community/SCAP-Self-Assertion @ e3538595c5083b9c34d937a81d319234df9bbfaa
+# SCAP_1.4/OVAL_Test_Content/unix/ind-def_textfilecontent54_test_unix.xml
+# Selected source Test: oval:org.mitre.oval.test:tst:688
+assessment:
+  id: board.textfilecontent54
+  version: 1
+  assessment_title: Match OVAL Interpreter text in the support build file
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  objects:
+    support-build-text:
+      object_title: Support build text
+      capability: independent.textfilecontent54
+      select:
+        directory:
+          value: /opt/support/txt/txtfile
+          operation: equal
+          datatype: string
+        name:
+          value: build.win32.txt
+          operation: equal
+          datatype: string
+        pattern:
+          value: OVAL Interpreter
+          operation: match
+          datatype: string
+        instance:
+          value: 1
+          operation: greater_or_equal
+          datatype: integer
+      filesystem: any
+      collect:
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: all_object_elements_fullfilled
+  states:
+    expected-support-build-text:
+      state_title: Expected support build text
+      capability: independent.textfilecontent54
+      state:
+        all:
+        - field: directory
+          value: /opt/support/txt/txtfile
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: name
+          value: build.win32.txt
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+        - field: pattern
+          value: ^OVAL Interpreter$
+          operation: match
+          datatype: string
+          match: all
+          existence: some
+        - field: instance
+          value: 1
+          operation: greater_or_equal
+          datatype: integer
+          match: all
+          existence: some
+        - field: text
+          value: OVAL Interpreter
+          operation: equal
+          datatype: string
+          match: all
+          existence: some
+  tests:
+    test-support-build-text:
+      test_title: Test support build text
+      capability: independent.textfilecontent54
+      object: support-build-text
+      check_existence: all
+      check: all
+      states:
+      - expected-support-build-text
+      reported_elements: all
+  evaluate:
+    test: test-support-build-text
