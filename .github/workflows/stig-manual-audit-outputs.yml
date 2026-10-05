@@ -87,7 +87,7 @@ jobs:
               for path in sorted((native / "rules").glob("*.rule.yaml"))
           ]
           checks += [
-              (path, repo / "schema/v0.2.0/assessment.schema.json")
+              (path, repo / "schema/v0.2.0/manual-assessment.schema.json")
               for path in sorted((native / "assessments/manual").glob("*.assessment.yaml"))
           ]
           for doc_path, schema_path in checks:
@@ -112,7 +112,7 @@ jobs:
               assert 'name="Result Options"' in workbook
               assert 'state="hidden"' in workbook
               assert "'Result Options'!$A$2:$A$5" in sheet
-              for label in ("Pass", "Fail", "Not Applicable", "Not Evaluated"):
+              for label in ("Pass", "Fail", "Unknown", "Not Applicable"):
                   assert label in lookup
               for heading in ("Result", "Evidence / Notes", "Evaluator / Reviewer", "Review Date"):
                   assert heading in sheet
