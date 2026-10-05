@@ -1,0 +1,92 @@
+assessment:
+  id: board.conditional-evaluation
+  version: 1
+  assessment_title: Select one local evaluation branch from an explicit condition
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    condition-value:
+      variable_title: Condition value
+      kind: constant
+      datatype: boolean
+      value: true
+    primary-value:
+      variable_title: Primary branch value
+      kind: constant
+      datatype: string
+      value: primary
+    alternate-value:
+      variable_title: Alternate branch value
+      kind: constant
+      datatype: string
+      value: alternate
+  states:
+    condition-is-true:
+      state_title: Condition is true
+      capability: variable.value
+      state:
+        field: value
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+    primary-matches:
+      state_title: Primary branch value matches
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: primary
+        match: all
+        existence: some
+    alternate-matches:
+      state_title: Alternate branch value matches
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: alternate
+        match: all
+        existence: some
+  tests:
+    test-condition:
+      test_title: Evaluate the branch condition
+      capability: variable.value
+      reported_elements: all
+      variable: condition-value
+      states:
+      - condition-is-true
+      check_existence: some
+      check: all
+    test-primary:
+      test_title: Evaluate the primary branch
+      capability: variable.value
+      reported_elements: all
+      variable: primary-value
+      states:
+      - primary-matches
+      check_existence: some
+      check: all
+    test-alternate:
+      test_title: Evaluate the alternate branch
+      capability: variable.value
+      reported_elements: all
+      variable: alternate-value
+      states:
+      - alternate-matches
+      check_existence: some
+      check: all
+  evaluate:
+    if:
+      test: test-condition
+    then:
+      test: test-primary
+    else:
+      test: test-alternate
