@@ -117,7 +117,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
             original = item["fields"].get(source)
             if original is None:
                 raise ValueError(f"{name} requires numeric source {source}")
-            if "value" in item["fields"][name] and (original.get("redacted") or original.get("status", "exists") != "exists" or "value" not in original):
+            if "value" in item["fields"][name] and (original.get("redacted") or original["status"] != "exists" or "value" not in original):
                 raise ValueError(f"{name} cannot expose an unavailable/redacted identity")
         indexed[item["id"]] = item
     requests = {identity: [] for identity in indexed}
