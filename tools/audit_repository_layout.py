@@ -180,6 +180,16 @@ def check(policy):
 
     removed_roots = policy.get("removed_trees", {})
     allowed_missing = set()
+
+    for path, record in policy.get("removed_files", {}).items():
+        if path not in baseline:
+            failures.append("Removed historical file not present in baseline: " + path)
+            continue
+        if not record.get("recovery_tag"):
+            failures.append("Removed historical file missing recovery tag: " + path)
+        if not record.get("deletion_commit"):
+            failures.append("Removed historical file missing deletion commit: " + path)
+        allowed_missing.add(path)
     for root, record in removed_roots.items():
         expected = {p for p in baseline if p == root or p.startswith(root + "/")}
         if not expected:
