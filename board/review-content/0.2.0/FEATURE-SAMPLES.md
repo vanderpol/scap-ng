@@ -43,7 +43,8 @@ These are still required before the Board sample inventory can be called feature
 
 - a concise embedded-Object example if embedded Objects remain in the final 0.2.0 authoring contract;
 - finalize the collected-Item reuse authoring proposal and adopt it into the 0.2.0 schema only after the source identity/binding questions in [the proposal](proposals/item-reuse.md) are resolved;
-- unsupported-capability execution/result behavior, if that remains a native Assessment contract rather than an implementation/reporting-only concern.
+
+Runtime conditions such as an unsupported collector/capability are Result semantics, not authored Assessment-language features. They belong in the Result conformance inventory rather than being represented as fake source syntax here.
 
 Policy-only concepts such as Benchmark Parameters, Profiles, Tailoring, Rule selection/scoring, and package trust are intentionally not duplicated here. Their examples belong with the policy/results specifications, although this index may link to them where an Assessment input binding crosses that boundary.
 
