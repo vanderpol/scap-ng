@@ -211,7 +211,7 @@ jobs:
           root=Path("work/board-review")
           shutil.rmtree(root,ignore_errors=True)
           root.mkdir(parents=True,exist_ok=True)
-          shutil.copytree("work/board-source",root/"source")
+          shutil.copytree("work/board-source",root/"authoring")
           shutil.copytree("work/board-packages",root/"packages")
 
           normalizer=json.loads(Path("work/normalizer-report.json").read_text())
@@ -226,7 +226,7 @@ jobs:
                   "Google Chrome",
               ],
               "layout":{
-                  "source":"Readable normalized native SCAP-NG authoring trees; exact duplicate Assessments are shared under shared/assessments with meaningful names.",
+                  "authoring":"Readable normalized native SCAP-NG authoring trees intended for ongoing editing/maintenance; exact duplicate Assessments are shared under shared/assessments with meaningful names.",
                   "packages":"Compiled .scapng packages from the same source trees.",
               },
               "shared_assessment_groups":normalizer["summary"]["exact_duplicate_groups"],
@@ -235,7 +235,7 @@ jobs:
           (root/"REVIEW.json").write_text(json.dumps(review,indent=2,sort_keys=True)+"\n")
           (root/"README.md").write_text(
               "# SCAP-NG representative OVAL Board review build\n\n"
-              "Start with `source/` to review the native authoring model, then inspect `packages/` for compiled distribution examples.\n\n"
+              "Start with `authoring/` to review the maintainable native SCAP-NG source model, then inspect `packages/` for compiled distribution examples.\n\n"
               "This intentionally small review set contains RHEL 9, Windows 11, macOS 15, Apache 2.4 UNIX Server, Apache Tomcat 9, and Google Chrome.\n"
               "No Solaris benchmark is present in the pinned NIWC source repository; that platform can be added later when a pinned source is available.\n"
               "The exhaustive 65-package corpus remains regression evidence and is not part of this human-review artifact.\n",
