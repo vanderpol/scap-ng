@@ -123,6 +123,8 @@ def main() -> int:
             assert "<dataValidations count=\"1\">" in sheet
             assert "'Result Options'!$A$2:$A$5" in sheet
             assert "Pass" in lookup
+            assert "true" in lookup
+            assert "false" in lookup
             assert "unknown" in lookup
             assert "Evidence / Notes" in sheet
             assert "Evaluator / Reviewer" in sheet
