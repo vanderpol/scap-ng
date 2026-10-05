@@ -80,7 +80,7 @@ def main() -> int:
         assessment_doc = yaml.safe_load(
             (native / "assessments" / "manual" / "SV-243502.manual.assessment.yaml").read_text(encoding="utf-8")
         )
-        assessment_schema = yaml.safe_load((ROOT / "schema/v0.2.0/assessment.schema.json").read_text(encoding="utf-8"))
+        assessment_schema = yaml.safe_load((ROOT / "schema/v0.2.0/manual-assessment.schema.json").read_text(encoding="utf-8"))
         assert not list(Draft202012Validator(assessment_schema).iter_errors(assessment_doc))
         assessment = assessment_doc["assessment"]
         assert assessment["mode"] == "manual"
