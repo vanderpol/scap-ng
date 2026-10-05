@@ -545,6 +545,16 @@ def convert(source: Path, output: Path) -> dict:
                 "role": {"explicit": role_explicit, "effective": effective_role},
                 "weight": {"explicit": weight_explicit, "effective": effective_weight},
             },
+            "source_status": [
+                {"value": text(node), "date": node.get("date")}
+                for node in children(rule, "status") if text(node)
+            ],
+            "source_check_systems": [
+                node.get("system") for node in children(rule, "check") if node.get("system")
+            ],
+            "source_fixtext_attributes": [
+                dict(node.attrib) for node in children(rule, "fixtext") if node.attrib
+            ],
         })
 
     profiles = native_profile_rows(root, source_rule_to_native, source_group_to_native_rules)
