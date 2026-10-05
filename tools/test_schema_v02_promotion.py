@@ -109,6 +109,14 @@ class Version020PromotionTests(unittest.TestCase):
         self.assertTrue(list(document_errors(validators["assessment.schema.json"], invalid)))
 
 
+    def test_single_operand_difference_preserves_oval_set_semantics(self):
+        common = json.loads((V02 / "capability-common.schema.json").read_text(encoding="utf-8"))
+        set_expression = common["$defs"]["set_expression"]
+        self.assertEqual(set_expression["properties"]["operands"]["minItems"], 1)
+        difference = set_expression["allOf"][0]["then"]["properties"]["operands"]
+        self.assertEqual(difference.get("maxItems"), 2)
+        self.assertNotIn("minItems", difference)
+
     def test_schema_diagnostics_are_json_safe(self):
         class Sentinel:
             def __str__(self):
