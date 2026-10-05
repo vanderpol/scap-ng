@@ -74,6 +74,23 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            },
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "required": [
+              "variable_match"
+            ]
+          }
         }
       ]
     },
@@ -124,6 +141,23 @@
                 "$ref": "#/$defs/variable_reference"
               }
             }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            },
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "required": [
+              "variable_match"
+            ]
           }
         }
       ]
@@ -476,12 +510,48 @@
         "existence": {
           "$ref": "#/$defs/existence_requirement"
         },
+        "variable_match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
         "redact_result": {
           "type": "boolean",
           "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
           "const": true
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            },
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "required": [
+              "variable_match"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "variable_match"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/variable_reference"
+              }
+            }
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "structured_value_predicate": {
