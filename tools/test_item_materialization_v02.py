@@ -40,7 +40,7 @@ class MaterializationTests(unittest.TestCase):
             self.assertTrue(result['population_complete']);self.assertTrue(result['evidence_complete'])
     def test_default_all_input_not_mutated(self):
         original=copy.deepcopy(self.observations)
-        result=materialize_observations(self.observations);self.assertEqual(len(result['items']),2)
+        result=materialize_observations(self.observations,scope='all');self.assertEqual(len(result['items']),2)
         self.assertEqual(self.observations,original)
     def test_indirect_field_use_and_variable_inputs_are_consumed(self):
         obs=copy.deepcopy(self.observations);obs['field_uses'].append({'test_ref':'test-owner','item_ref':'file-unused','relationship':'filter','used_elements':['owner_uid'],'required_elements':['full_path']})
