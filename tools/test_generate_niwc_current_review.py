@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import unittest
 
-from generate_niwc_current_review import native_artifact_base
+from generate_niwc_current_review import native_artifact_base, native_benchmark_id
 
 
 class NativeArtifactIdentityTests(unittest.TestCase):
@@ -17,6 +17,20 @@ class NativeArtifactIdentityTests(unittest.TestCase):
                 "U_MS_Defender_Antivirus_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV16-signed"
             ),
             "ms_defender_antivirus",
+        )
+
+    def test_native_benchmark_namespace_is_publisher_neutral(self):
+        self.assertEqual(
+            native_benchmark_id(
+                "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed"
+            ),
+            "benchmark.rhel_9",
+        )
+        self.assertNotIn(
+            "niwc",
+            native_benchmark_id(
+                "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed"
+            ),
         )
 
     def test_product_version_remains_part_of_product_identity(self):
