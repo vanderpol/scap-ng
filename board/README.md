@@ -6,9 +6,9 @@
 
 1. Read **[SCAP 1.4 → SCAP-NG: key changes](SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md)**.
 2. Open the **[SCAP-NG 0.2.0 schema](../schema/v0.2.0/README.md)** — the frozen schema set, capability mappings, validation commands, and newcomer guide are all there.
-3. Review the six small **[0.2.0 source-to-NG examples](review-content/0.2.0/README.md)**.
+3. Review the **[0.2.0 Board review content](review-content/0.2.0/README.md)** — this now includes the six source-to-NG converter pilot cases, frequency-oriented examples, focused New NG feature samples, and supporting/stress examples. For a feature-by-feature inventory, use **[FEATURE-SAMPLES.md](review-content/0.2.0/FEATURE-SAMPLES.md)**.
 4. Review the **[OVAL 5.12.3 → SCAP-NG capability crosswalk](../specification/migration/oval-5.12.3-capability-crosswalk.md)** — this is the direct Test-type/capability mapping and a critical part of the Board review.
-5. Download the **[current normalized 65-package SCAP 1.4 → SCAP-NG review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37247949326/artifacts/11320068255)** (`niwc-current-full-review`). It contains the source-derived trees, exact-semantics normalized trees, compiled packages, and validation evidence for all 65 pinned NIWC Current source packages.
+5. Review the **full NIWC Current conversion evidence** described below. A replacement full-corpus artifact is being regenerated from the current 0.2.0 hidden-behavior-safe baseline; do not treat the older 65/65 artifact as the current Board deliverable.
 6. Review the **[Board proposals and votes](VOTES.md)** — one maintained index for proposal records, Discussion vote links, and the small set of current design decisions that still need new proposals.
 7. Try the **[human-runnable SCAP 1.4 → NG conversion tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)**. The normal one-package entry point is **[`generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)**, which runs the checked-in rule splitter and current converter from an original pinned SCAP 1.4 ZIP. The exact-deduplication step is **[`scap_ng_repo_normalizer.py`](../tools/scap_ng_repo_normalizer.py)**.
 
@@ -27,23 +27,29 @@
 
 The technical schema baseline is `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Later commits may add Board samples, documentation, CI, or maintenance without changing that frozen schema meaning.
 
-The six converter-produced Board cases are present and validated, but still **pending human acceptance**. The six-case publication commit is `8262e7e03418c229b85db6fe5cab600c9b92b8e9`; its repository-boundary, rebaseline-smoke, current-design-regression, and fast-five conversion workflows completed successfully. The frozen 0.2.0 baseline also passed broader Self-Assertion and full-corpus validation gates.
+The six converter-produced Board cases remain **pending human acceptance**, but they are no longer the whole review surface. The 0.2.0 Board corpus now also includes frequency-oriented examples from the pinned Self-Assertion source, supporting/stress examples for non-trivial Variable/Set/filter/dependency logic, and focused samples for newer NG concepts such as conditional evaluation, Assessment-result dependencies, intrinsic and standalone applicability, explicit `not_applicable`, reporting projection, redaction, Organizational Input, manual Assessment, and the collected-Item reuse proposal.
 
-These checks establish structural, conversion, and known-result evidence. They do **not** establish independent scanner equivalence, complete collector coverage, or live-target conformance. ESX/VMware and Kubernetes semantics that still need upstream guidance remain deferred rather than being guessed into the frozen design.
+The maintained entry point for that corpus is [`review-content/0.2.0/README.md`](review-content/0.2.0/README.md); the authoritative feature inventory is [`FEATURE-SAMPLES.md`](review-content/0.2.0/FEATURE-SAMPLES.md). The sample corpus is intentionally broader than the six converter-pilot cases, while keeping converter-fidelity evidence separate from native feature-demonstration content.
 
-## Full 65-package conversion build
+These checks establish structural, conversion, schema/semantic, and known-result evidence. They do **not** establish independent scanner equivalence, complete collector coverage, or live-target conformance. ESX/VMware and Kubernetes semantics that still need upstream guidance remain deferred rather than being guessed into the frozen design.
 
-A fresh conversion of all **65 pinned NIWC Current SCAP 1.4 packages** completed successfully using the checked-in converter and exact-semantics normalizer pipeline for Board review. The published artifact contains **65 source trees, 65 compiled packages, and zero blocked source packages**:
+## Full NIWC Current conversion build
 
-- **[Download the normalized 65-package review artifact](https://github.com/vanderpol/scap-ng/actions/runs/37247949326/artifacts/11320068255)** — `niwc-current-full-review`
-- **[GitHub Actions run 37242380664](https://github.com/vanderpol/scap-ng/actions/runs/37247949326)** — build provenance, logs, and all generated artifacts
-- Artifact SHA-256: `f57256ef8a9a7696c1170d1594ef34b5ea12bb357d28bf08c2994c2c7c14eeb4`
+The exhaustive Board build accounts for all **65 pinned NIWC Current SCAP 1.4 source packages**. The current conversion contract intentionally distinguishes supported standard content from four known NIWC/SCC publisher-extension packages that use `independent.sqlext`:
 
-The build preserves the fresh source-derived NG trees, exact-semantics normalized trees, compiled `.scapng` packages, conversion/blocker status for every source package, and before/after validation evidence. Normalization may replace exact duplicate Assessment definitions with one shared Assessment only when semantic equivalence is proven; Rule/check bindings and source provenance remain represented.
+- **61 packages** are expected to produce native SCAP-NG source trees and compiled packages;
+- **4 SQL Server packages** are expected to stop with the explicit blocker `nonstandard source capability independent.sqlext`;
+- **0 unexpected blockers** are permitted.
+
+The four expected blockers are the SQL Server 2016 Database/Instance and SQL Server 2022 Database/Instance packages. `sqlext` is NIWC/SCC experimental publisher-extension content and is **not** being promoted into the SCAP-NG native capability registry merely to make the corpus appear 65/65 convertible.
+
+A replacement full-corpus Board artifact is currently being regenerated from the hidden-behavior-safe 0.2.0 baseline. The older artifact from run `37247949326` predates the explicit-default/hidden-behavior fixes and SHALL NOT be treated as the current Board deliverable. This page should be updated with the new run/artifact link and digest only after the current build completes all schema, Assessment-semantic, package-graph, normalization, compilation, and evidence gates.
+
+The full build preserves the fresh source-derived NG trees for supported packages, exact-semantics normalized trees, compiled `.scapng` packages, conversion/blocker status for every one of the 65 source packages, and before/after validation evidence. Normalization may replace exact duplicate Assessment definitions with one shared Assessment only when semantic equivalence is proven; Rule/check bindings and source provenance remain represented.
 
 ## Reproduce the conversion
 
-The published review builds are generated from checked-in tools and pinned source packages; they are not hand-edited exports. A reviewer can run the same pipeline locally:
+The review builds are generated from checked-in tools and pinned source packages; they are not hand-edited exports. A reviewer can run the same pipeline locally:
 
 - **Convert one pinned SCAP 1.4 package:** [`tools/generate_niwc_current_review.py`](../tools/generate_niwc_current_review.py)
 - **See complete commands and prerequisites:** [Human-runnable SCAP-NG tools](../tools/HUMAN-RUNNABLE-SCRIPTS.md)
