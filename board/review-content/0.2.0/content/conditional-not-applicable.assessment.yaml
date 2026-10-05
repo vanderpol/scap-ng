@@ -1,0 +1,69 @@
+assessment:
+  id: board.conditional-not-applicable
+  version: 1
+  assessment_title: Return not applicable when an authored applicability condition is false
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    applicable-value:
+      variable_title: Applicability condition value
+      kind: constant
+      datatype: boolean
+      value: true
+    assessed-value:
+      variable_title: Value evaluated when applicable
+      kind: constant
+      datatype: string
+      value: enabled
+  states:
+    applicable-is-true:
+      state_title: Applicability condition is true
+      capability: variable.value
+      state:
+        field: value
+        datatype: boolean
+        operation: equal
+        value: true
+        match: all
+        existence: some
+    assessed-value-is-enabled:
+      state_title: Assessed value equals enabled
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: enabled
+        match: all
+        existence: some
+  tests:
+    test-applicable:
+      test_title: Determine whether the assessment applies
+      capability: variable.value
+      reported_elements: all
+      variable: applicable-value
+      states:
+      - applicable-is-true
+      check_existence: some
+      check: all
+    test-assessed-value:
+      test_title: Evaluate the applicable requirement
+      capability: variable.value
+      reported_elements: all
+      variable: assessed-value
+      states:
+      - assessed-value-is-enabled
+      check_existence: some
+      check: all
+  evaluate:
+    if:
+      test: test-applicable
+    then:
+      test: test-assessed-value
+    else:
+      not_applicable:
+        reason: The authored applicability condition is false for this target
