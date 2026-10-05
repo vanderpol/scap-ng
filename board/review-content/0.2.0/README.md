@@ -38,7 +38,7 @@ For concepts that are new to SCAP-NG or intentionally more explicit than the SCA
 - [intrinsic applicability](content/intrinsic-applicability.assessment.yaml) and a reusable [standalone applicability Assessment](content/standalone-applicability.assessment.yaml);
 - an explicit conditional [`not_applicable` outcome](content/conditional-not-applicable.assessment.yaml);
 - explicit evidence projection by [field list](content/reported-elements.assessment.yaml) and [`compared`](content/reported-elements-compared.assessment.yaml), alongside existing `all` examples;
-- [result redaction](content/redaction.assessment.yaml);
+- [result redaction](content/redaction.assessment.yaml), using a real-world `/etc/shadow` text-parsing case to show that captured password/hash material must not leak into clear-text results;
 - typed [Organizational Input consumption](content/organizational-input.assessment.yaml);
 - [manual Assessment](content/manual.assessment.yaml);
 - the proposed end-to-end [collected Item reuse/import model](proposals/item-reuse.md), including producer, consumer, request binding, and materialized Item provenance.
@@ -65,7 +65,7 @@ Capability frequency alone is not sufficient for Board review. Real SCAP content
 | Conditional evaluation | [`conditional-evaluation.assessment.yaml`](content/conditional-evaluation.assessment.yaml) | Explicit authored condition, then branch, and else branch. |
 | Explicit not-applicable branch | [`conditional-not-applicable.assessment.yaml`](content/conditional-not-applicable.assessment.yaml) | A reasoned technical `not_applicable` outcome produced by authored evaluation logic. |
 | Explicit reporting projection | [field list](content/reported-elements.assessment.yaml), [`compared`](content/reported-elements-compared.assessment.yaml) | Reporting selection is explicit; together with `all` examples, all three modes are visible. |
-| Result redaction | [`redaction.assessment.yaml`](content/redaction.assessment.yaml) | Preserve technical truth while suppressing a sensitive disclosed value. |
+| Result redaction | [`redaction.assessment.yaml`](content/redaction.assessment.yaml) | Parse `/etc/shadow` with `textfilecontent54`, preserve comparison truth, and suppress captured password/hash material from results. |
 | Organizational Input | [`organizational-input.assessment.yaml`](content/organizational-input.assessment.yaml) | Typed organization-supplied policy data feeds expected State only and does not alter executable Assessment behavior. |
 | Manual Assessment | [`manual.assessment.yaml`](content/manual.assessment.yaml) | Native human determination without an OCIL workflow graph. |
 
