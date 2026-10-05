@@ -27,6 +27,7 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Conditional evaluation | [Dependency](content/dependency.assessment.yaml) | `if/then/else` without hiding which branch is selected |
 | Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability distinct from Rule applicability |
 | Explicit evidence projection | [Reported elements](content/reported-elements.assessment.yaml) | Explicit field list; no omitted/default reporting behavior |
+| Typed Assessment input / Organizational Input consumption | [Organizational input](content/organizational-input.assessment.yaml) | Declared typed input becomes a Variable used only as expected-state data; no executable behavior is supplied by the input |
 | Manual Assessment | [Manual review](content/manual.assessment.yaml) | Native human determination without OCIL workflow graphs |
 | Authored result redaction | [Redaction](content/redaction.assessment.yaml) | `redact_result: true` preserves technical truth while suppressing disclosed evidence value |
 | Reporting projection and redaction runtime behavior | [Reported-elements conformance fixture](../../../tests/reported-elements-0.2.0/ownership.assessment.yaml) | Canonical tested reporting source; runtime tests cover projection and redaction preservation |
@@ -39,7 +40,6 @@ A feature is not considered covered merely because a schema permits it. It needs
 
 These are still required before the Board sample inventory can be called feature-complete:
 
-- current 0.2.0 Organizational Input / typed Assessment input binding;
 - additional Variable functions beyond the current literal, component, concat and arithmetic examples;
 - a concise embedded-Object example if embedded Objects remain in the final 0.2.0 authoring contract;
 - finalize the collected-Item reuse authoring proposal and adopt it into the 0.2.0 schema only after the source identity/binding questions in [the proposal](proposals/item-reuse.md) are resolved;
