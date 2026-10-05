@@ -44,6 +44,7 @@ These examples highlight SCAP-NG capabilities that are not merely one-for-one OV
 
 | New NG feature | Focused sample | What to review |
 | --- | --- | --- |
+| Explicit semantic choices / no hidden defaults | [UNIX file](content/unix-file.assessment.yaml), [Directory filter](content/directory-filter.assessment.yaml), [reported-elements samples](content/reported-elements.assessment.yaml) | Collection behaviors, existence/check quantifiers, filters, and reporting choices are authored explicitly rather than supplied by invisible NG defaults |
 | Source-authored conditional evaluation | [Conditional evaluation](content/conditional-evaluation.assessment.yaml) | Explicit condition, then, and else branches; branch selection is authored and reviewable rather than inferred by the scanner |
 | Assessment-result dependency/reuse | [Assessment result dependency](content/assessment-result-dependency.assessment.yaml) | Static dependency declaration and consumption of another Assessment's technical result without copying its Tests/Objects |
 | Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Applicability is ordinary authored Assessment logic, separate from Rule/platform naming metadata |
