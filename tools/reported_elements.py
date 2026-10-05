@@ -44,6 +44,9 @@ def source_errors(assessment):
     """Validate all authored Test controls, including unexecuted Tests."""
     errors = []
     for identity, test in assessment.get("tests", {}).items():
+        if assessment.get("specification", {}).get("version") == "0.2.0" and "reported_elements" not in test:
+            errors.append(f"{identity}: reported_elements is required in 0.2.0")
+            continue
         if "reported_elements" not in test:
             continue
         if assessment.get("specification", {}).get("version") != "0.2.0":
@@ -65,7 +68,6 @@ def generate_reporting_capability(mapping, root=ROOT):
     schema["$defs"]["test"]["properties"]["reported_elements"] = {
         "oneOf": [{"enum": ["all", "compared"]},
                   {"type": "array", "items": {"enum": known} if known else False, "uniqueItems": True}],
-        "default": "all",
     }
     return schema
 
@@ -133,7 +135,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
                 raise ValueError("Field-use lineage must contain explicit arrays")
         used = set(use["used_elements"])
         mandatory[item["id"]].update(used | set(use["required_elements"]))
-        control = test.get("reported_elements", "all")
+        control = test["reported_elements"]
         # Explicit names belong to the Test's declared capability. Upstream
         # Items of another capability retain actual use rather than interpreting
         # unrelated names in a different field vocabulary.
