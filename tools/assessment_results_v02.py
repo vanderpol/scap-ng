@@ -122,17 +122,17 @@ def validate_result_set(document, assessments):
         for test in tests.values():
             check_refs(test['object_refs'], objects, 'Test/Object')
             check_refs(test['item_refs'], items, 'Test/Item')
-            check_refs(test.get('state_refs', []), source.get('states', {}), 'Test/State')
+            check_refs(test['state_refs'], source.get('states', {}), 'Test/State')
             authored = source['tests'][test['id']]
             if test['object_refs'] and not set(test['item_refs']) <= set().union(*(set(objects[ref]['item_refs']) for ref in test['object_refs'])):
                 raise ValueError('Test Items outside referenced Object collection')
             if set(test['object_refs']) != ({authored['object']} if 'object' in authored else set()):
                 raise ValueError('Test source Object binding mismatch')
-            if set(test.get('state_refs', [])) != set(authored.get('states', [])):
+            if set(test['state_refs']) != set(authored.get('states', [])):
                 raise ValueError('Test source State binding mismatch')
             if 'variable' in authored and authored['variable'] not in variables:
                 raise ValueError('Test source Variable result missing')
-            for per_item in test.get('per_item_results', []):
+            for per_item in test['per_item_results']:
                 if per_item['item_ref'] not in test['item_refs']:
                     raise ValueError('Per-Item result outside Test Items')
                 for state in per_item['state_results']:
@@ -147,13 +147,13 @@ def validate_result_set(document, assessments):
                 uses = [u for u in result['field_uses'] if u['test_ref']==test['id'] and u['item_ref']==item_ref]
                 if not uses: raise ValueError('Test/Item association lacks field-use lineage')
                 used = set().union(*(set(u['used_elements']) for u in uses))
-                entities = {e['entity'] for per in test.get('per_item_results',[]) if per['item_ref']==item_ref
+                entities = {e['entity'] for per in test['per_item_results'] if per['item_ref']==item_ref
                             for st in per['state_results'] for e in st['entity_results']}
                 if not entities <= used: raise ValueError('Compared entities absent from field-use lineage')
         for use in result['field_uses']:
             if use['test_ref'] not in tests or use['item_ref'] not in items:
                 raise ValueError('Field-use reference outside executed local results')
-            if use.get('relationship', 'direct') == 'direct' and use['item_ref'] not in tests[use['test_ref']]['item_refs']:
+            if use['relationship'] == 'direct' and use['item_ref'] not in tests[use['test_ref']]['item_refs']:
                 raise ValueError('Direct field use outside Test Items')
         projection = project_items(source, result['items'], result['field_uses'], source_execution_ref=result['execution_id'],
                                    source_completeness={key: result[key] for key in ('logical_complete','population_complete','evidence_complete')})['item_report']
@@ -168,7 +168,7 @@ def validate_result_set(document, assessments):
             if dep['assessment'] != target['assessment'] or dep['outcome'] != target['outcome'] or dep.get('purpose') != target['purpose']:
                 raise ValueError('Dependency result identity/outcome mismatch')
         trace_deps = [(t['alias'],t['invocation_ref'],t['outcome'],t['reused']) for t in invocation['trace'] if t['kind']=='dependency']
-        result_deps = [(d['alias'],d['execution_id'],d['outcome'],d.get('reused',False)) for d in dependencies]
+        result_deps = [(d['alias'],d['execution_id'],d['outcome'],d['reused']) for d in dependencies]
         if trace_deps != result_deps:
             raise ValueError('Dependency trace/result linkage differs')
     def provider(identity, test, _):
