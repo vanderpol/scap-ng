@@ -27,7 +27,7 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Assessment-result dependency and reuse | [Assessment result dependency](content/assessment-result-dependency.assessment.yaml), [Dependency stress case](content/dependency.assessment.yaml) | Statically declared dependency, simple consumption, repeated reuse and result provenance |
 | Conditional evaluation | [Conditional evaluation](content/conditional-evaluation.assessment.yaml), [Dependency stress case](content/dependency.assessment.yaml) | Focused local conditional plus dependent-Assessment branching without hiding which branch is selected |
 | Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Assessment-level applicability distinct from Rule applicability |
-| Explicit evidence projection | [Reported elements](content/reported-elements.assessment.yaml) | Explicit field list; no omitted/default reporting behavior |
+| Explicit evidence projection | [Explicit field list](content/reported-elements.assessment.yaml), [compared fields](content/reported-elements-compared.assessment.yaml) | Explicit reporting modes; no omitted/default reporting behavior |
 | Typed Assessment input / Organizational Input consumption | [Organizational input](content/organizational-input.assessment.yaml) | Declared typed input becomes a Variable used only as expected-state data; no executable behavior is supplied by the input |
 | Manual Assessment | [Manual review](content/manual.assessment.yaml) | Native human determination without OCIL workflow graphs |
 | Authored result redaction | [Redaction](content/redaction.assessment.yaml) | `redact_result: true` preserves technical truth while suppressing disclosed evidence value |
@@ -48,7 +48,7 @@ These examples highlight SCAP-NG capabilities that are not merely one-for-one OV
 | Assessment-result dependency/reuse | [Assessment result dependency](content/assessment-result-dependency.assessment.yaml) | Static dependency declaration and consumption of another Assessment's technical result without copying its Tests/Objects |
 | Intrinsic Assessment applicability | [Intrinsic applicability](content/intrinsic-applicability.assessment.yaml) | Applicability is ordinary authored Assessment logic, separate from Rule/platform naming metadata |
 | Explicit not_applicable result branch | [Dependency/conditional example](content/dependency.assessment.yaml) | Authored branch can produce a reasoned technical not_applicable outcome |
-| Explicit evidence projection | [Reported elements](content/reported-elements.assessment.yaml) | Authors select all, compared, or an explicit field list; omission is not a hidden reporting default |
+| Explicit evidence projection | [Explicit field list](content/reported-elements.assessment.yaml), [compared fields](content/reported-elements-compared.assessment.yaml) | Together with existing `all` samples, these demonstrate all three explicit reporting modes; omission is not a hidden reporting default |
 | Evidence redaction | [Redaction](content/redaction.assessment.yaml) | Technical truth is retained while a sensitive result value is deliberately withheld |
 | Typed Organizational Input consumption | [Organizational input](content/organizational-input.assessment.yaml) | Organization-supplied policy data is typed and can feed expected State only; it does not alter executable behavior |
 | Manual Assessment | [Manual review](content/manual.assessment.yaml) | Native human determination without carrying forward OCIL workflow structure |
