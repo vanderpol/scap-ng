@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Synthetic checks for SCAP-NG explicit defaults."""
+import inspect
 import json
 from pathlib import Path
 import unittest
 from audit_v003_explicit_defaults import audit_doc
+import item_materialization_v02
+import assessment_results_v02
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -124,6 +127,12 @@ class ExplicitDefaultsTests(unittest.TestCase):
                             for branch in state_entity["allOf"]))
         self.assertTrue(any("variable_match" in branch.get("then", {}).get("required", [])
                             for branch in scalar_entity["allOf"]))
+
+    def test_result_materialization_choices_have_no_runtime_default(self):
+        materialize = inspect.signature(item_materialization_v02.materialize_observations)
+        self.assertIs(materialize.parameters["scope"].default, inspect.Parameter.empty)
+        assemble = inspect.signature(assessment_results_v02.assemble_result_set)
+        self.assertIs(assemble.parameters["item_scope"].default, inspect.Parameter.empty)
 
     def test_record_fields(self):
         doc = self.fixture()
