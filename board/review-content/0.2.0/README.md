@@ -17,6 +17,18 @@ If you only want to see what SCAP-NG Assessment content looks like, start here. 
 
 For a fast review, open a **Refined NG Assessment** first, then compare it with the adjacent **Source XML**. The explanation pages describe the selected OVAL scope, expected outcomes, and why each case was chosen.
 
+### Frequency-oriented examples
+
+The six-case pilot above was chosen for semantic coverage, not prevalence. To make the review set more representative of real DISA content, three additional native 0.2.0 examples are now derived from the pinned SCAP 1.4 Self-Assertion corpus and emphasize commonly encountered capability families:
+
+| Capability | Native Assessment | Why it is here |
+| --- | --- | --- |
+| `independent.textfilecontent54` | [`textfilecontent54.assessment.yaml`](content/textfilecontent54.assessment.yaml) | Text-file content checks are among the most common patterns in the current NIWC/DISA corpus. |
+| `linux.rpminfo` | [`rpminfo.assessment.yaml`](content/rpminfo.assessment.yaml) | Common Linux package-presence/version metadata pattern. |
+| `unix.sysctl` | [`sysctl.assessment.yaml`](content/sysctl.assessment.yaml) | Common UNIX/Linux kernel-parameter pattern. |
+
+The existing UNIX file and Windows registry cases are also representative high-frequency families. The Windows process/WMI example remains because it exercises correlated-record semantics; it should be read as a useful semantic stress case, not as evidence that process queries themselves are common DISA checks.
+
 ## What these six samples cover
 
 - **Family:** singleton Object removal and regex Variable behavior.
@@ -87,7 +99,7 @@ Four earlier examples are retained outside the six-case converter pilot, under
 Direct `variable.value` Test conversion remains a documented gap, with a focused
 reproducer. Keeping these seeds does not conceal that limitation or count them as
 converter successes. The complex native Variable/filter chain remains reviewable.
-There are ten native Assessment files in total: six active cases plus four seeds.
+There are thirteen native Assessment files in total: six active converter-pilot cases, four earlier supporting seeds, and three frequency-oriented examples.
 
 ## Expected behavior and evidence
 
