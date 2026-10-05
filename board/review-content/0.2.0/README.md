@@ -29,6 +29,19 @@ The six-case pilot above was chosen for semantic coverage, not prevalence. To ma
 
 The existing UNIX file and Windows registry cases are also representative high-frequency families. The Windows process/WMI example remains because it exercises correlated-record semantics; it should be read as a useful semantic stress case, not as evidence that process queries themselves are common DISA checks.
 
+### Key language-feature examples
+
+Capability frequency alone is not sufficient for Board review. Real SCAP content also depends on Variables, Sets, filters, quantifiers, and multi-step dataflow, so the sample set deliberately includes non-trivial examples that exercise those mechanisms:
+
+| Language feature | Native Assessment | What it demonstrates |
+| --- | --- | --- |
+| Variable-backed filter | [`directory-filter.assessment.yaml`](content/directory-filter.assessment.yaml) | Constant multi-value Variable, Variable reference in State comparison, `variable_match: one`, EXCLUDE filter, and Set semantics. |
+| Complex Variable/filter dataflow | [`filter.assessment.yaml`](content/filter.assessment.yaml) | Object-component Variable, chained local Variables, arithmetic, Cartesian multi-values, nested union/intersection, and filtering. |
+| Multi-value Variable functions | [`concat.assessment.yaml`](content/concat.assessment.yaml) | Constant Variables, Variable components, Cartesian concatenation, and quantified comparison of generated values. |
+| Explicit Variable tests | [`constants.assessment.yaml`](content/constants.assessment.yaml) | Direct `variable.value` Tests, integer comparison, and multi-value quantification. |
+
+These examples are intentionally more complex than the frequency-oriented capability examples. The review set should prove that SCAP-NG remains readable when the source logic is non-trivial, not merely that simple Tests serialize cleanly.
+
 ## What these six samples cover
 
 - **Family:** singleton Object removal and regex Variable behavior.
