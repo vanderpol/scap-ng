@@ -22,8 +22,8 @@ class AssessmentResultTests(unittest.TestCase):
             expected=sources[identity]['states']['owner']['state']['value']
             return 'true' if actual==expected else 'false'
         expression=AssessmentExpressionEvaluator(sources).run('results.conditional',provider,target='fixture-target',bindings={'secret':'not-for-output'})
-        evidence={'results.conditional':{'tests':[{'id':'test-guard','outcome':guard,'object_refs':[],'item_refs':[],'state_refs':['is-true']}],
-                 'objects':[],'items':[],'variables':[{'id':'guard','datatype':'boolean','status':'complete','cardinality':'one','values':[{'datatype':'boolean','value':True}]}],
+        evidence={'results.conditional':{'tests':[{'id':'test-guard','outcome':guard,'object_refs':[],'item_refs':[],'state_refs':['is-true'],'per_item_results':[]}],
+                 'objects':[],'items':[],'variables':[{'id':'guard','datatype':'boolean','status':'complete','cardinality':'one','values':[{'datatype':'boolean','status':'exists','value':True}],'item_refs':[]}],
                  'field_uses':[],'diagnostics':[],'logical_complete':True,'population_complete':True,'evidence_complete':True}}
         if guard=='true': evidence['results.ownership']=owner
         return assemble_result_set(sources,expression,evidence)
