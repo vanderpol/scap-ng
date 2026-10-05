@@ -37,15 +37,20 @@ class ReportedElementsTests(unittest.TestCase):
     def test_committed_known_result_cases(self):
         for case in self.fixture["cases"]:
             assessment = copy.deepcopy(self.assessment)
-            assessment["tests"]["test-owner"].pop("reported_elements")
-            if "control" in case:
-                assessment["tests"]["test-owner"]["reported_elements"] = case["control"]
+            assessment["tests"]["test-owner"]["reported_elements"] = case["control"]
             report = self.report(assessment)
             with self.subTest(case=case["id"]):
                 self.report_validator.validate({"item_report": report})
                 expected = self.expected[case["id"]]
                 self.assertEqual(sorted(report["items"][0]["item"]["fields"]), expected["fields"])
                 self.assertEqual(report["items"][0]["selection"]["unavailable_elements"], expected["unavailable_elements"])
+
+    def test_omitted_control_is_invalid(self):
+        assessment = copy.deepcopy(self.assessment)
+        assessment["tests"]["test-owner"].pop("reported_elements")
+        self.assertTrue(source_errors(assessment))
+        with self.assertRaisesRegex(ValueError, "reported_elements is required"):
+            self.report(assessment)
 
     def test_control_grammar_and_unknown_names(self):
         for control in ["all", "compared", [], ["owner_uid", "owner_user_name"]]:
@@ -98,7 +103,7 @@ class ReportedElementsTests(unittest.TestCase):
         assessment["tests"]["test-second"]["reported_elements"] = ["size"]
         fields = self.report(assessment, uses=uses)["items"][0]["item"]["fields"]
         self.assertEqual(set(fields), {"full_path", "owner_uid", "owner_user_name", "owner_gid", "size"})
-        assessment["tests"]["test-second"].pop("reported_elements")
+        assessment["tests"]["test-second"]["reported_elements"] = "all"
         self.assertEqual(set(self.report(assessment, uses=uses)["items"][0]["item"]["fields"]), set(self.fixture["items"][0]["fields"]))
         self.assertEqual(self.report(assessment, uses=list(reversed(uses))), self.report(assessment, uses=uses))
 
