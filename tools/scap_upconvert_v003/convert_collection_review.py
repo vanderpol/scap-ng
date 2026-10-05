@@ -276,6 +276,10 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         if not parity['equal']:
             failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
         native=align_assessment_vocabulary(native)
+        # SCAP-NG 0.2.0 has no hidden reporting default. Preserve the full
+        # SCAP 1.4/OVAL evidence surface explicitly during conversion.
+        for test in native.get('assessment',{}).get('tests',{}).values():
+            test['reported_elements']='all'
         try:
             native=apply_ready_capability_mappings(native,NATIVE_CAPABILITY_MAPPING_DIR)
         except ValueError as exc:
