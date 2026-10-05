@@ -125,10 +125,10 @@ def validate_graph(manifest,documents,assessments=None):
             if row['target_ref']!=group['target_ref']:raise ValueError('Cross-target dependency group')
             if row.get('binding_set_id')!=results[group['entry_execution_id']].get('binding_set_id'):
                 raise ValueError('Cross-binding dependency group')
-            for dep in row.get('dependent_assessments',[]):
+            for dep in row['dependent_assessments']:
                 child=results.get(dep['execution_id'])
                 if child is None or dep['execution_id'] not in ids: raise ValueError('Dependency outside invocation group')
-                if dep['assessment']!=child['assessment'] or dep['outcome']!=child['outcome'] or dep.get('purpose')!=child['purpose']:
+                if dep['assessment']!=child['assessment'] or dep['outcome']!=child['outcome'] or dep['purpose']!=child['purpose']:
                     raise ValueError('Dependency identity/outcome mismatch')
                 visit(dep['execution_id'])
             active.remove(identity);reached.add(identity)
