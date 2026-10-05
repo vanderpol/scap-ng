@@ -183,7 +183,7 @@ class ConditionalIntegrationTests(unittest.TestCase):
     def test_unused_dependencies_are_packaged_and_pinned(self):
         def change(a):
             if a["id"] == "conditional.local":
-                a["dependencies"] = {"unused": {"assessment": "role.assessment.yaml"}}
+                a["dependencies"] = {"unused": {"assessment": "role.assessment.yaml", "expected_id": "conditional.role", "expected_version": 1, "purpose": "applicability"}}
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             _, members, index = compile_benchmark(root, self.tree(root, "conditional.local", change))
@@ -196,7 +196,7 @@ class ConditionalIntegrationTests(unittest.TestCase):
             if a["id"] == "conditional.dependent":
                 a["dependencies"]["role-again"] = copy.deepcopy(a["dependencies"]["role"])
             if a["id"] == "conditional.role":
-                a["dependencies"] = {"nested": {"assessment": "local.assessment.yaml"}}
+                a["dependencies"] = {"nested": {"assessment": "local.assessment.yaml", "expected_id": "conditional.local", "expected_version": 1, "purpose": "assessment"}}
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             benchmark, members, index = compile_benchmark(root, self.tree(root, change=change))
@@ -206,8 +206,8 @@ class ConditionalIntegrationTests(unittest.TestCase):
 
     def test_unused_dependency_missing_source_and_identity_mismatch(self):
         for dependency, error in [
-            ({"assessment": "missing.assessment.yaml"}, "unresolved Assessment reference"),
-            ({"assessment": "role.assessment.yaml", "expected_id": "wrong-id"}, "expected_id mismatch"),
+            ({"assessment": "missing.assessment.yaml", "expected_id": "conditional.missing", "expected_version": 1, "purpose": "assessment"}, "unresolved Assessment reference"),
+            ({"assessment": "role.assessment.yaml", "expected_id": "wrong-id", "expected_version": 1, "purpose": "applicability"}, "expected_id mismatch"),
         ]:
             def change(a):
                 if a["id"] == "conditional.local":
