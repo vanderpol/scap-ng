@@ -101,12 +101,43 @@ def benchmark_description(root: ET.Element) -> str | None:
     return text(desc)
 
 
-def rule_discussion(rule: ET.Element) -> str | None:
+STIG_DESCRIPTION_FIELDS = {
+    "VulnDiscussion": "discussion",
+    "FalsePositives": "false_positives",
+    "FalseNegatives": "false_negatives",
+    "Documentable": "documentable",
+    "Mitigations": "mitigations",
+    "SeverityOverrideGuidance": "severity_override_guidance",
+    "PotentialImpacts": "potential_impacts",
+    "ThirdPartyTools": "third_party_tools",
+    "MitigationControl": "mitigation_control",
+    "Responsibility": "responsibility",
+    "IAControls": "ia_controls",
+}
+
+
+def stig_description_fields(rule: ET.Element) -> dict[str, str | None]:
+    """Parse DISA's escaped XML fragment carried inside xccdf:description."""
     desc = child(rule, "description")
     if desc is None:
-        return None
-    vuln = descendant(desc, "VulnDiscussion")
-    return text(vuln) or text(desc)
+        return {}
+    raw = "".join(desc.itertext()).strip()
+    if not raw:
+        return {}
+    try:
+        wrapper = ET.fromstring(f"<root>{raw}</root>")
+    except ET.ParseError:
+        return {"discussion": text(desc)}
+    result: dict[str, str | None] = {}
+    for node in list(wrapper):
+        key = STIG_DESCRIPTION_FIELDS.get(lname(node.tag))
+        if key:
+            result[key] = text(node)
+    return result or {"discussion": text(desc)}
+
+
+def rule_discussion(rule: ET.Element) -> str | None:
+    return stig_description_fields(rule).get("discussion")
 
 
 def rule_check(rule: ET.Element) -> str | None:
@@ -147,13 +178,28 @@ def references(rule: ET.Element) -> list[dict]:
     return out
 
 
+def profile_description(profile: ET.Element) -> str | None:
+    desc = child(profile, "description")
+    if desc is None:
+        return None
+    raw = "".join(desc.itertext()).strip()
+    if raw == "<ProfileDescription></ProfileDescription>":
+        return None
+    if raw.startswith("<ProfileDescription>") and raw.endswith("</ProfileDescription>"):
+        try:
+            return text(ET.fromstring(raw))
+        except ET.ParseError:
+            pass
+    return text(desc)
+
+
 def profile_rows(root: ET.Element) -> list[dict]:
     rows = []
     for profile in children(root, "Profile"):
         rows.append({
             "id": profile.get("id"),
             "title": text(child(profile, "title")),
-            "description": text(child(profile, "description")),
+            "description": profile_description(profile),
             "select": [
                 {"idref": x.get("idref"), "selected": x.get("selected")}
                 for x in children(profile, "select")
@@ -220,6 +266,7 @@ def convert(source: Path, output: Path) -> dict:
         used_ids.add(native_id)
 
         procedure = rule_check(rule)
+        description_fields = stig_description_fields(rule)
         assessment_id = f"{native_id}.manual"
         rule_doc = {
             "scap_ng": SCAP_NG_VERSION,
@@ -230,7 +277,7 @@ def convert(source: Path, output: Path) -> dict:
                 "version": stig_id,
                 "vulnerability_id": vuln_id,
                 "group_path": path,
-                "discussion": rule_discussion(rule),
+                "discussion": description_fields.get("discussion"),
                 "references": references(rule),
                 "idents": idents(rule),
                 "fix": rule_fix(rule),
@@ -262,6 +309,7 @@ def convert(source: Path, output: Path) -> dict:
             "source_rule_id": source_rule_id,
             "source_group_id": vuln_id,
             "source_stig_id": stig_id,
+            "source_description_fields": description_fields,
         })
 
     benchmark_doc = {
