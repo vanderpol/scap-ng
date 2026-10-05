@@ -115,6 +115,13 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                 except ValueError:
                     mapping = None
                     if allow_unpromoted_conversion_vocabulary:
+                        # The converter bridge may preserve explicitly known publisher
+                        # extensions losslessly without promoting them into the frozen
+                        # native 0.2.0 capability catalog. Strict authoring still rejects
+                        # these names when the bridge flag is absent.
+                        conversion_only_extensions = {"independent.sqlext"}
+                        if capability in conversion_only_extensions:
+                            continue
                         from capability_registry import mappings
                         from scap_upconvert_v003.native_capability_mapping import source_capability
                         candidates = [
