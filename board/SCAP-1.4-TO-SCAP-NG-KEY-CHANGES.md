@@ -20,7 +20,9 @@ SCAP-NG is intended to preserve useful SCAP 1.4 and OVAL assessment semantics wh
 
 - **Benchmark → Rule → Assessment.** A Rule owns the requirement, policy metadata, applicability references, and named Assessment choices/default. An Assessment owns how the requirement is evaluated. There is **no separate Policy object** in the current design.
 
-- **Preserve OVAL meaning, not OVAL XML structure.** Used, non-deprecated semantics are retained; XML type hierarchies, serialization workarounds, hidden defaults, and wrapper structure are not automatically carried forward.
+- **No hidden semantic defaults.** SCAP-NG requires behavior that affects collection, evaluation, reporting, or results to be visible in authored content. Authors must explicitly state choices such as reporting selection rather than relying on omission to mean a default value, and schemas must reject content when a required semantic choice is absent. This is a deliberate change from SCAP 1.4/OVAL patterns where schema or specification defaults could make effective behavior less obvious from the content itself.
+
+- **Preserve OVAL meaning, not OVAL XML structure.** Used, non-deprecated semantics are retained; XML type hierarchies, serialization workarounds, implicit/defaulted serialization behavior, and wrapper structure are not automatically carried forward.
 
 - **Recognizable OVAL vocabulary remains.** Native automated content uses **Test, Object, State, Variable, and Item**. `evaluate` replaces OVAL `criteria/criterion`. Typed titles replace generic OVAL `comment` metadata.
 
