@@ -29,7 +29,17 @@ rather than approximate behavior without disclosure.
 ## 3. Explicit legacy defaults
 
 Where legacy SCAP/OVAL semantics rely on behavior-affecting defaults, Stage 1
-NG output SHOULD make those semantics explicit.
+NG output SHALL materialize the effective behavior explicitly. A converter
+SHALL NOT carry a legacy omission forward when the omission itself selected a
+semantic value in the legacy specification.
+
+Examples include OVAL Test State aggregation: when legacy omission means
+`state_operator="AND"`, converted native content SHALL emit the corresponding
+explicit SCAP-NG aggregation (currently `states_match: all`).
+
+This requirement is distinct from semantics inherent in a native construct's
+type. SCAP-NG does not require redundant fields when the construct has only one
+defined behavior.
 
 ## 4. Native refactoring
 
