@@ -15,6 +15,7 @@ A feature is not considered covered merely because a schema permits it. It needs
 | Direct Variable Test | [Constants](content/constants.assessment.yaml) | `variable.value` without a redundant Object |
 | Constant and multi-value Variables | [Constants](content/constants.assessment.yaml) | Typed one/many values |
 | Variable components and concatenation | [Concat](content/concat.assessment.yaml) | Derived Variable dataflow and Cartesian results |
+| Additional Variable functions | [Variable functions](content/variable-functions.assessment.yaml) | Compact Self-Assertion-derived `split`, `substring`, and `regex_capture` examples with direct `variable.value` Tests |
 | Object-component Variable, chained Variables and arithmetic | [Filter](content/filter.assessment.yaml) | Non-trivial dataflow feeding collection filtering |
 | Set union and intersection | [Filter](content/filter.assessment.yaml) | Nested Set composition |
 | Set difference | [Set difference](content/set-difference.assessment.yaml) | Explicit subtraction of one reusable Object/Set from another |
@@ -40,7 +41,6 @@ A feature is not considered covered merely because a schema permits it. It needs
 
 These are still required before the Board sample inventory can be called feature-complete:
 
-- additional Variable functions beyond the current literal, component, concat and arithmetic examples;
 - a concise embedded-Object example if embedded Objects remain in the final 0.2.0 authoring contract;
 - finalize the collected-Item reuse authoring proposal and adopt it into the 0.2.0 schema only after the source identity/binding questions in [the proposal](proposals/item-reuse.md) are resolved;
 - unsupported-capability execution/result behavior, if that remains a native Assessment contract rather than an implementation/reporting-only concern.
