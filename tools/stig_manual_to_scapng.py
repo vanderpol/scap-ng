@@ -164,6 +164,40 @@ def rule_fix(rule: ET.Element) -> str | None:
     return "\n\n".join(x for x in fixes if x) or None
 
 
+def normalized_fixes(rule: ET.Element) -> list[dict]:
+    system_map = {
+        "urn:xccdf:fix:script:sh": "shell",
+        "urn:xccdf:fix:script:ansible": "ansible",
+        "urn:xccdf:fix:script:powershell": "powershell",
+        "urn:xccdf:fix:script:batch": "batch",
+    }
+    values = []
+    for node in children(rule, "fix"):
+        if list(node):
+            raise SystemExit(
+                f"Rule {rule.get('id')!r} has an XCCDF fix with substitution/child elements; "
+                "conversion support is required before it can be emitted losslessly."
+            )
+        content = prose_text(node)
+        if not content:
+            continue
+        source_system = node.get("system")
+        item = {"content": content}
+        if source_system:
+            fix_type = system_map.get(source_system)
+            if not fix_type:
+                raise SystemExit(
+                    f"Rule {rule.get('id')!r} uses unsupported XCCDF fix system {source_system!r}."
+                )
+            item["type"] = fix_type
+        for source_name in ("reboot", "disruption", "complexity", "strategy"):
+            value = node.get(source_name)
+            if value is not None:
+                item[source_name] = value.lower() == "true" if source_name == "reboot" else value
+        values.append(item)
+    return values
+
+
 def profile_description(profile: ET.Element) -> str | None:
     desc = child(profile, "description")
     if desc is None:
@@ -378,7 +412,7 @@ def unhandled_source_elements(inventory: dict) -> dict:
     }
     handled_rule = {
         "status", "version", "title", "description", "reference", "ident",
-        "check", "fixtext", "rationale", "warning",
+        "check", "fixtext", "fix", "rationale", "warning",
     }
     return {
         "benchmark_children": sorted(
@@ -454,6 +488,7 @@ def convert(source: Path, output: Path) -> dict:
         fields = stig_description_fields(rule)
         discussion = fields.get("discussion") or ""
         fix = rule_fix(rule)
+        fix_implementations = normalized_fixes(rule)
         assessment_id = f"{native_id}.manual"
         assessment_rel = f"../assessments/manual/{assessment_id}.assessment.yaml"
 
@@ -490,7 +525,10 @@ def convert(source: Path, output: Path) -> dict:
                 "conflicts": [],
                 "applicability": [],
                 "parameters": {},
-                "remediation": {"guidance": fix} if fix else {},
+                "remediation": {
+                    **({"guidance": fix} if fix else {}),
+                    **({"implementations": fix_implementations} if fix_implementations else {}),
+                },
                 "organizational_input_requirements": {},
                 "assessment_choices": {
                     "manual": {"assessment": assessment_rel}
