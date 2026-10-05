@@ -21,8 +21,8 @@ import yaml
 RESULT_OPTIONS = [
     ("Pass", "pass"),
     ("Fail", "fail"),
+    ("Unknown", "unknown"),
     ("Not Applicable", "not_applicable"),
-    ("Not Evaluated", "not_evaluated"),
 ]
 
 COLUMNS = [
