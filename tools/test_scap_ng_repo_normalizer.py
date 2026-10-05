@@ -91,7 +91,9 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertIn("$.objects.files.select.path.value",diff_paths)
             shared=list((output/"shared"/"assessments").glob("*.yaml"))
             self.assertEqual(len(shared),1)
+            self.assertEqual(shared[0].name, "file.assessment.yaml")
             shared_assessment=yaml.safe_load(shared[0].read_text())["assessment"]
+            self.assertEqual(shared_assessment["id"], "ng.shared.file")
             self.assertEqual(shared_assessment["version"],1)
             self.assertNotIn("reuse_provenance",shared_assessment)
             provenance=report["exact_groups"][0]["members"]
@@ -158,8 +160,9 @@ class RepoNormalizerTests(unittest.TestCase):
 
             shared=list((output/"shared"/"assessments").glob("*.yaml"))
             self.assertEqual(len(shared),1)
-            self.assertTrue(shared[0].name.endswith(".manual.assessment.yaml"))
+            self.assertEqual(shared[0].name, "manual-check.manual.assessment.yaml")
             doc=yaml.safe_load(shared[0].read_text())["assessment"]
+            self.assertEqual(doc["id"], "ng.shared.manual-check")
             self.assertEqual(doc["mode"],"manual")
             self.assertIn("response",doc)
 
