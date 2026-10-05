@@ -13,7 +13,7 @@ import re
 from reported_elements import _check_redaction
 
 
-def materialize_observations(observations, *, scope='all'):
+def materialize_observations(observations, *, scope):
     if 'item_materialization' in observations:
         raise ValueError('Provide original available observations, not an already-materialized result')
     if scope not in {'all','consumed'}:
