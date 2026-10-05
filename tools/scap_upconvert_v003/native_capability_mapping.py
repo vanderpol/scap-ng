@@ -599,6 +599,12 @@ def apply_ready_capability_mappings(document: dict, mapping_dir: Path) -> dict:
     for mapping in ready_capability_mappings(mapping_dir):
         result=apply_capability_mapping(result,mapping)
     assessment=result.get("assessment",result)
+    # OVAL permits an omitted Test state_operator and defines that omission as
+    # AND. Native SCAP-NG 0.2.0 does not permit hidden semantic defaults, so
+    # materialize the equivalent aggregation after all capability mappings.
+    for test in (assessment.get("tests") or {}).values():
+        if isinstance(test,dict) and len(test.get("states") or []) > 1 and "states_match" not in test:
+            test["states_match"]="all"
     for section in ("objects","states","tests"):
         for identity,node in (assessment.get(section) or {}).items():
             if not isinstance(node,dict):
