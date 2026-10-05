@@ -327,11 +327,15 @@ jobs:
               if source.exists():
                   shutil.copytree(source,target)
 
+          generation=json.loads(Path("work/evidence/generation-summary.json").read_text())
           summary={
               "artifact":"niwc-current-full-review",
               "scap_ng_revision":"${{ github.event.pull_request.head.sha || github.sha }}",
               "niwc_revision":"${{ env.NIWC_REVISION }}",
               "source_packages_expected":65,
+              "source_packages_accounted_for":generation["packages"],
+              "generated_native_benchmarks":generation["generated"],
+              "blocked_source_packages":generation["blocked"],
               "layout":{
                   "source":"Fresh current-design SCAP-NG source trees generated from pinned NIWC Current packages.",
                   "normalized":"Exact-semantics normalized source trees with shared Assessments.",
@@ -343,7 +347,7 @@ jobs:
           (root/"README.md").write_text(
               "# NIWC Current full SCAP-NG review build\n\n"
               "This artifact is generated fresh from all 65 pinned NIWC Current SCAP 1.4 packages.\n"
-              "Packages that cannot be converted are still accounted for under evidence/conversion-output/status/.\n\n"
+              "Publication is gated on 65/65 native Benchmark trees with zero blocked source packages.\n\n"
               "## Layout\n\n"
               "- source/ — fresh generated native SCAP-NG authoring trees\n"
               "- normalized/ — exact-semantics normalized authoring trees\n"
