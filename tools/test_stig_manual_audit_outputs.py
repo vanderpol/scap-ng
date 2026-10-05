@@ -59,6 +59,8 @@ def main() -> int:
         rule = rule_doc["rule"]
         assert rule["vulnerability_id"] == "V-243502"
         assert rule["assessment_choices"][0]["name"] == "manual"
+        assert rule["discussion"] == "Privileged membership discussion."
+        assert "<VulnDiscussion>" not in rule["discussion"]
         assert "CCI-000366" in str(rule["idents"])
 
         assessment = yaml.safe_load(
