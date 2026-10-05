@@ -77,6 +77,46 @@ UTF-8 source bytes are digest-pinned, source execution/target/bindings are
 checked, selected Item IDs are explicit, local IDs are collision-checked, and
 source completeness/provenance is retained.
 
+## End-to-end sample
+
+The complete proposal is intentionally split across four small files so the
+authoring contract and runtime binding are not conflated:
+
+1. [Producer Assessment](item-reuse-producer.assessment.yaml) collects the
+   reusable `unix.file` population.
+2. [Consumer Assessment](item-reuse-consumer.assessment.yaml) declares an
+   `item_inputs` contract and evaluates the imported Items with its own local
+   State/Test logic.
+3. [Assessment Request](item-reuse-request.yaml) binds that logical input to one
+   exact prior result artifact, target, binding set, source Item IDs, and local
+   Item IDs.
+4. [Materialized imported Item](item-reuse-materialized-item.json) shows what
+   the consumer actually receives locally after verified import.
+
+The resulting local Item is ordinary canonical evidence with `imported: true`.
+Its new local ID is used by the consumer. `context.origin` retains the exact
+source result, original Item ID, execution ID, digest, binding context, and
+completeness. The imported Item is therefore self-explanatory in the consumer's
+result and does not require an opaque external join.
+
+The digest in these Board proposal files is deliberately synthetic. It is
+well-formed so the example remains concrete, but it is not a trust anchor or a
+claim about a real result artifact. The conformance fixture under
+`tests/item-materialization-0.2.0/` exercises the same model with an actual
+byte-pinned synthetic source artifact.
+
+The consumer still evaluates locally:
+
+```text
+prior Assessment result
+        |
+        | verified Item import
+        v
+item input contract -> local imported Object -> local State/Test -> local result
+```
+
+Only observations cross that boundary. The producer's Test result does not.
+
 ## Questions this exposes for Board/design review
 
 - Is `item_inputs` the right native term, or should this be framed as an
