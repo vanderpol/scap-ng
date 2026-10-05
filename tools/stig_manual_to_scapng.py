@@ -311,6 +311,85 @@ def localized(node: ET.Element | None) -> list[dict]:
     return [{"text": value, "language": language}]
 
 
+def benchmark_status(root: ET.Element) -> list[dict]:
+    return [
+        {"value": text(node), "date": node.get("date")}
+        for node in children(root, "status") if text(node)
+    ]
+
+
+def benchmark_notices(root: ET.Element) -> list[dict]:
+    values = []
+    for node in children(root, "notice"):
+        values.append({
+            "id": safe_id(node.get("id"), "notice"),
+            "text": prose_text(node) or "",
+            "language": node.get("{http://www.w3.org/XML/1998/namespace}lang"),
+        })
+    return values
+
+
+def benchmark_references(root: ET.Element) -> list[dict]:
+    values = []
+    for node in children(root, "reference"):
+        item = {"text": text(node)}
+        if node.get("href"):
+            item["url"] = node.get("href")
+        values.append(item)
+    return values
+
+
+def benchmark_text_blocks(root: ET.Element) -> list[dict]:
+    return [
+        {"id": safe_id(node.get("id"), "text"), "text": prose_text(node) or ""}
+        for node in children(root, "plain-text")
+    ]
+
+
+def benchmark_scoring(root: ET.Element) -> list[dict]:
+    values = []
+    for node in children(root, "model"):
+        item = {"system": text(node), "parameters": {}}
+        for param in children(node, "param"):
+            if param.get("name"):
+                item["parameters"][param.get("name")] = param.get("value") or text(param)
+        values.append(item)
+    return values
+
+
+def source_inventory(root: ET.Element) -> dict:
+    top: dict[str, int] = {}
+    rule_children: dict[str, int] = {}
+    for node in list(root):
+        name = lname(node.tag)
+        top[name] = top.get(name, 0) + 1
+    for rule, _ in iter_rules(root):
+        for node in list(rule):
+            name = lname(node.tag)
+            rule_children[name] = rule_children.get(name, 0) + 1
+    return {"benchmark_children": top, "rule_children": rule_children}
+
+
+def unhandled_source_elements(inventory: dict) -> dict:
+    handled_benchmark = {
+        "status", "title", "description", "notice", "front-matter", "rear-matter",
+        "reference", "plain-text", "platform", "model", "Profile", "Group", "Rule",
+        "version", "metadata",
+    }
+    handled_rule = {
+        "status", "version", "title", "description", "reference", "ident",
+        "check", "fixtext", "rationale", "warning",
+    }
+    return {
+        "benchmark_children": sorted(
+            name for name in inventory["benchmark_children"] if name not in handled_benchmark
+        ),
+        "rule_children": sorted(
+            name for name in inventory["rule_children"] if name not in handled_rule
+        ),
+    }
+
+
 def benchmark_platform(root: ET.Element, benchmark_id: str, title: str) -> tuple[dict, list[str]]:
     source_ids = [
         x.get("idref") for x in children(root, "platform") if x.get("idref")
@@ -335,6 +414,13 @@ def convert(source: Path, output: Path) -> dict:
         raise SystemExit(f"Expected XCCDF Benchmark root, got {lname(root.tag)!r}")
 
     namespace = xccdf_namespace(root)
+    inventory = source_inventory(root)
+    unhandled = unhandled_source_elements(inventory)
+    if unhandled["benchmark_children"] or unhandled["rule_children"]:
+        raise SystemExit(
+            "Unhandled XCCDF source elements would be dropped: "
+            + json.dumps(unhandled, sort_keys=True)
+        )
     source_benchmark_id = root.get("id")
     benchmark_id = safe_id(source_benchmark_id, "stig-manual")
     benchmark_title = text(child(root, "title")) or benchmark_id
@@ -393,9 +479,11 @@ def convert(source: Path, output: Path) -> dict:
                 "role": effective_role,
                 "weight": effective_weight,
                 "discussion": discussion,
-                "rationale": None,
+                "rationale": prose_text(child(rule, "rationale")),
                 "extensions": {"disa_stig": extension_fields},
-                "warnings": [],
+                "warnings": [
+                    prose_text(node) for node in children(rule, "warning") if prose_text(node)
+                ],
                 "identifiers": identifiers(rule, path),
                 "references": references(rule),
                 "requires": [],
@@ -469,20 +557,21 @@ def convert(source: Path, output: Path) -> dict:
             "title": localized(child(root, "title")),
             "description": localized(child(root, "description")),
             "language": root.get("{http://www.w3.org/XML/1998/namespace}lang"),
-            "status": [
-                {"value": x.get("status") or text(x)}
-                for x in children(root, "status") if (x.get("status") or text(x))
-            ],
-            "version": {"value": benchmark_version},
+            "status": benchmark_status(root),
+            "version": {
+                "value": benchmark_version,
+                "time": child(root, "version").get("time") if child(root, "version") is not None else None,
+                "update": child(root, "version").get("update") if child(root, "version") is not None else None,
+            },
             "metadata": metadata(root),
-            "notices": [],
+            "notices": benchmark_notices(root),
             "front_matter": localized(child(root, "front-matter")),
             "rear_matter": localized(child(root, "rear-matter")),
-            "references": [],
-            "text_blocks": [],
+            "references": benchmark_references(root),
+            "text_blocks": benchmark_text_blocks(root),
             "platform": platform,
             "applicability_catalog": "applicability.yaml",
-            "scoring": [],
+            "scoring": benchmark_scoring(root),
             "parameters": [],
             "default_selection": True,
             # Legacy DISA vulnerability wrapper Groups are not meaningful NG
@@ -504,6 +593,8 @@ def convert(source: Path, output: Path) -> dict:
             "benchmark_version": benchmark_version,
             "platform_ids": source_platform_ids,
             "profiles": source_profile_rows(root),
+            "inventory": inventory,
+            "unhandled_elements": unhandled,
         },
         "native": {
             "benchmark_id": benchmark_id,
