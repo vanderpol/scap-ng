@@ -1,7 +1,24 @@
 #!/usr/bin/env python3
 """Synthetic checks for SCAP-NG explicit defaults."""
+import json
+from pathlib import Path
 import unittest
 from audit_v003_explicit_defaults import audit_doc
+
+ROOT = Path(__file__).resolve().parents[1]
+
+def default_keyword_paths(value, path="$"):
+    hits = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            here = f"{path}.{key}"
+            if key == "default":
+                hits.append(here)
+            hits.extend(default_keyword_paths(child, here))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            hits.extend(default_keyword_paths(child, f"{path}[{index}]"))
+    return hits
 
 class ExplicitDefaultsTests(unittest.TestCase):
     def fixture(self):
@@ -61,6 +78,37 @@ class ExplicitDefaultsTests(unittest.TestCase):
         issues, _ = audit_doc(doc)
         self.assertNotIn("HIDDEN_TEST_DEFAULT_REPORTED_ELEMENTS",
                          [r["code"] for r in issues])
+
+
+    def test_v020_schemas_have_no_json_schema_defaults(self):
+        hits = []
+        for path in sorted((ROOT / "schema/v0.2.0").rglob("*.json")):
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            for where in default_keyword_paths(doc):
+                hits.append(f"{path.relative_to(ROOT)}:{where}")
+        self.assertEqual([], hits)
+
+    def test_v020_schema_requires_semantically_meaningful_choices(self):
+        assessment = json.loads((ROOT / "schema/v0.2.0/assessment.schema.json").read_text())
+        test_schema = assessment["properties"]["assessment"]["properties"]["tests"]["additionalProperties"]
+        self.assertIn("reported_elements", test_schema["required"])
+
+        result_types = json.loads((ROOT / "schema/v0.2.0/result-types.schema.json").read_text())
+        self.assertIn("status", result_types["$defs"]["typed_value"]["required"])
+
+        assessment_result = json.loads((ROOT / "schema/v0.2.0/assessment-result.schema.json").read_text())
+        ar = assessment_result["properties"]["assessment_result"]["properties"]
+        self.assertIn("relationship", ar["field_uses"]["items"]["required"])
+        dependency = ar["dependent_assessments"]["items"]
+        self.assertIn("purpose", dependency["required"])
+        self.assertIn("reused", dependency["required"])
+
+        test_result = json.loads((ROOT / "schema/v0.2.0/test-result.schema.json").read_text())
+        self.assertIn("state_refs", test_result["required"])
+        self.assertIn("per_item_results", test_result["required"])
+
+        variable_result = json.loads((ROOT / "schema/v0.2.0/variable-result.schema.json").read_text())
+        self.assertIn("item_refs", variable_result["required"])
 
     def test_record_fields(self):
         doc = self.fixture()
