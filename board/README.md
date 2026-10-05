@@ -56,7 +56,7 @@ The artifact contains only:
 The `authoring/` tree is the form NG content developers would maintain after mechanical SCAP 1.4 translation and normalization. Exact duplicate Assessments are factored into `authoring/shared/assessments/` and use meaningful human-readable names derived from their semantics. Opaque hash-only shared names are prohibited by repository policy.
 
 - **[Download `scap-ng-board-representative-review`](https://github.com/vanderpol/scap-ng/actions/runs/37326998136/artifacts/11353525428)**
-- **[GitHub Actions run 37321474460](https://github.com/vanderpol/scap-ng/actions/runs/37326998136)**
+- **[GitHub Actions run 37326998136](https://github.com/vanderpol/scap-ng/actions/runs/37326998136)**
 - Artifact SHA-256: `f18345004a66f4a1d6f40794d8f302102f19bf7d830195650c58e420cdf8e263`
 - Approximate artifact size: **8.0 MB**
 - SCAP-NG source revision used by the build: `023a154ba719af842bd0ca037ef5c6759dbd646a`
