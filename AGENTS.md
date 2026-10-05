@@ -58,6 +58,28 @@ This is a hard repository rule for every SCAP-NG schema version.
 - CI SHALL recursively enforce version identity, required metadata, complete version-local dependencies, and absence of cross-version references. A version is not freeze-ready while any violation exists.
 - Version directories SHALL be directly and meaningfully diffable without hidden inheritance.
 
+## GitHub milestone and release-tracking invariant
+
+This is a hard repository operating rule for issue and release planning.
+
+- GitHub **milestones** SHALL be the authoritative release/version grouping for repository issues. Do not rely on title prefixes such as `[M0]`, `[M1]`, `[M2]`, `[M3]`, `[0.2.0]`, or similar text as a substitute for an actual GitHub milestone.
+- Every open issue that represents work required for a named SCAP-NG release/version SHALL be assigned to the corresponding GitHub milestone.
+- The **0.2.0** milestone represents the substantially completed OVAL Board review baseline. Issues that were actually completed for that baseline SHOULD be closed and associated with 0.2.0 when historically appropriate. Do not keep completed 0.2.0 work open merely to make the milestone appear active.
+- The **0.3.0** milestone is the active forward backlog for unresolved design, schema, tooling, conformance, documentation, packaging, governance, and implementation work currently expected on the path toward 1.0, unless an issue is explicitly deferred to a later named milestone.
+- New issues discovered during 0.2.0 review that require a semantic/schema change after the 0.2.0 baseline SHALL default to the 0.3.0 milestone unless the owner explicitly assigns a different release.
+- Closed, superseded, duplicate, not-planned, or historical issues SHALL NOT be reopened merely to populate a milestone.
+- Do not invent retrospective milestones for historical versions that were never actually managed as milestones. In particular, do not fabricate a 0.1.0 milestone solely for cosmetic history reconstruction.
+- Before declaring a version review-ready, freeze-ready, beta-ready, or release-ready, audit the corresponding milestone:
+  - every release-relevant open issue is assigned;
+  - completed work is closed;
+  - superseded/not-planned work is classified accurately;
+  - intentionally deferred work is moved to the appropriate later milestone;
+  - the milestone description accurately states its scope/status.
+- When creating a new release-relevant issue, assign the milestone in the same operation whenever the target version is already known.
+- When an issue changes release scope, update its milestone promptly; stale milestone assignment is a repository-integrity defect.
+- Milestone progress SHALL reflect actual completed/open issue state and SHALL NOT be manipulated for presentation.
+- Repository documentation MAY summarize milestone status, but GitHub milestone membership remains the authoritative issue-to-release mapping.
+
 ## Review-surface lifecycle invariant
 
 This is a hard repository rule.
