@@ -177,6 +177,16 @@ class NativeCapabilityMappingTests(unittest.TestCase):
         self.assertNotIn("state_operator",test)
         self.assertEqual(test["states_match"],"odd")
 
+    def test_omitted_oval_state_operator_is_materialized_for_multiple_states(self):
+        doc=self.aligned_wmi_document()
+        doc["assessment"]["states"]["state-result-2"]=copy.deepcopy(
+            doc["assessment"]["states"]["state-result"]
+        )
+        doc["assessment"]["tests"]["test-query"]["states"].append("state-result-2")
+        out=apply_capability_mapping(doc,self.mapping)
+        test=out["assessment"]["tests"]["test-query"]
+        self.assertEqual(test["states_match"],"all")
+
     def test_collector_comparison_semantics_fail_closed(self):
         doc=self.aligned_wmi_document()
         doc["assessment"]["objects"]["query-object"]["select"]["wql"]["operation"]="pattern match"
