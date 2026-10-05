@@ -112,7 +112,7 @@ def validate_result_set(document, assessments):
                 raise ValueError('Item target provenance mismatch')
         validate_materialization(result)
         for variable in variables.values():
-            check_refs(variable.get('item_refs',[]),items,'Variable/Item')
+            check_refs(variable['item_refs'],items,'Variable/Item')
         for obj in objects.values():
             if obj['capability'] != source['objects'][obj['id']]['capability']:
                 raise ValueError('Object capability mismatch')
@@ -136,7 +136,7 @@ def validate_result_set(document, assessments):
                 if per_item['item_ref'] not in test['item_refs']:
                     raise ValueError('Per-Item result outside Test Items')
                 for state in per_item['state_results']:
-                    if state['state_ref'] not in test.get('state_refs', []):
+                    if state['state_ref'] not in test['state_refs']:
                         raise ValueError('Per-Item State outside Test States')
                     for entity in state['entity_results']:
                         check_refs(entity.get('variable_refs', []), variables, 'Entity/Variable')
@@ -165,7 +165,7 @@ def validate_result_set(document, assessments):
             declared = source.get('dependencies', {}).get(dep['alias'])
             if target is None or declared is None or declared['expected_id'] != target['assessment']['id'] or declared['expected_version'] != target['assessment']['version']:
                 raise ValueError('Dependency execution binding mismatch')
-            if dep['assessment'] != target['assessment'] or dep['outcome'] != target['outcome'] or dep.get('purpose') != target['purpose']:
+            if dep['assessment'] != target['assessment'] or dep['outcome'] != target['outcome'] or dep['purpose'] != target['purpose']:
                 raise ValueError('Dependency result identity/outcome mismatch')
         trace_deps = [(t['alias'],t['invocation_ref'],t['outcome'],t['reused']) for t in invocation['trace'] if t['kind']=='dependency']
         result_deps = [(d['alias'],d['execution_id'],d['outcome'],d['reused']) for d in dependencies]
