@@ -208,7 +208,16 @@ The `sqlext` implementation is evidence for the use case only. It is a NIWC/SCC
 publisher extension and SHALL NOT by itself establish a native SCAP-NG SQL
 capability or normative targeting model.
 
-## 5. Promotion rule
+## 5. Content authorship
+
+Assessment content authorship is deferred to the 0.3.0 design track. The focused
+proposal is documented in
+[draft-0.3.0-content-authorship.md](draft-0.3.0-content-authorship.md).
+
+The 0.2.0 converter uses publisher-neutral native IDs; source repository and
+migration provenance SHALL NOT be mistaken for authorship.
+
+## 6. Promotion rule
 
 A deferred feature should move into normative specification text and executable
 JSON Schema only after:
