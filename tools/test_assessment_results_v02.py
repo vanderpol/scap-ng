@@ -26,7 +26,7 @@ class AssessmentResultTests(unittest.TestCase):
                  'objects':[],'items':[],'variables':[{'id':'guard','datatype':'boolean','status':'complete','cardinality':'one','values':[{'datatype':'boolean','status':'exists','value':True}],'item_refs':[]}],
                  'field_uses':[],'diagnostics':[],'logical_complete':True,'population_complete':True,'evidence_complete':True}}
         if guard=='true': evidence['results.ownership']=owner
-        return assemble_result_set(sources,expression,evidence)
+        return assemble_result_set(sources,expression,evidence,item_scope='all')
     def rows(self,doc): return {r['assessment_result']['assessment']['id']:r['assessment_result'] for r in doc['assessment_results']}
     def test_all_draft_schemas_meta_validate(self):
         for path in SCHEMAS.glob('*.schema.json'): Draft202012Validator.check_schema(json.loads(path.read_text()))
@@ -97,9 +97,9 @@ class AssessmentResultTests(unittest.TestCase):
         sources=copy.deepcopy(self.sources);sources['results.conditional']['evaluate']={'test':'test-guard'}
         expression=AssessmentExpressionEvaluator(sources).run('results.conditional',lambda *_:None,target='fixture-target')
         doc=self.build('error',sources=sources);obs={r['assessment_result']['assessment']['id']:{k:v for k,v in r['assessment_result'].items() if k in {'tests','objects','items','variables','field_uses','diagnostics','logical_complete','population_complete','evidence_complete'}} for r in doc['assessment_results']}
-        assemble_result_set(sources,expression,obs)
+        assemble_result_set(sources,expression,obs,item_scope='all')
         expression['outcome']='true'
-        with self.assertRaises(ValueError): assemble_result_set(sources,expression,obs)
+        with self.assertRaises(ValueError): assemble_result_set(sources,expression,obs,item_scope='all')
 
     def test_manual_outcome_provenance_and_redacted_bindings(self):
         source={'id':'results.manual','version':1,'assessment_title':'Fixture manual determination','mode':'manual','class':'compliance','purpose':'assessment',
@@ -112,7 +112,7 @@ class AssessmentResultTests(unittest.TestCase):
                       'input_bindings':[{'input':'credential','source':'fixture','redacted':True}]}
             if outcome!='not_evaluated':
                 evidence['manual_response']={'outcome':outcome,'completed_at':'2026-10-03T00:00:00Z','response_source':'direct','evaluator':{'id':{'scheme':'fixture','value':'reviewer-1'}}}
-            doc=assemble_result_set(sources,expression,{source['id']:evidence})
+            doc=assemble_result_set(sources,expression,{source['id']:evidence},item_scope='all')
             row=doc['assessment_results'][0]['assessment_result'];self.assertEqual(row['outcome'],outcome)
             if outcome!='not_evaluated':
                 row['manual_response']['outcome']='false' if outcome=='true' else 'true'
