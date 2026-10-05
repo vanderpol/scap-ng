@@ -73,11 +73,36 @@ class Version020PromotionTests(unittest.TestCase):
                 self.assertIn("/schema/v0.2.0/", overlay_text)
                 self.assertNotIn("/schema/v0.1.0/", overlay_text)
                 self.assertIn("reported_elements", overlay["$defs"]["test"]["properties"])
+                self.assertIn("reported_elements", overlay["$defs"]["test"]["required"])
+                self.assertIn("reported_elements", generated["$defs"]["test"]["properties"])
+                self.assertIn("reported_elements", generated["$defs"]["test"]["required"])
                 if mapping.get("native", {}).get("fixed_result") is None:
                     self.assertIn("check_existence", generated["$defs"]["test"]["required"])
                     self.assertIn("check", generated["$defs"]["test"]["required"])
                 self.assertNotIn("existence", generated["$defs"]["test"]["properties"])
                 self.assertNotIn("match", generated["$defs"]["test"]["properties"])
+
+    def test_020_schemas_have_no_json_schema_defaults(self):
+        def default_paths(value, path="$"):
+            found = []
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    here = f"{path}.{key}"
+                    if key == "default":
+                        found.append(here)
+                    found.extend(default_paths(child, here))
+            elif isinstance(value, list):
+                for index, child in enumerate(value):
+                    found.extend(default_paths(child, f"{path}[{index}]"))
+            return found
+
+        for path in sorted(V02.glob("*.schema.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(default_paths(data), [], path.name)
+
+        assessment = json.loads((V02 / "assessment.schema.json").read_text(encoding="utf-8"))
+        test_schema = assessment["properties"]["assessment"]["properties"]["tests"]["additionalProperties"]
+        self.assertIn("reported_elements", test_schema["required"])
 
     def test_capability_scope_separates_supported_from_experimental(self):
         scope = json.loads((V02 / "capability-scope.json").read_text(encoding="utf-8"))
