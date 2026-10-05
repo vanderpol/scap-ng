@@ -29,6 +29,12 @@ The six-case pilot above was chosen for semantic coverage, not prevalence. To ma
 
 The existing UNIX file and Windows registry cases are also representative high-frequency families. The Windows process/WMI example remains because it exercises correlated-record semantics; it should be read as a useful semantic stress case, not as evidence that process queries themselves are common DISA checks.
 
+### New NG features
+
+For concepts that are new to SCAP-NG or intentionally more explicit than the SCAP 1.4 model, start with the [New NG feature samples](FEATURE-SAMPLES.md#new-ng-feature-samples). That section gives focused examples for conditional evaluation, Assessment-result dependency/reuse, intrinsic applicability, explicit `not_applicable`, evidence projection, redaction, typed Organizational Input, manual Assessment, and the collected-Item reuse proposal.
+
+These are kept distinct from the frequency-oriented OVAL capability examples below so a reviewer can tell **new NG language features** from **common migrated OVAL patterns**.
+
 ### Key language-feature examples
 
 Capability frequency alone is not sufficient for Board review. Real SCAP content also depends on Variables, Sets, filters, quantifiers, multi-step dataflow, applicability, explicit reporting controls, and manual assessment. The [Assessment feature sample index](FEATURE-SAMPLES.md) is the authoritative inventory; this table highlights the most useful non-trivial examples:
