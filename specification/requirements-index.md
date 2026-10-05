@@ -36,6 +36,12 @@ SCAP-NG SHALL distinguish policy from assessment implementation.
 SCAP-NG SHALL favor explicit author-controlled relationships over processor
 inference.
 
+SCAP-NG SHALL NOT rely on hidden semantic defaults. When multiple meaningful
+behaviors are possible for collection, evaluation, reporting, or results, the
+selected behavior SHALL be explicit in authored content and omission SHALL fail
+validation. Legacy SCAP/OVAL defaults preserved during migration SHALL be
+materialized explicitly in the generated SCAP-NG content.
+
 SCAP-NG SHALL support lossless migration of supported SCAP 1.4 semantics before
 optional native refactoring.
 
@@ -104,11 +110,12 @@ this index:
 
 Before certifying the v003 Assessment model as fully OVAL-compatible, the
 project SHALL inventory and verify all Object `behaviors` types and
-their XSD/Schematron constraints; derive and expose effective defaults where
-normatively established; and execution-test behavior variants.
+their XSD/Schematron constraints; derive every normatively established legacy
+effective default and materialize it explicitly in converted NG content; and
+execution-test behavior variants.
 
-The current converter copies explicit behavior attributes but does not fully
-normalize inherited/implicit defaults or prove behavior execution. This is
+The current converter copies explicit behavior attributes but has not yet fully
+materialized every inherited/implicit legacy behavior default or proven behavior execution. This is
 **not** resolved merely by green document round-trip CI. See
 [behavior audit](../research/iterations/003/design/oval-object-behaviors-audit.md).
 
