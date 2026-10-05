@@ -17,6 +17,8 @@ class CurrentQuantifiers(unittest.TestCase):
         native, error = lower_definition(root, "oval:example:def:1", "current-quantifiers", collection_graph=True)
         self.assertIsNone(error)
         native = align_assessment_vocabulary(native)
+        for test in native.get("assessment", {}).get("tests", {}).values():
+            test["reported_elements"] = "all"
         self.assertEqual(violations(native), [])
         regenerated, rid = build(native)
         with tempfile.TemporaryDirectory() as tmp:
