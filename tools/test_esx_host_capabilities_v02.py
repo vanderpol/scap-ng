@@ -187,7 +187,7 @@ class EsxHostCapabilityTests(unittest.TestCase):
             a = self.documents[kind]["assessment"]
             item = self.item(kind)
             report = project_items(a, [item], [{"test_ref": "test-check", "item_ref": item["id"],
-                                  "used_elements": names, "required_elements": [names[0]]}],
+                                  "used_elements": names, "required_elements": [names[0]], "relationship": "direct"}],
                                   source_execution_ref="fixture-execution", source_completeness={
                                       "logical_complete": True, "population_complete": True, "evidence_complete": True})
             self.assertEqual(sorted(report["item_report"]["items"][0]["item"]["fields"]), sorted(names))
@@ -196,7 +196,7 @@ class EsxHostCapabilityTests(unittest.TestCase):
         item = self.item("advancedsetting")
         item["fields"]["advanced_setting_value"] = [{"datatype": "integer", "redacted": True}]
         report = project_items(a, [item], [{"test_ref": "test-check", "item_ref": item["id"],
-                               "used_elements": ["advanced_setting_value"], "required_elements": ["advanced_setting_name"]}],
+                               "used_elements": ["advanced_setting_value"], "required_elements": ["advanced_setting_name"], "relationship": "direct"}],
                                source_execution_ref="fixture-execution", source_completeness={
                                    "logical_complete": True, "population_complete": True, "evidence_complete": True})
         value = report["item_report"]["items"][0]["item"]["fields"]["advanced_setting_value"][0]
