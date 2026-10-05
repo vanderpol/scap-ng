@@ -65,6 +65,7 @@ The first eight rows are current 0.2.0 authoring/result concepts. Collected Item
 These are still required before the Board sample inventory can be called feature-complete:
 
 - a concise embedded-Object example if embedded Objects remain in the final 0.2.0 authoring contract;
+- clarify the automated-Assessment `evidence` authoring field: the 0.2.0 schema exposes publisher-authored evidence requirements/guidance, but the Board sample set should not invent semantics until its normative processor/result contract is explicit; if retained, add a focused sample and conformance case;
 - finalize the collected-Item reuse authoring proposal and adopt it into the 0.2.0 schema only after the source identity/binding questions in [the proposal](proposals/item-reuse.md) are resolved;
 
 Runtime conditions such as an unsupported collector/capability are Result semantics, not authored Assessment-language features. They belong in the Result conformance inventory rather than being represented as fake source syntax here.
