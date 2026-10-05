@@ -207,9 +207,10 @@ def generate(mapping, repo_root, schema_version=None):
             "$defs": {
                 "test": {
                     "type": "object",
-                    "required": ["test_title", "capability"],
+                    "required": (["test_title", "reported_elements", "capability"] if version == "0.2.0" else ["test_title", "capability"]),
                     "properties": {
                         "test_title": {"type": ["string", "null"]},
+                        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version == "0.2.0" else {}),
                         "capability": {"const": capability},
                     },
                     "additionalProperties": False,
@@ -452,11 +453,12 @@ def generate(mapping, repo_root, schema_version=None):
     existence_field = "check_existence" if version == "0.2.0" else "existence"
     match_field = "check" if version == "0.2.0" else "match"
     test_required = [
-        "test_title", "capability",
+        "test_title", *(["reported_elements"] if version == "0.2.0" else []), "capability",
         existence_field, match_field,
     ]
     test_properties = {
         "test_title": {"type": ["string", "null"]},
+        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version == "0.2.0" else {}),
         "capability": {"const": capability},
         existence_field: {
             "$ref": f"{common_capability_schema_id}#/$defs/existence_requirement"
