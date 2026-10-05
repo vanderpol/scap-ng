@@ -239,6 +239,19 @@ Use evidence according to the question being answered:
 - "Can a native SCAP-NG representation replace the source behavior exactly?" -> require faithful IR plus differential/conformance testing; do not infer equivalence from syntax alone.
 
 
+## Human-readable generated-content naming invariant
+
+This is a hard repository rule for all future SCAP-NG content generation, normalization, reuse, and packaging work.
+
+- Generated native content SHALL use meaningful, human-readable file names and native IDs that communicate what the content does.
+- Shared/reused generated content SHALL live under the designated shared-content location for that artifact or repository layout; for shared Assessments, use `shared/assessments/`.
+- Opaque hash-only names, UUID-like names, random names, allocation-order names, single-letter names, and generic numbered names SHALL NOT be used as the primary human-visible identity of generated content.
+- A short deterministic digest MAY be appended only when necessary to disambiguate two distinct resources that would otherwise receive the same meaningful name.
+- Naming SHOULD be derived from stable semantic/native information such as Test purpose/title, Assessment purpose/title, capability, or another reviewed semantic descriptor. Legacy XML IDs and source-local numeric identifiers SHALL NOT be used as the primary native name merely because they are available.
+- Generators and normalizers SHALL include regression tests that assert meaningful shared/generated names, not merely file existence or uniqueness.
+- Review artifacts SHALL be checked for opaque generated names before publication. A technically valid build with unreadable generated names is not human-review-ready.
+- This naming requirement applies equally to content created by ChatGPT, Codex, CI, conversion tools, normalizers, and future repository automation.
+
 ## Iteration 003 native-output cleanliness
 
 Iteration 003 restarts SCAP 1.4 up-conversion from the accepted native design.
