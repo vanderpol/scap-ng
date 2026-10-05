@@ -1,0 +1,39 @@
+assessment:
+  id: board.reported-elements-compared
+  version: 1
+  assessment_title: Report only evidence fields that participate in comparison
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.2.0
+  variables:
+    observed-setting:
+      variable_title: Observed setting used for a focused reporting example
+      kind: constant
+      datatype: string
+      value: enabled
+  states:
+    setting-is-enabled:
+      state_title: Setting equals enabled
+      capability: variable.value
+      state:
+        field: value
+        datatype: string
+        operation: equal
+        value: enabled
+        match: all
+        existence: some
+  tests:
+    test-setting:
+      test_title: Compare the setting and report only compared evidence
+      capability: variable.value
+      reported_elements: compared
+      variable: observed-setting
+      states:
+      - setting-is-enabled
+      check_existence: some
+      check: all
+  evaluate:
+    test: test-setting
