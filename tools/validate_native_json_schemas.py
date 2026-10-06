@@ -93,11 +93,16 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
     # New versioned capability contracts are checked even in skipped branches.
     assessment = doc.get("assessment")
     if isinstance(assessment, dict):
-        from capability_registry import draft_capabilities, load_mapping
+        from capability_registry import draft_capabilities, load_mapping, mappings
         from generate_capability_schema import generate
         from reported_elements import generate_reporting_capability
-        draft = draft_capabilities()
         declared_version = (assessment.get("specification") or {}).get("version")
+        modern_versions = {"0.2.0", "0.3.0"}
+        draft = (
+            draft_capabilities(version=declared_version)
+            if declared_version in modern_versions
+            else frozenset()
+        )
         for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
             nodes = assessment.get(section, {})
             if not isinstance(nodes, dict):
@@ -106,43 +111,58 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                 capability = node.get("capability") if isinstance(node, dict) else None
                 if not isinstance(capability, str):
                     continue
-                if declared_version != "0.2.0":
+                if declared_version not in modern_versions:
                     if capability in draft:
-                        yield ValidationError("New capability requires specification 0.2.0", path=["assessment", section, identity])
+                        yield ValidationError(
+                            "New capability requires specification 0.2.0 or later",
+                            path=["assessment", section, identity],
+                        )
                     continue
                 try:
-                    mapping = load_mapping(capability, "0.2.0")
+                    mapping = load_mapping(capability, declared_version)
                 except ValueError:
                     mapping = None
                     if allow_unpromoted_conversion_vocabulary:
                         # The converter bridge is limited to official SCAP 1.4/OVAL
                         # vocabulary awaiting native promotion. Publisher/private
                         # extensions are conversion blockers, not bridge vocabulary.
-                        from capability_registry import mappings
                         from scap_upconvert_v003.native_capability_mapping import source_capability
                         candidates = [
-                            candidate for candidate in mappings("0.2.0")
+                            candidate for candidate in mappings(declared_version)
                             if source_capability(candidate) == capability
                             and not (candidate.get("native") or {}).get("post_alignment_ready", False)
                         ]
                         if len(candidates) == 1:
                             continue
-                    yield ValidationError(f"Unknown 0.2.0 capability: {capability}", path=["assessment", section, identity, "capability"])
+                    yield ValidationError(
+                        f"Unknown {declared_version} capability: {capability}",
+                        path=["assessment", section, identity, "capability"],
+                    )
                     continue
                 if (
                     allow_unpromoted_conversion_vocabulary
                     and not (mapping.get("native") or {}).get("post_alignment_ready", False)
                 ):
                     continue
-                generated = generate_reporting_capability(mapping) if kind == "test" else generate(mapping, Path(__file__).resolve().parents[1], schema_version="0.2.0")
+                generated = (
+                    generate_reporting_capability(mapping, version=declared_version)
+                    if kind == "test"
+                    else generate(
+                        mapping,
+                        Path(__file__).resolve().parents[1],
+                        schema_version=declared_version,
+                    )
+                )
                 if kind not in generated["$defs"]:
                     yield ValidationError("Capability does not support this source node", path=["assessment", section, identity])
                     continue
                 root = Path(__file__).resolve().parents[1]
-                store = schema_store(root / "schema/v0.2.0")
-                from referencing import Registry, Resource
-                registry = Registry().with_resources((uri, Resource.from_contents(schema)) for uri, schema in store.items())
-                validator = Draft202012Validator(generated["$defs"][kind], registry=registry)
+                store = schema_store(root / f"schema/v{declared_version}")
+                resolver = RefResolver.from_schema(generated, store=store)
+                validator = Draft202012Validator(
+                    generated["$defs"][kind],
+                    resolver=resolver,
+                )
                 for error in validator.iter_errors(node):
                     error.path.extendleft(reversed(["assessment", section, identity]))
                     yield error
