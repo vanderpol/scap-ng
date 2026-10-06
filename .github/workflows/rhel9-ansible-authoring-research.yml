@@ -1,0 +1,32 @@
+name: RHEL9 Ansible-inspired authoring research
+
+on:
+  push:
+    paths:
+      - tools/research_render_ansible_like.py
+      - research/assessment-simplification/ansible-authoring-09/**
+      - .github/workflows/rhel9-ansible-authoring-research.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Render conservative local authoring research form
+        run: |
+          python tools/research_render_ansible_like.py \
+            research/iterations/003/source/split-rule-assessment/rhel9-full \
+            --output work/ansible-authoring-rhel9
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-ansible-authoring-research
+          path: work/ansible-authoring-rhel9
+          if-no-files-found: error
