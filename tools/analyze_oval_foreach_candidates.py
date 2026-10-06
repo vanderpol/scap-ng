@@ -393,6 +393,7 @@ def analyze_file(path: Path) -> dict:
 def summarize(files: list[dict]) -> dict:
     classifications = Counter()
     families = Counter()
+    derived_operations = Counter()
     parse_status = Counter()
     candidate_files = 0
     for row in files:
@@ -402,12 +403,16 @@ def summarize(files: list[dict]) -> dict:
         for candidate in row.get("candidates", []):
             classifications[candidate["classification"]] += 1
             families[candidate.get("candidate_family") or "none"] += 1
+            if candidate.get("candidate_family") == "derived_projection":
+                for op in candidate.get("expression", {}).get("operations", []):
+                    derived_operations[op] += 1
     return {
         "files": len(files),
         "files_with_candidates": candidate_files,
         "parse_status": dict(sorted(parse_status.items())),
         "classifications": dict(sorted(classifications.items())),
         "families": dict(sorted(families.items())),
+        "derived_operations": dict(sorted(derived_operations.items())),
     }
 
 
