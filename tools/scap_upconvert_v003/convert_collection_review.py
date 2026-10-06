@@ -24,6 +24,7 @@ from check_current_authoring_contract import violations
 from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 from scap_upconvert_v003.native_capability_mapping import apply_ready_capability_mappings
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
+from scap_upconvert_v003.conditional_modernization import modernize_conditionals_v1
 from validate_generated_capability_semantics import validate_assessment_capability_semantics
 import yaml
 
@@ -44,14 +45,17 @@ def postprocess_automated_assessment(
     *,
     target_ng_version="0.2.0",
     modernize_foreach=False,
+    modernize_conditionals=False,
 ):
-    """Apply versioned native mappings and optional 0.3 foreach modernization.
+    """Apply versioned native mappings and optional 0.3 modernization passes.
 
     The default 0.2 path intentionally preserves the existing converter
-    behavior.  Foreach modernization is legal only for an explicit 0.3 target.
+    behavior. Modernization passes are legal only for an explicit 0.3 target.
     """
     if modernize_foreach and target_ng_version != "0.3.0":
         raise ValueError("--modernize-foreach-v1 requires target SCAP-NG 0.3.0")
+    if modernize_conditionals and target_ng_version != "0.3.0":
+        raise ValueError("--modernize-conditionals-v1 requires target SCAP-NG 0.3.0")
 
     result=align_assessment_vocabulary(native)
     assessment=result.get("assessment",{})
@@ -72,9 +76,10 @@ def postprocess_automated_assessment(
         capability_mapping_dir(target_ng_version),
     )
 
-    modernization=None
+    foreach_report=None
+    conditional_report=None
     if modernize_foreach:
-        result,modernization=modernize_foreach_v1(result,enabled=True)
+        result,foreach_report=modernize_foreach_v1(result,enabled=True)
         diagnostics=validate_assessment_capability_semantics(result)
         foreach_diagnostics=[
             row for row in diagnostics
@@ -85,6 +90,21 @@ def postprocess_automated_assessment(
                 "foreach modernization semantic validation failed: "
                 + repr(foreach_diagnostics)
             )
+
+    if modernize_conditionals:
+        result,conditional_report=modernize_conditionals_v1(result,enabled=True)
+
+    if modernize_foreach and modernize_conditionals:
+        modernization={
+            "foreach":foreach_report,
+            "conditional":conditional_report,
+        }
+    elif modernize_foreach:
+        modernization=foreach_report
+    elif modernize_conditionals:
+        modernization=conditional_report
+    else:
+        modernization=None
 
     return result,modernization
 
@@ -239,6 +259,7 @@ def convert_rule(
     assessment_namespace=None,
     target_ng_version="0.2.0",
     modernize_foreach=False,
+    modernize_conditionals=False,
 ):
     """Convert one Rule while keeping generated Assessment identities repository-safe.
 
@@ -349,6 +370,7 @@ def convert_rule(
                 native,
                 target_ng_version=target_ng_version,
                 modernize_foreach=modernize_foreach,
+                modernize_conditionals=modernize_conditionals,
             )
         except ValueError as exc:
             mapping_error=str(exc)
@@ -384,7 +406,15 @@ def convert_rule(
             'states':len(native['assessment'].get('states',{})),
             'variables':len(native['assessment'].get('variables',{})),'reverse_omni_schema_valid':True}
         if modernize_foreach:
-            assessment_row['foreach_modernization']=modernization
+            assessment_row['foreach_modernization']=(
+                modernization['foreach']
+                if modernize_conditionals else modernization
+            )
+        if modernize_conditionals:
+            assessment_row['conditional_modernization']=(
+                modernization['conditional']
+                if modernize_foreach else modernization
+            )
         result['assessments'].append(assessment_row)
     if deprecated_selector_fallbacks:
         manual_ref=result['selectors'].get('manual') or (next(iter(manual_done.values())) if manual_done else None)
@@ -430,6 +460,8 @@ def main(argv=None):
     args=p.parse_args(argv)
     if args.modernize_foreach_v1 and args.target_ng_version != '0.3.0':
         p.error('--modernize-foreach-v1 requires --target-ng-version 0.3.0')
+    if args.modernize_conditionals_v1 and args.target_ng_version != '0.3.0':
+        p.error('--modernize-conditionals-v1 requires --target-ng-version 0.3.0')
     digest=hashlib.sha256(args.input.read_bytes()).hexdigest()
     if digest!=args.sha256:raise SystemExit('Source archive checksum mismatch')
     wanted=set(args.rule)
@@ -550,6 +582,7 @@ def main(argv=None):
                         native,
                         target_ng_version=args.target_ng_version,
                         modernize_foreach=args.modernize_foreach_v1,
+                        modernize_conditionals=args.modernize_conditionals_v1,
                     )
                 errors=violations(native)
                 if errors:raise ValueError('Current vocabulary guard: '+str(errors))
@@ -564,7 +597,15 @@ def main(argv=None):
                     'variables':len(native['assessment'].get('variables',{})),
                     'reverse_omni_schema_valid':True}
                 if args.modernize_foreach_v1:
-                    assessment_row['foreach_modernization']=modernization
+                    assessment_row['foreach_modernization']=(
+                        modernization['foreach']
+                        if args.modernize_conditionals_v1 else modernization
+                    )
+                if args.modernize_conditionals_v1:
+                    assessment_row['conditional_modernization']=(
+                        modernization['conditional']
+                        if args.modernize_foreach_v1 else modernization
+                    )
                 result['assessments'].append(assessment_row)
             if deprecated_selector_fallbacks:
                 manual_ref=result['selectors'].get('manual')
