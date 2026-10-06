@@ -133,8 +133,6 @@ def state_expr(state):
 def collect_expr(collect):
     if not isinstance(collect, dict):
         raise Unsupported("collect_not_mapping")
-    if "set" in collect:
-        raise Unsupported("set")
     if collect.get("filters"):
         raise Unsupported("filters")
     cap = collect.get("capability")
@@ -142,12 +140,32 @@ def collect_expr(collect):
     if not module:
         raise Unsupported("missing_capability")
 
-    result = {}
-    select = collect.get("select") or {}
-    if not isinstance(select, dict):
-        raise Unsupported("select_not_mapping")
-    for field, spec in select.items():
-        result[field] = predicate(spec)
+    if "set" in collect:
+        spec = collect["set"]
+        if not isinstance(spec, dict):
+            raise Unsupported("set_not_mapping")
+        operator = (spec.get("operator") or "").lower()
+        if operator != "union":
+            raise Unsupported("set:" + (operator or "missing_operator"))
+        members = spec.get("members") or []
+        if not isinstance(members, list) or not members:
+            raise Unsupported("set_union_members")
+        sources = []
+        for member in members:
+            if not isinstance(member, dict) or set(member) != {"collect"}:
+                raise Unsupported("set_union_noncollect_member")
+            child_module, child = collect_expr(member["collect"])
+            if child_module != module:
+                raise Unsupported("set_union_mixed_capability")
+            sources.append(child)
+        result = {"sources": sources}
+    else:
+        result = {}
+        select = collect.get("select") or {}
+        if not isinstance(select, dict):
+            raise Unsupported("select_not_mapping")
+        for field, spec in select.items():
+            result[field] = predicate(spec)
 
     if collect.get("behaviors"):
         # Keep behavior explicit in the research rendering. It is collection
@@ -166,8 +184,6 @@ def leaf(check_id, check):
         raise Unsupported("check_collect_capability_mismatch")
 
     assertion = check.get("assert") or {}
-    if assertion.get("states"):
-        raise Unsupported("multiple_named_states")
     if not isinstance(assertion, dict):
         raise Unsupported("assert_not_mapping")
 
@@ -178,9 +194,25 @@ def leaf(check_id, check):
     check_quantifier = assertion.get("check")
     if check_quantifier is not None:
         expect["match"] = check_quantifier
-    state = state_expr(assertion.get("state"))
-    if state is not None:
-        expect.update(state)
+
+    named_states = assertion.get("states")
+    if named_states:
+        if not isinstance(named_states, list):
+            raise Unsupported("multiple_named_states_not_list")
+        operator = (assertion.get("state_operator") or "AND").lower()
+        if operator not in {"and", "or"}:
+            raise Unsupported("state_operator:" + operator)
+        key = "all" if operator == "and" else "any"
+        values = []
+        for item in named_states:
+            if not isinstance(item, dict) or "state" not in item:
+                raise Unsupported("named_state_shape")
+            values.append(state_expr(item["state"]))
+        expect[key] = values
+    else:
+        state = state_expr(assertion.get("state"))
+        if state is not None:
+            expect.update(state)
 
     return {
         module: selection,
