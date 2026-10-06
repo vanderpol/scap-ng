@@ -30,7 +30,7 @@ XCCDF = """<?xml version="1.0" encoding="UTF-8"?>
     <title>V-243502</title>
     <Rule id="SV-243502r1026198_rule" severity="medium">
       <version>AD.0017</version>
-      <title>Membership &amp; schema &lt;admins&gt; must be limited.</title>
+      <title>User account membership &amp; schema &lt;admins&gt; must be limited.</title>
       <description><VulnDiscussion xmlns="">Privileged membership discussion.</VulnDiscussion></description>
       <ident system="http://cyber.mil/cci">CCI-000366</ident>
       <check system="http://checklists.nist.gov/xccdf/1.1">
@@ -78,6 +78,31 @@ def main() -> int:
         assert not list(Draft202012Validator(benchmark_schema).iter_errors(benchmark))
         assert benchmark["benchmark"]["rules"] == ["SV-243502"]
         assert benchmark["benchmark"]["profiles"][0]["disabled_rules"] == ["SV-243502"]
+        assert benchmark["benchmark"]["groups"] == []
+
+        grouped_native = root / "grouped-native"
+        run(
+            str(CONVERTER),
+            str(source),
+            "--output-dir",
+            str(grouped_native),
+            "--auto-map-groups",
+        )
+        grouped_benchmark = yaml.safe_load(
+            (grouped_native / "benchmark.yaml").read_text(encoding="utf-8")
+        )["benchmark"]
+        assert grouped_benchmark["groups"][0]["id"] == "manual-or-managerial"
+        assert (
+            grouped_benchmark["groups"][0]["groups"][0]["id"]
+            == "manual-or-managerial.account-management"
+        )
+        assert grouped_benchmark["groups"][0]["groups"][0]["rules"] == ["SV-243502"]
+        grouped_audit = yaml.safe_load(
+            (grouped_native / "conversion-audit.json").read_text(encoding="utf-8")
+        )
+        assert grouped_audit["grouping"]["auto_map_groups"] is True
+        assert grouped_audit["grouping"]["mapped_rules"] == 1
+        assert grouped_audit["grouping"]["unmapped_rules"] == 0
 
         rule_doc = yaml.safe_load((native / "rules" / "SV-243502.rule.yaml").read_text(encoding="utf-8"))
         rule_schema = yaml.safe_load((ROOT / "schema/v0.2.0/rule.schema.json").read_text(encoding="utf-8"))
