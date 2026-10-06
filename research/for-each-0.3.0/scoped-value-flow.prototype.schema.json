@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/0.3.0/scoped-value-flow.prototype.schema.json",
+  "title": "SCAP-NG 0.3.0 scoped value-flow research prototype",
+  "description": "Research-only schema fragment for Projection, Binding and Test-level for_each. This is not a released SCAP-NG schema.",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/value_source"
+    },
+    {
+      "$ref": "#/$defs/for_each"
+    }
+  ],
+  "$defs": {
+    "binding_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.-]*$",
+      "minLength": 1
+    },
+    "variable_reference": {
+      "type": "object",
+      "required": [
+        "variable"
+      ],
+      "properties": {
+        "variable": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "binding_reference": {
+      "type": "object",
+      "required": [
+        "binding",
+        "field"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "#/$defs/binding_name"
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_field": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "projection_spec": {
+      "type": "object",
+      "required": [
+        "object",
+        "field"
+      ],
+      "properties": {
+        "object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_field": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "projection_reference": {
+      "type": "object",
+      "required": [
+        "projection"
+      ],
+      "properties": {
+        "projection": {
+          "$ref": "#/$defs/projection_spec"
+        }
+      },
+      "additionalProperties": false
+    },
+    "value_source": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        {
+          "$ref": "#/$defs/variable_reference"
+        },
+        {
+          "$ref": "#/$defs/binding_reference"
+        },
+        {
+          "$ref": "#/$defs/projection_reference"
+        }
+      ]
+    },
+    "inline_object": {
+      "type": "object",
+      "required": [
+        "capability"
+      ],
+      "properties": {
+        "object_title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "select": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "object_source": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "$ref": "#/$defs/inline_object"
+        }
+      ]
+    },
+    "check_existence": {
+      "type": "string",
+      "enum": [
+        "all_exist",
+        "any_exist",
+        "at_least_one_exists",
+        "none_exist",
+        "only_one_exists"
+      ]
+    },
+    "check": {
+      "type": "string",
+      "enum": [
+        "all",
+        "at_least_one",
+        "only_one",
+        "none_satisfy"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "binding",
+        "object",
+        "check_existence",
+        "check"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "#/$defs/binding_name"
+        },
+        "object": {
+          "$ref": "#/$defs/object_source"
+        },
+        "check_existence": {
+          "$ref": "#/$defs/check_existence"
+        },
+        "check": {
+          "$ref": "#/$defs/check"
+        }
+      },
+      "additionalProperties": false
+    },
+    "for_each": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scope"
+      }
+    }
+  }
+}
