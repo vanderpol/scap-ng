@@ -99,7 +99,7 @@ def predicate(spec, variables=None):
         raise Unsupported("masked_predicate")
     allowed={
         "operation","datatype","mask","value","entity_check","entity_existence",
-        "variable_check","nil",
+        "variable_check","nil","field",
     }
     extra=set(spec)-allowed
     if extra:
