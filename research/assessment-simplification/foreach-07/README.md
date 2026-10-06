@@ -376,8 +376,25 @@ satisfied, it must fail closed and retain the faithful form.
 7. Only after those proofs, prepare a human review packet for any 0.3.0 language
    addition.
 
+
+## Current recommendation
+
+The semantic proof for the narrow first class is complete enough to move from
+OVAL-algebra research into human language review.
+
+Proposed specification:
+[PROPOSED-SPEC.md](PROPOSED-SPEC.md)
+
+The recommendation is to review **collection-expansion foreach v1** as a
+0.3.0 language addition with the exact transformation identifier
+`foreach.direct-object-component.at-least-one.v1`.
+
+Automatic rewriting remains disabled until the syntax and normative wording are
+accepted. Eligible analyzer hits remain `review_required`.
+
+
 ## Human status
 
-`pending-review`
+`semantic-proof-complete / syntax-review-pending`
 
 No schema or accepted specification change is made by this research record.
