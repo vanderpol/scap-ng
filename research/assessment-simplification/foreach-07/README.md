@@ -58,7 +58,7 @@ objects:
       directory:
         from: user.home_dir
       name:
-        operation: pattern_match
+        operation: match
         value: '^\\.[^\\s\\.]+'
 ```
 
