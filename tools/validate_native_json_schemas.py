@@ -101,7 +101,7 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
         draft = (
             draft_capabilities(version=declared_version)
             if declared_version in modern_versions
-            else frozenset()
+            else draft_capabilities(version="0.2.0")
         )
         legacy_v02_drafts = draft_capabilities(version="0.2.0")
         for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
