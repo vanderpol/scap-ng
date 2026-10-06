@@ -1,0 +1,137 @@
+name: Full current SCAP 1.4 scoped-iteration audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/for-each-audit-20261006
+    paths:
+      - ".github/workflows/for-each-correlation-full-corpus.yml"
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.sources.outputs.matrix }}
+    steps:
+      - name: Check out pinned NIWC corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+      - id: sources
+        name: Discover current SCAP 1.4 benchmark ZIPs
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          rows=[]
+          for p in sorted(Path("niwc/Current").glob("*STIG_SCAP_1-4_Benchmark*-signed.zip")):
+              rows.append({"key":p.stem.replace("-signed","")[:90],"source":p.relative_to("niwc").as_posix()})
+          print("matrix="+json.dumps({"include":rows},separators=(",",":")))
+          PY
+
+  audit:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    steps:
+      - name: Check out SCAP-NG research branch
+        uses: actions/checkout@v4
+      - name: Check out pinned NIWC corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install lxml
+      - name: Split and audit
+        shell: bash
+        env:
+          SOURCE: ${{ matrix.source }}
+          KEY: ${{ matrix.key }}
+        run: |
+          mkdir -p work/audit
+          set +e
+          python tools/scap14_rule_splitter.py \
+            "niwc/$SOURCE" \
+            --output-dir work/split \
+            --schema third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "$SOURCE" \
+            --benchmark-key "$KEY" \
+            --fail-on-unresolved
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            python - <<'PY'
+          import json,os
+          from pathlib import Path
+          Path("work/audit/report.json").write_text(json.dumps({
+            "label":os.environ["KEY"],"source":os.environ["SOURCE"],
+            "audit_status":"split_failed"
+          },indent=2)+"\n")
+          PY
+          else
+            python tools/audit_for_each_candidates.py work/split --label "$KEY" --output work/audit/report.json
+            python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path("work/audit/report.json"); d=json.loads(p.read_text())
+          d["source"]=os.environ["SOURCE"]; d["audit_status"]="complete"
+          p.write_text(json.dumps(d,indent=2)+"\n")
+          PY
+          fi
+      - name: Upload package audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-corpus-${{ strategy.job-index }}
+          path: work/audit/report.json
+
+  aggregate:
+    needs: audit
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-corpus-*
+          path: reports
+      - name: Aggregate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          rows=[]
+          for p in Path("reports").rglob("report.json"):
+              try: rows.append(json.loads(p.read_text()))
+              except Exception: pass
+          complete=[r for r in rows if r.get("audit_status")=="complete"]
+          failed=[r for r in rows if r.get("audit_status")!="complete"]
+          agg={
+            "source_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
+            "packages_discovered":len(rows),
+            "packages_complete":len(complete),
+            "packages_failed":len(failed),
+            "closure_files":sum(r.get("closure_files",0) for r in complete),
+            "candidate_closures":sum(r.get("candidate_closures",0) for r in complete),
+            "class_counts":dict(sum((Counter(r.get("class_counts",{})) for r in complete),Counter())),
+            "packages":sorted(rows,key=lambda r:r.get("source","")),
+          }
+          Path("full-corpus-for-each-audit.json").write_text(json.dumps(agg,indent=2)+"\n")
+          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts")},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-corpus-for-each-audit-summary
+          path: full-corpus-for-each-audit.json
