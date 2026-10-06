@@ -11,15 +11,17 @@ from pathlib import Path
 from lxml import etree as ET
 
 HIGH_PATTERNS = [
-    ("corresponding_resource", re.compile(r"\bcorresponding\s+(private\s+key|user|account|owner|directory|file|group|device|interface|record|entry)\b", re.I)),
-    ("respective_subject", re.compile(r"\b(respective|that|same)\s+(user|account|owner|group|directory|file|device|interface)\b", re.I)),
-    ("home_owner_primary_group", re.compile(r"\bhome\s+director(?:y|ies).{0,120}\b(owner(?:'s)?\s+primary\s+group|primary\s+group\s+of\s+the\s+user)\b", re.I|re.S)),
-    ("member_of_home_owner_group", re.compile(r"\bgroup-owned\b.{0,160}\bgroup\b.{0,80}\bhome\s+directory\s+owner\b", re.I|re.S)),
-    ("owned_by_assigned_user", re.compile(r"\bowned\s+by\b.{0,100}\b(user|account)\b.{0,120}\b(assigned|/etc/passwd)\b", re.I|re.S)),
-    ("parent_derived_expectation", re.compile(r"\b(that\s+user(?:'s)?|user(?:'s)?\s+primary|owner(?:'s)?\s+primary|same\s+(?:user|account|owner))\b", re.I)),
+    ("corresponding_private_key", re.compile(r"\bcorresponding\s+private\s+key\b", re.I)),
+    ("certificate_identity_mapping", re.compile(r"\b(certificate|authenticated\s+identity).{0,180}\bcorresponding\s+(user|group|account)\b", re.I|re.S)),
+    ("home_owner_primary_group", re.compile(r"\bhome\s+director(?:y|ies).{0,180}\b(owner(?:'s)?\s+primary\s+group|primary\s+group\s+of\s+the\s+user|same\s+as\s+the\s+primary\s+gid\s+of\s+the\s+user)\b", re.I|re.S)),
+    ("home_owned_by_assigned_user", re.compile(r"\bhome\s+director(?:y|ies).{0,180}\bowned\s+by\s+the\s+(respective\s+)?user\b.{0,180}\b(/etc/passwd|assigned)\b", re.I|re.S)),
+    ("assigned_home_owner_relation", re.compile(r"\bhome\s+director(?:y|ies).{0,180}\b(respective\s+user|user\s+assigned\s+to\s+it)\b", re.I|re.S)),
 ]
 
 MEDIUM_PATTERNS = [
+    ("corresponding_resource", re.compile(r"\bcorresponding\s+(user|account|owner|directory|file|group|device|interface|record|entry)\b", re.I)),
+    ("respective_subject", re.compile(r"\b(respective|that|same)\s+(user|account|owner|group|directory|file|device|interface)\b", re.I)),
+    ("parent_derived_expectation", re.compile(r"\b(that\s+user(?:'s)?|user(?:'s)?\s+primary|owner(?:'s)?\s+primary|same\s+(?:user|account|owner))\b", re.I)),
     ("home_from_account_must_exist", re.compile(r"\bhome\s+director(?:y|ies)\b.{0,120}\b(defined|assigned|configured)\b.{0,100}\b(/etc/passwd|user|account)\b.{0,120}\bexist", re.I|re.S)),
     ("user_home_path_relation", re.compile(r"\b(user(?:'s)?|users)\s+home\s+director(?:y|ies)\b", re.I)),
     ("initialization_file_user_relation", re.compile(r"\binitialization\s+files?\b.{0,160}\b(home\s+directory\s+user|user(?:'s)?\s+primary\s+group|users?\s+home\s+director)", re.I|re.S)),
