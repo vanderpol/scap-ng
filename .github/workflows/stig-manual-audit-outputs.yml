@@ -1,0 +1,130 @@
+name: STIG manual conversion and audit outputs
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/stig_manual_to_scapng.py"
+      - "tools/render_stig_audit_outputs.py"
+      - "tools/test_stig_manual_audit_outputs.py"
+      - ".github/workflows/stig-manual-audit-outputs.yml"
+  pull_request:
+    paths:
+      - "tools/stig_manual_to_scapng.py"
+      - "tools/render_stig_audit_outputs.py"
+      - "tools/test_stig_manual_audit_outputs.py"
+      - ".github/workflows/stig-manual-audit-outputs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  active-directory-forest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install focused dependency
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
+
+      - name: Run focused synthetic regression
+        run: python tools/test_stig_manual_audit_outputs.py
+
+      - name: Download pinned DISA Active Directory Forest V3R2 STIG
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Active_Directory_Forest_V3R2_STIG.zip" \
+            -o work/U_Active_Directory_Forest_V3R2_STIG.zip
+          echo "fce2eb549574dab02c0bbde2ea5af8b59f3f1e01a0683db5d406103872defd6a  work/U_Active_Directory_Forest_V3R2_STIG.zip" \
+            | sha256sum --check -
+
+      - name: Convert real STIG manual XCCDF to native SCAP-NG
+        run: |
+          python tools/stig_manual_to_scapng.py \
+            work/U_Active_Directory_Forest_V3R2_STIG.zip \
+            --output-dir work/active-directory-forest-native
+
+      - name: Render optional HTML and Excel audit checklist
+        run: |
+          python tools/render_stig_audit_outputs.py \
+            work/active-directory-forest-native \
+            --html work/active-directory-forest-audit.html \
+            --xlsx work/active-directory-forest-audit.xlsx
+
+      - name: Verify real pilot outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import zipfile
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          import yaml
+          from jsonschema import Draft202012Validator
+
+          root = Path("work")
+          summary = json.loads((root / "active-directory-forest-native/conversion-summary.json").read_text())
+          assert summary["rules"] == 7, summary
+          assert summary["manual_assessments"] == 7, summary
+          assert summary["source_xccdf_namespace"] == "http://checklists.nist.gov/xccdf/1.1", summary
+
+          native = root / "active-directory-forest-native"
+          repo = Path(".")
+          checks = [
+              (native / "benchmark.yaml", repo / "schema/v0.2.0/benchmark.schema.json"),
+          ]
+          checks += [
+              (path, repo / "schema/v0.2.0/rule.schema.json")
+              for path in sorted((native / "rules").glob("*.rule.yaml"))
+          ]
+          checks += [
+              (path, repo / "schema/v0.2.0/manual-assessment.schema.json")
+              for path in sorted((native / "assessments/manual").glob("*.assessment.yaml"))
+          ]
+          for doc_path, schema_path in checks:
+              doc = yaml.safe_load(doc_path.read_text(encoding="utf-8"))
+              schema = json.loads(schema_path.read_text(encoding="utf-8"))
+              errors = sorted(Draft202012Validator(schema).iter_errors(doc), key=lambda e: list(e.path))
+              assert not errors, (doc_path, [e.message for e in errors[:10]])
+
+          html = (root / "active-directory-forest-audit.html").read_text(encoding="utf-8")
+          assert "Active Directory Forest" in html
+          assert "Check Procedure" in html
+          assert "Fix / Remediation" in html
+
+          xlsx = root / "active-directory-forest-audit.xlsx"
+          with zipfile.ZipFile(xlsx) as zf:
+              workbook = zf.read("xl/workbook.xml").decode()
+              sheet = zf.read("xl/worksheets/sheet1.xml").decode()
+              lookup = zf.read("xl/worksheets/sheet2.xml").decode()
+              ET.fromstring(workbook)
+              ET.fromstring(sheet)
+              ET.fromstring(lookup)
+              assert 'name="Result Options"' in workbook
+              assert 'state="hidden"' in workbook
+              assert "'Result Options'!$A$2:$A$5" in sheet
+              for label in ("Pass", "Fail", "Unknown", "Not Applicable"):
+                  assert label in lookup
+              for heading in ("Result", "Evidence / Notes", "Evaluator / Reviewer", "Review Date"):
+                  assert heading in sheet
+          print("Real Active Directory Forest pilot verification: PASS")
+          PY
+
+      - name: Upload native and optional review artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: active-directory-forest-stig-manual-pilot
+          path: |
+            work/active-directory-forest-native/**
+            work/active-directory-forest-audit.html
+            work/active-directory-forest-audit.xlsx
+          if-no-files-found: error
