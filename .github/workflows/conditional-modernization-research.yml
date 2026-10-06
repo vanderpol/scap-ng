@@ -52,9 +52,15 @@ jobs:
           - label: RHEL 9 SV-258004
             artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
             rule: SV-258004
+            expect_rewrite: "true"
           - label: Windows Server 2025 SV-278001
             artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
             rule: SV-278001
+            expect_rewrite: "true"
+          - label: RHEL 9 SV-257804 alternative paths
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+            rule: SV-257804
+            expect_rewrite: "false"
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -69,6 +75,7 @@ jobs:
       - name: Convert with conditional modernization
         env:
           RULE: ${{ matrix.rule }}
+          EXPECT_REWRITE: ${{ matrix.expect_rewrite }}
         run: |
           SHA256="$(sha256sum source.zip | awk '{print $1}')"
           python tools/scap_upconvert_v003/convert_collection_review.py \
@@ -96,13 +103,20 @@ jobs:
           ]
           assert rows, evidence
           applied=[r for r in rows if r["conditional_modernization"].get("rewrite_performed")]
-          assert applied, rows
-          for row in applied:
+          expect=os.environ["EXPECT_REWRITE"] == "true"
+          assert bool(applied) is expect, rows
+          for row in rows:
               report=row["conditional_modernization"]
               assert report["pattern_based"] is True
               assert report["rule_id_allowlist"] is False
               assert report["semantic_class"] == "intent_preserving_not_six_state_parity"
-              assert report["applied"], report
+          if applied:
+              assert all(r["conditional_modernization"]["applied"] for r in applied)
+          else:
+              assert any(
+                  r["conditional_modernization"].get("review_required")
+                  for r in rows
+              ), rows
 
           docs=[]
           for path in Path("out/assessments/automated").glob("*.yaml"):
@@ -119,9 +133,11 @@ jobs:
                   return any(has_if(v) for v in node)
               return False
 
-          assert any(has_if(d["assessment"]["evaluate"]) for d in docs), docs
+          has_conditional=any(has_if(d["assessment"]["evaluate"]) for d in docs)
+          assert has_conditional is expect, docs
           print(json.dumps({
               "rule":os.environ["RULE"],
+              "expected_rewrite":expect,
               "rewrites":sum(len(r["conditional_modernization"]["applied"]) for r in applied),
           },indent=2))
           PY
