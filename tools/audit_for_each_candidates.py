@@ -81,9 +81,38 @@ def variable_root_operator(el):
         return local(children[0])
     return "other"
 
-def variable_consumer_roles(vid, objects, states, variables):
+def variable_consumer_roles(vid, objects, states, variables, tests):
     roles=[]
     for oid,el in objects.items():
+        # Ordinary Object entities use @var_ref and represent selector value
+        # dataflow. independent:variable_object is different: its <var_ref>
+        # child contains the Variable ID as element text and exists only to
+        # expose Variable values to variable_test.
+        if local(el)=="variable_object":
+            refs=[
+                (x.text or "").strip()
+                for x in el.iter()
+                if local(x)=="var_ref"
+            ]
+            if vid in refs:
+                consumers=[]
+                for tid,t in tests.items():
+                    ta=attrs_local(t)
+                    object_refs=[]
+                    if ta.get("object_ref"):
+                        object_refs.append(ta["object_ref"])
+                    for x in t.iter():
+                        xa=attrs_local(x)
+                        if xa.get("object_ref"):
+                            object_refs.append(xa["object_ref"])
+                    if oid in object_refs:
+                        consumers.append(tid)
+                if consumers:
+                    for tid in sorted(set(consumers)):
+                        roles.append({"kind":"direct_variable_test","consumer":tid,"entity":"value","var_check":None})
+                else:
+                    roles.append({"kind":"variable_object_source","consumer":oid,"entity":"var_ref","var_check":None})
+            continue
         for x in el.iter():
             a=attrs_local(x)
             if a.get("var_ref")==vid:
@@ -99,7 +128,7 @@ def variable_consumer_roles(vid, objects, states, variables):
         for x in el.iter():
             a=attrs_local(x)
             if local(x)=="variable_component" and a.get("var_ref")==vid:
-                roles.append({"kind":"variable_input","consumer":other,"entity":"variable_component"})
+                roles.append({"kind":"variable_input","consumer":other,"entity":"variable_component","var_check":None})
     return roles
 
 def analyze_file(path):
@@ -186,7 +215,7 @@ def analyze_file(path):
             "variable":vid,
             "shape":variable_shape(vel),
             "root_operator":variable_root_operator(vel),
-            "consumers":variable_consumer_roles(vid,objects,states,variables),
+            "consumers":variable_consumer_roles(vid,objects,states,variables,tests),
             "lineage":[{"source_object":o,"field":f} for o,f in sorted(var_lineages(vid,variables,memo))],
         })
     risk=[]
