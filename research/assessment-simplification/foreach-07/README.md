@@ -406,6 +406,6 @@ accepted. Eligible analyzer hits remain `review_required`.
 
 ## Human status
 
-`semantic-proof-complete / production-proof-complete / schema-prototype-pending-review`
+`v1-ready-for-0.3.0-integration-review`
 
 No schema or accepted specification change is made by this research record.
