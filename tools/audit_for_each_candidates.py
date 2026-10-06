@@ -81,6 +81,21 @@ def variable_root_operator(el):
         return local(children[0])
     return "other"
 
+
+def pure_projection_detail(el):
+    """Return exact object_component details for a pure projection Variable."""
+    if variable_shape(el)!="pure_object_projection":
+        return None
+    children=[x for x in el if isinstance(x.tag,str) and local(x)!="notes"]
+    component=children[0]
+    a=attrs_local(component)
+    return {
+        "object":a.get("object_ref"),
+        "field":a.get("item_field"),
+        "record_field":a.get("record_field"),
+        "datatype":el.get("datatype"),
+    }
+
 def variable_consumer_roles(vid, objects, states, variables, tests):
     roles=[]
     for oid,el in objects.items():
@@ -116,12 +131,26 @@ def variable_consumer_roles(vid, objects, states, variables, tests):
         for x in el.iter():
             a=attrs_local(x)
             if a.get("var_ref")==vid:
-                roles.append({"kind":"object_selector","consumer":oid,"entity":local(x),"var_check":a.get("var_check") or "all(default)"})
+                roles.append({
+                    "kind":"object_selector",
+                    "consumer":oid,
+                    "entity":local(x),
+                    "var_check":a.get("var_check") or "all(default)",
+                    "operation":a.get("operation") or "equals(default)",
+                    "datatype":a.get("datatype") or "string(default)",
+                })
     for sid,el in states.items():
         for x in el.iter():
             a=attrs_local(x)
             if a.get("var_ref")==vid:
-                roles.append({"kind":"state_expected_value","consumer":sid,"entity":local(x),"var_check":a.get("var_check") or "all(default)"})
+                roles.append({
+                    "kind":"state_expected_value",
+                    "consumer":sid,
+                    "entity":local(x),
+                    "var_check":a.get("var_check") or "all(default)",
+                    "operation":a.get("operation") or "equals(default)",
+                    "datatype":a.get("datatype") or "string(default)",
+                })
     for other,el in variables.items():
         if other==vid:
             continue
@@ -215,6 +244,8 @@ def analyze_file(path):
             "variable":vid,
             "shape":variable_shape(vel),
             "root_operator":variable_root_operator(vel),
+            "datatype":vel.get("datatype"),
+            "projection":pure_projection_detail(vel),
             "consumers":variable_consumer_roles(vid,objects,states,variables,tests),
             "lineage":[{"source_object":o,"field":f} for o,f in sorted(var_lineages(vid,variables,memo))],
         })
@@ -261,17 +292,27 @@ def main():
             entry=unique_variables.setdefault(vr["variable"],{
                 "shape":vr["shape"],
                 "root_operator":vr.get("root_operator"),
+                "datatype":vr.get("datatype"),
+                "projection":json.dumps(vr.get("projection"),sort_keys=True) if vr.get("projection") is not None else None,
                 "consumers":set(),
                 "lineage":set(),
             })
-            if entry["shape"]!=vr["shape"] or entry.get("root_operator")!=vr.get("root_operator"):
-                raise ValueError(f"Variable shape/operator changed across closures: {vr['variable']}")
+            expected_projection=json.dumps(vr.get("projection"),sort_keys=True) if vr.get("projection") is not None else None
+            if (
+                entry["shape"]!=vr["shape"]
+                or entry.get("root_operator")!=vr.get("root_operator")
+                or entry.get("datatype")!=vr.get("datatype")
+                or entry.get("projection")!=expected_projection
+            ):
+                raise ValueError(f"Variable shape/operator/datatype/projection changed across closures: {vr['variable']}")
             for consumer in vr["consumers"]:
                 entry["consumers"].add((
                     consumer["kind"],
                     consumer["consumer"],
                     consumer.get("entity"),
                     consumer.get("var_check"),
+                    consumer.get("operation"),
+                    consumer.get("datatype"),
                 ))
             for lineage in vr["lineage"]:
                 entry["lineage"].add((lineage["source_object"],lineage["field"]))
@@ -300,8 +341,18 @@ def main():
     unique_inventory=[]
     for vid,v in sorted(unique_variables.items()):
         consumers=[
-            {"kind":kind,"consumer":consumer,"entity":entity,"var_check":var_check}
-            for kind,consumer,entity,var_check in sorted(v["consumers"])
+            {
+                "kind":kind,
+                "consumer":consumer,
+                "entity":entity,
+                "var_check":var_check,
+                "operation":operation,
+                "datatype":datatype,
+            }
+            for kind,consumer,entity,var_check,operation,datatype in sorted(
+                v["consumers"],
+                key=lambda x: tuple("" if y is None else str(y) for y in x)
+            )
         ]
         lineage=[
             {"source_object":source_object,"field":field}
@@ -317,6 +368,8 @@ def main():
             "variable":vid,
             "shape":v["shape"],
             "root_operator":v.get("root_operator"),
+            "datatype":v.get("datatype"),
+            "projection":json.loads(v["projection"]) if v.get("projection") is not None else None,
             "usage_class":usage_class,
             "consumers":consumers,
             "lineage":lineage,
