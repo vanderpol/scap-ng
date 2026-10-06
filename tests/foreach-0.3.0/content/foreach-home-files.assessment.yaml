@@ -1,0 +1,48 @@
+assessment:
+  id: foreach-v1-home-files
+  version: 1
+  assessment_title: Foreach v1 home-directory file selection
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+
+  objects:
+    users:
+      object_title: Selected local users
+      capability: unix.password
+      select:
+        username:
+          value: .+
+          operation: match
+          datatype: string
+
+    initialization-files:
+      object_title: Initialization files in selected user home directories
+      capability: unix.file
+      for_each:
+        item: user
+        in: users
+      select:
+        directory:
+          from: user.home_dir
+        name:
+          value: '^\.[^\s\.]+'
+          operation: match
+          datatype: string
+      filesystem: any
+
+  tests:
+    initialization-files-exist:
+      test_title: Initialization files are collected as one target population
+      reported_elements: compared
+      capability: unix.file
+      object: initialization-files
+      check_existence: any_exist
+      check: all
+
+  evaluate:
+    test: initialization-files-exist
