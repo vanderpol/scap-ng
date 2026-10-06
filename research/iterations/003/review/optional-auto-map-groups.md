@@ -21,7 +21,7 @@
 
 **Tests:** Focused STIG-manual conversion verifies default `groups: []` and opt-in mapping. Native package-graph tests verify partial/no Group coverage is valid, while duplicate and unknown Rule membership remain errors.
 
-**Machine evidence:** Pending branch CI for `feature/optional-auto-map-groups`.
+**Machine evidence:** Focused STIG-manual workflow passed on branch head lineage: https://github.com/vanderpol/scap-ng/actions/runs/37465029661 . The PR broad regression gates remain the pre-merge integration evidence.
 
 **Human status:** accepted
 
