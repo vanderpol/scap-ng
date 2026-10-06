@@ -48,10 +48,10 @@ objects:
       in: non-system-users
 
     select:
-      path:
+      directory:
         from: user.home_dir
 
-      filename:
+      name:
         value: '^\\.[^\\s\\.]+'
         operation: pattern_match
         datatype: string
@@ -62,7 +62,7 @@ identity.
 
 `in: non-system-users` identifies the complete source Object dependency.
 
-`from: user.home_dir` means that the target `path` is bound from that field
+`from: user.home_dir` means that the target `directory` is bound from that field
 of each source Item. In v1, `from` is a binding, not an authored comparison.
 The equivalent `equals`, datatype compatibility, and
 `var_check="at least one"` behavior belong to the normative desugaring rather
