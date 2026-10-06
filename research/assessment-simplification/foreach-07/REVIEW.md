@@ -59,7 +59,7 @@ objects:
         variable: non-system-home-dirs
         var_check: at least one
       name:
-        operation: pattern_match
+        operation: match
         datatype: string
         value: '^\\.[^\\s\\.]+'
     # original filters / behaviors retained
@@ -107,7 +107,7 @@ objects:
       directory:
         from: user.home_dir
       name:
-        operation: pattern_match
+        operation: match
         datatype: string
         value: '^\\.[^\\s\\.]+'
     # same filters / behaviors
