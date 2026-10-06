@@ -217,6 +217,18 @@ proposal is documented in
 The 0.2.0 converter uses publisher-neutral native IDs; source repository and
 migration provenance SHALL NOT be mistaken for authorship.
 
+## Scoped Item binding and flattened value flow — 0.3.0 research
+
+The active research proposal for separating flattened Object-field Projection,
+lexical Item Binding/`for_each`, named Variables, lineage, and collection
+execution reuse is maintained in one authoritative research document:
+
+[SCAP-NG 0.3.0 value-flow and scoped-iteration proposal](../../research/for-each-0.3.0/PROPOSED-SPECIFICATION.md).
+
+That proposal is not part of frozen 0.2.0. This file intentionally does not
+duplicate its semantics. Promotion follows the feature-promotion rule below.
+
+
 ## 6. Promotion rule
 
 A deferred feature should move into normative specification text and executable
