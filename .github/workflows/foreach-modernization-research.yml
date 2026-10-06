@@ -60,8 +60,11 @@ jobs:
         run: |
           python tools/test_foreach_v03_integration.py
           python tools/test_schema_v03_independence.py
-          python tools/validate_native_json_schemas.py tests/foreach-0.3.0/content \
-            --schema-dir schema/v0.3.0 --report /tmp/foreach-v03-schema.json
+          if ! python tools/validate_native_json_schemas.py tests/foreach-0.3.0/content \
+            --schema-dir schema/v0.3.0 --report /tmp/foreach-v03-schema.json; then
+            cat /tmp/foreach-v03-schema.json
+            exit 1
+          fi
           python tools/validate_native_semantics.py tests/foreach-0.3.0/content \
             --report /tmp/foreach-v03-semantics.json
 
