@@ -152,6 +152,32 @@ def closure(idx, roots):
             if target not in seen: q.append((kind,target))
     return nodes,edges,missing
 
+def classify_extend_definition(nodes):
+    """Classify whether extend_definition contributes semantics or only indirection."""
+    out={"occurrences":0,"wrapper_only":0,"mixed_with_other_criteria":0,"nested_or_negated":0}
+    for node in nodes.values():
+        if node_kind(node)!="definition":
+            continue
+        direct=list(node)
+        criteria=[x for x in direct if local(x.tag)=="criteria"]
+        for crit in criteria:
+            children=[x for x in list(crit) if local(x.tag) in {"criterion","criteria","extend_definition"}]
+            extends=[x for x in children if local(x.tag)=="extend_definition"]
+            if not extends:
+                continue
+            out["occurrences"] += len(extends)
+            operator=(crit.get("operator") or "AND").upper()
+            negate=(crit.get("negate") or "false").lower()=="true"
+            nested=any(local(x.tag)=="criteria" for x in children)
+            if negate or nested:
+                out["nested_or_negated"] += len(extends)
+            if len(children)==1 and len(extends)==1 and operator=="AND" and not negate:
+                out["wrapper_only"] += 1
+            else:
+                out["mixed_with_other_criteria"] += len(extends)
+    return out
+
+
 def analyze_root(idx, rule):
     nodes,edges,missing=closure(idx,rule["definitions"])
     kinds=Counter(node_kind(n) for n in nodes.values())
@@ -233,6 +259,8 @@ def analyze_root(idx, rule):
     )
     no_reuse_barrier=not obj_reused and not state_reused
 
+    extend_usage=classify_extend_definition(nodes)
+
     return {
         **rule,
         "counts":dict(kinds),
@@ -242,6 +270,7 @@ def analyze_root(idx, rule):
         "test_check":dict(checks),
         "test_existence":dict(exist),
         "missing_refs":missing,
+        "extend_definition_usage":extend_usage,
         "reuse":{
             "objects_reused":len(obj_reused),
             "states_reused":len(state_reused),
@@ -264,12 +293,13 @@ def pct(n,d): return round(100*n/d,1) if d else 0.0
 
 def summarize(rows):
     features=Counter(); functions=Counter(); test_types=Counter()
-    totals=Counter(); reuse=Counter(); classes=Counter()
+    totals=Counter(); reuse=Counter(); classes=Counter(); extend_usage=Counter()
     for r in rows:
         features.update(r["features"]); functions.update(r["functions"]); test_types.update(r["test_types"])
         for k,v in r["counts"].items(): totals[k]+=v
         for k,v in r["reuse"].items(): reuse[k]+=v
         for k,v in r["classification"].items(): classes[k]+=int(bool(v))
+        extend_usage.update(r.get("extend_definition_usage",{}))
     n=len(rows)
     return {
         "automated_rules_with_oval":n,
@@ -279,6 +309,7 @@ def summarize(rows):
         "test_type_occurrences":dict(test_types),
         "closure_node_occurrences":dict(totals),
         "reuse_totals":dict(reuse),
+        "extend_definition_usage":dict(extend_usage),
         "locality":{
             "simple_linear_rules":classes["simple_linear"],
             "simple_linear_percent":pct(classes["simple_linear"],n),
