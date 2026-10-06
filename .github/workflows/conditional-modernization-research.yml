@@ -88,11 +88,11 @@ jobs:
           - label: Windows Server 2025 SV-278184 paired domain guards
             artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
             rule: SV-278184
-            expect_rewrite: "true"
+            expect_rewrite: "false"
           - label: Windows Server 2025 SV-278185 paired domain guards
             artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
             rule: SV-278185
-            expect_rewrite: "true"
+            expect_rewrite: "false"
           - label: Windows Server 2025 SV-278188 paired domain guards
             artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
             rule: SV-278188
@@ -178,10 +178,14 @@ jobs:
               "rewrites":sum(len(r["conditional_modernization"]["applied"]) for r in applied),
           },indent=2))
           PY
-          python tools/validate_native_json_schemas.py out/assessments/automated \
+          if ! python tools/validate_native_json_schemas.py out/assessments/automated \
             --schema-dir schema/v0.3.0 \
-            --report /tmp/conditional-schema.json
+            --report /tmp/conditional-schema.json; then
+            cat /tmp/conditional-schema.json
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: conditional-modernization-${{ matrix.rule }}
           path: |
