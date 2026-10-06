@@ -52,20 +52,20 @@ objects:
   initialization_files:
     capability: unix.file
     for_each:
-      source:
-        object: non_system_users
-      as: user
-      select:
-        path:
-          from: user.home_dir
-        filename:
-          operation: pattern_match
-          value: '^\\.[^\\s\\.]+'
-      collect: union
+      item: user
+      in: non_system_users
+    select:
+      path:
+        from: user.home_dir
+      filename:
+        operation: pattern_match
+        value: '^\\.[^\\s\\.]+'
 ```
 
-`collect: union` is shown explicitly because collection-level iteration SHALL
-NOT imply per-iteration Test evaluation.
+Object-level `for_each` v1 has one intrinsic meaning: collection expansion
+whose child Items form one combined target Object population. The author does
+not spell `collect: union` because v1 offers no alternate collection mode;
+this is grammar semantics rather than a hidden default.
 
 ### B. Evaluation iteration
 
@@ -251,9 +251,8 @@ Prefer binding a complete source Item rather than only a scalar value:
 
 ```yaml
 for_each:
-  source:
-    object: users
-  as: user
+  item: user
+  in: users
 ```
 
 Then references such as `user.home_dir`, `user.username`, and `user.user_id`
