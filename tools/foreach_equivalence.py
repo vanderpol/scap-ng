@@ -184,12 +184,22 @@ def direct_foreach_preconditions(candidate):
     targets = candidate.get("targets", [])
     if not targets:
         reasons.append("no_target_object_selector")
+    if len(targets) != 1:
+        reasons.append("first_proof_class_requires_single_target_consumer")
 
+    variable_id = candidate.get("variable_id")
     for target in targets:
         if target.get("var_check") != "at least one":
             reasons.append("target_var_check_not_at_least_one")
         if target.get("context") != "object_selector":
             reasons.append("consumer_is_not_object_selector")
+        variable_entities = target.get("object_features", {}).get("variable_entities", [])
+        independent = [
+            entity for entity in variable_entities
+            if entity.get("var_ref") != variable_id
+        ]
+        if independent:
+            reasons.append("target_has_additional_variable_selectors")
 
     if expression.get("record_field") is not None:
         # The OVAL behavior is well defined, but record-field extraction has not
