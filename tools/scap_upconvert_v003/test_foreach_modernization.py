@@ -98,13 +98,9 @@ class ForeachConverterModernization(unittest.TestCase):
                 "mode": "automated",
                 "class": "compliance",
                 "purpose": "assessment",
-                "specification": {
-                    "id": "scap-ng.pre-alpha.assessment",
-                    "version": "0.2.0",
-                },
-                "objects": {
-                    "users": {
-                        "object_title": "Users",
+                "collections": {
+                    "users-collection": {
+                        "collection_title": "Users",
                         "capability": "unix.password",
                         "select": {
                             "username": {
@@ -114,8 +110,8 @@ class ForeachConverterModernization(unittest.TestCase):
                             }
                         },
                     },
-                    "files": {
-                        "object_title": "Files",
+                    "files-collection": {
+                        "collection_title": "Files",
                         "capability": "unix.file",
                         "select": {
                             "path": {
@@ -139,20 +135,21 @@ class ForeachConverterModernization(unittest.TestCase):
                         "datatype": "string",
                         "expression": {
                             "values": {
-                                "object": "users",
+                                "collection": "users-collection",
                                 "field": "home_dir",
                             }
                         },
                     }
                 },
-                "states": {},
                 "tests": {
                     "test-files": {
                         "test_title": "Files",
                         "capability": "unix.file",
-                        "object": "files",
-                        "check_existence": "any_exist",
-                        "check": "all",
+                        "collection": "files-collection",
+                        "assertion": {
+                            "existence": "any_exist",
+                            "item_quantifier": "all",
+                        },
                     }
                 },
                 "evaluate": {"test": "test-files"},
@@ -166,9 +163,9 @@ class ForeachConverterModernization(unittest.TestCase):
         assessment = result["assessment"]
         self.assertEqual(assessment["specification"]["version"], "0.2.0")
         self.assertIn("home-dirs", assessment["variables"])
-        self.assertNotIn("for_each", assessment["objects"]["files"])
+        self.assertNotIn("for_each", assessment["objects"]["files-object"])
         self.assertEqual(
-            assessment["objects"]["files"]["select"]["directory"]["value"],
+            assessment["objects"]["files-object"]["select"]["directory"]["value"],
             {"variable": "home-dirs"},
         )
 
@@ -184,11 +181,11 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertTrue(report["rewrite_performed"], report)
         self.assertNotIn("variables", assessment)
         self.assertEqual(
-            assessment["objects"]["files"]["for_each"],
-            {"item": "user", "in": "users"},
+            assessment["objects"]["files-object"]["for_each"],
+            {"item": "user", "in": "users-object"},
         )
         self.assertEqual(
-            assessment["objects"]["files"]["select"]["directory"],
+            assessment["objects"]["files-object"]["select"]["directory"],
             {"from": "user.home_dir"},
         )
         self.assertEqual(
@@ -221,10 +218,10 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertEqual(len(report["applied"]), 1)
         assessment = result["assessment"]
         self.assertNotIn("variables", assessment)
-        files = assessment["objects"]["files"]
+        files = assessment["objects"]["files-object"]
         self.assertEqual(
             files["for_each"],
-            {"item": "user", "in": "users"},
+            {"item": "user", "in": "users-object"},
         )
         self.assertEqual(
             files["select"]["directory"],
