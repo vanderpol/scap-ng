@@ -1,4 +1,8 @@
-from pathlib import Path\n\nimport yaml\n\nfrom tools.normalize_p1_projection import (
+from pathlib import Path
+
+import yaml
+
+from tools.normalize_p1_projection import (
     apply_p1_projection_normalization,
     plan_p1_projection_normalization,
 )
