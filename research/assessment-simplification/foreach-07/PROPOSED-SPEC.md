@@ -53,7 +53,7 @@ objects:
 
       name:
         value: '^\\.[^\\s\\.]+'
-        operation: pattern_match
+        operation: match
         datatype: string
 ```
 
