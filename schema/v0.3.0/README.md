@@ -8,8 +8,10 @@ It was opened from the frozen 0.2.0 baseline and is now versioned entirely as
 the frozen 0.2.0 tree.
 
 The 0.2.0 release remains unchanged and is the frozen OVAL Board review
-baseline. New semantic work, including the proposed Object-level `for_each`
-collection-expansion construct, belongs here.
+baseline. New semantic work belongs here. The narrow Object-level `for_each`
+collection-expansion v1 authoring/validation construct is now integrated into
+this active pre-alpha tree; automatic SCAP 1.4 converter modernization remains
+disabled pending its own equivalence gate.
 
 ## Change discipline
 
@@ -30,3 +32,29 @@ collection-expansion construct, belongs here.
 
 For the current foreach research/proof package, see
 [foreach-07](../../research/assessment-simplification/foreach-07/README.md).
+
+## Foreach v1 integration
+
+The first 0.3.0 `for_each` form is intentionally narrow:
+
+```yaml
+for_each:
+  item: user
+  in: users
+
+select:
+  directory:
+    from: user.home_dir
+```
+
+Its normative meaning remains the faithful
+Object -> ObjectComponent -> local Variable -> target Object selector graph with
+at-least-one selector quantification and one combined target Object population.
+
+The 0.3.0 semantic validator rejects unsupported v1 shapes such as missing
+source Objects, mismatched aliases, incompatible source/target datatypes,
+multiple bound selectors, helper targets not directly used by a Test, and
+independent additional Variable selectors.
+
+See the [foreach research/proof package](../../research/assessment-simplification/foreach-07/README.md)
+for the production proof and explicit exclusions.
