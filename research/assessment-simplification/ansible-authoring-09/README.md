@@ -1,5 +1,11 @@
 # Ansible-inspired RHEL 9 authoring research
 
+> **FOLLOW-UP RESEARCH:** The later [private Object/State locality study](../locality-11/README.md)
+> tests a more conservative hypothesis: retain the existing SCAP-NG semantic
+> model and inline only private Objects/States. The Ansible-inspired sketches
+> remain useful comparative evidence but are **not a preferred or accepted
+> direction**.
+
 > **RESEARCH ONLY — NOT AN ACCEPTED SCAP-NG DESIGN**
 >
 > Nothing in this directory changes the SCAP-NG 0.2.0 or 0.3.0 language,
