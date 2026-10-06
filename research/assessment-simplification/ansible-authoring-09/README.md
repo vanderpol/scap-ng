@@ -176,3 +176,17 @@ measure Windows-specific constructs, especially:
 
 No Windows-derived syntax change becomes an accepted design without the same
 human review and cross-platform comparison required for the RHEL study.
+
+
+## Cross-research evidence
+
+- [Proven foreach cases translated into the speculative authoring form](FOREACH-PROVEN-CASE-TRANSLATIONS.md)
+  reuses the exact five production bindings from the foreach v1 semantic proof
+  rather than inventing new loop examples.
+- [Conditional-shaped OVAL criteria research](../conditional-10/README.md)
+  measures when nested AND/OR trees are really environment/role branches versus
+  ordinary alternative compliance paths.
+
+These artifacts remain research-only. Their purpose is to test whether the same
+small human vocabulary can explain real production patterns that previously
+required separate OVAL-style graph constructs.
