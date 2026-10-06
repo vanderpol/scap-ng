@@ -1,0 +1,66 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-278001
+intent: Windows Server 2025 default permissions for HKEY_LOCAL_MACHINE must be maintained.
+
+check:
+  all:
+    - powershell:
+        run: |
+          ([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
+            "Security",
+            [System.Security.AccessControl.RegistryRights]::ReadPermissions
+          )).GetAccessControl().Access
+      expect:
+        permissions:
+          include:
+            - principal: NT AUTHORITY\SYSTEM
+              rights: FullControl
+            - principal: BUILTIN\Administrators
+              rights:
+                - ReadPermissions
+                - ChangePermissions
+
+    - powershell:
+        run: |
+          ([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
+            "Software",
+            [System.Security.AccessControl.RegistryRights]::ReadPermissions
+          )).GetAccessControl().Access
+      expect:
+        permissions: default_member_server_acl
+
+    - case:
+        when:
+          wmi:
+            namespace: root\cimv2
+            query: SELECT DomainRole FROM win32_computersystem
+          expect:
+            domainrole:
+              in: [4, 5]
+
+        then:
+          powershell:
+            run: |
+              ([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
+                "System",
+                [System.Security.AccessControl.RegistryRights]::ReadPermissions
+              )).GetAccessControl().Access
+          expect:
+            permissions: default_domain_controller_acl
+
+        otherwise:
+          powershell:
+            run: |
+              ([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
+                "System",
+                [System.Security.AccessControl.RegistryRights]::ReadPermissions
+              )).GetAccessControl().Access
+          expect:
+            permissions: default_member_server_acl
+
+research_notes:
+  source_shape: OR(AND(domain-controller, dc-acl), AND(NOT domain-controller, member-acl))
+  warning: >
+    case/when is human-oriented research syntax. Mechanical conversion must
+    preserve OVAL six-state behavior; generic Boolean-to-procedural conditional
+    rewriting is not yet proven lossless.
