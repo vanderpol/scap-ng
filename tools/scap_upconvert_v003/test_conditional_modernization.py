@@ -163,7 +163,7 @@ class ConditionalModernizationTests(unittest.TestCase):
         self.assertEqual(result["assessment"]["evaluate"],evaluate)
         self.assertFalse(report["rewrite_performed"])
         self.assertEqual(report["review_required"][0]["reasons"],
-                         ["no_exact_complementary_guard"])
+                         ["no_proven_conditional_guard_pattern"])
 
     def test_ambiguous_two_complementary_guards_fail_closed(self):
         evaluate={
