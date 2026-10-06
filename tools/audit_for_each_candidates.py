@@ -53,6 +53,11 @@ def var_lineages(vid, variables, memo, stack=()):
     return ans
 
 def analyze_file(path):
+    title=None
+    prov=path.parent/"provenance.json"
+    if prov.exists():
+        try: title=json.loads(prov.read_text()).get("xccdf_title")
+        except Exception: pass
     try: root=ET.parse(str(path)).getroot()
     except Exception as e: return {"file":str(path),"parse_error":str(e)}
     defs=index_section(root,'definitions'); tests=index_section(root,'tests'); objects=index_section(root,'objects'); states=index_section(root,'states'); variables=index_section(root,'variables')
@@ -63,7 +68,7 @@ def analyze_file(path):
     for oid,refs in obj_consumers.items():
         for r in refs:
             for src,field in var_lineages(r['variable'],variables,memo):
-                edges.append({"source_object":src,"source_field":field,"variable":r['variable'],"target_object":oid,"target_entity":r['entity'],"operation":r['operation'],"var_check":r['var_check']})
+                edges.append({"source_object":src,"source_object_type":local(objects[src]) if src in objects else None,"source_field":field,"variable":r['variable'],"target_object":oid,"target_object_type":local(objects[oid]),"target_entity":r['entity'],"operation":r['operation'],"var_check":r['var_check'] or "all(default)"})
     correlated=[]
     for tid,t in tests.items():
         a=attrs_local(t); oid=a.get('object_ref'); sids=[]
@@ -108,7 +113,15 @@ def analyze_file(path):
     for part in path.parts:
         m=re.search(r'SV-\d+',part)
         if m: rid=m.group(0); break
-    return {"file":str(path),"rule_id":rid,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj}
+    functions=sorted({local(x) for v in variables.values() for x in v.iter() if local(x) in {"arithmetic","begin","concat","count","end","escape_regex","glob_to_regex","merge","regex_capture","split","substring","time_difference","unique"}})
+    risk=[]
+    if correlated: risk.append("correlated_binding")
+    if nested: risk.append("nested_dependency")
+    if multiproj: risk.append("multi_projection")
+    if functions: risk.append("variable_function")
+    if any(e["var_check"] not in {"at least one","all(default)"} for e in edges): risk.append("nontrivial_var_check")
+    disposition="candidate_for_equivalence_proof" if edges and not risk else "review_required_before_rewrite"
+    return {"file":str(path),"rule_id":rid,"title":title,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj,"variable_functions":functions,"rewrite_risk":risk,"preliminary_disposition":disposition}
 
 def main():
     ap=argparse.ArgumentParser()
