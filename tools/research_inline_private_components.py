@@ -219,7 +219,12 @@ def load_assessments(root: Path) -> list[tuple[Path,dict]]:
         if not isinstance(doc,dict) or "assessment" not in doc:
             continue
         a=doc["assessment"]
+        assessment_id=str(a.get("id") or "")
         if a.get("mode")!="automated" or not isinstance(a.get("tests"),dict) or not a["tests"]:
+            continue
+        # This experiment compares STIG Rule Assessments, not platform/applicability
+        # helper Assessments that happen to use the same automated vocabulary.
+        if ".SV-" not in assessment_id and not assessment_id.startswith("SV-"):
             continue
         rows.append((path,doc))
     return rows
