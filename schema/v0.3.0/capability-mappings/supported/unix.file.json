@@ -1,0 +1,203 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "specification_version": "0.2.0",
+  "last_modified": "2026-10-04",
+  "capability": "unix.file",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/unix-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+    "test": "file_test",
+    "object": "file_object",
+    "state": "file_state"
+  },
+  "native": {
+    "selector_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "full_path"
+      ],
+      [
+        "directory",
+        "name"
+      ]
+    ],
+    "state_field_map": {
+      "filepath": "full_path",
+      "path": "directory",
+      "filename": "name",
+      "type": "type",
+      "group_id": "owner_gid",
+      "user_id": "owner_uid",
+      "a_time": "access_time",
+      "c_time": "change_time",
+      "m_time": "modify_time",
+      "size": "size",
+      "suid": "setuid",
+      "sgid": "setgid",
+      "sticky": "sticky",
+      "uread": "owner_read",
+      "uwrite": "owner_write",
+      "uexec": "owner_execute",
+      "gread": "group_read",
+      "gwrite": "group_write",
+      "gexec": "group_execute",
+      "oread": "other_read",
+      "owrite": "other_write",
+      "oexec": "other_execute",
+      "has_extended_acl": "has_extended_acl"
+    },
+    "field_datatypes": {
+      "full_path": [
+        "string"
+      ],
+      "directory": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "type": [
+        "string"
+      ],
+      "owner_gid": [
+        "integer"
+      ],
+      "owner_uid": [
+        "integer"
+      ],
+      "access_time": [
+        "integer"
+      ],
+      "change_time": [
+        "integer"
+      ],
+      "modify_time": [
+        "integer"
+      ],
+      "size": [
+        "integer"
+      ],
+      "setuid": [
+        "boolean"
+      ],
+      "setgid": [
+        "boolean"
+      ],
+      "sticky": [
+        "boolean"
+      ],
+      "owner_read": [
+        "boolean"
+      ],
+      "owner_write": [
+        "boolean"
+      ],
+      "owner_execute": [
+        "boolean"
+      ],
+      "group_read": [
+        "boolean"
+      ],
+      "group_write": [
+        "boolean"
+      ],
+      "group_execute": [
+        "boolean"
+      ],
+      "other_read": [
+        "boolean"
+      ],
+      "other_write": [
+        "boolean"
+      ],
+      "other_execute": [
+        "boolean"
+      ],
+      "has_extended_acl": [
+        "boolean"
+      ]
+    },
+    "uses_file_traversal": true,
+    "traversal_definition": "file_traversal"
+  },
+  "migration_crosswalk": {
+    "operation": {
+      "equals": "equal",
+      "not equal": "not_equal",
+      "case insensitive equals": "equal_ci",
+      "case insensitive not equal": "not_equal_ci",
+      "greater than": "greater_than",
+      "greater than or equal": "greater_or_equal",
+      "less than": "less_than",
+      "less than or equal": "less_or_equal",
+      "bitwise and": "bit_and",
+      "bitwise or": "bit_or",
+      "pattern match": "match",
+      "subset of": "subset",
+      "superset of": "superset"
+    },
+    "check": {
+      "all": "all",
+      "at least one": "any",
+      "only one": "one",
+      "none satisfy": "none"
+    },
+    "existence": {
+      "all_exist": "all",
+      "at_least_one_exists": "some",
+      "none_exist": "none",
+      "only_one_exists": "one",
+      "any_exist": "optional"
+    },
+    "datatype": {
+      "string": "string",
+      "boolean": "boolean",
+      "int": "integer",
+      "float": "float",
+      "binary": "binary",
+      "version": "version",
+      "ipv4_address": "ipv4",
+      "ipv6_address": "ipv6",
+      "evr_string": "rpm_evr",
+      "debian_evr_string": "debian_evr",
+      "fileset_revision": "fileset_revision",
+      "ios_version": "ios_version",
+      "record": "record"
+    },
+    "deprecated": {
+      "recurse_direction_up": "migration_error",
+      "check_none_exist": "migration_error"
+    },
+    "traversal": {
+      "max_depth_-1": "max_depth_null",
+      "recurse.directories": "directories",
+      "recurse.symlinks": "symlinks",
+      "recurse.symlinks and directories": "symlinks_and_directories",
+      "recurse_direction.none": "no_traversal",
+      "recurse_direction.down": "implicit_downward_traversal",
+      "recurse_direction.up": "migration_error_deprecated",
+      "recurse_file_system.all": "any",
+      "recurse_file_system.local": "local",
+      "recurse_file_system.defined": "same"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "unix.file.filter_state_capability",
+      "rule": "Every file-selection filter State reference must resolve to capability unix.file."
+    },
+    {
+      "id": "unix.file.full_path_no_traversal",
+      "rule": "Traversal is not permitted when full_path selection is used."
+    },
+    {
+      "id": "unix.file.pattern_directory_no_traversal",
+      "rule": "Traversal is not permitted when directory uses non-equality pattern-style selection."
+    }
+  ]
+}

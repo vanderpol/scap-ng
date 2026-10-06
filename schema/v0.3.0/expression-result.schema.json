@@ -1,0 +1,397 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/expression-result.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-03",
+  "title": "Draft Assessment expression execution result 0.2.0",
+  "description": "Expression-stage result, not a complete Assessment Result or scanner result package.",
+  "type": "object",
+  "required": [
+    "outcome",
+    "executed_tests",
+    "trace",
+    "diagnostics",
+    "context",
+    "evaluation_scope",
+    "invocations"
+  ],
+  "properties": {
+    "outcome": {
+      "$ref": "#/$defs/outcome"
+    },
+    "evaluation_scope": {
+      "const": "assessment_expression"
+    },
+    "executed_tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "target",
+        "invocation_ref"
+      ],
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "invocation_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "test"
+        ],
+        "properties": {
+          "code": {
+            "const": "missing_test_result"
+          },
+          "test": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind",
+          "outcome",
+          "owner_invocation_ref"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "expression",
+              "terminal",
+              "test",
+              "dependency",
+              "conditional",
+              "manual"
+            ]
+          },
+          "outcome": {
+            "$ref": "#/$defs/outcome"
+          },
+          "condition_outcome": {
+            "$ref": "#/$defs/outcome"
+          },
+          "selected_branch": {
+            "enum": [
+              "then",
+              "else",
+              null
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "test": {
+            "type": "string"
+          },
+          "assessment": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "reused": {
+            "type": "boolean"
+          },
+          "invocation_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner_invocation_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "condition_outcome",
+                "selected_branch"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "test"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "test",
+                "assessment",
+                "reused"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "dependency"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "alias",
+                "assessment",
+                "invocation_ref",
+                "reused"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "expression",
+                    "terminal"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reason"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "expression"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outcome": {
+                  "const": "not_evaluated"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "terminal"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outcome": {
+                  "const": "not_applicable"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "true"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": "then"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "false"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": "else"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "error"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null
+                },
+                "outcome": {
+                  "const": "error"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "unknown"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null
+                },
+                "outcome": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "not_evaluated"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null
+                },
+                "outcome": {
+                  "const": "not_evaluated"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional"
+                },
+                "condition_outcome": {
+                  "const": "not_applicable"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null
+                },
+                "outcome": {
+                  "const": "not_applicable"
+                }
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "invocations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "expression-invocation.schema.json"
+      }
+    }
+  },
+  "$defs": {
+    "outcome": {
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

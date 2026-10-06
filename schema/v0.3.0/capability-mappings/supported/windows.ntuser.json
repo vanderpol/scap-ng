@@ -1,0 +1,200 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "specification_version": "0.2.0",
+  "last_modified": "2026-10-04",
+  "capability": "windows.ntuser",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "ntuser_test",
+    "object": "ntuser_object",
+    "state": "ntuser_state",
+    "item": "ntuser_item"
+  },
+  "native": {
+    "selector_map": {
+      "key": "key",
+      "name": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "key",
+        "name"
+      ]
+    ],
+    "nullable_selectors": [
+      "name"
+    ],
+    "traversal_definition": "hierarchy_traversal",
+    "collection_parameters": {
+      "include_default": {
+        "type": "boolean",
+        "required": true,
+        "description": "Whether the local Default user's ntuser.dat is included. OVAL default false is materialized explicitly."
+      },
+      "item_creation": {
+        "type": "string",
+        "required": true,
+        "enum": [
+          "key_and_name_exist",
+          "every_ntuser"
+        ],
+        "description": "Controls whether Items are created only for matching key/name pairs or for every relevant ntuser.dat. OVAL default key_and_name_exist is materialized explicitly."
+      }
+    },
+    "state_field_map": {
+      "key": "key",
+      "name": "name",
+      "sid": "sid",
+      "username": "username",
+      "account_type": "account_type",
+      "logged_on": "logged_on",
+      "days_since_last_logon": "days_since_last_logon",
+      "user_has_signed_into_explorer": "user_has_signed_into_explorer",
+      "enabled": "enabled",
+      "date_modified": "date_modified",
+      "days_since_modified": "days_since_modified",
+      "filepath": "filepath",
+      "last_write_time": "last_write_time",
+      "type": "type",
+      "value": "value"
+    },
+    "field_datatypes": {
+      "key": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "sid": [
+        "string"
+      ],
+      "username": [
+        "string"
+      ],
+      "account_type": [
+        "string"
+      ],
+      "logged_on": [
+        "boolean"
+      ],
+      "days_since_last_logon": [
+        "integer"
+      ],
+      "user_has_signed_into_explorer": [
+        "boolean"
+      ],
+      "enabled": [
+        "boolean"
+      ],
+      "date_modified": [
+        "integer"
+      ],
+      "days_since_modified": [
+        "integer"
+      ],
+      "filepath": [
+        "string"
+      ],
+      "last_write_time": [
+        "integer"
+      ],
+      "type": [
+        "string"
+      ],
+      "value": [
+        "string",
+        "boolean",
+        "integer",
+        "float",
+        "binary",
+        "version",
+        "ipv4",
+        "ipv6",
+        "rpm_evr",
+        "debian_evr",
+        "fileset_revision",
+        "ios_version"
+      ]
+    },
+    "state_value_enums": {
+      "account_type": [
+        "local",
+        "domain"
+      ],
+      "type": [
+        "binary",
+        "dword",
+        "dword_big_endian",
+        "expand_string",
+        "link",
+        "multi_string",
+        "none",
+        "qword",
+        "string",
+        "resource_list",
+        "full_resource_descriptor",
+        "resource_requirements_list"
+      ]
+    },
+    "post_alignment_ready": true,
+    "state_value_crosswalk": {
+      "type": "registry_type"
+    }
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "ntuser": "windows.ntuser"
+    },
+    "behaviors": {
+      "include_default": "collect.include_default",
+      "item_creation": "collect.item_creation",
+      "max_depth_-1": "traversal.max_depth=null",
+      "recurse_direction.none": "traversal omitted",
+      "recurse_direction.down": "traversal present with max_depth",
+      "recurse_direction.up": "migration_error_deprecated"
+    },
+    "registry_type": {
+      "reg_binary": "binary",
+      "reg_dword": "dword",
+      "reg_dword_little_endian": "dword",
+      "reg_dword_big_endian": "dword_big_endian",
+      "reg_expand_sz": "expand_string",
+      "reg_link": "link",
+      "reg_multi_sz": "multi_string",
+      "reg_none": "none",
+      "reg_qword": "qword",
+      "reg_qword_little_endian": "qword",
+      "reg_sz": "string",
+      "reg_resource_list": "resource_list",
+      "reg_full_resource_descriptor": "full_resource_descriptor",
+      "reg_resource_requirements_list": "resource_requirements_list"
+    },
+    "removed_source_fields": {
+      "windows_view": "deprecated_not_native"
+    },
+    "materialized_defaults": {
+      "behaviors.include_default": false,
+      "behaviors.item_creation": "key_and_name_exist"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.ntuser.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability windows.ntuser."
+    },
+    {
+      "id": "windows.ntuser.pattern_key_no_traversal",
+      "rule": "Traversal is not permitted when key uses a non-equality selector."
+    },
+    {
+      "id": "windows.ntuser.materialized_collection_defaults",
+      "rule": "Direct native Objects explicitly carry include_default and item_creation; importers materialize OVAL defaults false and key_and_name_exist."
+    },
+    {
+      "id": "windows.ntuser.value_type_datatype",
+      "rule": "Registry value datatype must be compatible with registry type when both are asserted."
+    }
+  ]
+}

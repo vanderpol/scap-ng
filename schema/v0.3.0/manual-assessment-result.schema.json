@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/manual-assessment-result.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-04",
+  "title": "SCAP-NG Manual Assessment Result v0.2.0 high-level draft",
+  "description": "Disposable high-level schema for a self-contained manual determination and its provenance.",
+  "type": "object",
+  "required": [
+    "manual_assessment_result"
+  ],
+  "properties": {
+    "manual_assessment_result": {
+      "type": "object",
+      "required": [
+        "result_schema_version",
+        "execution_id",
+        "assessment",
+        "answer",
+        "outcome",
+        "completed_at",
+        "response_source",
+        "evaluator"
+      ],
+      "properties": {
+        "result_schema_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "digest": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "answer": {
+          "description": "Exact response value selected or supplied under the Manual Assessment response contract.",
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "answer_label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false",
+            "error",
+            "unknown",
+            "not_evaluated",
+            "not_applicable"
+          ]
+        },
+        "started_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "response_source": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "imported",
+            "delegated"
+          ]
+        },
+        "evaluator": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "object",
+              "required": [
+                "scheme",
+                "value"
+              ],
+              "properties": {
+                "scheme": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "display_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "organization": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "organizational_unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "role": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "identity_source": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "import_provenance": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "review": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "procedure_snapshot": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional snapshot when required for durable audit; normally source identity/digest is sufficient."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

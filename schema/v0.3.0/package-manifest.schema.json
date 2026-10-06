@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/package-manifest.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-04",
+  "title": "SCAP-NG package manifest v0.2.0",
+  "description": "Pre-alpha manifest for the SCAP-NG logical object graph. Container member paths are storage bindings only; logical IDs are authoritative.",
+  "type": "object",
+  "required": [
+    "format",
+    "format_version",
+    "benchmark_id",
+    "benchmark_version",
+    "entrypoint",
+    "objects",
+    "integrity",
+    "build_provenance",
+    "signature"
+  ],
+  "properties": {
+    "format": {
+      "const": "scap-ng-package-manifest"
+    },
+    "format_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "benchmark_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "benchmark_version": {},
+    "entrypoint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objects": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/object_record"
+      }
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
+    },
+    "build_provenance": {
+      "type": "object"
+    },
+    "signature": {
+      "$ref": "#/$defs/signature"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "object_record": {
+      "type": "object",
+      "required": [
+        "type",
+        "version",
+        "path",
+        "sha256",
+        "size"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "benchmark",
+            "rule",
+            "assessment",
+            "applicability_catalog"
+          ]
+        },
+        "version": {},
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[^\\\\]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "unexpected_members"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha-256"
+        },
+        "unexpected_members": {
+          "const": "reject"
+        }
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "format",
+        "path",
+        "certificate_path",
+        "trust"
+      ],
+      "properties": {
+        "format": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "certificate_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trust": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "format"
+            ]
+          },
+          "then": {
+            "properties": {
+              "format": {
+                "const": "cms-detached-der"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "certificate_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "trust": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "format"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "type": "null"
+              },
+              "certificate_path": {
+                "type": "null"
+              },
+              "trust": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "specification_version": "0.2.0",
+  "last_modified": "2026-10-04",
+  "capability": "windows.registry",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+    "test": "registry_test",
+    "object": "registry_object",
+    "state": "registry_state"
+  },
+  "native": {
+    "selector_map": {
+      "hive": "hive",
+      "key": "key",
+      "name": "name"
+    },
+    "object_selector_alternatives": [
+      [
+        "hive",
+        "key",
+        "name"
+      ]
+    ],
+    "nullable_selectors": [
+      "key",
+      "name"
+    ],
+    "selector_value_enums": {
+      "hive": [
+        "classes_root",
+        "current_config",
+        "current_user",
+        "current_user_local_settings",
+        "local_machine",
+        "users"
+      ]
+    },
+    "traversal_definition": "hierarchy_traversal",
+    "state_field_map": {
+      "hive": "hive",
+      "key": "key",
+      "name": "name",
+      "last_write_time": "last_write_time",
+      "type": "type",
+      "value": "value",
+      "expanded_value": "expanded_value"
+    },
+    "field_datatypes": {
+      "hive": [
+        "string"
+      ],
+      "key": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "last_write_time": [
+        "integer"
+      ],
+      "type": [
+        "string"
+      ],
+      "value": [
+        "string",
+        "integer",
+        "binary",
+        "version"
+      ],
+      "expanded_value": [
+        "string"
+      ]
+    },
+    "state_value_enums": {
+      "hive": [
+        "classes_root",
+        "current_config",
+        "current_user",
+        "current_user_local_settings",
+        "local_machine",
+        "users"
+      ],
+      "type": [
+        "binary",
+        "dword",
+        "dword_big_endian",
+        "expand_string",
+        "link",
+        "multi_string",
+        "none",
+        "qword",
+        "string",
+        "resource_list",
+        "full_resource_descriptor",
+        "resource_requirements_list"
+      ]
+    },
+    "selector_value_crosswalk": {
+      "hive": "hive"
+    },
+    "state_value_crosswalk": {
+      "hive": "hive",
+      "type": "registry_type"
+    }
+  },
+  "migration_crosswalk": {
+    "hive": {
+      "HKEY_CLASSES_ROOT": "classes_root",
+      "HKEY_CURRENT_CONFIG": "current_config",
+      "HKEY_CURRENT_USER": "current_user",
+      "HKEY_CURRENT_USER_LOCAL_SETTINGS": "current_user_local_settings",
+      "HKEY_LOCAL_MACHINE": "local_machine",
+      "HKEY_USERS": "users",
+      "": "variable_reference_artifact_not_native_value"
+    },
+    "registry_type": {
+      "reg_binary": "binary",
+      "reg_dword": "dword",
+      "reg_dword_little_endian": "dword",
+      "reg_dword_big_endian": "dword_big_endian",
+      "reg_expand_sz": "expand_string",
+      "reg_link": "link",
+      "reg_multi_sz": "multi_string",
+      "reg_none": "none",
+      "reg_qword": "qword",
+      "reg_qword_little_endian": "qword",
+      "reg_sz": "string",
+      "reg_resource_list": "resource_list",
+      "reg_full_resource_descriptor": "full_resource_descriptor",
+      "reg_resource_requirements_list": "resource_requirements_list",
+      "": "variable_reference_artifact_not_native_value"
+    },
+    "null_semantics": {
+      "key_null": "select_hive_itself",
+      "name_null": "select_key_itself",
+      "name_empty_string": "select_default_registry_value"
+    },
+    "removed_source_fields": {
+      "windows_view": "deprecated_not_native"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "windows.registry.key_null_requires_name_null",
+      "rule": "When key is null, name must also be null because a value cannot exist without a containing key."
+    },
+    {
+      "id": "windows.registry.pattern_key_no_traversal",
+      "rule": "Traversal is not permitted when key uses a non-equality selector."
+    },
+    {
+      "id": "windows.registry.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability windows.registry."
+    },
+    {
+      "id": "windows.registry.value_type_datatype",
+      "rule": "Registry value datatype must be compatible with the registry type when both are asserted."
+    }
+  ]
+}

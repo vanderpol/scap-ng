@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/state-result.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-03",
+  "title": "SCAP-NG State Result draft v0.2.0 strawman",
+  "description": "Per-Item result for one authored State, preserving State operator and entity-level aggregation details.",
+  "type": "object",
+  "required": [
+    "state_ref",
+    "outcome",
+    "entity_results"
+  ],
+  "properties": {
+    "state_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "$ref": "result-types.schema.json#/$defs/technical_outcome"
+    },
+    "operator": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "AND",
+        "OR",
+        null
+      ]
+    },
+    "entity_results": {
+      "type": "array",
+      "items": {
+        "$ref": "entity-result.schema.json"
+      }
+    },
+    "reason": {
+      "type": [
+        "object",
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

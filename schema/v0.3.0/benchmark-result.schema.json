@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/benchmark-result.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-03",
+  "title": "SCAP-NG Benchmark Result draft v0.2.0 strawman",
+  "description": "Benchmark-scoped policy result for one Benchmark evaluation against one scan-level target reference. Run-wide scanner and target details are not duplicated here.",
+  "type": "object",
+  "required": [
+    "benchmark_result"
+  ],
+  "properties": {
+    "benchmark_result": {
+      "type": "object",
+      "required": [
+        "result_schema_version",
+        "run_id",
+        "started_at",
+        "completed_at",
+        "benchmark",
+        "target_ref",
+        "effective_policy",
+        "summary",
+        "rule_results"
+      ],
+      "properties": {
+        "result_schema_version": {
+          "const": "0.2.0"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "benchmark": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "package_digest": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "effective_policy": {
+          "type": "object",
+          "required": [
+            "profile",
+            "tailoring",
+            "selected_rules",
+            "disabled_rules",
+            "check_selectors",
+            "parameters",
+            "organizational_inputs"
+          ],
+          "properties": {
+            "profile": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tailoring": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "selected_rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "disabled_rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "check_selectors": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "parameters": {
+              "type": "object"
+            },
+            "organizational_inputs": {
+              "type": "object",
+              "description": "Run-local registry of effective Organizational Input assertions used by the run.",
+              "additionalProperties": {
+                "type": "object",
+                "required": [
+                  "parameter",
+                  "source",
+                  "provenance"
+                ],
+                "properties": {
+                  "parameter": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {},
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "organizational_input",
+                      "interactive",
+                      "api",
+                      "integration",
+                      "other"
+                    ]
+                  },
+                  "input_set": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "version": {
+                        "type": [
+                          "string",
+                          "integer"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "provenance": {
+                    "type": "object"
+                  },
+                  "scope": {
+                    "type": [
+                      "object",
+                      "null"
+                    ]
+                  },
+                  "effective_from": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "expires_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "redacted": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "redacted": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "redacted"
+                      ]
+                    },
+                    "then": {
+                      "not": {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    },
+                    "else": {
+                      "required": [
+                        "value"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "summary": {
+          "type": "object",
+          "required": [
+            "total",
+            "pass",
+            "fail",
+            "not_applicable",
+            "not_evaluated",
+            "error",
+            "unknown"
+          ],
+          "properties": {
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "pass": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fail": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_applicable": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_evaluated": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": true
+        },
+        "rule_results": {
+          "type": "array",
+          "items": {
+            "$ref": "rule-result.schema.json"
+          }
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference to the scan-level target evaluated by this Benchmark Result. Target identity and inventory are owned by Scan Result."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

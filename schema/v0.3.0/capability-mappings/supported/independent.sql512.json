@@ -1,0 +1,176 @@
+{
+  "format": "scap-ng-capability-mapping-0.2",
+  "specification_version": "0.2.0",
+  "last_modified": "2026-10-04",
+  "capability": "independent.sql512",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "definitions_schema": "third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+    "test": "sql512_test",
+    "object": "sql512_object",
+    "state": "sql512_state",
+    "item": "sql512_item"
+  },
+  "native": {
+    "collection_parameters": {
+      "engine": {
+        "type": "string",
+        "enum": [
+          "access",
+          "aurora",
+          "azuresql",
+          "crunchypostgres",
+          "derby",
+          "db2",
+          "cache",
+          "firebird",
+          "firstsql",
+          "foxpro",
+          "informix",
+          "ingres",
+          "interbase",
+          "lightbase",
+          "mariadb",
+          "maxdb",
+          "monetdb",
+          "mimer",
+          "mysql",
+          "oracle",
+          "paradox",
+          "pervasive",
+          "postgre",
+          "sqlbase",
+          "sqlite",
+          "sqlserver",
+          "sybase"
+        ],
+        "required": true,
+        "allow_variable": true,
+        "description": "Database engine. NG uses the complete collected-Item vocabulary so every engine remains filterable."
+      },
+      "version": {
+        "type": "string",
+        "required": true,
+        "allow_variable": true,
+        "description": "Database engine/version selector."
+      },
+      "instance": {
+        "type": "string",
+        "required": true,
+        "allow_variable": true,
+        "description": "Database instance identifier."
+      },
+      "database": {
+        "type": "string",
+        "required": true,
+        "nullable": true,
+        "allow_variable": true,
+        "description": "Database/catalog name; null preserves source xsi:nil semantics."
+      },
+      "sql": {
+        "type": "string",
+        "required": true,
+        "nullable": true,
+        "allow_variable": true,
+        "description": "SQL statement; null preserves source xsi:nil semantics."
+      }
+    },
+    "state_field_map": {
+      "engine": "engine",
+      "version": "version",
+      "instance": "instance",
+      "database": "database",
+      "sql": "sql",
+      "result": "result"
+    },
+    "field_datatypes": {
+      "engine": [
+        "string"
+      ],
+      "version": [
+        "string"
+      ],
+      "instance": [
+        "string"
+      ],
+      "database": [
+        "string"
+      ],
+      "sql": [
+        "string"
+      ],
+      "result": [
+        "record"
+      ]
+    },
+    "state_value_enums": {
+      "engine": [
+        "access",
+        "aurora",
+        "azuresql",
+        "crunchypostgres",
+        "derby",
+        "db2",
+        "cache",
+        "firebird",
+        "firstsql",
+        "foxpro",
+        "informix",
+        "ingres",
+        "interbase",
+        "lightbase",
+        "mariadb",
+        "maxdb",
+        "monetdb",
+        "mimer",
+        "mysql",
+        "oracle",
+        "paradox",
+        "pervasive",
+        "postgre",
+        "sqlbase",
+        "sqlite",
+        "sqlserver",
+        "sybase"
+      ]
+    },
+    "record_state_fields": [
+      "result"
+    ],
+    "post_alignment_ready": true
+  },
+  "migration_crosswalk": {
+    "capability": {
+      "sql512": "independent.sql512"
+    },
+    "object": {
+      "engine": "collect.engine",
+      "version": "collect.version",
+      "instance": "collect.instance",
+      "database": "collect.database",
+      "sql": "collect.sql"
+    },
+    "source_defect_corrections": {
+      "engine_state_vocabulary": "OVAL 5.12.3 sql512 Item vocabulary includes aurora, azuresql, crunchypostgres, derby, and mariadb while the State vocabulary omits them. NG uses the Item vocabulary so every collected engine can be filtered."
+    },
+    "structural_simplifications": {
+      "record datatype=record": "implicit in record_predicate / typed record evidence",
+      "record field uniqueness": "structural map-key uniqueness"
+    }
+  },
+  "semantic_validator_rules": [
+    {
+      "id": "independent.sql512.filter_state_capability",
+      "rule": "Every Set filter State reference must resolve to capability independent.sql512."
+    },
+    {
+      "id": "independent.sql512.result_record",
+      "rule": "SQL result rows remain structured record values and SHALL NOT be flattened to strings."
+    },
+    {
+      "id": "independent.sql512.engine_filterability",
+      "rule": "The native engine vocabulary follows the collected Item vocabulary so every collected engine value is representable in State predicates."
+    }
+  ]
+}

@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.2.0/collected-item.schema.json",
+  "x-scap-ng-version": "0.2.0",
+  "x-last-modified": "2026-10-05",
+  "title": "Draft canonical collected Item 0.2.0",
+  "description": "Reusable runtime Item shape. Capability-specific schemas may further constrain fields and statuses.",
+  "type": "object",
+  "required": [
+    "id",
+    "capability",
+    "status",
+    "fields",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "exists",
+        "does_not_exist",
+        "error",
+        "not_collected"
+      ]
+    },
+    "imported": {
+      "type": "boolean"
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "https://scap-ng.dev/schema/v0.2.0/result-types.schema.json#/$defs/typed_value"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "https://scap-ng.dev/schema/v0.2.0/result-types.schema.json#/$defs/typed_value"
+            }
+          }
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "name_resolution": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "source_field",
+              "target_context_ref",
+              "source_ref",
+              "observed_at"
+            ],
+            "properties": {
+              "source_field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "target_context_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "locators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "source_ref"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "text",
+                  "structured",
+                  "record"
+                ]
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path_language": {
+                "type": "string",
+                "minLength": 1
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "property": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "text"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "line"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path_language"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "structured"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "path",
+                    "path_language"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "line"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "column"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "record"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "index"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "line"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "column"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path_language"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "value_index"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "property"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "field"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "const": "record"
+                    }
+                  }
+                }
+              }
+            ],
+            "additionalProperties": false
+          }
+        },
+        "origin": {
+          "type": "object",
+          "required": [
+            "result_ref",
+            "item_ref"
+          ],
+          "properties": {
+            "result_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "item_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_execution_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "binding_set_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_completeness": {
+              "$ref": "result-types.schema.json#/$defs/completeness"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "source_digest"
+                ]
+              },
+              "then": {
+                "required": [
+                  "source_execution_ref",
+                  "binding_set_id",
+                  "source_completeness"
+                ]
+              }
+            }
+          ]
+        },
+        "import_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "result_ref",
+              "item_ref"
+            ],
+            "properties": {
+              "result_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "item_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_execution_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "binding_set_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_completeness": {
+                "$ref": "result-types.schema.json#/$defs/completeness"
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "source_digest"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "source_execution_ref",
+                    "binding_set_id",
+                    "source_completeness"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "imported"
+        ],
+        "properties": {
+          "imported": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "context"
+        ],
+        "properties": {
+          "context": {
+            "required": [
+              "origin"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
