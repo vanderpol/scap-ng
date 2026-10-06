@@ -142,6 +142,24 @@ def binary_guard_pattern(node):
         "guard_applicability_marked":bool(left.get("applicability_check") or right.get("applicability_check")),
     }
 
+def compact_tree(node):
+    if node.get("kind")=="group":
+        return {
+            "kind":"group",
+            "operator":node.get("operator"),
+            "negate":node.get("negate",False),
+            "applicability_check":node.get("applicability_check",False),
+            "children":[compact_tree(x) for x in node.get("children",[])],
+        }
+    return {
+        "kind":node.get("kind"),
+        "ref":node.get("ref"),
+        "negate":node.get("negate",False),
+        "applicability_check":node.get("applicability_check",False),
+        "comment":node.get("comment"),
+    }
+
+
 def structural_metrics(tree):
     nodes=list(walk(tree))
     groups=[n for n in nodes if n["kind"]=="group"]
@@ -242,7 +260,10 @@ def analyze(package):
                 m["nested_group_edges"] or m["or_groups"] or
                 m["applicability_marked_nodes"] or m["binary_guard_patterns"]
             ):
-                per.append({"definition":d.get("id"),**m})
+                row={"definition":d.get("id"),**m}
+                if m["branch_like_or_of_ands"] or m["binary_guard_patterns"]:
+                    row["criteria_tree"]=compact_tree(tree)
+                per.append(row)
         if not per: continue
         rows.append({
             "rule_id":rule["id"],
