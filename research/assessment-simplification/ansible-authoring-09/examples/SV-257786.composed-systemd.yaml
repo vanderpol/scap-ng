@@ -1,0 +1,34 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257786
+intent: RHEL 9 debug-shell systemd service must be disabled.
+
+check:
+  all:
+    - systemd:
+        unit: debug-shell.service
+        property: LoadState
+      expect:
+        exists: any
+        all:
+          value: masked
+
+    - systemd:
+        unit: debug-shell.service
+        property: UnitFileState
+      expect:
+        exists: any
+        all:
+          value: masked
+
+semantic_obligations:
+  boolean: all
+  per_check:
+    capability: linux.systemdunitproperty
+    source_existence: any_exist
+    source_test_check: all
+    expectation:
+      value:
+        operation: equal
+        datatype: string
+        entity_check: all
+        entity_existence: at_least_one_exists
