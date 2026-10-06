@@ -1,0 +1,147 @@
+name: OVAL multi-value variable-instance differential
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/for-each-audit-20261006
+    paths:
+      - "research/for-each-0.3.0/evidence/variable-instance/**"
+      - ".github/workflows/oval-variable-instance-differential.yml"
+
+jobs:
+  openscap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OpenSCAP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openscap-scanner
+          oscap --version
+
+      - name: Validate fixture where supported
+        continue-on-error: true
+        run: |
+          oscap oval validate research/for-each-0.3.0/evidence/variable-instance/multivalue-file-object.xml
+
+      - name: Execute fixture
+        run: |
+          mkdir -p work/variable-instance
+          oscap oval eval \
+            --results work/variable-instance/results.xml \
+            --report work/variable-instance/report.html \
+            research/for-each-0.3.0/evidence/variable-instance/multivalue-file-object.xml
+
+      - name: Summarize variable-instance representation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from lxml import etree as ET
+
+          p=Path("work/variable-instance/results.xml")
+          root=ET.parse(str(p)).getroot()
+
+          def ln(x):
+              return ET.QName(x).localname
+
+          collected=[]
+          for x in root.iter():
+              if ln(x)=="object" and x.get("id")=="oval:org.scapng.research:obj:1":
+                  vals=[
+                      {"variable_id":v.get("variable_id"),"value":(v.text or "")}
+                      for v in x
+                      if ln(v)=="variable_value"
+                  ]
+                  refs=[
+                      r.get("item_ref")
+                      for r in x
+                      if ln(r)=="reference"
+                  ]
+                  collected.append({
+                      "id":x.get("id"),
+                      "version":x.get("version"),
+                      "variable_instance":x.get("variable_instance","1(default)"),
+                      "flag":x.get("flag"),
+                      "variable_values":vals,
+                      "item_refs":refs,
+                  })
+
+          tests=[]
+          for x in root.iter():
+              if ln(x)=="test" and x.get("test_id")=="oval:org.scapng.research:tst:1":
+                  tested_vars=[
+                      {"variable_id":v.get("variable_id"),"value":(v.text or "")}
+                      for v in x
+                      if ln(v)=="tested_variable"
+                  ]
+                  tested_items=[
+                      {"item_id":v.get("item_id"),"result":v.get("result")}
+                      for v in x
+                      if ln(v)=="tested_item"
+                  ]
+                  tests.append({
+                      "test_id":x.get("test_id"),
+                      "version":x.get("version"),
+                      "variable_instance":x.get("variable_instance","1(default)"),
+                      "result":x.get("result"),
+                      "tested_variables":tested_vars,
+                      "tested_items":tested_items,
+                  })
+
+          definitions=[]
+          for x in root.iter():
+              if ln(x)=="definition" and x.get("definition_id")=="oval:org.scapng.research:def:1":
+                  definitions.append({
+                      "definition_id":x.get("definition_id"),
+                      "version":x.get("version"),
+                      "variable_instance":x.get("variable_instance","1(default)"),
+                      "result":x.get("result"),
+                  })
+
+          items=[]
+          ref_ids={ref for obj in collected for ref in obj["item_refs"]}
+          for x in root.iter():
+              if x.get("id") in ref_ids and ln(x).endswith("_item"):
+                  fields={}
+                  for child in x:
+                      if isinstance(child.tag,str):
+                          fields.setdefault(ln(child),[]).append((child.text or ""))
+                  items.append({
+                      "id":x.get("id"),
+                      "type":ln(x),
+                      "status":x.get("status"),
+                      "fields":fields,
+                  })
+
+          summary={
+              "evaluator":"OpenSCAP",
+              "fixture":"multivalue-file-object.xml",
+              "collected_object_instances":collected,
+              "test_instances":tests,
+              "definition_instances":definitions,
+              "referenced_items":items,
+              "observations":{
+                  "collected_object_instance_count":len(collected),
+                  "test_instance_count":len(tests),
+                  "definition_instance_count":len(definitions),
+                  "distinct_collected_variable_instances":sorted({o["variable_instance"] for o in collected}),
+                  "variable_values_per_collected_object":[len(o["variable_values"]) for o in collected],
+                  "item_refs_per_collected_object":[len(o["item_refs"]) for o in collected],
+              },
+              "caveat":"OpenSCAP is supporting implementation evidence, not normative authority for OVAL 5.12.3.",
+          }
+          Path("work/variable-instance/summary.json").write_text(json.dumps(summary,indent=2)+"\n")
+          print(json.dumps(summary,indent=2))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oval-variable-instance-differential
+          path: |
+            work/variable-instance/results.xml
+            work/variable-instance/report.html
+            work/variable-instance/summary.json
