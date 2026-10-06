@@ -219,6 +219,11 @@ class ForeachConverterModernization(unittest.TestCase):
         result, report = modernize_foreach_v1(source, enabled=True)
         self.assertTrue(report["rewrite_performed"], report)
         self.assertEqual(len(report["applied"]), 1)
+        self.assertEqual(report["stats"]["variables_total"],1)
+        self.assertEqual(report["stats"]["direct_projection_variables_examined"],1)
+        self.assertEqual(report["stats"]["rewrite_candidates_proven"],1)
+        self.assertEqual(report["stats"]["rewrites_applied"],1)
+        self.assertEqual(report["stats"]["rewrite_rate_pct_of_direct_projections"],100.0)
         assessment = result["assessment"]
         self.assertNotIn("variables", assessment)
         files = assessment["objects"]["files"]
@@ -246,6 +251,11 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertIn(
             "target_variable_match_not_any",
             report["review_required"][0]["reasons"],
+        )
+        self.assertEqual(report["stats"]["review_required_variables"],1)
+        self.assertEqual(
+            report["stats"]["review_reason_counts"]["target_variable_match_not_any"],
+            1,
         )
 
     def test_second_consumer_fails_closed(self):
