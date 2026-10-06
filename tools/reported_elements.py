@@ -73,7 +73,7 @@ def source_errors(assessment):
         if "reported_elements" not in test:
             continue
         if not modern:
-            errors.append(f"{identity}: reported_elements requires specification 0.2.0 or later")
+            errors.append(f"{identity}: reported_elements requires the draft 0.2.0 specification")
             continue
         try:
             validate_control(test["reported_elements"], test["capability"], version)
