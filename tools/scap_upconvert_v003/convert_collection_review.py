@@ -438,6 +438,118 @@ def convert_rule(
             result['source_defect_manual_fallback_assessment']=manual_ref
     return result, failed
 
+def aggregate_modernization_stats(evidence, *, foreach_enabled=False, conditional_enabled=False):
+    """Aggregate per-Assessment modernization reports for machine-readable CI use."""
+    stats = {
+        "format": "scap-ng-modernization-stats-0.1",
+        "foreach": None,
+        "conditional": None,
+    }
+
+    assessment_rows = [
+        assessment
+        for rule in evidence.get("rules", [])
+        for assessment in rule.get("assessments", [])
+        if isinstance(assessment, dict)
+    ]
+
+    if foreach_enabled:
+        totals = {
+            "assessments_examined": 0,
+            "assessments_rewritten": 0,
+            "variables_total": 0,
+            "direct_projection_variables_examined": 0,
+            "rewrite_candidates_proven": 0,
+            "rewrites_applied": 0,
+            "review_required_variables": 0,
+            "review_reason_counts": {},
+        }
+        for row in assessment_rows:
+            report = row.get("foreach_modernization")
+            if not isinstance(report, dict):
+                continue
+            totals["assessments_examined"] += 1
+            if report.get("rewrite_performed"):
+                totals["assessments_rewritten"] += 1
+            local = report.get("stats") or {}
+            for key in (
+                "variables_total",
+                "direct_projection_variables_examined",
+                "rewrite_candidates_proven",
+                "rewrites_applied",
+                "review_required_variables",
+            ):
+                totals[key] += int(local.get(key, 0) or 0)
+            for reason, count in (local.get("review_reason_counts") or {}).items():
+                totals["review_reason_counts"][reason] = (
+                    totals["review_reason_counts"].get(reason, 0) + int(count)
+                )
+        direct = totals["direct_projection_variables_examined"]
+        totals["rewrite_rate_pct_of_direct_projections"] = (
+            round(100.0 * totals["rewrites_applied"] / direct, 2)
+            if direct else 0.0
+        )
+        totals["assessment_rewrite_rate_pct"] = (
+            round(
+                100.0
+                * totals["assessments_rewritten"]
+                / totals["assessments_examined"],
+                2,
+            )
+            if totals["assessments_examined"] else 0.0
+        )
+        stats["foreach"] = totals
+
+    if conditional_enabled:
+        totals = {
+            "assessments_examined": 0,
+            "assessments_rewritten": 0,
+            "expression_nodes_examined": 0,
+            "branch_like_nodes_examined": 0,
+            "rewrite_candidates_proven": 0,
+            "rewrites_applied": 0,
+            "review_required_nodes": 0,
+            "applied_pattern_counts": {},
+            "review_reason_counts": {},
+        }
+        for row in assessment_rows:
+            report = row.get("conditional_modernization")
+            if not isinstance(report, dict):
+                continue
+            totals["assessments_examined"] += 1
+            if report.get("rewrite_performed"):
+                totals["assessments_rewritten"] += 1
+            local = report.get("stats") or {}
+            for key in (
+                "expression_nodes_examined",
+                "branch_like_nodes_examined",
+                "rewrite_candidates_proven",
+                "rewrites_applied",
+                "review_required_nodes",
+            ):
+                totals[key] += int(local.get(key, 0) or 0)
+            for field in ("applied_pattern_counts", "review_reason_counts"):
+                for name, count in (local.get(field) or {}).items():
+                    totals[field][name] = totals[field].get(name, 0) + int(count)
+        branch_like = totals["branch_like_nodes_examined"]
+        totals["rewrite_rate_pct_of_branch_like"] = (
+            round(100.0 * totals["rewrites_applied"] / branch_like, 2)
+            if branch_like else 0.0
+        )
+        totals["assessment_rewrite_rate_pct"] = (
+            round(
+                100.0
+                * totals["assessments_rewritten"]
+                / totals["assessments_examined"],
+                2,
+            )
+            if totals["assessments_examined"] else 0.0
+        )
+        stats["conditional"] = totals
+
+    return stats
+
+
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--input',type=Path,required=True)
@@ -643,10 +755,25 @@ def main(argv=None):
                     result['source_defect_manual_fallback_assessment']=manual_ref
             evidence['rules'].append(result)
     evidence['status']='blocked' if failed else 'prototype_dataflow_and_roundtrip_checks_passed'
+    modernization_stats = aggregate_modernization_stats(
+        evidence,
+        foreach_enabled=args.modernize_foreach_v1,
+        conditional_enabled=args.modernize_conditionals_v1,
+    )
+    if args.modernize_foreach_v1 or args.modernize_conditionals_v1:
+        evidence['modernization_stats'] = modernization_stats
+        (args.output/'modernization-stats.json').write_text(
+            json.dumps(modernization_stats,indent=2,sort_keys=True)+'\n',
+            encoding='utf-8',
+        )
     (args.output/'evidence.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({'status':evidence['status'],'rules':len(wanted),
+    print(json.dumps({
+        'status':evidence['status'],
+        'rules':len(wanted),
         'automated_assessments':sum(len(r['assessments']) for r in evidence['rules']),
-        'source_sha256':digest},indent=2))
+        'source_sha256':digest,
+        'modernization_stats':modernization_stats,
+    },indent=2))
     return 1 if failed else 0
 
 if __name__=='__main__':raise SystemExit(main())
