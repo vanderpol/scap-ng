@@ -61,6 +61,36 @@ jobs:
               report=json.loads(p.read_text())
               print(f'=== {name} ===')
               print(json.dumps(report['summary'], indent=2, sort_keys=True))
+              direct=[
+                  c for row in report['files'] for c in row.get('candidates',[])
+                  if c.get('candidate_family') == 'collection_expansion'
+              ]
+              for c in direct:
+                  targets=[
+                      {
+                          'object_type': t['object_type'],
+                          'entity': t['entity'],
+                          'var_check': t['var_check'],
+                          'tests': [
+                              {
+                                  'test_type': x['test_type'],
+                                  'check': x['check'],
+                                  'check_existence': x['check_existence'],
+                              }
+                              for x in t.get('tests',[])
+                          ],
+                      }
+                      for t in c.get('targets',[])
+                  ]
+                  print(json.dumps({
+                      'variable_id': c['variable_id'],
+                      'source_object_type': c['source']['object_type'],
+                      'item_field': c['source']['item_field'],
+                      'record_field': c['source']['record_field'],
+                      'source_sets': c['source']['object_features']['sets'],
+                      'source_filters': c['source']['object_features']['filters'],
+                      'targets': targets,
+                  }, sort_keys=True))
               assert report['rewrite_performed'] is False
               assert report['safe_automatic_enabled'] is False
           PY
