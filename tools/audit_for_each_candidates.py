@@ -52,6 +52,46 @@ def var_lineages(vid, variables, memo, stack=()):
     memo[vid]=ans
     return ans
 
+
+def variable_shape(el):
+    kind=local(el)
+    if kind=="constant_variable":
+        return "constant"
+    if kind=="external_variable":
+        return "external"
+    children=[x for x in el if isinstance(x.tag,str) and local(x)!="notes"]
+    if kind!="local_variable" or len(children)!=1:
+        return "other"
+    root=local(children[0])
+    if root=="object_component":
+        return "pure_object_projection"
+    if root=="variable_component":
+        return "pure_variable_alias"
+    if root=="literal_component":
+        return "pure_literal"
+    return "transform"
+
+def variable_consumer_roles(vid, objects, states, variables):
+    roles=[]
+    for oid,el in objects.items():
+        for x in el.iter():
+            a=attrs_local(x)
+            if a.get("var_ref")==vid:
+                roles.append({"kind":"object_selector","consumer":oid,"entity":local(x),"var_check":a.get("var_check") or "all(default)"})
+    for sid,el in states.items():
+        for x in el.iter():
+            a=attrs_local(x)
+            if a.get("var_ref")==vid:
+                roles.append({"kind":"state_expected_value","consumer":sid,"entity":local(x),"var_check":a.get("var_check") or "all(default)"})
+    for other,el in variables.items():
+        if other==vid:
+            continue
+        for x in el.iter():
+            a=attrs_local(x)
+            if local(x)=="variable_component" and a.get("var_ref")==vid:
+                roles.append({"kind":"variable_input","consumer":other,"entity":"variable_component"})
+    return roles
+
 def analyze_file(path):
     title=None
     prov=path.parent/"provenance.json"
@@ -130,6 +170,14 @@ def analyze_file(path):
         m=re.search(r'SV-\d+',part)
         if m: rid=m.group(0); break
     functions=sorted({local(x) for v in variables.values() for x in v.iter() if local(x) in {"arithmetic","begin","concat","count","end","escape_regex","glob_to_regex","merge","regex_capture","split","substring","time_difference","unique"}})
+    variable_roles=[]
+    for vid,vel in variables.items():
+        variable_roles.append({
+            "variable":vid,
+            "shape":variable_shape(vel),
+            "consumers":variable_consumer_roles(vid,objects,states,variables),
+            "lineage":[{"source_object":o,"field":f} for o,f in sorted(var_lineages(vid,variables,memo))],
+        })
     risk=[]
     if correlated: risk.append("correlated_binding")
     if nested: risk.append("nested_dependency")
@@ -138,7 +186,7 @@ def analyze_file(path):
     if functions: risk.append("variable_function")
     if any(e["var_check"] not in {"at least one","all(default)"} for e in edges): risk.append("nontrivial_var_check")
     disposition="candidate_for_equivalence_proof" if edges and not risk else "review_required_before_rewrite"
-    return {"file":str(path),"rule_id":rid,"title":title,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj,"intra_variable_multi_field_sources":intra_variable_multi_field,"variable_functions":functions,"rewrite_risk":risk,"preliminary_disposition":disposition}
+    return {"file":str(path),"rule_id":rid,"title":title,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj,"intra_variable_multi_field_sources":intra_variable_multi_field,"variable_functions":functions,"variable_roles":variable_roles,"rewrite_risk":risk,"preliminary_disposition":disposition}
 
 def main():
     ap=argparse.ArgumentParser()
@@ -157,7 +205,23 @@ def main():
         if r['multi_projection_sources']: classes['multi_projection']+=1
         if r['intra_variable_multi_field_sources']: classes['same_item_field_correlation']+=1
         if r['dependent_object_edges']: classes['dependent_collection']+=1
-    report={"label":args.label,"closure_files":len(files),"candidate_closures":len(candidates),"class_counts":dict(classes),"candidates":candidates}
+    role_counts=Counter()
+    role_consumers=Counter()
+    all_rows=[r for r in rows if not r.get("parse_error")]
+    for row in all_rows:
+        for vr in row.get("variable_roles",[]):
+            role_counts[vr["shape"]]+=1
+            for consumer in vr["consumers"]:
+                role_consumers[(vr["shape"],consumer["kind"])]+=1
+    report={
+        "label":args.label,
+        "closure_files":len(files),
+        "candidate_closures":len(candidates),
+        "class_counts":dict(classes),
+        "variable_shape_counts":dict(role_counts),
+        "variable_consumer_counts":{"|".join(k):v for k,v in sorted(role_consumers.items())},
+        "candidates":candidates,
+    }
     out=Path(args.output)
     out.parent.mkdir(parents=True,exist_ok=True)
     out.write_text(json.dumps(report,indent=2)+"\n")
