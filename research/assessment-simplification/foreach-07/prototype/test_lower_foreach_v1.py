@@ -24,10 +24,10 @@ class ForeachV1Prototype(unittest.TestCase):
                     "in": "non-system-users",
                 },
                 "select": {
-                    "path": {
+                    "directory": {
                         "from": "user.home_dir",
                     },
-                    "filename": {
+                    "name": {
                         "value": r"^\.[^\s\.]+",
                         "operation": "pattern_match",
                         "datatype": "string",
@@ -44,7 +44,7 @@ class ForeachV1Prototype(unittest.TestCase):
                 }
             },
         )
-        path = lowered["target_object"]["select"]["path"]
+        path = lowered["target_object"]["select"]["directory"]
         self.assertEqual(path["var_check"], "at least one")
         self.assertEqual(path["operation"], "equals")
         self.assertEqual(path["datatype"], "source-compatible")
@@ -61,7 +61,7 @@ class ForeachV1Prototype(unittest.TestCase):
                 {
                     "for_each": {"item": "user", "in": "users"},
                     "select": {
-                        "path": {
+                        "directory": {
                             "from": "user.home_dir",
                             "operation": "equals",
                         }
@@ -76,7 +76,7 @@ class ForeachV1Prototype(unittest.TestCase):
                 {
                     "for_each": {"item": "user", "in": "users"},
                     "select": {
-                        "path": {"from": "account.home_dir"},
+                        "directory": {"from": "account.home_dir"},
                     },
                 },
             )
@@ -88,7 +88,7 @@ class ForeachV1Prototype(unittest.TestCase):
                 {
                     "for_each": {"item": "user", "in": "users"},
                     "select": {
-                        "path": {"from": "user.home_dir"},
+                        "directory": {"from": "user.home_dir"},
                         "owner": {"from": "user.username"},
                     },
                 },
