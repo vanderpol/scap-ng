@@ -1,0 +1,368 @@
+#!/usr/bin/env python3
+"""Identify OVAL dataflow shapes that may be modernizable as SCAP-NG foreach.
+
+This is a read-only research analyzer. It does not rewrite OVAL or SCAP-NG.
+It intentionally fails closed: direct projection candidates remain
+"review_required" until a separately reviewed equivalence rule exists.
+
+The first modeled family is:
+
+    source Object
+      -> local_variable(object_component item_field=...)
+      -> target Object entity var_ref
+      -> Test(s) over the target Object
+
+This shape is interesting because the Variable can be representation plumbing
+for collection expansion. The analyzer preserves the aggregation boundary: it
+does NOT infer per-source-item Test evaluation.
+
+Usage:
+    python tools/analyze_oval_foreach_candidates.py FILE_OR_DIR [...]
+    python tools/analyze_oval_foreach_candidates.py ... --output report.json
+"""
+from __future__ import annotations
+
+import argparse
+from collections import Counter
+import json
+from pathlib import Path
+import sys
+import xml.etree.ElementTree as ET
+
+
+CROSS_PRODUCT_OR_MULTI_INPUT_OPS = {
+    "arithmetic",
+    "concat",
+    "merge",
+    "time_difference",
+}
+
+
+def local(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1] if "}" in tag else tag
+
+
+def iter_xml_inputs(paths: list[Path]) -> list[Path]:
+    out: list[Path] = []
+    for path in paths:
+        if path.is_dir():
+            out.extend(sorted(p for p in path.rglob("*.xml") if p.is_file()))
+        elif path.is_file():
+            out.append(path)
+        else:
+            raise FileNotFoundError(path)
+    # Preserve stable first occurrence when paths overlap.
+    seen = set()
+    unique = []
+    for path in out:
+        key = str(path.resolve())
+        if key not in seen:
+            seen.add(key)
+            unique.append(path)
+    return unique
+
+
+def section_nodes(root: ET.Element, section_name: str) -> list[ET.Element]:
+    for child in root:
+        if local(child.tag) == section_name:
+            return [x for x in child if isinstance(x.tag, str)]
+    return []
+
+
+def expression_shape(variable: ET.Element) -> dict:
+    children = [x for x in variable if isinstance(x.tag, str)]
+    if len(children) != 1:
+        return {
+            "kind": "invalid_component_count",
+            "count": len(children),
+            "automatic_blocker": True,
+        }
+
+    expr = children[0]
+    op = local(expr.tag)
+    if op == "object_component":
+        return {
+            "kind": "direct_object_projection",
+            "op": op,
+            "object_ref": expr.get("object_ref"),
+            "item_field": expr.get("item_field"),
+            "record_field": expr.get("record_field"),
+            "automatic_blocker": False,
+        }
+
+    object_components = []
+    operations = []
+    for node in expr.iter():
+        if not isinstance(node.tag, str):
+            continue
+        name = local(node.tag)
+        operations.append(name)
+        if name == "object_component":
+            object_components.append({
+                "object_ref": node.get("object_ref"),
+                "item_field": node.get("item_field"),
+                "record_field": node.get("record_field"),
+            })
+
+    return {
+        "kind": "derived_expression",
+        "op": op,
+        "operations": operations,
+        "object_components": object_components,
+        "cross_product_risk": any(x in CROSS_PRODUCT_OR_MULTI_INPUT_OPS for x in operations),
+        "automatic_blocker": True,
+    }
+
+
+def object_features(obj: ET.Element) -> dict:
+    filters = []
+    sets = []
+    behaviors = []
+    entities = []
+    for node in obj.iter():
+        if node is obj or not isinstance(node.tag, str):
+            continue
+        name = local(node.tag)
+        if name == "filter":
+            filters.append({
+                "action": node.get("action", "exclude"),
+                "state_ref": (node.text or "").strip() or None,
+            })
+        elif name == "set":
+            sets.append({
+                "operator": node.get("set_operator", "UNION"),
+                "operator_explicit": "set_operator" in node.attrib,
+            })
+        elif name == "behaviors":
+            behaviors.append(dict(sorted(node.attrib.items())))
+        elif node.get("var_ref"):
+            entities.append({
+                "name": name,
+                "var_ref": node.get("var_ref"),
+                "var_check": node.get("var_check") or "all",
+                "var_check_explicit": "var_check" in node.attrib,
+                "operation": node.get("operation") or "equals",
+                "datatype": node.get("datatype") or "string",
+            })
+    return {
+        "filters": filters,
+        "sets": sets,
+        "behaviors": behaviors,
+        "variable_entities": entities,
+    }
+
+
+def index_document(root: ET.Element) -> dict:
+    objects = {x.get("id"): x for x in section_nodes(root, "objects") if x.get("id")}
+    variables = {x.get("id"): x for x in section_nodes(root, "variables") if x.get("id")}
+    tests = {x.get("id"): x for x in section_nodes(root, "tests") if x.get("id")}
+
+    variable_consumers: dict[str, list[dict]] = {}
+    for object_id, obj in objects.items():
+        for node in obj.iter():
+            if not isinstance(node.tag, str):
+                continue
+            var_ref = node.get("var_ref")
+            if not var_ref:
+                continue
+            variable_consumers.setdefault(var_ref, []).append({
+                "context": "object_selector",
+                "object_id": object_id,
+                "object_type": local(obj.tag),
+                "entity": local(node.tag),
+                "operation": node.get("operation") or "equals",
+                "datatype": node.get("datatype") or "string",
+                "var_check": node.get("var_check") or "all",
+                "var_check_explicit": "var_check" in node.attrib,
+            })
+
+    target_tests: dict[str, list[dict]] = {}
+    for test_id, test in tests.items():
+        for child in test:
+            if local(child.tag) != "object":
+                continue
+            object_ref = child.get("object_ref")
+            if not object_ref:
+                continue
+            target_tests.setdefault(object_ref, []).append({
+                "test_id": test_id,
+                "test_type": local(test.tag),
+                "check": test.get("check"),
+                "check_existence": test.get("check_existence") or "at_least_one_exists",
+                "state_operator": test.get("state_operator") or "AND",
+            })
+
+    return {
+        "objects": objects,
+        "variables": variables,
+        "tests": tests,
+        "variable_consumers": variable_consumers,
+        "target_tests": target_tests,
+    }
+
+
+def classify_candidate(
+    variable_id: str,
+    variable: ET.Element,
+    index: dict,
+) -> dict | None:
+    consumers = index["variable_consumers"].get(variable_id, [])
+    if not consumers:
+        return None
+
+    shape = expression_shape(variable)
+    base = {
+        "variable_id": variable_id,
+        "variable_type": local(variable.tag),
+        "datatype": variable.get("datatype"),
+        "expression": shape,
+        "consumers": consumers,
+    }
+
+    if local(variable.tag) != "local_variable":
+        return {
+            **base,
+            "classification": "not_applicable",
+            "candidate_family": None,
+            "reasons": ["selector_variable_is_not_local_variable"],
+        }
+
+    if shape["kind"] != "direct_object_projection":
+        reasons = ["variable_expression_is_not_direct_object_component"]
+        if shape.get("cross_product_risk"):
+            reasons.append("multi_input_or_cartesian_semantics_may_be_present")
+        return {
+            **base,
+            "classification": "review_required",
+            "candidate_family": "derived_projection",
+            "reasons": reasons,
+        }
+
+    source_object_id = shape.get("object_ref")
+    source_obj = index["objects"].get(source_object_id)
+    if source_obj is None:
+        return {
+            **base,
+            "classification": "blocked",
+            "candidate_family": "collection_expansion",
+            "reasons": ["source_object_unresolved"],
+        }
+
+    target_details = []
+    for consumer in consumers:
+        target_object_id = consumer["object_id"]
+        target_obj = index["objects"].get(target_object_id)
+        target_details.append({
+            **consumer,
+            "object_features": object_features(target_obj),
+            "tests": index["target_tests"].get(target_object_id, []),
+        })
+
+    reasons = [
+        "direct_object_component_projection_into_object_selector",
+        "collection_aggregation_boundary_must_be_preserved",
+        "equivalence_fixture_required_before_safe_automatic",
+    ]
+    if len(consumers) > 1:
+        reasons.append("shared_projected_variable_has_multiple_target_consumers")
+    if any(c["var_check"] != "all" for c in consumers):
+        reasons.append("non_default_var_check_requires_explicit_equivalence_proof")
+
+    return {
+        **base,
+        "classification": "review_required",
+        "candidate_family": "collection_expansion",
+        "source": {
+            "object_id": source_object_id,
+            "object_type": local(source_obj.tag),
+            "item_field": shape.get("item_field"),
+            "record_field": shape.get("record_field"),
+            "object_features": object_features(source_obj),
+        },
+        "targets": target_details,
+        "reasons": reasons,
+    }
+
+
+def analyze_file(path: Path) -> dict:
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError as exc:
+        return {
+            "path": str(path),
+            "status": "parse_error",
+            "error": str(exc),
+            "candidates": [],
+        }
+
+    if local(root.tag) != "oval_definitions":
+        return {
+            "path": str(path),
+            "status": "not_oval_definitions",
+            "candidates": [],
+        }
+
+    index = index_document(root)
+    candidates = []
+    for variable_id, variable in sorted(index["variables"].items()):
+        candidate = classify_candidate(variable_id, variable, index)
+        if candidate is not None:
+            candidates.append(candidate)
+
+    counts = Counter(x["classification"] for x in candidates)
+    families = Counter(x.get("candidate_family") or "none" for x in candidates)
+    return {
+        "path": str(path),
+        "status": "ok",
+        "counts": dict(sorted(counts.items())),
+        "families": dict(sorted(families.items())),
+        "candidates": candidates,
+    }
+
+
+def summarize(files: list[dict]) -> dict:
+    classifications = Counter()
+    families = Counter()
+    parse_status = Counter()
+    candidate_files = 0
+    for row in files:
+        parse_status[row["status"]] += 1
+        if row.get("candidates"):
+            candidate_files += 1
+        for candidate in row.get("candidates", []):
+            classifications[candidate["classification"]] += 1
+            families[candidate.get("candidate_family") or "none"] += 1
+    return {
+        "files": len(files),
+        "files_with_candidates": candidate_files,
+        "parse_status": dict(sorted(parse_status.items())),
+        "classifications": dict(sorted(classifications.items())),
+        "families": dict(sorted(families.items())),
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("inputs", nargs="+", type=Path)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args(argv)
+
+    files = [analyze_file(path) for path in iter_xml_inputs(args.inputs)]
+    report = {
+        "format": "scap-ng-foreach-candidate-analysis-0.1",
+        "rewrite_performed": False,
+        "safe_automatic_enabled": False,
+        "summary": summarize(files),
+        "files": files,
+    }
+    encoded = json.dumps(report, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        sys.stdout.write(encoded)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
