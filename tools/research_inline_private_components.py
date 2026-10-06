@@ -84,6 +84,10 @@ def inline_private(doc: dict) -> tuple[dict, dict]:
     identity={
         "status":"research_only_not_accepted_design",
         "assessment_id":a.get("id"),
+        "original_sections_present":{
+            "objects":"objects" in a,
+            "states":"states" in a,
+        },
         "inlined_objects":{},
         "inlined_states":{},
         "shared_objects":[],
@@ -167,10 +171,15 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
 
     # Recreate original section order convention used by converter: objects,
     # variables, states, tests. Python equality ignores mapping order.
-    if objects:
+    present=identity.get("original_sections_present",{})
+    if objects or present.get("objects"):
         a["objects"]=objects
-    if states:
+    else:
+        a.pop("objects",None)
+    if states or present.get("states"):
         a["states"]=states
+    else:
+        a.pop("states",None)
     return out
 
 
