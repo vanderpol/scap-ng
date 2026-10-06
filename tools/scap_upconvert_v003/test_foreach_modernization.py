@@ -165,7 +165,7 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertIn("home-dirs", assessment["variables"])
         self.assertNotIn("for_each", assessment["objects"]["files-object"])
         self.assertEqual(
-            assessment["objects"]["files-object"]["select"]["directory"]["value"],
+            assessment["objects"]["files-object"]["select"]["path"]["value"],
             {"variable": "home-dirs"},
         )
 
@@ -218,7 +218,7 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertEqual(len(report["applied"]), 1)
         assessment = result["assessment"]
         self.assertNotIn("variables", assessment)
-        files = assessment["objects"]["files-object"]
+        files = assessment["objects"]["files"]
         self.assertEqual(
             files["for_each"],
             {"item": "user", "in": "users-object"},
