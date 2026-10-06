@@ -155,6 +155,38 @@ def eval_contains_exact_complement(node)->bool:
         return any(eval_contains_exact_complement(v) for v in node)
     return False
 
+def eval_operator_counts(node:Any)->Counter:
+    counts=Counter()
+    for item in walk(node):
+        if isinstance(item,dict):
+            for key in item:
+                if key in BOOL_KEYS:
+                    counts[key]+=1
+    return counts
+
+
+def count_bucket(value:int)->str:
+    if value==0: return "0"
+    if value==1: return "1"
+    if value==2: return "2"
+    if value<=5: return "3-5"
+    return "6+"
+
+
+def coarse_pattern(row:dict)->dict:
+    return {
+        "reasons": row["residual_reasons"],
+        "variable_kinds": sorted(row["variable_kinds"]),
+        "function_names": sorted(row["function_counts"]),
+        "set_bucket": count_bucket(row["sets"]),
+        "filter_bucket": count_bucket(row["filters"]),
+        "test_bucket": count_bucket(row["tests"]),
+        "evaluate_depth": row["evaluate_depth"],
+        "evaluate_operators": sorted(row["evaluate_operator_counts"]),
+        "capability_set": sorted(row["capabilities"]),
+    }
+
+
 def analyze(path:Path,doc:dict):
     a=doc.get("assessment") or {}
     mode=a.get("mode")
@@ -181,6 +213,7 @@ def analyze(path:Path,doc:dict):
     eval_node=a.get("evaluate")
     eval_depth=max_eval_depth(eval_node)
     exact_cond=eval_contains_exact_complement(eval_node)
+    eval_ops=eval_operator_counts(eval_node)
 
     capabilities=Counter()
     for node in walk(a):
@@ -218,6 +251,7 @@ def analyze(path:Path,doc:dict):
         "sets":sets,
         "filters":filters,
         "evaluate_depth":eval_depth,
+        "evaluate_operator_counts":dict(eval_ops),
         "exact_complement_conditional_shape":exact_cond,
         "capabilities":dict(capabilities),
         "residual_complex":residual,
@@ -244,10 +278,17 @@ def main():
 
     residual=[r for r in rows if r["residual_complex"]]
     clusters=defaultdict(list)
+    coarse_clusters=defaultdict(list)
+    reason_combinations=Counter()
     for row in residual:
         clusters[row["shape_fingerprint"]].append(row)
+        coarse=coarse_pattern(row)
+        coarse_fp=fingerprint(coarse)
+        coarse_clusters[coarse_fp].append(row)
+        reason_combinations[" + ".join(row["residual_reasons"])] += 1
 
     ranked=sorted(clusters.items(),key=lambda kv:(-len(kv[1]),kv[0]))
+    coarse_ranked=sorted(coarse_clusters.items(),key=lambda kv:(-len(kv[1]),kv[0]))
     reason_counts=Counter()
     function_counts=Counter()
     variable_kind_counts=Counter()
@@ -273,6 +314,18 @@ def main():
             "examples":[m["assessment_id"] for m in members[:10]],
         })
 
+    coarse_top=[]
+    for fp,members in coarse_ranked[:args.top]:
+        exemplar=members[0]
+        pattern=coarse_pattern(exemplar)
+        coarse_top.append({
+            "coarse_fingerprint":fp,
+            "count":len(members),
+            "percent_of_residual":round(100*len(members)/len(residual),2) if residual else 0.0,
+            **pattern,
+            "examples":[m["assessment_id"] for m in members[:15]],
+        })
+
     report={
         "format":"scap-ng-residual-complexity-pattern-census-0.1",
         "status":"research_only_not_accepted_design",
@@ -291,6 +344,9 @@ def main():
         "variable_kind_counts":dict(variable_kind_counts),
         "variable_function_counts":dict(function_counts),
         "unique_residual_shapes":len(clusters),
+        "unique_coarse_pattern_families":len(coarse_clusters),
+        "residual_reason_combinations":dict(reason_combinations),
+        "top_coarse_pattern_families":coarse_top,
         "top_residual_shapes":top,
         "all_residual_rows":[{
             k:v for k,v in row.items() if k!="shape"
@@ -304,7 +360,11 @@ def main():
         "residual_complex_assessments":len(residual),
         "residual_complex_percent":report["residual_complex_percent"],
         "unique_residual_shapes":len(clusters),
-        "top_shapes":[{"count":x["count"],"reasons":x["residual_reasons"],"examples":x["examples"][:3]} for x in top[:10]],
+        "unique_coarse_pattern_families":len(coarse_clusters),
+        "top_pattern_families":[
+            {"count":x["count"],"reasons":x["reasons"],"functions":x["function_names"],"capabilities":x["capability_set"],"examples":x["examples"][:3]}
+            for x in coarse_top[:10]
+        ],
     },indent=2))
 
 if __name__=="__main__":
