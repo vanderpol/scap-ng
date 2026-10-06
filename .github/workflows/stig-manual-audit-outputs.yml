@@ -128,3 +128,70 @@ jobs:
             work/active-directory-forest-audit.html
             work/active-directory-forest-audit.xlsx
           if-no-files-found: error
+
+  google-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install focused dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
+
+      - name: Download pinned Cyber Exchange Google Chrome V2R11 STIG
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Google_Chrome_V2R11_STIG.zip" \
+            -o work/U_Google_Chrome_V2R11_STIG.zip
+          echo "04F577373EC9A151EFF12481AE377B69D119B3EA7B114D8476FAA59FB34E109D  work/U_Google_Chrome_V2R11_STIG.zip" \
+            | sha256sum --check -
+
+      - name: Convert Chrome manual XCCDF
+        run: |
+          python tools/stig_manual_to_scapng.py \
+            work/U_Google_Chrome_V2R11_STIG.zip \
+            --output-dir work/google-chrome-native
+
+      - name: Verify strict Chrome conversion audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("work/google-chrome-native")
+          audit = json.loads((root / "conversion-audit.json").read_text())
+          summary = json.loads((root / "conversion-summary.json").read_text())
+          assert audit["success"] is True, audit
+          assert not any(audit["unhandled_constructs"].values()), audit["unhandled_constructs"]
+          assert audit["schema_validation"]["valid"] is True, audit["schema_validation"]
+          assert summary["rules"] > 7, summary
+          assert summary["manual_assessments"] == summary["rules"], summary
+          print("Google Chrome strict conversion audit: PASS", summary["rules"])
+          PY
+
+      - name: Render optional Chrome audit outputs
+        run: |
+          python tools/render_stig_audit_outputs.py \
+            work/google-chrome-native \
+            --html work/google-chrome-audit.html \
+            --xlsx work/google-chrome-audit.xlsx
+
+      - name: Upload Chrome probe artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-chrome-stig-manual-probe
+          path: |
+            work/google-chrome-native/**
+            work/google-chrome-audit.html
+            work/google-chrome-audit.xlsx
+          if-no-files-found: warn
+

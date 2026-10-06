@@ -61,6 +61,18 @@ def main() -> int:
 
         run(str(CONVERTER), str(source), "--output-dir", str(native))
 
+        audit = yaml.safe_load((native / "conversion-audit.json").read_text(encoding="utf-8"))
+        assert audit["success"] is True
+        assert audit["unhandled_constructs"] == {
+            "benchmark_children": [],
+            "profile_children": [],
+            "rule_children": [],
+            "check_children": [],
+        }
+        assert audit["counts"]["source_rules"] == 1
+        assert audit["counts"]["native_rules"] == 1
+        assert audit["schema_validation"]["valid"] is True
+
         benchmark = yaml.safe_load((native / "benchmark.yaml").read_text(encoding="utf-8"))
         benchmark_schema = yaml.safe_load((ROOT / "schema/v0.2.0/benchmark.schema.json").read_text(encoding="utf-8"))
         assert not list(Draft202012Validator(benchmark_schema).iter_errors(benchmark))
@@ -128,6 +140,36 @@ def main() -> int:
             assert "unknown" in lookup
             assert "Evidence / Notes" in sheet
             assert "Evaluator / Reviewer" in sheet
+
+        rejected_source = root / "rejected.xml"
+        rejected_native = root / "rejected-native"
+        rejected_source.write_text(
+            XCCDF.replace(
+                "<check-content>Inspect Schema Admins.",
+                "<check-export value-id=\"unsupported-value\"/><check-content>Inspect Schema Admins.",
+            ),
+            encoding="utf-8",
+        )
+        rejected = subprocess.run(
+            [
+                sys.executable,
+                str(CONVERTER),
+                str(rejected_source),
+                "--output-dir",
+                str(rejected_native),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert rejected.returncode != 0
+        rejected_audit = yaml.safe_load(
+            (rejected_native / "conversion-audit.json").read_text(encoding="utf-8")
+        )
+        assert rejected_audit["success"] is False
+        assert rejected_audit["unhandled_constructs"]["check_children"] == ["check-export"]
+        assert rejected_audit["schema_validation"]["not_run_reason"]
+        assert rejected_audit["source"]["source_sha256"]
 
     print("STIG manual conversion + HTML/XLSX focused regression: PASS")
     return 0

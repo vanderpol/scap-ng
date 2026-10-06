@@ -336,3 +336,10 @@ GitHub is the durable system of record for work performed through ChatGPT and Co
 
 For ChatGPT/web Codex handoffs, read transition/README.md and transition/decisions.md after CURRENT-DESIGN. Treat archived issue/conversation summaries and pinned historical documents as evidence, not current implementation proof. Recover latest owner corrections before restoring an older feature. Owner Oct 1 correction: Tailoring cannot override publisher Parameter values; delegated values use Organizational Input and changed requirements need distinct policy identity. Preserve Rule role as the working informational policy control pending an agreed replacement. Update the handoff with exact commit, validation evidence, blockers and next step when changing interfaces.
 
+## DISA STIG manual source provenance
+
+- DISA STIG manual source artifacts used for SCAP-NG conversion, regression testing, semantic comparison, or provenance evidence SHALL be obtained directly from the DISA Cyber Exchange at `cyber.mil` (including official DISA download endpoints hosted for Cyber Exchange).
+- Third-party mirrors, archives, transformed copies, or downstream projects SHALL NOT be used as the authoritative source for DISA STIG manual XCCDF.
+- If an older or current manual STIG artifact is no longer downloadable from Cyber Exchange, document the source-availability gap and choose another Cyber Exchange-hosted STIG for testing rather than substituting a third-party copy.
+- Third-party repositories MAY be consulted only as non-authoritative research context and SHALL NOT be used to establish source provenance, checksums, release identity, or conversion fidelity for DISA STIG manuals.
+
