@@ -1913,7 +1913,7 @@ def functional_group(rec):
             return gid, group_title
     return "needs-grouping", "Needs Grouping"
 
-def build_groups(selected):
+def build_groups(selected, *, include_unmapped=True):
     parents = {
         "automated": {"id": "automated", "title": "Automated", "groups": {}},
         "manual-or-managerial": {
@@ -1930,6 +1930,16 @@ def build_groups(selected):
         )
         parent_id = "manual-or-managerial" if default is None or check_kind(default) == "manual" else "automated"
         topic_id, topic_title = functional_group(rec)
+        if topic_id == "needs-grouping" and not include_unmapped:
+            evidence.append({
+                "rule": rec["id"],
+                "assessment_group": parent_id,
+                "functional_group": None,
+                "method": "heuristic",
+                "mapped": False,
+                "reason": "no_high_confidence_topic",
+            })
+            continue
         subgroup_id = f"{parent_id}.{topic_id}"
         subgroup = parents[parent_id]["groups"].setdefault(
             subgroup_id,
@@ -1941,6 +1951,7 @@ def build_groups(selected):
             "assessment_group": parent_id,
             "functional_group": subgroup_id,
             "method": "heuristic",
+            "mapped": topic_id != "needs-grouping",
         })
 
     output = []
