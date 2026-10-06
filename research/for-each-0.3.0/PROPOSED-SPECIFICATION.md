@@ -95,7 +95,31 @@ Object-field Variables were single-use Object-selector or State-expected-value
 plumbing candidates. Five additional pure projections feed one Variable
 expression and remain a separate proof class.
 
-These are corpus counts, not claims that every candidate may be removed.
+The enriched 65-package P1 pass completed all 65 packages successfully and
+emitted exact lowering metadata for those candidates. Across the 162 first-class
+P1 candidates:
+
+- 139 use OVAL datatype `string`;
+- 23 use OVAL datatype `int`;
+- 162/162 have exact effective Variable/consumer datatype agreement;
+- none rely on a datatype mismatch or missing datatype;
+- value quantifiers are inherited `all`, explicit `all`, or
+  `at least one`;
+- consumer operations remain unchanged by normalization.
+
+The pinned OVAL Self-Assertion object_component fixture at revision
+`e3538595c5083b9c34d937a81d319234df9bbfaa` independently exercises one/many
+Items crossed with one/many matching entity values. That fixture supports the
+required flattened value-set model and does not encode lexical row correlation.
+
+The production-shaped RHEL 9 SV-257889 native sample was also normalized by the
+research P1 implementation: two one-use home-directory Variables were removed,
+their Object/field projections were inlined, and their existing consumer
+quantifiers were retained without creating Binding scope.
+
+The five projection-to-expression cases, reusable projections, direct Variable
+Tests, Variable-backed Objects, and the 845 single-use transform candidates
+remain outside this initial automatic P1 class.
 
 ## 3. Terminology
 
@@ -217,14 +241,25 @@ ObjectComponentType for migrated content:
    the requested record field. A missing record field SHALL make Projection
    resolution error.
 5. All matching values SHALL contribute to one flattened value set.
+   Projection SHALL preserve source value multiplicity unless the inherited
+   source semantics explicitly define deduplication.
 6. Projection SHALL NOT retain source-Item identity as semantic correlation.
-7. The Projection's effective datatype SHALL be compatible with the consuming
-   value position.
-8. The consuming entity's value-set comparison quantifier SHALL apply exactly
-   as it would to an equivalent Variable value set.
-9. Collection error/unknown/not-collected/not-applicable status SHALL propagate
-   according to the applicable Assessment semantics; it SHALL NOT be converted
-   into an empty value set.
+7. A Projection used to replace an OVAL Variable SHALL be evaluated in the same
+   effective input/Variable-binding invocation context as that Variable.
+   Values from distinct OVAL `variable_instance` contexts SHALL NOT be
+   unioned merely because the same authored Object is referenced.
+8. The Projection's effective datatype SHALL be the datatype required by its
+   typed consuming value position. For P1 migration, that datatype SHALL match
+   the removed OVAL Variable's declared datatype exactly after the defined
+   OVAL-to-NG datatype mapping.
+9. Every projected value SHALL satisfy the same datatype contract that applied
+   to the removed OVAL Variable. A value that would make the source Variable an
+   error SHALL make the normalized Projection resolution an error.
+10. The consuming entity's value-set comparison quantifier SHALL apply exactly
+    as it would to an equivalent Variable value set.
+11. Collection error/unknown/not-collected/not-applicable status SHALL propagate
+    according to the applicable Assessment semantics; it SHALL NOT be converted
+    into an empty value set.
 
 ### 5.3 Projection is not a Binding
 
@@ -260,11 +295,16 @@ Projection only when all of the following are machine-proven:
    Variable-backed Test/Object construct;
 8. no Variable component, filter, Set, dependency, or other reachable node also
    references it;
-9. datatype is preserved exactly;
-10. the consumer's operation and value-set quantifier are preserved exactly;
-11. the Projection implements the zero-Item, missing-field, record-field, and
-    status rules in section 5;
-12. source Variable identity/comment/version are retained in migration
+9. the removed Variable's declared datatype maps exactly to the consumer's
+   effective native datatype;
+10. every projected value is validated against that same datatype contract;
+11. the consumer's operation and value-set quantifier are preserved exactly;
+12. the Projection remains in the same effective input/Variable-binding
+    invocation context and SHALL NOT union distinct OVAL `variable_instance`
+    contexts;
+13. the Projection implements the zero-Item, missing-field, record-field,
+    multiplicity, and status rules in section 5;
+14. source Variable identity/comment/version are retained in migration
     provenance even though the executable native Variable node is removed.
 
 A failure of any precondition SHALL cause the converter to preserve the named
@@ -272,6 +312,13 @@ Variable.
 
 This transformation is **P1 structural normalization**. It does not create Item
 scope and is not for_each.
+
+**Initial automatic P1 proof envelope.** The first converter implementation
+SHOULD enable automatic P1 only for datatypes and consumer contexts covered by
+the conformance suite. The current production-corpus proof envelope is OVAL
+`string` and `int` projected into one Object-selector or State-expected-value
+consumer with exact datatype agreement. Other datatypes or projection consumers
+remain preserve/review until equivalent proof is added.
 
 ## 7. Scoped iteration
 
@@ -667,8 +714,9 @@ the source OVAL for the complete proof family.
 The recommended 0.3.0 direction is:
 
 - adopt Projection as a first-class flattened value source;
-- permit automatic P1 normalization only for fully proven single-use
-  object_component plumbing;
+- enable automatic P1 normalization for the proven fail-closed single-use
+  object_component -> Object/State Projection class, initially within the
+  string/int proof envelope;
 - adopt lexical scoped for_each as a native authoring/evaluation construct;
 - keep named Variables for inputs, reuse, direct Variable Tests and meaningful
   transformations;
