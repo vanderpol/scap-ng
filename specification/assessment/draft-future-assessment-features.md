@@ -17,6 +17,20 @@ illustrative `assessment_result`/`equals` form below is superseded in that draft
 by the ordinary `assessment` alias leaf. This does not amend v0.1.0, establish
 Board ratification, or declare a released v0.2.0 implementation.
 
+Production-shape research, 2026-10-06:
+[conditional-shaped OVAL criteria census](../../research/assessment-simplification/conditional-10/README.md).
+Across 1,537 representative automated OVAL-backed Rules, 114 use nested
+criteria, 29 contain OR-of-AND branch structures, and manual review classifies
+19 of those 29 as clear environment/requirement conditionals, eight as
+alternative compliance paths, and two as requiring deeper semantic review.
+Only nine match a strict same-guard positive/negative binary shape. The generic
+six-state truth comparison confirms that neither procedural if/else nor
+applicability-scoped branch selection is a generally lossless rewrite of
+`OR(AND(G,P),AND(NOT G,Q))`; both agree in 135 of 216 generic outcome
+combinations and differ in 81. This evidence supports source-authored
+conditional/applicability ergonomics but does not reverse the decision against
+general automatic conditional normalization.
+
 Owner-directed 2026-10-03 experiment:
 [conditional known-result content](../../tests/conditional-0.2.0/README.md).
 It demonstrates six-state guard handling, nested/dependent conditions, skipped
