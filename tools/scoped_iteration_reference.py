@@ -25,6 +25,25 @@ TECHNICAL_OUTCOMES = {
     TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE
 }
 
+_CHECK_ALIASES = {
+    "all": "all",
+    "at_least_one": "at least one",
+    "at least one": "at least one",
+    "only_one": "only one",
+    "only one": "only one",
+    "none_satisfy": "none satisfy",
+    "none satisfy": "none satisfy",
+}
+
+
+def canonical_check_semantics(value):
+    """Map provisional NG token spelling to inherited OVAL check semantics."""
+    try:
+        return _CHECK_ALIASES[value]
+    except KeyError as exc:
+        raise ValueError(f"unsupported scoped check: {value}") from exc
+
+
 
 def evaluate_complete_scope(
     *,
@@ -86,7 +105,7 @@ def evaluate_complete_scope(
             "complete scope requires one body outcome for each existing source Item"
         )
 
-    outcome = aggregate_check(check, vals)
+    outcome = aggregate_check(canonical_check_semantics(check), vals)
     return {
         "outcome": outcome,
         "existence_outcome": TRUE,
@@ -149,7 +168,7 @@ def evaluate_partial_scope(
             "population_complete": False,
         }
 
-    decisive = decisive_partial_check(check, vals)
+    decisive = decisive_partial_check(canonical_check_semantics(check), vals)
     if decisive is None:
         return {
             "outcome": UNKNOWN,
