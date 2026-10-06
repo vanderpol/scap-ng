@@ -25,7 +25,7 @@ Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10
 
 | Branch | Status | Purpose / relationship to main | Disposition |
 | --- | --- | --- | --- |
-| `feature/optional-auto-map-groups` | active | Add opt-in `--auto-map-groups` normalization to conversion tools; default conversion remains faithful and does not invent grouping. | Merge via PR after focused converter tests and fast integration regression. |
+| `feature/optional-auto-map-groups` | ready-to-merge | Add opt-in `--auto-map-groups` normalization to conversion tools; default conversion remains faithful and does not invent grouping. Focused Forest/Chrome manual regression is green. | Merge via PR after current-design and representative conversion regression gates. |
 | `feature/stig-manual-conversion-audit-161` | merged/stale | Issue #161: strict conversion-audit artifact and nested legacy-XCCDF loss guard; validated with Cyber Exchange AD Forest V3R2 and Google Chrome V2R11. Merged through PR #162. | Safe cleanup candidate after merge verification. |\n| `feature/stig-manual-audit-outputs-159` | merged/stale | Issue #159: optional native-NG HTML and XLSX manual-audit outputs; merged through PR #160. | Safe cleanup candidate after merge verification. |
 | `assessment-reference-20261003` | merged/stale | Assessment reference documentation; fully behind main. | Safe cleanup candidate after freeze. |
 | `assessment-results-0.2-20261003` | merged/stale | Assessment Results work; fully behind main. | Safe cleanup candidate after freeze. |
