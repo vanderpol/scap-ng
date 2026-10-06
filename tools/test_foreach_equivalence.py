@@ -150,6 +150,7 @@ class DirectForeachDesugaring(unittest.TestCase):
 
     def test_first_proof_class_preconditions_are_fail_closed(self):
         eligible = {
+            "variable_id": "oval:test:var:1",
             "candidate_family": "collection_expansion_at_least_one",
             "expression": {
                 "kind": "direct_object_projection",
@@ -159,6 +160,12 @@ class DirectForeachDesugaring(unittest.TestCase):
                 {
                     "context": "object_selector",
                     "var_check": "at least one",
+                    "tests": [{"test_id": "oval:test:tst:1"}],
+                    "object_features": {
+                        "variable_entities": [
+                            {"var_ref": "oval:test:var:1"}
+                        ]
+                    },
                 }
             ],
         }
@@ -189,6 +196,28 @@ class DirectForeachDesugaring(unittest.TestCase):
             result = direct_foreach_preconditions(candidate)
             self.assertFalse(result["eligible"])
             self.assertIn(reason, result["reasons"])
+
+        helper_target = {
+            **eligible,
+            "targets": [
+                {
+                    "context": "object_selector",
+                    "var_check": "at least one",
+                    "tests": [],
+                    "object_features": {
+                        "variable_entities": [
+                            {"var_ref": "oval:test:var:1"}
+                        ]
+                    },
+                }
+            ],
+        }
+        result = direct_foreach_preconditions(helper_target)
+        self.assertFalse(result["eligible"])
+        self.assertIn(
+            "first_proof_class_requires_directly_tested_target",
+            result["reasons"],
+        )
 
 
 class DownstreamTestResultEquivalence(unittest.TestCase):
