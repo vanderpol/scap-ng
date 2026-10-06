@@ -13,34 +13,44 @@ from generate_capability_schema import generate
 from capability_registry import load_mapping
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTROL = json.loads((ROOT / "schema/v0.2.0/reported-elements.schema.json").read_text())
-EXTENSIONS = json.loads((ROOT / "schema/v0.2.0/result-field-extensions.json").read_text())["capabilities"]
+@lru_cache(maxsize=None)
+def control_schema(version="0.2.0"):
+    return json.loads(
+        (ROOT / f"schema/v{version}/reported-elements.schema.json").read_text()
+    )
 
 
 @lru_cache(maxsize=None)
-def capability_fields(capability):
+def result_extensions(version="0.2.0"):
+    return json.loads(
+        (ROOT / f"schema/v{version}/result-field-extensions.json").read_text()
+    )["capabilities"]
+
+
+@lru_cache(maxsize=None)
+def capability_fields(capability, version="0.2.0"):
     if not isinstance(capability, str) or not capability:
         raise ValueError("A capability identifier is required")
-    mapping = load_mapping(capability)
-    generated = generate(mapping, ROOT)
+    mapping = load_mapping(capability, version)
+    generated = generate(mapping, ROOT, schema_version=version)
     item = generated.get("$defs", {}).get("collected_item")
     fields = set()
     for fragment in (item or {}).get("allOf", []):
         fields.update(fragment.get("properties", {}).get("fields", {}).get("properties", {}))
-    names = EXTENSIONS.get(capability, {})
+    names = result_extensions(version).get(capability, {})
     if not set(names.values()) <= fields or set(names) & fields:
         raise ValueError(f"Invalid reviewed result-only extensions for {capability}")
     return frozenset(fields | set(names))
 
 
-def validate_control(control, capability):
-    Draft202012Validator(CONTROL).validate(control)
+def validate_control(control, capability, version="0.2.0"):
+    Draft202012Validator(control_schema(version)).validate(control)
     # "all" and "compared" do not name capability fields, so they remain valid
     # for explicitly permitted conversion-only capability vocabulary. Only an
     # authored field list needs capability-specific field-name validation.
     if not isinstance(control, list):
         return
-    known = capability_fields(capability)
+    known = capability_fields(capability, version)
     if not set(control) <= known:
         raise ValueError(f"Unknown reported elements for {capability}: {sorted(set(control) - known)}")
 
@@ -48,28 +58,31 @@ def validate_control(control, capability):
 def source_errors(assessment):
     """Validate all authored Test controls, including unexecuted Tests."""
     errors = []
+    version = assessment.get("specification", {}).get("version")
+    modern = version in {"0.2.0", "0.3.0"}
     for identity, test in assessment.get("tests", {}).items():
-        if assessment.get("specification", {}).get("version") == "0.2.0" and "reported_elements" not in test:
-            errors.append(f"{identity}: reported_elements is required in 0.2.0")
+        if modern and "reported_elements" not in test:
+            errors.append(f"{identity}: reported_elements is required in {version}")
             continue
         if "reported_elements" not in test:
             continue
-        if assessment.get("specification", {}).get("version") != "0.2.0":
-            errors.append(f"{identity}: reported_elements requires the draft 0.2.0 specification")
+        if not modern:
+            errors.append(f"{identity}: reported_elements requires specification 0.2.0 or later")
             continue
         try:
-            validate_control(test["reported_elements"], test["capability"])
+            validate_control(test["reported_elements"], test["capability"], version)
         except (ValueError, KeyError, ValidationError) as exc:
             errors.append(f"{identity}: {exc}")
     return errors
 
 
-def generate_reporting_capability(mapping, root=ROOT):
+def generate_reporting_capability(mapping, root=ROOT, version=None):
     """Versioned Test-schema overlay; Object and State contracts stay identical."""
-    generated = generate(mapping, root, schema_version="0.2.0")
+    version = version or mapping.get("specification_version", "0.2.0")
+    generated = generate(mapping, root, schema_version=version)
     schema = copy.deepcopy(generated)
-    schema["$id"] = f"https://scap-ng.dev/schema/v0.2.0/capabilities/{mapping['capability']}.schema.json"
-    known = sorted(capability_fields(mapping["capability"]))
+    schema["$id"] = f"https://scap-ng.dev/schema/v{version}/capabilities/{mapping['capability']}.schema.json"
+    known = sorted(capability_fields(mapping["capability"], version))
     schema["$defs"]["test"]["properties"]["reported_elements"] = {
         "oneOf": [{"enum": ["all", "compared"]},
                   {"type": "array", "items": {"enum": known} if known else False, "uniqueItems": True}],
@@ -98,6 +111,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
     lineage; this routine never guesses it from authored expressions.
     """
     errors = source_errors(assessment)
+    version = assessment.get("specification", {}).get("version") or "0.2.0"
     if errors:
         raise ValueError("; ".join(errors))
     if not isinstance(source_execution_ref, str) or not source_execution_ref:
@@ -109,7 +123,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
         if item["id"] in indexed:
             raise ValueError(f"Duplicate Item identity: {item['id']}")
         _check_redaction(item)
-        if not set(item["fields"]) <= capability_fields(item["capability"]):
+        if not set(item["fields"]) <= capability_fields(item["capability"], version):
             raise ValueError(f"Unknown Item fields: {item['id']}")
         for name, source in EXTENSIONS.get(item["capability"], {}).items():
             if name not in item["fields"]:
@@ -135,7 +149,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
         if relationship == "direct" and test["capability"] != item["capability"]:
             raise ValueError("Field-use lineage capability mismatch")
         for key in ("used_elements", "required_elements"):
-            validate_control(use[key], item["capability"])
+            validate_control(use[key], item["capability"], version)
             if not isinstance(use[key], list):
                 raise ValueError("Field-use lineage must contain explicit arrays")
         used = set(use["used_elements"])
