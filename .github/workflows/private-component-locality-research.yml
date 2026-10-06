@@ -82,7 +82,21 @@ jobs:
           KEY: ${{ matrix.key }}
           LABEL: ${{ matrix.label }}
         run: |
-          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY"             --output "work/research/$KEY"             --count 10             --label "$LABEL"
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/research/$KEY" \
+            --count 10 \
+            --label "$LABEL"
+      - name: Measure all STIG Rule Assessments without bulk output
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/census/$KEY" \
+            --all-assessments \
+            --metrics-only \
+            --label "$LABEL"
+          cp "work/census/$KEY/report.json" "work/research/$KEY/census-report.json"
       - uses: actions/upload-artifact@v4
         with:
           name: private-component-locality-${{ matrix.key }}
@@ -103,27 +117,35 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
-          totals={}
-          for r in reports:
-              for k,v in r["summary"].items():
-                  if isinstance(v,(int,float)) and not k.endswith("_percent"):
-                      totals[k]=totals.get(k,0)+v
-          def reduction(b,a):
-              return round(100*(b-a)/b,1) if b else 0.0
-          summary={
-              **totals,
-              "cross_reference_reduction_percent":reduction(totals.get("cross_refs_before",0),totals.get("cross_refs_after",0)),
-              "line_reduction_percent":reduction(totals.get("lines_before",0),totals.get("lines_after",0)),
-              "byte_reduction_percent":reduction(totals.get("bytes_before",0),totals.get("bytes_after",0)),
-              "object_scope_reduction_percent":reduction(totals.get("objects_before",0),totals.get("objects_after",0)),
-              "state_scope_reduction_percent":reduction(totals.get("states_before",0),totals.get("states_after",0)),
-          }
+          sample_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
+          census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("census-report.json"))]
+          def aggregate(reports):
+              totals={}
+              for r in reports:
+                  for k,v in r["summary"].items():
+                      if isinstance(v,(int,float)) and not k.endswith("_percent"):
+                          totals[k]=totals.get(k,0)+v
+              def reduction(b,a):
+                  return round(100*(b-a)/b,1) if b else 0.0
+              return {
+                  **totals,
+                  "cross_reference_reduction_percent":reduction(totals.get("cross_refs_before",0),totals.get("cross_refs_after",0)),
+                  "line_reduction_percent":reduction(totals.get("lines_before",0),totals.get("lines_after",0)),
+                  "byte_reduction_percent":reduction(totals.get("bytes_before",0),totals.get("bytes_after",0)),
+                  "object_scope_reduction_percent":reduction(totals.get("objects_before",0),totals.get("objects_after",0)),
+                  "state_scope_reduction_percent":reduction(totals.get("states_before",0),totals.get("states_after",0)),
+              }
           out={
-              "format":"scap-ng-inline-private-components-aggregate-0.1",
+              "format":"scap-ng-inline-private-components-aggregate-0.2",
               "status":"research_only_not_accepted_design",
-              "packages":[{"label":r["label"],"summary":r["summary"]} for r in reports],
-              "summary":summary,
+              "sample":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in sample_reports],
+                  "summary":aggregate(sample_reports),
+              },
+              "full_census":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in census_reports],
+                  "summary":aggregate(census_reports),
+              },
           }
           Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
           print(json.dumps(out,indent=2,sort_keys=True))
