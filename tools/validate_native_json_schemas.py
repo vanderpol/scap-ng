@@ -103,6 +103,7 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
             if declared_version in modern_versions
             else frozenset()
         )
+        legacy_v02_drafts = draft_capabilities(version="0.2.0")
         for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
             nodes = assessment.get(section, {})
             if not isinstance(nodes, dict):
@@ -112,9 +113,9 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                 if not isinstance(capability, str):
                     continue
                 if declared_version not in modern_versions:
-                    if capability in draft:
+                    if capability in legacy_v02_drafts:
                         yield ValidationError(
-                            "New capability requires specification 0.2.0 or later",
+                            "New capability requires specification 0.2.0",
                             path=["assessment", section, identity],
                         )
                     continue
