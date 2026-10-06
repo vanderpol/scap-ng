@@ -55,9 +55,9 @@ objects:
       item: user
       in: non_system_users
     select:
-      path:
+      directory:
         from: user.home_dir
-      filename:
+      name:
         operation: pattern_match
         value: '^\\.[^\\s\\.]+'
 ```
