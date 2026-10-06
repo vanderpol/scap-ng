@@ -938,6 +938,47 @@ def main() -> int:
         ],
     }
 
+    normalizer_stats = {
+        "format": "scap-ng-normalizer-stats-0.1",
+        "tool": "scap_ng_repo_normalizer",
+        "mode": "exact-rewrite" if args.rewrite else "dry-run-exact-plan",
+        "examined": {
+            "benchmarks": len(benchmarks),
+            "rules": sum(len(x["rules"]) for x in benchmarks),
+            "referenced_assessment_instances": before_assessment_instances,
+            "exact_semantic_fingerprints": len(exact_groups),
+            "shape_fingerprints": len(shape_groups),
+        },
+        "changed": {
+            "exact_duplicate_groups_promoted": len(exact_report),
+            "duplicate_assessment_definitions_avoided": duplicate_instances_avoided,
+            "rule_files_rewritten": rewritten_rule_files,
+            "applicability_files_rewritten": rewritten_applicability_files,
+            "local_assessment_files_removed": removed_local_assessments,
+        },
+        "unchanged_or_review": {
+            "assessment_definitions_after_exact_normalization": after_assessment_definitions,
+            "near_duplicate_review_groups": len(near_groups),
+            "near_duplicate_rule_candidates_reported": len(rule_candidates),
+        },
+        "rates": {
+            "exact_definition_reduction_pct": reduction_pct,
+            "cache_hit_pct": (
+                round(100.0 * cache_hits / (cache_hits + cache_misses), 2)
+                if (cache_hits + cache_misses) else 0.0
+            ),
+        },
+        "reasons": {
+            "automatic_change_exact_semantic_duplicate_groups": len(exact_report),
+            "review_only_near_duplicate_groups": len(near_groups),
+            "review_only_rule_overlap_candidates": len(rule_candidates),
+        },
+        "cache": {
+            "hits": cache_hits,
+            "misses": cache_misses,
+        },
+    }
+
     report = {
         "format": "scap-ng-repository-normalizer-report-0.1",
         "mode": (
@@ -946,6 +987,7 @@ def main() -> int:
             "dry-run-exact-plan"
         ),
         "advisory_mode": args.advisory,
+        "stats": normalizer_stats,
         "summary": {
             "benchmarks": len(benchmarks),
             "rules": sum(len(x["rules"]) for x in benchmarks),
