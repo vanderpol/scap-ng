@@ -1,8 +1,9 @@
 # Foreach modernization research
 
-**Status:** v1 semantic proof complete / ready for 0.3.0 integration review.
-This document does not change the frozen 0.2.0 language, schema, converter, or
-current accepted design.
+**Status:** v1 collection-expansion authoring and validation integrated into the
+active 0.3.0 pre-alpha tree. Automatic SCAP 1.4 modernization remains disabled
+until the converter path is integrated and passes the same equivalence gates.
+The frozen 0.2.0 language and schemas remain unchanged.
 
 **Working baseline:** `main` at
 `0c85d8a563b3320f80b7215c0f18e4dec4b064b4` (2026-10-06).
@@ -360,19 +361,33 @@ decomposition styles.
 The modernization output should be deterministic. If preconditions are not
 satisfied, it must fail closed and retain the faithful form.
 
-## Next integration steps
+## Current integration state and next steps
 
-1. open the intentional 0.3.0 schema tree without modifying frozen 0.2.0;
-2. add the reviewed Object-level `for_each` binding shape to the 0.3.0
-   authoring schema and semantic validator;
-3. integrate the context-aware datatype compatibility gate into conversion /
-   normalization rather than duplicating it in the research prototype;
-4. keep faithful Object -> Variable -> Object lowering as the normative oracle;
-5. add converted RHEL/Solaris v1 examples to 0.3.0 regression content;
-6. keep automatic modernization disabled until the integrated schema,
-   converter, validator, and result evidence tests all pass;
-7. track fan-out, helper-target, record-field, alternate quantifier, and derived
-   expression shapes as separate later proof classes.
+Completed for 0.3.0:
+
+1. opened a complete independent `schema/v0.3.0/` tree without modifying
+   frozen 0.2.0;
+2. added Object-level `for_each` / selector `from:` structural primitives;
+3. added cross-Object alias, field, direct-Test, and datatype-compatibility
+   semantic validation;
+4. made capability-registry and deep schema validation version-aware so 0.3.0
+   resolves only its own schema/mapping catalog;
+5. added an end-to-end 0.3.0 authoring fixture using the simplified syntax;
+6. retained the faithful Object -> ObjectComponent -> Variable -> Object graph
+   as the normative semantic oracle;
+7. kept all frozen-0.2 regression, Board conversion, and smoke gates green.
+
+Next:
+
+1. integrate the exact v1 rewrite into the SCAP 1.4 converter as an explicit,
+   fail-closed modernization pass;
+2. initially keep that converter modernization opt-in / disabled by default;
+3. compare faithful and modernized converted output plus canonical evidence for
+   the five pinned production candidates;
+4. enable `safe_automatic` only after the integrated converter path passes
+   those gates;
+5. keep fan-out, helper-target, record-field, alternate-quantifier, derived
+   expression, and evaluation-iteration shapes as separate later proof classes.
 
 
 ## Current recommendation
