@@ -1,0 +1,72 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-278138
+intent: Windows Server 2025 Active Directory data files must only allow system administrators access.
+applicability:
+  windows_role: domain_controller
+
+check:
+  let:
+    ntds:
+      database_log_dir:
+        from:
+          registry:
+            hive: HKEY_LOCAL_MACHINE
+            key: System\CurrentControlSet\Services\NTDS\Parameters
+            name: Database log files path
+        field: value
+
+      database_file:
+        from:
+          registry:
+            hive: HKEY_LOCAL_MACHINE
+            key: System\CurrentControlSet\Services\NTDS\Parameters
+            name: DSA Database file
+        field: value
+
+      working_dir:
+        from:
+          registry:
+            hive: HKEY_LOCAL_MACHINE
+            key: System\CurrentControlSet\Services\NTDS\Parameters
+            name: DSA Working Directory
+        field: value
+
+  all:
+    - windows_file_permissions:
+        directory: ntds.database_log_dir
+        files: "*"
+      expect:
+        only:
+          - principal: NT AUTHORITY\SYSTEM
+            rights: full_control
+          - principal: BUILTIN\Administrators
+            rights: full_control
+
+    - windows_file_permissions:
+        directory:
+          dirname: ntds.database_file
+        files: "*"
+      expect:
+        only:
+          - principal: NT AUTHORITY\SYSTEM
+            rights: full_control
+          - principal: BUILTIN\Administrators
+            rights: full_control
+
+    - windows_file_permissions:
+        directory: ntds.working_dir
+        files: "*"
+      expect:
+        only:
+          - principal: NT AUTHORITY\SYSTEM
+            rights: full_control
+          - principal: BUILTIN\Administrators
+            rights: full_control
+
+research_notes:
+  source_complexity: >
+    Current faithful NG uses registry Objects, three Variables, many
+    fileeffectiverights Objects, several States, and nine Tests.
+  hypothesis: >
+    The security intent is substantially clearer if registry-derived paths are
+    local bindings and the permission expectation is expressed once per path.
