@@ -390,6 +390,12 @@ Human review packet:
 Machine-readable rewrite contract:
 [transformation-v1.json](transformation-v1.json)
 
+Pinned production proof:
+[PRODUCTION-PROOF.md](PRODUCTION-PROOF.md)
+
+Research-only schema/lowering prototype:
+[prototype/](prototype/)
+
 The recommendation is to review **collection-expansion foreach v1** as a
 0.3.0 language addition with the exact transformation identifier
 `foreach.direct-object-component.at-least-one.v1`.
@@ -400,6 +406,6 @@ accepted. Eligible analyzer hits remain `review_required`.
 
 ## Human status
 
-`semantic-proof-complete / syntax-review-pending`
+`semantic-proof-complete / production-proof-complete / schema-prototype-pending-review`
 
 No schema or accepted specification change is made by this research record.
