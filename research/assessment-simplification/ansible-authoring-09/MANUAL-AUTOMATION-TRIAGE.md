@@ -20,12 +20,10 @@ subject to exact-result proof:
 
 | Rule | Why |
 | --- | --- |
-| SV-257932 | Detect incorrectly labelled device nodes; existing Check Text is already deterministic host-local commands with a documented exception. |
 | SV-257937 | Determine active firewalld zones/targets and require deny-all/drop behavior. |
 | SV-258028 | Compare dconf database modification times to keyfiles; current procedure already defines deterministic command logic. |
-| SV-258096 | Verify pam_faillock presence/order, including included/substacked PAM configuration. A dedicated PAM parser may ultimately be better, but this is a plausible command-oriented candidate. |
 
-**Initial count: 4 / 27.**
+**Initial count: 2 / 27.**
 
 This is deliberately conservative. These four still require proof that exit,
 stdout/stderr and error semantics can represent every branch of the Check Text.
@@ -39,8 +37,9 @@ These look more appropriate for typed collection than shell commands:
 | SV-258044 | Enumerate local interactive users, inspect initialization files, compare umask. |
 | SV-258052 | Enumerate interactive users and verify home directories exist. |
 | SV-258053 | Join user primary GID to home-directory group ownership. |
+| SV-258096 | Parse PAM stack/include/substack semantics and verify pam_faillock ordering. A small typed PAM capability is likely clearer and safer than embedding a shell parser. |
 
-**Initial count: 3 / 27.**
+**Initial count: 4 / 27.**
 
 These are especially useful tests of whether `for_each` / local binding can
 make a previously manual check clearer without shell scripting.
@@ -78,6 +77,10 @@ rather than shellcommand.
 
 ### Needs additional domain-model research before automation
 
+- **SV-257932** — the Check Text intentionally requires interpretation of
+  device nodes carrying `device_t`; the command output alone is not the
+  finding decision. A typed SELinux/device model may help, but shellcommand
+  would hide that judgment.
 - **SV-257857 / SV-257858 / SV-257859** — determining which configured file
   systems are “used with removable media” is the hard part; parsing mount
   options is trivial. Shellcommand alone would hide this ambiguity.
@@ -89,8 +92,8 @@ rather than shellcommand.
 
 ## Initial result
 
-At this stage, **7 / 27** manual Rules look like relatively strong host-local
-automation candidates: 4 command-oriented and 3 structured-native.
+At this stage, **6 / 27** manual Rules look like relatively strong host-local
+automation candidates: 2 command-oriented and 4 structured-native.
 
 That is **not** a final automation percentage. The other 20 are not “cannot be
 automated”; many appear automatable if SCAP-NG supplies explicit
@@ -99,7 +102,7 @@ shellcommand by itself should not be used to paper over missing policy inputs.
 
 ## Next proof step
 
-For each of the seven strong candidates:
+For each of the six strong candidates:
 
 1. reconstruct the exact Check Text finding logic;
 2. design the smallest readable research syntax;
