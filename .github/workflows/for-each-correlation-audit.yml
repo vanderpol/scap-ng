@@ -1,0 +1,83 @@
+name: SCAP-NG for_each correlation corpus audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/for-each-audit-20261006
+    paths:
+      - "tools/audit_for_each_candidates.py"
+      - ".github/workflows/for-each-correlation-audit.yml"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: rhel9
+            source: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - key: oracle9
+            source: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+          - key: rhel8
+            source: Current/U_RHEL_8_V2R8_STIG_SCAP_1-4_Benchmark-enhancedV22-signed.zip
+          - key: oracle8
+            source: Current/U_Oracle_Linux_8_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip
+          - key: sles15
+            source: Current/U_SLES_15_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip
+          - key: sles12
+            source: Current/U_SLES_12_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV17-signed.zip
+          - key: ubuntu24
+            source: Current/U_CAN_Ubuntu_24-04_LTS_V1R5_STIG_SCAP_1-4_Benchmark-enhancedV7-signed.zip
+          - key: solaris11-x86
+            source: Current/U_SOL_11_X86_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: solaris11-sparc
+            source: Current/U_SOL_11_SPARC_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: macos15
+            source: Current/U_Apple_macOS_15_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+          - key: windows11
+            source: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+
+    steps:
+      - name: Check out SCAP-NG research branch
+        uses: actions/checkout@v4
+
+      - name: Check out pinned NIWC corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install parser dependencies
+        run: python -m pip install lxml
+
+      - name: Split benchmark into per-rule OVAL closures
+        run: |
+          python tools/scap14_rule_splitter.py \
+            "niwc/${{ matrix.source }}" \
+            --output-dir "work/${{ matrix.key }}-split" \
+            --schema third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "${{ matrix.source }}" \
+            --benchmark-key "${{ matrix.key }}" \
+            --fail-on-unresolved
+
+      - name: Audit iteration/correlation dataflow
+        run: |
+          python tools/audit_for_each_candidates.py \
+            "work/${{ matrix.key }}-split" \
+            --label "${{ matrix.key }}" \
+            --output "work/${{ matrix.key }}-for-each-audit.json"
+
+      - name: Upload audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.key }}-for-each-audit
+          path: work/${{ matrix.key }}-for-each-audit.json
