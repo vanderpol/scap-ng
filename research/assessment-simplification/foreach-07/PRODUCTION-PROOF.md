@@ -2,9 +2,9 @@
 
 **Date:** 2026-10-06  
 **Transformation:** `foreach.direct-object-component.at-least-one.v1`  
-**Status:** production-candidate semantic proof passed and 0.3.0
-authoring/validation integration passed; automatic converter rewrite remains
-disabled.
+**Status:** production-candidate semantic proof, 0.3.0 authoring/validation
+integration, and opt-in converter modernization proof passed. Automatic
+converter rewrite remains disabled by default.
 
 ## Pinned sources
 
@@ -113,6 +113,23 @@ The research lowerer, context-aware compiler, production candidate verifier,
 fixture now pass together. The complete independent 0.3.0 release tree is open;
 frozen 0.2.0 remains unchanged.
 
-The next gate is production converter modernization. It remains fail-closed and
-disabled until faithful-versus-modernized converted output and evidence checks
-pass through the integrated converter path.
+The production converter now includes a fail-closed, explicitly opt-in 0.3.0
+post-mapping modernization pass. A regression built from the pinned
+SV-257889 OVAL source exercises the real path:
+
+```
+OVAL source
+  -> faithful semantic lowering
+  -> native capability mapping
+  -> opt-in foreach v1 modernization
+  -> 0.3 semantic validation
+```
+
+That source produces the two expected home-directory foreach rewrites and
+passes semantic validation. The focused workflow run
+https://github.com/vanderpol/scap-ng/actions/runs/37522441963 passed.
+
+Automatic modernization remains disabled by default. This is now a stable
+technical checkpoint for the narrow v1 construct; broader authoring-language
+design should be reviewed before extending foreach into additional proof
+classes.
