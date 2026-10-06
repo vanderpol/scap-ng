@@ -1,4 +1,4 @@
-from tools.normalize_p1_projection import (
+from pathlib import Path\n\nimport yaml\n\nfrom tools.normalize_p1_projection import (
     apply_p1_projection_normalization,
     plan_p1_projection_normalization,
 )
@@ -160,3 +160,50 @@ def test_state_expected_value_is_supported():
     value = normalized["assessment"]["states"]["expected-owner"]["state"]["value"]
     assert value == {"projection": {"object": "users", "field": "home_dir"}}
     assert len(report["applied"]) == 1
+
+
+def test_rhel9_sv257889_real_projection_pattern_normalizes_losslessly_in_shape():
+    root = Path(__file__).resolve().parents[1]
+    source = yaml.safe_load(
+        (
+            root
+            / "research/assessment-simplification/samples/rhel_9/assessments/automated"
+            / "niwc.rhel_9.SV-257889.automated.assessment.yaml"
+        ).read_text()
+    )
+
+    plan = plan_p1_projection_normalization(source)
+    assert {row["variable"] for row in plan} == {
+        "home-directories-non-system-users-variable",
+        "home-directory-root-user-variable",
+    }
+
+    normalized, report = apply_p1_projection_normalization(source)
+    assessment = normalized["assessment"]
+
+    assert "variables" not in assessment
+
+    non_system_path = assessment["objects"][
+        "local-initialization-files-non-system-users-object"
+    ]["select"]["path"]
+    assert non_system_path["variable_check"] == "at least one"
+    assert non_system_path["value"] == {
+        "projection": {
+            "object": "only-non-system-users-uid-999-home-dirs-excluding-root-object",
+            "field": "home_dir",
+        }
+    }
+
+    root_path = assessment["objects"][
+        "local-initialization-files-root-user-object"
+    ]["select"]["path"]
+    assert root_path["variable_check"] == "at least one"
+    assert root_path["value"] == {
+        "projection": {
+            "object": "only-root-users-uid-0-home-dirs-excluding-root-directory-object",
+            "field": "home_dir",
+        }
+    }
+
+    assert len(report["applied"]) == 2
+    assert all(row["classification"] == "P1_flattened_projection" for row in report["applied"])
