@@ -271,6 +271,35 @@ Result evidence should be able to retain:
 
 Evidence caps may limit retained samples but SHALL NOT change the verdict.
 
+
+## Canonical evidence-equivalence contract
+
+The native foreach representation does not need to reproduce every faithful
+Variable/result serialization detail byte-for-byte, but it must preserve the
+same decisive evidence.
+
+For the first direct projection class, faithful and modernized Results SHALL be
+reducible to the same canonical evidence view containing:
+
+- source Object identity;
+- source Item identities consumed by the projection;
+- each projected source field/value paired with its source Item identity;
+- projection/value-production status;
+- the combined target Item population used by the existing Test boundary.
+
+The canonical view deliberately does **not** require a parent-value -> child Item
+correlation unless the faithful result actually established that relationship.
+Inventing such a correlation would add unsupported meaning.
+
+Duplicate projected values are retained with their distinct source Item
+identities in the provenance view even though duplicates do not change
+`var_check="at least one"` selector truth.
+
+Focused fixtures fail closed if the faithful Variable values cannot be
+reconstructed from its recorded source `item_refs` and source Item fields, or
+if the modernized target Item population differs.
+
+
 ## Modernization classifications
 
 The modernization analyzer should emit one of:
