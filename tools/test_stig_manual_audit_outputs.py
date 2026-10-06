@@ -61,6 +61,13 @@ def main() -> int:
 
         run(str(CONVERTER), str(source), "--output-dir", str(native))
 
+        audit = yaml.safe_load((native / "conversion-audit.json").read_text(encoding="utf-8"))
+        assert audit["success"] is True
+        assert audit["unhandled_constructs"] == {"benchmark_children": [], "rule_children": []}
+        assert audit["counts"]["source_rules"] == 1
+        assert audit["counts"]["native_rules"] == 1
+        assert audit["schema_validation"]["valid"] is True
+
         benchmark = yaml.safe_load((native / "benchmark.yaml").read_text(encoding="utf-8"))
         benchmark_schema = yaml.safe_load((ROOT / "schema/v0.2.0/benchmark.schema.json").read_text(encoding="utf-8"))
         assert not list(Draft202012Validator(benchmark_schema).iter_errors(benchmark))
