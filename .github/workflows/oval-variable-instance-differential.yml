@@ -21,18 +21,24 @@ jobs:
           sudo apt-get install -y openscap-scanner
           oscap --version
 
-      - name: Validate fixture where supported
-        continue-on-error: true
+      - name: Prepare OpenSCAP-compatible execution copy
         run: |
-          oscap oval validate research/for-each-0.3.0/evidence/variable-instance/multivalue-file-object.xml
+          mkdir -p work/variable-instance
+          cp research/for-each-0.3.0/evidence/variable-instance/multivalue-file-object.xml \
+             work/variable-instance/evaluable-5.11.1.xml
+          sed -i 's/<oval:schema_version>5.12.3<\/oval:schema_version>/<oval:schema_version>5.11.1<\/oval:schema_version>/' \
+             work/variable-instance/evaluable-5.11.1.xml
+
+      - name: Validate execution copy
+        run: |
+          oscap oval validate work/variable-instance/evaluable-5.11.1.xml
 
       - name: Execute fixture
         run: |
-          mkdir -p work/variable-instance
           oscap oval eval \
             --results work/variable-instance/results.xml \
             --report work/variable-instance/report.html \
-            research/for-each-0.3.0/evidence/variable-instance/multivalue-file-object.xml
+            work/variable-instance/evaluable-5.11.1.xml
 
       - name: Summarize variable-instance representation
         run: |
@@ -131,7 +137,7 @@ jobs:
                   "variable_values_per_collected_object":[len(o["variable_values"]) for o in collected],
                   "item_refs_per_collected_object":[len(o["item_refs"]) for o in collected],
               },
-              "caveat":"OpenSCAP is supporting implementation evidence, not normative authority for OVAL 5.12.3.",
+              "caveat":"OpenSCAP 1.3.9 advertises OVAL 5.11.1, so execution used a temporary copy changing only generator schema_version from 5.12.3 to 5.11.1. This is supporting historical implementation evidence, not normative authority for OVAL 5.12.3.",
           }
           Path("work/variable-instance/summary.json").write_text(json.dumps(summary,indent=2)+"\n")
           print(json.dumps(summary,indent=2))
@@ -142,6 +148,7 @@ jobs:
         with:
           name: oval-variable-instance-differential
           path: |
+            work/variable-instance/evaluable-5.11.1.xml
             work/variable-instance/results.xml
             work/variable-instance/report.html
             work/variable-instance/summary.json
