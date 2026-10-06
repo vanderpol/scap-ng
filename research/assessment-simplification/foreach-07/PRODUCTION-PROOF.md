@@ -43,9 +43,12 @@ For each analyzer candidate satisfying the conservative v1 proof preconditions:
    - presence of the faithful target datatype;
 5. fail the workflow if any eligible candidate differs.
 
-The prototype deliberately marks the bound selector datatype as
-`source-compatible`; full capability-schema type inference belongs to the
-0.3.0 compiler prototype and is not claimed by this bounded proof.
+The first production-lowering run used a `source-compatible` placeholder.
+The follow-on context-aware compiler and verifier now resolve the source and
+target Object capabilities against the maintained 0.2.0 capability mappings,
+map the projected/selector fields into native vocabulary, and require exactly
+one compatible native datatype before lowering. The five eligible production
+candidates all satisfy that type gate.
 
 ## Result
 
@@ -87,8 +90,9 @@ This result does not extend v1 to:
 - multiple independent projected sources;
 - evaluation iteration.
 
-It also does not yet establish production capability-schema datatype inference,
-a finalized 0.3.0 JSON Schema, scanner execution conformance, or Board approval.
+It does not yet establish a finalized 0.3.0 JSON Schema, scanner execution
+conformance, or Board approval. Capability-mapping datatype compatibility is
+now included in the research compiler/proof gate.
 
 ## Gate conclusion
 
@@ -101,5 +105,7 @@ The narrow v1 semantic design has passed:
 - fail-closed eligibility proof;
 - production-candidate lowering proof.
 
-The next gate is the **0.3.0 authoring-schema/compiler prototype**, still kept
-separate from frozen 0.2.0.
+The research-only authoring schema, lowering prototype, context-aware compiler,
+and production candidate verifier now pass together. The narrow v1 semantic
+design is therefore ready for **0.3.0 integration review**, still separate from
+frozen 0.2.0 until the new release tree is intentionally opened.
