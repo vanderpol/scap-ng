@@ -134,6 +134,29 @@ following can be proven from the semantic IR:
 This transformation should remove representation plumbing, not alter the
 collector or policy requirement.
 
+
+## Standards correction: zero-source ObjectComponent is an error
+
+The OVAL ObjectComponentType contract is stricter than a generic zero-value
+Variable rule. For a direct `object_component`:
+
+- if the referenced Object finds zero Items, determining the component value is
+  an **error**;
+- if a collected Item lacks the requested `item_field`, determining the
+  component value is an **error**;
+- if one or more matching entities exist, all matching values contribute to the
+  component value set.
+
+Therefore a native foreach modernization SHALL NOT reinterpret zero source
+Items as a normal empty iteration or as an ordinary empty Variable. The
+modernized form must preserve the ObjectComponent error before the target
+Object/Test is evaluated.
+
+This correction narrows the first automatic candidate class: the selector
+population equivalence is proven only after successful ObjectComponent
+projection. Non-success source collection/component status remains a separate
+proof gate.
+
 ## Automatic rejection / review-required conditions
 
 The first modernization pass should refuse or require human review when any of
