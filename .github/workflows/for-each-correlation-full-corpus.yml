@@ -140,9 +140,15 @@ jobs:
                   for advisory in row.get("advisories",[]):
                       advisories[advisory.get("code","unknown")]+=1
           variable_shapes=Counter()
+          variable_root_operators=Counter()
+          variable_usage_by_shape=Counter()
+          variable_usage_by_root_operator=Counter()
           projection_usage=Counter()
           for row in complete:
               variable_shapes.update(row.get("unique_variable_shape_counts",{}))
+              variable_root_operators.update(row.get("unique_variable_root_operator_counts",{}))
+              variable_usage_by_shape.update(row.get("unique_variable_usage_by_shape",{}))
+              variable_usage_by_root_operator.update(row.get("unique_variable_usage_by_root_operator",{}))
               projection_usage.update(row.get("unique_pure_projection_usage",{}))
           manual_confidence=Counter()
           for manual in manuals:
@@ -158,13 +164,16 @@ jobs:
             "migration_dispositions":dict(dispositions),
             "modernization_advisories":dict(advisories),
             "unique_variable_shape_counts_by_benchmark":dict(variable_shapes),
+            "unique_variable_root_operator_counts_by_benchmark":dict(variable_root_operators),
+            "unique_variable_usage_by_shape_by_benchmark":dict(variable_usage_by_shape),
+            "unique_variable_usage_by_root_operator_by_benchmark":dict(variable_usage_by_root_operator),
             "unique_pure_projection_usage_by_benchmark":dict(projection_usage),
             "manual_correlation_candidates":sum(m.get("manual_correlation_candidates",0) for m in manuals),
             "manual_correlation_confidence_counts":dict(manual_confidence),
             "packages":sorted(rows,key=lambda r:r.get("source","")),
           }
           Path("full-corpus-for-each-audit.json").write_text(json.dumps(agg,indent=2)+"\n")
-          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts")},indent=2))
+          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_variable_root_operator_counts_by_benchmark","unique_variable_usage_by_shape_by_benchmark","unique_variable_usage_by_root_operator_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts")},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
