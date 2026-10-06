@@ -43,6 +43,14 @@ class ConditionalModernizationTests(unittest.TestCase):
         self.assertTrue(report["rewrite_performed"])
         self.assertEqual(len(report["applied"]),1)
         self.assertFalse(report["rule_id_allowlist"])
+        self.assertEqual(report["stats"]["branch_like_nodes_examined"],1)
+        self.assertEqual(report["stats"]["rewrite_candidates_proven"],1)
+        self.assertEqual(report["stats"]["rewrites_applied"],1)
+        self.assertEqual(
+            report["stats"]["applied_pattern_counts"]["exact_complementary_guard"],
+            1,
+        )
+        self.assertEqual(report["stats"]["rewrite_rate_pct_of_branch_like"],100.0)
 
     def test_reversed_branches_preserve_then_else_meaning(self):
         source=self.doc({
@@ -164,6 +172,12 @@ class ConditionalModernizationTests(unittest.TestCase):
         self.assertFalse(report["rewrite_performed"])
         self.assertEqual(report["review_required"][0]["reasons"],
                          ["no_proven_conditional_guard_pattern"])
+        self.assertEqual(report["stats"]["branch_like_nodes_examined"],1)
+        self.assertEqual(report["stats"]["review_required_nodes"],1)
+        self.assertEqual(
+            report["stats"]["review_reason_counts"]["no_proven_conditional_guard_pattern"],
+            1,
+        )
 
     def test_ambiguous_two_complementary_guards_fail_closed(self):
         evaluate={
