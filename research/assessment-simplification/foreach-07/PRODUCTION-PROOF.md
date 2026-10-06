@@ -2,7 +2,9 @@
 
 **Date:** 2026-10-06  
 **Transformation:** `foreach.direct-object-component.at-least-one.v1`  
-**Status:** production-candidate semantic proof passed; automatic rewrite remains disabled.
+**Status:** production-candidate semantic proof passed and 0.3.0
+authoring/validation integration passed; automatic converter rewrite remains
+disabled.
 
 ## Pinned sources
 
@@ -90,9 +92,10 @@ This result does not extend v1 to:
 - multiple independent projected sources;
 - evaluation iteration.
 
-It does not yet establish a finalized 0.3.0 JSON Schema, scanner execution
-conformance, or Board approval. Capability-mapping datatype compatibility is
-now included in the research compiler/proof gate.
+It does not establish scanner execution conformance or Board approval.
+The 0.3.0 authoring/validation integration is now implemented, including
+capability-mapping datatype compatibility. Automatic SCAP 1.4 converter
+modernization remains a separate gate.
 
 ## Gate conclusion
 
@@ -105,7 +108,11 @@ The narrow v1 semantic design has passed:
 - fail-closed eligibility proof;
 - production-candidate lowering proof.
 
-The research-only authoring schema, lowering prototype, context-aware compiler,
-and production candidate verifier now pass together. The narrow v1 semantic
-design is therefore ready for **0.3.0 integration review**, still separate from
-frozen 0.2.0 until the new release tree is intentionally opened.
+The research lowerer, context-aware compiler, production candidate verifier,
+0.3.0 authoring/deep-schema validation, semantic validator, and real authoring
+fixture now pass together. The complete independent 0.3.0 release tree is open;
+frozen 0.2.0 remains unchanged.
+
+The next gate is production converter modernization. It remains fail-closed and
+disabled until faithful-versus-modernized converted output and evidence checks
+pass through the integrated converter path.
