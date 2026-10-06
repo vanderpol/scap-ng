@@ -1886,12 +1886,11 @@ def lowerability_reason(rec, oroot):
 def fully_lowerable(rec, oroot):
     return lowerability_reason(rec, oroot) is None
 
-def functional_group_from_text(title="", discussion="", remediation=""):
-    haystack = " ".join((
-        (title or "").lower(),
-        (discussion or "").lower(),
-        (remediation or "").lower(),
-    ))
+def functional_group(rec):
+    title = (rec.get("title") or "").lower()
+    discussion = (text(rec["element"].find("x:description", NS)) or "").lower()
+    remediation = (text(rec["element"].find("x:fixtext", NS)) or "").lower()
+    haystack = " ".join((title, discussion, remediation))
 
     # Prefer specific, recognizable policy domains.  Avoid broad substring
     # matches such as "user" or "log" that create misleading groups.
@@ -1914,14 +1913,7 @@ def functional_group_from_text(title="", discussion="", remediation=""):
             return gid, group_title
     return "needs-grouping", "Needs Grouping"
 
-def functional_group(rec):
-    return functional_group_from_text(
-        rec.get("title"),
-        text(rec["element"].find("x:description", NS)),
-        text(rec["element"].find("x:fixtext", NS)),
-    )
-
-def build_groups(selected, *, include_unmapped=True):
+def build_groups(selected):
     parents = {
         "automated": {"id": "automated", "title": "Automated", "groups": {}},
         "manual-or-managerial": {
@@ -1938,16 +1930,6 @@ def build_groups(selected, *, include_unmapped=True):
         )
         parent_id = "manual-or-managerial" if default is None or check_kind(default) == "manual" else "automated"
         topic_id, topic_title = functional_group(rec)
-        if topic_id == "needs-grouping" and not include_unmapped:
-            evidence.append({
-                "rule": rec["id"],
-                "assessment_group": parent_id,
-                "functional_group": None,
-                "method": "heuristic",
-                "mapped": False,
-                "reason": "no_high_confidence_topic",
-            })
-            continue
         subgroup_id = f"{parent_id}.{topic_id}"
         subgroup = parents[parent_id]["groups"].setdefault(
             subgroup_id,
@@ -1959,7 +1941,6 @@ def build_groups(selected, *, include_unmapped=True):
             "assessment_group": parent_id,
             "functional_group": subgroup_id,
             "method": "heuristic",
-            "mapped": topic_id != "needs-grouping",
         })
 
     output = []
