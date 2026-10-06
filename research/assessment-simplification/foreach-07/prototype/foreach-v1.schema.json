@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/foreach-v1.schema.json",
+  "title": "Research-only SCAP-NG foreach v1 fragment",
+  "type": "object",
+  "required": [
+    "for_each",
+    "select"
+  ],
+  "properties": {
+    "for_each": {
+      "type": "object",
+      "required": [
+        "item",
+        "in"
+      ],
+      "properties": {
+        "item": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        "in": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "select": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "from"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "value",
+              "operation",
+              "datatype"
+            ],
+            "properties": {
+              "value": {},
+              "operation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "datatype": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}
