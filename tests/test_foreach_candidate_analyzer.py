@@ -38,7 +38,7 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
         finally: path.unlink(missing_ok=True)
         candidate=result["candidates"][0]
         self.assertEqual(candidate["classification"],"review_required")
-        self.assertEqual(candidate["candidate_family"],"collection_expansion")
+        self.assertEqual(candidate["candidate_family"],"collection_expansion_at_least_one")
         self.assertEqual(candidate["source"]["item_field"],"home_dir")
         self.assertEqual(candidate["targets"][0]["var_check"],"at least one")
         self.assertEqual(candidate["targets"][0]["tests"][0]["check"],"all")
@@ -64,7 +64,7 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
         finally: path.unlink(missing_ok=True)
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["status"],"ok")
-        self.assertEqual(rows[0]["families"],{"collection_expansion":1})
+        self.assertEqual(rows[0]["families"],{"collection_expansion_at_least_one":1})
 
     def test_report_never_enables_automatic_rewrite(self):
         path=write_fixture('<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"><tests/><objects/><states/><variables/></oval_definitions>')
