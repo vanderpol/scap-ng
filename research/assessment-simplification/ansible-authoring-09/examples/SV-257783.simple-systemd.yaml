@@ -1,0 +1,27 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257783
+intent: RHEL 9 systemd-journald service must be enabled.
+
+check:
+  systemd:
+    unit: systemd-journald.service
+    property: ActiveState
+
+  expect:
+    exists: at_least_one
+    all:
+      value: active
+
+semantic_obligations:
+  capability: linux.systemdunitproperty
+  source_existence: at_least_one_exists
+  source_test_check: all
+  selectors:
+    unit: {operation: equal, datatype: string}
+    property: {operation: equal, datatype: string}
+  expectation:
+    value:
+      operation: equal
+      datatype: string
+      entity_check: all
+      entity_existence: at_least_one_exists
