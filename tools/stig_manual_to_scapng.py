@@ -88,7 +88,11 @@ def dump_json(path: Path, value: object) -> None:
 
 def extract_xccdf(source: Path, work: Path) -> tuple[Path, dict]:
     if source.suffix.lower() != ".zip":
-        return source, {"source_file": source.name, "archive_sha256": None}
+        return source, {
+            "source_file": source.name,
+            "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+            "archive_sha256": None,
+        }
     sha = hashlib.sha256(source.read_bytes()).hexdigest()
     with zipfile.ZipFile(source) as zf:
         candidates = [
@@ -106,6 +110,7 @@ def extract_xccdf(source: Path, work: Path) -> tuple[Path, dict]:
     target.write_bytes(data)
     return target, {
         "source_file": source.name,
+        "source_sha256": sha,
         "archive_member": name,
         "archive_sha256": sha,
     }
@@ -514,12 +519,44 @@ def convert(source: Path, output: Path) -> dict:
     namespace = xccdf_namespace(root)
     inventory = source_inventory(root)
     unhandled = unhandled_source_elements(inventory)
+    source_benchmark_id = root.get("id")
     if any(unhandled.values()):
+        failure_audit = {
+            "format": "scap-ng-stig-manual-conversion-audit-0.1",
+            "source": {
+                **archive_meta,
+                "xccdf_namespace": namespace,
+                "benchmark_id": source_benchmark_id,
+                "benchmark_version": text(child(root, "version")),
+            },
+            "counts": {
+                "source_rules": sum(1 for _ in iter_rules(root)),
+                "native_rules": 0,
+                "native_manual_assessments": 0,
+                "profiles": len(source_profile_rows(root)),
+                "benchmark_source_elements": inventory["benchmark_children"],
+                "profile_source_elements": inventory["profile_children"],
+                "rule_source_elements": inventory["rule_children"],
+                "check_source_elements": inventory["check_children"],
+            },
+            "mapped_constructs": {},
+            "intentional_transformations": [],
+            "source_only_provenance": [],
+            "unhandled_constructs": unhandled,
+            "schema_validation": {
+                "valid": False,
+                "not_run_reason": "Source contains unhandled XCCDF constructs.",
+                "documents": [],
+            },
+            "success": False,
+        }
+        dump_json(output / "conversion-audit.json", failure_audit)
+        shutil.rmtree(output / ".source-work", ignore_errors=True)
         raise SystemExit(
-            "Unhandled XCCDF source elements would be dropped: "
+            "Unhandled XCCDF source elements would be dropped; "
+            "see conversion-audit.json: "
             + json.dumps(unhandled, sort_keys=True)
         )
-    source_benchmark_id = root.get("id")
     benchmark_id = safe_id(source_benchmark_id, "stig-manual")
     benchmark_title = text(child(root, "title")) or benchmark_id
     benchmark_version = text(child(root, "version"))
@@ -743,7 +780,9 @@ def convert(source: Path, output: Path) -> dict:
             "native_manual_assessments": len(converted_rules),
             "profiles": len(profiles),
             "benchmark_source_elements": inventory["benchmark_children"],
+            "profile_source_elements": inventory["profile_children"],
             "rule_source_elements": inventory["rule_children"],
+            "check_source_elements": inventory["check_children"],
         },
         "mapped_constructs": {
             "benchmark": sorted(inventory["benchmark_children"]),
