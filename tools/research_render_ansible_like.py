@@ -135,8 +135,9 @@ def state_expr(state):
 def collect_expr(collect):
     if not isinstance(collect, dict):
         raise Unsupported("collect_not_mapping")
-    if collect.get("filters"):
-        raise Unsupported("filters")
+    filters = collect.get("filters") or []
+    if not isinstance(filters, list):
+        raise Unsupported("filters_not_list")
     cap = collect.get("capability")
     module = MODULE_NAMES.get(cap, cap.replace(".", "_") if isinstance(cap, str) else None)
     if not module:
@@ -168,6 +169,22 @@ def collect_expr(collect):
             raise Unsupported("select_not_mapping")
         for field, spec in select.items():
             result[field] = predicate(spec)
+
+    if filters:
+        grouped = {"include": [], "exclude": []}
+        for item in filters:
+            if not isinstance(item, dict):
+                raise Unsupported("filter_not_mapping")
+            action = item.get("action")
+            if action not in {"include", "exclude"}:
+                raise Unsupported("filter_action:" + str(action))
+            match = item.get("match")
+            if not isinstance(match, dict):
+                raise Unsupported("filter_match")
+            grouped[action].append(state_expr(match))
+        for action, values in grouped.items():
+            if values:
+                result[action] = values[0] if len(values) == 1 else values
 
     if collect.get("behaviors"):
         # Keep behavior explicit in the research rendering. It is collection
@@ -251,8 +268,8 @@ def has_dataflow(assessment):
             return "function:" + hit[0]
         # Set handling is delegated to collect_expr so simple UNION collection
         # can be rendered while complement/intersection continue to fail closed.
-        if node.get("filters"):
-            return "filters"
+        # Filters are handled locally by collect_expr and remain explicit as
+        # include/exclude clauses in the research rendering.
     return None
 
 
