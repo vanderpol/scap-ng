@@ -37,14 +37,39 @@ jobs:
           assert report['rewrite_performed'] is False
           assert report['safe_automatic_enabled'] is False
           candidates=[
-              c
-              for row in report['files']
-              for c in row.get('candidates',[])
+              c for row in report['files'] for c in row.get('candidates',[])
               if c.get('candidate_family') == 'collection_expansion'
           ]
           assert len(candidates) >= 2, report
-          projected={c['source']['item_field'] for c in candidates}
-          assert 'home_dir' in projected, projected
+          assert 'home_dir' in {c['source']['item_field'] for c in candidates}
           assert all(c['classification'] == 'review_required' for c in candidates)
           print(json.dumps(report['summary'], indent=2, sort_keys=True))
           PY
+
+      - name: Measure published RHEL 9 and Solaris 11 X86
+        run: |
+          mkdir -p /tmp/foreach-corpus
+          curl -fL --retry 3             https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/refs/heads/main/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             -o /tmp/foreach-corpus/rhel9.zip
+          curl -fL --retry 3             https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/refs/heads/main/Current/U_SOL_11_X86_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip             -o /tmp/foreach-corpus/solaris11-x86.zip
+          python tools/analyze_oval_foreach_candidates.py /tmp/foreach-corpus/rhel9.zip             --output /tmp/foreach-rhel9-published.json
+          python tools/analyze_oval_foreach_candidates.py /tmp/foreach-corpus/solaris11-x86.zip             --output /tmp/foreach-solaris11-x86-published.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name in ('rhel9','solaris11-x86'):
+              p=Path(f'/tmp/foreach-{name}-published.json')
+              report=json.loads(p.read_text())
+              print(f'=== {name} ===')
+              print(json.dumps(report['summary'], indent=2, sort_keys=True))
+              assert report['rewrite_performed'] is False
+              assert report['safe_automatic_enabled'] is False
+          PY
+
+      - name: Upload candidate reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: foreach-modernization-candidate-reports
+          path: |
+            /tmp/foreach-rhel.json
+            /tmp/foreach-rhel9-published.json
+            /tmp/foreach-solaris11-x86-published.json
