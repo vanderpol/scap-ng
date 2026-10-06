@@ -165,9 +165,11 @@ jobs:
               manual_confidence.update(manual.get("confidence_counts",{}))
           variable_normalization=Counter()
           variable_normalization_single_use=Counter()
+          variable_automatic_eligibility=Counter()
           for vp in variable_plans:
               variable_normalization.update(vp.get("summary",{}))
               variable_normalization_single_use.update(vp.get("single_use_by_shape",{}))
+              variable_automatic_eligibility.update(vp.get("automatic_eligibility_summary",{}))
           agg={
             "source_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
             "packages_discovered":len(rows),
@@ -187,10 +189,11 @@ jobs:
             "manual_correlation_confidence_counts":dict(manual_confidence),
             "variable_normalization_dispositions":dict(variable_normalization),
             "variable_normalization_single_use_by_shape":dict(variable_normalization_single_use),
+            "variable_automatic_eligibility":dict(variable_automatic_eligibility),
             "packages":sorted(rows,key=lambda r:r.get("source","")),
           }
           Path("full-corpus-for-each-audit.json").write_text(json.dumps(agg,indent=2)+"\n")
-          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_variable_root_operator_counts_by_benchmark","unique_variable_usage_by_shape_by_benchmark","unique_variable_usage_by_root_operator_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts","variable_normalization_dispositions","variable_normalization_single_use_by_shape")},indent=2))
+          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_variable_root_operator_counts_by_benchmark","unique_variable_usage_by_shape_by_benchmark","unique_variable_usage_by_root_operator_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts","variable_normalization_dispositions","variable_normalization_single_use_by_shape","variable_automatic_eligibility")},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
