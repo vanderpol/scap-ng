@@ -6,6 +6,9 @@ from scap_upconvert_v003.foreach_modernization import (
     REWRITE_ID,
     modernize_foreach_v1,
 )
+from scap_upconvert_v003.convert_collection_review import (
+    postprocess_automated_assessment,
+)
 from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
 )
@@ -85,6 +88,124 @@ def fixture():
 
 
 class ForeachConverterModernization(unittest.TestCase):
+
+    def faithful_pre_mapping_fixture(self):
+        return {
+            "assessment": {
+                "id": "faithful-pre-mapping",
+                "version": 1,
+                "assessment_title": "Faithful pre-mapping graph",
+                "mode": "automated",
+                "class": "compliance",
+                "purpose": "assessment",
+                "specification": {
+                    "id": "scap-ng.pre-alpha.assessment",
+                    "version": "0.2.0",
+                },
+                "objects": {
+                    "users": {
+                        "object_title": "Users",
+                        "capability": "unix.password",
+                        "select": {
+                            "username": {
+                                "value": ".+",
+                                "operation": "pattern match",
+                                "datatype": "string",
+                            }
+                        },
+                    },
+                    "files": {
+                        "object_title": "Files",
+                        "capability": "unix.file",
+                        "select": {
+                            "path": {
+                                "value": {"variable": "home-dirs"},
+                                "operation": "equals",
+                                "datatype": "string",
+                                "variable_check": "at least one",
+                            },
+                            "filename": {
+                                "value": r"^\\.[^\\s\\.]+",
+                                "operation": "pattern match",
+                                "datatype": "string",
+                            },
+                        },
+                    },
+                },
+                "variables": {
+                    "home-dirs": {
+                        "title": "Home directories",
+                        "kind": "local",
+                        "datatype": "string",
+                        "expression": {
+                            "values": {
+                                "object": "users",
+                                "field": "home_dir",
+                            }
+                        },
+                    }
+                },
+                "states": {},
+                "tests": {
+                    "test-files": {
+                        "test_title": "Files",
+                        "capability": "unix.file",
+                        "object": "files",
+                        "check_existence": "any_exist",
+                        "check": "all",
+                    }
+                },
+                "evaluate": {"test": "test-files"},
+            }
+        }
+
+    def test_postprocess_default_stays_02_and_faithful(self):
+        source = self.faithful_pre_mapping_fixture()
+        result, report = postprocess_automated_assessment(source)
+        self.assertIsNone(report)
+        assessment = result["assessment"]
+        self.assertEqual(assessment["specification"]["version"], "0.2.0")
+        self.assertIn("home-dirs", assessment["variables"])
+        self.assertNotIn("for_each", assessment["objects"]["files"])
+        self.assertEqual(
+            assessment["objects"]["files"]["select"]["directory"]["value"],
+            {"variable": "home-dirs"},
+        )
+
+    def test_postprocess_03_opt_in_maps_then_rewrites(self):
+        source = self.faithful_pre_mapping_fixture()
+        result, report = postprocess_automated_assessment(
+            source,
+            target_ng_version="0.3.0",
+            modernize_foreach=True,
+        )
+        assessment = result["assessment"]
+        self.assertEqual(assessment["specification"]["version"], "0.3.0")
+        self.assertTrue(report["rewrite_performed"], report)
+        self.assertNotIn("variables", assessment)
+        self.assertEqual(
+            assessment["objects"]["files"]["for_each"],
+            {"item": "user", "in": "users"},
+        )
+        self.assertEqual(
+            assessment["objects"]["files"]["select"]["directory"],
+            {"from": "user.home_dir"},
+        )
+        self.assertEqual(
+            validate_assessment_capability_semantics(result),
+            [],
+        )
+
+    def test_postprocess_rejects_modernization_on_02(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "requires target SCAP-NG 0.3.0",
+        ):
+            postprocess_automated_assessment(
+                self.faithful_pre_mapping_fixture(),
+                modernize_foreach=True,
+            )
+
     def test_default_disabled_is_identity(self):
         source = fixture()
         result, report = modernize_foreach_v1(source)
