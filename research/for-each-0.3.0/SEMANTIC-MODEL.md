@@ -104,6 +104,30 @@ Nested evidence should answer:
 
 An evaluator MAY terminate once the selected aggregation is logically conclusive, provided unseen Items cannot change the result and completeness/early-termination metadata remains explicit.
 
+
+## Result cardinality and invocation boundary
+
+Scoped iteration is internal evaluation within one Assessment invocation unless
+the authored policy explicitly defines independently reported invocations.
+
+A processor SHOULD NOT create one Assessment Result artifact or one Rule-result
+instance for every bound Item. Doing so would make high-cardinality filesystem,
+account, registry, or package checks produce result explosions.
+
+Instead one Assessment Result should retain:
+
+- aggregate scoped evaluation counts;
+- logical/population/evidence completeness;
+- bounded failing or decisive scope records;
+- parent/child binding context needed to explain retained failures;
+- optional summaries by outer scope when useful.
+
+Passing scopes need not all be serialized merely because they were evaluated.
+
+This keeps iteration compatible with the existing evidence-maximum and decisive-
+expression result model while preserving enough relationship context to explain
+why a rule failed.
+
 ## Production proof families
 
 ### Manual correlation - new native expressiveness
