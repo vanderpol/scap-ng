@@ -82,6 +82,8 @@ jobs:
           PY
           else
             python tools/audit_for_each_candidates.py work/split --label "$KEY" --output work/audit/report.json
+            python tools/audit_manual_correlation_candidates.py "niwc/$SOURCE" --label "$KEY" --output work/audit/manual.json
+            python tools/plan_for_each_migration.py work/audit/report.json --manual-audit work/audit/manual.json --output work/audit/plan.json
             python - <<'PY'
           import json,os
           from pathlib import Path
@@ -95,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: full-corpus-${{ strategy.job-index }}
-          path: work/audit/report.json
+          path: |\n            work/audit/report.json\n            work/audit/manual.json\n            work/audit/plan.json
 
   aggregate:
     needs: audit
@@ -112,12 +114,21 @@ jobs:
           import json
           from collections import Counter
           from pathlib import Path
-          rows=[]
+          rows=[]; plans=[]; manuals=[]
           for p in Path("reports").rglob("report.json"):
               try: rows.append(json.loads(p.read_text()))
               except Exception: pass
+          for p in Path("reports").rglob("plan.json"):
+              try: plans.append(json.loads(p.read_text()))
+              except Exception: pass
+          for p in Path("reports").rglob("manual.json"):
+              try: manuals.append(json.loads(p.read_text()))
+              except Exception: pass
           complete=[r for r in rows if r.get("audit_status")=="complete"]
           failed=[r for r in rows if r.get("audit_status")!="complete"]
+          dispositions=Counter()
+          for plan in plans:
+              dispositions.update(plan.get("summary",{}))
           agg={
             "source_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
             "packages_discovered":len(rows),
@@ -126,10 +137,12 @@ jobs:
             "closure_files":sum(r.get("closure_files",0) for r in complete),
             "candidate_closures":sum(r.get("candidate_closures",0) for r in complete),
             "class_counts":dict(sum((Counter(r.get("class_counts",{})) for r in complete),Counter())),
+            "migration_dispositions":dict(dispositions),
+            "manual_correlation_candidates":sum(m.get("manual_correlation_candidates",0) for m in manuals),
             "packages":sorted(rows,key=lambda r:r.get("source","")),
           }
           Path("full-corpus-for-each-audit.json").write_text(json.dumps(agg,indent=2)+"\n")
-          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts")},indent=2))
+          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","manual_correlation_candidates")},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
