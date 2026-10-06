@@ -157,6 +157,49 @@ population equivalence is proven only after successful ObjectComponent
 projection. Non-success source collection/component status remains a separate
 proof gate.
 
+
+## Normative desugaring contract for the first foreach class
+
+The strongest way to preserve non-complete source status is to avoid defining a
+second runtime semantics for foreach.
+
+For the first candidate family, native foreach SHALL be defined as authoring
+shorthand for the same semantic graph produced by faithful OVAL conversion:
+
+```
+source Object
+  -> object_component(item_field)
+  -> local Variable
+  -> target Object selector var_ref(var_check="at least one")
+  -> existing target Object population
+  -> existing Test check_existence/check/state semantics
+```
+
+The rewrite removes authoring plumbing only. It does not remove or bypass the
+source Object, ObjectComponent, Variable status, target Object aggregation
+boundary, or downstream Test aggregation.
+
+Consequences:
+
+- source Object collection status remains observable through the same
+  ObjectComponent/Variable dependency;
+- `object_component` zero-Item and missing-field errors remain errors;
+- an incomplete source remains an incomplete value-producing dependency rather
+  than being silently treated as a complete list of the Items seen so far;
+- provenance continues to identify the source Object/Item and projected field;
+- a scanner MAY optimize execution but MUST produce behavior equivalent to this
+  desugared graph.
+
+This avoids maintaining two independently specified flag-propagation systems.
+
+The older OVAL processing-model documentation explicitly classified direct
+ObjectComponent results as `complete` when the referenced Object is complete
+and `incomplete` when the referenced Object is incomplete. OVAL 5.12.3 retains
+the ObjectComponent rules for zero Items and missing fields and contains no
+contradictory semantic change. For any source status not fully determined by the
+current normative material, the graph-desugaring definition remains the
+authoritative SCAP-NG behavior rather than an invented loop-specific rule.
+
 ## Automatic rejection / review-required conditions
 
 The first modernization pass should refuse or require human review when any of
