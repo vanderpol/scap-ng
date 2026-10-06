@@ -168,7 +168,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
         # Without complete Test lineage, preserve the Item in full.
         requested = available if not item_requests or any(r is None for r in item_requests) else set().union(*item_requests)
         keep = requested | mandatory[identity]
-        for name, source in EXTENSIONS.get(original["capability"], {}).items():
+        for name, source in result_extensions(version).get(original["capability"], {}).items():
             if name in keep and name in available:
                 keep.add(source)
                 mandatory[identity].add(source)
