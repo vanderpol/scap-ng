@@ -12,6 +12,8 @@ from tools.oval_result_truth_tables import (
     FALSE,
     UNKNOWN,
     evaluate_collected_object_test,
+    decisive_partial_check,
+    aggregate_check,
     resolve_variable_reference,
     apply_variable_reference_context,
 )
@@ -129,6 +131,21 @@ def incomplete_at_least_one_result(observed_item_results):
     )
 
 
+def native_partial_check_result(check, observed_item_results, *, population_complete):
+    """Conservative native partial-population aggregation probe.
+
+    This intentionally models evaluator-controlled partial population, not the
+    inherited OVAL collected_object flag=incomplete contract. If evaluation
+    stopped before the population was complete, only an irreversible decisive
+    result may be returned; otherwise the result is unknown.
+    """
+    vals=list(observed_item_results)
+    if population_complete:
+        return aggregate_check(check, vals)
+    decisive=decisive_partial_check(check, vals)
+    return decisive if decisive is not None else UNKNOWN
+
+
 def run():
     rows=[
         {"item":"p1","block_size":2,"total_space":10},
@@ -203,10 +220,12 @@ def run():
             "finding":"Nested iteration needs per-scope existence semantics; Boolean aggregation alone can silently pass a parent with no required child.",
         },
         "incomplete_collection_warning":{
-            "all_with_only_observed_passes":incomplete_all_result([TRUE]),
-            "all_with_observed_failure":incomplete_all_result([FALSE]),
-            "at_least_one_with_observed_pass":incomplete_at_least_one_result([TRUE]),
-            "finding":"Incomplete populations may be decisive only in specific directions. A scoped implementation must preserve these monotonicity rules.",
+            "oval_all_with_only_observed_passes":incomplete_all_result([TRUE]),
+            "oval_all_with_observed_failure":incomplete_all_result([FALSE]),
+            "oval_at_least_one_with_observed_pass":incomplete_at_least_one_result([TRUE]),
+            "oval_at_least_one_with_observed_failure":incomplete_at_least_one_result([FALSE]),
+            "native_partial_at_least_one_with_observed_failure":native_partial_check_result("at least one",[FALSE],population_complete=False),
+            "finding":"OVAL collected_object flag=incomplete has explicit inherited result rules that are not identical to conservative evaluator-controlled partial-population semantics. Conversion must preserve the former; native early-stop/resource semantics should not accidentally inherit it.",
         },
         "lineage_is_not_scope":{
             **lineage,
@@ -227,9 +246,11 @@ def run():
     assert empty_object=="does_not_exist"
     assert report["nested_required_child_warning"]["naive_nested_all"] is True
     assert report["nested_required_child_warning"]["explicit_required_child"] is False
-    assert report["incomplete_collection_warning"]["all_with_only_observed_passes"]==UNKNOWN
-    assert report["incomplete_collection_warning"]["all_with_observed_failure"]==FALSE
-    assert report["incomplete_collection_warning"]["at_least_one_with_observed_pass"]==TRUE
+    assert report["incomplete_collection_warning"]["oval_all_with_only_observed_passes"]==UNKNOWN
+    assert report["incomplete_collection_warning"]["oval_all_with_observed_failure"]==FALSE
+    assert report["incomplete_collection_warning"]["oval_at_least_one_with_observed_pass"]==TRUE
+    assert report["incomplete_collection_warning"]["oval_at_least_one_with_observed_failure"]==FALSE
+    assert report["incomplete_collection_warning"]["native_partial_at_least_one_with_observed_failure"]==UNKNOWN
     assert report["lineage_is_not_scope"]["semantic_child_count"]==1
     assert report["lineage_is_not_scope"]["lineage_edge_count"]==2
     print(json.dumps(report,indent=2))
