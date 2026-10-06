@@ -1,0 +1,139 @@
+name: OVAL authoring complexity census
+
+on:
+  push:
+    paths:
+      - tools/measure_oval_authoring_complexity.py
+      - .github/workflows/oval-authoring-complexity-census.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  measure:
+    name: Measure ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: RHEL 9
+            key: rhel9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: Oracle Linux 9
+            key: oracle9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+          - label: Windows 11
+            key: windows11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - label: Windows Server 2025
+            key: windows2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+          - label: Apache 2.4 UNIX Server
+            key: apache24
+            artifact: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+          - label: Apache Tomcat 9
+            key: tomcat9
+            artifact: U_Apache_Tomcat_Application_Server_9_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+          - label: Solaris 11 x86
+            key: solaris11
+            artifact: U_SOL_11_X86_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - label: Windows Server DNS
+            key: dns
+            artifact: U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pinned NIWC package
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          curl -fL --retry 3 \
+            "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/${NIWC_REVISION}/Current/${ARTIFACT}" \
+            -o source.zip
+      - name: Measure authoring complexity
+        run: |
+          python tools/measure_oval_authoring_complexity.py source.zip \
+            --label "${{ matrix.label }}" \
+            --output report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oval-authoring-complexity-${{ matrix.key }}
+          path: report.json
+
+  aggregate:
+    name: Aggregate representative census
+    needs: measure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: oval-authoring-complexity-*
+          path: reports
+      - name: Aggregate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
+          total_rules=sum(x["summary"]["automated_rules_with_oval"] for x in reports)
+          features=Counter()
+          functions=Counter()
+          tests=Counter()
+          reuse=Counter()
+          locality=Counter()
+          rows=[]
+          for x in reports:
+              s=x["summary"]; l=s["locality"]
+              features.update(s["rule_feature_counts"])
+              functions.update(s["variable_function_counts"])
+              tests.update(s["test_type_occurrences"])
+              reuse.update(s["reuse_totals"])
+              n=s["automated_rules_with_oval"]
+              simple=round(l["simple_linear_percent"]*n/100)
+              no_reuse=round(l["rules_without_object_state_reuse_barrier_percent"]*n/100)
+              advanced=round(l["advanced_graph_percent"]*n/100)
+              locality.update(simple= simple, no_reuse=no_reuse, advanced=advanced)
+              rows.append({
+                  "label":x["label"],
+                  "rules":n,
+                  "simple_linear_percent":l["simple_linear_percent"],
+                  "no_object_state_reuse_barrier_percent":l["rules_without_object_state_reuse_barrier_percent"],
+                  "advanced_graph_percent":l["advanced_graph_percent"],
+                  "direct_object_single_use_percent":l["direct_test_object_single_use_percent"],
+                  "direct_state_single_use_percent":l["direct_test_state_single_use_percent"],
+              })
+          pct=lambda n,d: round(100*n/d,1) if d else 0
+          aggregate={
+              "format":"scap-ng-oval-authoring-complexity-aggregate-0.1",
+              "packages":len(reports),
+              "automated_rules_with_oval":total_rules,
+              "packages_summary":rows,
+              "rule_feature_counts":dict(features),
+              "rule_feature_percent":{k:pct(v,total_rules) for k,v in sorted(features.items())},
+              "variable_function_counts":dict(functions),
+              "test_type_occurrences":dict(tests),
+              "reuse_totals":dict(reuse),
+              "locality":{
+                  "simple_linear_rules":locality["simple"],
+                  "simple_linear_percent":pct(locality["simple"],total_rules),
+                  "rules_without_object_state_reuse_barrier":locality["no_reuse"],
+                  "rules_without_object_state_reuse_barrier_percent":pct(locality["no_reuse"],total_rules),
+                  "advanced_graph_rules":locality["advanced"],
+                  "advanced_graph_percent":pct(locality["advanced"],total_rules),
+                  "direct_test_object_single_use_percent":pct(reuse["direct_test_object_refs_single_use"],reuse["direct_test_object_refs"]),
+                  "direct_test_state_single_use_percent":pct(reuse["direct_test_state_refs_single_use"],reuse["direct_test_state_refs"]),
+              },
+          }
+          Path("aggregate.json").write_text(json.dumps(aggregate,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(aggregate,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oval-authoring-complexity-aggregate
+          path: aggregate.json
