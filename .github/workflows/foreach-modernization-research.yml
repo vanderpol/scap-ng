@@ -10,12 +10,22 @@ on:
       - tools/test_schema_v03_independence.py
       - tools/generate_capability_schema.py
       - tools/validate_generated_capability_semantics.py
+      - tools/validate_native_json_schemas.py
+      - tools/validate_native_semantics.py
+      - tools/capability_registry.py
+      - tools/reported_elements.py
       - schema/v0.3.0/**
+      - tests/foreach-0.3.0/**
       - tools/test_foreach_v03_integration.py
       - tools/test_schema_v03_independence.py
       - tools/generate_capability_schema.py
       - tools/validate_generated_capability_semantics.py
+      - tools/validate_native_json_schemas.py
+      - tools/validate_native_semantics.py
+      - tools/capability_registry.py
+      - tools/reported_elements.py
       - schema/v0.3.0/**
+      - tests/foreach-0.3.0/**
       - tests/test_foreach_candidate_analyzer.py
       - research/assessment-simplification/foreach-07/**
       - .github/workflows/foreach-modernization-research.yml
@@ -50,6 +60,10 @@ jobs:
         run: |
           python tools/test_foreach_v03_integration.py
           python tools/test_schema_v03_independence.py
+          python tools/validate_native_json_schemas.py tests/foreach-0.3.0/content \
+            --schema-dir schema/v0.3.0 --report /tmp/foreach-v03-schema.json
+          python tools/validate_native_semantics.py tests/foreach-0.3.0/content \
+            --report /tmp/foreach-v03-semantics.json
 
       - name: Foreach v1 authoring prototype tests
         run: |
@@ -153,3 +167,5 @@ jobs:
             /tmp/foreach-solaris11-x86-published.json
             /tmp/foreach-rhel9-v1-proof.json
             /tmp/foreach-solaris11-x86-v1-proof.json
+            /tmp/foreach-v03-schema.json
+            /tmp/foreach-v03-semantics.json
