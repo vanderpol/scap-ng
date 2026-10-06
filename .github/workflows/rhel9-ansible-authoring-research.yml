@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - tools/research_render_ansible_like.py
+      - tools/research_analyze_rhel9_variables.py
       - research/assessment-simplification/ansible-authoring-09/**
       - .github/workflows/rhel9-ansible-authoring-research.yml
   workflow_dispatch:
@@ -25,6 +26,12 @@ jobs:
           python tools/research_render_ansible_like.py \
             research/iterations/003/source/split-rule-assessment/rhel9-full \
             --output work/ansible-authoring-rhel9
+
+      - name: Analyze Variable/dataflow tail
+        run: |
+          python tools/research_analyze_rhel9_variables.py \
+            research/iterations/003/source/split-rule-assessment/rhel9-full \
+            --output work/ansible-authoring-rhel9/variable-patterns.json
       - uses: actions/upload-artifact@v4
         with:
           name: rhel9-ansible-authoring-research
