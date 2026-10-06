@@ -1,0 +1,60 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257889
+intent: All RHEL 9 local initialization files must have mode 0740 or less permissive.
+
+check:
+  all:
+    - for_each:
+        user:
+          password:
+            username:
+              matches: '[\\w]+'
+            exclude:
+              - user_id: {less_than: 1000}
+              - home_dir: /
+      file:
+        directory: user.home_dir
+        name:
+          matches: '^\\.[^\\s\\.]+'
+        recurse:
+          depth: 1
+          symlinks: follow
+        exclude:
+          type: directory
+      expect:
+        exists: any
+        all:
+          mode: no_more_permissive_than_0740
+
+    - for_each:
+        user:
+          password:
+            username:
+              matches: '[\\w]+'
+            exclude:
+              - user_id: {greater_than: 0}
+              - home_dir: /
+      file:
+        directory: user.home_dir
+        name:
+          matches: '^\\.[^\\s\\.]+'
+        recurse:
+          depth: 1
+          symlinks: follow
+        exclude:
+          type: directory
+      expect:
+        exists: at_least_one
+        all:
+          mode: no_more_permissive_than_0740
+
+semantic_obligations:
+  note: >
+    This is deliberately more readable than the faithful graph, but it is valid
+    only if it compiles to the proven collection-expansion semantics: source
+    Items project home_dir values, child file Items combine into one target
+    Object population, then the original existence/check/state semantics apply.
+  source_sets_and_filters_preserved: true
+  target_population_combination: union
+  no_invented_parent_child_correlation: true
+  mode_0740_expands_to_original_permission_boolean_state: true
