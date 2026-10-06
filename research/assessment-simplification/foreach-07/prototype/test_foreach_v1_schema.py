@@ -27,10 +27,10 @@ class ForeachV1Schema(unittest.TestCase):
                 "in": "non-system-users",
             },
             "select": {
-                "path": {
+                "directory": {
                     "from": "user.home_dir",
                 },
-                "filename": {
+                "name": {
                     "value": r"^\.[^\s\.]+",
                     "operation": "pattern_match",
                     "datatype": "string",
@@ -45,7 +45,7 @@ class ForeachV1Schema(unittest.TestCase):
                 "in": "users",
             },
             "select": {
-                "path": {
+                "directory": {
                     "from": "user.home_dir",
                     "operation": "equals",
                 },
@@ -60,7 +60,7 @@ class ForeachV1Schema(unittest.TestCase):
                 "collect": "union",
             },
             "select": {
-                "path": {"from": "user.home_dir"},
+                "directory": {"from": "user.home_dir"},
             },
         })
 
@@ -71,7 +71,7 @@ class ForeachV1Schema(unittest.TestCase):
                 "in": "users",
             },
             "select": {
-                "path": {"from": "home_dir"},
+                "directory": {"from": "home_dir"},
             },
         })
 
