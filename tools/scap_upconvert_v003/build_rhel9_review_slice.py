@@ -1886,11 +1886,12 @@ def lowerability_reason(rec, oroot):
 def fully_lowerable(rec, oroot):
     return lowerability_reason(rec, oroot) is None
 
-def functional_group(rec):
-    title = (rec.get("title") or "").lower()
-    discussion = (text(rec["element"].find("x:description", NS)) or "").lower()
-    remediation = (text(rec["element"].find("x:fixtext", NS)) or "").lower()
-    haystack = " ".join((title, discussion, remediation))
+def functional_group_from_text(title="", discussion="", remediation=""):
+    haystack = " ".join((
+        (title or "").lower(),
+        (discussion or "").lower(),
+        (remediation or "").lower(),
+    ))
 
     # Prefer specific, recognizable policy domains.  Avoid broad substring
     # matches such as "user" or "log" that create misleading groups.
@@ -1912,6 +1913,13 @@ def functional_group(rec):
         if any(re.search(pattern, haystack) for pattern in patterns):
             return gid, group_title
     return "needs-grouping", "Needs Grouping"
+
+def functional_group(rec):
+    return functional_group_from_text(
+        rec.get("title"),
+        text(rec["element"].find("x:description", NS)),
+        text(rec["element"].find("x:fixtext", NS)),
+    )
 
 def build_groups(selected, *, include_unmapped=True):
     parents = {
