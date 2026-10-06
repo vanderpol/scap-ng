@@ -16,6 +16,10 @@ This work explores ways to make accurate assessments easier for humans to author
 | [requirements-05](requirements-05/README.md) | Full RHEL 9 + Windows Server 2025 Check Text reading | reading notes, recommendations, evidence, decision candidates |
 | [editor-06](editor-06/README.md) | Open authoring workbench/editor direction | full-coverage obligations, implementation options, decision candidates |
 | [foreach-07](foreach-07/README.md) | Post-conversion iteration modernization with provable OVAL equivalence | collection-vs-evaluation semantics, automatic rewrite boundary, rejection rules, conformance plan |
+| [authoring-language-08](authoring-language-08/OVAL-USAGE-CENSUS-2026-10-06.md) | Production OVAL feature/locality census | feature frequencies, reuse/locality evidence, coverage implications |
+| [ansible-authoring-09](ansible-authoring-09/README.md) | Research-only Ansible-inspired authoring sketches | RHEL/Windows examples, manual automation review, organizational-input sketches |
+| [conditional-10](conditional-10/README.md) | Conditional-shaped OVAL Boolean trees | branch-shape census, six-state caveats, applicability/case research |
+| [locality-11](locality-11/README.md) | Inline private Object/State layout over the existing semantic model | 20-rule examples, full RHEL/Server 2025 census, structural round-trip evidence |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
