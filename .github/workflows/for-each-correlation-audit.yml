@@ -123,6 +123,12 @@ jobs:
             --manual-audit "work/${{ matrix.key }}-manual-correlation-audit.json" \
             --output "work/${{ matrix.key }}-for-each-migration-plan.json"
 
+      - name: Build Variable normalization plan
+        run: |
+          python tools/plan_variable_normalization.py \
+            "work/${{ matrix.key }}-for-each-audit.json" \
+            --output "work/${{ matrix.key }}-variable-normalization-plan.json"
+
       - name: Upload audit
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,4 +138,5 @@ jobs:
             work/${{ matrix.key }}-for-each-audit.json
             work/${{ matrix.key }}-manual-correlation-audit.json
             work/${{ matrix.key }}-for-each-migration-plan.json
+            work/${{ matrix.key }}-variable-normalization-plan.json
             work/${{ matrix.key }}-for-each-proof-cases/**
