@@ -211,3 +211,23 @@ def test_rhel9_sv257889_real_projection_pattern_normalizes_losslessly_in_shape()
 
     assert len(report["applied"]) == 2
     assert all(row["classification"] == "P1_flattened_projection" for row in report["applied"])
+
+
+def test_integer_native_projection_is_inside_initial_p1_envelope():
+    doc=base_document()
+    var=doc["assessment"]["variables"]["home-dirs"]
+    var["datatype"]="integer"
+    entity=doc["assessment"]["objects"]["files"]["select"]["path"]
+    entity["datatype"]="integer"
+    plan=plan_p1_projection_normalization(doc)
+    assert len(plan)==1
+    assert plan[0]["datatype"]=="integer"
+
+
+def test_unproven_native_datatype_fails_closed():
+    doc=base_document()
+    var=doc["assessment"]["variables"]["home-dirs"]
+    var["datatype"]="boolean"
+    entity=doc["assessment"]["objects"]["files"]["select"]["path"]
+    entity["datatype"]="boolean"
+    assert plan_p1_projection_normalization(doc)==[]
