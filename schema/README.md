@@ -6,7 +6,7 @@ The current frozen technical baseline is SCAP-NG **0.2.0** at `7cd8b1242d7fb4a2e
 
 ## Current use
 
-- `v0.2.0/` contains the current frozen schema set and capability mappings used for Board/content review.
+- `v0.2.0/` contains the frozen Board-review baseline. `v0.3.0/` is the active, complete, independent development schema tree for new semantic work.
 - Earlier schema versions remain for compatibility/history and SHALL NOT be silently modified to match newer semantics.
 - JSON Schema defines document structure. Runtime/evaluation semantics also live in the specification, capability mappings/reference docs, and focused conformance tests.
 - Schema-valid does not imply migration-equivalent, collector-conformant, live-target-tested, or Board-approved.
@@ -24,4 +24,4 @@ For the full operator catalog, see [`tools/HUMAN-RUNNABLE-SCRIPTS.md`](../tools/
 
 ## Change discipline
 
-Semantic schema changes require the human-review process in [`MAINTAINING.md`](../MAINTAINING.md). During the 0.2.0 review freeze, prefer small reproducer-backed fixes over broad redesign.
+Semantic schema changes require the human-review process in [`MAINTAINING.md`](../MAINTAINING.md). Do not add 0.3.0 features to the frozen 0.2.0 tree. New semantic changes belong in `v0.3.0/` with focused reproducer-backed tests and human review.
