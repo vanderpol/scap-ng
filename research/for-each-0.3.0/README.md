@@ -2,26 +2,38 @@
 
 **Status:** research branch; not normative and not part of the 0.2.0 contract.
 
-## Working question
+## Research conclusion
 
-Can SCAP-NG make correlated/nested assessment logic materially easier to author,
-review, debug, and render than OVAL while retaining a deterministic lossless
-migration path from valid OVAL 5.12.3?
+The corpus, standards, counterexample, and prototype work supports a concrete
+0.3.0 design split:
 
-The current hypothesis is that NG should separate two concerns that OVAL often
-mixes through multi-valued Variables:
+1. **Projection** is the lossless flattened value-flow primitive for obtaining
+   values from fields of Items produced by an Object without retaining
+   originating Item identity.
+2. **Binding / scoped for_each** is the native semantic primitive for preserving
+   one Item's identity while evaluating dependent logic for that Item.
+3. **Variables** remain first-class for external inputs, reusable named value
+   sets, direct Variable Tests, and meaningful value transformations.
 
-1. **Item identity / evaluation scope** — expressed by an explicit scoped
-   iteration construct such as a future for_each over Items produced by an
-   authored Object.
-2. **Value transport and transformation** — expressed by Variables or direct
-   typed value references.
-
-A concise working rule is:
+The working rule is now a recommended 0.3.0 design principle:
 
 > Objects identify populations. Bindings identify Items. Variables derive or transport values.
 
-This is a research hypothesis, not a specification decision.
+A multi-valued Variable is not an implicit loop, zip, or parent/child
+relationship.
+
+The first bounded P1 automatic normalization class is now proven at research
+level: a single-use local OVAL object_component Variable feeding one Object
+selector or State expected-value position may be replaced by an explicit
+flattened Projection when all fail-closed preconditions are satisfied. Across
+the pinned 65-package corpus, **162** Variables meet that class. The initial
+automatic proof envelope is OVAL string/int with exact datatype agreement and
+preserved consumer operation/value quantifier.
+
+Scoped for_each is recommended for native 0.3.0 authoring and reviewed native
+modernization. **Automatic OVAL -> for_each lowering remains disabled** because
+no production P2 equivalence class has yet proven that lexical Item identity can
+be introduced without changing source semantics.
 
 ## Why this matters
 
@@ -325,16 +337,22 @@ Candidate future requirement:
 A stronger SHALL/SHALL NOT rule is deferred until corpus classification proves
 that valid non-correlated OVAL semantics retain a clear native representation.
 
-## Next proof work
+## Remaining work before 0.3.0 promotion
 
-1. Complete corpus classification including manual-only correlation candidates.
-2. Define a typed semantic IR node for scoped iteration before defining final
-   YAML.
-3. Specify zero-item, error, incomplete, truncation, and aggregation behavior.
-4. Build known-result fixtures for same-Item arithmetic, parent-child
-   filesystem ownership, nested dependent collections, and unequal
-   cardinalities.
-5. Implement a research lowering that emits a transition plan:
-   proven, preserve, or review; it SHALL NOT silently rewrite review cases.
-6. Only after those proofs, prototype native syntax/schema and round-trip or
-   differential execution.
+The core semantic conclusion is reached. Remaining work is specification and
+promotion work rather than open-ended problem discovery:
+
+1. reconcile final enum/token spelling with the full OVAL-to-NG vocabulary
+   audit;
+2. integrate Projection and scoped Binding/for_each into the real 0.3.0
+   Assessment schema rather than the research fragment;
+3. integrate compact scoped-result structures into the real Results schema;
+4. preserve the proven P1 fail-closed eligibility checks in the production
+   converter and provenance ledger;
+5. complete the full scoped conformance corpus, including two/three-level
+   nesting, shared child observations, duplicate equal values, resource limits,
+   and decisive early termination;
+6. keep P2 automatic scoped lowering disabled unless a future source pattern
+   independently proves full equivalence;
+7. develop reviewed P4 native automation examples from the recurring manual
+   relational STIG families for editor/scanner demonstrations.
