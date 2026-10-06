@@ -44,16 +44,12 @@ objects:
     capability: unix.file
 
     for_each:
-      source:
-        object: non-system-users
-      as: user
-      collect: union
+      item: user
+      in: non-system-users
 
     select:
       path:
         from: user.home_dir
-        operation: equals
-        datatype: string
 
       filename:
         value: '^\\.[^\\s\\.]+'
@@ -64,11 +60,18 @@ objects:
 The binding name (`user`) is lexical authoring syntax. It is not runtime Item
 identity.
 
-`source.object` identifies the complete source Object dependency.
+`in: non-system-users` identifies the complete source Object dependency.
 
-`from: user.home_dir` projects the named Item field from each source Item.
+`from: user.home_dir` means that the target `path` is bound from that field
+of each source Item. In v1, `from` is a binding, not an authored comparison.
+The equivalent `equals`, datatype compatibility, and
+`var_check="at least one"` behavior belong to the normative desugaring rather
+than the author-facing syntax.
 
-`collect: union` is REQUIRED in the first form. There is no hidden collection
+Object-level `for_each` has exactly one v1 meaning: expand collection from the
+bound source Items and combine the resulting target Items into one target Object
+population. Because there is no author choice in v1, `collect: union` is not
+authored. This is intrinsic grammar semantics, not a hidden configurable
 default.
 
 ## 4. Normative meaning
@@ -138,6 +141,10 @@ The first form has fixed selector quantification:
 
 `var_check = at least one`.
 
+This quantifier is intrinsic to the v1 `from:` binding and is not authored
+separately. If future forms support a real quantifier choice, that choice SHALL
+be explicit rather than introduced as a hidden default.
+
 It SHALL NOT be used to modernize a source selector whose effective
 `var_check` is `all`, `only one`, `none satisfy`, or a mixed set of
 quantifiers.
@@ -188,7 +195,9 @@ the following are true:
 7. that target Object has no independent additional Variable selector;
 8. the target Object is directly referenced by at least one Test;
 9. source Sets and Filters remain on the source Object unchanged;
-10. target operation and datatype are preserved;
+10. the target selector's effective equality comparison and compatible datatype
+    are preserved by desugaring even though they are not redundantly authored
+    beside `from:`;
 11. target Object population remains the Test aggregation boundary;
 12. the canonical evidence view remains derivable.
 
