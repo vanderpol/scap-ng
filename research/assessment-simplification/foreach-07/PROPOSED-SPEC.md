@@ -89,10 +89,10 @@ Variable projected-home-dirs:
       item_field: home_dir
 
 Object initialization-files:
-  path:
+  directory:
     variable: projected-home-dirs
     var_check: at least one
-    operation: equals
+    operation: equal
     datatype: string
   ...
 ```
