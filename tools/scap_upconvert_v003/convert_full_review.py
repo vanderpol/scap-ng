@@ -30,6 +30,7 @@ from scap_upconvert_v003.assessment_oval_vocabulary import (align_assessment_voc
 from scap_upconvert_v003.native_capability_mapping import apply_ready_capability_mappings
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+from group_mapping import auto_map_groups
 
 
 def write_json(path, value):
@@ -573,7 +574,25 @@ def main(argv=None):
         if unsupported: raise ValueError('Unsupported Benchmark metadata: '+str(unsupported))
         front,_=source.normalize_front_matter(xr);rear,_=source.normalize_rear_matter(xr)
         if args.auto_map_groups:
-            groups,grouping_rows=source.build_groups(rs, include_unmapped=False)
+            grouping_candidates=[]
+            for rec in rs:
+                default=next(
+                    (check for check in rec['checks'] if not (check.get('selector') or '').strip()),
+                    rec['checks'][0] if rec['checks'] else None,
+                )
+                parent_id=(
+                    'manual-or-managerial'
+                    if default is None or source.check_kind(default)=='manual'
+                    else 'automated'
+                )
+                grouping_candidates.append({
+                    'rule':rec['id'],
+                    'assessment_group':parent_id,
+                    'title':rec.get('title'),
+                    'discussion':source.text(rec['element'].find('x:description',source.NS)),
+                    'remediation':source.text(rec['element'].find('x:fixtext',source.NS)),
+                })
+            groups,grouping_rows=auto_map_groups(grouping_candidates)
         else:
             groups=[]
             grouping_rows=[
