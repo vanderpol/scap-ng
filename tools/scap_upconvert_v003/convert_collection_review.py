@@ -23,11 +23,70 @@ from scap_ng_roundtrip_v003.compare_oval_semantics import compare, OD
 from check_current_authoring_contract import violations
 from scap_upconvert_v003.assessment_oval_vocabulary import align_assessment_vocabulary
 from scap_upconvert_v003.native_capability_mapping import apply_ready_capability_mappings
+from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
+from validate_generated_capability_semantics import validate_assessment_capability_semantics
 import yaml
 
+ROOT = Path(__file__).resolve().parents[2]
 NATIVE_CAPABILITY_MAPPING_DIR = (
-    Path(__file__).resolve().parents[2] / "schema/v0.2.0/capability-mappings/supported"
+    ROOT / "schema/v0.2.0/capability-mappings/supported"
 )
+
+
+def capability_mapping_dir(version):
+    if version not in {"0.2.0", "0.3.0"}:
+        raise ValueError(f"Unsupported target SCAP-NG version: {version}")
+    return ROOT / f"schema/v{version}/capability-mappings/supported"
+
+
+def postprocess_automated_assessment(
+    native,
+    *,
+    target_ng_version="0.2.0",
+    modernize_foreach=False,
+):
+    """Apply versioned native mappings and optional 0.3 foreach modernization.
+
+    The default 0.2 path intentionally preserves the existing converter
+    behavior.  Foreach modernization is legal only for an explicit 0.3 target.
+    """
+    if modernize_foreach and target_ng_version != "0.3.0":
+        raise ValueError("--modernize-foreach-v1 requires target SCAP-NG 0.3.0")
+
+    result=align_assessment_vocabulary(native)
+    assessment=result.get("assessment",{})
+    specification=assessment.setdefault("specification",{
+        "id":"scap-ng.pre-alpha.assessment",
+        "version":target_ng_version,
+    })
+    if target_ng_version != "0.2.0":
+        specification["version"]=target_ng_version
+
+    # Both 0.2 and the current 0.3 draft require explicit reporting selection.
+    # Preserve the complete SCAP 1.4/OVAL evidence surface during conversion.
+    for test in assessment.get("tests",{}).values():
+        test["reported_elements"]="all"
+
+    result=apply_ready_capability_mappings(
+        result,
+        capability_mapping_dir(target_ng_version),
+    )
+
+    modernization=None
+    if modernize_foreach:
+        result,modernization=modernize_foreach_v1(result,enabled=True)
+        diagnostics=validate_assessment_capability_semantics(result)
+        foreach_diagnostics=[
+            row for row in diagnostics
+            if str(row.get("code","")).startswith("foreach.")
+        ]
+        if foreach_diagnostics:
+            raise ValueError(
+                "foreach modernization semantic validation failed: "
+                + repr(foreach_diagnostics)
+            )
+
+    return result,modernization
 
 def source_benchmark(package):
     benchmarks=[]
@@ -170,7 +229,17 @@ def scoped_assessment_id(namespace, local_id):
     return f"{namespace}.{local_id}" if namespace else local_id
 
 
-def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, assessment_namespace=None):
+def convert_rule(
+    rec,
+    original,
+    output,
+    schema,
+    temp_root,
+    parameter_ids=None,
+    assessment_namespace=None,
+    target_ng_version="0.2.0",
+    modernize_foreach=False,
+):
     """Convert one Rule while keeping generated Assessment identities repository-safe.
 
     assessment_namespace is a native Benchmark identity. When supplied, generated
@@ -275,13 +344,12 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         parity=compare(original_path,regenerated,did,new_id,root_only=True)
         if not parity['equal']:
             failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
-        native=align_assessment_vocabulary(native)
-        # SCAP-NG 0.2.0 has no hidden reporting default. Preserve the full
-        # SCAP 1.4/OVAL evidence surface explicitly during conversion.
-        for test in native.get('assessment',{}).get('tests',{}).values():
-            test['reported_elements']='all'
         try:
-            native=apply_ready_capability_mappings(native,NATIVE_CAPABILITY_MAPPING_DIR)
+            native,modernization=postprocess_automated_assessment(
+                native,
+                target_ng_version=target_ng_version,
+                modernize_foreach=modernize_foreach,
+            )
         except ValueError as exc:
             mapping_error=str(exc)
             fallback_reason=None
@@ -310,11 +378,14 @@ def convert_rule(rec, original, output, schema, temp_root, parameter_ids=None, a
         if errors: raise ValueError('Current vocabulary guard: '+str(errors))
         ref='assessments/automated/'+aid+'.assessment.yaml'
         write_yaml(output/ref,native); done[did]=ref; result['selectors'][selector]=ref
-        result['assessments'].append({'status':'representation_comparator_equal','path':ref,
+        assessment_row={'status':'representation_comparator_equal','path':ref,
             'source_graph_bindings':provenance,'tests':len(native['assessment']['tests']),
             'objects':len(native['assessment']['objects']),
             'states':len(native['assessment'].get('states',{})),
-            'variables':len(native['assessment'].get('variables',{})),'reverse_omni_schema_valid':True})
+            'variables':len(native['assessment'].get('variables',{})),'reverse_omni_schema_valid':True}
+        if modernize_foreach:
+            assessment_row['foreach_modernization']=modernization
+        result['assessments'].append(assessment_row)
     if deprecated_selector_fallbacks:
         manual_ref=result['selectors'].get('manual') or (next(iter(manual_done.values())) if manual_done else None)
         if manual_ref is None:
