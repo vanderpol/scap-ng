@@ -44,6 +44,8 @@ OP_NAMES = {
     "match": "matches",
     "not equal": "not_equal",
     "not_equal": "not_equal",
+    "case insensitive equals": "equals_ci",
+    "case_insensitive_equal": "equals_ci",
     "greater than": "gt",
     "greater_than": "gt",
     "greater than or equal": "gte",
@@ -247,8 +249,8 @@ def has_dataflow(assessment):
         hit = sorted(keys & FUNCTION_KEYS)
         if hit:
             return "function:" + hit[0]
-        if "set" in keys:
-            return "set"
+        # Set handling is delegated to collect_expr so simple UNION collection
+        # can be rendered while complement/intersection continue to fail closed.
         if node.get("filters"):
             return "filters"
     return None
