@@ -25,7 +25,7 @@ Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10
 
 | Branch | Status | Purpose / relationship to main | Disposition |
 | --- | --- | --- | --- |
-| `feature/stig-manual-conversion-audit-161` | active | Issue #161: machine-readable STIG-manual conversion audit plus additional legacy-XCCDF probes. | Merge via PR after AD Forest regression and additional small/manual STIG validation. |\n| `feature/stig-manual-audit-outputs-159` | merged/stale | Issue #159: optional native-NG HTML and XLSX manual-audit outputs; merged through PR #160. | Safe cleanup candidate after merge verification. |
+| `feature/stig-manual-conversion-audit-161` | ready-to-merge | Issue #161: strict conversion-audit artifact and nested legacy-XCCDF loss guard; validated with Cyber Exchange AD Forest V3R2 and Google Chrome V2R11. | Merge via PR after repository regression gates. |\n| `feature/stig-manual-audit-outputs-159` | merged/stale | Issue #159: optional native-NG HTML and XLSX manual-audit outputs; merged through PR #160. | Safe cleanup candidate after merge verification. |
 | `assessment-reference-20261003` | merged/stale | Assessment reference documentation; fully behind main. | Safe cleanup candidate after freeze. |
 | `assessment-results-0.2-20261003` | merged/stale | Assessment Results work; fully behind main. | Safe cleanup candidate after freeze. |
 | `audit/issue-30-rhel9-selection` | historical/superseded | Old issue-30 RHEL 9 selection audit; diverged far behind current design. | Do not merge wholesale. Recover only by specific reviewed cherry-pick if ever needed. |
