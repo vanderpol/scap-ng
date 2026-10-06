@@ -1,12 +1,12 @@
-# SCAP-NG 0.2.0 schema
+# SCAP-NG 0.3.0 schema
 
 **Status:** frozen pre-alpha technical baseline for human and OVAL Board review.
 
-This directory contains the complete SCAP-NG **0.2.0** schema snapshot: Benchmark and Rule policy structures, automated and manual Assessment structures, result schemas, packaging schemas, shared capability contracts, and reviewed OVAL-to-NG capability mappings.
+This directory contains the complete SCAP-NG **0.3.0** schema snapshot: Benchmark and Rule policy structures, automated and manual Assessment structures, result schemas, packaging schemas, shared capability contracts, and reviewed OVAL-to-NG capability mappings.
 
 Technical baseline commit: `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
 
-Later commits may improve documentation, examples, tests, and Board-review material without changing the frozen 0.2.0 schema meaning unless a focused defect is explicitly accepted.
+Later commits may improve documentation, examples, tests, and Board-review material without changing the frozen 0.3.0 schema meaning unless a focused defect is explicitly accepted.
 
 ## Start here
 
@@ -20,7 +20,7 @@ If you are new to SCAP-NG, read these in order:
 6. **[`capability-mappings/supported/`](capability-mappings/supported/)** — reviewed native capability contracts mapped from supported OVAL semantics.
 7. **[`assessment-result.schema.json`](assessment-result.schema.json)** and **[`scan-result.schema.json`](scan-result.schema.json)** — execution/result structures.
 
-For a small source-to-NG example rather than reading schemas first, use the **[0.2.0 Board review examples](../../board/review-content/0.2.0/README.md)**.
+For a small source-to-NG example rather than reading schemas first, use the **[0.3.0 Board review examples](../../board/review-content/0.3.0/README.md)**.
 
 ## How the main pieces fit together
 
@@ -56,7 +56,7 @@ The Assessment language retains recognizable OVAL concepts such as **Test, Objec
 - [`capability-common.schema.json`](capability-common.schema.json) — shared native capability primitives.
 - [`capability-scope.json`](capability-scope.json) — capability support/scope metadata.
 - [`capability-mappings/supported/`](capability-mappings/supported/) — supported native Test/Object/State/Item mappings.
-- [`capability-mappings/experimental/`](capability-mappings/experimental/) — research mappings not in the supported 0.2.0 content-development scope.
+- [`capability-mappings/experimental/`](capability-mappings/experimental/) — research mappings not in the supported 0.3.0 content-development scope.
 
 ### Results and evidence
 
@@ -77,7 +77,7 @@ The Assessment language retains recognizable OVAL concepts such as **Test, Objec
 
 ## Conditional evaluation
 
-Version 0.2.0 supports structured conditional evaluation in `evaluate`:
+Version 0.3.0 supports structured conditional evaluation in `evaluate`:
 
 ```yaml
 evaluate:
@@ -117,7 +117,7 @@ That source information is **not** a runtime dependency on OVAL XML or XSD files
 
 Removing or materially rewriting those source references therefore requires provenance review rather than ordinary documentation cleanup.
 
-Mappings under `capability-mappings/experimental/` are research artifacts. In particular, ESX/VMware expansion remains deferred pending upstream semantic guidance. Deferred experimental mappings are not part of the supported 0.2.0 content-development scope.
+Mappings under `capability-mappings/experimental/` are research artifacts. In particular, ESX/VMware expansion remains deferred pending upstream semantic guidance. Deferred experimental mappings are not part of the supported 0.3.0 content-development scope.
 
 ## Version metadata
 
@@ -126,20 +126,20 @@ Every version-local JSON artifact carries human-visible version metadata.
 JSON Schema files use:
 
 ```json
-"x-scap-ng-version": "0.2.0",
-"x-last-modified": "YYYY-MM-DD"
+"x-scap-ng-version": "0.3.0",
+"x-last-modified": "2026-10-06"
 ```
 
 Non-schema support JSON uses:
 
 ```json
-"specification_version": "0.2.0",
-"last_modified": "YYYY-MM-DD"
+"specification_version": "0.3.0",
+"last_modified": "2026-10-06"
 ```
 
 The `x-` prefix identifies SCAP-NG-specific JSON Schema annotations rather than JSON Schema validation keywords. `last_modified` records the most recent substantive or normalization change to that file; it is not a release date.
 
-Automated Assessments currently identify the provisional assessment specification as `scap-ng.pre-alpha.assessment` version `0.2.0`. The final standards name and identifier remain an OVAL Board decision.
+Automated Assessments currently identify the provisional assessment specification as `scap-ng.pre-alpha.assessment` version `0.3.0`. The final standards name and identifier remain an OVAL Board decision.
 
 ## Validate content yourself
 
@@ -148,7 +148,7 @@ From the repository root:
 ```powershell
 python -m pip install PyYAML==6.0.3 lxml==6.1.1 jsonschema cryptography
 
-python tools/validate_native_json_schemas.py PATH_TO_CONTENT --schema-dir schema/v0.2.0
+python tools/validate_native_json_schemas.py PATH_TO_CONTENT --schema-dir schema/v0.3.0
 python tools/validate_native_semantics.py PATH_TO_CONTENT
 python tools/validate_native_package_graph.py PATH_TO_CONTENT
 ```
@@ -157,7 +157,7 @@ For conversion, normalization, packaging, and other human-runnable commands, see
 
 ## What schema validation does — and does not — prove
 
-A document passing JSON Schema validation means its structure conforms to the 0.2.0 structural contract.
+A document passing JSON Schema validation means its structure conforms to the 0.3.0 structural contract.
 
 It does **not** by itself prove:
 
@@ -171,13 +171,13 @@ Those require separate semantic, conversion, known-result, round-trip, collectio
 
 ## Review status
 
-0.2.0 is intentionally frozen for review rather than presented as a finished standard.
+0.3.0 is intentionally frozen for review rather than presented as a finished standard.
 
 The current review goals are to identify demonstrated semantic gaps, confirm that used non-deprecated OVAL semantics are preserved, verify that normalization does not change assessment meaning, and obtain Board guidance on the remaining standards decisions.
 
 See:
 
 - **[OVAL Board review landing page](../../board/README.md)**
-- **[0.2.0 review checkpoint](../../board/SCAP-NG-0.2.0-REVIEW-CHECKPOINT.md)**
+- **[0.3.0 review checkpoint](../../board/SCAP-NG-0.3.0-REVIEW-CHECKPOINT.md)**
 - **[Proposal coverage audit](../../board/PROPOSAL-COVERAGE-AUDIT.md)**
 - **[OVAL 5.12.3 capability crosswalk](../../specification/migration/oval-5.12.3-capability-crosswalk.md)**

@@ -1,14 +1,14 @@
-# Supported SCAP-NG 0.2.0 capability mappings
+# Supported SCAP-NG 0.3.0 capability mappings
 
 These 100 reviewed, non-deprecated OVAL 5.12.3-derived mappings are the
-supported SCAP-NG 0.2.0 capability baseline. Every canonical mapping is physically
-present in this directory; 0.2.0 does not navigate to or resolve normative
+supported SCAP-NG 0.3.0 capability baseline. Every canonical mapping is physically
+present in this directory; 0.3.0 does not navigate to or resolve normative
 capability definitions from v0.1.0.
 
 Each mapping retains its OVAL source Test/Object/State/Item identity as durable
-provenance. Generators and validators resolve the local 0.2.0 files against the
-0.2.0 authoring/result contracts. The promotion regression verifies the count,
-version isolation, and generation of every supported capability against 0.2.0
+provenance. Generators and validators resolve the local 0.3.0 files against the
+0.3.0 authoring/result contracts. The promotion regression verifies the count,
+version isolation, and generation of every supported capability against 0.3.0
 schema IDs.
 
 A missing or unknown capability fails validation.
