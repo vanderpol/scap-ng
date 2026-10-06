@@ -274,7 +274,33 @@ def _branch_like(node):
     )
 
 
+def _bump(mapping, key, amount=1):
+    mapping[key] = mapping.get(key, 0) + amount
+
+
+def _finalize_stats(report):
+    stats = report["stats"]
+    stats["rewrites_applied"] = len(report["applied"])
+    stats["review_required_nodes"] = len(report["review_required"])
+    branch_like = stats["branch_like_nodes_examined"]
+    stats["rewrite_rate_pct_of_branch_like"] = (
+        round(100.0 * stats["rewrites_applied"] / branch_like, 2)
+        if branch_like else 0.0
+    )
+    stats["review_rate_pct_of_branch_like"] = (
+        round(100.0 * stats["review_required_nodes"] / branch_like, 2)
+        if branch_like else 0.0
+    )
+    return report
+
+
 def _rewrite_expression(node, path, report, assessment):
+    if isinstance(node, dict):
+        report["stats"]["expression_nodes_examined"] += 1
+    branch_like = _branch_like(node)
+    if branch_like:
+        report["stats"]["branch_like_nodes_examined"] += 1
+
     candidate, rejection = _candidate(node, assessment)
     if candidate is not None:
         rewritten = {
@@ -282,6 +308,8 @@ def _rewrite_expression(node, path, report, assessment):
             "then": _rewrite_expression(candidate["then"], path + "/then", report, assessment),
             "else": _rewrite_expression(candidate["else"], path + "/else", report, assessment),
         }
+        report["stats"]["rewrite_candidates_proven"] += 1
+        _bump(report["stats"]["applied_pattern_counts"], candidate["pattern_class"])
         report["applied"].append({
             "path": path,
             "source_pattern": candidate["pattern_class"],
@@ -303,7 +331,8 @@ def _rewrite_expression(node, path, report, assessment):
         })
         return rewritten
 
-    if _branch_like(node) and rejection:
+    if branch_like and rejection:
+        _bump(report["stats"]["review_reason_counts"], rejection)
         report["review_required"].append({
             "path": path,
             "reasons": [rejection],
@@ -346,17 +375,29 @@ def modernize_conditionals_v1(document, *, enabled=False):
         "rewrite_performed": False,
         "pattern_based": True,
         "rule_id_allowlist": False,
+        "stats": {
+            "expression_nodes_examined": 0,
+            "branch_like_nodes_examined": 0,
+            "rewrite_candidates_proven": 0,
+            "rewrites_applied": 0,
+            "review_required_nodes": 0,
+            "rewrite_rate_pct_of_branch_like": 0.0,
+            "review_rate_pct_of_branch_like": 0.0,
+            "applied_pattern_counts": {},
+            "review_reason_counts": {},
+        },
         "applied": [],
         "review_required": [],
     }
     if not enabled:
-        return result, report
+        return result, _finalize_stats(report)
     if version != TARGET_VERSION:
         report["review_required"].append({
             "path": "/assessment/evaluate",
             "reasons": ["conditional_v1_requires_0.3.0"],
         })
-        return result, report
+        _bump(report["stats"]["review_reason_counts"], "conditional_v1_requires_0.3.0")
+        return result, _finalize_stats(report)
 
     expression = assessment.get("evaluate")
     if not isinstance(expression, dict):
@@ -364,10 +405,11 @@ def modernize_conditionals_v1(document, *, enabled=False):
             "path": "/assessment/evaluate",
             "reasons": ["evaluate_expression_missing"],
         })
-        return result, report
+        _bump(report["stats"]["review_reason_counts"], "evaluate_expression_missing")
+        return result, _finalize_stats(report)
 
     assessment["evaluate"] = _rewrite_expression(
         expression, "/assessment/evaluate", report, assessment
     )
     report["rewrite_performed"] = bool(report["applied"])
-    return result, report
+    return result, _finalize_stats(report)
