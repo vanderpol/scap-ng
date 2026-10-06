@@ -55,6 +55,28 @@ Zero-source semantics SHALL be explicit and SHALL NOT be inferred from generic B
 
 Error, incomplete, does-not-exist, not-collected, unknown and not-applicable behavior must be specified for each aggregation.
 
+The research SHALL distinguish at least two different meanings of "incomplete":
+
+1. **Migrated OVAL collected-object flag=incomplete.** OVAL 5.12.3 defines
+   explicit Test-result exceptions for this flag. Those inherited rules are
+   compatibility semantics and can produce outcomes that differ from a generic
+   conservative partial-population model.
+2. **Native evaluator-controlled partial population.** A scanner may stop
+   because of a resource limit, an execution limit, or deliberate early
+   termination. This condition SHALL NOT automatically reuse OVAL's
+   collected-object incomplete truth table. Unless the observed evidence is
+   logically irreversible under every unseen continuation, the native result
+   must remain incomplete/unknown/error according to the final result model.
+
+For example, with OVAL collected-object flag=incomplete and Test
+check=at-least-one, the inherited generic result rules permit an observed false
+check result to make the Test false. By contrast, if a native scanner itself
+stopped before seeing the complete population after observing only failures,
+those unseen Items could still contain a success; a native early-stop path
+cannot claim false on that basis alone.
+
+This distinction is a conversion proof obligation, not an implementation detail.
+
 ### Truncation and evidence caps
 
 Evidence caps SHALL NOT change truth semantics.
