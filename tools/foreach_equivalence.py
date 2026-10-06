@@ -79,3 +79,40 @@ def direct_at_least_one_equivalent(items, projected_values, predicate: Callable)
         faithful_at_least_one_selection(items, projected_values, predicate),
         foreach_union_selection(items, projected_values, predicate),
     )
+
+
+def project_object_component_complete(items, item_field):
+    """Model the explicit OVAL ObjectComponentType rules for a complete source.
+
+    The pinned OVAL schema states:
+    * zero collected Items => error determining the ObjectComponent value;
+    * each collected Item must contain the requested item_field, otherwise error;
+    * one or more matching entities contribute all of their values.
+
+    Record-field projection and non-complete collected-object flags are separate
+    proof classes and intentionally not guessed here.
+    """
+    rows = list(items)
+    if not rows:
+        return {"status": "error", "values": [], "reason": "source_object_has_no_items"}
+
+    values = []
+    for item in rows:
+        if item_field not in item:
+            return {
+                "status": "error",
+                "values": [],
+                "reason": f"item_field_missing:{item_field}",
+            }
+        raw = item[item_field]
+        if isinstance(raw, list):
+            if not raw:
+                return {
+                    "status": "error",
+                    "values": [],
+                    "reason": f"item_field_has_no_entities:{item_field}",
+                }
+            values.extend(raw)
+        else:
+            values.append(raw)
+    return {"status": "values", "values": values}
