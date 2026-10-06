@@ -11,6 +11,7 @@ on:
       - "tools/plan_for_each_migration.py"
       - "tools/for_each_semantics_probe.py"
       - "tests/test_for_each_semantics_probe.py"
+      - "tools/extract_for_each_proof_cases.py"
       - ".github/workflows/for-each-correlation-audit.yml"
 
 jobs:
@@ -109,6 +110,12 @@ jobs:
             --label "${{ matrix.key }}" \
             --output "work/${{ matrix.key }}-manual-correlation-audit.json"
 
+      - name: Extract exact OVAL proof cases
+        run: |
+          python tools/extract_for_each_proof_cases.py \
+            "work/${{ matrix.key }}-for-each-audit.json" \
+            --output-dir "work/${{ matrix.key }}-for-each-proof-cases"
+
       - name: Build conservative migration plan
         run: |
           python tools/plan_for_each_migration.py \
@@ -125,3 +132,4 @@ jobs:
             work/${{ matrix.key }}-for-each-audit.json
             work/${{ matrix.key }}-manual-correlation-audit.json
             work/${{ matrix.key }}-for-each-migration-plan.json
+            work/${{ matrix.key }}-for-each-proof-cases/**
