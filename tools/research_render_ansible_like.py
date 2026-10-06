@@ -92,47 +92,93 @@ def typed_value(value, datatype):
     return value
 
 
-def predicate(spec):
+def predicate(spec, variables=None):
     if not isinstance(spec, dict):
         raise Unsupported("predicate_not_mapping")
     if spec.get("mask") is True:
         raise Unsupported("masked_predicate")
-    if isinstance(spec.get("value"), dict):
-        raise Unsupported("variable_or_structured_value")
+    allowed={
+        "operation","datatype","mask","value","entity_check","entity_existence",
+        "variable_check","nil",
+    }
+    extra=set(spec)-allowed
+    if extra:
+        raise Unsupported("predicate_attributes:" + ",".join(sorted(extra)))
+
+    raw=spec.get("value")
+    if isinstance(raw, dict):
+        if set(raw)!={"variable"} or variables is None:
+            raise Unsupported("variable_or_structured_value")
+        var_id=raw["variable"]
+        var=variables.get(var_id)
+        if not isinstance(var,dict) or var.get("kind")!="constant":
+            raise Unsupported("variable_nonconstant")
+        expr=var.get("expression")
+        if not isinstance(expr,dict) or set(expr)!={"literal"}:
+            raise Unsupported("variable_nonliteral")
+        values=expr["literal"]
+        if not isinstance(values,list):
+            values=[values]
+        values=[typed_value(v,spec.get("datatype")) for v in values]
+        op=spec.get("operation")
+        if op not in {"equals","equal"}:
+            raise Unsupported("constant_variable_operation:" + str(op))
+        check=spec.get("variable_check")
+        key={
+            "at least one":"one_of",
+            "any":"one_of",
+            "all":"all_of",
+            "only one":"exactly_one_of",
+            "none satisfy":"none_of",
+        }.get(check)
+        if key is None:
+            raise Unsupported("constant_variable_check:" + str(check))
+        return {key: values}
+
+    if spec.get("variable_check") is not None:
+        raise Unsupported("variable_check_without_variable")
+
     op = spec.get("operation")
     if op not in OP_NAMES:
         raise Unsupported("unsupported_operation:" + str(op))
-    value = typed_value(spec.get("value"), spec.get("datatype"))
+    value = typed_value(raw, spec.get("datatype"))
     short = OP_NAMES[op]
     if short is None:
-        return value
+        out=value
+    else:
+        out={short:value}
 
-    out = {short: value}
+    if spec.get("nil") is True:
+        if not isinstance(out,dict):
+            out={"value":out}
+        out["nil"]=True
     # These alter evaluation and cannot disappear merely for prettiness.
     if spec.get("entity_check") not in {None, "all"}:
+        if not isinstance(out,dict): out={"value":out}
         out["entity_check"] = spec["entity_check"]
     if spec.get("entity_existence") not in {None, "at_least_one_exists"}:
+        if not isinstance(out,dict): out={"value":out}
         out["entity_existence"] = spec["entity_existence"]
     return out
 
 
-def state_expr(state):
+def state_expr(state, variables=None):
     if state is None:
         return None
     if not isinstance(state, dict):
         raise Unsupported("state_not_mapping")
     if "field" in state:
-        return {state["field"]: predicate(state)}
+        return {state["field"]: predicate(state, variables)}
     for op in ("all", "any"):
         if op in state:
             values = state[op]
             if not isinstance(values, list):
                 raise Unsupported("state_boolean_not_list")
-            return {op: [state_expr(x) for x in values]}
+            return {op: [state_expr(x, variables) for x in values]}
     raise Unsupported("unsupported_state_shape")
 
 
-def collect_expr(collect):
+def collect_expr(collect, variables=None):
     if not isinstance(collect, dict):
         raise Unsupported("collect_not_mapping")
     filters = collect.get("filters") or []
@@ -157,7 +203,7 @@ def collect_expr(collect):
         for member in members:
             if not isinstance(member, dict) or set(member) != {"collect"}:
                 raise Unsupported("set_union_noncollect_member")
-            child_module, child = collect_expr(member["collect"])
+            child_module, child = collect_expr(member["collect"], variables)
             if child_module != module:
                 raise Unsupported("set_union_mixed_capability")
             sources.append(child)
@@ -168,7 +214,7 @@ def collect_expr(collect):
         if not isinstance(select, dict):
             raise Unsupported("select_not_mapping")
         for field, spec in select.items():
-            result[field] = predicate(spec)
+            result[field] = predicate(spec, variables)
 
     if filters:
         grouped = {"include": [], "exclude": []}
@@ -181,7 +227,7 @@ def collect_expr(collect):
             match = item.get("match")
             if not isinstance(match, dict):
                 raise Unsupported("filter_match")
-            grouped[action].append(state_expr(match))
+            grouped[action].append(state_expr(match, variables))
         for action, values in grouped.items():
             if values:
                 result[action] = values[0] if len(values) == 1 else values
@@ -194,11 +240,11 @@ def collect_expr(collect):
     return module, result
 
 
-def leaf(check_id, check):
+def leaf(check_id, check, variables=None):
     if not isinstance(check, dict):
         raise Unsupported("check_not_mapping")
     cap = check.get("capability")
-    module, selection = collect_expr(check.get("collect"))
+    module, selection = collect_expr(check.get("collect"), variables)
     if cap and MODULE_NAMES.get(cap, cap.replace(".", "_")) != module:
         raise Unsupported("check_collect_capability_mismatch")
 
@@ -226,10 +272,10 @@ def leaf(check_id, check):
         for item in named_states:
             if not isinstance(item, dict) or "state" not in item:
                 raise Unsupported("named_state_shape")
-            values.append(state_expr(item["state"]))
+            values.append(state_expr(item["state"], variables))
         expect[key] = values
     else:
-        state = state_expr(assertion.get("state"))
+        state = state_expr(assertion.get("state"), variables)
         if state is not None:
             expect.update(state)
 
@@ -258,8 +304,20 @@ def eval_expr(node, rendered):
     raise Unsupported("unsupported_evaluate_shape")
 
 
+def constant_literal_variables(assessment):
+    variables=assessment.get("variables") or {}
+    for var in variables.values():
+        if not isinstance(var,dict) or var.get("kind")!="constant":
+            return None
+        expr=var.get("expression")
+        if not isinstance(expr,dict) or set(expr)!={"literal"}:
+            return None
+    return variables
+
+
 def has_dataflow(assessment):
-    if assessment.get("variables"):
+    variables=assessment.get("variables") or {}
+    if variables and constant_literal_variables(assessment) is None:
         return "variables"
     for node in walk(assessment):
         keys = set(node)
@@ -281,7 +339,8 @@ def render(assessment):
         raise Unsupported(reason)
 
     checks = assessment.get("checks") or assessment.get("tests") or {}
-    rendered = {cid: leaf(cid, c) for cid, c in checks.items()}
+    variables = constant_literal_variables(assessment) or {}
+    rendered = {cid: leaf(cid, c, variables) for cid, c in checks.items()}
     root = eval_expr(assessment.get("evaluate"), rendered)
 
     return {
