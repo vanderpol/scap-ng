@@ -158,10 +158,14 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                     continue
                 root = Path(__file__).resolve().parents[1]
                 store = schema_store(root / f"schema/v{declared_version}")
-                resolver = RefResolver.from_schema(generated, store=store)
+                from referencing import Registry, Resource
+                registry = Registry().with_resources(
+                    (uri, Resource.from_contents(schema))
+                    for uri, schema in store.items()
+                )
                 validator = Draft202012Validator(
                     generated["$defs"][kind],
-                    resolver=resolver,
+                    registry=registry,
                 )
                 for error in validator.iter_errors(node):
                     error.path.extendleft(reversed(["assessment", section, identity]))
