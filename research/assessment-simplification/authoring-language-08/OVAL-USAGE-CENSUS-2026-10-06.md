@@ -120,6 +120,29 @@ things such as:
 It does **not** imply that authors need to see an OVAL-style Object/State/Test
 graph to express those semantics.
 
+## Extend-definition appears overwhelmingly to be authoring indirection
+
+A refined structural classification of the same representative corpus found
+**1,267** reachable `extend_definition` occurrences:
+
+| Form | Occurrences |
+| --- | ---: |
+| Pure one-hop wrapper | **1,217 (96.1%)** |
+| Multiple extends and no direct Test criteria | 16 |
+| Extend plus direct Test criteria | 29 |
+| Extend plus nested criteria | 5 |
+| Negated extend | **0** |
+
+This strongly supports treating `extend_definition` as source/publication
+indirection rather than a first-class human-authoring requirement.
+
+The remaining 50 occurrences still need semantic review before claiming that
+100% can be erased mechanically. Even if their Boolean meaning must be
+preserved in the semantic IR, nothing in this census shows that an NG author
+needs to write an `extend_definition` construct. Their meaning may be better
+rendered directly as ordinary `all` / `any` composition in a simplified
+authoring layer.
+
 ## OVAL indirection is not the same thing as security-check complexity
 
 `extend_definition` appears in **80.9%** of the measured Rules.
