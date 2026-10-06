@@ -125,7 +125,7 @@ def project_items(assessment, items, uses, *, source_execution_ref, source_compl
         _check_redaction(item)
         if not set(item["fields"]) <= capability_fields(item["capability"], version):
             raise ValueError(f"Unknown Item fields: {item['id']}")
-        for name, source in EXTENSIONS.get(item["capability"], {}).items():
+        for name, source in result_extensions(version).get(item["capability"], {}).items():
             if name not in item["fields"]:
                 continue
             original = item["fields"].get(source)
