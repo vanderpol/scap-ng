@@ -100,16 +100,12 @@ objects:
     capability: unix.file
 
     for_each:
-      source:
-        object: non-system-users
-      as: user
-      collect: union
+      item: user
+      in: non-system-users
 
     select:
       path:
         from: user.home_dir
-        operation: equals
-        datatype: string
       filename:
         operation: pattern_match
         datatype: string
@@ -139,18 +135,17 @@ The author no longer has to:
 The author still sees:
 
 - which source Object supplies Items;
-- which exact source field is projected;
-- the target selector operation/datatype;
-- explicit union collection behavior;
+- the local Item name used by the binding;
+- which exact source field supplies the target selector;
 - the target Object;
 - the Test aggregation boundary.
 
 This is deliberate. A shorter syntax that hides those facts would not be an
 improvement.
 
-## Why `collect: union` is explicit
+## Why union is not authored
 
-The important semantic distinction is:
+The important semantic distinction remains:
 
 ```
 source Items
@@ -168,9 +163,14 @@ source Item
 repeat and aggregate Tests
 ```
 
-Making `collect: union` authored and required is slightly more verbose, but it
-protects the most important semantic boundary exposed by the RHEL production
-counterexample.
+But v1 Object-level `for_each` has only the first meaning. Since the author has
+no alternative collection mode to choose, spelling `collect: union` adds
+ceremony without information. Union is therefore intrinsic to this exact
+grammar, not a configurable value with an omitted default.
+
+Likewise, `from: user.home_dir` is a binding. The author does not redundantly
+write `operation: equals` or `datatype: string`; the compiler preserves the
+effective comparison and type compatibility in the normative desugaring.
 
 ## Error/status behavior
 
@@ -242,17 +242,16 @@ products or otherwise transform value sets. They are not v1 foreach.
 
 ## Review questions
 
-1. Is `for_each.source.object + as + collect: union` clearer than the named
+1. Is `for_each: {item: user, in: non-system-users}` clearer than the named
    one-use Variable graph?
-2. Should `collect: union` remain mandatory, as proposed, to avoid hidden
-   semantics?
-3. Is `from: user.home_dir` sufficiently explicit, or should the syntax say
-   `field: home_dir` under a longer binding object?
-4. Should v1 stay intentionally limited to `var_check="at least one"`, with
-   that quantifier implicit in this exact construct, or should it be visible?
-5. Is removal of one-use Variable result presentation desirable if canonical
+2. Is `from: user.home_dir` clear enough as a binding without redundant
+   equality/datatype syntax?
+3. Is it acceptable for union collection and `var_check="at least one"` to be
+   intrinsic to this narrowly defined v1 grammar, given that v1 offers no other
+   choices?
+4. Is removal of one-use Variable result presentation desirable if canonical
    source/value provenance remains available?
-6. If adopted, should converter modernization be opt-in initially even for
+5. If adopted, should converter modernization be opt-in initially even for
    `safe_automatic` matches, so Board/vendors can compare faithful and modern
    output side by side?
 
