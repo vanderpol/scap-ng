@@ -20,6 +20,9 @@ from foreach_equivalence import (
     direct_foreach_desugaring,
     direct_foreach_preconditions,
     DIRECT_FOREACH_REWRITE_ID,
+    faithful_direct_evidence,
+    foreach_direct_evidence,
+    evidence_equivalent,
 )
 from oval_result_truth_tables import (
     TRUE,
@@ -218,6 +221,101 @@ class DirectForeachDesugaring(unittest.TestCase):
             "first_proof_class_requires_directly_tested_target",
             result["reasons"],
         )
+
+
+class DirectForeachEvidenceEquivalence(unittest.TestCase):
+    def test_faithful_and_foreach_reduce_to_same_canonical_evidence(self):
+        items = {
+            "user-a": {"id":"user-a","fields":{"home_dir":{"datatype":"string","value":"/home/a"}}},
+            "user-b": {"id":"user-b","fields":{"home_dir":{"datatype":"string","value":"/home/b"}}},
+        }
+        faithful = faithful_direct_evidence(
+            source_object_ref="users",
+            variable_result={
+                "status":"complete",
+                "item_refs":["user-a","user-b"],
+                "values":[
+                    {"datatype":"string","value":"/home/a"},
+                    {"datatype":"string","value":"/home/b"},
+                ],
+            },
+            items_by_id=items,
+            item_field="home_dir",
+            target_item_refs=["file-b","file-a"],
+        )
+        modern = foreach_direct_evidence(
+            source_object_ref="users",
+            bindings=[
+                {"source_item_ref":"user-a","projected_values":[{"datatype":"string","value":"/home/a"}]},
+                {"source_item_ref":"user-b","projected_values":[{"datatype":"string","value":"/home/b"}]},
+            ],
+            target_item_refs=["file-a","file-b"],
+            status="complete",
+        )
+        self.assertTrue(evidence_equivalent(faithful, modern))
+
+    def test_duplicate_values_preserve_source_item_provenance(self):
+        items = {
+            "user-a": {"id":"user-a","fields":{"home_dir":{"datatype":"string","value":"/shared"}}},
+            "user-b": {"id":"user-b","fields":{"home_dir":{"datatype":"string","value":"/shared"}}},
+        }
+        faithful = faithful_direct_evidence(
+            source_object_ref="users",
+            variable_result={
+                "status":"complete",
+                "item_refs":["user-a","user-b"],
+                "values":[
+                    {"datatype":"string","value":"/shared"},
+                    {"datatype":"string","value":"/shared"},
+                ],
+            },
+            items_by_id=items,
+            item_field="home_dir",
+            target_item_refs=["file-shared"],
+        )
+        modern = foreach_direct_evidence(
+            source_object_ref="users",
+            bindings=[
+                {"source_item_ref":"user-a","projected_values":[{"datatype":"string","value":"/shared"}]},
+                {"source_item_ref":"user-b","projected_values":[{"datatype":"string","value":"/shared"}]},
+            ],
+            target_item_refs=["file-shared"],
+            status="complete",
+        )
+        self.assertTrue(evidence_equivalent(faithful, modern))
+        self.assertEqual(len(faithful["projected"]), 2)
+
+    def test_different_target_population_is_not_equivalent(self):
+        base = foreach_direct_evidence(
+            source_object_ref="users",
+            bindings=[{"source_item_ref":"user-a","projected_values":[{"datatype":"string","value":"/home/a"}]}],
+            target_item_refs=["file-a"],
+            status="complete",
+        )
+        changed = foreach_direct_evidence(
+            source_object_ref="users",
+            bindings=[{"source_item_ref":"user-a","projected_values":[{"datatype":"string","value":"/home/a"}]}],
+            target_item_refs=["file-a","file-b"],
+            status="complete",
+        )
+        self.assertFalse(evidence_equivalent(base, changed))
+
+    def test_faithful_projection_mismatch_fails_closed(self):
+        items = {
+            "user-a": {"id":"user-a","fields":{"home_dir":{"datatype":"string","value":"/home/a"}}}
+        }
+        with self.assertRaises(ValueError):
+            faithful_direct_evidence(
+                source_object_ref="users",
+                variable_result={
+                    "status":"complete",
+                    "item_refs":["user-a"],
+                    "values":[{"datatype":"string","value":"/wrong"}],
+                },
+                items_by_id=items,
+                item_field="home_dir",
+                target_item_refs=[],
+            )
 
 
 class DownstreamTestResultEquivalence(unittest.TestCase):
