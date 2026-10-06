@@ -1004,41 +1004,6 @@ def main() -> int:
             "fingerprint_cache_hits": cache_hits,
             "fingerprint_cache_misses": cache_misses,
         },
-        "stats": {
-            "scope": {
-                "benchmarks_examined": len(benchmarks),
-                "rules_examined": sum(len(x["rules"]) for x in benchmarks),
-                "referenced_assessment_instances_examined": before_assessment_instances,
-            },
-            "exact_normalization": {
-                "duplicate_groups_found": len(exact_report),
-                "duplicate_assessment_definitions_avoided": duplicate_instances_avoided,
-                "definitions_before": before_assessment_instances,
-                "definitions_after": after_assessment_definitions,
-                "definition_reduction_pct": reduction_pct,
-                "shared_assessments_created_or_planned": len(exact_report),
-            },
-            "rewrite": {
-                "requested": bool(args.rewrite),
-                "rule_files_rewritten": rewritten_rule_files,
-                "applicability_files_rewritten": rewritten_applicability_files,
-                "local_assessment_files_removed": removed_local_assessments,
-            },
-            "review": {
-                "near_duplicate_groups": len(near_groups),
-                "near_duplicate_rule_candidates": len(rule_candidates),
-                "near_duplicates_merged": False,
-            },
-            "cache": {
-                "hits": cache_hits,
-                "misses": cache_misses,
-                "hit_rate_pct": (
-                    round(100.0 * cache_hits / (cache_hits + cache_misses), 2)
-                    if cache_hits + cache_misses else 0.0
-                ),
-            },
-            "validation": repository_validation,
-        },
         "repository_validation": repository_validation,
         "change_manifest": change_manifest,
         "planned_changes": {
