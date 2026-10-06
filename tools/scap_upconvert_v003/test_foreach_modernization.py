@@ -221,7 +221,7 @@ class ForeachConverterModernization(unittest.TestCase):
         files = assessment["objects"]["files"]
         self.assertEqual(
             files["for_each"],
-            {"item": "user", "in": "users-object"},
+            {"item": "user", "in": "users"},
         )
         self.assertEqual(
             files["select"]["directory"],
