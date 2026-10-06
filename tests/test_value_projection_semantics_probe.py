@@ -148,3 +148,38 @@ def test_oval_self_assertion_object_component_cardinality_matrix():
     bound = same_item_binding_projection(multiple_items_multiple_entities, "value")
     assert len(bound) == 6
     assert {entry["source_item"] for entry in bound} == {0, 1}
+
+
+def test_projection_preserves_oval_variable_datatype_compliance():
+    integer_items=[
+        {"value":["0","+7","-42","0010"]},
+    ]
+    source=oval_object_component(integer_items,"value",datatype="int")
+    target=inline_projection(integer_items,"value",datatype="int")
+    assert source == {"status":OK,"values":["0","+7","-42","0010"]}
+    assert target == source
+
+    invalid=[
+        {"value":["10","1.5"]},
+    ]
+    assert oval_object_component(invalid,"value",datatype="int") == {
+        "status":ERROR,
+        "values":[],
+    }
+    assert inline_projection(invalid,"value",datatype="int") == {
+        "status":ERROR,
+        "values":[],
+    }
+
+
+def test_current_p1_string_projection_requires_string_values():
+    assert oval_object_component(
+        [{"value":["abc","123"]}],
+        "value",
+        datatype="string",
+    ) == {"status":OK,"values":["abc","123"]}
+    assert oval_object_component(
+        [{"value":["abc",123]}],
+        "value",
+        datatype="string",
+    ) == {"status":ERROR,"values":[]}
