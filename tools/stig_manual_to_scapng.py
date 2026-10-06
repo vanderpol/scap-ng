@@ -20,7 +20,7 @@ from xml.etree import ElementTree as ET
 import yaml
 from jsonschema import Draft202012Validator
 
-from scap_upconvert_v003.build_rhel9_review_slice import functional_group_from_text
+from group_mapping import auto_map_groups
 
 
 def lname(tag: str) -> str:
@@ -720,40 +720,13 @@ def convert(source: Path, output: Path, *, auto_map_groups: bool = False) -> dic
     groups = []
     grouping_rows = []
     if auto_map_groups:
-        buckets: dict[str, dict] = {}
-        for candidate in group_candidates:
-            topic_id, topic_title = functional_group_from_text(
-                candidate["title"],
-                candidate["discussion"],
-                candidate["remediation"],
-            )
-            if topic_id == "needs-grouping":
-                grouping_rows.append({
-                    "rule": candidate["rule"],
-                    "functional_group": None,
-                    "method": "heuristic",
-                    "mapped": False,
-                    "reason": "no_high_confidence_topic",
-                })
-                continue
-            group_id = f"manual-or-managerial.{topic_id}"
-            bucket = buckets.setdefault(
-                group_id,
-                {"id": group_id, "title": topic_title, "rules": []},
-            )
-            bucket["rules"].append(candidate["rule"])
-            grouping_rows.append({
-                "rule": candidate["rule"],
-                "functional_group": group_id,
-                "method": "heuristic",
-                "mapped": True,
-            })
-        if buckets:
-            groups = [{
-                "id": "manual-or-managerial",
-                "title": "Manual or Managerial",
-                "groups": list(buckets.values()),
-            }]
+        groups, grouping_rows = auto_map_groups([
+            {
+                **candidate,
+                "assessment_group": "manual-or-managerial",
+            }
+            for candidate in group_candidates
+        ])
     else:
         grouping_rows = [
             {
