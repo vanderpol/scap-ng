@@ -268,6 +268,31 @@ def main():
             projection_usage[usage]+=1
             projection_usage["consumer_kind_set:"+"+".join(sorted(kinds))]+=1
 
+    unique_inventory=[]
+    for vid,v in sorted(unique_variables.items()):
+        consumers=[
+            {"kind":kind,"consumer":consumer,"entity":entity,"var_check":var_check}
+            for kind,consumer,entity,var_check in sorted(v["consumers"])
+        ]
+        lineage=[
+            {"source_object":source_object,"field":field}
+            for source_object,field in sorted(v["lineage"])
+        ]
+        if len(consumers)==1:
+            usage_class="single_use_"+consumers[0]["kind"]
+        elif len(consumers)>1:
+            usage_class="multi_use"
+        else:
+            usage_class="unused_in_reachable_closures"
+        unique_inventory.append({
+            "variable":vid,
+            "shape":v["shape"],
+            "root_operator":v.get("root_operator"),
+            "usage_class":usage_class,
+            "consumers":consumers,
+            "lineage":lineage,
+        })
+
     report={
         "label":args.label,
         "closure_files":len(files),
@@ -280,6 +305,7 @@ def main():
         "unique_variable_usage_by_shape":{"|".join(k):v for k,v in sorted(usage_by_shape.items())},
         "unique_variable_usage_by_root_operator":{"|".join(k):v for k,v in sorted(root_usage.items())},
         "unique_pure_projection_usage":dict(projection_usage),
+        "unique_variable_inventory":unique_inventory,
         "candidates":candidates,
     }
     out=Path(args.output)
