@@ -213,3 +213,103 @@ def direct_foreach_preconditions(candidate):
         "eligible": not reasons,
         "reasons": sorted(set(reasons)),
     }
+
+
+def _typed_value_key(value):
+    """Normalize a result typed_value or primitive without losing datatype."""
+    if isinstance(value, dict) and "value" in value:
+        return (
+            value.get("datatype"),
+            json.dumps(value.get("value"), sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+        )
+    return (
+        None,
+        json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+    )
+
+
+def _field_values(item, item_field):
+    fields = item.get("fields", {})
+    if item_field not in fields:
+        raise ValueError(f"source Item {item.get('id')} lacks field {item_field}")
+    raw = fields[item_field]
+    return raw if isinstance(raw, list) else [raw]
+
+
+def faithful_direct_evidence(
+    *,
+    source_object_ref,
+    variable_result,
+    items_by_id,
+    item_field,
+    target_item_refs,
+):
+    """Canonical evidence view for faithful object_component plumbing.
+
+    The view intentionally includes only relationships the faithful result can
+    establish without inference:
+      * source Object identity;
+      * source Item identities consumed by the Variable;
+      * projected source field/value pairs;
+      * the Variable status;
+      * the combined target Object/Test Item population.
+
+    It does not infer which target Item came from which projected source value.
+    """
+    source_item_refs = list(variable_result.get("item_refs", []))
+    projections = []
+    flattened = []
+    for item_ref in source_item_refs:
+        item = items_by_id[item_ref]
+        for value in _field_values(item, item_field):
+            key = _typed_value_key(value)
+            projections.append((item_ref, key))
+            flattened.append(key)
+
+    reported = [_typed_value_key(v) for v in variable_result.get("values", [])]
+    if sorted(flattened) != sorted(reported):
+        raise ValueError(
+            "Variable values do not match values reconstructable from source item_refs"
+        )
+
+    return {
+        "source_object_ref": source_object_ref,
+        "source_item_refs": tuple(sorted(source_item_refs)),
+        "projected": tuple(sorted(projections)),
+        "status": variable_result.get("status"),
+        "target_item_refs": tuple(sorted(set(target_item_refs))),
+    }
+
+
+def foreach_direct_evidence(
+    *,
+    source_object_ref,
+    bindings,
+    target_item_refs,
+    status,
+):
+    """Canonical evidence view for native foreach binding evidence.
+
+    Each binding contains a source_item_ref and one or more projected_values.
+    Child target correlation is deliberately not required; target_item_refs are
+    compared as one combined population, matching the preserved Test boundary.
+    """
+    source_item_refs = []
+    projections = []
+    for binding in bindings:
+        item_ref = binding["source_item_ref"]
+        source_item_refs.append(item_ref)
+        for value in binding.get("projected_values", []):
+            projections.append((item_ref, _typed_value_key(value)))
+
+    return {
+        "source_object_ref": source_object_ref,
+        "source_item_refs": tuple(sorted(source_item_refs)),
+        "projected": tuple(sorted(projections)),
+        "status": status,
+        "target_item_refs": tuple(sorted(set(target_item_refs))),
+    }
+
+
+def evidence_equivalent(left, right):
+    return left == right
