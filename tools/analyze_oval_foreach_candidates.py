@@ -16,6 +16,9 @@ This shape is interesting because the Variable can be representation plumbing
 for collection expansion. The analyzer preserves the aggregation boundary: it
 does NOT infer per-source-item Test evaluation.
 
+Inputs may be standalone OVAL XML, SCAP datastream XML containing embedded
+oval_definitions components, ZIP packages containing XML, or directories.
+
 Usage:
     python tools/analyze_oval_foreach_candidates.py FILE_OR_DIR [...]
     python tools/analyze_oval_foreach_candidates.py ... --output report.json
@@ -24,10 +27,12 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import io
 import json
 from pathlib import Path
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
 
 
 CROSS_PRODUCT_OR_MULTI_INPUT_OPS = {
@@ -42,16 +47,21 @@ def local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1] if "}" in tag else tag
 
 
-def iter_xml_inputs(paths: list[Path]) -> list[Path]:
+def iter_inputs(paths: list[Path]) -> list[Path]:
     out: list[Path] = []
     for path in paths:
         if path.is_dir():
-            out.extend(sorted(p for p in path.rglob("*.xml") if p.is_file()))
+            out.extend(
+                sorted(
+                    p
+                    for p in path.rglob("*")
+                    if p.is_file() and p.suffix.lower() in {".xml", ".zip"}
+                )
+            )
         elif path.is_file():
             out.append(path)
         else:
             raise FileNotFoundError(path)
-    # Preserve stable first occurrence when paths overlap.
     seen = set()
     unique = []
     for path in out:
@@ -284,24 +294,7 @@ def classify_candidate(
     }
 
 
-def analyze_file(path: Path) -> dict:
-    try:
-        root = ET.parse(path).getroot()
-    except ET.ParseError as exc:
-        return {
-            "path": str(path),
-            "status": "parse_error",
-            "error": str(exc),
-            "candidates": [],
-        }
-
-    if local(root.tag) != "oval_definitions":
-        return {
-            "path": str(path),
-            "status": "not_oval_definitions",
-            "candidates": [],
-        }
-
+def analyze_oval_root(root: ET.Element, source_label: str) -> dict:
     index = index_document(root)
     candidates = []
     for variable_id, variable in sorted(index["variables"].items()):
@@ -312,12 +305,89 @@ def analyze_file(path: Path) -> dict:
     counts = Counter(x["classification"] for x in candidates)
     families = Counter(x.get("candidate_family") or "none" for x in candidates)
     return {
-        "path": str(path),
+        "path": source_label,
         "status": "ok",
         "counts": dict(sorted(counts.items())),
         "families": dict(sorted(families.items())),
         "candidates": candidates,
     }
+
+
+def oval_roots(root: ET.Element) -> list[ET.Element]:
+    if local(root.tag) == "oval_definitions":
+        return [root]
+    return [
+        node
+        for node in root.iter()
+        if isinstance(node.tag, str) and local(node.tag) == "oval_definitions"
+    ]
+
+
+def analyze_xml_bytes(data: bytes, source_label: str) -> list[dict]:
+    try:
+        root = ET.fromstring(data)
+    except ET.ParseError as exc:
+        return [{
+            "path": source_label,
+            "status": "parse_error",
+            "error": str(exc),
+            "candidates": [],
+        }]
+
+    roots = oval_roots(root)
+    if not roots:
+        return [{
+            "path": source_label,
+            "status": "no_oval_definitions",
+            "candidates": [],
+        }]
+    return [
+        analyze_oval_root(
+            oval_root,
+            source_label if len(roots) == 1 else f"{source_label}#oval[{i}]",
+        )
+        for i, oval_root in enumerate(roots, start=1)
+    ]
+
+
+def analyze_input(path: Path) -> list[dict]:
+    if path.suffix.lower() != ".zip":
+        return analyze_xml_bytes(path.read_bytes(), str(path))
+
+    rows = []
+    try:
+        with zipfile.ZipFile(path) as archive:
+            members = sorted(
+                info
+                for info in archive.infolist()
+                if not info.is_dir() and info.filename.lower().endswith(".xml")
+            )
+            if not members:
+                return [{
+                    "path": str(path),
+                    "status": "zip_has_no_xml",
+                    "candidates": [],
+                }]
+            for info in members:
+                with archive.open(info) as stream:
+                    data = stream.read()
+                rows.extend(analyze_xml_bytes(data, f"{path}!{info.filename}"))
+    except zipfile.BadZipFile as exc:
+        return [{
+            "path": str(path),
+            "status": "bad_zip",
+            "error": str(exc),
+            "candidates": [],
+        }]
+    return rows
+
+
+def analyze_file(path: Path) -> dict:
+    """Compatibility helper for focused tests expecting one standalone OVAL XML."""
+    rows = analyze_input(path)
+    if len(rows) != 1:
+        raise ValueError(f"expected one analyzed document for {path}, got {len(rows)}")
+    return rows[0]
 
 
 def summarize(files: list[dict]) -> dict:
@@ -347,9 +417,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
 
-    files = [analyze_file(path) for path in iter_xml_inputs(args.inputs)]
+    files = []
+    for path in iter_inputs(args.inputs):
+        files.extend(analyze_input(path))
     report = {
-        "format": "scap-ng-foreach-candidate-analysis-0.1",
+        "format": "scap-ng-foreach-candidate-analysis-0.2",
         "rewrite_performed": False,
         "safe_automatic_enabled": False,
         "summary": summarize(files),
