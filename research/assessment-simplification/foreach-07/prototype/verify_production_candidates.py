@@ -21,7 +21,7 @@ assert LOWER_SPEC.loader is not None
 LOWER_SPEC.loader.exec_module(LOWER)
 
 
-def authoring_from_candidate(candidate: dict) -> tuple[str, dict]:
+def authoring_from_candidate(candidate: dict, mappings: dict) -> tuple[str, dict]:
     proof = candidate.get("first_proof_class") or {}
     if not proof.get("eligible"):
         raise ValueError("candidate is not first-proof-class eligible")
@@ -50,14 +50,24 @@ def authoring_from_candidate(candidate: dict) -> tuple[str, dict]:
             "is outside foreach v1"
         )
 
+    source_mapping = mappings.get(source["object_type"])
+    target_mapping = mappings.get(target["object_type"])
+    if source_mapping is None or target_mapping is None:
+        raise ValueError(f"{variable_id}: capability mapping missing")
+
+    source_field = native_source_field(source_mapping, source["item_field"])
+    target_entity = native_target_selector(target_mapping, target["entity"])
+    if not source_field or not target_entity:
+        raise ValueError(f"{variable_id}: native field mapping missing")
+
     obj = {
         "for_each": {
             "item": binding,
             "in": source["object_id"],
         },
         "select": {
-            target["entity"]: {
-                "from": f"{binding}.{source['item_field']}",
+            target_entity: {
+                "from": f"{binding}.{source_field}",
             }
         },
     }
@@ -146,10 +156,14 @@ def datatype_compatibility(candidate: dict, mappings: dict) -> dict:
 
 
 def compare_candidate(candidate: dict, mappings: dict) -> dict:
-    target_id, authoring = authoring_from_candidate(candidate)
+    target_id, authoring = authoring_from_candidate(candidate, mappings)
     lowered = LOWER.lower_foreach_v1(target_id, authoring)
     target = candidate["targets"][0]
     source = candidate["source"]
+
+    datatype_proof = datatype_compatibility(candidate, mappings)
+    native_source = datatype_proof.get("source_native_field")
+    native_target = datatype_proof.get("target_native_field")
 
     checks = {
         "rewrite_id": (
@@ -159,16 +173,16 @@ def compare_candidate(candidate: dict, mappings: dict) -> dict:
         "source_object": lowered["source_object"] == source["object_id"],
         "projected_field": (
             lowered["synthetic_variable"]["expression"]["object_component"]["item_field"]
-            == source["item_field"]
+            == native_source
         ),
         "target_object": lowered["target_object"]["id"] == target["object_id"],
-        "target_entity": target["entity"] in lowered["target_object"]["select"],
+        "target_entity": native_target in lowered["target_object"]["select"],
         "target_operation": (
-            lowered["target_object"]["select"][target["entity"]]["operation"]
+            lowered["target_object"]["select"][native_target]["operation"]
             == target["operation"]
         ),
         "target_var_check": (
-            lowered["target_object"]["select"][target["entity"]]["var_check"]
+            lowered["target_object"]["select"][native_target]["var_check"]
             == target["var_check"]
         ),
         "aggregation_boundary": (
@@ -182,17 +196,18 @@ def compare_candidate(candidate: dict, mappings: dict) -> dict:
     # Record the faithful datatype and require it to be concrete; a production
     # 0.3.0 compiler must prove compatibility from capability schemas.
     datatype = target.get("datatype")
-    datatype_proof = datatype_compatibility(candidate, mappings)
     checks["capability_datatype_compatible"] = datatype_proof["compatible"]
 
     return {
         "variable_id": candidate["variable_id"],
         "source_object": source["object_id"],
         "source_object_type": source["object_type"],
-        "item_field": source["item_field"],
+        "source_item_field": source["item_field"],
+        "native_source_field": native_source,
         "target_object": target["object_id"],
         "target_object_type": target["object_type"],
         "target_entity": target["entity"],
+        "native_target_entity": native_target,
         "faithful_target_datatype": datatype,
         "datatype_proof": datatype_proof,
         "authoring": authoring,
