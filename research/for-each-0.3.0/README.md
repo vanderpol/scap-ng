@@ -12,13 +12,14 @@ The current hypothesis is that NG should separate two concerns that OVAL often
 mixes through multi-valued Variables:
 
 1. **Item identity / evaluation scope** — expressed by an explicit scoped
-   iteration construct such as a future for_each.
+   iteration construct such as a future for_each over Items produced by an
+   authored Object.
 2. **Value transport and transformation** — expressed by Variables or direct
    typed value references.
 
 A concise working rule is:
 
-> Bindings identify Items. Variables derive or transport values.
+> Objects identify populations. Bindings identify Items. Variables derive or transport values.
 
 This is a research hypothesis, not a specification decision.
 
@@ -36,16 +37,16 @@ be conflated:
 
 ### A. Value-set dataflow
 
-A Variable projects values from one Object and supplies them to another Object
-or State. The downstream semantics operate on the **set of values**, not on the
-identity of the originating Items.
+A Variable projects values from Items collected for one Object and supplies
+them to another Object or State. The downstream semantics operate on the
+**set of values**, not on the identity of the originating Items.
 
 This should remain legal value dataflow. It is not automatically a for_each
 rewrite.
 
-### B. Nested/dependent collection expansion
+### B. Nested/dependent Object collection expansion
 
-A value derived from one collected population selects another population,
+A value derived from one Object's collected population selects another Object,
 possibly through several levels. OVAL can represent this as a dependency graph,
 but provenance/identity normally becomes flattened into value sets.
 
@@ -118,7 +119,7 @@ parent identity.
 
 The research branch scans production SCAP 1.4 benchmarks for:
 
-- Object field -> Variable -> dependent Object edges;
+- Object Item field -> Variable -> dependent Object edges;
 - nested dependent Object chains;
 - multiple projections from one source Object;
 - multiple same-source fields consumed by one function;
@@ -215,9 +216,9 @@ Candidates need to be classified first.
    - keep Variable/value-reference semantics;
    - no parent identity introduced.
 
-2. **flattened_collection_rewrite**
-   - possible explicit iteration/comprehension syntax;
-   - output must be flattened to exactly the source collection semantics;
+2. **flattened_object_dataflow_rewrite**
+   - possible explicit iteration/comprehension or direct-value syntax;
+   - output must be flattened to exactly the source Object/value-set semantics;
    - incomplete/error/zero-value behavior must be proven equivalent.
 
 3. **scoped_iteration_proven**
