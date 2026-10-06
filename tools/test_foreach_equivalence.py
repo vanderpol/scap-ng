@@ -16,6 +16,7 @@ from foreach_equivalence import (
     faithful_all_selection,
     foreach_union_selection,
     equivalent_population,
+    project_object_component_complete,
 )
 from oval_result_truth_tables import (
     TRUE,
@@ -93,30 +94,29 @@ class DirectCollectionExpansionEquivalence(unittest.TestCase):
         self.assertEqual(faithful, [6])
         self.assertEqual(set(foreach_union), {2, 3, 4, 6})
 
-    def test_zero_projected_values_preserves_object_reference_status_obligation(self):
-        variable = resolve_variable_reference([])
-        self.assertEqual(
-            apply_variable_reference_context(variable, "object"),
-            "does_not_exist",
+    def test_zero_source_items_is_object_component_error(self):
+        projection = project_object_component_complete([], "home_dir")
+        self.assertEqual(projection["status"], "error")
+        self.assertEqual(projection["reason"], "source_object_has_no_items")
+
+    def test_missing_projected_field_is_object_component_error(self):
+        projection = project_object_component_complete(
+            [{"username": "alice"}],
+            "home_dir",
         )
-        # A native foreach lowering cannot silently turn this into a normal
-        # complete Object with an empty Item set. It must preserve the
-        # Object-reference no-values status before Test evaluation.
-        for existence, expected in (
-            ("any_exist", TRUE),
-            ("none_exist", TRUE),
-            ("at_least_one_exists", FALSE),
-            ("all_exist", FALSE),
-            ("only_one_exists", FALSE),
-        ):
-            with self.subTest(existence=existence):
-                self.assertEqual(
-                    evaluate_collected_object_test(
-                        "does not exist",
-                        existence=existence,
-                    ),
-                    expected,
-                )
+        self.assertEqual(projection["status"], "error")
+        self.assertEqual(projection["reason"], "item_field_missing:home_dir")
+
+    def test_multiple_source_entities_are_flattened_as_component_values(self):
+        projection = project_object_component_complete(
+            [{"home_dir": ["/home/a", "/srv/a"]}, {"home_dir": "/home/b"}],
+            "home_dir",
+        )
+        self.assertEqual(projection["status"], "values")
+        self.assertEqual(
+            projection["values"],
+            ["/home/a", "/srv/a", "/home/b"],
+        )
 
 
 class DownstreamTestResultEquivalence(unittest.TestCase):
@@ -151,11 +151,11 @@ class DownstreamTestResultEquivalence(unittest.TestCase):
                 state_by_item = dict(zip(items, assignment))
                 for existence in existence_modes:
                     for check in checks:
-                        # For any_exist + zero Items + State, the repository's
-                        # generic truth-table helper intentionally has no empty
-                        # Boolean aggregation rule. That specific OVAL corner is
-                        # tracked separately rather than guessed here.
-                        if not faithful and existence == "any_exist":
+                        # The repository truth-table helper intentionally
+                        # rejects State aggregation over an empty Item list.
+                        # Preserve that unresolved corner separately instead of
+                        # inventing vacuous truth for any CheckEnumeration.
+                        if not faithful:
                             continue
                         with self.subTest(
                             values=values,
