@@ -268,20 +268,30 @@ def classify_candidate(
             "tests": index["target_tests"].get(target_object_id, []),
         })
 
+    selector_checks = sorted({consumer["var_check"] for consumer in consumers})
+    if selector_checks == ["at least one"]:
+        candidate_family = "collection_expansion_at_least_one"
+        quantifier_reason = "selector_accepts_at_least_one_projected_value"
+    elif selector_checks == ["all"]:
+        candidate_family = "quantified_projection_all_values"
+        quantifier_reason = "selector_requires_comparison_against_all_projected_values"
+    else:
+        candidate_family = "mixed_selector_quantification"
+        quantifier_reason = "projected_variable_is_shared_across_different_var_check_semantics"
+
     reasons = [
         "direct_object_component_projection_into_object_selector",
+        quantifier_reason,
         "collection_aggregation_boundary_must_be_preserved",
         "equivalence_fixture_required_before_safe_automatic",
     ]
     if len(consumers) > 1:
         reasons.append("shared_projected_variable_has_multiple_target_consumers")
-    if any(c["var_check"] != "all" for c in consumers):
-        reasons.append("non_default_var_check_requires_explicit_equivalence_proof")
 
     return {
         **base,
         "classification": "review_required",
-        "candidate_family": "collection_expansion",
+        "candidate_family": candidate_family,
         "source": {
             "object_id": source_object_id,
             "object_type": local(source_obj.tag),
