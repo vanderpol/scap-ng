@@ -151,6 +151,46 @@ The mismatch is especially important around `not_applicable`,
 mask or transform a branch outcome differently from procedural branch
 selection.
 
+## Applicability-scoped branch experiment
+
+A second natural rendering is to make each simple Test/check applicable only
+under its branch condition and combine the branch checks with `any`:
+
+```yaml
+check:
+  any:
+    - when: domain_controller
+      registry: ...
+      expect: ...
+
+    - when:
+        not: domain_controller
+      registry: ...
+      expect: ...
+```
+
+Conceptually this is very attractive for the Ansible-inspired authoring layer,
+and may be preferable to a visibly procedural `if/then/else`.
+
+However, with the current intrinsic-applicability rule that a false guard yields
+`not_applicable`, this form has the **same 135/216 generic equivalence result**
+as procedural if/else when compared with the source OVAL formula
+`OR(AND(G,P),AND(NOT G,Q))`. It therefore is not a generally lossless
+mechanical rewrite either.
+
+If guard and branch outcomes are restricted to ordinary Boolean
+`true/false`, all 8 possible combinations are equivalent. The problem begins
+when real scanner outcomes include `error`, `unknown`, `not_evaluated`, or
+`not_applicable`.
+
+This suggests a useful separation:
+
+- **native authoring:** applicability-scoped checks may be an excellent simple
+  surface if their six-state behavior is explicitly defined;
+- **legacy conversion:** preserve the OVAL Boolean graph unless a specific
+  equivalence condition is proven, or define the research `case/when` syntax
+  as exact desugaring to that graph rather than procedural branch selection.
+
 ## Design implication
 
 There may be two different concepts hiding under the word "conditional":
