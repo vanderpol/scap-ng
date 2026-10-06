@@ -6,6 +6,10 @@ on:
       - tools/analyze_oval_foreach_candidates.py
       - tools/foreach_equivalence.py
       - tools/test_foreach_equivalence.py
+      - tools/scap_upconvert_v003/foreach_modernization.py
+      - tools/scap_upconvert_v003/test_foreach_modernization.py
+      - tools/scap_upconvert_v003/foreach_modernization.py
+      - tools/scap_upconvert_v003/test_foreach_modernization.py
       - tools/test_foreach_v03_integration.py
       - tools/test_schema_v03_independence.py
       - tools/generate_capability_schema.py
@@ -57,7 +61,9 @@ jobs:
           python tests/test_foreach_selector_equivalence.py
 
       - name: Direct collection-expansion equivalence tests
-        run: python tools/test_foreach_equivalence.py
+        run: |
+          python tools/test_foreach_equivalence.py
+          PYTHONPATH=tools python tools/scap_upconvert_v003/test_foreach_modernization.py
 
       - name: SCAP-NG 0.3.0 foreach integration tests
         run: |
