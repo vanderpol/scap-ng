@@ -63,7 +63,12 @@ def main() -> int:
 
         audit = yaml.safe_load((native / "conversion-audit.json").read_text(encoding="utf-8"))
         assert audit["success"] is True
-        assert audit["unhandled_constructs"] == {"benchmark_children": [], "rule_children": []}
+        assert audit["unhandled_constructs"] == {
+            "benchmark_children": [],
+            "profile_children": [],
+            "rule_children": [],
+            "check_children": [],
+        }
         assert audit["counts"]["source_rules"] == 1
         assert audit["counts"]["native_rules"] == 1
         assert audit["schema_validation"]["valid"] is True
