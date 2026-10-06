@@ -209,15 +209,29 @@ def analyze_root(idx, rule):
     direct_objects_total=len(direct_object_refs)
     direct_states_total=len(direct_state_refs)
 
+    function_features={x for x in feats if x.startswith("function:")}
+    dataflow_complex=bool(
+        {"variable","set","filter"} & feats or function_features
+    )
+    evaluation_complex=bool(
+        {"multiple_tests","multiple_states","nested_criteria","negation"} & feats
+    )
     simple_linear=(
-        kinds["test"]==1 and kinds["object"]==1 and kinds["state"]<=1 and kinds["variable"]==0
-        and not ({"set","filter","behaviors","nested_criteria","negation","extend_definition"} & feats)
+        kinds["test"]==1
+        and direct_objects_total==1
+        and direct_states_total<=1
+        and direct_objects_single==direct_objects_total
+        and direct_states_single==direct_states_total
+        and not dataflow_complex
+        and not ({"nested_criteria","negation"} & feats)
+    )
+    local_multi_test=(
+        direct_objects_single==direct_objects_total
+        and direct_states_single==direct_states_total
+        and not dataflow_complex
+        and not ({"nested_criteria","negation"} & feats)
     )
     no_reuse_barrier=not obj_reused and not state_reused
-    advanced=bool(
-        {"variable","set","filter","multiple_tests","multiple_states","nested_criteria","negation","extend_definition"} & feats
-        or any(x.startswith("function:") for x in feats)
-    )
 
     return {
         **rule,
@@ -239,8 +253,10 @@ def analyze_root(idx, rule):
         },
         "classification":{
             "simple_linear":simple_linear,
+            "local_multi_test":local_multi_test,
             "no_object_state_reuse_barrier":no_reuse_barrier,
-            "advanced_graph":advanced,
+            "dataflow_complex":dataflow_complex,
+            "evaluation_complex":evaluation_complex,
         },
     }
 
@@ -268,8 +284,12 @@ def summarize(rows):
             "simple_linear_percent":pct(classes["simple_linear"],n),
             "rules_without_object_state_reuse_barrier":classes["no_object_state_reuse_barrier"],
             "rules_without_object_state_reuse_barrier_percent":pct(classes["no_object_state_reuse_barrier"],n),
-            "advanced_graph_rules":classes["advanced_graph"],
-            "advanced_graph_percent":pct(classes["advanced_graph"],n),
+            "dataflow_complex_rules":classes["dataflow_complex"],
+            "dataflow_complex_percent":pct(classes["dataflow_complex"],n),
+            "evaluation_complex_rules":classes["evaluation_complex"],
+            "evaluation_complex_percent":pct(classes["evaluation_complex"],n),
+            "local_multi_test_rules":classes["local_multi_test"],
+            "local_multi_test_percent":pct(classes["local_multi_test"],n),
             "direct_test_object_single_use_percent":pct(reuse["direct_test_object_refs_single_use"],reuse["direct_test_object_refs"]),
             "direct_test_state_single_use_percent":pct(reuse["direct_test_state_refs_single_use"],reuse["direct_test_state_refs"]),
         },
