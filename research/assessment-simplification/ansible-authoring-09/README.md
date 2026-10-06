@@ -91,3 +91,38 @@ The experiment succeeds if it can answer, with real production evidence:
 
 A high conversion percentage alone is not success. Human readability and
 semantic fidelity are both required.
+
+
+## Current checkpoint artifacts
+
+- [RHEL 9 feasibility checkpoint](RHEL9-FEASIBILITY-CHECKPOINT.md) — provisional
+  whole-benchmark classification of the 418 automated Rules and the 27
+  default-manual Rules.
+- [Manual automation review](MANUAL-AUTOMATION-REVIEW.md) — individual review
+  of all 27 default-manual procedures.
+- [Straw-man syntax](STRAW-MAN-SYNTAX.md) — non-normative working vocabulary.
+- [Examples](examples/) — real RHEL 9 Rules rendered in the speculative local
+  authoring form.
+- [Manual review notes](manual-review/) — examples where a command is not
+  sufficient to decide compliance.
+
+### Current provisional counts
+
+The 418 default-automated Rules currently classify by observed source features
+as:
+
+- 207 (49.5%) simple native;
+- 106 (25.4%) composed native;
+- 84 (20.1%) advanced structured/dataflow;
+- 21 (5.0%) existing shellcommand.
+
+These are research buckets, not proven syntax coverage.
+
+The 27 default-manual Rules currently classify as:
+
+- 5 deterministic automation candidates;
+- 7 potentially automatable with a better typed domain model;
+- 15 requiring organizational/external input or approved-exception knowledge.
+
+This specifically argues against treating `shellcommand` as the universal
+answer to the remaining manual population.
