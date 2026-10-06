@@ -1,8 +1,9 @@
 # Proposed SCAP-NG 0.3.0 foreach specification
 
-**Status:** research proposal / pending human and Board review.  
+**Status:** integrated into the SCAP-NG 0.3.0 pre-alpha authoring/validation
+tree; pending broader Board review and converter-modernization enablement.  
 **Tracking:** #164  
-**Does not modify:** frozen 0.2.0 schemas or accepted semantics.
+**Does not modify:** frozen 0.2.0 schemas or semantics.
 
 ## 1. Purpose
 
@@ -224,11 +225,12 @@ These are potential later proof classes, not syntax errors in faithful content.
 
 ## 12. Analyzer states
 
-Until this proposal is accepted and implemented in the 0.3.0 schema/compiler,
-the research analyzer SHALL continue to report eligible examples as
-`review_required`.
+The 0.3.0 authoring/schema and semantic-validation layers now implement this
+v1 construct. The research analyzer SHALL nevertheless continue to report
+legacy-conversion candidates as `review_required` until the production
+SCAP 1.4 converter modernization pass is integrated and enabled.
 
-After acceptance, an implementation may report:
+After that converter gate is accepted, an implementation may report:
 
 `safe_automatic`
 
