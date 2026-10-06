@@ -21,7 +21,7 @@
 
 **Tests:** Focused STIG-manual conversion verifies default `groups: []` and opt-in mapping. Native package-graph tests verify partial/no Group coverage is valid, while duplicate and unknown Rule membership remain errors.
 
-**Machine evidence:** Focused STIG-manual workflow passed on branch head lineage: https://github.com/vanderpol/scap-ng/actions/runs/37465029661 . The PR broad regression gates remain the pre-merge integration evidence.
+**Machine evidence:** Focused STIG-manual regression passed on branch lineage (run 37465029661). Final PR #163 head `e3fc312f40d7fab445ae614d2a7bfd55b98e05fa` passed: STIG manual conversion/audit outputs (37465676119), Current RHEL9 full source review (37465676031), Current-design regression contracts (37465676037), Repository preservation/boundaries (37465676038), and Representative Board conversion regression (37465676070). Merged as `019faa21c601efb983b3468028bd9ebb415c7be2`.
 
 **Human status:** accepted
 
