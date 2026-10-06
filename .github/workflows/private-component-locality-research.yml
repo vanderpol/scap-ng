@@ -1,0 +1,134 @@
+name: Private component locality research
+
+on:
+  push:
+    paths:
+      - tools/research_inline_private_components.py
+      - tools/test_research_inline_private_components.py
+      - .github/workflows/private-component-locality-research.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  unit:
+    name: Focused locality renderer tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - run: PYTHONPATH=tools python tools/test_research_inline_private_components.py -v
+
+  generate:
+    name: Research ${{ matrix.label }}
+    needs: unit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: RHEL 9
+            key: rhel9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: Windows Server 2025
+            key: windows-server-2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate faithful current conversion
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+          KEY: ${{ matrix.key }}
+        run: |
+          python - <<'PY'
+          import os, shutil, subprocess, sys
+          from pathlib import Path
+          source=Path("niwc/Current")/os.environ["ARTIFACT"]
+          out=Path("work/source")/os.environ["KEY"]
+          split=Path("work")/("split-"+os.environ["KEY"])
+          out.parent.mkdir(parents=True,exist_ok=True)
+          cmd=[
+              sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+              "--output",str(out),
+              "--split-root",str(split),
+              "--source-revision",os.environ["NIWC_REVISION"],
+              "--source-repository-path","Current/"+os.environ["ARTIFACT"],
+              "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+              "--summary",str(out/"source-generation.json"),
+          ]
+          subprocess.run(cmd,check=True)
+          shutil.rmtree(split,ignore_errors=True)
+          PY
+      - name: Render 10 diverse locality examples
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY"             --output "work/research/$KEY"             --count 10             --label "$LABEL"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-component-locality-${{ matrix.key }}
+          path: work/research/${{ matrix.key }}
+          if-no-files-found: error
+
+  aggregate:
+    name: Aggregate locality research
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: private-component-locality-*
+          path: reports
+      - name: Aggregate reports
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
+          totals={}
+          for r in reports:
+              for k,v in r["summary"].items():
+                  if isinstance(v,(int,float)) and not k.endswith("_percent"):
+                      totals[k]=totals.get(k,0)+v
+          def reduction(b,a):
+              return round(100*(b-a)/b,1) if b else 0.0
+          summary={
+              **totals,
+              "cross_reference_reduction_percent":reduction(totals.get("cross_refs_before",0),totals.get("cross_refs_after",0)),
+              "line_reduction_percent":reduction(totals.get("lines_before",0),totals.get("lines_after",0)),
+              "byte_reduction_percent":reduction(totals.get("bytes_before",0),totals.get("bytes_after",0)),
+              "object_scope_reduction_percent":reduction(totals.get("objects_before",0),totals.get("objects_after",0)),
+              "state_scope_reduction_percent":reduction(totals.get("states_before",0),totals.get("states_after",0)),
+          }
+          out={
+              "format":"scap-ng-inline-private-components-aggregate-0.1",
+              "status":"research_only_not_accepted_design",
+              "packages":[{"label":r["label"],"summary":r["summary"]} for r in reports],
+              "summary":summary,
+          }
+          Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(out,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-component-locality-aggregate
+          path: aggregate.json
