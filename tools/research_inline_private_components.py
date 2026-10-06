@@ -235,12 +235,16 @@ def main():
     ap.add_argument("input_root",type=Path)
     ap.add_argument("--output",type=Path,required=True)
     ap.add_argument("--count",type=int,default=10)
+    ap.add_argument("--all-assessments",action="store_true",
+                    help="Measure every eligible STIG Rule Assessment instead of a diverse sample.")
+    ap.add_argument("--metrics-only",action="store_true",
+                    help="Write only report.json; do not emit transformed YAML/identity files.")
     ap.add_argument("--label",required=True)
     args=ap.parse_args()
 
     rows=load_assessments(args.input_root)
-    selected=select_evenly(rows,args.count)
-    if len(selected)<args.count:
+    selected=rows if args.all_assessments else select_evenly(rows,args.count)
+    if not args.all_assessments and len(selected)<args.count:
         raise SystemExit(f"{args.label}: requested {args.count} assessments, found {len(selected)}")
 
     args.output.mkdir(parents=True,exist_ok=True)
@@ -271,14 +275,15 @@ def main():
 
         relname=path.stem.replace(".assessment","")+".inline-private.yaml"
         outpath=args.output/relname
-        outpath.write_text(RESEARCH_HEADER+normalized_text(rendered),encoding="utf-8")
-        (args.output/(relname+".identity.json")).write_text(
-            json.dumps(identity,indent=2,sort_keys=True)+"\n",encoding="utf-8"
-        )
+        if not args.metrics_only:
+            outpath.write_text(RESEARCH_HEADER+normalized_text(rendered),encoding="utf-8")
+            (args.output/(relname+".identity.json")).write_text(
+                json.dumps(identity,indent=2,sort_keys=True)+"\n",encoding="utf-8"
+            )
 
         row={
             "source":str(path),
-            "output":str(outpath),
+            "output":str(outpath) if not args.metrics_only else None,
             "assessment_id":doc["assessment"].get("id"),
             "before":before,
             "after":after,
