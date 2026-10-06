@@ -8,6 +8,40 @@ This document is the authoritative proposal for the value-flow / scoped-iteratio
 research track. Supporting corpus notes and counterexamples remain evidence, not
 parallel normative specifications.
 
+## Standards authority and implementation evidence
+
+The authority order for this proposal is:
+
+1. pinned OVAL 5.12.3 XSD;
+2. pinned OVAL 5.12.3 Schematron;
+3. normative OVAL 5.12.3 schema/prose semantics and documented standards decisions;
+4. production SCAP 1.4 corpus evidence;
+5. independent evaluator behavior such as OpenSCAP, ovaldi, SCC, or other implementations.
+
+Implementation behavior is supporting evidence only. It SHALL NOT override a
+clear standards requirement.
+
+OpenSCAP is useful for differential experiments, but this project SHALL NOT
+treat OpenSCAP as normative authority for OVAL 5.12.3. In particular, an
+OpenSCAP result, validation result, or implementation limitation SHALL be
+recorded as implementation evidence and compared with the pinned OVAL 5.12.3
+contract before it influences SCAP-NG semantics.
+
+If implementation behavior and the authoritative OVAL 5.12.3 contract disagree,
+the migration specification SHALL preserve the standards-defined behavior unless
+an explicit governance decision intentionally chooses a native divergence.
+
+A differential test MAY therefore be classified as:
+
+- standards-confirming implementation evidence;
+- implementation divergence;
+- unsupported-version/tooling limitation;
+- unresolved behavior requiring further standards evidence.
+
+It SHALL NOT silently become a normative rule merely because one evaluator
+behaves that way.
+
+
 ## 1. Conclusion
 
 SCAP-NG 0.3.0 SHOULD distinguish two concepts that OVAL commonly expresses
