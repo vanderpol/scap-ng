@@ -155,6 +155,30 @@ A Variable SHALL NOT be interpreted as:
 OVAL-compatible Variable functions SHALL retain their defined value-set
 semantics, including Cartesian-product behavior where applicable.
 
+## 4.1 OVAL variable_instance is invocation identity, not Item scope
+
+Pinned OVAL 5.12.3 System Characteristics and Results schemas use
+variable_instance to distinguish separate instances of the same Object, Test, or
+Definition when different supplied Variable bindings are used by different
+references/invocations.
+
+That mechanism does not create a per-value or per-Item lexical loop:
+
+- one collected Object instance may contain multiple variable_value entries for
+  the same Variable when that Variable itself contains multiple values;
+- one Test result instance may contain multiple tested_variable entries for the
+  same multi-valued Variable;
+- variable_instance associates the correct Object/Test/Definition instance with
+  the supplied binding set for that invocation.
+
+SCAP-NG SHALL preserve this invocation/binding-set distinction where required by
+lossless migration, but SHALL NOT treat OVAL variable_instance as evidence that
+the source preserves originating Item identity across object_component
+projections.
+
+Policy/input invocation identity and scoped Item Binding are separate concepts.
+
+
 ## 5. Flattened Projection value source
 
 ### 5.1 Proposed authoring form
