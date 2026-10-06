@@ -131,6 +131,68 @@ Current platforms include RHEL 7/8/9, Oracle Linux 7/8/9, Ubuntu 18/20/22/24,
 SLES 12/15, Solaris 11 x86/SPARC, macOS variants, Windows 11, and Apache UNIX
 benchmarks.
 
+
+## Full-current-corpus structural census
+
+A pinned full-current NIWC SCAP 1.4 pass expanded the initial OS study to all
+65 discovered signed SCAP 1.4 benchmark packages at source revision
+8c8e5dff860af6b1290ee9273a282db24278f8d5.
+
+The first full structural pass completed all 65 packages with no split failures:
+
+- 7,344 per-rule/platform OVAL closures examined;
+- 396 candidate closures with at least one dependent-dataflow signal;
+- 388 closures with dependent Collection/Object dataflow;
+- 70 closures with at least one multi-level dependency path;
+- 120 closures with multiple projected values from one source population.
+
+These categories overlap and are **candidate signals**, not counts of rules that
+should become scoped iteration.
+
+A secondary multi-label structural classification of those candidate closures
+shows the problem is substantially broader than Unix account/home logic:
+
+- 141 candidate closures construct downstream shell-command text from upstream
+  collected values;
+- 130 have configuration/file/process-derived values selecting another file,
+  text, XML, or partition resource;
+- 60 have Windows registry/WMI/appcmd/SID discovery feeding file, ACL, text, or
+  command collection;
+- 35 have account/password/shadow-derived values feeding another account or
+  filesystem collection;
+- 12 have SQL-extension-derived values feeding another Collection;
+- 277 use one or more Variable transformation functions.
+
+The counts above intentionally overlap. They identify design/problem families,
+not mutually exclusive conversion dispositions.
+
+Notable concentration examples from the pinned corpus include:
+
+- Windows Server DNS: 34 candidate closures out of 43, with extensive
+  multi-projection and command-construction dataflow;
+- Firefox Linux: 30 of 31 closures, largely installation/configuration path
+  discovery feeding text-file policy collection;
+- Apache 2.4 UNIX Server: 22 of 23 closures, including 18 nested dependency
+  cases and repeated dynamic command/config-include pipelines;
+- Apache 2.4 Windows Server: 23 of 24 closures, including 18 nested cases;
+- F5 NGINX: 21 candidate closures, including nested service/configuration
+  dependencies;
+- Kubernetes: 11 candidate closures, including config-derived certificate and
+  file-property lookups.
+
+This changes the research question. Scoped binding is not only a possible fix
+for Linux/Solaris account correlation. The same R&D must determine which of
+these wider patterns need:
+
+1. lexical semantic scope;
+2. ordinary value-set dataflow with better author-facing syntax;
+3. non-semantic lineage for better results/debugging;
+4. parameterized Collection reuse;
+5. native capability replacement for legacy dynamic shell-command plumbing.
+
+The final converter SHALL NOT treat these categories as interchangeable.
+
+
 ## Conversion safety principle
 
 The migration pipeline should have at least two distinct products:
