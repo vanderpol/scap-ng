@@ -87,6 +87,7 @@ jobs:
             python tools/audit_for_each_candidates.py work/split --label "$KEY" --output work/audit/report.json
             python tools/audit_manual_correlation_candidates.py "niwc/$SOURCE" --label "$KEY" --output work/audit/manual.json
             python tools/plan_for_each_migration.py work/audit/report.json --manual-audit work/audit/manual.json --output work/audit/plan.json
+            python tools/plan_variable_normalization.py work/audit/report.json --output work/audit/variables.json
             python - <<'PY'
           import json,os
           from pathlib import Path
@@ -104,6 +105,7 @@ jobs:
             work/audit/report.json
             work/audit/manual.json
             work/audit/plan.json
+            work/audit/variables.json
 
   aggregate:
     needs: audit
@@ -120,7 +122,7 @@ jobs:
           import json
           from collections import Counter
           from pathlib import Path
-          rows=[]; plans=[]; manuals=[]
+          rows=[]; plans=[]; manuals=[]; variable_plans=[]
           for p in Path("reports").rglob("report.json"):
               try: rows.append(json.loads(p.read_text()))
               except Exception: pass
@@ -129,6 +131,9 @@ jobs:
               except Exception: pass
           for p in Path("reports").rglob("manual.json"):
               try: manuals.append(json.loads(p.read_text()))
+              except Exception: pass
+          for p in Path("reports").rglob("variables.json"):
+              try: variable_plans.append(json.loads(p.read_text()))
               except Exception: pass
           complete=[r for r in rows if r.get("audit_status")=="complete"]
           failed=[r for r in rows if r.get("audit_status")!="complete"]
@@ -153,6 +158,11 @@ jobs:
           manual_confidence=Counter()
           for manual in manuals:
               manual_confidence.update(manual.get("confidence_counts",{}))
+          variable_normalization=Counter()
+          variable_normalization_single_use=Counter()
+          for vp in variable_plans:
+              variable_normalization.update(vp.get("summary",{}))
+              variable_normalization_single_use.update(vp.get("single_use_by_shape",{}))
           agg={
             "source_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
             "packages_discovered":len(rows),
@@ -170,10 +180,12 @@ jobs:
             "unique_pure_projection_usage_by_benchmark":dict(projection_usage),
             "manual_correlation_candidates":sum(m.get("manual_correlation_candidates",0) for m in manuals),
             "manual_correlation_confidence_counts":dict(manual_confidence),
+            "variable_normalization_dispositions":dict(variable_normalization),
+            "variable_normalization_single_use_by_shape":dict(variable_normalization_single_use),
             "packages":sorted(rows,key=lambda r:r.get("source","")),
           }
           Path("full-corpus-for-each-audit.json").write_text(json.dumps(agg,indent=2)+"\n")
-          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_variable_root_operator_counts_by_benchmark","unique_variable_usage_by_shape_by_benchmark","unique_variable_usage_by_root_operator_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts")},indent=2))
+          print(json.dumps({k:agg[k] for k in ("packages_discovered","packages_complete","packages_failed","closure_files","candidate_closures","class_counts","migration_dispositions","modernization_advisories","unique_variable_shape_counts_by_benchmark","unique_variable_root_operator_counts_by_benchmark","unique_variable_usage_by_shape_by_benchmark","unique_variable_usage_by_root_operator_by_benchmark","unique_pure_projection_usage_by_benchmark","manual_correlation_candidates","manual_correlation_confidence_counts","variable_normalization_dispositions","variable_normalization_single_use_by_shape")},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
