@@ -23,14 +23,17 @@ def main():
     args=ap.parse_args()
 
     defs_by_test={}
+    parent_defs={}
     rules=[]
     for name,root in iter_xml(args.package):
         for node in root.iter():
             if local(node.tag)=="definition" and node.get("id"):
                 did=node.get("id")
-                for c in node.iter():
-                    if local(c.tag)=="criterion" and c.get("test_ref"):
-                        defs_by_test.setdefault(c.get("test_ref"),set()).add(did)
+                for child in node.iter():
+                    if local(child.tag)=="criterion" and child.get("test_ref"):
+                        defs_by_test.setdefault(child.get("test_ref"),set()).add(did)
+                    elif local(child.tag)=="extend_definition" and child.get("definition_ref"):
+                        parent_defs.setdefault(child.get("definition_ref"),set()).add(did)
             elif local(node.tag)=="Rule":
                 rid=node.get("id")
                 title=next(((x.text or "").strip() for x in node if local(x.tag)=="title"),"")
@@ -44,9 +47,23 @@ def main():
 
     out=[]
     for test in args.test:
-        defs=sorted(defs_by_test.get(test,set()))
-        matched=[r for r in rules if any(d in r["definition_refs"] for d in defs)]
-        out.append({"test_id":test,"definitions":defs,"rules":matched})
+        direct=set(defs_by_test.get(test,set()))
+        reachable=set(direct)
+        queue=list(direct)
+        while queue:
+            child=queue.pop()
+            for parent in parent_defs.get(child,set()):
+                if parent not in reachable:
+                    reachable.add(parent)
+                    queue.append(parent)
+        defs=sorted(reachable)
+        matched=[r for r in rules if any(d in r["definition_refs"] for d in reachable)]
+        out.append({
+            "test_id":test,
+            "direct_definitions":sorted(direct),
+            "definitions":defs,
+            "rules":matched,
+        })
     args.output.write_text(json.dumps(out,indent=2)+"\n")
     print(json.dumps(out,indent=2))
 
