@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 
 XSD = "{http://www.w3.org/2001/XMLSchema}"
 def schema_id(version, filename):
-    if version not in {"0.1.0", "0.2.0"}:
+    if version not in {"0.1.0", "0.2.0", "0.3.0"}:
         raise ValueError(f"Unsupported capability schema version: {version}")
     return f"https://scap-ng.dev/schema/v{version}/{filename}"
 
@@ -188,7 +188,7 @@ def generate(mapping, repo_root, schema_version=None):
     root = ET.parse(xsd_path).getroot()
     capability = mapping["capability"]
     version = schema_version or mapping.get("specification_version", "0.1.0")
-    if version not in {"0.1.0", "0.2.0"}:
+    if version not in {"0.1.0", "0.2.0", "0.3.0"}:
         raise ValueError(f"Unsupported capability schema version: {version}")
     common_capability_schema_id = schema_id(version, "capability-common.schema.json")
     collected_item_schema_id = schema_id(version, "collected-item.schema.json")
@@ -207,10 +207,10 @@ def generate(mapping, repo_root, schema_version=None):
             "$defs": {
                 "test": {
                     "type": "object",
-                    "required": (["test_title", "reported_elements", "capability"] if version == "0.2.0" else ["test_title", "capability"]),
+                    "required": (["test_title", "reported_elements", "capability"] if version in {"0.2.0", "0.3.0"} else ["test_title", "capability"]),
                     "properties": {
                         "test_title": {"type": ["string", "null"]},
-                        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version == "0.2.0" else {}),
+                        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version in {"0.2.0", "0.3.0"} else {}),
                         "capability": {"const": capability},
                     },
                     "additionalProperties": False,
@@ -282,6 +282,15 @@ def generate(mapping, repo_root, schema_version=None):
                     "oneOf": [
                         selector_schema,
                         {"type": "null"},
+                    ]
+                }
+            if version == "0.3.0":
+                selector_schema = {
+                    "oneOf": [
+                        selector_schema,
+                        {
+                            "$ref": f"{common_capability_schema_id}#/$defs/foreach_selector_binding"
+                        },
                     ]
                 }
             selector_props[name] = selector_schema
@@ -450,15 +459,15 @@ def generate(mapping, repo_root, schema_version=None):
 
     object_required = ["object_title", "capability"]
 
-    existence_field = "check_existence" if version == "0.2.0" else "existence"
-    match_field = "check" if version == "0.2.0" else "match"
+    existence_field = "check_existence" if version in {"0.2.0", "0.3.0"} else "existence"
+    match_field = "check" if version in {"0.2.0", "0.3.0"} else "match"
     test_required = [
-        "test_title", *(["reported_elements"] if version == "0.2.0" else []), "capability",
+        "test_title", *(["reported_elements"] if version in {"0.2.0", "0.3.0"} else []), "capability",
         existence_field, match_field,
     ]
     test_properties = {
         "test_title": {"type": ["string", "null"]},
-        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version == "0.2.0" else {}),
+        **({"reported_elements": {"$ref": schema_id(version, "reported-elements.schema.json")}} if version in {"0.2.0", "0.3.0"} else {}),
         "capability": {"const": capability},
         existence_field: {
             "$ref": f"{common_capability_schema_id}#/$defs/existence_requirement"
@@ -650,6 +659,11 @@ def generate(mapping, repo_root, schema_version=None):
         object_properties = {
             "object_title": {"type": ["string", "null"]},
             "capability": {"const": capability},
+            **({
+                "for_each": {
+                    "$ref": f"{common_capability_schema_id}#/$defs/foreach_binding"
+                }
+            } if version == "0.3.0" else {}),
             **({"filesystem": filesystem_schema} if filesystem_schema else {}),
             **({"traversal": traversal_schema} if traversal_schema else {}),
             **({"collect": collect_schema} if collect_schema else {}),
@@ -684,6 +698,7 @@ def generate(mapping, repo_root, schema_version=None):
                 "anyOf": [
                     {"required": ["select"]},
                     {"required": ["collect"]},
+                    *([{"required": ["for_each"]}] if version == "0.3.0" else []),
                 ]
             },
         })
@@ -694,6 +709,14 @@ def generate(mapping, repo_root, schema_version=None):
             "additionalProperties": False,
             "oneOf": object_alternatives,
         }
+        if version == "0.3.0":
+            defs["object"].setdefault("allOf", []).append({
+                "if": {"required": ["for_each"]},
+                "then": {
+                    "required": ["select"],
+                    "not": {"required": ["set"]},
+                },
+            })
         if filesystem_schema and selector_props:
             # Filesystem scope applies to file-backed selectors, including exact
             # full_path selection, but not to alternate non-file sources such
