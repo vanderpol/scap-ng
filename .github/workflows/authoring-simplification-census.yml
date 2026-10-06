@@ -1,0 +1,131 @@
+name: Authoring simplification OVAL census
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - research/assessment-simplification/authoring-08/**
+      - .github/workflows/authoring-simplification-census.yml
+      - tools/scap14_rule_splitter.py
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: rhel_9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+            benchmark_key: xccdf_mil.disa.stig_benchmark_rhel_9_stig
+          - label: oracle_linux_9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+            benchmark_key: xccdf_mil.disa.stig_benchmark_oracle_linux_9_stig
+          - label: ms_windows_11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            benchmark_key: xccdf_mil.disa.stig_benchmark_microsoft_windows_11_stig
+          - label: ms_windows_server_2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+            benchmark_key: xccdf_mil.disa.stig_benchmark_ms_windows_server_2025_stig
+          - label: apache_server_2-4_unix_server
+            artifact: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+            benchmark_key: xccdf_navy.navwar.niwcatlantic.scc_benchmark_apache_server_2-4_unix_server_stig
+          - label: apache_tomcat_application_server_9
+            artifact: U_Apache_Tomcat_Application_Server_9_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+            benchmark_key: xccdf_navy.navwar.niwcatlantic.scc_benchmark_tomcat_application_server_9_stig
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check lxml==6.1.1
+      - name: Split exact per-Rule OVAL closures
+        env:
+          LABEL: ${{ matrix.label }}
+          ARTIFACT: ${{ matrix.artifact }}
+          BENCHMARK_KEY: ${{ matrix.benchmark_key }}
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py "niwc/Current/$ARTIFACT" \
+            --output-dir "work/$LABEL" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision "$NIWC_REVISION" \
+            --source-repository-path "Current/$ARTIFACT" \
+            --benchmark-key "$BENCHMARK_KEY" \
+            --fail-on-unresolved
+      - name: Measure raw OVAL features
+        env:
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/research/assessment-simplification/authoring-08/analyze_split_oval.py \
+            "work/$LABEL" --label "$LABEL" --output "work/$LABEL-oval-features.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authoring-oval-census-${{ matrix.label }}
+          path: work/*-oval-features.json
+          if-no-files-found: error
+
+  aggregate:
+    needs: census
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: authoring-oval-census-*
+          path: downloads
+      - name: Aggregate summaries
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          rows=[]
+          for p in sorted(Path("downloads").rglob("*-oval-features.json")):
+              rows.append(json.loads(p.read_text())["summary"])
+
+          total_rules=sum(r["rules_with_oval"] for r in rows)
+          feature_counts=Counter()
+          functions=Counter()
+          test_types=Counter()
+          for r in rows:
+              feature_counts.update(r["feature_rule_counts"])
+              functions.update(r["function_occurrences"])
+              test_types.update(r["test_types"])
+
+          result={
+              "format":"scap-ng-authoring-oval-feature-census-combined-0.1",
+              "source_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
+              "rules_with_oval":total_rules,
+              "feature_rule_counts":dict(feature_counts),
+              "feature_rule_pct":{
+                  k:round(100*v/total_rules,2) if total_rules else 0.0
+                  for k,v in sorted(feature_counts.items())
+              },
+              "function_occurrences":dict(functions),
+              "test_types":dict(test_types.most_common()),
+              "benchmarks":rows,
+          }
+          Path("combined-oval-feature-census.json").write_text(
+              json.dumps(result,indent=2,sort_keys=True)+"\n"
+          )
+          print(json.dumps(result,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authoring-oval-census-combined
+          path: combined-oval-feature-census.json
+          if-no-files-found: error
