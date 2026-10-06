@@ -48,6 +48,7 @@ Useful options:
 - `--platform-id` / `--platform-title`: override platform metadata.
 - `--split-root`: use component-resolved per-Rule OVAL from the rule splitter.
 - `--sha256 auto`: only for a source already pinned by repository revision/path.
+- `--auto-map-groups`: opt in to heuristic functional grouping. It is **off by default**; uncertain Rules remain ungrouped rather than being forced into a catch-all group.
 
 **Safety:** the output directory must be new or empty. The tool does not modify the source ZIP.
 
@@ -68,6 +69,31 @@ python tools/generate_niwc_current_review.py "PATH_TO_SCAP.zip" ^
 ```
 
 Use this instead of manually chaining tools when creating a fresh current corpus review.
+
+Add `--auto-map-groups` only when you want the wrapper to request heuristic functional grouping from the converter. The default is faithful conversion with no inferred Group taxonomy.
+
+## Convert a standalone DISA STIG manual
+
+**Script:** `tools/stig_manual_to_scapng.py`
+
+Use this for a DISA STIG manual XCCDF/XML or ZIP obtained directly from DISA Cyber Exchange.
+
+```powershell
+python tools/stig_manual_to_scapng.py "PATH_TO_STIG.zip" ^
+  --output-dir work/stig-manual-native
+```
+
+Optional editorial grouping:
+
+```powershell
+python tools/stig_manual_to_scapng.py "PATH_TO_STIG.zip" ^
+  --output-dir work/stig-manual-native-grouped ^
+  --auto-map-groups
+```
+
+`--auto-map-groups` is **off by default**. When enabled, only high-confidence functional matches are grouped; uncertain Rules remain ungrouped. Legacy one-Rule-per-vulnerability XCCDF wrapper Groups are not recreated as native taxonomy.
+
+**Source rule:** DISA STIG manual source artifacts used for conversion, testing, semantic comparison, or provenance must come directly from `cyber.mil` / DISA Cyber Exchange, as required by `AGENTS.md`.
 
 ## Split a SCAP 1.4 benchmark into per-Rule OVAL
 

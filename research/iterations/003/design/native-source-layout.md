@@ -154,8 +154,10 @@ publisher Profiles and remains a separate Tailoring property.
 
 Groups SHALL support child Groups recursively.
 
-For the iteration-003 migration experiment, the preferred generated hierarchy
-is assessment-oriented at the top level and functional beneath it.
+For the iteration-003 migration experiment, converters SHALL leave inferred
+grouping disabled by default. An explicit `--auto-map-groups` option MAY
+generate an assessment-oriented hierarchy at the top level and functional
+subgroups beneath it when high-confidence mapping signals exist.
 
 Illustrative form:
 
@@ -198,9 +200,14 @@ Generated Group classification is migration metadata and navigation structure.
 It SHALL NOT alter Rule applicability, Rule selection, Assessment behavior,
 Parameter binding, or result semantics.
 
-When the converter cannot infer a useful functional subgroup with sufficient
-confidence, it SHOULD place the Rule under a `needs-grouping` child of the
-appropriate assessment-mode parent rather than fabricate a topic.
+When automatic grouping is enabled and the converter cannot infer a useful
+functional subgroup with sufficient confidence, the Rule SHALL remain
+ungrouped. The converter SHALL NOT fabricate a topic or force the Rule into a
+catch-all `needs-grouping` bucket merely to obtain complete Group coverage.
+
+Lossless/faithful conversion therefore does not depend on Group membership.
+Grouping is an optional editorial normalization layer and SHALL NOT change
+policy, Assessment, applicability, selection, scoring, or result semantics.
 
 
 ## Relationship to XCCDF design

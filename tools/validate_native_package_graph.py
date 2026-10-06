@@ -145,11 +145,17 @@ def validate_package(root: Path, reference_root: Path | None = None, documents=N
             grouped.extend(group.get("rules") or [])
             collect(group.get("groups"))
     collect(benchmark.get("groups"))
-    if Counter(grouped)!=Counter(rule_ids):
+    duplicates=sorted(rule for rule,count in Counter(grouped).items() if count>1)
+    if duplicates:
         diagnostics.append({
-            "code":"benchmark_group_membership_mismatch",
-            "missing":sorted((Counter(rule_ids)-Counter(grouped)).elements()),
-            "extra":sorted((Counter(grouped)-Counter(rule_ids)).elements()),
+            "code":"benchmark_group_membership_duplicate",
+            "rules":duplicates,
+        })
+    unknown=sorted(set(grouped)-set(rule_ids))
+    if unknown:
+        diagnostics.append({
+            "code":"benchmark_group_membership_unknown",
+            "rules":unknown,
         })
     return diagnostics
 

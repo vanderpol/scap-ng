@@ -20,6 +20,8 @@ from xml.etree import ElementTree as ET
 import yaml
 from jsonschema import Draft202012Validator
 
+from group_mapping import auto_map_groups as build_auto_groups
+
 
 def lname(tag: str) -> str:
     return tag.rsplit("}", 1)[-1] if "}" in tag else tag
@@ -507,7 +509,7 @@ def benchmark_platform(root: ET.Element, benchmark_id: str, title: str) -> tuple
     }, source_ids
 
 
-def convert(source: Path, output: Path) -> dict:
+def convert(source: Path, output: Path, *, auto_map_groups: bool = False) -> dict:
     if output.exists():
         shutil.rmtree(output)
     output.mkdir(parents=True)
@@ -567,6 +569,7 @@ def convert(source: Path, output: Path) -> dict:
     source_rule_to_native: dict[str, str] = {}
     source_group_to_native_rules: dict[str, list[str]] = {}
     used_ids: set[str] = set()
+    group_candidates: list[dict] = []
 
     for idx, (rule, path) in enumerate(iter_rules(root), start=1):
         source_rule_id = rule.get("id")
@@ -590,6 +593,12 @@ def convert(source: Path, output: Path) -> dict:
         discussion = fields.get("discussion") or ""
         fix = rule_fix(rule)
         fix_implementations = normalized_fixes(rule)
+        group_candidates.append({
+            "rule": native_id,
+            "title": text(child(rule, "title")) or native_id,
+            "discussion": discussion,
+            "remediation": fix or "",
+        })
         assessment_id = f"{native_id}.manual"
         assessment_rel = f"../assessments/manual/{assessment_id}.assessment.yaml"
 
@@ -708,6 +717,35 @@ def convert(source: Path, output: Path) -> dict:
         })
 
     profiles = native_profile_rows(root, source_rule_to_native, source_group_to_native_rules)
+    groups = []
+    grouping_rows = []
+    if auto_map_groups:
+        groups, grouping_rows = build_auto_groups([
+            {
+                **candidate,
+                "assessment_group": "manual-or-managerial",
+            }
+            for candidate in group_candidates
+        ])
+    else:
+        grouping_rows = [
+            {
+                "rule": candidate["rule"],
+                "functional_group": None,
+                "method": "disabled",
+                "mapped": False,
+                "reason": "auto_map_groups_not_requested",
+            }
+            for candidate in group_candidates
+        ]
+    grouping = {
+        "auto_map_groups": auto_map_groups,
+        "method": "heuristic" if auto_map_groups else "disabled",
+        "mapped_rules": sum(1 for row in grouping_rows if row.get("mapped")),
+        "unmapped_rules": sum(1 for row in grouping_rows if not row.get("mapped")),
+        "rules": grouping_rows,
+    }
+
     benchmark_doc = {
         "benchmark": {
             "id": benchmark_id,
@@ -735,8 +773,9 @@ def convert(source: Path, output: Path) -> dict:
             "parameters": [],
             "default_selection": True,
             # Legacy DISA vulnerability wrapper Groups are not meaningful NG
-            # authoring taxonomy, so do not recreate one Group per Rule.
-            "groups": [],
+            # authoring taxonomy. Optional grouping is inferred only when the
+            # caller explicitly requests it and a high-confidence topic matches.
+            "groups": groups,
             "profiles": profiles,
             "rules": converted_rules,
         }
@@ -761,6 +800,7 @@ def convert(source: Path, output: Path) -> dict:
             "rules": len(converted_rules),
             "manual_assessments": len(converted_rules),
         },
+        "grouping": grouping,
         "rules": provenance_rules,
     }
     dump_json(output / "provenance.json", provenance)
@@ -819,6 +859,7 @@ def convert(source: Path, output: Path) -> dict:
             "source role/weight explicit-vs-effective values",
             "source Profile select directives",
         ],
+        "grouping": grouping,
         "unhandled_constructs": unhandled,
         "schema_validation": validation,
         "success": (
@@ -842,6 +883,9 @@ def convert(source: Path, output: Path) -> dict:
         "rules": len(converted_rules),
         "manual_assessments": len(converted_rules),
         "profiles": len(profiles),
+        "auto_map_groups": auto_map_groups,
+        "grouped_rules": grouping["mapped_rules"],
+        "ungrouped_rules": grouping["unmapped_rules"],
         "conversion_audit": "conversion-audit.json",
         "audit_success": conversion_audit["success"],
         "output_dir": str(output),
@@ -856,8 +900,20 @@ def main() -> int:
     )
     ap.add_argument("source", type=Path, help="Manual XCCDF XML or DISA STIG ZIP")
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument(
+        "--auto-map-groups",
+        action="store_true",
+        help=(
+            "Opt in to heuristic functional grouping. Default conversion leaves "
+            "Rules ungrouped; uncertain Rules remain ungrouped even when enabled."
+        ),
+    )
     args = ap.parse_args()
-    print(json.dumps(convert(args.source, args.output_dir), indent=2, sort_keys=True))
+    print(json.dumps(
+        convert(args.source, args.output_dir, auto_map_groups=args.auto_map_groups),
+        indent=2,
+        sort_keys=True,
+    ))
     return 0
 
 

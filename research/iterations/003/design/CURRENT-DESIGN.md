@@ -47,6 +47,10 @@
 
 ## OVAL/SCAP migration
 
+- Faithful conversion does not infer Benchmark Group taxonomy by default.
+- Conversion tools MAY expose explicit opt-in automatic grouping (currently `--auto-map-groups`) for editorial normalization.
+- Automatic grouping SHALL use only high-confidence mappings; uncertain Rules remain ungrouped rather than being forced into a catch-all Group.
+- Group membership SHALL NOT alter Rule applicability, selection, Assessment behavior, Parameters, scoring, remediation, or result semantics.
 - Forward migration from SCAP 1.4 is mandatory.
 - OVAL 5.12.3 is the current semantic migration baseline, with later authoritative corrections/reinstatements handled explicitly.
 - OVAL 6 is used primarily to identify genuinely new Test/Object/State/Item semantics; it is not an intermediate runtime format.

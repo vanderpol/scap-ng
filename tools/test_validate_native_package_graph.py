@@ -76,16 +76,34 @@ class NativePackageGraphValidationTests(unittest.TestCase):
             rows=validate_package(root)
             self.assertIn("reference_missing",{r["code"] for r in rows})
 
-    def test_normalization_broken_group_membership_is_detected(self):
+    def test_partial_group_coverage_is_valid(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); self.build_valid(root)
-            write(root/"benchmark.yaml", {"benchmark":{
-                "id":"b","rules":["R1"],"applicability_catalog":"applicability.yaml",
-                "platform":{"applicability":{"conditions":["platform.rhel"]}},
-                "groups":[{"id":"g","rules":[],"groups":[]}],
-            }})
+            benchmark=yaml.safe_load((root/"benchmark.yaml").read_text())
+            benchmark["benchmark"]["groups"]=[]
+            write(root/"benchmark.yaml",benchmark)
+            self.assertEqual(validate_package(root),[])
+
+    def test_duplicate_group_membership_is_detected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); self.build_valid(root)
+            benchmark=yaml.safe_load((root/"benchmark.yaml").read_text())
+            benchmark["benchmark"]["groups"]=[
+                {"id":"g1","rules":["R1"],"groups":[]},
+                {"id":"g2","rules":["R1"],"groups":[]},
+            ]
+            write(root/"benchmark.yaml",benchmark)
             rows=validate_package(root)
-            self.assertIn("benchmark_group_membership_mismatch",{r["code"] for r in rows})
+            self.assertIn("benchmark_group_membership_duplicate",{r["code"] for r in rows})
+
+    def test_unknown_group_membership_is_detected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); self.build_valid(root)
+            benchmark=yaml.safe_load((root/"benchmark.yaml").read_text())
+            benchmark["benchmark"]["groups"]=[{"id":"g","rules":["R2"],"groups":[]}]
+            write(root/"benchmark.yaml",benchmark)
+            rows=validate_package(root)
+            self.assertIn("benchmark_group_membership_unknown",{r["code"] for r in rows})
 
 if __name__=="__main__":
     unittest.main()
