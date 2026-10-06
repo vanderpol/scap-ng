@@ -234,7 +234,9 @@ unix.password Object
 check:
   for_each:
     user:
-      password: {}
+      password:
+        username:
+          matches: '.*'
 
   file:
     directory: user.home_dir
@@ -246,10 +248,22 @@ check:
       mode: no_more_permissive_than_0600
 ```
 
-The final source extraction for the Solaris Object/State details is retained by
-the foreach candidate mapping workflow. If those source details require
-additional selectors or permission entities, this sketch must be expanded
-rather than inferring them from the Rule title.
+The pinned source was re-extracted after mapping the candidate to SV-216074.
+It confirms:
+
+- source Password Object selector: `username pattern_match ".*"`;
+- projected field: `home_dir`;
+- target File selector: projected path + literal filename `.Xauthority`;
+- Test: `check_existence=any_exist`, `check=all`;
+- State: `suid=false`, `sgid=false`, `uexec=false`, and all group/other
+  read/write/execute bits false.
+
+Therefore `mode: no_more_permissive_than_0600` is acceptable in this
+research sketch only if the compiler expands it to those exact source
+permission predicates rather than inventing a different numeric-mode contract.
+
+Source-evidence workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37536228383
 
 ## What these five cases suggest
 
