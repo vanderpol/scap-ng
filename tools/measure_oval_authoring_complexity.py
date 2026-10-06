@@ -154,27 +154,45 @@ def closure(idx, roots):
 
 def classify_extend_definition(nodes):
     """Classify whether extend_definition contributes semantics or only indirection."""
-    out={"occurrences":0,"wrapper_only":0,"mixed_with_other_criteria":0,"nested_or_negated":0}
+    out={
+        "occurrences":0,
+        "wrapper_only":0,
+        "multiple_extends_only":0,
+        "extend_plus_direct_tests":0,
+        "extend_plus_nested_criteria":0,
+        "negated_extend":0,
+        "or_composition":0,
+        "other_mixed":0,
+    }
     for node in nodes.values():
         if node_kind(node)!="definition":
             continue
-        direct=list(node)
-        criteria=[x for x in direct if local(x.tag)=="criteria"]
+        criteria=[x for x in list(node) if local(x.tag)=="criteria"]
         for crit in criteria:
             children=[x for x in list(crit) if local(x.tag) in {"criterion","criteria","extend_definition"}]
             extends=[x for x in children if local(x.tag)=="extend_definition"]
             if not extends:
                 continue
-            out["occurrences"] += len(extends)
+            n=len(extends)
+            out["occurrences"] += n
             operator=(crit.get("operator") or "AND").upper()
             negate=(crit.get("negate") or "false").lower()=="true"
+            direct_tests=any(local(x.tag)=="criterion" for x in children)
             nested=any(local(x.tag)=="criteria" for x in children)
-            if negate or nested:
-                out["nested_or_negated"] += len(extends)
-            if len(children)==1 and len(extends)==1 and operator=="AND" and not negate:
+            if negate:
+                out["negated_extend"] += n
+            if operator=="OR":
+                out["or_composition"] += n
+            if len(children)==1 and n==1 and operator=="AND" and not negate:
                 out["wrapper_only"] += 1
+            elif len(children)==n and n>1 and not nested and not direct_tests and not negate:
+                out["multiple_extends_only"] += n
+            elif direct_tests:
+                out["extend_plus_direct_tests"] += n
+            elif nested:
+                out["extend_plus_nested_criteria"] += n
             else:
-                out["mixed_with_other_criteria"] += len(extends)
+                out["other_mixed"] += n
     return out
 
 
