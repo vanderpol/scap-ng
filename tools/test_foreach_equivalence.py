@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import itertools
+import json
 import sys
 from pathlib import Path
 import unittest
@@ -316,6 +317,28 @@ class DirectForeachEvidenceEquivalence(unittest.TestCase):
                 item_field="home_dir",
                 target_item_refs=[],
             )
+
+
+class MachineReadableTransformationContract(unittest.TestCase):
+    def test_rewrite_contract_matches_code_identifier_and_remains_disabled(self):
+        contract_path = (
+            Path(__file__).resolve().parents[1]
+            / "research"
+            / "assessment-simplification"
+            / "foreach-07"
+            / "transformation-v1.json"
+        )
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        self.assertEqual(contract["id"], DIRECT_FOREACH_REWRITE_ID)
+        self.assertEqual(
+            contract["desugaring"]["aggregation_boundary"],
+            "target_object_population",
+        )
+        self.assertEqual(
+            contract["source_pattern"]["effective_var_check"],
+            "at least one",
+        )
+        self.assertFalse(contract["automatic_rewrite_enabled"])
 
 
 class DownstreamTestResultEquivalence(unittest.TestCase):
