@@ -84,10 +84,13 @@ def classify(v):
                     "automatic_normalization":False,
                     "reason":"Projection looked single-use but exact source/consumer lowering metadata was incomplete.",
                 }
+            proven_datatype=(v.get("datatype") in {"string","int"})
             return {
                 "disposition":"candidate_inline_flattened_projection",
                 "automatic_normalization":False,
-                "reason":"Single-use object_component is projection plumbing. The emitted P1 lowering preserves flattened source Object-field semantics and the consumer's effective operation/datatype/value quantifier; automatic application remains gated on conformance proof.",
+                "automatic_normalization_eligible":proven_datatype,
+                "proof_envelope":"oval_string_or_int_exact_consumer_datatype" if proven_datatype else "datatype_requires_additional_conformance",
+                "reason":"Single-use object_component is projection plumbing. The emitted P1 lowering preserves flattened source Object-field semantics and the consumer's effective operation/datatype/value quantifier. The current automatic proof envelope is limited to OVAL string/int with exact consumer datatype agreement; converter enablement is a separate release decision.",
                 "p1_lowering":lowering,
             }
         if usage=="single_use_variable_input":
@@ -172,6 +175,7 @@ def main():
         "policy":{
             "automatic_normalization_enabled":False,
             "principle":"Named Variables should represent inputs, reusable values, or meaningful transformations; single-use projection/expression plumbing may be simplified only with exact semantic proof.",
+            "proven_p1_automatic_envelope":"pure object_component; exactly one Object/State value consumer; exact datatype match; OVAL string/int; preserved operation/quantifier/invocation/provenance",
         },
         "summary":dict(summary),
         "root_operator_counts":dict(root),
