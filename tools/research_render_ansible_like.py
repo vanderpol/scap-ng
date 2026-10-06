@@ -121,18 +121,28 @@ def predicate(spec, variables=None):
             values=[values]
         values=[typed_value(v,spec.get("datatype")) for v in values]
         op=spec.get("operation")
-        if op not in {"equals","equal"}:
+        if op not in OP_NAMES:
             raise Unsupported("constant_variable_operation:" + str(op))
         check=spec.get("variable_check")
-        key={
-            "at least one":"one_of",
-            "any":"one_of",
-            "all":"all_of",
-            "only one":"exactly_one_of",
-            "none satisfy":"none_of",
+        quant={
+            "at least one":"any",
+            "any":"any",
+            "all":"all",
+            "only one":"exactly_one",
+            "none satisfy":"none",
         }.get(check)
-        if key is None:
+        if quant is None:
             raise Unsupported("constant_variable_check:" + str(check))
+        short=OP_NAMES[op]
+        if short is None:
+            key={
+                "any":"one_of",
+                "all":"all_of",
+                "exactly_one":"exactly_one_of",
+                "none":"none_of",
+            }[quant]
+        else:
+            key=f"{short}_{quant}"
         return {key: values}
 
     if spec.get("variable_check") is not None:
