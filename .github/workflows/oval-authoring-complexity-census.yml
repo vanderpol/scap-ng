@@ -97,14 +97,24 @@ jobs:
               n=s["automated_rules_with_oval"]
               simple=round(l["simple_linear_percent"]*n/100)
               no_reuse=round(l["rules_without_object_state_reuse_barrier_percent"]*n/100)
-              advanced=round(l["advanced_graph_percent"]*n/100)
-              locality.update(simple= simple, no_reuse=no_reuse, advanced=advanced)
+              dataflow=round(l["dataflow_complex_percent"]*n/100)
+              evaluation=round(l["evaluation_complex_percent"]*n/100)
+              local_multi=round(l["local_multi_test_percent"]*n/100)
+              locality.update(
+                  simple=simple,
+                  no_reuse=no_reuse,
+                  dataflow=dataflow,
+                  evaluation=evaluation,
+                  local_multi=local_multi,
+              )
               rows.append({
                   "label":x["label"],
                   "rules":n,
                   "simple_linear_percent":l["simple_linear_percent"],
                   "no_object_state_reuse_barrier_percent":l["rules_without_object_state_reuse_barrier_percent"],
-                  "advanced_graph_percent":l["advanced_graph_percent"],
+                  "dataflow_complex_percent":l["dataflow_complex_percent"],
+                  "evaluation_complex_percent":l["evaluation_complex_percent"],
+                  "local_multi_test_percent":l["local_multi_test_percent"],
                   "direct_object_single_use_percent":l["direct_test_object_single_use_percent"],
                   "direct_state_single_use_percent":l["direct_test_state_single_use_percent"],
               })
@@ -124,8 +134,12 @@ jobs:
                   "simple_linear_percent":pct(locality["simple"],total_rules),
                   "rules_without_object_state_reuse_barrier":locality["no_reuse"],
                   "rules_without_object_state_reuse_barrier_percent":pct(locality["no_reuse"],total_rules),
-                  "advanced_graph_rules":locality["advanced"],
-                  "advanced_graph_percent":pct(locality["advanced"],total_rules),
+                  "dataflow_complex_rules":locality["dataflow"],
+                  "dataflow_complex_percent":pct(locality["dataflow"],total_rules),
+                  "evaluation_complex_rules":locality["evaluation"],
+                  "evaluation_complex_percent":pct(locality["evaluation"],total_rules),
+                  "local_multi_test_rules":locality["local_multi"],
+                  "local_multi_test_percent":pct(locality["local_multi"],total_rules),
                   "direct_test_object_single_use_percent":pct(reuse["direct_test_object_refs_single_use"],reuse["direct_test_object_refs"]),
                   "direct_test_state_single_use_percent":pct(reuse["direct_test_state_refs_single_use"],reuse["direct_test_state_refs"]),
               },
