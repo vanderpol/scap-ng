@@ -17,6 +17,10 @@ class ProjectionNormalizationError(ValueError):
     pass
 
 
+# Initial automatic proof envelope. Native SCAP-NG maps OVAL int -> integer.
+P1_PROVEN_NATIVE_DATATYPES = {"string", "integer"}
+
+
 def _walk(node, path=()):
     if isinstance(node, dict):
         yield path, node
@@ -145,6 +149,8 @@ def plan_p1_projection_normalization(document):
         # P1 class. Future type-normalization rules may widen this only with
         # independent proof.
         if consumer["datatype"] != parsed["datatype"]:
+            continue
+        if parsed["datatype"] not in P1_PROVEN_NATIVE_DATATYPES:
             continue
 
         # OVAL var_check/default semantics must remain visible at the consumer.
