@@ -14,6 +14,12 @@ specific until proven reusable.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+V03_MAPPING_DIR = ROOT / "schema" / "v0.3.0" / "capability-mappings" / "supported"
+
 
 class CapabilitySemanticError(ValueError):
     pass
@@ -673,6 +679,181 @@ def validate_singleton_source_document(document):
     return diagnostics
 
 
+
+
+def _load_v03_capability_mappings():
+    mappings={}
+    for path in sorted(V03_MAPPING_DIR.glob("*.json")):
+        row=json.loads(path.read_text(encoding="utf-8"))
+        capability=row.get("capability")
+        if capability:
+            mappings[capability]=row
+    return mappings
+
+
+def validate_v03_foreach(document):
+    """Validate the narrow Object-level foreach v1 semantic contract."""
+    assessment=document.get("assessment",document)
+    specification=assessment.get("specification") or {}
+    if specification.get("version") != "0.3.0":
+        return []
+
+    objects=assessment.get("objects") or {}
+    tests=assessment.get("tests") or {}
+    mappings=_load_v03_capability_mappings()
+    diagnostics=[]
+
+    directly_tested={
+        test.get("object")
+        for test in tests.values()
+        if isinstance(test,dict) and isinstance(test.get("object"),str)
+    }
+
+    for object_id,obj in objects.items():
+        if not isinstance(obj,dict):
+            continue
+        select=obj.get("select") or {}
+        bound=[
+            (field,spec.get("from"))
+            for field,spec in select.items()
+            if isinstance(spec,dict) and "from" in spec
+        ]
+        foreach=obj.get("for_each")
+
+        if foreach is None:
+            for field,_ in bound:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.from_without_for_each",
+                    "field":field,
+                    "message":"A selector from binding requires Object-level for_each",
+                })
+            continue
+
+        if not isinstance(foreach,dict) or set(foreach) != {"item","in"}:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.binding_shape",
+                "message":"foreach v1 requires exactly item and in",
+            })
+            continue
+
+        alias=foreach.get("item")
+        source_id=foreach.get("in")
+        if source_id == object_id:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.self_source",
+                "message":"foreach v1 source Object must be distinct from target Object",
+            })
+            continue
+        source=objects.get(source_id)
+        if source is None:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.source_missing",
+                "source_object":source_id,
+                "message":"foreach source references an unknown Object",
+            })
+            continue
+        if isinstance(source,dict) and "for_each" in source:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.chained_source_not_v1",
+                "source_object":source_id,
+                "message":"foreach v1 does not chain from another foreach Object",
+            })
+
+        if len(bound) != 1:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.bound_selector_count",
+                "count":len(bound),
+                "message":"foreach v1 requires exactly one bound target selector",
+            })
+            continue
+
+        target_field,from_ref=bound[0]
+        if not isinstance(from_ref,str) or from_ref.count(".") != 1:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.from_shape",
+                "field":target_field,
+                "message":"from must be <binding>.<source-field>",
+            })
+            continue
+        ref_alias,source_field=from_ref.split(".",1)
+        if ref_alias != alias:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.binding_alias",
+                "field":target_field,
+                "message":"from binding alias must match for_each.item",
+            })
+
+        source_cap=source.get("capability") if isinstance(source,dict) else None
+        target_cap=obj.get("capability")
+        source_map=mappings.get(source_cap)
+        target_map=mappings.get(target_cap)
+        if source_map is None or target_map is None:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.capability_mapping_missing",
+                "source_capability":source_cap,
+                "target_capability":target_cap,
+                "message":"foreach v1 requires reviewed 0.3.0 source and target capability mappings",
+            })
+            continue
+
+        source_types=set(source_map.get("native",{}).get("field_datatypes",{}).get(source_field,[]))
+        target_selector_names=set(target_map.get("native",{}).get("selector_map",{}).values())
+        target_types=set(target_map.get("native",{}).get("field_datatypes",{}).get(target_field,[]))
+        if not source_types:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.source_field_unknown",
+                "field":source_field,
+                "message":"foreach source field is not a typed collected field of the source capability",
+            })
+        if target_field not in target_selector_names or not target_types:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.target_selector_unknown",
+                "field":target_field,
+                "message":"foreach target field is not a typed selector of the target capability",
+            })
+        compatible=sorted(source_types & target_types)
+        if source_types and target_types and len(compatible) != 1:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.datatype_compatibility",
+                "source_datatypes":sorted(source_types),
+                "target_datatypes":sorted(target_types),
+                "compatible_datatypes":compatible,
+                "message":"foreach v1 requires exactly one compatible source/target datatype",
+            })
+
+        for field,spec in select.items():
+            if field == target_field or not isinstance(spec,dict):
+                continue
+            if _is_variable_value(spec.get("value")):
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.additional_variable_selector",
+                    "field":field,
+                    "message":"foreach v1 target Object cannot add an independent Variable selector",
+                })
+
+        if object_id not in directly_tested:
+            diagnostics.append({
+                "object":object_id,
+                "code":"foreach.target_not_directly_tested",
+                "message":"foreach v1 target Object must be referenced directly by at least one Test",
+            })
+
+    return diagnostics
+
+
 def validate_assessment_capability_semantics(document):
     """Validate current native Assessment cross-node capability semantics."""
     assessment=document.get("assessment",document)
@@ -793,6 +974,7 @@ def validate_assessment_capability_semantics(document):
 
     diagnostics.extend(validate_singleton_source_document(document))
     diagnostics.extend(validate_v02_native_literal_types(document))
+    diagnostics.extend(validate_v03_foreach(document))
     return diagnostics
 
 
