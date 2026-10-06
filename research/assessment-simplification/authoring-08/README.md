@@ -257,6 +257,48 @@ This suggests two different design layers:
 1. task-local collection/expectation for ordinary authoring;
 2. named reusable Assessment/observation components when actual reuse exists.
 
+
+## Raw OVAL cross-check
+
+The converted-YAML census was cross-checked against exact per-Rule OVAL
+closures generated from the same pinned six NIWC packages.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37526567764
+
+Across **1,355 OVAL-backed Rules**:
+
+- Variables: **9.30%**
+- Variable functions: **5.17%**
+- Sets: **8.12%**
+- Filters: **4.80%**
+- ObjectComponent: **6.57%**
+- VariableComponent: **1.85%**
+- entity `var_ref`: **8.34%**
+- multiple Tests: **27.38%**
+- criteria depth greater than 2: **0.37%**
+- shellcommand Test: **6.05%**
+
+The close agreement with the converted-YAML percentages is important: the
+small complex tail is present in the source OVAL itself rather than being
+created by the converter.
+
+Raw per-platform function use is also highly skewed. Apache 2.4 has 22
+OVAL-backed Rules and all 22 use Variables, Variable functions,
+ObjectComponent/VariableComponent and shellcommand. By contrast:
+
+| Benchmark | Variables | Functions | Sets | Filters |
+| --- | ---: | ---: | ---: | ---: |
+| RHEL 9 | 10.05% | 4.07% | 10.77% | 5.02% |
+| Oracle Linux 9 | 9.31% | 3.68% | 10.78% | 5.39% |
+| Windows 11 | 4.07% | 2.85% | 5.69% | 4.07% |
+| Windows Server 2025 | 5.36% | 3.45% | 2.68% | 4.60% |
+| Apache 2.4 UNIX Server | 100% | 100% | 0% | 0% |
+
+This does not mean every Rule without a Variable function is trivial. It does
+show that preserving the full OVAL function/dataflow language for every author
+would make the common case pay for features concentrated in a small minority.
+
 ## Current conclusion
 
 The initial data supports the owner's intuition: external Object/State placement
@@ -274,9 +316,11 @@ The bigger problem is not only names. Current source also exposes:
 A much more Ansible-like **authoring surface** can therefore plausibly cover the
 majority of real content while compiling to the rigorous semantic graph.
 
-This census does **not** yet establish a percentage of OVAL that a smaller
-standard may safely refuse. The next quantitative pass should compare the raw
-pinned OVAL graphs and classify every automated Rule by the minimum authoring
-features required: local task, shallow composition, local loop/binding,
-Set/exclusion, reusable observation, function/dataflow, or content redesign /
-review candidate.
+The raw OVAL cross-check now confirms the feature-frequency measurements, but
+this census still does **not** establish a percentage of OVAL that a smaller
+standard may safely refuse. The next classification should assign every
+automated Rule to the minimum *authoring* feature needed: local task, shallow
+composition, local loop/binding, Set/exclusion, reusable observation,
+function/dataflow, or content redesign/review candidate. That classification,
+not raw XML feature presence alone, is the appropriate basis for a proposed
+90/95/99-percent migration target.
