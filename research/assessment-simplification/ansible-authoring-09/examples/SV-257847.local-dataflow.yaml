@@ -1,0 +1,42 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257847
+intent: RHEL 9 must use a separate file system for the system audit data path.
+
+check:
+  let:
+    audit_dir:
+      from:
+        text:
+          path: /etc/audit/auditd.conf
+          pattern: '^\\s*log_file\\s*=\\s*(\\S+)/\\S+\\s*$'
+          ignore_case: true
+        field: subexpression
+
+  all:
+    - partition:
+        mount_point: audit_dir
+      expect:
+        exists: all
+
+    - text:
+        path: /etc/fstab
+        pattern:
+          concat:
+            - '^[^# \\t]+\\s+'
+            - audit_dir
+            - '\\s+'
+      expect:
+        exists: all
+
+semantic_obligations:
+  note: >
+    This remains an advanced structured case. The local binding is intended to
+    improve locality, not erase OVAL multi-value semantics.
+  audit_dir:
+    preserves_all_object_component_values: true
+    datatype: string
+  concat:
+    preserves_cartesian_product_semantics: true
+  checks:
+    boolean: all
+    existence: all_exist
