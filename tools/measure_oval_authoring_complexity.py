@@ -51,22 +51,52 @@ def automated_roots(docs):
             if local(rule.tag)!="Rule": continue
             rid=rule.get("id") or ""
             title=text(next((x for x in rule if local(x.tag)=="title"),None))
-            defs=[]
+            checks=[]
             for check in rule:
                 if local(check.tag)!="check": continue
                 system=(check.get("system") or "").lower()
                 for ref in check:
                     if local(ref.tag)!="check-content-ref": continue
                     name=ref.get("name")
+                    href=ref.get("href")
                     if name and name.startswith("oval:") and ("oval" in system or not system):
-                        defs.append(name)
-            defs=list(dict.fromkeys(defs))
-            if not defs: continue
-            key=(rid,tuple(defs))
+                        checks.append({"definition":name,"href":href})
+            unique=[]
+            observed=set()
+            for item in checks:
+                key2=(item["definition"],item.get("href"))
+                if key2 not in observed:
+                    observed.add(key2); unique.append(item)
+            checks=unique
+            if not checks: continue
+            key=(rid,tuple((x["definition"],x.get("href")) for x in checks))
             if key in seen: continue
             seen.add(key)
-            rows.append({"rule_id":rid,"title":title,"definitions":defs})
+            rows.append({
+                "rule_id":rid,
+                "title":title,
+                "checks":checks,
+                "definitions":[x["definition"] for x in checks],
+            })
     return rows
+
+def scoped_index(docs, rule, fallback):
+    """Build the OVAL ID index from the component(s) referenced by this Rule."""
+    hrefs={
+        Path((item.get("href") or "").split("#",1)[0]).name
+        for item in rule.get("checks",[])
+        if item.get("href")
+    }
+    selected=[
+        (name,root)
+        for name,root in docs
+        if Path(name).name in hrefs
+    ]
+    if not selected:
+        return fallback, []
+    idx,conflicts=index_oval(selected)
+    return idx, sorted(conflicts)
+
 
 def node_kind(node):
     n=local(node.tag)
@@ -254,7 +284,13 @@ def main():
     docs=xml_docs(args.package)
     idx,duplicates=index_oval(docs)
     roots=automated_roots(docs)
-    rows=[analyze_root(idx,r) for r in roots]
+    rows=[]
+    scoped_conflicts={}
+    for rule in roots:
+        rule_idx,conflicts=scoped_index(docs,rule,idx)
+        if conflicts:
+            scoped_conflicts[rule["rule_id"]]=conflicts
+        rows.append(analyze_root(rule_idx,rule))
     report={
         "format":"scap-ng-oval-authoring-complexity-0.1",
         "package":args.package.name,
@@ -262,7 +298,8 @@ def main():
         "sha256":hashlib.sha256(args.package.read_bytes()).hexdigest(),
         "xml_files":len(docs),
         "indexed_oval_nodes":len(idx),
-        "duplicate_conflicting_ids":sorted(duplicates),
+        "global_duplicate_conflicting_ids":sorted(duplicates),
+        "scoped_duplicate_conflicting_ids":scoped_conflicts,
         "summary":summarize(rows),
         "rules":rows,
     }
@@ -270,7 +307,7 @@ def main():
     args.output.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print(json.dumps({"label":report["label"],**report["summary"]["locality"],
                       "automated_rules_with_oval":len(rows)},indent=2))
-    return 0 if not duplicates else 1
+    return 0 if not scoped_conflicts else 1
 
 if __name__=="__main__":
     raise SystemExit(main())
