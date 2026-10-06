@@ -20,7 +20,7 @@ from xml.etree import ElementTree as ET
 import yaml
 from jsonschema import Draft202012Validator
 
-from group_mapping import auto_map_groups
+from group_mapping import auto_map_groups as build_auto_groups
 
 
 def lname(tag: str) -> str:
@@ -720,7 +720,7 @@ def convert(source: Path, output: Path, *, auto_map_groups: bool = False) -> dic
     groups = []
     grouping_rows = []
     if auto_map_groups:
-        groups, grouping_rows = auto_map_groups([
+        groups, grouping_rows = build_auto_groups([
             {
                 **candidate,
                 "assessment_group": "manual-or-managerial",
