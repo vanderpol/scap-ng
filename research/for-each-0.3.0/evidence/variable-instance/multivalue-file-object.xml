@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5">
+  <generator>
+    <oval:product_name>SCAP-NG scoped iteration research</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-10-06T15:35:00Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <definition id="oval:org.scapng.research:def:1" version="1" class="miscellaneous">
+      <metadata>
+        <title>Observe multi-valued Object var_ref runtime representation</title>
+        <description>Both /etc/passwd and /etc/group should be selected by one file Object whose filepath uses one three-valued constant Variable; the third path is intentionally absent.</description>
+      </metadata>
+      <criteria operator="AND">
+        <criterion test_ref="oval:org.scapng.research:tst:1"
+                   comment="Observe one Object consuming three Variable values."/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+               id="oval:org.scapng.research:tst:1"
+               version="1"
+               check_existence="any_exist"
+               check="all"
+               comment="Observe collection cardinality and variable-instance representation.">
+      <object object_ref="oval:org.scapng.research:obj:1"/>
+    </file_test>
+  </tests>
+  <objects>
+    <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+                 id="oval:org.scapng.research:obj:1"
+                 version="1"
+                 comment="Three filepath values are supplied by one constant Variable.">
+      <filepath operation="equals"
+                var_ref="oval:org.scapng.research:var:1"
+                var_check="at least one"/>
+    </file_object>
+  </objects>
+  <states/>
+  <variables>
+    <constant_variable id="oval:org.scapng.research:var:1"
+                       version="1"
+                       datatype="string"
+                       comment="Two present paths and one absent path.">
+      <value>/etc/passwd</value>
+      <value>/etc/group</value>
+      <value>/scap-ng-intentionally-absent-variable-instance-probe</value>
+    </constant_variable>
+  </variables>
+</oval_definitions>
