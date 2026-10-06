@@ -111,39 +111,55 @@ def predicate(spec, variables=None):
             raise Unsupported("variable_or_structured_value")
         var_id=raw["variable"]
         var=variables.get(var_id)
-        if not isinstance(var,dict) or var.get("kind")!="constant":
+        if not isinstance(var,dict):
+            raise Unsupported("variable_missing")
+        if var.get("kind")=="constant":
+            expr=var.get("expression")
+            if not isinstance(expr,dict) or set(expr)!={"literal"}:
+                raise Unsupported("variable_nonliteral")
+            values=expr["literal"]
+            if not isinstance(values,list):
+                values=[values]
+            values=[typed_value(v,spec.get("datatype")) for v in values]
+            op=spec.get("operation")
+            if op not in OP_NAMES:
+                raise Unsupported("constant_variable_operation:" + str(op))
+            check=spec.get("variable_check")
+            quant={
+                "at least one":"any",
+                "any":"any",
+                "all":"all",
+                "only one":"exactly_one",
+                "none satisfy":"none",
+            }.get(check)
+            if quant is None:
+                raise Unsupported("constant_variable_check:" + str(check))
+            short=OP_NAMES[op]
+            if short is None:
+                key={
+                    "any":"one_of",
+                    "all":"all_of",
+                    "exactly_one":"exactly_one_of",
+                    "none":"none_of",
+                }[quant]
+            else:
+                key=f"{short}_{quant}"
+            return {key: values}
+
+        projection=field_projection_variable(var)
+        if projection is None:
             raise Unsupported("variable_nonconstant")
-        expr=var.get("expression")
-        if not isinstance(expr,dict) or set(expr)!={"literal"}:
-            raise Unsupported("variable_nonliteral")
-        values=expr["literal"]
-        if not isinstance(values,list):
-            values=[values]
-        values=[typed_value(v,spec.get("datatype")) for v in values]
         op=spec.get("operation")
         if op not in OP_NAMES:
-            raise Unsupported("constant_variable_operation:" + str(op))
-        check=spec.get("variable_check")
-        quant={
-            "at least one":"any",
-            "any":"any",
-            "all":"all",
-            "only one":"exactly_one",
-            "none satisfy":"none",
-        }.get(check)
-        if quant is None:
-            raise Unsupported("constant_variable_check:" + str(check))
+            raise Unsupported("projection_variable_operation:" + str(op))
+        out={
+            "from": var_id,
+            "variable_match": spec.get("variable_check"),
+        }
         short=OP_NAMES[op]
-        if short is None:
-            key={
-                "any":"one_of",
-                "all":"all_of",
-                "exactly_one":"exactly_one_of",
-                "none":"none_of",
-            }[quant]
-        else:
-            key=f"{short}_{quant}"
-        return {key: values}
+        if short is not None:
+            out["compare"]=short
+        return out
 
     if spec.get("variable_check") is not None:
         raise Unsupported("variable_check_without_variable")
@@ -314,6 +330,38 @@ def eval_expr(node, rendered):
     raise Unsupported("unsupported_evaluate_shape")
 
 
+def field_projection_variable(var):
+    if not isinstance(var,dict) or var.get("kind")!="local":
+        return None
+    expr=var.get("expression")
+    if not isinstance(expr,dict) or set(expr)!={"object_values"}:
+        return None
+    values=expr["object_values"]
+    if not isinstance(values,dict) or set(values)!={"collect","field"}:
+        return None
+    if not isinstance(values.get("field"),str) or not values["field"]:
+        return None
+    # Keep v1 local projection acyclic: source collection must not itself
+    # consume another Variable.
+    for node in walk(values.get("collect")):
+        if isinstance(node,dict) and set(node)=={"variable"}:
+            return None
+    return values
+
+
+def supported_local_variables(assessment):
+    variables=assessment.get("variables") or {}
+    for var in variables.values():
+        if isinstance(var,dict) and var.get("kind")=="constant":
+            expr=var.get("expression")
+            if isinstance(expr,dict) and set(expr)=={"literal"}:
+                continue
+        if field_projection_variable(var) is not None:
+            continue
+        return None
+    return variables
+
+
 def constant_literal_variables(assessment):
     variables=assessment.get("variables") or {}
     for var in variables.values():
@@ -327,7 +375,7 @@ def constant_literal_variables(assessment):
 
 def has_dataflow(assessment):
     variables=assessment.get("variables") or {}
-    if variables and constant_literal_variables(assessment) is None:
+    if variables and supported_local_variables(assessment) is None:
         return "variables"
     for node in walk(assessment):
         keys = set(node)
@@ -341,6 +389,22 @@ def has_dataflow(assessment):
     return None
 
 
+def render_local_bindings(assessment):
+    variables=supported_local_variables(assessment) or {}
+    out={}
+    for var_id,var in variables.items():
+        projection=field_projection_variable(var)
+        if projection is None:
+            continue
+        module, selection=collect_expr(projection["collect"], variables)
+        out[var_id]={
+            "from": {module: selection},
+            "field": projection["field"],
+            "datatype": var.get("datatype"),
+        }
+    return out
+
+
 def render(assessment):
     if assessment.get("mode") != "automated":
         raise Unsupported("manual")
@@ -349,18 +413,20 @@ def render(assessment):
         raise Unsupported(reason)
 
     checks = assessment.get("checks") or assessment.get("tests") or {}
-    variables = constant_literal_variables(assessment) or {}
+    variables = supported_local_variables(assessment) or {}
     rendered = {cid: leaf(cid, c, variables) for cid, c in checks.items()}
     root = eval_expr(assessment.get("evaluate"), rendered)
+    bindings=render_local_bindings(assessment)
 
-    return {
-        "research_assessment": {
-            "status": "research_only_not_accepted_design",
-            "source_assessment": assessment.get("id"),
-            "title": assessment.get("assessment_title"),
-            "check": root,
-        }
+    body={
+        "status": "research_only_not_accepted_design",
+        "source_assessment": assessment.get("id"),
+        "title": assessment.get("assessment_title"),
     }
+    if bindings:
+        body["let"]=bindings
+    body["check"]=root
+    return {"research_assessment": body}
 
 
 def main():
