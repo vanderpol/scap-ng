@@ -38,6 +38,8 @@ def test_p1_projection_lowering_is_explicit_and_preserves_consumer_semantics():
     result=classify(v)
     assert result["disposition"]=="candidate_inline_flattened_projection"
     assert result["automatic_normalization"] is False
+    assert result["automatic_normalization_eligible"] is True
+    assert result["proof_envelope"]=="oval_string_or_int_exact_consumer_datatype"
 
     lowering=result["p1_lowering"]
     assert lowering["value_source"]=={
@@ -104,3 +106,15 @@ def test_multi_use_projection_stays_named():
     })
     result=classify(v)
     assert result["disposition"]=="keep_named_projection_for_reuse"
+
+
+def test_unproven_projection_datatype_is_not_automatic_eligible():
+    v=projection_var()
+    v["datatype"]="boolean"
+    v["projection"]["datatype"]="boolean"
+    v["consumers"][0]["datatype"]="boolean"
+    result=classify(v)
+    assert result["disposition"]=="candidate_inline_flattened_projection"
+    assert result["automatic_normalization"] is False
+    assert result["automatic_normalization_eligible"] is False
+    assert result["proof_envelope"]=="datatype_requires_additional_conformance"
