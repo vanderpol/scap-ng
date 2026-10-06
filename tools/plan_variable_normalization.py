@@ -11,6 +11,44 @@ from collections import Counter
 from pathlib import Path
 
 
+def projection_lowering(v):
+    projection=v.get("projection") or {}
+    consumers=v.get("consumers") or []
+    if len(consumers)!=1:
+        return None
+    consumer=consumers[0]
+    if consumer.get("kind") not in {"object_selector","state_expected_value"}:
+        return None
+    if not projection.get("object") or not projection.get("field"):
+        return None
+    return {
+        "value_source":{
+            "projection":{
+                "object":projection["object"],
+                "field":projection["field"],
+                **(
+                    {"record_field":projection["record_field"]}
+                    if projection.get("record_field") else {}
+                ),
+            }
+        },
+        "projection_datatype":projection.get("datatype") or v.get("datatype"),
+        "consumer":{
+            "kind":consumer.get("kind"),
+            "id":consumer.get("consumer"),
+            "entity":consumer.get("entity"),
+            "operation":consumer.get("operation"),
+            "datatype":consumer.get("datatype"),
+            "variable_match":consumer.get("var_check"),
+        },
+        "removed_native_variable":v.get("variable"),
+        "required_provenance":{
+            "source_variable_id":v.get("variable"),
+            "source_variable_datatype":v.get("datatype"),
+        },
+    }
+
+
 def classify(v):
     shape=v.get("shape")
     usage=v.get("usage_class")
@@ -39,10 +77,18 @@ def classify(v):
                 "reason":"The projected value set is the direct subject of a Variable Test. Current native variable.value Test semantics consume a named Variable; do not erase that identity until a direct-expression Test contract is independently proven.",
             }
         if usage in {"single_use_object_selector","single_use_state_expected_value"}:
+            lowering=projection_lowering(v)
+            if lowering is None:
+                return {
+                    "disposition":"review_projection",
+                    "automatic_normalization":False,
+                    "reason":"Projection looked single-use but exact source/consumer lowering metadata was incomplete.",
+                }
             return {
                 "disposition":"candidate_inline_flattened_projection",
                 "automatic_normalization":False,
-                "reason":"Single-use object_component is projection plumbing. A native Collection-field value expression could remove the named Variable only if it preserves OVAL flattening, zero/missing-field error behavior, datatype/status propagation and consumer var_check semantics.",
+                "reason":"Single-use object_component is projection plumbing. The emitted P1 lowering preserves flattened source Object-field semantics and the consumer's effective operation/datatype/value quantifier; automatic application remains gated on conformance proof.",
+                "p1_lowering":lowering,
             }
         if usage=="single_use_variable_input":
             return {
