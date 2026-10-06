@@ -105,13 +105,14 @@ def bounded_failure_summary(results, maximum, *, population_complete=True):
 
 def incomplete_all_result(observed_item_results):
     """OVAL result for an incomplete collection with check=all."""
+    vals=list(observed_item_results)
     return evaluate_collected_object_test(
         "incomplete",
         existence="at_least_one_exists",
         check="all",
-        item_results=list(observed_item_results),
+        item_results=vals,
         has_state=True,
-        exists=len(list(observed_item_results)),
+        exists=len(vals),
     )
 
 
