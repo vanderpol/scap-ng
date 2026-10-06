@@ -159,6 +159,75 @@ Nested iteration also needs implementation limits for dependency depth and
 population expansion so malicious or accidental content cannot create an
 unbounded evaluation bomb.
 
+
+## Scope, lineage, and collection invocation are different concepts
+
+The corpus study shows that a native evaluator needs to keep three identities
+separate:
+
+1. **Semantic scope/binding** — a parent Item is lexically bound because the
+   truth of a child evaluation depends on that specific parent.
+2. **Dataflow lineage** — an upstream Object/Variable/value explains why a
+   downstream Item became reachable, but does not create a new semantic
+   evaluation relationship.
+3. **Collection invocation** — one execution of a Collection template with one
+   effective selector/input binding set.
+
+These identities SHALL NOT be conflated.
+
+### Lineage without semantic iteration
+
+A flattened value-set dependency can legitimately have two upstream derivations
+for one downstream Item:
+
+    config-a -> /etc/target
+    config-b -> /etc/target
+
+The downstream Item may still be evaluated once. Results MAY retain both
+lineage edges for diagnosis without pretending there were two scoped compliance
+relationships.
+
+This is an important route to better converted-content results that does not
+change OVAL truth semantics.
+
+### Scoped relationships with shared observations
+
+A true correlated requirement can have two parent bindings that resolve to the
+same physical child:
+
+    alice(expected_gid=100) -> /shared
+    bob(expected_gid=200)   -> /shared
+
+If /shared has gid 100, acquisition of the directory can be reused, but the two
+relationship evaluations are semantically distinct: alice passes and bob fails.
+
+A scanner SHOULD be able to store/reuse one immutable collected observation and
+reference it from multiple scoped relationship results. Collection reuse SHALL
+NOT collapse the parent bindings or their expected values.
+
+### Parameterized Collection invocation identity
+
+A Collection used inside a scope behaves conceptually as a typed Collection
+template plus effective bound selector values. Implementations MAY cache/reuse
+collection work when two invocations have equivalent capability, selector,
+behavior, input, privilege, and target semantics.
+
+Cache/reuse identity SHALL be based on those effective collection semantics, not
+merely on source syntax or parent binding identity.
+
+Reusing acquisition work SHALL NOT change:
+
+- scoped truth;
+- multiplicity of semantic relationships;
+- collection completeness/status;
+- evidence attribution;
+- sensitivity/redaction requirements.
+
+The final result schema should permit a compact structure in which collected
+observations are normalized once and scoped outcomes reference them by stable
+result-local identity.
+
+
 ## Production proof families
 
 ### Manual correlation - new native expressiveness
