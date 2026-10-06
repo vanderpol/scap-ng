@@ -1,0 +1,27 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257790
+intent: RHEL 9 /boot/grub2/grub.cfg file must be group-owned by root.
+
+check:
+  file:
+    path: /boot/grub2/grub.cfg
+
+  expect:
+    exists: at_least_one
+    all:
+      group_id: 0
+
+semantic_obligations:
+  capability: unix.file
+  source_existence: at_least_one_exists
+  source_test_check: all
+  selector:
+    filepath:
+      operation: equal
+      datatype: string
+  expectation:
+    group_id:
+      operation: equal
+      datatype: int
+      entity_check: all
+      entity_existence: at_least_one_exists
