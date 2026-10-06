@@ -75,7 +75,7 @@ def test_partial_all_only_passes_is_not_decisive():
 def test_partial_at_least_one_true_is_decisive():
     result=evaluate_partial_scope(
         check_existence="at_least_one_exists",
-        check="at least one",
+        check="at_least_one",
         observed_body_outcomes=[FALSE, TRUE],
         observed_exists=2,
     )
@@ -98,7 +98,7 @@ def test_partial_only_failures_cannot_prove_at_least_one_false():
 def test_partial_only_one_two_successes_is_decisive_false():
     result=evaluate_partial_scope(
         check_existence="at_least_one_exists",
-        check="only one",
+        check="only_one",
         observed_body_outcomes=[TRUE, TRUE],
         observed_exists=2,
     )
@@ -109,7 +109,7 @@ def test_partial_only_one_two_successes_is_decisive_false():
 def test_partial_none_satisfy_success_seen_is_decisive_false():
     result=evaluate_partial_scope(
         check_existence="at_least_one_exists",
-        check="none satisfy",
+        check="none_satisfy",
         observed_body_outcomes=[FALSE, TRUE],
         observed_exists=2,
     )
