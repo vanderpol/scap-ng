@@ -27,6 +27,12 @@ def result_extensions(version="0.2.0"):
     )["capabilities"]
 
 
+# Backward-compatible public 0.2 constants. Version-aware code uses the
+# accessors above, but existing 0.2 callers/tests still import these names.
+CONTROL = control_schema("0.2.0")
+EXTENSIONS = result_extensions("0.2.0")
+
+
 @lru_cache(maxsize=None)
 def capability_fields(capability, version="0.2.0"):
     if not isinstance(capability, str) or not capability:
