@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 """Research probes for OVAL value-set semantics versus scoped iteration.
 
-These are semantic counterexamples, not a production evaluator.
-They exist to prevent unsafe rewrite rules from being introduced.
+These are semantic counterexamples and result-shape probes, not a production
+evaluator. They exist to prevent unsafe rewrite rules from being introduced.
 """
 from __future__ import annotations
 import itertools, json
+
+from tools.oval_result_truth_tables import (
+    TRUE,
+    FALSE,
+    UNKNOWN,
+    evaluate_collected_object_test,
+    resolve_variable_reference,
+    apply_variable_reference_context,
+)
+
 
 def oval_cartesian_product(rows, left, right):
     a=[r[left] for r in rows]
     b=[r[right] for r in rows]
     return [x*y for x,y in itertools.product(a,b)]
 
+
 def bound_elementwise_product(rows, left, right):
     return [r[left]*r[right] for r in rows]
+
 
 def equals_with_var_check(actual, values, check):
     comps=[actual==v for v in values]
@@ -27,6 +39,7 @@ def equals_with_var_check(actual, values, check):
         return sum(bool(x) for x in comps)==1
     raise ValueError(check)
 
+
 def iterate_values_exist(system_values, values, aggregate):
     scoped=[v in system_values for v in values]
     if aggregate=="all":
@@ -34,6 +47,86 @@ def iterate_values_exist(system_values, values, aggregate):
     if aggregate=="at least one":
         return any(scoped)
     raise ValueError(aggregate)
+
+
+def nested_required_child_naive(scopes):
+    """Demonstrate why host-language all([]) is unsafe for required children."""
+    return all(all(scope["child_results"]) for scope in scopes)
+
+
+def nested_required_child_explicit(scopes):
+    """Illustrative native semantics when every parent requires >=1 passing child.
+
+    This is intentionally not claimed to be OVAL lowering. It demonstrates that
+    scoped iteration needs an explicit child-existence contract in addition to
+    Boolean aggregation.
+    """
+    per_parent=[]
+    for scope in scopes:
+        children=list(scope["child_results"])
+        per_parent.append(bool(children) and all(children))
+    return all(per_parent)
+
+
+def lineage_only_example():
+    """Diagnostic lineage can be richer without changing semantic child truth.
+
+    Two upstream values lead to one downstream child observation. The semantic
+    child population is evaluated once; the two lineage edges explain how the
+    child became reachable. This must not be confused with two scoped semantic
+    relationships.
+    """
+    return {
+        "semantic_children":[{"child":"/etc/target","pass":True}],
+        "lineage_edges":[
+            {"source":"config-a","child":"/etc/target"},
+            {"source":"config-b","child":"/etc/target"},
+        ],
+    }
+
+
+def bounded_failure_summary(results, maximum, *, population_complete=True):
+    """Compact result/evidence probe consistent with the current NG result model."""
+    values=list(results)
+    failures=[i for i,v in enumerate(values) if v is False]
+    aggregate=all(values)
+    retained=failures[:maximum]
+    return {
+        "aggregate":aggregate,
+        "logical_complete":population_complete or bool(failures),
+        "population_complete":population_complete,
+        "observed_failures":len(failures),
+        "actual_failures":len(failures) if population_complete else None,
+        "returned_failures":retained,
+        "evidence_complete":population_complete and len(failures)<=maximum,
+        "truncated_population":len(failures)>maximum or not population_complete,
+    }
+
+
+def incomplete_all_result(observed_item_results):
+    """OVAL result for an incomplete collection with check=all."""
+    return evaluate_collected_object_test(
+        "incomplete",
+        existence="at_least_one_exists",
+        check="all",
+        item_results=list(observed_item_results),
+        has_state=True,
+        exists=len(list(observed_item_results)),
+    )
+
+
+def incomplete_at_least_one_result(observed_item_results):
+    """OVAL result for an incomplete collection with check=at least one."""
+    vals=list(observed_item_results)
+    return evaluate_collected_object_test(
+        "incomplete",
+        existence="at_least_one_exists",
+        check="at least one",
+        item_results=vals,
+        has_state=True,
+        exists=len(vals),
+    )
+
 
 def run():
     rows=[
@@ -64,6 +157,16 @@ def run():
         for p in shared_child["parents"]
     ]
 
+    empty_var=resolve_variable_reference([])
+    empty_object=apply_variable_reference_context(empty_var,"object")
+
+    missing_child_scopes=[
+        {"parent":"alice","child_results":[True]},
+        {"parent":"bob","child_results":[]},
+    ]
+
+    lineage=lineage_only_example()
+
     report={
         "same_item_function_counterexample":{
             "source_rows":rows,
@@ -88,15 +191,49 @@ def run():
             "finding":"One child Item can participate in multiple parent relationships with different expected values; flattening child identity cannot represent both relationship outcomes.",
         },
         "empty_source_warning":{
-            "oval_object_var_ref_zero_values":"object considered not to exist",
-            "naive_all_over_zero_iterations":True,
+            "oval_object_var_ref_zero_values":empty_object,
+            "naive_all_over_zero_iterations":all([]),
             "finding":"Zero iteration must not inherit programming-language/vacuous all semantics when migrating OVAL empty-variable behavior.",
         },
+        "nested_required_child_warning":{
+            "scopes":missing_child_scopes,
+            "naive_nested_all":nested_required_child_naive(missing_child_scopes),
+            "explicit_required_child":nested_required_child_explicit(missing_child_scopes),
+            "finding":"Nested iteration needs per-scope existence semantics; Boolean aggregation alone can silently pass a parent with no required child.",
+        },
+        "incomplete_collection_warning":{
+            "all_with_only_observed_passes":incomplete_all_result([TRUE]),
+            "all_with_observed_failure":incomplete_all_result([FALSE]),
+            "at_least_one_with_observed_pass":incomplete_at_least_one_result([TRUE]),
+            "finding":"Incomplete populations may be decisive only in specific directions. A scoped implementation must preserve these monotonicity rules.",
+        },
+        "lineage_is_not_scope":{
+            **lineage,
+            "semantic_child_count":len(lineage["semantic_children"]),
+            "lineage_edge_count":len(lineage["lineage_edges"]),
+            "finding":"Diagnostic provenance may retain multiple upstream derivations without multiplying semantic child evaluations. Lineage and scoped iteration are distinct concepts.",
+        },
+        "bounded_results":{
+            "complete":bounded_failure_summary([True,False,False,True],1,population_complete=True),
+            "stopped_after_decisive_failure":bounded_failure_summary([True,False],1,population_complete=False),
+            "finding":"Failure evidence can be bounded independently of truth; early decisive failure need not serialize every passing or unseen scope.",
+        },
     }
+
     assert report["same_item_function_counterexample"]["equivalent"] is False
     assert report["var_check_is_not_loop_aggregation"]["equivalent"] is False
     assert [x["pass"] for x in scoped]==[True,False]
+    assert empty_object=="does_not_exist"
+    assert report["nested_required_child_warning"]["naive_nested_all"] is True
+    assert report["nested_required_child_warning"]["explicit_required_child"] is False
+    assert report["incomplete_collection_warning"]["all_with_only_observed_passes"]==UNKNOWN
+    assert report["incomplete_collection_warning"]["all_with_observed_failure"]==FALSE
+    assert report["incomplete_collection_warning"]["at_least_one_with_observed_pass"]==TRUE
+    assert report["lineage_is_not_scope"]["semantic_child_count"]==1
+    assert report["lineage_is_not_scope"]["lineage_edge_count"]==2
     print(json.dumps(report,indent=2))
+    return report
+
 
 if __name__=="__main__":
     run()
