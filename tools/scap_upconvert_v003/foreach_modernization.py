@@ -237,6 +237,31 @@ def _candidate(document, variable_id):
     }, []
 
 
+def _count_reasons(rows):
+    counts = {}
+    for row in rows:
+        for reason in row.get("reasons", []):
+            counts[reason] = counts.get(reason, 0) + 1
+    return counts
+
+
+def _finalize_stats(report):
+    stats = report["stats"]
+    stats["rewrites_applied"] = len(report["applied"])
+    stats["review_required_variables"] = len(report["review_required"])
+    direct = stats["direct_projection_variables_examined"]
+    stats["rewrite_rate_pct_of_direct_projections"] = (
+        round(100.0 * stats["rewrites_applied"] / direct, 2)
+        if direct else 0.0
+    )
+    stats["review_rate_pct_of_direct_projections"] = (
+        round(100.0 * stats["review_required_variables"] / direct, 2)
+        if direct else 0.0
+    )
+    stats["review_reason_counts"] = _count_reasons(report["review_required"])
+    return report
+
+
 def modernize_foreach_v1(document, *, enabled=False):
     """Return (document, report), applying only exact v1 matches when enabled."""
     result = deepcopy(document)
@@ -248,25 +273,37 @@ def modernize_foreach_v1(document, *, enabled=False):
         "enabled": bool(enabled),
         "automatic_rewrite_enabled": False,
         "rewrite_performed": False,
+        "stats": {
+            "variables_total": 0,
+            "direct_projection_variables_examined": 0,
+            "rewrite_candidates_proven": 0,
+            "rewrites_applied": 0,
+            "review_required_variables": 0,
+            "rewrite_rate_pct_of_direct_projections": 0.0,
+            "review_rate_pct_of_direct_projections": 0.0,
+            "review_reason_counts": {},
+        },
         "applied": [],
         "review_required": [],
     }
     if not enabled:
-        return result, report
+        return result, _finalize_stats(report)
     if version != TARGET_VERSION:
         report["review_required"].append({
             "variable": None,
             "reasons": ["foreach_v1_requires_0.3.0"],
         })
-        return result, report
+        return result, _finalize_stats(report)
 
     variables = assessment.get("variables") or {}
+    report["stats"]["variables_total"] = len(variables)
     # Analyze against the original faithful graph. Rewrites are collected first
     # so removing one Variable cannot change candidate detection for another.
     candidates = []
     for variable_id in sorted(variables):
         if _direct_projection(variables[variable_id]) is None:
             continue
+        report["stats"]["direct_projection_variables_examined"] += 1
         candidate, reasons = _candidate(result, variable_id)
         if candidate is None:
             report["review_required"].append({
@@ -274,6 +311,7 @@ def modernize_foreach_v1(document, *, enabled=False):
                 "reasons": reasons,
             })
         else:
+            report["stats"]["rewrite_candidates_proven"] += 1
             candidates.append(candidate)
 
     # A target Object may only carry one v1 binding.
@@ -327,4 +365,4 @@ def modernize_foreach_v1(document, *, enabled=False):
             assessment["variables"] = variables
         assessment["objects"] = objects
 
-    return result, report
+    return result, _finalize_stats(report)
