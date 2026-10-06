@@ -4,12 +4,13 @@ Status: research only. No syntax here is normative.
 
 ## Core boundary
 
-- Collection acquires typed Items.
-- Binding gives one Item lexical identity inside a scope.
+- Object declares a typed population and its acquisition/selection semantics.
+- Collection is the runtime act/result of evaluating an Object and producing Items plus status/completeness.
+- Binding gives one collected Item lexical identity inside a scope.
 - Variable carries or transforms typed values.
 - Iteration repeats a scoped assessment body over bound Items and combines scoped outcomes explicitly.
 
-Working shorthand: Bindings identify Items. Variables derive values.
+Working shorthand: Objects identify populations. Bindings identify Items. Variables derive values.
 
 A multi-valued Variable is not automatically an iteration.
 
@@ -39,7 +40,7 @@ No mutation, assignment, counters, recursion, break, continue, or arbitrary cont
 
 ### Source population and identity
 
-The source is a typed Collection of Items. Source order SHOULD be semantically irrelevant. Duplicate Item identity and imported/reused Item behavior must be defined.
+The iteration source is an authored typed Object whose runtime collection produces Items. Source order SHOULD be semantically irrelevant. Duplicate Item identity and imported/reused Item behavior must be defined.
 
 ### Outcome aggregation
 
@@ -166,7 +167,8 @@ The standard should distinguish at least:
 
 A resource limit reached before truth is conclusive SHALL produce an explicit
 incomplete/error-style outcome according to the final result model; it SHALL
-NOT be treated as ordinary evidence truncation.
+NOT be treated as ordinary evidence truncation. Object collection status and
+iteration-evaluation completeness remain separate dimensions when needed.
 
 Bound fields also create a security concern when consumed by executable
 capabilities. A binding reference used as a filesystem path or typed comparison
@@ -192,8 +194,8 @@ separate:
 2. **Dataflow lineage** — an upstream Object/Variable/value explains why a
    downstream Item became reachable, but does not create a new semantic
    evaluation relationship.
-3. **Collection invocation** — one execution of a Collection template with one
-   effective selector/input binding set.
+3. **Object collection invocation** — one runtime execution of an authored
+   Object with one effective selector/input binding set.
 
 These identities SHALL NOT be conflated.
 
@@ -227,17 +229,18 @@ A scanner SHOULD be able to store/reuse one immutable collected observation and
 reference it from multiple scoped relationship results. Collection reuse SHALL
 NOT collapse the parent bindings or their expected values.
 
-### Parameterized Collection invocation identity
+### Parameterized Object collection invocation identity
 
-A Collection used inside a scope behaves conceptually as a typed Collection
-template plus effective bound selector values. Implementations MAY cache/reuse
-collection work when two invocations have equivalent capability, selector,
-behavior, input, privilege, and target semantics.
+An Object used inside a scope behaves conceptually as a typed authored Object
+plus effective bound selector/input values. Runtime collection evaluates that
+effective Object invocation. Implementations MAY cache/reuse collection work
+when two invocations have equivalent capability, selector, behavior, input,
+privilege, and target semantics.
 
-Cache/reuse identity SHALL be based on those effective collection semantics, not
-merely on source syntax or parent binding identity.
+Cache/reuse identity SHALL be based on those effective Object/collection
+semantics, not merely on source syntax or parent binding identity.
 
-Reusing acquisition work SHALL NOT change:
+Reusing Object collection/acquisition work SHALL NOT change:
 
 - scoped truth;
 - multiplicity of semantic relationships;
