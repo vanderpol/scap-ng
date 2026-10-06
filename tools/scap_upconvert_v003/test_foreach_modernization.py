@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+from copy import deepcopy
+import unittest
+
+from scap_upconvert_v003.foreach_modernization import (
+    REWRITE_ID,
+    modernize_foreach_v1,
+)
+from validate_generated_capability_semantics import (
+    validate_assessment_capability_semantics,
+)
+
+
+def fixture():
+    return {
+        "assessment": {
+            "id": "foreach-converter-fixture",
+            "version": 1,
+            "assessment_title": "Foreach converter fixture",
+            "mode": "automated",
+            "class": "compliance",
+            "purpose": "assessment",
+            "specification": {
+                "id": "scap-ng.pre-alpha.assessment",
+                "version": "0.3.0",
+            },
+            "objects": {
+                "users": {
+                    "object_title": "Non-system users",
+                    "capability": "unix.password",
+                    "select": {
+                        "username": {
+                            "value": ".+",
+                            "operation": "match",
+                            "datatype": "string",
+                        }
+                    },
+                },
+                "files": {
+                    "object_title": "Initialization files",
+                    "capability": "unix.file",
+                    "select": {
+                        "directory": {
+                            "value": {"variable": "home-dirs"},
+                            "operation": "equal",
+                            "datatype": "string",
+                            "variable_match": "any",
+                        },
+                        "name": {
+                            "value": r"^\.[^\s\.]+",
+                            "operation": "match",
+                            "datatype": "string",
+                        },
+                    },
+                    "filesystem": "any",
+                },
+            },
+            "variables": {
+                "home-dirs": {
+                    "title": "Home directories",
+                    "kind": "local",
+                    "datatype": "string",
+                    "expression": {
+                        "values": {
+                            "object": "users",
+                            "field": "home_dir",
+                        }
+                    },
+                }
+            },
+            "states": {},
+            "tests": {
+                "test-files": {
+                    "test_title": "Initialization files",
+                    "reported_elements": "all",
+                    "capability": "unix.file",
+                    "object": "files",
+                    "check_existence": "optional",
+                    "check": "all",
+                }
+            },
+            "evaluate": {"test": "test-files"},
+        }
+    }
+
+
+class ForeachConverterModernization(unittest.TestCase):
+    def test_default_disabled_is_identity(self):
+        source = fixture()
+        result, report = modernize_foreach_v1(source)
+        self.assertEqual(result, source)
+        self.assertFalse(report["enabled"])
+        self.assertFalse(report["rewrite_performed"])
+        self.assertEqual(report["rewrite_id"], REWRITE_ID)
+
+    def test_exact_v1_rewrite(self):
+        source = fixture()
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertTrue(report["rewrite_performed"], report)
+        self.assertEqual(len(report["applied"]), 1)
+        assessment = result["assessment"]
+        self.assertNotIn("variables", assessment)
+        files = assessment["objects"]["files"]
+        self.assertEqual(
+            files["for_each"],
+            {"item": "user", "in": "users"},
+        )
+        self.assertEqual(
+            files["select"]["directory"],
+            {"from": "user.home_dir"},
+        )
+        self.assertEqual(
+            validate_assessment_capability_semantics(result),
+            [],
+        )
+
+    def test_wrong_quantifier_fails_closed(self):
+        source = fixture()
+        source["assessment"]["objects"]["files"]["select"]["directory"][
+            "variable_match"
+        ] = "all"
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        self.assertFalse(report["rewrite_performed"])
+        self.assertIn(
+            "target_variable_match_not_any",
+            report["review_required"][0]["reasons"],
+        )
+
+    def test_second_consumer_fails_closed(self):
+        source = fixture()
+        source["assessment"]["states"]["uses-home"] = {
+            "state_title": "Uses same Variable elsewhere",
+            "capability": "unix.file",
+            "state": {
+                "field": "directory",
+                "value": {"variable": "home-dirs"},
+                "operation": "equal",
+                "datatype": "string",
+                "match": "all",
+                "variable_match": "any",
+                "existence": "some",
+            },
+        }
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        self.assertIn(
+            "single_target_consumer_required",
+            report["review_required"][0]["reasons"],
+        )
+
+    def test_helper_target_fails_closed(self):
+        source = fixture()
+        source["assessment"]["tests"]["test-files"]["object"] = "users"
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        self.assertIn(
+            "target_not_directly_tested",
+            report["review_required"][0]["reasons"],
+        )
+
+    def test_datatype_mismatch_fails_closed(self):
+        source = fixture()
+        source["assessment"]["variables"]["home-dirs"]["datatype"] = "integer"
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        self.assertIn(
+            "variable_datatype_mismatch",
+            report["review_required"][0]["reasons"],
+        )
+
+    def test_second_target_variable_fails_closed(self):
+        source = fixture()
+        source["assessment"]["variables"]["other"] = {
+            "title": "Other value",
+            "kind": "constant",
+            "datatype": "string",
+            "expression": {"literal": "root"},
+        }
+        source["assessment"]["objects"]["files"]["select"]["name"] = {
+            "value": {"variable": "other"},
+            "operation": "equal",
+            "datatype": "string",
+            "variable_match": "any",
+        }
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        rows = [
+            row for row in report["review_required"]
+            if row.get("variable") == "home-dirs"
+        ]
+        self.assertIn(
+            "independent_additional_variable_selector",
+            rows[0]["reasons"],
+        )
+
+    def test_02_never_rewrites(self):
+        source = fixture()
+        source["assessment"]["specification"]["version"] = "0.2.0"
+        result, report = modernize_foreach_v1(source, enabled=True)
+        self.assertEqual(result, source)
+        self.assertFalse(report["rewrite_performed"])
+        self.assertEqual(
+            report["review_required"][0]["reasons"],
+            ["foreach_v1_requires_0.3.0"],
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
