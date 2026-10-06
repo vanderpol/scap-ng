@@ -70,6 +70,87 @@ class ConditionalModernizationTests(unittest.TestCase):
             "all":[{"test":"p"},{"test":"r"}]
         })
 
+    def enum_doc(self, left_values, right_values, *, overlap=False, existence="some"):
+        doc=self.doc({
+            "any":[
+                {"all":[{"test":"guard-a"},{"test":"p"}]},
+                {"all":[{"test":"guard-b"},{"test":"q"}]},
+            ]
+        })
+        a=doc["assessment"]
+        a["objects"]={
+            "role-object":{
+                "capability":"windows.wmi.query",
+                "collect":{"namespace":"root\\cimv2","query":"SELECT DomainRole FROM win32_computersystem"},
+            }
+        }
+        a["states"]={}
+        for prefix,values in (("a",left_values),("b",right_values)):
+            ids=[]
+            for index,value in enumerate(values):
+                sid=f"state-{prefix}-{index}"
+                ids.append(sid)
+                a["states"][sid]={
+                    "state_title":f"state {prefix} {value}",
+                    "capability":"windows.wmi.query",
+                    "state":{
+                        "field":"result",
+                        "record":{
+                            "match":"all",
+                            "existence":"some",
+                            "fields":{
+                                "domainrole":{
+                                    "value":str(value),
+                                    "operation":"equal",
+                                    "datatype":"string",
+                                    "match":"all",
+                                    "existence":"some",
+                                }
+                            },
+                        },
+                    },
+                }
+            tid=f"guard-{prefix}"
+            a["tests"][tid]={
+                "test_title":f"guard {prefix}",
+                "reported_elements":"all",
+                "capability":"windows.wmi.query",
+                "object":"role-object",
+                "check_existence":existence,
+                "check":"all",
+                "states":ids,
+                "states_match":"any",
+            }
+        return doc
+
+    def test_rewrites_mutually_exclusive_enum_guards_without_assuming_exhaustive(self):
+        source=self.enum_doc([2,3],[4,5])
+        result,report=modernize_conditionals_v1(source,enabled=True)
+        self.assertEqual(result["assessment"]["evaluate"],{
+            "if":{"test":"guard-a"},
+            "then":{"test":"p"},
+            "else":{"all":[{"test":"guard-b"},{"test":"q"}]},
+        })
+        self.assertTrue(report["rewrite_performed"])
+        applied=report["applied"][0]
+        self.assertEqual(applied["pattern_class"],"mutually_exclusive_enum_guards")
+        self.assertTrue(applied["else_retains_guard"])
+        self.assertEqual(applied["enum_proof"]["left_values"],["2","3"])
+        self.assertEqual(applied["enum_proof"]["right_values"],["4","5"])
+        self.assertFalse(applied["enum_proof"]["exhaustive"])
+
+    def test_overlapping_enum_guards_are_not_rewritten(self):
+        source=self.enum_doc([2,3],[3,4])
+        result,report=modernize_conditionals_v1(source,enabled=True)
+        self.assertEqual(result["assessment"]["evaluate"],source["assessment"]["evaluate"])
+        self.assertFalse(report["rewrite_performed"])
+
+    def test_enum_guard_requires_positive_existence(self):
+        source=self.enum_doc([2,3],[4,5],existence="optional")
+        result,report=modernize_conditionals_v1(source,enabled=True)
+        self.assertEqual(result["assessment"]["evaluate"],source["assessment"]["evaluate"])
+        self.assertFalse(report["rewrite_performed"])
+
     def test_alternative_compliance_paths_are_not_rewritten(self):
         evaluate={
             "any":[
