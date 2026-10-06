@@ -1,7 +1,8 @@
 # Foreach modernization research
 
-**Status:** research / pending human review. This document does not change the
-0.2.0 language, schema, converter, or current accepted design.
+**Status:** v1 semantic proof complete / ready for 0.3.0 integration review.
+This document does not change the frozen 0.2.0 language, schema, converter, or
+current accepted design.
 
 **Working baseline:** `main` at
 `0c85d8a563b3320f80b7215c0f18e4dec4b064b4` (2026-10-06).
@@ -359,21 +360,19 @@ decomposition styles.
 The modernization output should be deterministic. If preconditions are not
 satisfied, it must fail closed and retain the faithful form.
 
-## Next research steps
+## Next integration steps
 
-1. Build minimal fixtures for collection-expansion versus evaluation-iteration
-   semantics, starting with the RHEL home-directory pattern.
-2. Audit RHEL 9 and Solaris production graphs for direct
-   `object_component -> var_ref Object selector` patterns.
-3. Partition candidates by scalar projection, mapped function, multi-source
-   Cartesian function, Set/Filter dependency, and State-variable use.
-4. Define exact empty/error/multiplicity behavior for collection expansion from
-   OVAL 5.12.3 and the existing NG result model.
-5. Prototype a semantic-IR detector that reports candidates without rewriting.
-6. Compare candidate counts and complexity reduction before proposing schema
-   syntax.
-7. Only after those proofs, prepare a human review packet for any 0.3.0 language
-   addition.
+1. open the intentional 0.3.0 schema tree without modifying frozen 0.2.0;
+2. add the reviewed Object-level `for_each` binding shape to the 0.3.0
+   authoring schema and semantic validator;
+3. integrate the context-aware datatype compatibility gate into conversion /
+   normalization rather than duplicating it in the research prototype;
+4. keep faithful Object -> Variable -> Object lowering as the normative oracle;
+5. add converted RHEL/Solaris v1 examples to 0.3.0 regression content;
+6. keep automatic modernization disabled until the integrated schema,
+   converter, validator, and result evidence tests all pass;
+7. track fan-out, helper-target, record-field, alternate quantifier, and derived
+   expression shapes as separate later proof classes.
 
 
 ## Current recommendation
