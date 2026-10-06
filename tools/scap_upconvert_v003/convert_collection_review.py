@@ -416,7 +416,20 @@ def main(argv=None):
     p.add_argument('--rule',action='append',default=[])
     p.add_argument('--rules-file',type=Path)
     p.add_argument('--schema',type=Path,default=Path(__file__).resolve().parents[2]/'third_party/scap-1.4-schemas/omni-schema.xsd')
+    p.add_argument(
+        '--target-ng-version',
+        choices=('0.2.0','0.3.0'),
+        default='0.2.0',
+        help='Target SCAP-NG authoring version. Default preserves the frozen 0.2.0 review output.',
+    )
+    p.add_argument(
+        '--modernize-foreach-v1',
+        action='store_true',
+        help='Opt in to the proven 0.3.0 foreach v1 modernization; requires --target-ng-version 0.3.0.',
+    )
     args=p.parse_args(argv)
+    if args.modernize_foreach_v1 and args.target_ng_version != '0.3.0':
+        p.error('--modernize-foreach-v1 requires --target-ng-version 0.3.0')
     digest=hashlib.sha256(args.input.read_bytes()).hexdigest()
     if digest!=args.sha256:raise SystemExit('Source archive checksum mismatch')
     wanted=set(args.rule)
@@ -525,23 +538,34 @@ def main(argv=None):
                 parity=compare(original_path,regenerated,did,new_id,root_only=True)
                 if not parity['equal']:
                     failed=True;result['assessments'].append({'status':'blocked','parity':parity});continue
-                native=align_assessment_vocabulary(native)
-                # SCAP-NG 0.2.0 requires reporting selection to be explicit.
-                # Preserve the complete SCAP 1.4/OVAL evidence surface.
-                for test in native.get('assessment',{}).get('tests',{}).values():
-                    test['reported_elements']='all'
+                modernization=None
+                if args.target_ng_version == '0.2.0':
+                    # Frozen default path: preserve the historical 0.2.0 selected-rule
+                    # converter output exactly.
+                    native=align_assessment_vocabulary(native)
+                    for test in native.get('assessment',{}).get('tests',{}).values():
+                        test['reported_elements']='all'
+                else:
+                    native,modernization=postprocess_automated_assessment(
+                        native,
+                        target_ng_version=args.target_ng_version,
+                        modernize_foreach=args.modernize_foreach_v1,
+                    )
                 errors=violations(native)
                 if errors:raise ValueError('Current vocabulary guard: '+str(errors))
                 ref='assessments/automated/'+aid+'.assessment.yaml'
                 write_yaml(args.output/ref,native)
                 done[did]=ref;result['selectors'][selector]=ref
-                result['assessments'].append({'status':'representation_comparator_equal',
+                assessment_row={'status':'representation_comparator_equal',
                     'path':ref,'source_graph_bindings':provenance,
                     'tests':len(native['assessment']['tests']),
                     'objects':len(native['assessment']['objects']),
                     'states':len(native['assessment'].get('states',{})),
                     'variables':len(native['assessment'].get('variables',{})),
-                    'reverse_omni_schema_valid':True})
+                    'reverse_omni_schema_valid':True}
+                if args.modernize_foreach_v1:
+                    assessment_row['foreach_modernization']=modernization
+                result['assessments'].append(assessment_row)
             if deprecated_selector_fallbacks:
                 manual_ref=result['selectors'].get('manual')
                 if manual_ref is None and manual_done:
