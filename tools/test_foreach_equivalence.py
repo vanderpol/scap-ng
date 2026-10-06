@@ -17,6 +17,9 @@ from foreach_equivalence import (
     foreach_union_selection,
     equivalent_population,
     project_object_component_complete,
+    direct_foreach_desugaring,
+    direct_foreach_preconditions,
+    DIRECT_FOREACH_REWRITE_ID,
 )
 from oval_result_truth_tables import (
     TRUE,
@@ -117,6 +120,75 @@ class DirectCollectionExpansionEquivalence(unittest.TestCase):
             projection["values"],
             ["/home/a", "/srv/a", "/home/b"],
         )
+
+
+class DirectForeachDesugaring(unittest.TestCase):
+    def test_desugaring_preserves_existing_semantic_nodes(self):
+        graph = direct_foreach_desugaring(
+            source_object="users",
+            item_field="home_dir",
+            target_object="init-files",
+            target_entity="path",
+            operation="equals",
+            datatype="string",
+        )
+        self.assertEqual(graph["rewrite_id"], DIRECT_FOREACH_REWRITE_ID)
+        self.assertEqual(graph["aggregation_boundary"], "target_object_population")
+        self.assertEqual(
+            graph["variable"],
+            {
+                "kind": "local_variable",
+                "expression": {
+                    "kind": "object_component",
+                    "object_ref": "users",
+                    "item_field": "home_dir",
+                },
+            },
+        )
+        self.assertEqual(graph["selector"]["var_check"], "at least one")
+        self.assertIs(graph["selector"]["variable"], graph["variable"])
+
+    def test_first_proof_class_preconditions_are_fail_closed(self):
+        eligible = {
+            "candidate_family": "collection_expansion_at_least_one",
+            "expression": {
+                "kind": "direct_object_projection",
+                "record_field": None,
+            },
+            "targets": [
+                {
+                    "context": "object_selector",
+                    "var_check": "at least one",
+                }
+            ],
+        }
+        self.assertTrue(direct_foreach_preconditions(eligible)["eligible"])
+
+        for mutation, reason in (
+            (
+                {"candidate_family": "quantified_projection_all_values"},
+                "candidate_family_not_at_least_one_collection_expansion",
+            ),
+            (
+                {"expression": {"kind": "derived_expression", "record_field": None}},
+                "projection_is_not_direct_object_component",
+            ),
+            (
+                {"expression": {"kind": "direct_object_projection", "record_field": "name"}},
+                "record_field_not_in_first_proof_class",
+            ),
+            (
+                {"targets": [{"context": "object_selector", "var_check": "all"}]},
+                "target_var_check_not_at_least_one",
+            ),
+        ):
+            candidate = {
+                **eligible,
+                **mutation,
+            }
+            result = direct_foreach_preconditions(candidate)
+            self.assertFalse(result["eligible"])
+            self.assertIn(reason, result["reasons"])
 
 
 class DownstreamTestResultEquivalence(unittest.TestCase):
