@@ -30,7 +30,7 @@ Password Object
   -> filters / Set selecting the account population
   -> object_component(home_dir)
   -> local Variable
-  -> File Object path var_ref(var_check="at least one")
+  -> File Object directory selector via source path var_ref(var_check="at least one")
   -> one combined File population
   -> File Test
 ```
@@ -58,7 +58,7 @@ objects:
         datatype: string
         variable: non-system-home-dirs
         var_check: at least one
-      filename:
+      name:
         operation: pattern_match
         datatype: string
         value: '^\\.[^\\s\\.]+'
@@ -104,9 +104,9 @@ objects:
       in: non-system-users
 
     select:
-      path:
+      directory:
         from: user.home_dir
-      filename:
+      name:
         operation: pattern_match
         datatype: string
         value: '^\\.[^\\s\\.]+'
