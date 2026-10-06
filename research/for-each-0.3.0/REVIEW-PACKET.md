@@ -188,6 +188,27 @@ only consumer is one Object or State value position.
 Automatic scoped iteration is **not** enabled for converted OVAL unless a
 future P2 class proves complete equivalence.
 
+### P1 automatic-normalization conclusion
+
+The research conclusion is to propose automatic P1 normalization for the
+fail-closed pure object_component -> one Object/State value-consumer class,
+initially only where the removed OVAL Variable datatype is string or int and
+maps exactly to the consumer datatype.
+
+P1 SHALL preserve:
+
+- Object/field/record-field identity;
+- flattened value multiplicity;
+- Variable datatype validity/error behavior;
+- effective operation and value quantifier;
+- collection/error/status propagation;
+- effective OVAL variable_instance/input-binding invocation context;
+- full removed-Variable provenance.
+
+The RHEL 9 SV-257889 production-shaped sample successfully removes two
+home-directory projection Variables while retaining their Object selectors and
+quantifiers and creating no Binding scope.
+
 ### Results
 
 The existing completeness dimensions remain:
@@ -239,9 +260,19 @@ Unique Variable census across benchmark-local graphs:
 - 204 pure Object-field projections;
 - 1,106 transforms.
 
-The initial corrected census identified 162 single-use pure projections feeding
-one Object selector or State expected value after obvious direct-Variable-Test
-consumers/reuse were excluded.
+The final enriched census identified 162 single-use pure projections feeding
+one Object selector or State expected value after direct-Variable-Test
+consumers, Variable-backed Objects and reuse were excluded. All 162 have exact
+effective Variable/consumer datatype agreement: 139 OVAL string and 23 OVAL
+int. The enriched 65-package run completed all 65 packages successfully and
+emitted an exact P1 lowering recipe for each candidate.
+
+The initial P1 normalizer is therefore deliberately bounded to this proven
+pass-through class. The 845 single-use transformation Variables are not being
+removed merely to reduce node count: concat, regex_capture, count, merge,
+unique, arithmetic and similar work is meaningful value manipulation and
+remains an appropriate Variable role unless a separate readability/equivalence
+study later proves a better native expression form.
 
 ### Recurring manual relational family
 
@@ -338,10 +369,17 @@ Completed research evidence includes:
 - selected multi-platform correlation audit — successful;
 - scoped prototype schema/lexical tests — successful after one schema-fragment
   harness correction;
+- scoped aggregation/partial-population reference tests — successful;
 - direct Variable-Test consumer regression — successful;
-- OVAL result/Variable truth-table regressions — successful.
+- OVAL result/Variable truth-table regressions — successful;
+- OVAL Self-Assertion object_component one/many Item/entity cardinality matrix —
+  successful;
+- P1 string/integer datatype-compliance tests — successful;
+- production-shaped RHEL 9 P1 normalizer tests — successful;
+- enriched 65-package P1 lowering census — successful, 65/65 packages complete.
 
-The final P1 normalizer focused run should be recorded here after completion.
+OpenSCAP supporting differential experiments are recorded separately and are
+not normative proof gates.
 
 OpenSCAP differential experiments are implementation evidence only and are not
 normative gates for this proposal.
@@ -358,7 +396,8 @@ because the research tests pass.
 1. Accept or reject the semantic split:
    **Projection = flattened value set; Binding = Item identity.**
 2. Accept or reject narrowing native named Variables toward
-   inputs/reuse/transforms rather than mandatory one-use projection plumbing.
+   inputs/reuse/transforms rather than mandatory one-use projection plumbing,
+   including the bounded automatic P1 pass-through Projection class.
 3. Accept or reject Test-level lexical for_each as the preferred scoped
    authoring construct.
 4. Accept or reject the P0-P4 migration classification and the rule that no
