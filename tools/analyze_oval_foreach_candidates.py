@@ -34,6 +34,12 @@ import sys
 import xml.etree.ElementTree as ET
 import zipfile
 
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+from foreach_equivalence import direct_foreach_preconditions
+
 
 CROSS_PRODUCT_OR_MULTI_INPUT_OPS = {
     "arithmetic",
@@ -288,7 +294,7 @@ def classify_candidate(
     if len(consumers) > 1:
         reasons.append("shared_projected_variable_has_multiple_target_consumers")
 
-    return {
+    result = {
         **base,
         "classification": "review_required",
         "candidate_family": candidate_family,
@@ -302,6 +308,9 @@ def classify_candidate(
         "targets": target_details,
         "reasons": reasons,
     }
+    proof = direct_foreach_preconditions(result)
+    result["first_proof_class"] = proof
+    return result
 
 
 def analyze_oval_root(root: ET.Element, source_label: str) -> dict:
@@ -404,6 +413,7 @@ def summarize(files: list[dict]) -> dict:
     classifications = Counter()
     families = Counter()
     derived_operations = Counter()
+    proof_class = Counter()
     parse_status = Counter()
     candidate_files = 0
     for row in files:
@@ -413,6 +423,9 @@ def summarize(files: list[dict]) -> dict:
         for candidate in row.get("candidates", []):
             classifications[candidate["classification"]] += 1
             families[candidate.get("candidate_family") or "none"] += 1
+            proof = candidate.get("first_proof_class")
+            if proof is not None:
+                proof_class["eligible" if proof.get("eligible") else "ineligible"] += 1
             if candidate.get("candidate_family") == "derived_projection":
                 for op in candidate.get("expression", {}).get("operations", []):
                     derived_operations[op] += 1
@@ -422,6 +435,7 @@ def summarize(files: list[dict]) -> dict:
         "parse_status": dict(sorted(parse_status.items())),
         "classifications": dict(sorted(classifications.items())),
         "families": dict(sorted(families.items())),
+        "first_proof_class": dict(sorted(proof_class.items())),
         "derived_operations": dict(sorted(derived_operations.items())),
     }
 
