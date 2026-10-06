@@ -10,6 +10,7 @@ from tools.for_each_semantics_probe import (
     bounded_failure_summary,
     incomplete_all_result,
     incomplete_at_least_one_result,
+    native_partial_check_result,
 )
 from tools.oval_result_truth_tables import TRUE, FALSE, UNKNOWN
 
@@ -39,7 +40,10 @@ def test_incomplete_population_decisiveness_matches_oval():
     assert incomplete_all_result([TRUE])==UNKNOWN
     assert incomplete_all_result([FALSE])==FALSE
     assert incomplete_at_least_one_result([TRUE])==TRUE
-    assert incomplete_at_least_one_result([FALSE])==UNKNOWN
+    # OVAL 5.12.3 explicitly permits false here for collected_object flag=incomplete.
+    assert incomplete_at_least_one_result([FALSE])==FALSE
+    # Native evaluator-controlled partial population is a different condition.
+    assert native_partial_check_result("at least one",[FALSE],population_complete=False)==UNKNOWN
 
 
 def test_lineage_does_not_multiply_semantic_children():
