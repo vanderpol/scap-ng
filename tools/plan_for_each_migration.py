@@ -10,6 +10,35 @@ from __future__ import annotations
 import argparse, json
 from pathlib import Path
 
+
+def modernization_advisories(row):
+    edges=row.get("dependent_object_edges") or []
+    advisories=[]
+    dynamic=[
+        e for e in edges
+        if e.get("target_object_type")=="shellcommand_object"
+        and e.get("target_entity")=="command"
+    ]
+    if dynamic:
+        advisories.append({
+            "code":"dynamic_command_construction",
+            "count":len(dynamic),
+            "recommendation":"Preserve for lossless migration, but review native replacement with typed capability collection or safe parameter binding; do not normalize bound values into executable text by default.",
+        })
+    if edges:
+        advisories.append({
+            "code":"retain_dataflow_lineage",
+            "count":len(edges),
+            "recommendation":"Retain non-semantic source-to-target lineage for results/editor diagnostics without multiplying semantic scoped evaluations.",
+        })
+    if row.get("nested_dependency_paths"):
+        advisories.append({
+            "code":"nested_dependency_readability",
+            "count":len(row.get("nested_dependency_paths") or []),
+            "recommendation":"Review whether native bindings or a simpler typed collection pipeline improve authoring; preserve flattened OVAL semantics unless equivalence is proven.",
+        })
+    return advisories
+
 def classify(row):
     risks=set(row.get("rewrite_risk") or [])
     edges=row.get("dependent_object_edges") or []
@@ -69,6 +98,7 @@ def main():
             "rule_id":row.get("rule_id"),
             "title":row.get("title"),
             **decision,
+            "advisories":modernization_advisories(row),
             "source_signals":{
                 "dependent_object_edges":len(row.get("dependent_object_edges") or []),
                 "nested_dependency_paths":len(row.get("nested_dependency_paths") or []),
@@ -76,6 +106,11 @@ def main():
                 "multi_projection_sources":len(row.get("multi_projection_sources") or []),
                 "variable_functions":row.get("variable_functions") or [],
                 "rewrite_risk":row.get("rewrite_risk") or [],
+                "dynamic_command_edges":sum(
+                    1 for e in (row.get("dependent_object_edges") or [])
+                    if e.get("target_object_type")=="shellcommand_object"
+                    and e.get("target_entity")=="command"
+                ),
             },
         })
     manual=[]
@@ -89,6 +124,8 @@ def main():
                 "automatic_rewrite":False,
                 "reason":"manual policy/check text may require per-parent correlation; native automation is a new implementation and cannot be labeled lossless conversion",
                 "signals":row.get("signals") or [],
+                "confidence":row.get("confidence"),
+                "evidence_excerpt":row.get("evidence_excerpt"),
             })
     summary={}
     for row in rows+manual:
