@@ -87,6 +87,7 @@ jobs:
           tests=Counter()
           reuse=Counter()
           locality=Counter()
+          extend_usage=Counter()
           rows=[]
           for x in reports:
               s=x["summary"]; l=s["locality"]
@@ -94,6 +95,7 @@ jobs:
               functions.update(s["variable_function_counts"])
               tests.update(s["test_type_occurrences"])
               reuse.update(s["reuse_totals"])
+              extend_usage.update(s.get("extend_definition_usage",{}))
               n=s["automated_rules_with_oval"]
               simple=round(l["simple_linear_percent"]*n/100)
               no_reuse=round(l["rules_without_object_state_reuse_barrier_percent"]*n/100)
@@ -129,6 +131,7 @@ jobs:
               "variable_function_counts":dict(functions),
               "test_type_occurrences":dict(tests),
               "reuse_totals":dict(reuse),
+              "extend_definition_usage":dict(extend_usage),
               "locality":{
                   "simple_linear_rules":locality["simple"],
                   "simple_linear_percent":pct(locality["simple"],total_rules),
