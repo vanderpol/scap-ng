@@ -1,0 +1,143 @@
+name: Residual complexity pattern census
+
+on:
+  push:
+    paths:
+      - tools/measure_residual_complexity_patterns.py
+      - .github/workflows/residual-complexity-pattern-census.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  measure:
+    name: Measure ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: RHEL 9
+            key: rhel9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: Windows Server 2025
+            key: windows-server-2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate faithful current conversion
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+          KEY: ${{ matrix.key }}
+        run: |
+          python - <<'PY'
+          import os, shutil, subprocess, sys
+          from pathlib import Path
+          source=Path("niwc/Current")/os.environ["ARTIFACT"]
+          out=Path("work/source")/os.environ["KEY"]
+          split=Path("work")/("split-"+os.environ["KEY"])
+          out.parent.mkdir(parents=True,exist_ok=True)
+          subprocess.run([
+              sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+              "--output",str(out),
+              "--split-root",str(split),
+              "--source-revision",os.environ["NIWC_REVISION"],
+              "--source-repository-path","Current/"+os.environ["ARTIFACT"],
+              "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+              "--summary",str(out/"source-generation.json"),
+          ],check=True)
+          shutil.rmtree(split,ignore_errors=True)
+          PY
+      - name: Measure residual semantic shapes
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/measure_residual_complexity_patterns.py "work/source/$KEY" \
+            --label "$LABEL" \
+            --output "report.json" \
+            --top 40
+      - uses: actions/upload-artifact@v4
+        with:
+          name: residual-complexity-${{ matrix.key }}
+          path: report.json
+
+  aggregate:
+    name: Aggregate residual pattern census
+    needs: measure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: residual-complexity-*
+          path: reports
+      - name: Aggregate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter, defaultdict
+          from pathlib import Path
+          reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
+          totals=Counter()
+          reasons=Counter()
+          functions=Counter()
+          variable_kinds=Counter()
+          cluster_counts=Counter()
+          cluster_meta={}
+          for r in reports:
+              totals["automated"] += r["automated_assessments"]
+              totals["residual"] += r["residual_complex_assessments"]
+              reasons.update(r["residual_reason_counts"])
+              functions.update(r["variable_function_counts"])
+              variable_kinds.update(r["variable_kind_counts"])
+              for row in r["top_residual_shapes"]:
+                  fp=row["shape_fingerprint"]
+                  cluster_counts[fp]+=row["count"]
+                  cluster_meta.setdefault(fp,row)
+          ranked=[]
+          for fp,count in cluster_counts.most_common(50):
+              row=dict(cluster_meta[fp])
+              row["aggregate_count"]=count
+              ranked.append(row)
+          out={
+              "format":"scap-ng-residual-complexity-pattern-census-aggregate-0.1",
+              "status":"research_only_not_accepted_design",
+              "packages":[{
+                  "label":r["label"],
+                  "automated_assessments":r["automated_assessments"],
+                  "residual_complex_assessments":r["residual_complex_assessments"],
+                  "residual_complex_percent":r["residual_complex_percent"],
+                  "unique_residual_shapes":r["unique_residual_shapes"],
+              } for r in reports],
+              "summary":{
+                  "automated_assessments":totals["automated"],
+                  "residual_complex_assessments":totals["residual"],
+                  "residual_complex_percent":round(100*totals["residual"]/totals["automated"],2) if totals["automated"] else 0,
+                  "residual_reason_counts":dict(reasons),
+                  "variable_function_counts":dict(functions),
+                  "variable_kind_counts":dict(variable_kinds),
+              },
+              "top_residual_shapes":ranked,
+          }
+          Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(out,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: residual-complexity-aggregate
+          path: aggregate.json
