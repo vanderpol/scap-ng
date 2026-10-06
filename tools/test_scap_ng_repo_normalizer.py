@@ -78,6 +78,15 @@ class RepoNormalizerTests(unittest.TestCase):
             finally:
                 __import__("sys").argv=old_argv
             report=json.loads(report_path.read_text())
+            self.assertEqual(report["stats"]["format"],"scap-ng-normalizer-stats-0.1")
+            self.assertEqual(report["stats"]["tool"],"scap_ng_repo_normalizer")
+            self.assertEqual(report["stats"]["examined"]["referenced_assessment_instances"],3)
+            self.assertEqual(report["stats"]["changed"]["exact_duplicate_groups_promoted"],1)
+            self.assertEqual(report["stats"]["changed"]["duplicate_assessment_definitions_avoided"],1)
+            self.assertGreaterEqual(report["stats"]["unchanged_or_review"]["near_duplicate_review_groups"],1)
+            self.assertEqual(
+                report["stats"]["reasons"]["automatic_change_exact_semantic_duplicate_groups"],1
+            )
             self.assertEqual(report["summary"]["exact_duplicate_groups"],1)
             self.assertEqual(report["summary"]["duplicate_assessment_definitions_avoided"],1)
             self.assertGreaterEqual(report["summary"]["near_duplicate_review_groups"],1)
