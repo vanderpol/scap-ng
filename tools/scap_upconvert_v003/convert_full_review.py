@@ -227,10 +227,13 @@ def validate_native_tree(root):
         for group in groups:
             grouped.extend(group.get('rules',[]));group_members(group.get('groups',[]))
     group_members(benchmark['groups'])
-    if Counter(grouped)!=Counter(rule_ids): raise ValueError('Grouping lost/duplicated Rules')
+    if len(grouped)!=len(set(grouped)): raise ValueError('Grouping duplicated Rules')
+    if set(grouped)-set(rule_ids): raise ValueError('Grouping references unknown Rules')
     return {'yaml_files':len(documents),'rules':len(rule_ids),'identities':identities,
             'relative_references':'passed','native_cleanliness':'passed','presentation_order':'passed',
-            'group_membership':'passed'}
+            'group_membership':'passed',
+            'grouped_rules':len(grouped),
+            'ungrouped_rules':len(rule_ids)-len(grouped)}
 
 
 def main(argv=None):
@@ -242,6 +245,14 @@ def main(argv=None):
     parser.add_argument('--platform-id', default='enterprise-linux.9')
     parser.add_argument('--platform-title', default='Enterprise Linux 9 family')
     parser.add_argument('--split-root', type=Path, help='Optional component-resolved rule-split corpus from scap14_rule_splitter.py')
+    parser.add_argument(
+        '--auto-map-groups',
+        action='store_true',
+        help=(
+            'Opt in to heuristic functional grouping. Default conversion leaves '
+            'Rules ungrouped; uncertain Rules remain ungrouped even when enabled.'
+        ),
+    )
     parser.add_argument('--schema', type=Path, default=Path(__file__).resolve().parents[2]/'third_party/scap-1.4-schemas/omni-schema.xsd')
     args=parser.parse_args(argv)
     actual_sha256=hashlib.sha256(args.input.read_bytes()).hexdigest()
@@ -561,7 +572,28 @@ def main(argv=None):
         metadata,unsupported=source.benchmark_metadata(xr)
         if unsupported: raise ValueError('Unsupported Benchmark metadata: '+str(unsupported))
         front,_=source.normalize_front_matter(xr);rear,_=source.normalize_rear_matter(xr)
-        groups,grouping=source.build_groups(rs);version=xr.find('x:version',source.NS)
+        if args.auto_map_groups:
+            groups,grouping_rows=source.build_groups(rs, include_unmapped=False)
+        else:
+            groups=[]
+            grouping_rows=[
+                {
+                    'rule':rec['id'],
+                    'functional_group':None,
+                    'method':'disabled',
+                    'mapped':False,
+                    'reason':'auto_map_groups_not_requested',
+                }
+                for rec in rs
+            ]
+        grouping={
+            'auto_map_groups':args.auto_map_groups,
+            'method':'heuristic' if args.auto_map_groups else 'disabled',
+            'rules':grouping_rows,
+            'mapped_rules':sum(1 for row in grouping_rows if row.get('mapped')),
+            'unmapped_rules':sum(1 for row in grouping_rows if not row.get('mapped')),
+        }
+        version=xr.find('x:version',source.NS)
         # Keep Benchmark discovery metadata aligned with each automated Assessment.
         # The identifier is explicitly provisional until the OVAL Board adopts
         # the successor specification identity.
