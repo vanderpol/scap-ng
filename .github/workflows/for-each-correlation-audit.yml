@@ -9,6 +9,8 @@ on:
       - "tools/audit_for_each_candidates.py"
       - "tools/audit_manual_correlation_candidates.py"
       - "tools/plan_for_each_migration.py"
+      - "tools/for_each_semantics_probe.py"
+      - "tests/test_for_each_semantics_probe.py"
       - ".github/workflows/for-each-correlation-audit.yml"
 
 jobs:
@@ -77,7 +79,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install parser dependencies
-        run: python -m pip install lxml
+        run: python -m pip install lxml pytest
+
+      - name: Run scoped-iteration semantic counterexamples
+        run: pytest -q tests/test_for_each_semantics_probe.py
 
       - name: Split benchmark into per-rule OVAL closures
         run: |
