@@ -194,6 +194,77 @@ these wider patterns need:
 The final converter SHALL NOT treat these categories as interchangeable.
 
 
+
+## Emerging migration boundary
+
+The evidence now supports a stronger separation between lossless migration and
+native scoped authoring.
+
+### Stage 1 lossless migration
+
+Stage 1 SHALL preserve OVAL value-set semantics and SHALL NOT introduce lexical
+Item scope merely because an Object field is projected through a Variable into
+another Object or State.
+
+In particular:
+
+- \`object_component\` is a flattening value projection, not a binding;
+- a multi-valued \`var_ref\` is a quantified value-set reference, not a loop;
+- OVAL function components retain Cartesian-product behavior where defined;
+- duplicate/deduplicated downstream Item behavior and collection flags remain
+  source semantics;
+- no source parent/child identity may be invented.
+
+Therefore the default lossless target for existing OVAL remains the explicit
+Object/Variable/State/Test dependency graph.
+
+### Stage 2 structural normalization
+
+Stage 2 MAY simplify source presentation without introducing Item scope when the
+transformation can be proven to preserve the same value-producing semantic node.
+
+The first candidate is a single-use local Variable whose root expression is an
+OVAL \`object_component\`. A future native Object-field value expression could
+remove the temporary Variable name while deliberately retaining:
+
+- flattened zero/one/many value cardinality;
+- \`ObjectComponentType\` error when the referenced Object yields zero Items;
+- error when the requested Item field/record field is absent;
+- datatype and value-set status;
+- the consuming Object/State operation and variable-value quantifier;
+- source provenance outside the executable identity.
+
+This is a structural/value-expression normalization, not \`for_each\`.
+
+Single-use transform Variables (for example \`concat\`, \`regex_capture\`, \`merge\`,
+\`unique\`) are a second candidate class. They require additional proof for exact
+function AST, Cartesian products, datatype casting, zero/error/unknown
+propagation and reverse reconstruction before automatic normalization can be
+approved.
+
+### Native scoped iteration
+
+Scoped iteration is justified when the assessment meaning depends on the
+identity of an originating Item across dependent evaluation.
+
+That relationship is new semantic information if source OVAL has already
+flattened the fields into independent value sets. A migration tool SHALL NOT
+reconstruct such identity from likely author intent and call the result
+lossless.
+
+Accordingly, native scoped iteration currently belongs to:
+
+- new native Assessments;
+- new automation of manual relational checks;
+- reviewed Stage-2 modernization where an author explicitly approves the
+  intended relationship;
+- a future automatic P2 class only if executable equivalence proof establishes
+  one.
+
+No production OVAL pattern has yet been approved for automatic P2 scoped
+lowering.
+
+
 ## Conversion safety principle
 
 The migration pipeline should have at least two distinct products:
