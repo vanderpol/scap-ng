@@ -100,6 +100,22 @@ def analyze_file(path):
     for a,bs in adj.items():
         for b in bs:
             for c in adj.get(b,()): nested.append([a,b,c])
+    intra_variable_multi_field=[]
+    for vid,vel in variables.items():
+        by_source=defaultdict(set)
+        for x in vel.iter():
+            if local(x)=="object_component":
+                xa=attrs_local(x)
+                if xa.get("object_ref"):
+                    by_source[xa["object_ref"]].add(xa.get("item_field") or xa.get("record_field") or "")
+        for source,fields in by_source.items():
+            if len(fields)>1:
+                intra_variable_multi_field.append({
+                    "variable":vid,
+                    "source_object":source,
+                    "source_object_type":local(objects[source]) if source in objects else None,
+                    "fields":sorted(fields),
+                })
     projections=defaultdict(list)
     for vid in variables:
         for o,f in var_lineages(vid,variables,memo):
@@ -118,10 +134,11 @@ def analyze_file(path):
     if correlated: risk.append("correlated_binding")
     if nested: risk.append("nested_dependency")
     if multiproj: risk.append("multi_projection")
+    if intra_variable_multi_field: risk.append("same_item_field_correlation")
     if functions: risk.append("variable_function")
     if any(e["var_check"] not in {"at least one","all(default)"} for e in edges): risk.append("nontrivial_var_check")
     disposition="candidate_for_equivalence_proof" if edges and not risk else "review_required_before_rewrite"
-    return {"file":str(path),"rule_id":rid,"title":title,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj,"variable_functions":functions,"rewrite_risk":risk,"preliminary_disposition":disposition}
+    return {"file":str(path),"rule_id":rid,"title":title,"definitions":len(defs),"tests":len(tests),"objects":len(objects),"states":len(states),"variables":len(variables),"object_component_variables":sum(bool(var_lineages(v,variables,memo)) for v in variables),"dependent_object_edges":edges,"correlated_candidates":correlated,"nested_dependency_paths":nested,"multi_projection_sources":multiproj,"intra_variable_multi_field_sources":intra_variable_multi_field,"variable_functions":functions,"rewrite_risk":risk,"preliminary_disposition":disposition}
 
 def main():
     ap=argparse.ArgumentParser()
@@ -132,12 +149,13 @@ def main():
     root=Path(args.corpus)
     files=sorted(root.rglob('oval.xml'))
     rows=[analyze_file(p) for p in files]
-    candidates=[r for r in rows if not r.get('parse_error') and (r['dependent_object_edges'] or r['correlated_candidates'] or r['nested_dependency_paths'] or r['multi_projection_sources'])]
+    candidates=[r for r in rows if not r.get('parse_error') and (r['dependent_object_edges'] or r['correlated_candidates'] or r['nested_dependency_paths'] or r['multi_projection_sources'] or r['intra_variable_multi_field_sources'])]
     classes=Counter()
     for r in candidates:
         if r['correlated_candidates']: classes['correlated_binding_risk']+=1
         if r['nested_dependency_paths']: classes['nested_dependency']+=1
         if r['multi_projection_sources']: classes['multi_projection']+=1
+        if r['intra_variable_multi_field_sources']: classes['same_item_field_correlation']+=1
         if r['dependent_object_edges']: classes['dependent_collection']+=1
     report={"label":args.label,"closure_files":len(files),"candidate_closures":len(candidates),"class_counts":dict(classes),"candidates":candidates}
     out=Path(args.output)
