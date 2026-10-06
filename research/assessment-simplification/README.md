@@ -15,6 +15,7 @@ This work explores ways to make accurate assessments easier for humans to author
 | [concepts-04](concepts-04/README.md) | Broader authoring/assessment concepts | concept review and decision candidates |
 | [requirements-05](requirements-05/README.md) | Full RHEL 9 + Windows Server 2025 Check Text reading | reading notes, recommendations, evidence, decision candidates |
 | [editor-06](editor-06/README.md) | Open authoring workbench/editor direction | full-coverage obligations, implementation options, decision candidates |
+| [foreach-07](foreach-07/README.md) | Post-conversion iteration modernization with provable OVAL equivalence | collection-vs-evaluation semantics, automatic rewrite boundary, rejection rules, conformance plan |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
