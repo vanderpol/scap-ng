@@ -58,6 +58,8 @@ Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10
 | `schema-enforcement-0.2-scope-20261003` | merged/stale | Schema enforcement scope work; fully behind main. | Safe cleanup candidate after freeze. |
 | `schema-v020-self-contained-repair` | merged/stale | 0.2.0 self-contained schema repair lineage; fully behind main. | Safe cleanup candidate after freeze. |
 
+| `research/for-each-audit-20261006` | active | 0.3.0 research on OVAL value-flow, Variable normalization, scoped Item binding/`for_each`, corpus evidence, conversion proof classes, and compact scoped results. This branch is intentionally isolated from frozen 0.2.0 and from current `main` until human semantic review. | Prepare focused review packet and proposed 0.3.0 specification; do not merge wholesale until owner review/acceptance and named focused/fast regression gates pass. |
+
 ## Branch creation template
 
 Add a row immediately when creating a branch:
