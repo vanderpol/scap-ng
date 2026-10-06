@@ -1,0 +1,22 @@
+# RESEARCH ONLY — speculative authoring example, not SCAP-NG schema.
+rule: SV-257823
+intent: RHEL 9 cryptographic hashes of system files must match vendor values.
+
+check:
+  command:
+    shell: bash
+    run: |
+      rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+
+  expect:
+    stdout_lines: empty
+
+semantic_obligations:
+  capability: independent.shellcommand
+  source_existence: at_least_one_exists
+  source_test_check: all
+  output_semantics: >
+    Preserve the source meaning that no collected stdout_line entity matching
+    the empty-string state exists. The shorthand stdout_lines: empty must not
+    be accepted unless that equivalence is proven for this capability's Item
+    model.
