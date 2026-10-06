@@ -73,6 +73,19 @@ jobs:
           import json
           from pathlib import Path
           for name in ('rhel9','solaris11-x86'):
+              proof=json.loads(Path(f'/tmp/foreach-{name}-v1-proof.json').read_text())
+              print(f'=== {name} v1 proof ===')
+              print(json.dumps({
+                  'eligible_candidates': proof['eligible_candidates'],
+                  'equivalent_candidates': proof['equivalent_candidates'],
+                  'failed_candidates': proof['failed_candidates'],
+                  'all_equivalent': proof['all_equivalent'],
+              }, sort_keys=True))
+          PY
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name in ('rhel9','solaris11-x86'):
               p=Path(f'/tmp/foreach-{name}-published.json')
               report=json.loads(p.read_text())
               print(f'=== {name} ===')
