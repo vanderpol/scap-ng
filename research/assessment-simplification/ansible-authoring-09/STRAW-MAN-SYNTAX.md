@@ -119,3 +119,66 @@ check:
 
 Native typed collectors remain preferred where scanner-aware collection
 semantics matter.
+
+
+## Organizational input
+
+Organizational input is a first-class part of this authoring experiment.
+
+The simplified authoring layer should make a policy-dependent check read like
+the requirement itself, for example:
+
+```yaml
+inputs:
+  approved_time_sources:
+    type: string_list
+    required: true
+    provenance: organization
+
+check:
+  chrony:
+    servers: discovered
+
+  expect:
+    every:
+      server:
+        in: approved_time_sources
+```
+
+or:
+
+```yaml
+inputs:
+  approved_local_accounts:
+    type: string_list
+    required: true
+    provenance: organization
+
+check:
+  users:
+    local: true
+    interactive: true
+
+  expect:
+    every:
+      username:
+        in: approved_local_accounts
+```
+
+The exact syntax is provisional. The important semantic requirements are:
+
+- organizational input supplies **state values / policy facts**, not new
+  collection or execution logic;
+- the scanner MUST NOT rewrite or mutate the authored assessment based on input;
+- provenance is mandatory for supplied organizational values;
+- missing required input must produce a defined non-pass outcome rather than
+  silently substituting a default;
+- input values must be typed and constrained by the target field/domain;
+- the same authored assessment should remain portable between organizations,
+  with local policy supplied separately;
+- results must record which organizational input values materially affected the
+  decision, subject to redaction policy.
+
+This should be tested as part of the simplified-authoring feasibility study,
+especially for currently manual RHEL 9 Rules whose host evidence is measurable
+but whose pass/fail decision depends on approval or local policy.
