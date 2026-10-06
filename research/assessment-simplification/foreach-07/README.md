@@ -385,6 +385,12 @@ OVAL-algebra research into human language review.
 Proposed specification:
 [PROPOSED-SPEC.md](PROPOSED-SPEC.md)
 
+Human review packet:
+[REVIEW.md](REVIEW.md)
+
+Machine-readable rewrite contract:
+[transformation-v1.json](transformation-v1.json)
+
 The recommendation is to review **collection-expansion foreach v1** as a
 0.3.0 language addition with the exact transformation identifier
 `foreach.direct-object-component.at-least-one.v1`.
