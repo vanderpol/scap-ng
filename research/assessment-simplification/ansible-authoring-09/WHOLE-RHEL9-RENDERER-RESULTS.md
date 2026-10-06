@@ -16,11 +16,12 @@ Tool: `tools/research_render_ansible_like.py`
 | 1 | Simple/composed local checks | 313 / 445 | 70.3% |
 | 2 | Local multiple-State `any/all` | 330 / 445 | 74.2% |
 | 3 | Simple union Sets as multiple collection sources | 371 / 445 | 83.4% |
-| 4 | Local include/exclude Filters | **375 / 445** | **84.3%** |
+| 4 | Local include/exclude Filters | 375 / 445 | 84.3% |
+| 5 | Constant Variables inlined with explicit variable-match semantics | **390 / 445** | **87.6%** |
 
 Latest successful run:
 
-https://github.com/vanderpol/scap-ng/actions/runs/37533285488
+https://github.com/vanderpol/scap-ng/actions/runs/37533988157
 
 ## Current fail-closed remainder
 
