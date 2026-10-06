@@ -200,6 +200,8 @@ def direct_foreach_preconditions(candidate):
         ]
         if independent:
             reasons.append("target_has_additional_variable_selectors")
+        if not target.get("tests"):
+            reasons.append("first_proof_class_requires_directly_tested_target")
 
     if expression.get("record_field") is not None:
         # The OVAL behavior is well defined, but record-field extraction has not
