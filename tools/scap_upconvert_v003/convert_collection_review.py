@@ -457,6 +457,14 @@ def main(argv=None):
         action='store_true',
         help='Opt in to the proven 0.3.0 foreach v1 modernization; requires --target-ng-version 0.3.0.',
     )
+    p.add_argument(
+        '--modernize-conditionals-v1',
+        action='store_true',
+        help=(
+            'Opt in to pattern-based 0.3.0 conditional modernization for exact '
+            'complementary-guard branch trees; requires --target-ng-version 0.3.0.'
+        ),
+    )
     args=p.parse_args(argv)
     if args.modernize_foreach_v1 and args.target_ng_version != '0.3.0':
         p.error('--modernize-foreach-v1 requires --target-ng-version 0.3.0')
