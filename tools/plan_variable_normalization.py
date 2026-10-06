@@ -32,6 +32,12 @@ def classify(v):
         }
 
     if shape=="pure_object_projection":
+        if usage=="single_use_direct_variable_test":
+            return {
+                "disposition":"keep_named_projection_for_direct_test",
+                "automatic_normalization":False,
+                "reason":"The projected value set is the direct subject of a Variable Test. Current native variable.value Test semantics consume a named Variable; do not erase that identity until a direct-expression Test contract is independently proven.",
+            }
         if usage in {"single_use_object_selector","single_use_state_expected_value"}:
             return {
                 "disposition":"candidate_inline_flattened_projection",
@@ -57,6 +63,12 @@ def classify(v):
         }
 
     if shape=="transform":
+        if usage=="single_use_direct_variable_test":
+            return {
+                "disposition":"keep_named_transform_for_direct_test",
+                "automatic_normalization":False,
+                "reason":"The computed value set is directly tested. Current native variable.value Test semantics use a named Variable, so this is not temporary selector plumbing.",
+            }
         if usage and usage.startswith("single_use_"):
             return {
                 "disposition":"candidate_inline_transform_expression",
