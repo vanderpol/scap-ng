@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/0.3.0/scoped-test-result.prototype.schema.json",
+  "title": "SCAP-NG 0.3.0 scoped Test result research prototype",
+  "description": "Research-only compact result shape for scoped Test execution. Not a released result schema.",
+  "type": "object",
+  "required": [
+    "outcome",
+    "scope_levels",
+    "evaluated_scopes",
+    "outcome_counts",
+    "logical_complete",
+    "population_complete",
+    "evidence_complete",
+    "retained_scope_evidence"
+  ],
+  "properties": {
+    "outcome": {
+      "$ref": "#/$defs/technical_outcome"
+    },
+    "scope_levels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "binding",
+          "check_existence",
+          "check"
+        ],
+        "properties": {
+          "binding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "object_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "check_existence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "check": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evaluated_scopes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_items_seen": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outcome_counts": {
+      "type": "object",
+      "required": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ],
+      "properties": {
+        "true": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "false": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_evaluated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_applicable": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "logical_complete": {
+      "type": "boolean"
+    },
+    "population_complete": {
+      "type": "boolean"
+    },
+    "evidence_complete": {
+      "type": "boolean"
+    },
+    "stop_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_maximum": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retained_scope_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scope_evidence"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "technical_outcome": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ]
+    },
+    "scope_evidence": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "bindings",
+        "item_refs"
+      ],
+      "properties": {
+        "outcome": {
+          "$ref": "#/$defs/technical_outcome"
+        },
+        "bindings": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "item_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "reason": {},
+        "expected": {},
+        "lineage_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
