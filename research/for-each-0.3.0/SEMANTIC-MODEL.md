@@ -128,6 +128,37 @@ This keeps iteration compatible with the existing evidence-maximum and decisive-
 expression result model while preserving enough relationship context to explain
 why a rule failed.
 
+
+## Resource and execution safety
+
+Scoped iteration can amplify collection cost, especially when nested. A native
+scanner therefore needs bounded execution semantics that are independent from
+evidence-retention limits.
+
+The standard should distinguish at least:
+
+- collection/evaluation work limits;
+- maximum retained evidence;
+- semantic aggregation requirements;
+- implementation safety/resource policy.
+
+A resource limit reached before truth is conclusive SHALL produce an explicit
+incomplete/error-style outcome according to the final result model; it SHALL
+NOT be treated as ordinary evidence truncation.
+
+Bound fields also create a security concern when consumed by executable
+capabilities. A binding reference used as a filesystem path or typed comparison
+value is not equivalent to textual interpolation into a shell, SQL, script, or
+other executable expression.
+
+Native source SHOULD require capability-defined safe parameter binding for any
+bound value that can influence executable text. General string interpolation
+from a bound Item into command text SHOULD NOT be the default authoring model.
+
+Nested iteration also needs implementation limits for dependency depth and
+population expansion so malicious or accidental content cannot create an
+unbounded evaluation bomb.
+
 ## Production proof families
 
 ### Manual correlation - new native expressiveness
