@@ -166,9 +166,14 @@ def main():
     summary=Counter(r["disposition"] for r in rows)
     root=Counter((r.get("root_operator") or "unknown") for r in rows)
     single_use=Counter()
+    automatic_eligibility=Counter()
     for r in rows:
         if (r.get("usage_class") or "").startswith("single_use_"):
             single_use[r.get("shape") or "unknown"]+=1
+        if r.get("automatic_normalization_eligible") is True:
+            automatic_eligibility["eligible"]+=1
+        elif r.get("disposition")=="candidate_inline_flattened_projection":
+            automatic_eligibility["projection_candidate_not_yet_eligible"]+=1
 
     report={
         "label":audit.get("label"),
@@ -180,6 +185,7 @@ def main():
         "summary":dict(summary),
         "root_operator_counts":dict(root),
         "single_use_by_shape":dict(single_use),
+        "automatic_eligibility_summary":dict(automatic_eligibility),
         "variables":rows,
     }
     out=Path(args.output)
@@ -189,6 +195,7 @@ def main():
         "label":report["label"],
         "summary":report["summary"],
         "single_use_by_shape":report["single_use_by_shape"],
+        "automatic_eligibility_summary":report["automatic_eligibility_summary"],
     },indent=2))
 
 
