@@ -395,14 +395,29 @@ def benchmark_scoring(root: ET.Element) -> list[dict]:
 def source_inventory(root: ET.Element) -> dict:
     top: dict[str, int] = {}
     rule_children: dict[str, int] = {}
+    check_children: dict[str, int] = {}
+    profile_children: dict[str, int] = {}
     for node in list(root):
         name = lname(node.tag)
         top[name] = top.get(name, 0) + 1
+        if name == "Profile":
+            for nested in list(node):
+                nested_name = lname(nested.tag)
+                profile_children[nested_name] = profile_children.get(nested_name, 0) + 1
     for rule, _ in iter_rules(root):
         for node in list(rule):
             name = lname(node.tag)
             rule_children[name] = rule_children.get(name, 0) + 1
-    return {"benchmark_children": top, "rule_children": rule_children}
+            if name == "check":
+                for nested in list(node):
+                    nested_name = lname(nested.tag)
+                    check_children[nested_name] = check_children.get(nested_name, 0) + 1
+    return {
+        "benchmark_children": top,
+        "profile_children": profile_children,
+        "rule_children": rule_children,
+        "check_children": check_children,
+    }
 
 
 def unhandled_source_elements(inventory: dict) -> dict:
@@ -411,16 +426,24 @@ def unhandled_source_elements(inventory: dict) -> dict:
         "reference", "plain-text", "platform", "model", "Profile", "Group", "Rule",
         "version", "metadata",
     }
+    handled_profile = {"title", "description", "select"}
     handled_rule = {
         "status", "version", "title", "description", "reference", "ident",
         "check", "fixtext", "fix", "rationale", "warning",
     }
+    handled_check = {"check-content", "check-content-ref"}
     return {
         "benchmark_children": sorted(
             name for name in inventory["benchmark_children"] if name not in handled_benchmark
         ),
+        "profile_children": sorted(
+            name for name in inventory["profile_children"] if name not in handled_profile
+        ),
         "rule_children": sorted(
             name for name in inventory["rule_children"] if name not in handled_rule
+        ),
+        "check_children": sorted(
+            name for name in inventory["check_children"] if name not in handled_check
         ),
     }
 
@@ -491,7 +514,7 @@ def convert(source: Path, output: Path) -> dict:
     namespace = xccdf_namespace(root)
     inventory = source_inventory(root)
     unhandled = unhandled_source_elements(inventory)
-    if unhandled["benchmark_children"] or unhandled["rule_children"]:
+    if any(unhandled.values()):
         raise SystemExit(
             "Unhandled XCCDF source elements would be dropped: "
             + json.dumps(unhandled, sort_keys=True)
@@ -631,6 +654,17 @@ def convert(source: Path, output: Path) -> dict:
             "source_check_systems": [
                 node.get("system") for node in children(rule, "check") if node.get("system")
             ],
+            "source_check_content_refs": [
+                {
+                    "href": nested.get("href"),
+                    "name": nested.get("name"),
+                }
+                for check_node in children(rule, "check")
+                for nested in children(check_node, "check-content-ref")
+            ],
+            "source_fix_attributes": [
+                dict(node.attrib) for node in children(rule, "fix") if node.attrib
+            ],
             "source_fixtext_attributes": [
                 dict(node.attrib) for node in children(rule, "fixtext") if node.attrib
             ],
@@ -741,16 +775,15 @@ def convert(source: Path, output: Path) -> dict:
             "original XCCDF Rule id",
             "source Group ancestry",
             "source Rule status",
-            "source check system",
-            "source fixtext attributes",
+            "source check system and check-content-ref bindings",
+            "source fix/fixtext attributes",
             "source role/weight explicit-vs-effective values",
             "source Profile select directives",
         ],
         "unhandled_constructs": unhandled,
         "schema_validation": validation,
         "success": (
-            not unhandled["benchmark_children"]
-            and not unhandled["rule_children"]
+            not any(unhandled.values())
             and validation["valid"]
             and len(converted_rules) == len(provenance_rules)
         ),
