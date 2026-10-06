@@ -11,7 +11,33 @@ ERROR = "error"
 OK = "ok"
 
 
-def oval_object_component(items, item_field, record_field=None):
+def _values_comply(values, datatype):
+    """Focused OVAL VariableType datatype compliance for current P1 proof types.
+
+    OVAL 5.12.3 VariableType requires all values identified by a Variable to
+    comply with its declared datatype or analysis reports error. The current
+    corpus-proven P1 class contains only string and int Variables.
+    """
+    if datatype is None:
+        return True
+    if datatype == "string":
+        return all(isinstance(v, str) for v in values)
+    if datatype == "int":
+        import re
+        for value in values:
+            if isinstance(value, bool):
+                return False
+            if isinstance(value, int):
+                continue
+            if not isinstance(value, str):
+                return False
+            if re.fullmatch(r"[+-]?\d+", value.strip()) is None:
+                return False
+        return True
+    raise ValueError(f"datatype not covered by focused P1 proof: {datatype}")
+
+
+def oval_object_component(items, item_field, record_field=None, datatype=None):
     """Resolve the value collection for a successful referenced Object.
 
     Each item is represented as a mapping from entity name to a list of values.
@@ -49,22 +75,24 @@ def oval_object_component(items, item_field, record_field=None):
                 return {"status": ERROR, "values": []}
             out.extend(fields)
 
+    if not _values_comply(out, datatype):
+        return {"status": ERROR, "values": []}
     return {"status": OK, "values": out}
 
 
-def inline_projection(items, item_field, record_field=None):
+def inline_projection(items, item_field, record_field=None, datatype=None):
     """Candidate native P1 projection.
 
     A P1 direct Collection-field projection is safe only if it deliberately
     uses the same semantic primitive as migrated object_component, including
     error behavior and flattening. It must not introduce lexical Item binding.
     """
-    return oval_object_component(items, item_field, record_field)
+    return oval_object_component(items, item_field, record_field, datatype)
 
 
-def prove_inline_projection_equivalence(items, item_field, record_field=None):
-    source = oval_object_component(items, item_field, record_field)
-    target = inline_projection(items, item_field, record_field)
+def prove_inline_projection_equivalence(items, item_field, record_field=None, datatype=None):
+    source = oval_object_component(items, item_field, record_field, datatype)
+    target = inline_projection(items, item_field, record_field, datatype)
     return {
         "source": source,
         "target": target,
