@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from copy import deepcopy
+from pathlib import Path
 import unittest
+import xml.etree.ElementTree as ET
 
 from scap_upconvert_v003.foreach_modernization import (
     REWRITE_ID,
@@ -9,6 +11,7 @@ from scap_upconvert_v003.foreach_modernization import (
 from scap_upconvert_v003.convert_collection_review import (
     postprocess_automated_assessment,
 )
+from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
 from validate_generated_capability_semantics import (
     validate_assessment_capability_semantics,
 )
@@ -310,6 +313,60 @@ class ForeachConverterModernization(unittest.TestCase):
         self.assertIn(
             "independent_additional_variable_selector",
             rows[0]["reasons"],
+        )
+
+
+    def test_pinned_rhel_sv257889_source_rewrites_through_converter_path(self):
+        root = Path(__file__).resolve().parents[2]
+        source = ET.parse(
+            root
+            / "research/assessment-simplification/evidence/rhel_9/SV-257889/source-oval.xml"
+        ).getroot()
+        faithful, error = lower_definition(
+            source,
+            "oval:mil.disa.stig.defs:def:230325",
+            "foreach-production-rhel",
+            collection_graph=True,
+        )
+        self.assertIsNone(error)
+        self.assertIsNotNone(faithful)
+
+        modern, report = postprocess_automated_assessment(
+            faithful,
+            target_ng_version="0.3.0",
+            modernize_foreach=True,
+        )
+        self.assertTrue(report["rewrite_performed"], report)
+        self.assertEqual(report["rewrite_id"], REWRITE_ID)
+        self.assertEqual(len(report["applied"]), 2, report)
+
+        assessment = modern["assessment"]
+        self.assertEqual(assessment["specification"]["version"], "0.3.0")
+        self.assertNotIn("variables", assessment)
+        foreach_objects = {
+            object_id: obj
+            for object_id, obj in assessment["objects"].items()
+            if isinstance(obj, dict) and "for_each" in obj
+        }
+        self.assertEqual(len(foreach_objects), 2, foreach_objects)
+        for obj in foreach_objects.values():
+            self.assertEqual(obj["for_each"]["item"], "user")
+            bound = [
+                spec["from"]
+                for spec in obj.get("select", {}).values()
+                if isinstance(spec, dict) and "from" in spec
+            ]
+            self.assertEqual(len(bound), 1)
+            self.assertTrue(bound[0].endswith(".home_dir"))
+
+        diagnostics = validate_assessment_capability_semantics(modern)
+        self.assertFalse(
+            [
+                row
+                for row in diagnostics
+                if str(row.get("code", "")).startswith("foreach.")
+            ],
+            diagnostics,
         )
 
     def test_02_never_rewrites(self):
