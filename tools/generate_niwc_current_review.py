@@ -91,6 +91,14 @@ def main():
     ap.add_argument("--source-repository-path", required=True)
     ap.add_argument("--schema", type=Path, required=True)
     ap.add_argument("--summary", type=Path, required=True)
+    ap.add_argument(
+        "--auto-map-groups",
+        action="store_true",
+        help=(
+            "Opt in to heuristic functional grouping in the current converter. "
+            "Default conversion leaves Rules ungrouped."
+        ),
+    )
     args = ap.parse_args()
 
     identity = source_identity(args.source_zip)
@@ -119,6 +127,7 @@ def main():
         "--platform-title", identity["platform_title"],
         "--split-root", args.split_root,
         "--output", args.output,
+        *(["--auto-map-groups"] if args.auto_map_groups else []),
     ])
 
     summary = {
@@ -128,6 +137,7 @@ def main():
         "source_sha256": sha256,
         "output": args.output.as_posix(),
         "generated_fresh": True,
+        "auto_map_groups": args.auto_map_groups,
     }
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     args.summary.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
