@@ -116,3 +116,88 @@ def project_object_component_complete(items, item_field):
         else:
             values.append(raw)
     return {"status": "values", "values": values}
+
+
+DIRECT_FOREACH_REWRITE_ID = "foreach.direct-object-component.at-least-one.v1"
+
+
+def direct_foreach_desugaring(
+    *,
+    source_object,
+    item_field,
+    target_object,
+    target_entity,
+    operation,
+    datatype,
+):
+    """Return the normative semantic graph for the first foreach candidate.
+
+    This deliberately does not define a second execution model. The native
+    authoring shorthand is equivalent by definition to the same semantic nodes
+    used by faithful OVAL conversion:
+
+        source Object
+          -> object_component(item_field)
+          -> local Variable
+          -> target Object entity var_ref(var_check=at least one)
+
+    Runtime collection/component flags, value status, provenance and downstream
+    Test aggregation therefore remain properties of those existing semantic
+    nodes. A scanner may optimize execution but may not change this graph's
+    observable semantics.
+    """
+    variable = {
+        "kind": "local_variable",
+        "expression": {
+            "kind": "object_component",
+            "object_ref": source_object,
+            "item_field": item_field,
+        },
+    }
+    selector = {
+        "object_ref": target_object,
+        "entity": target_entity,
+        "operation": operation,
+        "datatype": datatype,
+        "variable": variable,
+        "var_check": "at least one",
+    }
+    return {
+        "rewrite_id": DIRECT_FOREACH_REWRITE_ID,
+        "source_object": source_object,
+        "variable": variable,
+        "selector": selector,
+        "aggregation_boundary": "target_object_population",
+    }
+
+
+def direct_foreach_preconditions(candidate):
+    """Check semantic preconditions for the first reviewed rewrite family."""
+    reasons = []
+    if candidate.get("candidate_family") != "collection_expansion_at_least_one":
+        reasons.append("candidate_family_not_at_least_one_collection_expansion")
+
+    expression = candidate.get("expression", {})
+    if expression.get("kind") != "direct_object_projection":
+        reasons.append("projection_is_not_direct_object_component")
+
+    targets = candidate.get("targets", [])
+    if not targets:
+        reasons.append("no_target_object_selector")
+
+    for target in targets:
+        if target.get("var_check") != "at least one":
+            reasons.append("target_var_check_not_at_least_one")
+        if target.get("context") != "object_selector":
+            reasons.append("consumer_is_not_object_selector")
+
+    if expression.get("record_field") is not None:
+        # The OVAL behavior is well defined, but record-field extraction has not
+        # yet been included in this first equivalence fixture family.
+        reasons.append("record_field_not_in_first_proof_class")
+
+    return {
+        "rewrite_id": DIRECT_FOREACH_REWRITE_ID,
+        "eligible": not reasons,
+        "reasons": sorted(set(reasons)),
+    }
