@@ -708,6 +708,42 @@
         "same"
       ],
       "description": "Filesystem search scope independent of recursion. OVAL recurse_file_system all/local/defined maps to any/local/same and applies to exact full_path as well as directory/name selection."
+    },
+    "foreach_binding": {
+      "type": "object",
+      "required": [
+        "item",
+        "in"
+      ],
+      "properties": {
+        "item": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Lexical name for one Item produced by the source Object."
+        },
+        "in": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Named source Object whose Items are bound by Object-level for_each."
+        }
+      },
+      "additionalProperties": false,
+      "description": "SCAP-NG 0.3.0 collection-expansion foreach binding. Cross-Object existence, field and datatype compatibility are semantic-validator responsibilities."
+    },
+    "foreach_selector_binding": {
+      "type": "object",
+      "required": [
+        "from"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Bind this target selector from one field of the current foreach Item, e.g. user.home_dir."
+        }
+      },
+      "additionalProperties": false,
+      "description": "A v1 foreach selector binding. Equality, compatible datatype and at-least-one projected-value semantics are intrinsic to the normative desugaring and are not redundantly authored."
     }
   }
 }
