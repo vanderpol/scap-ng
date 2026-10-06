@@ -71,6 +71,16 @@ def variable_shape(el):
         return "pure_literal"
     return "transform"
 
+
+def variable_root_operator(el):
+    kind=local(el)
+    if kind in {"constant_variable","external_variable"}:
+        return kind
+    children=[x for x in el if isinstance(x.tag,str) and local(x)!="notes"]
+    if kind=="local_variable" and len(children)==1:
+        return local(children[0])
+    return "other"
+
 def variable_consumer_roles(vid, objects, states, variables):
     roles=[]
     for oid,el in objects.items():
@@ -175,6 +185,7 @@ def analyze_file(path):
         variable_roles.append({
             "variable":vid,
             "shape":variable_shape(vel),
+            "root_operator":variable_root_operator(vel),
             "consumers":variable_consumer_roles(vid,objects,states,variables),
             "lineage":[{"source_object":o,"field":f} for o,f in sorted(var_lineages(vid,variables,memo))],
         })
@@ -220,11 +231,12 @@ def main():
             # inflated merely because several rules reuse one Variable.
             entry=unique_variables.setdefault(vr["variable"],{
                 "shape":vr["shape"],
+                "root_operator":vr.get("root_operator"),
                 "consumers":set(),
                 "lineage":set(),
             })
-            if entry["shape"]!=vr["shape"]:
-                raise ValueError(f"Variable shape changed across closures: {vr['variable']}")
+            if entry["shape"]!=vr["shape"] or entry.get("root_operator")!=vr.get("root_operator"):
+                raise ValueError(f"Variable shape/operator changed across closures: {vr['variable']}")
             for consumer in vr["consumers"]:
                 entry["consumers"].add((
                     consumer["kind"],
@@ -236,19 +248,25 @@ def main():
                 entry["lineage"].add((lineage["source_object"],lineage["field"]))
 
     unique_shapes=Counter(v["shape"] for v in unique_variables.values())
+    unique_root_operators=Counter(v.get("root_operator") or "unknown" for v in unique_variables.values())
     projection_usage=Counter()
+    usage_by_shape=Counter()
+    root_usage=Counter()
     for vid,v in unique_variables.items():
-        if v["shape"]!="pure_object_projection":
-            continue
         kinds={x[0] for x in v["consumers"]}
         if len(v["consumers"])==1:
             only=next(iter(v["consumers"]))
-            projection_usage[f"single_use_{only[0]}"]+=1
+            usage=f"single_use_{only[0]}"
         elif len(v["consumers"])>1:
-            projection_usage["multi_use"]+=1
+            usage="multi_use"
         else:
-            projection_usage["unused_in_reachable_closures"]+=1
-        projection_usage["consumer_kind_set:"+"+".join(sorted(kinds))]+=1
+            usage="unused_in_reachable_closures"
+        usage_by_shape[(v["shape"],usage)]+=1
+        root_usage[(v.get("root_operator") or "unknown",usage)]+=1
+
+        if v["shape"]=="pure_object_projection":
+            projection_usage[usage]+=1
+            projection_usage["consumer_kind_set:"+"+".join(sorted(kinds))]+=1
 
     report={
         "label":args.label,
@@ -258,6 +276,9 @@ def main():
         "variable_shape_counts":dict(role_counts),
         "variable_consumer_counts":{"|".join(k):v for k,v in sorted(role_consumers.items())},
         "unique_variable_shape_counts":dict(unique_shapes),
+        "unique_variable_root_operator_counts":dict(unique_root_operators),
+        "unique_variable_usage_by_shape":{"|".join(k):v for k,v in sorted(usage_by_shape.items())},
+        "unique_variable_usage_by_root_operator":{"|".join(k):v for k,v in sorted(root_usage.items())},
         "unique_pure_projection_usage":dict(projection_usage),
         "candidates":candidates,
     }
