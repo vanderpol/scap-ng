@@ -42,6 +42,11 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
         self.assertEqual(candidate["source"]["item_field"],"home_dir")
         self.assertEqual(candidate["targets"][0]["var_check"],"at least one")
         self.assertEqual(candidate["targets"][0]["tests"][0]["check"],"all")
+        self.assertTrue(candidate["first_proof_class"]["eligible"])
+        self.assertEqual(
+            candidate["first_proof_class"]["reasons"],
+            [],
+        )
 
     def test_concat_object_projection_is_not_direct_auto_candidate(self):
         path=write_fixture("""\
@@ -65,6 +70,10 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["status"],"ok")
         self.assertEqual(rows[0]["families"],{"collection_expansion_at_least_one":1})
+        self.assertEqual(
+            MOD.summarize(rows)["first_proof_class"],
+            {"eligible":1},
+        )
 
     def test_report_never_enables_automatic_rewrite(self):
         path=write_fixture('<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"><tests/><objects/><states/><variables/></oval_definitions>')
