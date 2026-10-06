@@ -141,21 +141,23 @@ jobs:
       - name: Install focused dependencies
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
 
-      - name: Download Cyber Exchange Apache Tomcat 9 V3R2 STIG
+      - name: Download Cyber Exchange Apache Tomcat 9 V3R3 STIG
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p work
           curl --fail --location --retry 3 --retry-delay 2 \
-            "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.zip" \
-            -o work/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.zip
-          sha256sum work/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.zip \
-            | tee work/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.sha256
+            "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.zip" \
+            -o work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.zip
+          echo "33E763CC6EDE123294D3F02FF86521EA996FE8EC09A08707E0D8B3F0BF1AA337  work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.zip" \
+            | sha256sum --check -
+          sha256sum work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.zip \
+            | tee work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.sha256
 
       - name: Convert Tomcat manual XCCDF
         run: |
           python tools/stig_manual_to_scapng.py \
-            work/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.zip \
+            work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.zip \
             --output-dir work/apache-tomcat-9-native
 
       - name: Verify strict Tomcat conversion audit
@@ -190,7 +192,7 @@ jobs:
         with:
           name: apache-tomcat-9-stig-manual-probe
           path: |
-            work/U_Apache_Tomcat_Application_Server_9_V3R2_STIG.sha256
+            work/U_Apache_Tomcat_Application_Server_9_V3R3_STIG.sha256
             work/apache-tomcat-9-native/**
             work/apache-tomcat-9-audit.html
             work/apache-tomcat-9-audit.xlsx
