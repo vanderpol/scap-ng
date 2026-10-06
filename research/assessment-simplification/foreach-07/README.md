@@ -1,8 +1,9 @@
 # Foreach modernization research
 
 **Status:** v1 collection-expansion authoring and validation integrated into the
-active 0.3.0 pre-alpha tree. Automatic SCAP 1.4 modernization remains disabled
-until the converter path is integrated and passes the same equivalence gates.
+active 0.3.0 pre-alpha tree. The converter now has an explicit opt-in 0.3.0 modernization pass for the exact
+v1 proof class, including a pinned RHEL production-source regression. Automatic
+modernization remains disabled by default pending broader authoring-language review.
 The frozen 0.2.0 language and schemas remain unchanged.
 
 **Working baseline:** `main` at
