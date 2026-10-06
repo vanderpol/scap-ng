@@ -232,10 +232,14 @@ Migration provenance SHALL remain outside executable native content except for s
 The evidence hierarchy for evaluator semantics is:
 
 1. **Normative authority:** pinned OVAL 5.12.3 schemas, Schematron, and published language documentation.
-2. **Primary legacy differential reference for core OVAL behavior:** MITRE's OVAL Definition Interpreter (`ovaldi`). The accessible GitHub repository `OVALInterpreter/ovaldi` is an unofficial Git conversion of the historical SourceForge/Subversion code; its own documentation identifies the MITRE interpreter as an open-source reference implementation of the OVAL Language. Because the implementation predates OVAL 5.12.x, it is evidence for stable/core semantics, not authority for later-version additions.
-3. **Secondary differential implementation evidence:** OpenSCAP. Results MAY be compared to expose implementation disagreements, but OpenSCAP SHALL NOT by itself settle an ambiguous OVAL semantic rule. A disagreement between OpenSCAP and the normative language or the MITRE reference lineage must be investigated rather than normalized into native NG behavior.
+2. **Normative-derived conformance evidence:** executable truth tables and fixtures whose expected behavior is traceable directly to the pinned normative sources.
+3. **Legacy implementation evidence only:** MITRE's OVAL Definition Interpreter (`ovaldi`), OpenSCAP, SCC, and other evaluators MAY be compared to expose implementation behavior, interoperability differences, or ambiguities. None of these implementations is normative authority for OVAL 5.12.3.
 
-Differential execution is supporting evidence, not a replacement for normative text. When legacy evaluators disagree, SCAP-NG SHALL preserve the ambiguity until stronger source evidence or an explicit standards decision resolves it.
+MITRE ovaldi predates OVAL 5.12.x and therefore cannot establish later-version semantics. OpenSCAP is not current with the complete OVAL 5.12.3 language and does not provide a standards-conformance guarantee for this project; historical SCAP validation status SHALL NOT be treated as proof that its observed behavior matches every OVAL 5.12.3 requirement.
+
+If an implementation disagrees with the pinned normative language, the normative language controls. If normative text is genuinely ambiguous, implementation behavior MAY help characterize the ambiguity but SHALL NOT settle it by itself. SCAP-NG SHALL preserve the ambiguity or make an explicit, documented native standards decision backed by conformance tests.
+
+Differential execution is supporting evidence, not a replacement for normative text.
 
 Current focused executable evidence:
 
