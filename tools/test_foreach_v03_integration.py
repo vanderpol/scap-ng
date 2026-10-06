@@ -4,7 +4,6 @@ from pathlib import Path
 import unittest
 
 import jsonschema
-from referencing import Registry, Resource
 
 from generate_capability_schema import generate
 from validate_generated_capability_semantics import validate_assessment_capability_semantics
@@ -27,15 +26,20 @@ class ForeachV03Integration(unittest.TestCase):
         common=load(V03/"capability-common.schema.json")
         collected=load(V03/"collected-item.schema.json")
         result_types=load(V03/"result-types.schema.json")
-        cls.registry=(Registry()
-            .with_resource(common["$id"],Resource.from_contents(common))
-            .with_resource(collected["$id"],Resource.from_contents(collected))
-            .with_resource(result_types["$id"],Resource.from_contents(result_types)))
+        cls.store={
+            common["$id"]:common,
+            collected["$id"]:collected,
+            result_types["$id"]:result_types,
+        }
 
     def validate_file_object(self,value):
+        resolver=jsonschema.RefResolver.from_schema(
+            self.file_schema,
+            store=self.store,
+        )
         jsonschema.Draft202012Validator(
             self.file_schema["$defs"]["object"],
-            registry=self.registry,
+            resolver=resolver,
         ).validate(value)
 
     def base_assessment(self):
@@ -88,13 +92,15 @@ class ForeachV03Integration(unittest.TestCase):
         common=load(V02/"capability-common.schema.json")
         collected=load(V02/"collected-item.schema.json")
         result_types=load(V02/"result-types.schema.json")
-        registry=(Registry()
-            .with_resource(common["$id"],Resource.from_contents(common))
-            .with_resource(collected["$id"],Resource.from_contents(collected))
-            .with_resource(result_types["$id"],Resource.from_contents(result_types)))
+        store={
+            common["$id"]:common,
+            collected["$id"]:collected,
+            result_types["$id"]:result_types,
+        }
         with self.assertRaises(jsonschema.ValidationError):
+            resolver=jsonschema.RefResolver.from_schema(schema,store=store)
             jsonschema.Draft202012Validator(
-                schema["$defs"]["object"],registry=registry
+                schema["$defs"]["object"],resolver=resolver
             ).validate(self.base_assessment()["objects"]["files"])
 
     def test_semantics_accept_home_dir_to_directory(self):
