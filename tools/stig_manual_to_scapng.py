@@ -18,6 +18,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import yaml
+from jsonschema import Draft202012Validator
 
 
 def lname(tag: str) -> str:
@@ -424,6 +425,46 @@ def unhandled_source_elements(inventory: dict) -> dict:
     }
 
 
+def schema_validation_report(output: Path) -> dict:
+    repo_root = Path(__file__).resolve().parent.parent
+    schema_root = repo_root / "schema" / "v0.2.0"
+    checks = [
+        ("benchmark", output / "benchmark.yaml", schema_root / "benchmark.schema.json"),
+    ]
+    checks.extend(
+        ("rule", path, schema_root / "rule.schema.json")
+        for path in sorted((output / "rules").glob("*.rule.yaml"))
+    )
+    checks.extend(
+        ("manual_assessment", path, schema_root / "manual-assessment.schema.json")
+        for path in sorted((output / "assessments" / "manual").glob("*.assessment.yaml"))
+    )
+    results = []
+    for kind, doc_path, schema_path in checks:
+        doc = yaml.safe_load(doc_path.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        errors = sorted(
+            Draft202012Validator(schema).iter_errors(doc),
+            key=lambda e: list(e.absolute_path),
+        )
+        results.append({
+            "kind": kind,
+            "path": str(doc_path.relative_to(output)),
+            "valid": not errors,
+            "errors": [
+                {
+                    "path": "/".join(str(x) for x in err.absolute_path),
+                    "message": err.message,
+                }
+                for err in errors
+            ],
+        })
+    return {
+        "valid": all(item["valid"] for item in results),
+        "documents": results,
+    }
+
+
 def benchmark_platform(root: ET.Element, benchmark_id: str, title: str) -> tuple[dict, list[str]]:
     source_ids = [
         x.get("idref") for x in children(root, "platform") if x.get("idref")
@@ -652,6 +693,73 @@ def convert(source: Path, output: Path) -> dict:
         "rules": provenance_rules,
     }
     dump_json(output / "provenance.json", provenance)
+
+    validation = schema_validation_report(output)
+    conversion_audit = {
+        "format": "scap-ng-stig-manual-conversion-audit-0.1",
+        "source": {
+            **archive_meta,
+            "xccdf_namespace": namespace,
+            "benchmark_id": source_benchmark_id,
+            "benchmark_version": benchmark_version,
+        },
+        "counts": {
+            "source_rules": len(provenance_rules),
+            "native_rules": len(converted_rules),
+            "native_manual_assessments": len(converted_rules),
+            "profiles": len(profiles),
+            "benchmark_source_elements": inventory["benchmark_children"],
+            "rule_source_elements": inventory["rule_children"],
+        },
+        "mapped_constructs": {
+            "benchmark": sorted(inventory["benchmark_children"]),
+            "rule": sorted(inventory["rule_children"]),
+        },
+        "intentional_transformations": [
+            {
+                "source": "legacy DISA vulnerability wrapper Group",
+                "native": "Rule disa-vulnerability-id identifier plus provenance ancestry",
+                "reason": "One-wrapper-Group-per-Rule is not recreated as native NG taxonomy.",
+            },
+            {
+                "source": "legacy XCCDF Profile select directives",
+                "native": "native Profile disabled_rules",
+                "reason": "Group and Rule references are resolved to native Rule identities.",
+            },
+            {
+                "source": "escaped DISA STIG fields inside xccdf:description",
+                "native": "Rule discussion plus extensions.disa_stig",
+                "reason": "Preserves meaning without carrying XML wrapper syntax into native source.",
+            },
+            {
+                "source": "XCCDF check-content",
+                "native": "Manual Assessment procedure",
+                "reason": "Standalone STIG manual checks are human procedures, not fabricated automation.",
+            },
+        ],
+        "source_only_provenance": [
+            "original XCCDF Rule id",
+            "source Group ancestry",
+            "source Rule status",
+            "source check system",
+            "source fixtext attributes",
+            "source role/weight explicit-vs-effective values",
+            "source Profile select directives",
+        ],
+        "unhandled_constructs": unhandled,
+        "schema_validation": validation,
+        "success": (
+            not unhandled["benchmark_children"]
+            and not unhandled["rule_children"]
+            and validation["valid"]
+            and len(converted_rules) == len(provenance_rules)
+        ),
+    }
+    dump_json(output / "conversion-audit.json", conversion_audit)
+    if not conversion_audit["success"]:
+        raise SystemExit(
+            "Conversion audit failed; see conversion-audit.json for loss/validation details."
+        )
     shutil.rmtree(output / ".source-work", ignore_errors=True)
 
     summary = {
@@ -662,6 +770,8 @@ def convert(source: Path, output: Path) -> dict:
         "rules": len(converted_rules),
         "manual_assessments": len(converted_rules),
         "profiles": len(profiles),
+        "conversion_audit": "conversion-audit.json",
+        "audit_success": conversion_audit["success"],
         "output_dir": str(output),
     }
     dump_json(output / "conversion-summary.json", summary)
