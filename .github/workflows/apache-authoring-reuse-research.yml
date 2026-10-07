@@ -34,6 +34,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Run focused Observation prototype tests
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_prove_apache_observation.py -v
       - name: Convert pinned Apache benchmark
         run: |
           python - <<'PY'
@@ -63,10 +66,16 @@ jobs:
         run: |
           python scap-ng/tools/analyze_apache_authoring_reuse.py work/apache \
             --output work/apache-authoring-reuse.json
-      - name: Prove source-module extraction and flattening
+      - name: Prove historical source-module extraction and flattening
         run: |
           python scap-ng/tools/prove_apache_observation_module.py work/apache \
             --output work/apache-module-proof.json
+      - name: Prove Observation extraction and exact flattening
+        run: |
+          python scap-ng/tools/prove_apache_observation.py work/apache \
+            --output work/apache-observation-proof.json \
+            --artifact-dir work/observation-prototype \
+            --sample-count 3
       - name: Prove Observation extraction and flattening
         run: |
           python scap-ng/tools/prove_apache_observation.py work/apache \
