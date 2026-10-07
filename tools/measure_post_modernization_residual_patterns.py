@@ -385,6 +385,39 @@ def build_report(root:Path,label:str,top:int=40)->dict:
         "unique_set_filter_pattern_signatures":len(set_clusters),
         "unique_derived_variable_pattern_signatures":len(variable_clusters),
         "unique_joint_pattern_signatures":len(joint_clusters),
+        "set_filter_pattern_counts":[
+            {
+                "fingerprint":fp,
+                "count":len(members),
+                "signature":members[0]["signature"],
+                "examples":[m["assessment_id"] for m in members[:12]],
+            }
+            for fp,members in sorted(
+                set_clusters.items(),key=lambda kv:(-len(kv[1]),kv[0])
+            )
+        ],
+        "derived_variable_pattern_counts":[
+            {
+                "fingerprint":fp,
+                "count":len(members),
+                "signature":members[0]["signature"],
+                "examples":[m["assessment_id"] for m in members[:12]],
+            }
+            for fp,members in sorted(
+                variable_clusters.items(),key=lambda kv:(-len(kv[1]),kv[0])
+            )
+        ],
+        "joint_pattern_counts":[
+            {
+                "fingerprint":fp,
+                "count":len(members),
+                "signature":members[0]["signature"],
+                "examples":[m["assessment_id"] for m in members[:12]],
+            }
+            for fp,members in sorted(
+                joint_clusters.items(),key=lambda kv:(-len(kv[1]),kv[0])
+            )
+        ],
         "top_set_filter_patterns":ranked(set_clusters),
         "top_derived_variable_patterns":ranked(variable_clusters),
         "top_joint_patterns":ranked(joint_clusters),
