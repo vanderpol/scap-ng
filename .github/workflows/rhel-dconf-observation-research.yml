@@ -1,0 +1,58 @@
+name: RHEL dconf Observation reuse research
+
+on:
+  push:
+    paths:
+      - tools/prove_rhel_dconf_observation.py
+      - tools/test_prove_rhel_dconf_observation.py
+      - .github/workflows/rhel-dconf-observation-research.yml
+      - research/assessment-simplification/shared-observation-17/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+  ARTIFACT: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Run focused mixed-export tests
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_prove_rhel_dconf_observation.py -v
+      - name: Convert pinned RHEL 9 benchmark
+        run: |
+          python scap-ng/tools/generate_niwc_current_review.py "niwc/Current/$ARTIFACT" \
+            --output work/rhel9 \
+            --split-root work/split-rhel9 \
+            --source-revision "$NIWC_REVISION" \
+            --source-repository-path "Current/$ARTIFACT" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --summary work/rhel9/source-generation.json
+      - name: Prove source-shared dconf mixed exports
+        run: |
+          python scap-ng/tools/prove_rhel_dconf_observation.py work/rhel9 \
+            --output work/rhel-dconf-observation-proof.json \
+            --artifact-dir work/observation-prototype
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rhel-dconf-observation-proof
+          path: |
+            work/rhel-dconf-observation-proof.json
+            work/observation-prototype
+          if-no-files-found: error
