@@ -23,6 +23,109 @@ permissions:
   contents: read
 
 jobs:
+  source-preflight:
+    name: Source package preflight (\${{ matrix.label }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Windows 11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - label: Oracle Linux 9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pinned NIWC production package
+        env:
+          ARTIFACT: \${{ matrix.artifact }}
+        run: |
+          curl -fL --retry 3 \
+            "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/8c8e5dff860af6b1290ee9273a282db24278f8d5/Current/$ARTIFACT" \
+            -o source.zip
+      - name: Inspect component-local identities and candidate Rules
+        run: |
+          python - <<'PY'
+          import collections, hashlib, json, re, zipfile
+          import xml.etree.ElementTree as ET
+
+          def local(tag):
+              return tag.rsplit("}",1)[-1]
+
+          roots=[]
+          with zipfile.ZipFile("source.zip") as z:
+              for name in sorted(z.namelist()):
+                  if name.lower().endswith(".xml"):
+                      roots.append((name,ET.fromstring(z.read(name))))
+
+          oval_roots=[]
+          benchmarks=[]
+          def walk(node,path):
+              here=path+[{"tag":local(node.tag),"id":node.get("id")}]
+              if local(node.tag)=="oval_definitions":
+                  oval_roots.append((here,node))
+              if local(node.tag)=="Benchmark":
+                  benchmarks.append(node)
+              for child in node:
+                  walk(child,here)
+          for name,root in roots:
+              walk(root,[{"tag":"zip-entry","id":name}])
+
+          global_ids=collections.defaultdict(list)
+          for idx,(path,oval) in enumerate(oval_roots):
+              context=" / ".join(
+                  part["tag"]+(f"[{part['id']}]" if part["id"] else "")
+                  for part in path[:-1]
+              )
+              for section in oval:
+                  if local(section.tag) not in {"definitions","tests","objects","states","variables"}:
+                      continue
+                  for node in section:
+                      ident=node.get("id")
+                      if not ident:
+                          continue
+                      raw=ET.tostring(node,encoding="utf-8")
+                      global_ids[ident].append({
+                          "oval_root":idx,
+                          "context":context,
+                          "kind":local(node.tag),
+                          "sha256":hashlib.sha256(raw).hexdigest(),
+                      })
+
+          conflicts={
+              ident:rows for ident,rows in global_ids.items()
+              if len({row["sha256"] for row in rows})>1
+          }
+          print("OVAL roots:",len(oval_roots))
+          print("Conflicting repeated OVAL identities:",len(conflicts))
+          for ident,rows in sorted(conflicts.items())[:30]:
+              print(json.dumps({"identity":ident,"occurrences":rows},indent=2))
+
+          candidates=[]
+          for benchmark in benchmarks:
+              for rule in benchmark.iter():
+                  if local(rule.tag)!="Rule":
+                      continue
+                  rid=rule.get("id","")
+                  title=""
+                  for child in rule:
+                      if local(child.tag)=="title":
+                          title=" ".join("".join(child.itertext()).split())
+                          break
+                  body=" ".join("".join(rule.itertext()).split())
+                  if (
+                      rid in {"SV-253260","SV-253340","SV-253341","SV-253342","SV-253491","SV-253494","SV-270697"}
+                      or re.search(r"kerberos|KerberosAuthentication",body,re.I)
+                  ):
+                      refs=[]
+                      for node in rule.iter():
+                          if local(node.tag)=="check-content-ref":
+                              refs.append({"href":node.get("href"),"name":node.get("name")})
+                      candidates.append({"id":rid,"title":title,"refs":refs})
+          print("Candidate Rules:")
+          print(json.dumps(candidates,indent=2))
+          PY
+
   focused:
     runs-on: ubuntu-latest
     steps:
