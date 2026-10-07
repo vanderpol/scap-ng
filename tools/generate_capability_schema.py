@@ -459,8 +459,10 @@ def generate(mapping, repo_root, schema_version=None):
 
     object_required = ["object_title", "capability"]
 
-    existence_field = "check_existence" if version in {"0.2.0", "0.3.0"} else "existence"
-    match_field = "check" if version in {"0.2.0", "0.3.0"} else "match"
+    # 0.2 stays frozen on the inherited OVAL-aligned field names.
+    # 0.3 uses the accepted native authoring names.
+    existence_field = "check_existence" if version == "0.2.0" else "existence"
+    match_field = "check" if version == "0.2.0" else "match"
     test_required = [
         "test_title", *(["reported_elements"] if version in {"0.2.0", "0.3.0"} else []), "capability",
         existence_field, match_field,
