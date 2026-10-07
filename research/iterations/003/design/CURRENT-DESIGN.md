@@ -2,7 +2,7 @@
 
 **Authoritative working-design checkpoint.** Historical experiments, generated trees, old proposal prose, and dated transition notes do not override this file. Material decisions should be reflected here when accepted by the project owner.
 
-**Current status:** SCAP-NG 0.3.0 is the active pre-alpha development line. SCAP-NG 0.2.0 remains the frozen earlier review baseline at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
+**Current status:** SCAP-NG 0.3.0 is the active pre-alpha development line. SCAP-NG 0.2.0 remains the frozen earlier review baseline at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`. Work intentionally deferred beyond the checkpoint is listed once in [deferred-after-0.3](../../../../specification/deferred-after-0.3.md).
 
 ## Architecture
 
