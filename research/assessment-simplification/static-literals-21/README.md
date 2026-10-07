@@ -134,6 +134,25 @@ multiple quantifiers, including `all`, `at least one`, and `only one`, with
 different comparison operations. A bare array with implicit OR semantics would
 not be a lossless conversion.
 
+## Broader residual Variable census
+
+A later 11-package post-modernization Variable census provides a wider view of
+the same problem:
+
+- 398 Variables remain;
+- 168 are compile-time static (128 constant + 40 local/static expressions);
+- 230 are runtime Variables;
+- 307 of the 398 have one consumer.
+
+This suggests a useful SCAP-NG authoring taxonomy:
+
+1. static scalar/list values → native literals/literal collections;
+2. static operands inside runtime expressions → literal expression operands;
+3. external policy values → Assessment/Organizational Input bindings;
+4. runtime Variables → real collection-derived or computed dataflow.
+
+The goal is not to remove Variables. It is to make a Variable mean something
+useful: runtime input or transformation rather than XML serialization plumbing.
 ## Complexity/value assessment
 
 This approach adds a native value shape, but no scheduling, iteration,
