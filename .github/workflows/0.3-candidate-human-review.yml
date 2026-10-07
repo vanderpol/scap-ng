@@ -15,6 +15,8 @@ on:
       - tools/research_static_literal_collections.py
       - tools/test_research_static_literal_collections.py
       - tools/validate_generated_capability_semantics.py
+      - tools/validate_native_json_schemas.py
+      - tools/validate_native_semantics.py
       - schema/v0.3.0/**
       - tools/build_modernization_scorecard.py
       - tools/measure_full_modernization_census.py
@@ -97,7 +99,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1 jsonschema
 
       - name: Fresh faithful conversion
         env:
@@ -157,6 +159,18 @@ jobs:
           done
           find "work/review/$KEY/candidate-authoring" -type f -name '*.json' -delete
           find "work/review/$KEY/faithful-authoring" -type f -name '*.json' -delete
+
+      - name: Validate rendered 0.3 candidate
+        env:
+          KEY: ${{ matrix.key }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_json_schemas.py \
+            "work/review/$KEY/candidate-authoring" \
+            --schema-dir scap-ng/schema/v0.3.0 \
+            --report "work/evidence/$KEY/candidate-schema-validation.json"
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py \
+            "work/review/$KEY/candidate-authoring" \
+            --report "work/evidence/$KEY/candidate-semantic-validation.json"
 
       - name: Build modernization scorecard
         env:
