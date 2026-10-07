@@ -280,6 +280,47 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         self.assertNotIn("base",identity["inlined_set_operand_objects"])
         self.assertEqual(reexpand(rendered,identity),source)
 
+
+    def test_private_filtered_leaf_set_operand_localizes_and_roundtrips(self):
+        source={
+            "assessment":{
+                "id":"filtered-set-locality",
+                "mode":"automated",
+                "objects":{
+                    "base":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                    "combined":{
+                        "capability":"unix.file",
+                        "set":{
+                            "operator":"union",
+                            "operands":[{
+                                "object":"base",
+                                "filters":[{"state":"only-root","action":"include"}],
+                            }],
+                        },
+                    },
+                },
+                "states":{
+                    "only-root":{
+                        "capability":"unix.file",
+                        "state":{"field":"user_id","value":"0"},
+                    },
+                },
+                "tests":{"one":{"capability":"unix.file","object":"combined"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_set_operands=True,
+            inline_private_filtered_set_operands=True,
+        )
+        operand=rendered["assessment"]["tests"]["one"]["object"]["set"]["operands"][0]
+        self.assertIsInstance(operand["object"],dict)
+        self.assertEqual(operand["filters"][0]["state"],"only-root")
+        rows=identity["inlined_set_operand_objects"]
+        self.assertEqual(rows[0]["filter_count"],1)
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_nested_set_operand_object_stays_named(self):
         source={
             "assessment":{
