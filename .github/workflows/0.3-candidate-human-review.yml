@@ -164,13 +164,32 @@ jobs:
         env:
           KEY: ${{ matrix.key }}
         run: |
-          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_json_schemas.py \
+          if ! PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_json_schemas.py \
             "work/review/$KEY/candidate-authoring" \
             --schema-dir scap-ng/schema/v0.3.0 \
-            --report "work/evidence/$KEY/candidate-schema-validation.json"
-          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py \
+            --report "work/evidence/$KEY/candidate-schema-validation.json"; then
+            python - <<'PY'
+import json, os
+from pathlib import Path
+p=Path("work/evidence")/os.environ["KEY"]/"candidate-schema-validation.json"
+data=json.loads(p.read_text())
+print(json.dumps({
+    "summary":data.get("summary") or {
+        "documents_checked":data.get("documents_checked"),
+        "valid":data.get("valid"),
+        "invalid":data.get("invalid"),
+    },
+    "first_errors":(data.get("errors") or data.get("invalid_documents") or [])[:20],
+},indent=2,sort_keys=True))
+PY
+            exit 1
+          fi
+          if ! PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py \
             "work/review/$KEY/candidate-authoring" \
-            --report "work/evidence/$KEY/candidate-semantic-validation.json"
+            --report "work/evidence/$KEY/candidate-semantic-validation.json"; then
+            cat "work/evidence/$KEY/candidate-semantic-validation.json"
+            exit 1
+          fi
 
       - name: Build modernization scorecard
         env:
