@@ -400,6 +400,41 @@ Whether faithful conversion should retain unreachable legacy States as
 migration evidence is separate from native authoring. They SHALL NOT be used
 as evidence for a global native State scope.
 
+## Variable-local Object follow-up
+
+A further bounded experiment localizes a leaf Object into the one Variable
+expression that consumes it when:
+
+- the Object has exactly one total reference;
+- that reference is in a Variable;
+- the reference is an explicit Object-valued edge; and
+- the Object is not itself a Set.
+
+Across the same 676 RHEL 9 + Windows Server 2025 Assessments:
+
+| Measure | Previous locality | + Variable-local Object | Reduction from source |
+| --- | ---: | ---: | ---: |
+| Top-level Objects | 98 | **69** | **93.7%** |
+| Top-level States | 28 | **28** | **96.7%** |
+| Named component references | — | — | **93.9%** |
+
+The transform localized **29 additional Objects** and mechanically re-expanded
+to the faithful source graph for every Assessment.
+
+Two `variable:1` Objects remained named because their reference shape did not
+match this deliberately bounded explicit Object edge. Three Objects are still
+used by two Variables. Shared Test acquisition and mixed Test/dataflow
+consumers remain named.
+
+Latest successful workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37619627496
+
+This strengthens the working rule:
+
+> Localize an Object to its semantic consumer when doing so preserves one
+> acquisition identity. Keep a named/shared Object when acquisition itself is
+> shared or independently meaningful.
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
