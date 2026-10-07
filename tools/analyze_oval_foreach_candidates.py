@@ -38,7 +38,10 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-from foreach_equivalence import direct_foreach_preconditions
+from foreach_equivalence import (
+    direct_foreach_preconditions,
+    unary_concat_foreach_preconditions,
+)
 
 
 CROSS_PRODUCT_OR_MULTI_INPUT_OPS = {
@@ -105,6 +108,46 @@ def expression_shape(variable: ET.Element) -> dict:
             "record_field": expr.get("record_field"),
             "automatic_blocker": False,
         }
+
+    # Bounded second proof class: exactly one collection-valued
+    # object_component with only singleton string literal operands around it.
+    # OVAL concat is Cartesian in the general case, but one dynamic operand
+    # degenerates to a one-to-one value map.
+    if op == "concat":
+        operands = [x for x in expr if isinstance(x.tag, str)]
+        object_operands = [x for x in operands if local(x.tag) == "object_component"]
+        other_operands = [x for x in operands if local(x.tag) != "object_component"]
+        literals_only = bool(other_operands) and all(
+            local(x.tag) == "literal_component"
+            and (x.get("datatype") in {None, "string"})
+            for x in other_operands
+        )
+        if len(object_operands) == 1 and literals_only:
+            projected = object_operands[0]
+            object_index = operands.index(projected)
+            before = operands[:object_index]
+            after = operands[object_index + 1:]
+            if all(local(x.tag) == "literal_component" for x in before + after):
+                return {
+                    "kind": "unary_concat_object_projection",
+                    "op": op,
+                    "object_ref": projected.get("object_ref"),
+                    "item_field": projected.get("item_field"),
+                    "record_field": projected.get("record_field"),
+                    "prefix": "".join((x.text or "") for x in before),
+                    "suffix": "".join((x.text or "") for x in after),
+                    "collection_operands": 1,
+                    "dynamic_operands": 1,
+                    "nested_functions": 0,
+                    "source_datatype": variable.get("datatype") or "string",
+                    "operations": [
+                        local(x.tag)
+                        for x in expr.iter()
+                        if isinstance(x.tag, str)
+                    ],
+                    "cross_product_risk": False,
+                    "automatic_blocker": False,
+                }
 
     object_components = []
     operations = []
@@ -243,17 +286,26 @@ def classify_candidate(
             "reasons": ["selector_variable_is_not_local_variable"],
         }
 
-    if shape["kind"] != "direct_object_projection":
-        reasons = ["variable_expression_is_not_direct_object_component"]
+    if shape["kind"] not in {
+        "direct_object_projection",
+        "unary_concat_object_projection",
+    }:
+        reasons = ["variable_expression_is_not_supported_projection_shape"]
         if shape.get("cross_product_risk"):
             reasons.append("multi_input_or_cartesian_semantics_may_be_present")
         return {
             **base,
             "classification": "review_required",
             "candidate_family": "derived_projection",
+            "projection_mode": shape.get("kind"),
             "reasons": reasons,
         }
 
+    projection_mode = (
+        "direct"
+        if shape["kind"] == "direct_object_projection"
+        else "unary_literal_concat"
+    )
     source_object_id = shape.get("object_ref")
     source_obj = index["objects"].get(source_object_id)
     if source_obj is None:
@@ -286,7 +338,11 @@ def classify_candidate(
         quantifier_reason = "projected_variable_is_shared_across_different_var_check_semantics"
 
     reasons = [
-        "direct_object_component_projection_into_object_selector",
+        (
+            "direct_object_component_projection_into_object_selector"
+            if projection_mode == "direct"
+            else "unary_literal_concat_projection_into_object_selector"
+        ),
         quantifier_reason,
         "collection_aggregation_boundary_must_be_preserved",
         "equivalence_fixture_required_before_safe_automatic",
@@ -298,6 +354,7 @@ def classify_candidate(
         **base,
         "classification": "review_required",
         "candidate_family": candidate_family,
+        "projection_mode": projection_mode,
         "source": {
             "object_id": source_object_id,
             "object_type": local(source_obj.tag),
@@ -308,8 +365,12 @@ def classify_candidate(
         "targets": target_details,
         "reasons": reasons,
     }
-    proof = direct_foreach_preconditions(result)
-    result["first_proof_class"] = proof
+    if projection_mode == "direct":
+        proof = direct_foreach_preconditions(result)
+        result["first_proof_class"] = proof
+    else:
+        proof = unary_concat_foreach_preconditions(result)
+        result["unary_concat_proof_class"] = proof
     return result
 
 
@@ -414,6 +475,8 @@ def summarize(files: list[dict]) -> dict:
     families = Counter()
     derived_operations = Counter()
     proof_class = Counter()
+    unary_concat_proof_class = Counter()
+    projection_modes = Counter()
     parse_status = Counter()
     candidate_files = 0
     for row in files:
@@ -423,9 +486,15 @@ def summarize(files: list[dict]) -> dict:
         for candidate in row.get("candidates", []):
             classifications[candidate["classification"]] += 1
             families[candidate.get("candidate_family") or "none"] += 1
+            projection_modes[candidate.get("projection_mode") or "none"] += 1
             proof = candidate.get("first_proof_class")
             if proof is not None:
                 proof_class["eligible" if proof.get("eligible") else "ineligible"] += 1
+            unary_proof = candidate.get("unary_concat_proof_class")
+            if unary_proof is not None:
+                unary_concat_proof_class[
+                    "eligible" if unary_proof.get("eligible") else "ineligible"
+                ] += 1
             if candidate.get("candidate_family") == "derived_projection":
                 for op in candidate.get("expression", {}).get("operations", []):
                     derived_operations[op] += 1
@@ -435,7 +504,11 @@ def summarize(files: list[dict]) -> dict:
         "parse_status": dict(sorted(parse_status.items())),
         "classifications": dict(sorted(classifications.items())),
         "families": dict(sorted(families.items())),
+        "projection_modes": dict(sorted(projection_modes.items())),
         "first_proof_class": dict(sorted(proof_class.items())),
+        "unary_concat_proof_class": dict(
+            sorted(unary_concat_proof_class.items())
+        ),
         "derived_operations": dict(sorted(derived_operations.items())),
     }
 
@@ -450,7 +523,7 @@ def main(argv: list[str] | None = None) -> int:
     for path in iter_inputs(args.inputs):
         files.extend(analyze_input(path))
     report = {
-        "format": "scap-ng-foreach-candidate-analysis-0.2",
+        "format": "scap-ng-foreach-candidate-analysis-0.3",
         "rewrite_performed": False,
         "safe_automatic_enabled": False,
         "summary": summarize(files),
