@@ -17,10 +17,10 @@ Structural validation can be repeated with:
 
 ```powershell
 python -m pip install jsonschema
-python tools/validate_native_json_schemas.py work/review --schema-dir schema/v0.2.0 --report work/schema-validation.json
+python tools/validate_native_json_schemas.py work/review --schema-dir schema/v0.3.0 --report work/schema-validation.json
 ```
 
-This is the maintained local full-review conversion command for the frozen 0.2.0 review phase. It is not proof of target-runtime equivalence; unsupported or unresolved source semantics must remain explicit.
+This is the maintained local full-review conversion command for the active 0.3 pre-alpha review phase. Frozen 0.2 reproduction uses its historical pinned tooling. This command is not proof of target-runtime equivalence; unsupported or unresolved source semantics must remain explicit.
 
 ## Preserved historical instructions
 
