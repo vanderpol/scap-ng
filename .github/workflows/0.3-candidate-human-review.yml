@@ -176,29 +176,8 @@ jobs:
             "work/review/$KEY/candidate-authoring" \
             --schema-dir scap-ng/schema/v0.3.0 \
             --report "work/evidence/$KEY/candidate-schema-validation.json"; then
-            python - <<'PY'
-            import json, os
-            from pathlib import Path
-            p=Path("work/evidence")/os.environ["KEY"]/"candidate-schema-validation.json"
-            data=json.loads(p.read_text())
-            invalid_rows=[
-                {
-                    "path":row.get("path"),
-                    "kind":row.get("kind"),
-                    "errors":(row.get("errors") or [])[:5],
-                }
-                for row in (data.get("results") or [])
-                if not row.get("valid",False)
-            ]
-            print(json.dumps({
-                "summary":{
-                    "documents_checked":data.get("documents_checked"),
-                    "valid":data.get("valid"),
-                    "invalid":data.get("invalid"),
-                },
-                "first_invalid_documents":invalid_rows[:20],
-            },indent=2,sort_keys=True))
-            PY
+            echo "First 400 lines of candidate schema validation report:"
+            python -m json.tool "work/evidence/$KEY/candidate-schema-validation.json" | sed -n '1,400p'
             exit 1
           fi
           if ! PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py \
