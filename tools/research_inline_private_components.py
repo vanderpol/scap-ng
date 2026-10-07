@@ -672,9 +672,10 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         a.pop("states",None)
     variables=copy.deepcopy(a.get("variables") or {})
     for original,payload in private_variable_payloads:
-        if original in variables and variables[original] != payload:
-            raise ValueError(f"private Variable payload mismatch for {original!r}")
-        variables[original]=payload
+        # A temporary registry entry may already have been updated while
+        # restoring Variable-local Objects. Keep that updated payload; only
+        # insert the originally captured payload when no registry entry exists.
+        variables.setdefault(original,payload)
     if variables or present.get("variables"):
         a["variables"]=variables
     else:
