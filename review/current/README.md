@@ -29,7 +29,10 @@ Open the run's **Artifacts** section and download
 not used here because they are not reliable navigation links for all GitHub
 sessions.
 
-## Frozen 0.2.0 baseline
+## Historical 0.2.0 baseline — review closed
+
+The 0.2.0 package is frozen historical reference only. OVAL Board review has moved
+to the forthcoming 0.3 checkpoint; do not spend review time on 0.2.
 
 - [0.2.0 schema](../../schema/v0.2.0/README.md)
 - [0.2.0 source samples](../../board/review-content/0.2.0/README.md)
