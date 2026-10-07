@@ -224,7 +224,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         },
         "observation_plan":observation_summary,
         "observation_artifacts":[
-            str(path.relative_to(output_root))
+            str(path.relative_to(output_root.resolve()))
             for path in sorted(observation_targets)
         ],
         "summary":totals,
