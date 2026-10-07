@@ -265,6 +265,46 @@ https://github.com/vanderpol/scap-ng/actions/runs/37619407392
 The generated artifact includes the Observation source, an illustrative
 Observation Result, three consumer samples, and a machine-readable proof.
 
+## Counterexample: shared runtime collection is not automatically an Observation
+
+The representative source-fanout census found one OVAL Object reused by **42**
+Windows Server 2025 Rules and **43** Windows 11 Rules:
+
+`oval:mil.disa.stig.win:obj:20000000`
+
+It is an empty `auditeventpolicysubcategories_object`.
+
+The reviewed native capability mapping already models
+`windows.auditeventpolicysubcategories` with:
+
+```text
+test_source.kind = none
+```
+
+because the OVAL Object carries no selector or other authored acquisition
+semantics. Native content therefore removes the meaningless Object and the Test
+directly evaluates the current system's audit-policy subcategories.
+
+This is **not** a good Observation artifact candidate merely because its source
+Object had high fanout.
+
+A scanner may still collect the underlying system data once and reuse that
+collection internally across compatible Tests. That is runtime collection
+execution reuse (#44), not an author-visible Observation dependency.
+
+This establishes an important extraction rule:
+
+> Source fanout is evidence to inspect, not sufficient evidence to create an
+> Observation.
+
+An Observation is justified when reusable authored acquisition/derivation has
+meaningful identity and a useful explicit export boundary. Capability-intrinsic
+singleton acquisition should remain intrinsic to the capability.
+
+A better source-fanout proving case is a shared Object with meaningful
+selection/dataflow, such as the Windows `DomainRole` WMI query reused by four
+Server 2025 Rules.
+
 ## Remaining proof before 65-benchmark modernization census
 
 1. Add negative fixtures for unknown export, ID/version mismatch, and private
