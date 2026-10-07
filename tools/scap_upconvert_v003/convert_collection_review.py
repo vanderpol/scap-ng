@@ -67,8 +67,11 @@ def postprocess_automated_assessment(
         "id":"scap-ng.pre-alpha.assessment",
         "version":target_ng_version,
     })
-    if target_ng_version != "0.2.0":
-        specification["version"]=target_ng_version
+    # The declared Assessment version must always match the mapping stack
+    # actually applied. Never allow a 0.3 identity to survive a 0.2 transform
+    # (or vice versa), because downstream schema validation would then diagnose
+    # misleading capability-shape errors instead of the real version skew.
+    specification["version"]=target_ng_version
 
     # Both 0.2 and the current 0.3 draft require explicit reporting selection.
     # Preserve the complete SCAP 1.4/OVAL evidence surface during conversion.
