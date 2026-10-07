@@ -92,6 +92,9 @@ def main() -> int:
     foreach_reasons = Counter()
     observation_consumers = Counter()
     observation_exports = Counter()
+    retained_object_reasons = Counter()
+    retained_object_contexts = Counter()
+    retained_object_context_signatures = Counter()
     classes_by_kind = defaultdict(Counter)
     residuals_by_kind = defaultdict(Counter)
     complex_residuals_by_kind = defaultdict(Counter)
@@ -113,6 +116,12 @@ def main() -> int:
         add_counts(foreach_reasons, s.get("foreach_review_reason_counts") or {})
         add_counts(observation_consumers, s.get("observation_consumer_counts") or {})
         add_counts(observation_exports, s.get("observation_export_reference_counts") or {})
+        add_counts(retained_object_reasons, s.get("retained_object_reason_counts") or {})
+        add_counts(retained_object_contexts, s.get("retained_object_context_counts") or {})
+        add_counts(
+            retained_object_context_signatures,
+            s.get("retained_object_context_signature_counts") or {},
+        )
 
         for kind, counts in (s.get("classification_counts_by_kind") or {}).items():
             add_counts(classes_by_kind[kind], counts)
@@ -168,6 +177,9 @@ def main() -> int:
         "foreach_review_reason_counts": dict(foreach_reasons),
         "observation_consumer_counts": dict(observation_consumers),
         "observation_export_reference_counts": dict(observation_exports),
+        "retained_object_reason_counts": dict(retained_object_reasons),
+        "retained_object_context_counts": dict(retained_object_contexts),
+        "retained_object_context_signature_counts": dict(retained_object_context_signatures),
         "object_scope_reduction_pct": reduction(
             numeric["baseline_objects"], numeric["modernized_objects"]
         ),
@@ -270,6 +282,28 @@ def main() -> int:
         f"- Observation artifacts: **{summary.get('observation_artifacts', 0)}** "
         f"across **{summary.get('packages_with_observation_artifacts', 0)}** packages; "
         f"consumer Assessments: **{summary.get('observation_consumer_assessments', 0)}**",
+        "",
+        "## Retained Object scope",
+        "",
+        "Top-level Objects remaining after proven locality are classified by why they remain named:",
+        "",
+    ]
+    for reason, count in sorted(
+        retained_object_reasons.items(), key=lambda kv: (-kv[1], kv[0])
+    ):
+        lines.append(f"- {reason}: **{count}**")
+
+    lines += [
+        "",
+        "Consumer signatures for those retained Objects:",
+        "",
+    ]
+    for signature, count in sorted(
+        retained_object_context_signatures.items(), key=lambda kv: (-kv[1], kv[0])
+    ):
+        lines.append(f"- {signature}: **{count}**")
+
+    lines += [
         "",
         "## Rule Assessment outcome after proven exact simplifications",
         "",
