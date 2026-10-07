@@ -39,7 +39,7 @@ def main():
         # in the census but semantic graph validation is not applicable.
         assessment = doc.get("assessment", doc)
         graph_applicable = any(
-            key in assessment for key in ("objects", "states", "tests", "variables")
+            key in assessment for key in ("shared_objects", "objects", "states", "tests", "variables")
         )
         diagnostics = (
             validate_assessment_capability_semantics(doc)
