@@ -374,13 +374,28 @@ No schema change is implied by this research note.
 
 ## Recommendation
 
-Prototype **source-time observation modules with typed exports** for 0.3.0
-research.
+Prototype **typed observation exports from a shared inventory Assessment** as
+the first 0.3.0 reuse direction.
 
-Use Apache discovery as the first proving case because it has unusually high
-repetition and Variable complexity. Keep runtime shared-collection execution as
-a separate later optimization.
+Apache is the proving case because the production corpus has unusually high
+repetition and the extraction/re-expansion proof already establishes a bounded
+shared discovery subgraph. Reuse the existing Assessment artifact if that can
+cleanly carry both its own technical result and separately typed exported
+observations.
 
-Before promotion, run the complete 22-Assessment Apache corpus through a module
-extraction/re-expansion proof and require the flattened graph to match the
-faithful source graph for the bounded helper subgraph.
+Keep the source-time `module` design as a fallback if Assessment exports would
+force artificial truth semantics, weaken standalone results, or otherwise make
+the Assessment contract less coherent.
+
+Before promotion:
+
+1. define export status/cardinality/completeness/provenance semantics;
+2. prototype producer and consumer syntax over the proven Apache subgraph;
+3. prove flattening/re-expansion against the faithful converted Assessments;
+4. prove same-target/binding and cycle rules; and
+5. demonstrate that a scanner can schedule the shared producer once without
+   changing consumer Test results or evidence semantics.
+
+Runtime collection caching remains a separate optimization; the authored
+dependency/export contract must be correct even when an implementation executes
+the producer more than once.
