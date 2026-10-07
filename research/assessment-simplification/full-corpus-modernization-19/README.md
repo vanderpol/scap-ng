@@ -1,118 +1,106 @@
-# Full-corpus 0.3 modernization census plan
+# Full-corpus 0.3 modernization census
 
-**Status:** exhaustive census running; no accepted schema change.
+**Status:** completed research checkpoint; no schema change or design acceptance.
 
-## Execution checkpoint
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37632292259
 
-Both prerequisites are now met:
+Pinned NIWC revision:
+`8c8e5dff860af6b1290ee9273a282db24278f8d5`
 
-1. bounded Object/State/Variable-Object/Set locality re-expands exactly; and
-2. Observation extraction is proven on Apache values, Windows DomainRole Items,
-   and RHEL dconf mixed Item/value exports.
+The run regenerated all 65 individual NIWC Current packages from source:
 
-The exhaustive workflow is:
-https://github.com/vanderpol/scap-ng/actions/workflows/full-0.3-modernization-census.yml
+- **61** generated native content;
+- **4** expected `independent.sqlext` source blockers;
+- **0** unexpected blockers.
 
-It regenerates every package from pinned NIWC source before measurement. The
-purpose is to decide what belongs in 0.3, not to make every candidate normative.
+## Result
 
-## Two output views
+Measured automated Assessments: **7,165** total, including **6,916 Rule
+Assessments** and **249 applicability Assessments**.
 
-Generate both from the same pinned source revision.
+Exact/reversible research transforms produced:
 
-### Faithful baseline
+| Measure | Faithful | Research view | Reduction |
+| --- | ---: | ---: | ---: |
+| Top-level Objects | 13,402 | 1,197 | **91.07%** |
+| Top-level States | 9,121 | 435 | **95.23%** |
+| Named Variables | 2,250 | 2,002 | **11.02%** |
+| Named component references | 23,883 | 1,926 | **91.94%** |
 
-Preserve the current lossless conversion graph. This remains the semantic oracle.
+Rule Assessment classifications:
 
-### Modernized research view
+| Class | Count | Percent |
+| --- | ---: | ---: |
+| local/simple | **4,736** | **68.48%** |
+| bounded dataflow (`foreach`) | 22 | 0.32% |
+| shared Observation consumer | 52 | 0.75% |
+| meaningfully complex | **2,106** | **30.45%** |
 
-Apply only transformations in one of these categories:
+The exact `foreach` v1 proof class is therefore useful but narrow: **22**
+rewrites across 6,916 Rules.
 
-- exact structural/presentation equivalence:
-  - consumer-local State;
-  - consumer-local/private Object locality;
-  - bounded Set-operand locality;
-- exact graph-desugared authoring shorthand:
-  - approved bounded foreach proof classes;
-- exact reusable-subgraph extraction:
-  - Observation artifacts whose flattening restores the faithful graph.
+## Shared Observation result
 
-Do **not** automatically rewrite features whose semantics are intentionally
-different or not losslessly proven. Report them as opportunities instead:
+The census created **9 package-local Observation artifacts** with **69**
+automated consumers:
 
-- procedural conditionals derived from legacy Boolean criteria;
-- typed linux.fstab replacement of legacy split/error graph;
-- ordinary positive rewrite of violation-query forms;
-- general concat / multi-source foreach;
-- domain-specific semantic corrections.
+- Apache discovery: 20 consumers across UNIX Server/Site content;
+- Windows DomainRole: 43 consumers across Windows 10, Windows 11, and Server
+  2019/2022/2025;
+- RHEL/Oracle Linux dconf discovery: 6 consumers.
 
-## Required corpus accounting
+Those artifacts factor **129 Object occurrences** and **226 Variable
+occurrences** into 15 unique Observation Objects and 24 unique Observation
+Variables within their packages.
 
-The existing full-current pipeline accounts for all 65 pinned packages:
+This strengthens Observation beyond the original Apache example: the same
+contract works for cloned value dataflow, source-shared Item acquisition, and
+mixed Item/value exports.
 
-- 61 currently generate native content;
-- 4 SQL Server packages are known blockers because of independent.sqlext.
+## What remains meaningfully complex
 
-The modernization census should preserve the same source-accounting discipline.
-A source blocker is not silently omitted from denominators.
+Among the **2,106** complex Rule Assessments, overlapping residual causes are:
 
-## Statistics
+- nontrivial Variable graph: **1,073**;
+- real multi-Test composition: **1,055**;
+- Set/Filter semantics: **630**;
+- nested evaluation tree: **560**;
+- shared acquisition: **301**;
+- named State reuse: **214**;
+- named Object graph: **154**;
+- repeated Test reference: **129**.
 
-Report corpus-wide and per benchmark:
+The largest next research target is therefore the remaining Variable graph, not
+broader Test/evaluate simplification.
 
-- Rules and automated Assessments;
-- faithful Objects / States / Variables / Tests;
-- modernized local Objects / States;
-- named Objects / States / Variables remaining;
-- Object/State cross-reference reduction;
-- Variables removed by foreach;
-- Variables/Objects moved into Observations;
-- Observation artifacts created;
-- consumer references per Observation;
-- exact duplicated subgraphs avoided;
-- normalized lines/bytes as secondary metrics;
-- Assessments with no residual complex graph;
-- Assessments still complex after modernization;
-- residual complexity by reason:
-  - shared acquisition;
-  - nontrivial Variable graph;
-  - Set/Filter semantics;
-  - multiple Tests/evaluate composition;
-  - nested Boolean logic;
-  - unsupported/deprecated capability;
-  - native-only modernization opportunity;
-- counts for each modernization:
-  - applied exactly;
-  - eligible but left faithful by policy;
-  - rejected by proof boundary;
-  - not applicable.
+## Evaluate checkpoint
 
-## Complexity outcome
+Across the full corpus, **4,740 / 6,916 (68.5%)** Rule Assessments have a
+single-Test explicit root. That is strong evidence for editor/normalizer
+authoring convenience, but not for a hidden executable default.
 
-The most useful final number is not merely file-size reduction.
+Real composition remains necessary: **147** Rule Assessments repeat Test
+references, and representative trees reach depth 5. Keep named Tests and
+first-class `evaluate` where composition exists.
 
-Classify every automated Assessment after modernization into:
+## Scope boundary
 
-1. **local/simple** — Test-local acquisition/expectation, no named dataflow;
-2. **bounded dataflow** — foreach or small explicit Variable flow;
-3. **shared observation consumer** — complexity factored into an Observation;
-4. **meaningfully complex** — graph complexity still required by semantics;
-5. **migration blocker / unsupported source**.
+Applied automatically in this census only when existing proof was exact and
+reversible:
 
-For category 4, emit the exact residual features so 0.3 decisions are driven by
-measured remaining complexity rather than anecdotal examples.
+- consumer-local Object/State presentation;
+- private Set-operand and Variable-local Object locality;
+- bounded `foreach` v1;
+- proven Observation extraction shapes.
 
-## Evidence policy
+Not rewritten merely to reduce the complexity count:
 
-The exhaustive generated corpus and detailed reports belong in
-`vanderpol/scap-ng-evidence` or CI artifacts. Keep only a compact summary,
-source pins, workflow URL, hashes, and representative examples in `scap-ng`.
+- native conditional/case authoring;
+- typed `linux.fstab`;
+- violation-query positive spelling;
+- general concat/multi-source `foreach`;
+- domain-specific semantic changes.
 
-## Milestone interpretation
-
-This run is a **0.3 design checkpoint**, not proof that every modernization is
-accepted. Its purpose is to answer:
-
-> After all currently proven safe simplifications, how much real-world
-> complexity remains, what causes it, and which proposed 0.3 features have
-> enough production value to justify standardization?
+The detailed 61-package reports and logs remain in the workflow artifact rather
+than this repository.
