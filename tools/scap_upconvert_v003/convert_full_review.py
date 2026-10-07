@@ -299,6 +299,7 @@ def main(argv=None):
                     rec,original,args.output,schema,temp,
                     parameter_ids=parameter_ids,
                     assessment_namespace=args.benchmark_id,
+                    target_ng_version=WORKING_ASSESSMENT_SPECIFICATION_VERSION,
                 )
                 evidence['rules'].append(result); blocked=blocked or failed_rule
             quarantined=sum(
@@ -318,7 +319,8 @@ def main(argv=None):
             rule_list=temp/'rules.json'
             write_json(rule_list,[r['id'] for r in rs])
             status=review.main(['--input',str(args.input),'--sha256',actual_sha256,'--output',str(args.output),
-                                '--rules-file',str(rule_list),'--schema',str(args.schema)])
+                                '--rules-file',str(rule_list),'--schema',str(args.schema),
+                                '--target-ng-version',WORKING_ASSESSMENT_SPECIFICATION_VERSION])
             evidence=json.loads((args.output/'evidence.json').read_text(encoding='utf-8'))
             if status:
                 blocked_rows=[]
@@ -485,7 +487,8 @@ def main(argv=None):
             for test in native.get('assessment',{}).get('tests',{}).values():
                 test['reported_elements']='all'
             native=apply_ready_capability_mappings(
-                native, review.NATIVE_CAPABILITY_MAPPING_DIR
+                native,
+                review.capability_mapping_dir(WORKING_ASSESSMENT_SPECIFICATION_VERSION),
             )
             errors=violations(native)
             if errors: raise ValueError('Current vocabulary guard: '+str(errors))
