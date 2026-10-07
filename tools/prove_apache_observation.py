@@ -73,6 +73,65 @@ def restore_export_refs(value:Any)->Any:
     return value
 
 
+def validate_observation_document(observation_doc:dict)->None:
+    obs=observation_doc.get("observation")
+    if not isinstance(obs,dict):
+        raise ValueError("missing observation root")
+    if obs.get("id")!=OBSERVATION_ID:
+        raise ValueError("Observation id mismatch")
+    if obs.get("version")!=OBSERVATION_VERSION:
+        raise ValueError("Observation version mismatch")
+    variables=obs.get("variables") or {}
+    exports=obs.get("exports") or {}
+    for alias,contract in exports.items():
+        if not isinstance(contract,dict):
+            raise ValueError(f"invalid Observation export contract: {alias}")
+        if contract.get("kind")!="values":
+            raise ValueError(f"unsupported Observation export kind: {alias}")
+        source=contract.get("variable")
+        if source not in variables:
+            raise ValueError(f"Observation export references unknown Variable: {alias}")
+        if not isinstance(contract.get("datatype"),str) or not contract["datatype"]:
+            raise ValueError(f"Observation export missing datatype: {alias}")
+        if contract.get("cardinality") not in {
+            "one","zero_or_one","one_or_more","zero_or_more"
+        }:
+            raise ValueError(f"Observation export has invalid cardinality: {alias}")
+
+
+def validate_consumer_binding(a:dict,observation_doc:dict)->None:
+    validate_observation_document(observation_doc)
+    bindings=a.get("observations") or {}
+    binding=bindings.get("apache")
+    if not isinstance(binding,dict):
+        raise ValueError("consumer missing apache Observation binding")
+    obs=observation_doc["observation"]
+    if binding.get("expected_id")!=obs["id"]:
+        raise ValueError("Observation consumer expected_id mismatch")
+    if binding.get("expected_version")!=obs["version"]:
+        raise ValueError("Observation consumer expected_version mismatch")
+    exports=set(obs.get("exports") or {})
+
+    def visit(value:Any):
+        if isinstance(value,dict):
+            if set(value)=={"observation","export"}:
+                if value.get("observation")!="apache":
+                    raise ValueError("unknown Observation binding alias")
+                if value.get("export") not in exports:
+                    raise ValueError("unknown Observation export")
+                return
+            for child in value.values():
+                visit(child)
+        elif isinstance(value,list):
+            for child in value:
+                visit(child)
+        elif isinstance(value,str) and value in set(CORE_OBJECTS+CORE_VARIABLES):
+            raise ValueError(f"consumer retains private Observation node: {value}")
+    for key,value in a.items():
+        if key!="observations":
+            visit(value)
+
+
 def observation_document(a:dict)->dict|None:
     objects=a.get("objects") or {}
     variables=a.get("variables") or {}
@@ -132,12 +191,14 @@ def extract(doc:dict,observation_doc:dict)->tuple[dict,Counter]:
             "expected_version":OBSERVATION_VERSION,
         }
     }
+    validate_consumer_binding(a,observation_doc)
     return out,counts
 
 
 def flatten(extracted:dict,observation_doc:dict)->dict:
     out=copy.deepcopy(extracted)
     a=out["assessment"]
+    validate_consumer_binding(a,observation_doc)
     a.pop("observations",None)
     restored=restore_export_refs(a)
     a.clear()
