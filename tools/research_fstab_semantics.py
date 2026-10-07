@@ -19,6 +19,7 @@ from oval_result_truth_tables import (
     TRUE,
     FALSE,
     ERROR,
+    UNKNOWN,
     aggregate_operator,
     evaluate_collected_object_test,
 )
@@ -95,6 +96,74 @@ def typed_fstab_complete(rows, required_option):
     )
 
 
+def faithful_split_variable_incomplete(rows, required_option):
+    """Model the source persistent subgraph for an incomplete text collection.
+
+    Historical OVAL processing-model text, consistent with the retained 5.12.3
+    ObjectComponent contract, gives an ObjectComponent sourced from an
+    incomplete Object an incomplete flag when values exist. OVAL Functions
+    proceed only from complete sub-components; otherwise the Function result is
+    error. With zero source Items, ObjectComponent itself is error.
+
+    Therefore the split/local-Variable path is error for both zero and nonzero
+    incomplete source populations. The separate source-row existence Test is
+    unknown for this check_existence shape. OVAL AND(error, unknown) is error.
+    """
+    del required_option  # the Function cannot safely reach option evaluation
+    first = _first_source_row(rows)
+    exists = 1 if first is not None else 0
+    row_presence_test = evaluate_collected_object_test(
+        "incomplete",
+        existence="at_least_one_exists",
+        check="all",
+        has_state=False,
+        exists=exists,
+    )
+    projected_option_test = ERROR
+    return aggregate_operator(
+        "AND", [projected_option_test, row_presence_test]
+    )
+
+
+def typed_fstab_incomplete(rows, required_option):
+    """Model ordinary generic Test semantics for an incomplete typed collector."""
+    first = _first_source_row(rows)
+    if first is None:
+        # OVAL incomplete collection is unknown here: no decisive false State
+        # exists and at_least_one_exists cannot be proven false until collection
+        # is complete.
+        return UNKNOWN
+
+    options = first.get("options")
+    if not isinstance(options, list) or not options:
+        raise ValueError(
+            "first proof class requires one or more typed option values"
+        )
+    item_result = TRUE if required_option in options else FALSE
+    return evaluate_collected_object_test(
+        "incomplete",
+        existence="at_least_one_exists",
+        check="all",
+        item_results=[item_result],
+        has_state=True,
+        exists=1,
+    )
+
+
+def compare_incomplete_case(rows, required_option):
+    typed = source_rows_to_typed(rows)
+    faithful = faithful_split_variable_incomplete(rows, required_option)
+    candidate = typed_fstab_incomplete(typed, required_option)
+    return {
+        "rewrite_id": REWRITE_ID,
+        "faithful": faithful,
+        "candidate": candidate,
+        "equivalent": faithful == candidate,
+        "source_rows": rows,
+        "typed_rows": typed,
+    }
+
+
 def source_rows_to_typed(rows):
     """Translate only the lexical subset proven by the first fixture class."""
     out = []
@@ -121,7 +190,12 @@ def compare_complete_case(rows, required_option):
 
 
 def modernization_preconditions(candidate):
-    """Fail-closed preconditions for this narrow complete-source proof class."""
+    """Fail-closed report for the narrow complete-source proof class.
+
+    A converter cannot use runtime collection status as a static proof
+    precondition.  Even a report whose bounded complete-case conditions pass is
+    therefore not eligible for automatic migration.
+    """
     reasons = []
     if candidate.get("source_capability") != "independent.textfilecontent54":
         reasons.append("source_is_not_textfilecontent54")
@@ -139,8 +213,12 @@ def modernization_preconditions(candidate):
         reasons.append("regex_to_fstab_field_mapping_not_proven")
     if not candidate.get("lexical_equivalence_proven", False):
         reasons.append("parser_lexical_equivalence_not_proven")
+    bounded_complete_case_proven = not reasons
+    automatic_reasons = list(reasons)
+    automatic_reasons.append("runtime_collection_status_not_statically_provable")
     return {
         "rewrite_id": REWRITE_ID,
-        "eligible": not reasons,
-        "reasons": sorted(set(reasons)),
+        "bounded_complete_case_proven": bounded_complete_case_proven,
+        "eligible": False,
+        "reasons": sorted(set(automatic_reasons)),
     }
