@@ -435,6 +435,50 @@ This strengthens the working rule:
 > acquisition identity. Keep a named/shared Object when acquisition itself is
 > shared or independently meaningful.
 
+
+## Private external/constant Variable follow-up
+
+The same reversible-locality rule now has a bounded Variable proof:
+
+> A single-use `external` or `constant` Variable may be presented at its sole
+> exact `{variable: ...}` consumer. Local/derived Variables remain named.
+
+This is deliberately a binding/locality transformation, not a new Variable
+function or a broader `foreach` class. The complete Variable payload,
+including datatype, input contract/validation, title, and literal values, is
+preserved verbatim in the research form. Re-expansion restores the original
+named Variable and requires structural equality with the faithful Assessment.
+
+Latest successful workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37640877274
+
+Across RHEL 9 + Windows Server 2025:
+
+| Measure | Faithful | + private input/constant locality | Reduction |
+| --- | ---: | ---: | ---: |
+| Named Variables | 94 | **73** | **22.3%** |
+| RHEL 9 Variables | 66 | **54** | **18.2%** |
+| Windows Server 2025 Variables | 28 | **19** | **32.1%** |
+
+The pass localized **21 Variables**: 12 in RHEL 9 and 9 in Server 2025.
+
+The first production run caught a re-expansion bookkeeping defect in RHEL
+SV-258042: a localized constant lived inside a retained top-level State, and a
+stale pre-restoration State copy reintroduced the inline payload. The run
+failed structural equality. The implementation was fixed to restore private
+Variable references before copying retained States, and a focused regression
+fixture now covers that shape. The proof gate was not weakened.
+
+This result supports a sharper vocabulary for the next corpus census:
+
+- **external input / constant binding** is not automatically "Variable
+  dataflow complexity";
+- **local derived Variable graphs** remain the advanced dataflow case;
+- shared/reused external or constant bindings may stay named without being
+  classified as derived graph complexity.
+
+No normative Variable syntax change is implied.
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
