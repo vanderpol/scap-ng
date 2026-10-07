@@ -250,6 +250,104 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
             "test_and_graph",
         )
 
+    def test_private_leaf_local_variable_localizes_and_roundtrips(self):
+        source={
+            "assessment":{
+                "id":"private-local-variable",
+                "mode":"automated",
+                "objects":{
+                    "source":{"capability":"unix.file","select":{"path":{"value":"/src"}}},
+                    "target":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                                "value":{"variable":"derived-path"},
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "derived-path":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"values":{"object":"source","field":"path"}},
+                                {"literal":{"value":"/x","datatype":"string"}},
+                            ]
+                        },
+                    }
+                },
+                "tests":{"one":{"capability":"unix.file","object":"target"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_variable_object_consumers=True,
+            inline_private_local_variables=True,
+        )
+        self.assertEqual(
+            len([
+                row for row in identity["inlined_variables"]
+                if row["variable"]=="derived-path"
+            ]),
+            1,
+        )
+        self.assertNotIn("derived-path",rendered["assessment"].get("variables",{}))
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_local_variable_chain_stays_named(self):
+        source={
+            "assessment":{
+                "id":"local-variable-chain",
+                "mode":"automated",
+                "objects":{
+                    "target":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                                "value":{"variable":"outer"},
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "inner":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"concat":[{"literal":{"value":"/a","datatype":"string"}}]},
+                    },
+                    "outer":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"variable":{"variable":"inner"}},
+                                {"literal":{"value":"/b","datatype":"string"}},
+                            ]
+                        },
+                    },
+                },
+                "tests":{"one":{"capability":"unix.file","object":"target"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_local_variables=True,
+        )
+        self.assertIn("inner",rendered["assessment"]["variables"])
+        self.assertIn("outer",rendered["assessment"]["variables"])
+        self.assertEqual(identity["inlined_variables"],[])
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_private_constant_in_retained_top_level_state_roundtrips(self):
         # Regression for RHEL SV-258042-style shape: the State remains top-level
         # while its sole constant Variable reference is localized.
