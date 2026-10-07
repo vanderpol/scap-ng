@@ -90,6 +90,12 @@ def main()->int:
         "candidate":candidate,
         "reduction_percent":reductions,
         "locality":{
+            "test_objects_localized":s.get("test_objects_localized",0),
+            "test_states_localized":s.get("test_states_localized",0),
+            "set_operand_objects_localized":s.get("set_operand_objects_localized",0),
+            "variable_objects_localized":s.get("variable_objects_localized",0),
+            "recursive_object_graph_objects_localized":s.get("recursive_object_graph_objects_localized",0),
+            "state_consumer_occurrences_localized":s.get("state_consumer_occurrences_localized",0),
             "variables_localized_total":s.get("private_binding_variables_localized",0),
             "binding_variables_localized":(
                 s.get("private_external_variables_localized",0)
@@ -98,6 +104,11 @@ def main()->int:
             "external_variables_localized":s.get("private_external_variables_localized",0),
             "constant_variables_localized":s.get("private_constant_variables_localized",0),
             "leaf_derived_variables_localized":s.get("private_local_variables_localized",0),
+        },
+        "static_literals":{
+            "constant_variables_removed":s.get("static_constant_variables_removed",0),
+            "references_replaced":s.get("static_literal_references_replaced",0),
+            "changed_assessments":s.get("static_literal_changed_assessments",0),
         },
         "foreach":{
             "rewrites":s.get("foreach_rewrites_applied",0),
@@ -174,6 +185,15 @@ def main()->int:
         "",
         "## Applied modernization",
         "",
+        f"- Test-local Objects: **{score['locality']['test_objects_localized']}**",
+        f"- Test-local States: **{score['locality']['test_states_localized']}**",
+        f"- private Set operand Objects: **{score['locality']['set_operand_objects_localized']}**",
+        f"- Variable-local Objects: **{score['locality']['variable_objects_localized']}**",
+        f"- recursive Object-graph Objects localized: **{score['locality']['recursive_object_graph_objects_localized']}**",
+        f"- reusable State consumer occurrences localized: **{score['locality']['state_consumer_occurrences_localized']}**",
+        f"- static constant Variables folded: **{score['static_literals']['constant_variables_removed']}** "
+        f"across **{score['static_literals']['changed_assessments']}** Assessments; "
+        f"literal references replaced: **{score['static_literals']['references_replaced']}**",
         f"- localized Variables total: **{score['locality']['variables_localized_total']}**",
         f"- localized external/constant bindings: **{score['locality']['binding_variables_localized']}** "
         f"(external {score['locality']['external_variables_localized']}, "
