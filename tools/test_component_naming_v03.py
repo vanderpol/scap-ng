@@ -39,7 +39,7 @@ def valid_assessment():
                 "id": "scap-ng.pre-alpha.assessment",
                 "version": "0.3.0",
             },
-            "objects": {
+            "shared_objects": {
                 "forward-zones-object": {
                     "capability": "independent.shellcommand",
                 }
@@ -95,10 +95,16 @@ class ComponentNamingV03Tests(unittest.TestCase):
         doc["assessment"]["evaluate"]["test"] = "test-zone-signing"
         self.assertTrue(self.errors(doc))
 
+
+    def test_legacy_objects_registry_is_rejected_in_canonical_v03(self):
+        doc = valid_assessment()
+        doc["assessment"]["objects"] = doc["assessment"].pop("shared_objects")
+        self.assertTrue(self.errors(doc))
+
     def test_untyped_object_id_is_rejected(self):
         doc = valid_assessment()
-        obj = doc["assessment"]["objects"].pop("forward-zones-object")
-        doc["assessment"]["objects"]["forward-zones"] = obj
+        obj = doc["assessment"]["shared_objects"].pop("forward-zones-object")
+        doc["assessment"]["shared_objects"]["forward-zones"] = obj
         doc["assessment"]["tests"]["zone-signing-test"]["object"] = "forward-zones"
         self.assertTrue(self.errors(doc))
 
