@@ -122,6 +122,19 @@ jobs:
           mkdir -p "work/research/$KEY/recursive"
           find "work/recursive-sample/$KEY" -maxdepth 1 -type f ! -name report.json -exec cp {} "work/research/$KEY/recursive/" \;
           cp "work/recursive-sample/$KEY/report.json" "work/research/$KEY/recursive-sample-report.json"
+      - name: Measure consumer-local State presentation
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/consumer-state-census/$KEY" \
+            --all-assessments \
+            --metrics-only \
+            --inline-private-set-operands \
+            --inline-state-consumers \
+            --label "$LABEL"
+          cp "work/consumer-state-census/$KEY/report.json" "work/research/$KEY/consumer-state-census-report.json"
       - uses: actions/upload-artifact@v4
         with:
           name: private-component-locality-${{ matrix.key }}
@@ -146,6 +159,7 @@ jobs:
           census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("census-report.json"))]
           recursive_sample_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("recursive-sample-report.json"))]
           recursive_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("recursive-census-report.json"))]
+          consumer_state_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("consumer-state-census-report.json"))]
           def aggregate(reports):
               totals={}
               for r in reports:
@@ -188,6 +202,10 @@ jobs:
               "recursive_set_operand_full_census":{
                   "packages":[{"label":r["label"],"summary":r["summary"]} for r in recursive_census_reports],
                   "summary":aggregate(recursive_census_reports),
+              },
+              "consumer_local_state_full_census":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in consumer_state_census_reports],
+                  "summary":aggregate(consumer_state_census_reports),
               },
           }
           Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
