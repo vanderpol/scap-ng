@@ -80,7 +80,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     assessment_rows=[]
     totals={
         "automated_assessments":0,
-        "observation_consumers":0,
+        "deferred_observation_opportunities":0,
         "foreach_rewrites":0,
         "localized_set_operand_objects":0,
         "localized_variable_objects":0,
@@ -160,7 +160,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "assessment_id":rendered["assessment"].get("id"),
             "path":relative.as_posix(),
             "kind":row["kind"],
-            "observation":observation_type,
+            "deferred_observation_opportunity":observation_type,
             "foreach_rewrites":rewrites,
             "localized":{
                 "test_objects":len(identity.get("inlined_objects") or {}),
