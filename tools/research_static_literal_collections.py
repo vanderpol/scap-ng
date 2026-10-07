@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Research proof for replacing static constant Variables with native literals.
 
-Research only. This utility does not modify source files and does not define
-accepted SCAP-NG 0.3 semantics. It proves that a bounded transform can inline
-constant Variable values and structurally re-expand the original document.
+Accepted SCAP-NG 0.3 transform proof. This utility does not modify source files.
+It proves that the bounded static-literal transform can inline constant Variable
+values and structurally re-expand the original document.
 """
 
 from __future__ import annotations
@@ -115,6 +115,8 @@ def inline_constants(document):
 
 def reexpand_constants(document, proof):
     restored = copy.deepcopy(document)
+    if not proof:
+        return restored
     assessment = restored["assessment"]
     variables = assessment.setdefault("variables", {})
 
@@ -189,7 +191,7 @@ def build_report(root: Path):
 
     report = {
         "format": "scap-ng-static-literal-collection-proof-0.1",
-        "status": "research_only_not_accepted_design",
+        "status": "accepted_0_3_transform_proof",
         "root": str(root),
         "summary": dict(counts),
         "round_trip_mismatches": mismatches,
