@@ -4,8 +4,6 @@
 
 This directory contains the proposed normative contract. Research records explain history/rationale; the specification describes expected content/processor behavior. Unresolved questions should remain visibly open rather than being silently normalized into requirements.
 
-Normative terms **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** use their conventional standards meaning.
-
 ## Start here
 
 1. [Core objectives](objectives.md)
@@ -31,15 +29,13 @@ Normative terms **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, and **MAY*
 
 ## Core design principles
 
-- Current architecture is **Benchmark → Rule → Assessment**; no separate Policy object.
-- Retain established SCAP/OVAL terminology when it remains semantically accurate; introduce new terms only when the legacy concept is misleading or obsolete.
-- Preserve demonstrated, non-deprecated semantics used by real/conformance content unless an explicit reviewed disposition replaces or removes them.
-- Normalize away XML/packaging/inheritance machinery when its effective meaning can be represented directly.
-- Prefer one clear construct per semantic purpose, explicit behavior over hidden defaults, and deterministic build-time normalization over runtime legacy machinery.
-- Treat implementation complexity as a standards cost: every feature creates parser, validator, compiler, runtime, result, test, documentation, and interoperability obligations.
-- Design for independent implementation: two vendors reading only the specification and conformance corpus should reach the same behavior.
-- Keep migration provenance/evidence separate from executable native content.
-- Keep schema validity, semantic validity, migration equivalence, collector conformance, live-target testing, human acceptance, and Board ratification distinct.
+- A **Benchmark** contains policy **Rules**; a Rule references one or more **Assessments** that define how the requirement is evaluated.
+- SCAP-NG preserves the meaning of supported SCAP 1.4 and OVAL content while using simpler native structures instead of reproducing XML and legacy packaging mechanics.
+- Behavior that can affect an assessment result is explicit. Content should not depend on hidden defaults or vendor-specific assumptions.
+- Established SCAP and OVAL concepts and terminology are reused when they remain accurate; new concepts are introduced only when they provide a clear benefit.
+- Content is modular and reusable. Shared Assessments, Observations, or collected facts must not change policy meaning, provenance, or assessment results.
+- Results explain both **what happened and why**, with clear completeness and bounded evidence rather than unnecessary result volume.
+- Independent implementations should reach the same meaning and results from the specification and conformance material; schema validation alone is not proof of conformance.
 
 ## Assessment reference
 
