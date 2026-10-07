@@ -485,6 +485,14 @@ def generate(mapping, repo_root, schema_version=None):
     if test_source_kind != "none":
         test_required.insert(2, test_source_field)
         test_properties[test_source_field] = {"type": "string", "minLength": 1}
+        if version == "0.3.0":
+            suffix_patterns = {
+                "object": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$",
+                "variable": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+            }
+            pattern = suffix_patterns.get(test_source_kind)
+            if pattern:
+                test_properties[test_source_field]["pattern"] = pattern
 
     collected_field_properties = {
         name: collected_value_schema(
