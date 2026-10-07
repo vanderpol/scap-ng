@@ -451,8 +451,23 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         retained_object_contexts.update(object_context_counts)
         retained_object_context_signatures.update(object_context_signature_counts)
 
+        totals["test_objects_localized"]+=len(
+            identity.get("inlined_objects") or {}
+        )
+        totals["test_states_localized"]+=len(
+            identity.get("inlined_states") or {}
+        )
+        totals["set_operand_objects_localized"]+=len(
+            identity.get("inlined_set_operand_objects") or []
+        )
+        totals["variable_objects_localized"]+=len(
+            identity.get("inlined_variable_objects") or []
+        )
         totals["recursive_object_graph_objects_localized"]+=len(
             identity.get("inlined_object_graph_objects") or []
+        )
+        totals["state_consumer_occurrences_localized"]+=len(
+            identity.get("inlined_state_consumer_occurrences") or []
         )
         totals["private_binding_variables_localized"]+=len(localized_variables)
         totals["private_external_variables_localized"]+=sum(
