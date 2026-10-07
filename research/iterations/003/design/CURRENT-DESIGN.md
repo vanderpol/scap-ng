@@ -29,6 +29,7 @@
 - A Test may consume another first-class node directly when that is the natural semantic source; `variable.value` is the established example and does not require an artificial Object wrapper.
 - Test, Object, and State/predicate capabilities remain independently typed where those nodes exist.
 - Source/presentation mapping order has no execution meaning; forward references are valid. Recommended authored section order is metadata, `objects`, `variables`, `states`, `tests`, `evaluate`.
+- Named internal component IDs use meaningful lowercase kebab-case with the component type as a required suffix: `-object`, `-state`, `-variable`, `-test`, and `-input`. Inline/private components do not receive artificial IDs. See [component naming](../../../../specification/assessment/component-naming.md).
 
 ## Variables, Sets, Filters, and dataflow
 
