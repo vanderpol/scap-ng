@@ -139,6 +139,53 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         self.assertEqual({row["consumer"] for row in rows},{"filter"})
         self.assertEqual(reexpand(rendered,identity),source)
 
+
+    def test_consumer_local_filter_state_in_named_variable_source_roundtrip(self):
+        # Mirrors the SV-257889 boundary: an Object remains named because a
+        # Variable consumes it, while the Object's Set Filter State is localized.
+        source={
+            "assessment":{
+                "id":"variable-source-filter-locality",
+                "mode":"automated",
+                "objects":{
+                    "users":{"capability":"unix.password","select":{"username":{"value":".*"}}},
+                    "filtered-users":{
+                        "capability":"unix.password",
+                        "set":{
+                            "operator":"difference",
+                            "operands":[{
+                                "object":"users",
+                                "filters":[{"state":"system-user","action":"exclude"}],
+                            }],
+                        },
+                    },
+                },
+                "variables":{
+                    "homes":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"values":{"object":"filtered-users","field":"home_dir"}},
+                    },
+                },
+                "states":{
+                    "system-user":{
+                        "capability":"unix.password",
+                        "state":{"field":"user_id","value":"1000","operation":"less_than"},
+                    },
+                },
+                "tests":{"one":{"capability":"unix.password","object":"users"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_set_operands=True,
+            inline_state_consumers=True,
+        )
+        operand=rendered["assessment"]["objects"]["filtered-users"]["set"]["operands"][0]
+        self.assertIsInstance(operand["filters"][0]["state"],dict)
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_variable_reference_prevents_object_inlining(self):
         source=self.base()
         # Reuse private-object from a Variable to make it independently addressable.
