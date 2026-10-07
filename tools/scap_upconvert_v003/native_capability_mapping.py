@@ -609,7 +609,107 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             test["states_match"]="all"
 
     test_source=native_cfg.get("test_source") or {}
-    if test_source.get("kind")=="none":
+    if test_source.get("kind")=="variable":
+        variable_field=test_source.get("field","variable")
+        variables=assessment.get("variables") or {}
+        consumed_objects=set()
+
+        def explicit_object_refs(value, target):
+            count=0
+            if isinstance(value,dict):
+                for key,child in value.items():
+                    if key=="object" and child==target:
+                        count+=1
+                    else:
+                        count+=explicit_object_refs(child,target)
+            elif isinstance(value,list):
+                for child in value:
+                    count+=explicit_object_refs(child,target)
+            return count
+
+        for test_id,test in tests.items():
+            if test.get("capability") != native:
+                continue
+            object_id=test.pop("object",None)
+            if not isinstance(object_id,str) or object_id not in objects:
+                raise ValueError(
+                    f"Variable-source Test {test_id!r} does not reference one legacy Variable Object"
+                )
+            obj=objects[object_id]
+            if obj.get("capability") != native:
+                raise ValueError(
+                    f"Variable-source Test {test_id!r} references incompatible Object {object_id!r}"
+                )
+            meaningful=set(obj)-{"object_title","capability","select"}
+            if meaningful:
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} carries unexpected semantics: "
+                    + ", ".join(sorted(meaningful))
+                )
+            select=obj.get("select")
+            if not isinstance(select,dict) or set(select)!={"var_ref"}:
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} must contain only select.var_ref"
+                )
+            selector=select["var_ref"]
+            if not isinstance(selector,dict):
+                raise ValueError(f"invalid var_ref selector on {object_id!r}")
+            if selector.get("operation","equals")!="equals":
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} var_ref must use equality"
+                )
+            if selector.get("datatype","string")!="string":
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} var_ref must be a string identity"
+                )
+            if bool(selector.get("mask",False)) or bool(selector.get("redact_result",False)):
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} var_ref cannot carry redaction semantics"
+                )
+            unsupported=set(selector)-{"operation","datatype","value","mask","redact_result"}
+            if unsupported:
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} var_ref carries unsupported semantics: "
+                    + ", ".join(sorted(unsupported))
+                )
+            source=selector.get("value")
+            if not (
+                isinstance(source,dict)
+                and set(source)=={"variable"}
+                and isinstance(source.get("variable"),str)
+            ):
+                raise ValueError(
+                    f"legacy Variable Object {object_id!r} var_ref is not one exact Variable reference"
+                )
+            variable_id=source["variable"]
+            if variable_id not in variables:
+                raise ValueError(
+                    f"Variable-source Test {test_id!r} references missing Variable {variable_id!r}"
+                )
+            test[variable_field]=variable_id
+            consumed_objects.add(object_id)
+
+        if consumed_objects:
+            other_objects={
+                identity:payload
+                for identity,payload in objects.items()
+                if identity not in consumed_objects
+            }
+            remaining_graph={
+                "objects":other_objects,
+                "variables":assessment.get("variables") or {},
+                "states":states,
+                "tests":tests,
+                "evaluate":assessment.get("evaluate"),
+            }
+            for object_id in sorted(consumed_objects):
+                if explicit_object_refs(remaining_graph,object_id):
+                    raise ValueError(
+                        f"legacy Variable Object {object_id!r} has non-Test graph consumers"
+                    )
+                del objects[object_id]
+
+    elif test_source.get("kind")=="none":
         singleton_ids={
             object_id
             for object_id,obj in objects.items()

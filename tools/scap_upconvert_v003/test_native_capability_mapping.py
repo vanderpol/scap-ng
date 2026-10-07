@@ -439,5 +439,165 @@ class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
             apply_capability_mapping(doc,mapping)
 
 
+class V03ProductionMappingTests(unittest.TestCase):
+    def mapping(self,name):
+        return json.loads(
+            (ROOT/"schema/v0.3.0/capability-mappings/supported"/name).read_text(
+                encoding="utf-8"
+            )
+        )
+
+    def variable_document(self):
+        return {"assessment":{
+            "objects":{"mount-options-variable-object":{
+                "object_title":"Mount options for /tmp in /etc/fstab",
+                "capability":"independent.variable",
+                "select":{"var_ref":{
+                    "operation":"equals",
+                    "datatype":"string",
+                    "value":{"variable":"mount-options-variable"},
+                }},
+            }},
+            "variables":{"mount-options-variable":{
+                "title":"Mount options for /tmp in /etc/fstab",
+                "kind":"local",
+                "datatype":"string",
+                "expression":{"split":{
+                    "value":{"literal":"rw,nodev,nosuid"},
+                    "delimiter":",",
+                }},
+            }},
+            "states":{"nodev-state":{
+                "state_title":"contains nodev",
+                "capability":"independent.variable",
+                "state":{
+                    "field":"value",
+                    "value":"nodev",
+                    "operation":"equals",
+                    "datatype":"string",
+                    "entity_check":"at least one",
+                    "entity_existence":"at_least_one_exists",
+                },
+            }},
+            "tests":{"nodev-test":{
+                "test_title":"computed mount options contain nodev",
+                "capability":"independent.variable",
+                "object":"mount-options-variable-object",
+                "check_existence":"at_least_one_exists",
+                "check":"all",
+                "states":["nodev-state"],
+            }},
+        }}
+
+    def test_v03_variable_value_removes_only_legacy_object_indirection(self):
+        mapping=self.mapping("variable.value.json")
+        self.assertTrue(mapping["native"]["post_alignment_ready"])
+        out=apply_capability_mapping(self.variable_document(),mapping)
+        assessment=out["assessment"]
+        self.assertNotIn("mount-options-variable-object",assessment["objects"])
+        self.assertIn("mount-options-variable",assessment["variables"])
+        test=assessment["tests"]["nodev-test"]
+        self.assertEqual(test["capability"],"variable.value")
+        self.assertEqual(test["variable"],"mount-options-variable")
+        self.assertNotIn("object",test)
+        self.assertEqual(test["existence"],"one_or_more")
+        self.assertEqual(test["match"],"all")
+        state=assessment["states"]["nodev-state"]
+        self.assertEqual(state["capability"],"variable.value")
+        self.assertEqual(state["state"]["field"],"value")
+        self.assertEqual(state["state"]["operation"],"equals")
+        self.assertEqual(state["state"]["match"],"one_or_more")
+        self.assertEqual(state["state"]["existence"],"one_or_more")
+
+    def test_v03_variable_value_rejects_nonidentity_var_ref(self):
+        doc=self.variable_document()
+        doc["assessment"]["objects"]["mount-options-variable-object"]["select"]["var_ref"][
+            "operation"
+        ]="pattern match"
+        with self.assertRaisesRegex(ValueError,"var_ref must use equality"):
+            apply_capability_mapping(doc,self.mapping("variable.value.json"))
+
+    def test_v03_variable_value_rejects_missing_named_variable(self):
+        doc=self.variable_document()
+        doc["assessment"]["objects"]["mount-options-variable-object"]["select"]["var_ref"][
+            "value"
+        ]={"variable":"missing-variable"}
+        with self.assertRaisesRegex(ValueError,"missing Variable"):
+            apply_capability_mapping(doc,self.mapping("variable.value.json"))
+
+    def test_v03_registry_uses_native_hive_type_and_test_vocabulary(self):
+        mapping=self.mapping("windows.registry.json")
+        self.assertTrue(mapping["native"]["post_alignment_ready"])
+        doc={"assessment":{
+            "objects":{"policy-object":{
+                "object_title":"Policy value",
+                "capability":"windows.registry",
+                "select":{
+                    "hive":{"value":"HKEY_LOCAL_MACHINE","operation":"equals","datatype":"string"},
+                    "key":{"value":"SOFTWARE\\\\Policies\\\\Example","operation":"equals","datatype":"string"},
+                    "name":{"value":"Enabled","operation":"equals","datatype":"string"},
+                },
+            }},
+            "states":{
+                "enabled-state":{
+                    "state_title":"Enabled DWORD",
+                    "capability":"windows.registry",
+                    "state":{"all":[
+                        {
+                            "field":"type",
+                            "value":"reg_dword",
+                            "operation":"equals",
+                            "datatype":"string",
+                            "entity_check":"all",
+                            "entity_existence":"at_least_one_exists",
+                        },
+                        {
+                            "field":"value",
+                            "value":"1",
+                            "operation":"equals",
+                            "datatype":"int",
+                            "entity_check":"all",
+                            "entity_existence":"at_least_one_exists",
+                        },
+                    ]},
+                },
+                "enabled-state-2":{
+                    "state_title":"Second state",
+                    "capability":"windows.registry",
+                    "state":{
+                        "field":"value",
+                        "value":"1",
+                        "operation":"equals",
+                        "datatype":"int",
+                        "entity_check":"all",
+                        "entity_existence":"at_least_one_exists",
+                    },
+                },
+            },
+            "tests":{"policy-test":{
+                "test_title":"Policy enabled",
+                "capability":"windows.registry",
+                "object":"policy-object",
+                "check_existence":"at_least_one_exists",
+                "check":"all",
+                "state_operator":"XOR",
+                "states":["enabled-state","enabled-state-2"],
+            }},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["policy-object"]
+        self.assertEqual(obj["select"]["hive"],"local_machine")
+        self.assertEqual(obj["select"]["key"]["operation"],"equals")
+        state=out["assessment"]["states"]["enabled-state"]["state"]
+        self.assertEqual(state["all"][0]["field"],"type")
+        self.assertEqual(state["all"][0]["value"],"dword")
+        self.assertEqual(state["all"][1]["datatype"],"integer")
+        test=out["assessment"]["tests"]["policy-test"]
+        self.assertEqual(test["existence"],"one_or_more")
+        self.assertEqual(test["match"],"all")
+        self.assertEqual(test["states_match"],"odd")
+        self.assertNotIn("state_operator",test)
+
+
 if __name__=="__main__":
     unittest.main()

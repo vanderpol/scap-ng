@@ -136,8 +136,11 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
             inline_private_object_consumers=True,
-            inline_private_variables=True,
-            inline_private_local_variables=True,
+            # Named Variables remain first-class for genuine runtime/expression
+            # dataflow. Only the exact compile-time static-literal pass above may
+            # remove Variables in the accepted 0.3 review candidate.
+            inline_private_variables=False,
+            inline_private_local_variables=False,
         )
         expanded=reexpand(rendered,identity)
         if expanded!=static_doc:
@@ -240,8 +243,8 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "This tree starts from the pinned faithful SCAP 1.4 conversion and applies "
         "only the currently proven modernization stack: consumer locality, private "
         "Set operands, Variable-local Objects, compile-time static literal "
-        "folding, single-use external/constant and leaf-derived Variable locality, "
-        "recursive private Object locality, and bounded foreach v1. Shared "
+        "folding while genuine computed Variables remain named, recursive private "
+        "Object locality, and bounded foreach v1. Shared "
         "Observation opportunities are measured "
         "separately but are deferred beyond normative 0.3 and are not rendered.\n\n"
         "The accompanying scorecard explains what changed and what deliberately "
