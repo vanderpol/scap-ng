@@ -99,6 +99,11 @@ jobs:
           if len(matched)!=3:
               raise SystemExit(f"expected 3 event-log Assessments, found {len(matched)}: {matched}")
           PY
+      - name: Verify Windows event-log family template
+        if: matrix.key == 'windows-server-2025'
+        run: |
+          python scap-ng/tools/analyze_windows_eventlog_family.py "work/source/windows-server-2025" \
+            --output focused-event-log/analysis.json
       - uses: actions/upload-artifact@v4
         with:
           name: residual-complexity-${{ matrix.key }}
