@@ -80,7 +80,7 @@ class ForeachV03Integration(unittest.TestCase):
         }
 
     def test_generated_03_schema_accepts_simple_binding(self):
-        self.validate_file_object(self.base_assessment()["shared_objects"]["files"])
+        self.validate_file_object(self.base_assessment()["shared_objects"]["files-object"])
 
     def test_generated_02_schema_rejects_foreach(self):
         mapping=load(V02/"capability-mappings/supported/unix.file.json")
@@ -95,7 +95,7 @@ class ForeachV03Integration(unittest.TestCase):
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.Draft202012Validator(
                 schema["$defs"]["object"],registry=registry
-            ).validate(self.base_assessment()["shared_objects"]["files"])
+            ).validate(self.base_assessment()["shared_objects"]["files-object"])
 
     def test_semantics_accept_home_dir_to_directory(self):
         rows=validate_assessment_capability_semantics(self.base_assessment())
@@ -103,19 +103,19 @@ class ForeachV03Integration(unittest.TestCase):
 
     def test_semantics_reject_wrong_alias(self):
         doc=self.base_assessment()
-        doc["shared_objects"]["files"]["select"]["directory"]["from"]="account.home_dir"
+        doc["shared_objects"]["files-object"]["select"]["directory"]["from"]="account.home_dir"
         codes={r["code"] for r in validate_assessment_capability_semantics(doc)}
         self.assertIn("foreach.binding_alias",codes)
 
     def test_semantics_reject_incompatible_datatype(self):
         doc=self.base_assessment()
-        doc["shared_objects"]["files"]["select"]["directory"]["from"]="user.last_login"
+        doc["shared_objects"]["files-object"]["select"]["directory"]["from"]="user.last_login"
         codes={r["code"] for r in validate_assessment_capability_semantics(doc)}
         self.assertIn("foreach.datatype_compatibility",codes)
 
     def test_semantics_reject_unknown_source(self):
         doc=self.base_assessment()
-        doc["shared_objects"]["files"]["for_each"]["in"]="missing-users-object"
+        doc["shared_objects"]["files-object"]["for_each"]["in"]="missing-users-object"
         codes={r["code"] for r in validate_assessment_capability_semantics(doc)}
         self.assertIn("foreach.source_missing",codes)
 
@@ -178,7 +178,7 @@ class ForeachV03Integration(unittest.TestCase):
 
     def test_semantics_reject_from_without_foreach(self):
         doc=self.base_assessment()
-        del doc["shared_objects"]["files"]["for_each"]
+        del doc["shared_objects"]["files-object"]["for_each"]
         codes={r["code"] for r in validate_assessment_capability_semantics(doc)}
         self.assertIn("foreach.from_without_for_each",codes)
 
