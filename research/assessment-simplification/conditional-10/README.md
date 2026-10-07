@@ -93,6 +93,27 @@ These are naturally read as a branch selected by target state/configuration.
 - Windows Server DNS: SV-259341 — forwarder presence determines the allowed
   recursion state.
 
+### Windows Server role/domain proof update
+
+The current generic enum-guard recognizer now covers all six Server 2025
+role/domain user-right fixtures in the focused production matrix:
+
+- SV-278004
+- SV-278005
+- SV-278184
+- SV-278185
+- SV-278187
+- SV-278188
+
+SV-278184 and SV-278185 exposed a stale workflow expectation rather than a
+recognizer gap. Their source guards compare the same WMI `domainrole` field
+against disjoint values. Because the value sets are not exhaustive, the
+rewritten else branch retains the second guard instead of treating "not the
+first role" as automatically meaning "the second role".
+
+The existing overlap/existence refusal tests remain the boundary: overlapping
+enum sets or non-positive guard existence are not rewritten.
+
 ### Alternative compliance paths — 8
 
 These should remain ordinary `any` / alternatives rather than being forced
