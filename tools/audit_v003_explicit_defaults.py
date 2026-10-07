@@ -84,7 +84,7 @@ def audit_doc(document, source="<memory>"):
         inspect(assertion.get("states"), f"checks.{key}.assert.states")
     for key, test in (assessment.get("tests") or {}).items():
         totals["tests"] += 1
-        if assessment.get("specification", {}).get("version") == "0.2.0" and "reported_elements" not in test:
+        if assessment.get("specification", {}).get("version") in {"0.2.0","0.3.0"} and "reported_elements" not in test:
             issue("HIDDEN_TEST_DEFAULT_REPORTED_ELEMENTS", f"tests.{key}")
 
     for key, variable in (assessment.get("variables") or {}).items():
