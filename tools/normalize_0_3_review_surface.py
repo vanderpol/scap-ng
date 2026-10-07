@@ -105,6 +105,130 @@ FILESYSTEM = {
 }
 
 
+COMPONENT_TYPES = ("object", "state", "variable", "test", "input")
+
+
+def canonical_component_id(value:str,kind:str)->str:
+    """Return the 0.3 meaningful-name-type form for one named component."""
+    if kind not in COMPONENT_TYPES:
+        raise ValueError(f"unknown component kind: {kind}")
+    text=value.strip().lower()
+    text=re.sub(r"[^a-z0-9]+","-",text).strip("-")
+    # Normalize legacy prefix forms such as test-foo/state-foo.
+    prefix=f"{kind}-"
+    if text.startswith(prefix):
+        text=text[len(prefix):]
+    # Normalize legacy collision placement such as foo-object-2.
+    m=re.fullmatch(rf"(.+)-{re.escape(kind)}-(\d+)",text)
+    if m:
+        text=f"{m.group(1)}-{m.group(2)}"
+    elif text.endswith(f"-{kind}"):
+        text=text[:-(len(kind)+1)]
+    text=text.strip("-") or kind
+    return f"{text}-{kind}"
+
+
+def component_id_maps(assessment:dict)->dict[str,dict[str,str]]:
+    """Build deterministic old->new maps, resolving collisions before type suffix."""
+    maps={}
+    sections={
+        "object":"objects",
+        "state":"states",
+        "variable":"variables",
+        "test":"tests",
+        "input":"inputs",
+    }
+    for kind,section in sections.items():
+        payload=assessment.get(section)
+        if not isinstance(payload,dict):
+            continue
+        used=set()
+        mapping={}
+        for old in payload:
+            base=canonical_component_id(str(old),kind)
+            stem=base[:-(len(kind)+1)]
+            candidate=base
+            n=2
+            while candidate in used:
+                candidate=f"{stem}-{n}-{kind}"
+                n+=1
+            used.add(candidate)
+            mapping[str(old)]=candidate
+        maps[kind]=mapping
+    return maps
+
+
+def rewrite_component_references(value:Any,maps:dict[str,dict[str,str]],path=())->Any:
+    """Rewrite typed Assessment-local component references after declaration rename."""
+    if isinstance(value,list):
+        # State arrays are a uniquely typed reference position.
+        if path and path[-1]=="states":
+            smap=maps.get("state",{})
+            return [smap.get(x,x) if isinstance(x,str) else rewrite_component_references(x,maps,path+(i,))
+                    for i,x in enumerate(value)]
+        return [rewrite_component_references(v,maps,path+(i,)) for i,v in enumerate(value)]
+    if not isinstance(value,dict):
+        return value
+
+    out={}
+    for key,item in value.items():
+        rewritten=item
+        if isinstance(item,str):
+            if key=="object":
+                rewritten=maps.get("object",{}).get(item,item)
+            elif key=="state":
+                rewritten=maps.get("state",{}).get(item,item)
+            elif key=="variable":
+                rewritten=maps.get("variable",{}).get(item,item)
+            elif key=="test":
+                rewritten=maps.get("test",{}).get(item,item)
+            elif key=="input":
+                rewritten=maps.get("input",{}).get(item,item)
+            elif key=="in" and path and path[-1]=="for_each":
+                rewritten=maps.get("object",{}).get(item,item)
+        out[key]=rewrite_component_references(rewritten,maps,path+(key,))
+    return out
+
+
+def normalize_assessment_component_ids(doc:dict,changes:list[dict])->dict:
+    assessment=doc.get("assessment")
+    if not isinstance(assessment,dict):
+        return doc
+    maps=component_id_maps(assessment)
+    if not maps:
+        return doc
+
+    out=copy.deepcopy(doc)
+    a=out["assessment"]
+    sections={
+        "object":"objects",
+        "state":"states",
+        "variable":"variables",
+        "test":"tests",
+        "input":"inputs",
+    }
+    for kind,section in sections.items():
+        payload=a.get(section)
+        mapping=maps.get(kind,{})
+        if not isinstance(payload,dict) or not mapping:
+            continue
+        renamed={}
+        for old,node in payload.items():
+            new=mapping[str(old)]
+            renamed[new]=node
+            if new!=old:
+                changes.append({
+                    "path":["assessment",section,str(old)],
+                    "original_component_id":str(old),
+                    "candidate_component_id":new,
+                    "component_type":kind,
+                })
+        a[section]=renamed
+
+    out["assessment"]=rewrite_component_references(a,maps,("assessment",))
+    return out
+
+
 def dump_yaml(value:Any)->str:
     return yaml.safe_dump(value,sort_keys=False,width=120,allow_unicode=True)
 
@@ -235,6 +359,7 @@ def normalize_tree(root:Path)->dict:
             continue
         local_changes=[]
         candidate=normalize_scalar_tree(doc,(),local_changes)
+        candidate=normalize_assessment_component_ids(candidate,local_changes)
         candidate=replace_strings(candidate,file_map,id_map,local_changes)
         if candidate!=doc:
             path.write_text(dump_yaml(candidate),encoding="utf-8")
@@ -276,6 +401,10 @@ def normalize_tree(root:Path)->dict:
             "logical_any":"retained for OR semantics",
             "comparison_operations":"full-word snake_case",
             "filesystem_scope":["all","local","same"],
+            "named_component_ids":"<meaningful-name>-<component-type>",
+            "component_type_suffixes":[
+                "-object","-state","-variable","-test","-input"
+            ],
         },
     }
 
