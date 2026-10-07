@@ -227,40 +227,57 @@ def resolve_assessment(source_root: Path, rule_path: Path, ref: str) -> tuple[Pa
 
 
 def validate_draft_expression_assessments(assessments, *, allow_unpromoted_conversion_vocabulary=False):
-    """Validate the explicit 0.2.0 slice after dependency binding, not 0.1.0."""
+    """Validate active pre-alpha Assessment versions after dependency binding."""
     from validate_native_json_schemas import build_validators, document_errors
     from assessment_expression import AssessmentExpressionEvaluator
     from reported_elements import source_errors
     from capability_registry import draft_capabilities
     from validate_generated_capability_semantics import validate_assessment_capability_semantics
-    new_capabilities = draft_capabilities()
-    validators = None
+
+    supported_versions={"0.2.0","0.3.0"}
+    validators_by_version={}
+    root=Path(__file__).resolve().parents[1]
+
     for aid, assessment in assessments.items():
-        has_new_capability = any(
-            isinstance(node, dict) and isinstance(node.get("capability"), str) and node["capability"] in new_capabilities
-            for section in ["objects", "states", "tests"]
-            for node in (assessment.get(section, {}) if isinstance(assessment.get(section, {}), dict) else {}).values()
-        )
-        if assessment.get("specification", {}).get("version") != "0.2.0":
-            if has_new_capability:
-                raise ValueError(f"{aid}: new capability requires specification 0.2.0")
+        version=(assessment.get("specification") or {}).get("version")
+        if version not in supported_versions:
             continue
-        if validators is None:
-            validators = build_validators(Path(__file__).resolve().parents[1] / "schema/v0.2.0")
+
+        named_object_section="shared_objects" if version=="0.3.0" else "objects"
+        capabilities=draft_capabilities(version=version)
+        has_new_capability = any(
+            isinstance(node, dict)
+            and isinstance(node.get("capability"), str)
+            and node["capability"] in capabilities
+            for section in [named_object_section, "states", "tests"]
+            for node in (
+                assessment.get(section, {})
+                if isinstance(assessment.get(section, {}), dict)
+                else {}
+            ).values()
+        )
+
+        if version not in validators_by_version:
+            validators_by_version[version]=build_validators(root/f"schema/v{version}")
+        validators=validators_by_version[version]
+
         errors = list(document_errors(
             validators["assessment.schema.json"],
             {"assessment": assessment},
             allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
         ))
         if errors:
-            raise ValueError(f"{aid}: invalid 0.2.0 Assessment: {errors[0].message}")
+            raise ValueError(f"{aid}: invalid {version} Assessment: {errors[0].message}")
+
         if has_new_capability:
             graph_errors = validate_assessment_capability_semantics(assessment)
             if graph_errors:
                 raise ValueError(f"{aid}: incompatible capability graph: {graph_errors[0]['message']}")
+
         reporting_errors = source_errors(assessment)
         if reporting_errors:
             raise ValueError(f"{aid}: invalid reported_elements: {reporting_errors[0]}")
+
         graph = {}
         def collect(identity):
             if identity in graph:
