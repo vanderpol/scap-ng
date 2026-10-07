@@ -384,8 +384,9 @@ tests:
       ...
 ```
 
-The 65-package modernization census reduces top-level Objects from 13,402 to 491
-and States from 9,121 to 435 while preserving exact re-expansion.
+The post-freeze 65-package census removes more than 95% of top-level Object/State
+registry entries while preserving exact re-expansion. Final checkpoint counts are
+regenerated from the frozen build stack rather than copied from earlier research runs.
 
 ## Static values without Variable plumbing
 
@@ -398,6 +399,41 @@ explicit. Named Variables remain for genuine runtime computation/dataflow.
 
 This simplification does not replace Object-derived Variables or runtime
 iteration.
+
+Example:
+
+```yaml
+select:
+  shell:
+    value: ["/bin/bash", "/bin/sh"]
+    datatype: string
+    variable_match: one_or_more
+```
+
+The literal collection keeps the source-equivalent datatype and quantifier;
+array syntax does not silently mean OR/ANY.
+
+## Predictable named component IDs
+
+**SCAP 1.4:** IDs often encode XML type/version namespaces and generated source
+identity, which makes repository searching noisy.
+
+**SCAP-NG 0.3:** Named internal components use meaningful kebab-case IDs ending
+in their type.
+
+```yaml
+shared_objects:
+  forward-zones-object: ...
+
+variables:
+  zone-names-variable: ...
+
+tests:
+  zone-signing-test: ...
+```
+
+Inline/private components do not receive artificial IDs solely to satisfy the
+naming convention.
 
 ## Runtime collection `for_each`
 
@@ -421,7 +457,34 @@ select:
 Nested collected-data iteration is also an accepted 0.3 requirement. It remains
 collection iteration—not “run one Test per Item”—and must retain outer-binding
 lineage, explicit correlation, completeness/error semantics, and cycle/resource
-protection. The DNS benchmark is the primary nested proving family.
+protection.
+
+```yaml
+shared_objects:
+  zones-object: ...
+
+  hosts-object:
+    for_each:
+      item: zone
+      in: zones-object
+    select:
+      zone:
+        from: zone.name
+
+  dnssec-responses-object:
+    for_each:
+      item: host
+      in: hosts-object
+    select:
+      name:
+        from: host.fqdn
+      zone:
+        from: zone.name
+```
+
+Here the inner collection inherits the correlated outer `zone` lineage; this
+does not imply an independent Cartesian product. The DNS benchmark is the primary
+production proving family.
 
 # Deferred beyond normative 0.3
 
