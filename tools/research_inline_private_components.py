@@ -160,7 +160,12 @@ def metrics(doc: dict) -> dict:
     }
 
 
-def inline_private(\n    doc: dict,\n    *,\n    inline_private_set_operands: bool = False,\n    inline_state_consumers: bool = False,\n) -> tuple[dict, dict]:
+def inline_private(
+    doc: dict,
+    *,
+    inline_private_set_operands: bool = False,
+    inline_state_consumers: bool = False,
+) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
     objects=a.get("objects") or {}
@@ -517,7 +522,8 @@ def main():
         ),
         "status":"research_only_not_accepted_design",
         "label":args.label,
-        "inline_private_set_operands":bool(args.inline_private_set_operands),\n        "inline_state_consumers":bool(args.inline_state_consumers),
+        "inline_private_set_operands":bool(args.inline_private_set_operands),
+        "inline_state_consumers":bool(args.inline_state_consumers),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -529,7 +535,8 @@ def main():
         "named_refs_before":0,"named_refs_after":0,
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
-        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,\n        "inlined_state_consumer_occurrences":0,
+        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
+        "inlined_state_consumer_occurrences":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
         "retained_object_context_counts":{},
@@ -598,7 +605,8 @@ def main():
         totals["bytes_after"]+=after["normalized_bytes"]
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
-        totals["inlined_states"]+=row["inlined_states"]\n        totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
+        totals["inlined_states"]+=row["inlined_states"]
+        totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
         for reason,count in row["retained_object_reason_counts"].items():
             totals["retained_object_reason_counts"][reason]=totals["retained_object_reason_counts"].get(reason,0)+count
         for reason,count in row["retained_state_reason_counts"].items():
