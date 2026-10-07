@@ -72,10 +72,42 @@ jobs:
             --label "$LABEL" \
             --output "report.json" \
             --top 40
+      - name: Capture focused Windows event-log family
+        if: matrix.key == 'windows-server-2025'
+        run: |
+          python - <<'PY'
+          import shutil, yaml
+          from pathlib import Path
+          wanted={"SV-278043","SV-278044","SV-278045"}
+          out=Path("focused-event-log")
+          out.mkdir(parents=True,exist_ok=True)
+          matched=[]
+          for path in Path("work/source/windows-server-2025").rglob("*.assessment.yaml"):
+              try:
+                  doc=yaml.safe_load(path.read_text(encoding="utf-8"))
+              except Exception:
+                  continue
+              aid=str(((doc or {}).get("assessment") or {}).get("id") or "")
+              if any(rule_id in aid for rule_id in wanted):
+                  dest=out/path.name
+                  shutil.copy2(path,dest)
+                  matched.append({"assessment_id":aid,"source":str(path),"artifact":dest.name})
+          (out/"manifest.json").write_text(
+              __import__("json").dumps({"matches":matched},indent=2)+"\n",
+              encoding="utf-8",
+          )
+          if len(matched)!=3:
+              raise SystemExit(f"expected 3 event-log Assessments, found {len(matched)}: {matched}")
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: residual-complexity-${{ matrix.key }}
           path: report.json
+      - uses: actions/upload-artifact@v4
+        if: matrix.key == 'windows-server-2025'
+        with:
+          name: windows-event-log-family
+          path: focused-event-log
 
   aggregate:
     name: Aggregate residual pattern census
