@@ -41,6 +41,26 @@ def scalar_reference_counts(node: Any, candidates: set[str]) -> dict[str, int]:
     return counts
 
 
+def exact_variable_ref_paths(value: Any, variable_id: str, path: tuple[Any, ...]=()):
+    """Yield paths to exact native Variable references: {variable: <id>}."""
+    if isinstance(value,dict):
+        if set(value)=={"variable"} and value.get("variable")==variable_id:
+            yield path
+            return
+        for key,child in value.items():
+            yield from exact_variable_ref_paths(child,variable_id,path+(key,))
+    elif isinstance(value,list):
+        for index,child in enumerate(value):
+            yield from exact_variable_ref_paths(child,variable_id,path+(index,))
+
+
+def path_parent(root: Any, path: list[Any] | tuple[Any, ...]):
+    current=root
+    for segment in path[:-1]:
+        current=current[segment]
+    return current,path[-1]
+
+
 def direct_test_reference_counts(
     tests: dict[str, Any],
     object_ids: set[str],
@@ -203,6 +223,7 @@ def inline_private(
     inline_private_filtered_set_operands: bool = False,
     inline_state_consumers: bool = False,
     inline_variable_object_consumers: bool = False,
+    inline_private_variables: bool = False,
 ) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
@@ -222,10 +243,12 @@ def inline_private(
         "original_sections_present":{
             "objects":"objects" in a,
             "states":"states" in a,
+            "variables":"variables" in a,
         },
         "inlined_objects":{},
         "inlined_set_operand_objects":[],
         "inlined_variable_objects":[],
+        "inlined_variables":[],
         "inlined_states":{},
         "inlined_state_consumer_occurrences":[],
         "shared_objects":[],
@@ -411,6 +434,59 @@ def inline_private(
             if remaining.get(name,0)==0:
                 states.pop(name,None)
 
+    if inline_private_variables:
+        # Bounded v5 locality experiment: localize only single-use external or
+        # constant Variables. These carry input/static-binding data, not derived
+        # runtime dataflow. Local Variables remain named for separate research.
+        variables=a.get("variables") or {}
+        for variable_id,payload in list(variables.items()):
+            if (
+                not isinstance(payload,dict)
+                or payload.get("kind") not in {"external","constant"}
+            ):
+                continue
+
+            # Count exact structured references across the complete Assessment
+            # except the Variable's own definition.
+            search_surface={
+                key:value
+                for key,value in a.items()
+                if key!="variables"
+            }
+            other_variables={
+                key:value
+                for key,value in variables.items()
+                if key!=variable_id
+            }
+            refs=list(exact_variable_ref_paths(search_surface,variable_id))
+            refs.extend(
+                ("variables",)+path
+                for path in exact_variable_ref_paths(other_variables,variable_id)
+            )
+            if len(refs)!=1:
+                continue
+
+            path=list(refs[0])
+            parent,last=path_parent(a,path)
+            node=parent[last]
+            if node!={"variable":variable_id}:
+                continue
+
+            # Research-only local form. The payload is preserved verbatim so
+            # re-expansion can prove exact structural identity.
+            parent[last]={"variable":copy.deepcopy(payload)}
+            identity["inlined_variables"].append({
+                "variable":variable_id,
+                "kind":payload.get("kind"),
+                "path":path,
+            })
+            variables.pop(variable_id)
+
+        if variables:
+            a["variables"]=variables
+        else:
+            a.pop("variables",None)
+
     if objects:
         a["objects"]=objects
         identity["shared_objects"]=sorted(objects)
@@ -447,12 +523,27 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     a=out["assessment"]
     tests=a.get("tests") or {}
     states=copy.deepcopy(a.get("states") or {})
+    variables=copy.deepcopy(a.get("variables") or {})
 
-    def path_parent(root: Any, path: list[Any]):
-        current=root
-        for segment in path[:-1]:
-            current=current[segment]
-        return current,path[-1]
+    # Restore private Variables before moving inline Objects/States back to
+    # Assessment scope because recorded paths describe the rendered tree.
+    for row in identity.get("inlined_variables",[]):
+        parent,last=path_parent(a,row["path"])
+        node=parent[last]
+        if (
+            not isinstance(node,dict)
+            or set(node)!={"variable"}
+            or not isinstance(node["variable"],dict)
+        ):
+            raise ValueError(
+                f"missing inline Variable payload for {row['variable']!r}"
+            )
+        payload=copy.deepcopy(node["variable"])
+        original=row["variable"]
+        if original in variables and variables[original] != payload:
+            raise ValueError(f"private Variable payload mismatch for {original!r}")
+        variables[original]=payload
+        parent[last]={"variable":original}
 
     # Restore consumer-local copies before moving any inline Objects back to
     # Assessment scope, because recorded paths describe the rendered tree.
@@ -532,6 +623,10 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         a["states"]=states
     else:
         a.pop("states",None)
+    if variables or present.get("variables"):
+        a["variables"]=variables
+    else:
+        a.pop("variables",None)
     return out
 
 
