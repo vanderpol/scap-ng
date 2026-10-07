@@ -82,7 +82,7 @@ class FullModernizationCensusTests(unittest.TestCase):
             self.assertEqual(s["private_external_variables_localized"],1)
             self.assertNotIn("derived_variable_graph",row["residual_reasons"])
 
-    def test_local_derived_variable_remains_complex(self):
+    def test_single_use_leaf_derived_variable_localizes(self):
         with tempfile.TemporaryDirectory() as td:
             self.write_assessment(td,"local-variable",{
                 "id":"benchmark.test.SV-local.automated",
@@ -108,13 +108,70 @@ class FullModernizationCensusTests(unittest.TestCase):
                     "derived-path":{
                         "kind":"local",
                         "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"values":{"object":"source","field":"path"}},
+                                {"literal":{"value":"/x","datatype":"string"}},
+                            ]
+                        },
+                    }
+                },
+                "tests":{"test":{"capability":"unix.file","object":"target"}},
+                "evaluate":{"test":"test"},
+            })
+            report=build_report(Path(td),label="synthetic")
+            row=report["assessments"][0]
+            s=report["summary"]
+            self.assertEqual(row["classification"],"local_simple")
+            self.assertNotIn("derived_variable_graph",row["residual_reasons"])
+            self.assertEqual(row["after"]["variables"],0)
+            self.assertEqual(s["private_local_variables_localized"],1)
+
+    def test_shared_local_derived_variable_remains_complex(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.write_assessment(td,"shared-local-variable",{
+                "id":"benchmark.test.SV-shared-local.automated",
+                "version":1,
+                "mode":"automated",
+                "purpose":"assessment",
+                "class":"compliance",
+                "objects":{
+                    "source":{"capability":"unix.file","select":{"path":"/tmp/source"}},
+                    "a":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "value":{"variable":"derived-path"},
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                            }
+                        },
+                    },
+                    "b":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "value":{"variable":"derived-path"},
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "derived-path":{
+                        "kind":"local",
+                        "datatype":"string",
                         "expression":{"values":{"object":"source","field":"path"}},
                     }
                 },
                 "tests":{
-                    "test":{"capability":"unix.file","object":"target"}
+                    "one":{"capability":"unix.file","object":"a"},
+                    "two":{"capability":"unix.file","object":"b"},
                 },
-                "evaluate":{"test":"test"},
+                "evaluate":{"all":[{"test":"one"},{"test":"two"}]},
             })
             report=build_report(Path(td),label="synthetic")
             row=report["assessments"][0]
