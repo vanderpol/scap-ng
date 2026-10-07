@@ -168,9 +168,22 @@ Focused negative coverage rejects private Observation-node access.
 Workflow:
 https://github.com/vanderpol/scap-ng/actions/runs/37619423430
 
-This proves source extraction and exact flattening only. Runtime execution,
-status/completeness propagation, package-manifest typing, cycle handling, and
-collector reuse remain research before promotion.
+This proves source extraction and exact flattening for the publisher-clone
+family. Windows Server 2025 separately proves a shared `kind: items` WMI
+export across 12 consumers.
+
+RHEL 9 now supplies the source-ID-fanout proof: SV-258013, SV-258020, and
+SV-258026 share one dconf acquisition Object and its derived lock-directory
+Variable. A single Observation exports both `databases` Items and
+`lock_directories` values; all **3/3** consumers flatten exactly back to the
+faithful conversion with **0 rejected**.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37628881725
+
+Together the three proofs cover publisher-cloned value graphs, source-shared
+Item acquisition, and source-shared mixed Item/value dataflow. Runtime
+result/provenance details remain research before normative promotion.
 
 ## Open naming decision
 
