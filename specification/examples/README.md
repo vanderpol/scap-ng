@@ -3,6 +3,17 @@
 Examples are supporting material for the specification. They do not override the
 normative text and are not automatically accepted merely because they validate.
 
+## Version rule
+
+The active examples track the active prerelease specification. Each published
+prerelease/review checkpoint SHALL regenerate or revalidate its source and result
+examples against the exact schema/specification version being reviewed. A sample
+from an older prerelease must not be presented as current merely because it still
+parses.
+
+Completed review iterations preserve their exact example set immutably under
+`review/iterations/`.
+
 ## Source examples
 
 Start with these small native Assessment examples:
