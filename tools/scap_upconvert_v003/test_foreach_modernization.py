@@ -386,14 +386,24 @@ class ForeachConverterModernization(unittest.TestCase):
         assessment = modern["assessment"]
         self.assertEqual(assessment["specification"]["version"], "0.3.0")
         self.assertNotIn("variables", assessment)
-        foreach_objects = {
-            object_id: obj
-            for object_id, obj in assessment["objects"].items()
-            if isinstance(obj, dict) and "for_each" in obj
-        }
+        foreach_objects = []
+        for object_id,obj in assessment["objects"].items():
+            if not isinstance(obj,dict):
+                continue
+            if "for_each" in obj:
+                foreach_objects.append((object_id,obj,[]))
+                continue
+            set_expr=obj.get("set")
+            if not isinstance(set_expr,dict):
+                continue
+            for operand in set_expr.get("operands") or []:
+                inner=operand.get("object") if isinstance(operand,dict) else None
+                if isinstance(inner,dict) and "for_each" in inner:
+                    foreach_objects.append((object_id,inner,operand.get("filters") or []))
         self.assertEqual(len(foreach_objects), 2, foreach_objects)
-        for obj in foreach_objects.values():
+        for _, obj, filters in foreach_objects:
             self.assertEqual(obj["for_each"]["item"], "user")
+            self.assertTrue(filters, "production filtered Object must retain its OVAL filter")
             bound = [
                 spec["from"]
                 for spec in obj.get("select", {}).values()
