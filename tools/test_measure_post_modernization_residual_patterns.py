@@ -94,7 +94,7 @@ class ResidualPatternTests(unittest.TestCase):
             self.assertEqual(r["set_filter_rules"],1)
             self.assertGreaterEqual(r["unique_set_filter_pattern_signatures"],1)
 
-    def test_build_report_counts_local_derived_variable(self):
+    def test_build_report_localizes_leaf_derived_variable(self):
         with tempfile.TemporaryDirectory() as td:
             self.write(td,"var",{
                 "id":"benchmark.test.SV-var.automated",
@@ -132,9 +132,57 @@ class ResidualPatternTests(unittest.TestCase):
                 "evaluate":{"test":"test"},
             })
             r=build_report(Path(td),"synthetic")
+            self.assertEqual(r["complex_rules"],0)
+            self.assertEqual(r["derived_variable_rules"],0)
+
+    def test_build_report_retains_chained_derived_variable(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.write(td,"chain",{
+                "id":"benchmark.test.SV-chain.automated",
+                "version":1,
+                "mode":"automated",
+                "purpose":"assessment",
+                "class":"compliance",
+                "objects":{
+                    "target":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "value":{"variable":"outer"},
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "inner":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"literal":{"value":"/src","datatype":"string"}}
+                            ]
+                        },
+                    },
+                    "outer":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"variable":{"variable":"inner"}},
+                                {"literal":{"value":"/x","datatype":"string"}},
+                            ]
+                        },
+                    },
+                },
+                "tests":{"test":{"capability":"unix.file","object":"target"}},
+                "evaluate":{"test":"test"},
+            })
+            r=build_report(Path(td),"synthetic")
             self.assertEqual(r["complex_rules"],1)
             self.assertEqual(r["derived_variable_rules"],1)
-            self.assertGreaterEqual(r["derived_expression_kind_counts"].get("concat+values",0),1)
 
 
 if __name__=="__main__":
