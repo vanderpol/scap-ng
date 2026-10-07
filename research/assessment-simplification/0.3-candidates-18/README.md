@@ -1,8 +1,10 @@
 # 0.3.0 assessment-modernization candidate matrix
 
-**Status:** research checkpoint only. This is an index, not a specification.
+**Status:** historical research checkpoint only. This is an index, not a specification.
 
-Tracking issue: #174. Every candidate semantic change is tracked by a GitHub issue before promotion.
+> **Superseded for release scope:** final 0.3 IN / DEFER / OUT dispositions are maintained in [#174](https://github.com/vanderpol/scap-ng/issues/174), with the canonical deferred list in [`specification/deferred-after-0.3.md`](../../../specification/deferred-after-0.3.md). Candidate labels below record the state of the research at this checkpoint and do not override those later decisions.
+
+Tracking issue: #174.
 
 | Candidate | Evidence | Current position | Remaining blocker before schema work |
 | --- | --- | --- | --- |
