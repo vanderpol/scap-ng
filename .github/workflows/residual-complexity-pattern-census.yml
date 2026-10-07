@@ -88,7 +88,7 @@ jobs:
               except Exception:
                   continue
               aid=str(((doc or {}).get("assessment") or {}).get("id") or "")
-              if any(rule_id in aid for rule_id in wanted):
+              if aid.endswith(".automated") and any(rule_id in aid for rule_id in wanted):
                   dest=out/path.name
                   shutil.copy2(path,dest)
                   matched.append({"assessment_id":aid,"source":str(path),"artifact":dest.name})
