@@ -54,6 +54,18 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         self.assertEqual(identity["inlined_states"],{
             "private-state":"assessment.tests.one.states[0]",
         })
+        self.assertEqual(
+            identity["retained_object_reasons"]["shared-object"],
+            "multiple_tests",
+        )
+        self.assertEqual(
+            identity["retained_object_reasons"]["variable-source"],
+            "graph_only",
+        )
+        self.assertEqual(
+            identity["retained_state_reasons"]["shared-state"],
+            "multiple_tests",
+        )
 
     def test_variable_reference_prevents_object_inlining(self):
         source=self.base()
@@ -65,6 +77,10 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         rendered,identity=inline_private(source)
         self.assertEqual(rendered["assessment"]["tests"]["one"]["object"],"private-object")
         self.assertNotIn("private-object",identity["inlined_objects"])
+        self.assertEqual(
+            identity["retained_object_reasons"]["private-object"],
+            "test_and_graph",
+        )
 
     def test_reexpand_is_structurally_identical(self):
         source=self.base()
