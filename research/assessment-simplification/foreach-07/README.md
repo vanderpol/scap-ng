@@ -275,6 +275,38 @@ foreach:
 The concrete syntax is still research. The important part is the desugaring,
 not the spelling.
 
+### Measured production result
+
+The focused GitHub workflow now runs this analyzer against pinned production
+RHEL 9 V2R9 and Solaris 11 X86 V3R5 packages.
+
+For RHEL 9 the analyzer found:
+
+- 3 unary-literal-`concat` Variables in the OVAL component;
+- 1 globally eligible single-consumer Variable;
+- 2 globally ineligible Variables;
+- **4 eligible target-scoped consumers** after applying the Rule/Assessment
+  boundary; and
+- 1 target-scoped consumer that remains ineligible.
+
+The four eligible target-scoped opportunities are:
+
+- the audit-data-directory -> fstab-pattern derivation; and
+- the three dconf lock Rules that share one source OVAL Variable but become
+  independent single-consumer graphs when converted per Rule.
+
+The ineligible RHEL case derives a shell command and uses effective
+`var_check=all`; it correctly remains outside this proof class.
+
+For Solaris 11 X86 the analyzer found one unary-literal-`concat` Variable but
+no eligible target-scoped consumer.
+
+The successful workflow also retained the original direct-projection proof:
+RHEL 9 had 4 direct candidates verified equivalent, and Solaris had 1.
+
+Machine-readable contract:
+[transformation-unary-concat-v1.json](transformation-unary-concat-v1.json).
+
 ### Boundary examples
 
 The same RHEL corpus contains useful counterexamples:
