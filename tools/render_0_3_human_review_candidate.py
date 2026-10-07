@@ -34,6 +34,7 @@ from research_inline_private_components import (
     reexpand,
 )
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
+from normalize_0_3_review_surface import normalize_tree
 
 
 def dump_yaml(value:Any)->str:
@@ -210,7 +211,16 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         target.parent.mkdir(parents=True,exist_ok=True)
         target.write_text(dump_yaml(observation),encoding="utf-8")
 
+    # Final presentation-only 0.3 review surface. This does not participate in
+    # semantic equivalence claims above; it reconciles known 0.3 terminology
+    # and redundant benchmark-local naming for human review.
+    surface_report=normalize_tree(output_root)
+
     evidence_dir.mkdir(parents=True,exist_ok=True)
+    (evidence_dir/"review-surface-normalization.json").write_text(
+        json.dumps(surface_report,indent=2,sort_keys=True)+"\n",
+        encoding="utf-8",
+    )
     report={
         "format":"scap-ng-0.3-human-review-render-0.1",
         "status":"research_only_not_accepted_design",
@@ -221,6 +231,13 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "observation_flatten_exact":True,
             "locality_reexpand_exact":True,
             "foreach_only_proven_v1":True,
+            "review_surface_is_presentation_only":True,
+        },
+        "review_surface_normalization":{
+            "renamed_assessment_files":len(surface_report.get("renames") or []),
+            "assessment_ids_shortened":len(surface_report.get("assessment_id_map") or {}),
+            "documents_changed":len(surface_report.get("document_changes") or []),
+            "candidate_vocabulary":surface_report.get("candidate_vocabulary"),
         },
         "observation_plan":observation_summary,
         "observation_artifacts":[
@@ -243,8 +260,13 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "leaf-derived Variable locality, bounded foreach v1, and proven shared "
         "Observation extraction.\n\n"
         "The accompanying scorecard explains what changed and what deliberately "
-        "remains complex. Human acceptance is required before these forms become "
-        "normative 0.3 schema/specification semantics.\n",
+        "remains complex. The review surface also applies the candidate 0.3 "
+        "terminology/naming normalization tracked by issues #151-#156: shorter "
+        "benchmark-local Assessment names, Test existence/match field names, "
+        "one_or_more at-least-one spelling, full-word snake_case comparison "
+        "operations, and all/local/same filesystem scope. Human acceptance is "
+        "required before these forms become normative 0.3 schema/specification "
+        "semantics.\n",
         encoding="utf-8",
     )
     return report
