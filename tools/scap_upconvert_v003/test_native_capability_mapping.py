@@ -525,6 +525,61 @@ class V03ProductionMappingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"missing Variable"):
             apply_capability_mapping(doc,self.mapping("variable.value.json"))
 
+    def test_v03_windows_file_pattern_path_drops_inert_oval_recursion(self):
+        mapping=self.mapping("windows.file.json")
+        doc={"assessment":{
+            "objects":{"certificate-search-object":{
+                "object_title":"Search all directories for certificate files",
+                "capability":"windows.file",
+                "select":{
+                    "path":{"value":".*","operation":"pattern match","datatype":"string"},
+                    "filename":{"value":"\\\\.[Pp]12$","operation":"pattern match","datatype":"string"},
+                },
+                "behaviors":{
+                    "max_depth":"-1",
+                    "recurse":"junctions and directories",
+                    "recurse_direction":"down",
+                    "recurse_file_system":"all",
+                },
+            }},
+            "states":{},
+            "tests":{"certificate-search-test":{
+                "test_title":"Certificate files absent",
+                "capability":"windows.file",
+                "object":"certificate-search-object",
+                "check_existence":"none_exist","check":"all","states":[],
+            }},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["certificate-search-object"]
+        self.assertEqual(obj["select"]["directory"]["operation"],"pattern_match")
+        self.assertEqual(obj["select"]["name"]["operation"],"pattern_match")
+        self.assertEqual(obj["filesystem"],"all")
+        self.assertNotIn("traversal",obj)
+        self.assertNotIn("behaviors",obj)
+
+    def test_v03_pattern_path_defined_filesystem_falls_back_to_all(self):
+        mapping=self.mapping("windows.file.json")
+        doc={"assessment":{
+            "objects":{"search-object":{
+                "object_title":"Pattern directory search",
+                "capability":"windows.file",
+                "select":{
+                    "path":{"value":"C:.*","operation":"pattern match","datatype":"string"},
+                    "filename":{"value":".*","operation":"pattern match","datatype":"string"},
+                },
+                "behaviors":{
+                    "max_depth":"4","recurse":"directories",
+                    "recurse_direction":"down","recurse_file_system":"defined",
+                },
+            }},
+            "states":{},"tests":{},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["search-object"]
+        self.assertEqual(obj["filesystem"],"all")
+        self.assertNotIn("traversal",obj)
+
     def test_v03_windows_file_maps_direct_filters_without_loss(self):
         mapping=self.mapping("windows.file.json")
         self.assertTrue(mapping["native"]["post_alignment_ready"])

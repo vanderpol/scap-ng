@@ -291,13 +291,27 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
 
     select=obj.get("select") or {}
     has_full_path="full_path" in select or "filepath" in select
+    directory=select.get("directory",select.get("path"))
+    directory_operation=(
+        directory.get("operation","equals")
+        if isinstance(directory,dict)
+        else "equals"
+    )
+    path_uses_oval_equality=directory_operation in {"equal","equals"}
+
     if has_full_path and direction=="down":
         raise ValueError("OVAL file recursion is not valid with full_path selection")
-    if not has_full_path and direction=="down":
+    if not has_full_path and direction=="down" and path_uses_oval_equality:
         obj["traversal"]={
             "max_depth":None if raw_depth==-1 else raw_depth,
             "recurse":recurse,
         }
+
+    # OVAL 5.12.3 defines recurse_file_system=defined only for an equality
+    # path. With another path operation it is inert, just like recursion, so
+    # the lossless native scope is the default all-filesystems search.
+    if filesystem_source=="defined" and not path_uses_oval_equality:
+        obj["filesystem"]="all" if mapping.get("specification_version")=="0.3.0" else "any"
 
     for key in traversal_keys:
         behaviors.pop(key,None)
