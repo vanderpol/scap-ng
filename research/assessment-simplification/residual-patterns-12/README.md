@@ -207,11 +207,18 @@ Each repeats the same basic graph:
 This is not primarily a general Variable-language problem. It is a recurring
 **persistent mount configuration** domain concept.
 
-**Research hypothesis:** consider whether `linux.partition` should expose
-configured/persistent mount facts in addition to active mount facts, or whether
-a sibling typed capability should do so. A native collector/parser could avoid
-reimplementing fstab parsing through regex + split while preserving typed
-evidence.
+**Follow-up result:** [fstab-13](../fstab-13/README.md) found 23 RHEL
+Assessments that read `/etc/fstab`, not just these five. OVAL 5.12.3 keeps
+mounted `linux.partition` facts distinct from persistent configuration, so a
+sibling typed record capability such as `linux.fstab` is the cleaner native
+authoring direction.
+
+The five split-Variable Rules **cannot** be automatically collapsed to one
+ordinary typed Test without changing six-state behavior: incomplete source
+collection drives the source `split`/Variable path to `error`, while an
+ordinary typed Test yields `unknown` or a decisive `false`. Treat the typed
+collector as a native-authoring opportunity, not a proven lossless migration
+rewrite.
 
 ### 5. Dconf database-name -> locks-directory derivation — at least 3 RHEL Assessments
 
