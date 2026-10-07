@@ -403,8 +403,21 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         for reason,count in (fstats.get("review_reason_counts") or {}).items():
             foreach_review[reason]+=int(count)
 
+        static_doc,static_proof=inline_constants(foreach_doc)
+        static_restored=reexpand_constants(static_doc,static_proof)
+        if static_restored!=foreach_doc:
+            detail=first_difference(foreach_doc,static_restored) or "unknown difference"
+            raise ValueError(
+                f"static-literal round-trip mismatch for {row['relative_path']}: {detail}"
+            )
+        static_variables={entry["variable"] for entry in static_proof}
+        totals["static_constant_variables_removed"]+=len(static_variables)
+        totals["static_literal_references_replaced"]+=len(static_proof)
+        if static_variables:
+            totals["static_literal_changed_assessments"]+=1
+
         rendered,identity=inline_private(
-            foreach_doc,
+            static_doc,
             inline_private_set_operands=True,
             inline_private_filtered_set_operands=True,
             inline_state_consumers=True,
@@ -414,8 +427,8 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             inline_private_local_variables=True,
         )
         expanded=reexpand(rendered,identity)
-        if expanded!=foreach_doc:
-            detail=first_difference(foreach_doc,expanded) or "unknown difference"
+        if expanded!=static_doc:
+            detail=first_difference(static_doc,expanded) or "unknown difference"
             raise ValueError(
                 f"locality round-trip mismatch for {row['relative_path']}: {detail}"
             )
@@ -468,6 +481,10 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             "classification":category,
             "observation":observation_info,
             "foreach_rewrites":foreach_applied,
+            "static_literals":{
+                "constant_variables_removed":len(static_variables),
+                "references_replaced":len(static_proof),
+            },
             "before":{
                 "objects":before["objects"],
                 "states":before["states"],
