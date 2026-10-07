@@ -5,8 +5,8 @@ This is the single active human-review entry point.
 ## Read first
 
 1. [Core objectives](../../specification/objectives.md)
-2. [Draft specification](../../specification/README.md)
-3. [Source and result examples](../../specification/examples/README.md)
+2. [SCAP-NG feature tour and 0.3 source/result examples](../../specification/examples/README.md)
+3. [Draft specification](../../specification/README.md)
 4. [Objective-to-issue traceability](../../OBJECTIVES.md)
 
 ## Current development review
