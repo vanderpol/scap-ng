@@ -403,6 +403,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
             inline_private_variables=True,
+            inline_private_local_variables=True,
         )
         expanded=reexpand(rendered,identity)
         if expanded!=foreach_doc:
@@ -420,6 +421,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         )
         totals["private_constant_variables_localized"]+=sum(
             row.get("kind")=="constant" for row in localized_variables
+        )
+        totals["private_local_variables_localized"]+=sum(
+            row.get("kind")=="local" for row in localized_variables
         )
 
         category=classify(
@@ -474,6 +478,10 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                     row.get("kind")=="constant"
                     for row in (identity.get("inlined_variables") or [])
                 ),
+                "inlined_local_variables":sum(
+                    row.get("kind")=="local"
+                    for row in (identity.get("inlined_variables") or [])
+                ),
                 "inlined_states":len(identity.get("inlined_states") or {}),
                 "inlined_state_consumer_occurrences":len(
                     identity.get("inlined_state_consumer_occurrences") or []
@@ -526,6 +534,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                 "private Set-operand locality",
                 "Variable-local Object locality",
                 "single-use external/constant Variable locality",
+                "single-use leaf derived Variable locality",
                 "foreach.direct-object-component.at-least-one.v1",
                 "proven shared Observation extraction shapes",
             ],
