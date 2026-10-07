@@ -374,6 +374,32 @@ evidence, and caching.
 Latest successful workflow for the combined consumer-local experiment:
 https://github.com/vanderpol/scap-ng/actions/runs/37613657218
 
+## Residual State audit
+
+The 28 States left after consumer-localization are not shared predicates.
+
+Reference analysis finds **zero consumers** for all 28: no Test, Filter,
+Variable, Object graph, or evaluate expression references them.
+
+They occur in only 12 production Rules:
+
+- RHEL 9: SV-257881, SV-257890, SV-258042, SV-258045, SV-258105;
+- Windows Server 2025: SV-278028, SV-278030, SV-278138, SV-278240,
+  SV-285320, SV-285321, SV-285322.
+
+Counts:
+
+- RHEL: 10 unreachable States;
+- Windows Server 2025: 18 unreachable States.
+
+This closes an important scoping question: the production census currently
+provides **no positive example requiring an Assessment-wide State registry**
+after State predicates are allowed to live with their semantic consumers.
+
+Whether faithful conversion should retain unreachable legacy States as
+migration evidence is separate from native authoring. They SHALL NOT be used
+as evidence for a global native State scope.
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
