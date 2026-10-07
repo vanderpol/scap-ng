@@ -194,6 +194,47 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         self.assertIsInstance(operand["filters"][0]["state"],dict)
         self.assertEqual(reexpand(rendered,identity),source)
 
+    def test_variable_only_object_localizes_and_roundtrips(self):
+        source=self.base()
+        rendered,identity=inline_private(
+            source,
+            inline_variable_object_consumers=True,
+        )
+        a=rendered["assessment"]
+        embedded=a["variables"]["homes"]["expression"]["values"]["object"]
+        self.assertIsInstance(embedded,dict)
+        self.assertNotIn("variable-source",a.get("objects",{}))
+        self.assertEqual(
+            identity["inlined_variable_objects"],
+            [{
+                "object":"variable-source",
+                "path":["variables","homes","expression","values","object"],
+            }],
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_test_and_variable_shared_object_does_not_localize_to_variable(self):
+        source=self.base()
+        source["assessment"]["variables"]["other"]={
+            "kind":"local",
+            "datatype":"string",
+            "expression":{"values":{"object":"private-object","field":"filepath"}},
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_variable_object_consumers=True,
+        )
+        self.assertEqual(rendered["assessment"]["tests"]["one"]["object"],"private-object")
+        self.assertEqual(
+            rendered["assessment"]["variables"]["other"]["expression"]["values"]["object"],
+            "private-object",
+        )
+        self.assertNotIn(
+            "private-object",
+            {row["object"] for row in identity["inlined_variable_objects"]},
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_variable_reference_prevents_object_inlining(self):
         source=self.base()
         # Reuse private-object from a Variable to make it independently addressable.
