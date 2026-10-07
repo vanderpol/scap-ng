@@ -190,6 +190,7 @@ def inline_private(
     doc: dict,
     *,
     inline_private_set_operands: bool = False,
+    inline_private_filtered_set_operands: bool = False,
     inline_state_consumers: bool = False,
 ) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
@@ -250,7 +251,11 @@ def inline_private(
                     not isinstance(child_id,str)
                     or child_id not in objects
                     or refs.get(child_id)!=1
-                    or (isinstance(filters,list) and filters)
+                    or (
+                        not inline_private_filtered_set_operands
+                        and isinstance(filters,list)
+                        and filters
+                    )
                     or (filters not in (None,[]) and not isinstance(filters,list))
                 ):
                     continue
@@ -262,6 +267,7 @@ def inline_private(
                     "object":child_id,
                     "parent_object":parent_id,
                     "operand_index":index,
+                    "filter_count":len(filters) if isinstance(filters,list) else 0,
                 })
                 remove_objects.add(child_id)
 
@@ -525,6 +531,15 @@ def main():
         ),
     )
     ap.add_argument(
+        "--inline-private-filtered-set-operands",
+        action="store_true",
+        help=(
+            "Research extension: allow a single-use leaf Object to localize "
+            "inside its Set operand even when that operand has Filters. The "
+            "Set and Filters remain unchanged."
+        ),
+    )
+    ap.add_argument(
         "--inline-state-consumers",
         action="store_true",
         help=(
@@ -554,6 +569,7 @@ def main():
         "status":"research_only_not_accepted_design",
         "label":args.label,
         "inline_private_set_operands":bool(args.inline_private_set_operands),
+        "inline_private_filtered_set_operands":bool(args.inline_private_filtered_set_operands),
         "inline_state_consumers":bool(args.inline_state_consumers),
         "source_root":str(args.input_root),
         "selected":[],
@@ -579,6 +595,7 @@ def main():
         rendered,identity=inline_private(
             doc,
             inline_private_set_operands=args.inline_private_set_operands,
+            inline_private_filtered_set_operands=args.inline_private_filtered_set_operands,
             inline_state_consumers=args.inline_state_consumers,
         )
         expanded=reexpand(rendered,identity)
