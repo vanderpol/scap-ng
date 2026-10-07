@@ -1,0 +1,371 @@
+#!/usr/bin/env python3
+"""Classify Variables that survive the proven 0.3 modernization census.
+
+Research only. This tool applies the same exact/reversible presentation and
+Observation/foreach transforms as the full corpus census, then describes the
+remaining Variable graphs. It performs no new rewrite.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from collections import Counter, defaultdict
+from pathlib import Path
+from typing import Any
+
+from measure_full_modernization_census import (
+    apply_observation,
+    build_observation_plan,
+    classify,
+    evaluate_metrics,
+    load_assessments,
+    promote_to_research_03,
+    residual_reasons,
+)
+from measure_residual_complexity_patterns import (
+    FUNCTION_KEYS,
+    expression_variable_kind,
+    walk,
+)
+from research_inline_private_components import inline_private, reexpand, first_difference
+from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
+
+
+def exact_variable_refs(value: Any, variable_id: str, path=()):
+    if isinstance(value, dict):
+        if set(value) == {"variable"} and value.get("variable") == variable_id:
+            yield path
+        for key, child in value.items():
+            yield from exact_variable_refs(child, variable_id, path + (str(key),))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from exact_variable_refs(child, variable_id, path + (str(index),))
+
+
+def consumer_context(path: tuple[str, ...]) -> str:
+    if not path:
+        return "other"
+    root = path[0]
+    if root == "variables":
+        return "variable"
+    if root == "objects":
+        return "object"
+    if root == "states":
+        return "state"
+    if root == "tests":
+        return "test"
+    if root == "evaluate":
+        return "evaluate"
+    if root == "observations":
+        return "observation"
+    return root
+
+
+def expression_functions(variable: dict) -> Counter:
+    counts = Counter()
+    expression = variable.get("expression")
+    if expression is None:
+        return counts
+    for node in walk(expression):
+        if isinstance(node, dict):
+            for key in node:
+                if key in FUNCTION_KEYS:
+                    counts[key] += 1
+    return counts
+
+
+def dependency_edges(variables: dict) -> list[tuple[str, str]]:
+    edges = []
+    for consumer_id, payload in variables.items():
+        if not isinstance(payload, dict):
+            continue
+        for producer_id in variables:
+            if producer_id == consumer_id:
+                continue
+            if any(exact_variable_refs(payload, producer_id)):
+                edges.append((consumer_id, producer_id))
+    return sorted(set(edges))
+
+
+def longest_chain(variables: dict, edges: list[tuple[str, str]]) -> int:
+    deps = defaultdict(set)
+    for consumer, producer in edges:
+        deps[consumer].add(producer)
+    memo = {}
+    visiting = set()
+
+    def depth(node: str) -> int:
+        if node in memo:
+            return memo[node]
+        if node in visiting:
+            return 0
+        visiting.add(node)
+        value = 1
+        if deps.get(node):
+            value = 1 + max(depth(child) for child in deps[node])
+        visiting.remove(node)
+        memo[node] = value
+        return value
+
+    return max((depth(node) for node in variables), default=0)
+
+
+def fanout_bucket(value: int) -> str:
+    if value == 0:
+        return "0"
+    if value == 1:
+        return "1"
+    if value == 2:
+        return "2"
+    if value <= 5:
+        return "3-5"
+    return "6+"
+
+
+def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
+    variables = assessment.get("variables") or {}
+    review_by_variable = {}
+    for row in foreach_report.get("review_required") or []:
+        variable = row.get("variable")
+        if variable:
+            review_by_variable[variable] = sorted(set(row.get("reasons") or []))
+
+    rows = []
+    expression_kinds = Counter()
+    function_counts = Counter()
+    consumer_contexts = Counter()
+    fanouts = Counter()
+    reused = 0
+    chained = 0
+
+    for variable_id, payload in sorted(variables.items()):
+        if not isinstance(payload, dict):
+            continue
+        search_surface = {
+            key: value for key, value in assessment.items()
+            if key != "variables"
+        }
+        refs = list(exact_variable_refs(search_surface, variable_id))
+        variable_refs = []
+        for other_id, other_payload in variables.items():
+            if other_id == variable_id:
+                continue
+            variable_refs.extend(
+                ("variables", other_id) + path
+                for path in exact_variable_refs(other_payload, variable_id)
+            )
+        refs.extend(variable_refs)
+        contexts = Counter(consumer_context(path) for path in refs)
+        funcs = expression_functions(payload)
+        kind = expression_variable_kind(payload)
+        expression_kinds[kind] += 1
+        function_counts.update(funcs)
+        consumer_contexts.update(contexts)
+        fanouts[fanout_bucket(len(refs))] += 1
+        if len(refs) >= 2:
+            reused += 1
+        if contexts.get("variable", 0):
+            chained += 1
+
+        rows.append({
+            "variable_id": variable_id,
+            "kind": kind,
+            "datatype": payload.get("datatype"),
+            "consumer_count": len(refs),
+            "consumer_contexts": dict(contexts),
+            "function_counts": dict(funcs),
+            "foreach_v1_refusal_reasons": review_by_variable.get(variable_id, []),
+        })
+
+    edges = dependency_edges(variables)
+    return {
+        "variables": len(rows),
+        "expression_kind_counts": dict(expression_kinds),
+        "function_counts": dict(function_counts),
+        "consumer_context_counts": dict(consumer_contexts),
+        "fanout_bucket_counts": dict(fanouts),
+        "variables_with_multiple_consumers": reused,
+        "variables_consumed_by_variables": chained,
+        "variable_dependency_edges": len(edges),
+        "max_variable_chain_depth": longest_chain(variables, edges),
+        "rows": rows,
+    }
+
+
+def pattern_signature(analysis: dict) -> str:
+    return json.dumps({
+        "expression_kinds": analysis["expression_kind_counts"],
+        "function_names": sorted(analysis["function_counts"]),
+        "fanout_buckets": analysis["fanout_bucket_counts"],
+        "has_variable_chaining": analysis["variables_consumed_by_variables"] > 0,
+        "chain_depth": analysis["max_variable_chain_depth"],
+    }, sort_keys=True, separators=(",", ":"))
+
+
+def main() -> int:
+    p = argparse.ArgumentParser()
+    p.add_argument("root", type=Path)
+    p.add_argument("--label", required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--top", type=int, default=25)
+    args = p.parse_args()
+
+    all_rows = load_assessments(args.root)
+    plan, observation_summary, observation_errors = build_observation_plan(all_rows)
+
+    assessments = []
+    expression_kinds = Counter()
+    function_counts = Counter()
+    consumer_contexts = Counter()
+    fanout_buckets = Counter()
+    refusal_reasons = Counter()
+    patterns = defaultdict(list)
+    variable_total = 0
+    complex_variable_rules = 0
+    multiple_consumers = 0
+    variable_chained = 0
+    dependency_edges_total = 0
+    max_chain_depth = 0
+
+    for index, source_row in enumerate(all_rows):
+        if source_row["kind"] != "rule":
+            continue
+
+        original = source_row["doc"]
+        working = original
+        planned = plan.get(index)
+        if planned is not None:
+            kind, observation, _ = planned
+            extracted, restored, _ = apply_observation(kind, working, observation)
+            if restored != working:
+                detail = first_difference(working, restored) or "unknown difference"
+                raise ValueError(
+                    f"Observation round-trip mismatch: {source_row['relative_path']}: {detail}"
+                )
+            working = extracted
+
+        foreach_input = promote_to_research_03(working)
+        foreach_doc, foreach_report = modernize_foreach_v1(
+            foreach_input, enabled=True
+        )
+        rendered, identity = inline_private(
+            foreach_doc,
+            inline_private_set_operands=True,
+            inline_private_filtered_set_operands=True,
+            inline_state_consumers=True,
+            inline_variable_object_consumers=True,
+        )
+        expanded = reexpand(rendered, identity)
+        if expanded != foreach_doc:
+            detail = first_difference(foreach_doc, expanded) or "unknown difference"
+            raise ValueError(
+                f"Locality round-trip mismatch: {source_row['relative_path']}: {detail}"
+            )
+
+        evalm = evaluate_metrics(source_row["path"], rendered)
+        category = classify(
+            rendered,
+            identity,
+            evalm,
+            observation_applied=planned is not None,
+            foreach_applied=int(
+                foreach_report["stats"].get("rewrites_applied", 0) or 0
+            ),
+        )
+        if category != "meaningfully_complex":
+            continue
+        if not (rendered["assessment"].get("variables") or {}):
+            continue
+
+        complex_variable_rules += 1
+        analysis = analyze_remaining_variables(
+            rendered["assessment"], foreach_report
+        )
+        variable_total += analysis["variables"]
+        expression_kinds.update(analysis["expression_kind_counts"])
+        function_counts.update(analysis["function_counts"])
+        consumer_contexts.update(analysis["consumer_context_counts"])
+        fanout_buckets.update(analysis["fanout_bucket_counts"])
+        multiple_consumers += analysis["variables_with_multiple_consumers"]
+        variable_chained += analysis["variables_consumed_by_variables"]
+        dependency_edges_total += analysis["variable_dependency_edges"]
+        max_chain_depth = max(
+            max_chain_depth, analysis["max_variable_chain_depth"]
+        )
+        for row in analysis["rows"]:
+            refusal_reasons.update(row["foreach_v1_refusal_reasons"])
+
+        signature = pattern_signature(analysis)
+        patterns[signature].append({
+            "assessment_id": rendered["assessment"].get("id"),
+            "path": source_row["relative_path"],
+            "residual_reasons": residual_reasons(
+                rendered, identity, evalm
+            ),
+            "variable_analysis": analysis,
+        })
+
+    ranked = sorted(patterns.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    top_patterns = []
+    for signature, members in ranked[:args.top]:
+        exemplar = members[0]["variable_analysis"]
+        top_patterns.append({
+            "count": len(members),
+            "percent_of_complex_variable_rules": (
+                round(100.0 * len(members) / complex_variable_rules, 2)
+                if complex_variable_rules else 0.0
+            ),
+            "signature": json.loads(signature),
+            "examples": [
+                {
+                    "assessment_id": row["assessment_id"],
+                    "residual_reasons": row["residual_reasons"],
+                }
+                for row in members[:10]
+            ],
+        })
+
+    report = {
+        "format": "scap-ng-post-modernization-variable-census-0.1",
+        "status": "research_only_not_accepted_design",
+        "label": args.label,
+        "complex_rules_with_variables": complex_variable_rules,
+        "remaining_variables": variable_total,
+        "expression_kind_counts": dict(expression_kinds),
+        "function_counts": dict(function_counts),
+        "consumer_context_counts": dict(consumer_contexts),
+        "fanout_bucket_counts": dict(fanout_buckets),
+        "variables_with_multiple_consumers": multiple_consumers,
+        "variables_consumed_by_variables": variable_chained,
+        "variable_dependency_edges": dependency_edges_total,
+        "max_variable_chain_depth": max_chain_depth,
+        "foreach_v1_refusal_reason_counts": dict(refusal_reasons),
+        "unique_variable_pattern_signatures": len(patterns),
+        "top_patterns": top_patterns,
+        "observation_plan": observation_summary,
+        "observation_candidate_errors": observation_errors,
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps({
+        key: report[key] for key in (
+            "label",
+            "complex_rules_with_variables",
+            "remaining_variables",
+            "expression_kind_counts",
+            "function_counts",
+            "fanout_bucket_counts",
+            "variables_with_multiple_consumers",
+            "variables_consumed_by_variables",
+            "max_variable_chain_depth",
+            "unique_variable_pattern_signatures",
+        )
+    }, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
