@@ -747,13 +747,13 @@ def _load_v03_capability_mappings():
 
 
 def validate_v03_foreach(document):
-    """Validate the narrow Object-level foreach v1 semantic contract."""
+    """Validate SCAP-NG 0.3 collection for_each, including chained lineage."""
     assessment=document.get("assessment",document)
     specification=assessment.get("specification") or {}
     if specification.get("version") != "0.3.0":
         return []
 
-    objects=_named_objects(assessment)
+    objects=_assessment_named_objects(assessment)
     tests=assessment.get("tests") or {}
     mappings=_load_v03_capability_mappings()
     diagnostics=[]
@@ -763,6 +763,81 @@ def validate_v03_foreach(document):
         for test in tests.values()
         if isinstance(test,dict) and isinstance(test.get("object"),str)
     }
+
+    bindings={}
+    foreach_sources=set()
+    for object_id,obj in objects.items():
+        if not isinstance(obj,dict):
+            continue
+        foreach=obj.get("for_each")
+        if isinstance(foreach,dict) and set(foreach)=={"item","in"}:
+            bindings[object_id]=foreach
+            if isinstance(foreach.get("in"),str):
+                foreach_sources.add(foreach["in"])
+
+    # One source edge per foreach Object yields a simple dependency graph.
+    # Reject cycles before calculating inherited lexical lineage.
+    reported_cycles=set()
+    for start_id in sorted(bindings):
+        order=[]
+        index={}
+        current=start_id
+        while current in bindings:
+            if current in index:
+                cycle=tuple(order[index[current]:])
+                key=tuple(sorted(cycle))
+                if key not in reported_cycles:
+                    reported_cycles.add(key)
+                    diagnostics.append({
+                        "object":start_id,
+                        "code":"foreach.dependency_cycle",
+                        "cycle":list(cycle),
+                        "message":"foreach Object dependency graph must be acyclic",
+                    })
+                break
+            index[current]=len(order)
+            order.append(current)
+            source_id=bindings[current].get("in")
+            if not isinstance(source_id,str) or source_id not in objects:
+                break
+            current=source_id
+
+    scope_cache={}
+    alias_shadow_reported=set()
+
+    def scope_for(object_id,trail=()):
+        if object_id in scope_cache:
+            return scope_cache[object_id]
+        if object_id in trail:
+            return {}
+        foreach=bindings.get(object_id)
+        if foreach is None:
+            scope_cache[object_id]={}
+            return {}
+        source_id=foreach.get("in")
+        source=objects.get(source_id)
+        if not isinstance(source,dict):
+            scope_cache[object_id]={}
+            return {}
+        inherited=scope_for(source_id,trail+(object_id,))
+        alias=foreach.get("item")
+        if not isinstance(alias,str):
+            scope_cache[object_id]=dict(inherited)
+            return scope_cache[object_id]
+        if alias in inherited:
+            key=(object_id,alias)
+            if key not in alias_shadow_reported:
+                alias_shadow_reported.add(key)
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.alias_shadow",
+                    "alias":alias,
+                    "message":"nested foreach item alias must not shadow an inherited lineage alias",
+                })
+        scope=dict(inherited)
+        scope[alias]=source.get("capability")
+        scope_cache[object_id]=scope
+        return scope
 
     for object_id,obj in objects.items():
         if not isinstance(obj,dict):
@@ -789,7 +864,7 @@ def validate_v03_foreach(document):
             diagnostics.append({
                 "object":object_id,
                 "code":"foreach.binding_shape",
-                "message":"foreach v1 requires exactly item and in",
+                "message":"for_each requires exactly item and in",
             })
             continue
 
@@ -799,7 +874,7 @@ def validate_v03_foreach(document):
             diagnostics.append({
                 "object":object_id,
                 "code":"foreach.self_source",
-                "message":"foreach v1 source Object must be distinct from target Object",
+                "message":"for_each source Object must be distinct from target Object",
             })
             continue
         source=objects.get(source_id)
@@ -808,102 +883,120 @@ def validate_v03_foreach(document):
                 "object":object_id,
                 "code":"foreach.source_missing",
                 "source_object":source_id,
-                "message":"foreach source references an unknown Object",
+                "message":"for_each source references an unknown shared Object",
             })
             continue
-        if isinstance(source,dict) and "for_each" in source:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.chained_source_not_v1",
-                "source_object":source_id,
-                "message":"foreach v1 does not chain from another foreach Object",
-            })
 
-        if len(bound) != 1:
+        if not bound:
             diagnostics.append({
                 "object":object_id,
                 "code":"foreach.bound_selector_count",
-                "count":len(bound),
-                "message":"foreach v1 requires exactly one bound target selector",
+                "count":0,
+                "message":"for_each requires at least one selector bound from its visible lineage",
             })
             continue
 
-        target_field,from_ref=bound[0]
-        if not isinstance(from_ref,str) or from_ref.count(".") != 1:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.from_shape",
-                "field":target_field,
-                "message":"from must be <binding>.<source-field>",
-            })
-            continue
-        ref_alias,source_field=from_ref.split(".",1)
-        if ref_alias != alias:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.binding_alias",
-                "field":target_field,
-                "message":"from binding alias must match for_each.item",
-            })
-
-        source_cap=source.get("capability") if isinstance(source,dict) else None
+        scope=scope_for(object_id)
+        current_alias_used=False
         target_cap=obj.get("capability")
-        source_map=mappings.get(source_cap)
         target_map=mappings.get(target_cap)
-        if source_map is None or target_map is None:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.capability_mapping_missing",
-                "source_capability":source_cap,
-                "target_capability":target_cap,
-                "message":"foreach v1 requires reviewed 0.3.0 source and target capability mappings",
-            })
-            continue
 
-        source_types=set(source_map.get("native",{}).get("field_datatypes",{}).get(source_field,[]))
-        target_selector_names=set(target_map.get("native",{}).get("selector_map",{}).values())
-        target_types=set(target_map.get("native",{}).get("field_datatypes",{}).get(target_field,[]))
-        if not source_types:
+        for target_field,from_ref in bound:
+            if not isinstance(from_ref,str) or from_ref.count(".") != 1:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.from_shape",
+                    "field":target_field,
+                    "message":"from must be <binding>.<source-field>",
+                })
+                continue
+            ref_alias,source_field=from_ref.split(".",1)
+            if ref_alias == alias:
+                current_alias_used=True
+            if ref_alias not in scope:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.binding_alias",
+                    "field":target_field,
+                    "alias":ref_alias,
+                    "visible_aliases":sorted(scope),
+                    "message":"from binding alias must be the current foreach item or an inherited correlated lineage alias",
+                })
+                continue
+
+            source_cap=scope.get(ref_alias)
+            source_map=mappings.get(source_cap)
+            if source_map is None or target_map is None:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.capability_mapping_missing",
+                    "source_capability":source_cap,
+                    "target_capability":target_cap,
+                    "message":"for_each requires reviewed 0.3 source and target capability mappings",
+                })
+                continue
+
+            source_types=set(
+                source_map.get("native",{}).get("field_datatypes",{}).get(source_field,[])
+            )
+            target_selector_names=set(
+                target_map.get("native",{}).get("selector_map",{}).values()
+            )
+            target_types=set(
+                target_map.get("native",{}).get("field_datatypes",{}).get(target_field,[])
+            )
+            if not source_types:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.source_field_unknown",
+                    "alias":ref_alias,
+                    "field":source_field,
+                    "message":"for_each source field is not a typed collected field of the bound capability",
+                })
+            if target_field not in target_selector_names or not target_types:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.target_selector_unknown",
+                    "field":target_field,
+                    "message":"for_each target field is not a typed selector of the target capability",
+                })
+            compatible=sorted(source_types & target_types)
+            if source_types and target_types and len(compatible) != 1:
+                diagnostics.append({
+                    "object":object_id,
+                    "code":"foreach.datatype_compatibility",
+                    "source_alias":ref_alias,
+                    "source_datatypes":sorted(source_types),
+                    "target_datatypes":sorted(target_types),
+                    "compatible_datatypes":compatible,
+                    "message":"for_each requires exactly one compatible source/target datatype per bound selector",
+                })
+
+        if not current_alias_used:
             diagnostics.append({
                 "object":object_id,
-                "code":"foreach.source_field_unknown",
-                "field":source_field,
-                "message":"foreach source field is not a typed collected field of the source capability",
-            })
-        if target_field not in target_selector_names or not target_types:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.target_selector_unknown",
-                "field":target_field,
-                "message":"foreach target field is not a typed selector of the target capability",
-            })
-        compatible=sorted(source_types & target_types)
-        if source_types and target_types and len(compatible) != 1:
-            diagnostics.append({
-                "object":object_id,
-                "code":"foreach.datatype_compatibility",
-                "source_datatypes":sorted(source_types),
-                "target_datatypes":sorted(target_types),
-                "compatible_datatypes":compatible,
-                "message":"foreach v1 requires exactly one compatible source/target datatype",
+                "code":"foreach.current_binding_unused",
+                "alias":alias,
+                "message":"for_each must bind at least one selector from its current item; ancestor-only bindings cannot justify an iteration level",
             })
 
+        bound_fields={field for field,_ in bound}
         for field,spec in select.items():
-            if field == target_field or not isinstance(spec,dict):
+            if field in bound_fields or not isinstance(spec,dict):
                 continue
             if _is_variable_value(spec.get("value")):
                 diagnostics.append({
                     "object":object_id,
                     "code":"foreach.additional_variable_selector",
                     "field":field,
-                    "message":"foreach v1 target Object cannot add an independent Variable selector",
+                    "message":"for_each target Object cannot add an independent Variable selector",
                 })
 
-        if object_id not in directly_tested:
+        if object_id not in directly_tested and object_id not in foreach_sources:
             diagnostics.append({
                 "object":object_id,
-                "code":"foreach.target_not_directly_tested",
-                "message":"foreach v1 target Object must be referenced directly by at least one Test",
+                "code":"foreach.target_not_consumed",
+                "message":"for_each Object must be directly tested or consumed as the named source of another for_each Object",
             })
 
     return diagnostics
