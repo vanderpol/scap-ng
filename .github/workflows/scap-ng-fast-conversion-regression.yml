@@ -5,13 +5,13 @@ on:
     branches: [main]
     paths:
       - tools/**
-      - schema/v0.2.0/**
+      - schema/v0.3.0/**
       - .github/workflows/scap-ng-fast-conversion-regression.yml
       - .github/workflows/scap-ng-full-current-native-normalize-compile.yml
   pull_request:
     paths:
       - tools/**
-      - schema/v0.2.0/**
+      - schema/v0.3.0/**
       - .github/workflows/scap-ng-fast-conversion-regression.yml
       - .github/workflows/scap-ng-full-current-native-normalize-compile.yml
   workflow_dispatch:
@@ -168,9 +168,9 @@ jobs:
               raise SystemExit(f"unexpected representative-set status totals: generated={generated} blocked={blocked}")
           print(json.dumps({"packages":6,"generated":generated,"blocked":blocked},indent=2))
           PY
-      - name: Validate v0.2.0 schema
+      - name: Validate active v0.3.0 schema
         run: |
-          python scap-ng/tools/validate_native_json_schemas.py work/representative             --schema-dir scap-ng/schema/v0.2.0             --allow-unpromoted-conversion-vocabulary             --report work/schema-validation.json
+          python scap-ng/tools/validate_native_json_schemas.py work/representative             --schema-dir scap-ng/schema/v0.3.0             --allow-unpromoted-conversion-vocabulary             --report work/schema-validation.json
       - name: Validate native Assessment semantics
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/representative             --report work/semantic-validation.json
@@ -187,7 +187,7 @@ jobs:
       - name: Validate normalized Board source
         run: |
           python scap-ng/tools/validate_native_json_schemas.py work/board-source \
-            --schema-dir scap-ng/schema/v0.2.0 \
+            --schema-dir scap-ng/schema/v0.3.0 \
             --allow-unpromoted-conversion-vocabulary \
             --report work/board-schema-validation.json
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/board-source \
