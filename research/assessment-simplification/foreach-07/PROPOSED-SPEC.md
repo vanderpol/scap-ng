@@ -1,7 +1,9 @@
 # Proposed SCAP-NG 0.3.0 foreach specification
 
-**Status:** integrated into the SCAP-NG 0.3.0 pre-alpha authoring/validation
-tree; pending broader Board review and converter-modernization enablement.  
+**Status:** historical v1 automatic-modernization proof. The accepted 0.3
+language now also supports correlated chained/nested collection iteration; see
+[`specification/assessment/foreach.md`](../../../specification/assessment/foreach.md).
+This document remains the proof boundary for the narrow automatic v1 rewrite.  
 **Tracking:** #164  
 **Does not modify:** frozen 0.2.0 schemas or semantics.
 
