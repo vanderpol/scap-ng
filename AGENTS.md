@@ -12,6 +12,22 @@
 - Any change to language/schema meaning, result semantics, capability semantics, or conversion semantics SHALL have the human review packet defined in `MAINTAINING.md` before it is treated as accepted current design.
 - Agents may investigate, implement already accepted behavior, add focused tests, and prepare review material, but SHALL NOT silently resolve a materially ambiguous semantic choice through implementation alone.
 
+## Issue-linked commit invariant
+
+Every new repository commit SHALL reference at least one GitHub issue in its
+commit message, using an explicit issue number such as `(#181)` or
+`Refs #181`.
+
+- The referenced issue SHALL describe the actual purpose of the commit.
+- One issue MAY cover multiple tightly related commits.
+- One commit MAY reference multiple issues.
+- Do not create empty placeholder issues merely to satisfy this rule.
+- Documentation, research, tests, tooling, schema, generated-maintenance, and
+  process commits are all covered.
+- Existing historical commits are not rewritten retroactively.
+- Before committing work whose purpose has no issue, create the issue first and
+  assign the appropriate release milestone/objective when applicable.
+
 ## Branch management invariant
 
 Branch state is part of the durable repository record.
