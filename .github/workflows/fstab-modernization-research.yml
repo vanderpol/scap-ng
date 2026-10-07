@@ -1,0 +1,27 @@
+name: Fstab modernization research
+
+on:
+  push:
+    paths:
+      - tools/research_fstab_semantics.py
+      - tools/test_research_fstab_semantics.py
+      - research/assessment-simplification/fstab-13/**
+      - .github/workflows/fstab-modernization-research.yml
+  pull_request:
+    paths:
+      - tools/research_fstab_semantics.py
+      - tools/test_research_fstab_semantics.py
+      - research/assessment-simplification/fstab-13/**
+      - .github/workflows/fstab-modernization-research.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run bounded fstab semantic proof
+        run: PYTHONPATH=tools python tools/test_research_fstab_semantics.py -v
