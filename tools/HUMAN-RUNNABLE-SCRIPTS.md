@@ -143,6 +143,13 @@ Useful options:
 
 **Safety:** exact semantic duplicates may be promoted automatically. Near duplicates are advisory only. The tool refuses to rewrite the source tree in place.
 
+The normalizer report always includes a machine-readable `stats` block
+(`scap-ng-normalizer-stats-0.1`) with examined, changed,
+unchanged/review, rate, reason, and cache counters. This is intended for CI and
+longitudinal corpus tracking; consumers should prefer `stats` over scraping
+console output.
+
+
 ## Validate native JSON Schemas
 
 **Script:** `tools/validate_native_json_schemas.py`
@@ -209,6 +216,36 @@ Optional research signing:
 ```
 
 A self-signed test certificate demonstrates mechanics only; it does not establish publisher trust.
+
+## Run opt-in 0.3.0 modernization during selected-Rule conversion
+
+**Script:** `tools/scap_upconvert_v003/convert_collection_review.py`
+
+The default remains faithful 0.2.0 output. Modernizers require an explicit
+0.3.0 target and are opt-in:
+
+```powershell
+python tools/scap_upconvert_v003/convert_collection_review.py ^
+  --input PATH_TO_SCAP.zip ^
+  --sha256 SOURCE_SHA256 ^
+  --output work/modernized ^
+  --rule SV-EXAMPLE ^
+  --target-ng-version 0.3.0 ^
+  --modernize-foreach-v1 ^
+  --modernize-conditionals-v1
+```
+
+When either modernizer runs:
+
+- each Assessment's modernization report includes a `stats` block;
+- `evidence.json` includes aggregate `modernization_stats`; and
+- `modernization-stats.json` is written as a standalone CI-friendly summary.
+
+The aggregate includes Assessments examined/rewritten, candidate and rewrite
+counts, rewrite rates, conditional pattern classes, and fail-closed/review
+reason counts. Modernization statistics describe what the pass recognized and
+changed; they are not evidence that an unrecognized pattern is semantically
+unimportant.
 
 ## Run the current OVAL → NG → OVAL round-trip corpus census
 
