@@ -314,6 +314,66 @@ model.
 This census is evidence for further research only. It does not change the
 0.3.0 schema.
 
+## Consumer-local State and filtered-Set follow-up
+
+The next experiment strengthened the locality rule from "private to one Test" to
+"local to the semantic consumer."
+
+A State used by a Test may be rendered beside that Test. A State used by a Set
+Filter may be rendered beside that Filter. When the same source State is reused
+by multiple consumers, each consumer receives the same predicate payload plus
+an identity record; mechanical re-expansion restores the one original named
+State before structural comparison.
+
+The first implementation exposed a re-expansion ordering defect for Filter
+States. The research workflow failed until the restored State references were
+written back before the top-level Object map was copied. The guard was not
+weakened.
+
+Across all 676 RHEL 9 + Windows Server 2025 Assessments:
+
+| Measure | Faithful source | Consumer-local presentation | Reduction |
+| --- | ---: | ---: | ---: |
+| Top-level States | 858 | **28** | **96.7%** |
+| Test/Object/State cross-references | 1,758 | **65** | **96.3%** |
+| Named component references | 2,039 | **162** | **92.1%** |
+
+The transform localized **164 additional State consumer occurrences** beyond
+the original single-use-State pass. The 28 States left top-level have no
+remaining classified Test/Filter reference in this experiment and need a
+separate dead/residual-state audit before any removal claim. They are not
+positive evidence that ordinary authors need a global State registry.
+
+A further bounded Object experiment allowed a single-use leaf Object to inline
+into its Set operand even when that operand carries Filters. The Filter list,
+actions, referenced/localized State predicates, Set operator, and enclosing
+Object/Test boundaries remain unchanged.
+
+That reduces top-level Objects from 107 after unfiltered recursive locality to
+**98**:
+
+- RHEL 9: 777 -> **38** (**95.1%** reduction);
+- Windows Server 2025: 310 -> **60** (**80.6%** reduction);
+- combined: 1,087 -> **98** (**91.0%** reduction).
+
+The 98 survivors are:
+
+- 64 graph/dataflow-only Objects;
+- 19 Objects shared directly by multiple Tests;
+- 15 Objects used by one Test plus graph/dataflow.
+
+This strengthens, but does not yet prove, the authoring hypothesis:
+
+> **State belongs with its consumer. Object belongs with its consumer unless
+> acquisition identity/reuse is semantically meaningful.**
+
+Object duplication across Tests remains intentionally unproven because repeated
+acquisition can differ from one shared collection in timing, completeness,
+evidence, and caching.
+
+Latest successful workflow for the combined consumer-local experiment:
+https://github.com/vanderpol/scap-ng/actions/runs/37613657218
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
