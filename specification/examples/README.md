@@ -80,6 +80,32 @@ evaluate:
 Whether a one-Test `evaluate` root should remain mandatory is still being reviewed
 in [#167](https://github.com/vanderpol/scap-ng/issues/167).
 
+## Conditional evaluation
+
+**SCAP 1.4:** Environment-dependent logic is commonly represented through nested
+OVAL criteria and guard Tests, so intentionally conditional authoring may be
+difficult to recognize at a glance.
+
+**SCAP-NG:** Explicit `if/then/else` evaluation is already part of the frozen
+0.2 baseline. It lets native content state an intentional conditional directly
+while retaining defined six-state outcomes.
+
+```yaml
+evaluate:
+  if:
+    test: server-is-domain-controller
+  then:
+    test: domain-controller-permissions
+  else:
+    test: member-server-permissions
+```
+
+This does **not** mean arbitrary SCAP 1.4 Boolean graphs can be automatically
+rewritten as procedural branches; the production research found counterexamples.
+The 0.3 review in [#173](https://github.com/vanderpol/scap-ng/issues/173) is
+whether the inherited conditional form should remain unchanged or be simplified,
+not whether conditionals should be introduced.
+
 ## Manual Assessments
 
 **SCAP 1.4:** Manual STIG procedures are commonly carried as XCCDF Check Text and
@@ -396,32 +422,6 @@ observation:
 This solves a real Apache/Windows/Linux reuse pattern, but adds a new artifact
 and runtime interface. It is receiving an explicit complexity/value decision in
 [#166](https://github.com/vanderpol/scap-ng/issues/166).
-
-## Candidate: conditional / case authoring
-
-**SCAP 1.4:** Environment-dependent requirements are often encoded as nested
-OVAL `OR`/`AND` criteria with positive and negated guard Tests, which can make
-the author’s intent difficult to see.
-
-**0.3 candidate:** A declarative conditional/case form could make the
-environment choice locally obvious while retaining defined six-state semantics.
-
-```yaml
-evaluate:
-  case:
-    when:
-      test: server-is-domain-controller
-    then:
-      test: domain-controller-permissions
-    otherwise:
-      test: member-server-permissions
-```
-
-The production census found real role/configuration-dependent Rules, but a
-procedural if/else is **not generally equivalent** to the source OVAL six-state
-Boolean graph. Any accepted form must therefore have explicit semantics and a
-lossless migration rule. Review decision:
-[#173](https://github.com/vanderpol/scap-ng/issues/173).
 
 ## Reusable applicability Assessments
 
