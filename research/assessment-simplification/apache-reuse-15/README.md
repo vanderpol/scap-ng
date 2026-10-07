@@ -28,6 +28,27 @@ differences begin primarily at the directive-specific query.
 Copying those Objects/Variables into every standalone Assessment creates
 maintenance risk without adding policy meaning.
 
+## Full Apache corpus reuse census
+
+Pinned Apache 2.4 UNIX Server conversion, 22 automated STIG Rule Assessments:
+
+- **18** Variable definitions recur with identical payloads;
+- those account for **233 repeated Variable occurrences**;
+- **9** Object definitions recur with identical payloads;
+- those account for **96 repeated Object occurrences**;
+- the Apache installation-path Object appears unchanged in **22/22** Rules;
+- the Apache executable-path Variable appears unchanged in **21/22** Rules;
+- the main root/config/include discovery chain appears unchanged in **16/22**
+  Rules;
+- loaded-config discovery appears unchanged in **17/22** Rules.
+
+This establishes a real maintenance/reuse problem rather than a hypothetical
+language convenience. The repeated graph is concentrated in acquisition and
+path discovery; Rule-specific directive logic varies afterward.
+
+Census workflow:
+`Apache authoring reuse research`, run `37614226049`.
+
 ## Proposed concept: source-time observation module
 
 Add an **authoring-only reusable module** that owns acquisition/dataflow and
