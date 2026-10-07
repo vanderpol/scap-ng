@@ -76,6 +76,7 @@ This is a hard repository operating rule for issue and release planning.
   - intentionally deferred work is moved to the appropriate later milestone;
   - the milestone description accurately states its scope/status.
 - When creating a new release-relevant issue, assign the milestone in the same operation whenever the target version is already known.
+- Every major release-relevant issue SHALL identify the SCAP-NG objective ID(s) it advances and the maintained objective-to-issue map SHALL remain complete in both directions.
 - When an issue changes release scope, update its milestone promptly; stale milestone assignment is a repository-integrity defect.
 - Milestone progress SHALL reflect actual completed/open issue state and SHALL NOT be manipulated for presentation.
 - Repository documentation MAY summarize milestone status, but GitHub milestone membership remains the authoritative issue-to-release mapping.
