@@ -34,7 +34,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 NATIVE_CAPABILITY_MAPPING_DIR = (
-    ROOT / "schema/v0.2.0/capability-mappings/supported"
+    ROOT / "schema/v0.3.0/capability-mappings/supported"
 )
 
 
