@@ -233,6 +233,8 @@ The Apache source already demonstrates that multi-installation and include
 semantics can matter. A reusable module must preserve those semantics unless a
 separately reviewed native collector intentionally changes them.
 
+Module extraction proof status: **executable research prototype added; full-corpus run pending.**
+
 ## Recommendation
 
 Prototype **source-time observation modules with typed exports** for 0.3.0
