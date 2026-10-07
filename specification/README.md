@@ -6,26 +6,28 @@ This directory contains the proposed normative contract. Research records explai
 
 Normative terms **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** use their conventional standards meaning.
 
-## Read in order
+## Start here
 
-1. [Terminology](terminology.md)
-2. [Requirements index](requirements-index.md)
-3. [Conformance and validation](core/conformance.md)
-4. [Benchmark, Rule, and Group model](policy/benchmark.md)
-5. [Platform and applicability](policy/platform-and-applicability.md)
-6. [Profiles and Tailoring](policy/profiles-and-tailoring.md)
-7. [Policy resolution/evaluation order](policy/policy-resolution.md)
-8. [Parameters and Organizational Input](policy/parameters-and-organizational-input.md)
-9. [Assessment method](assessment/assessment-method.md)
-10. [Manual assessment](assessment/manual-assessment.md)
-11. [Packaging and integrity](package/package-and-integrity.md)
-12. [Results and evidence](results/results.md)
-13. [SCAP 1.4 migration](migration/scap-1.4-migration.md)
-14. [OVAL 5.12.3 migration mapping](migration/oval-5.12.3-to-ng.md)
-15. [OVAL capability crosswalk](migration/oval-5.12.3-capability-crosswalk.md)
-16. [Security considerations](security/security-considerations.md)
-17. [SCAP 1.4 concept crosswalk](crosswalk/scap-1.4-concept-crosswalk.md)
-18. [SP 800-126r4 concept review](crosswalk/sp800-126r4-concept-review.md)
+1. [Core objectives](objectives.md)
+2. [Source and result examples](examples/README.md)
+3. [Terminology](terminology.md)
+4. [Requirements index](requirements-index.md)
+5. [Conformance and validation](core/conformance.md)
+6. [Benchmark, Rule, and Group model](policy/benchmark.md)
+7. [Platform and applicability](policy/platform-and-applicability.md)
+8. [Profiles and Tailoring](policy/profiles-and-tailoring.md)
+9. [Policy resolution/evaluation order](policy/policy-resolution.md)
+10. [Parameters and Organizational Input](policy/parameters-and-organizational-input.md)
+11. [Assessment method](assessment/assessment-method.md)
+12. [Manual assessment](assessment/manual-assessment.md)
+13. [Packaging and integrity](package/package-and-integrity.md)
+14. [Results and evidence](results/results.md)
+15. [SCAP 1.4 migration](migration/scap-1.4-migration.md)
+16. [OVAL 5.12.3 migration mapping](migration/oval-5.12.3-to-ng.md)
+17. [OVAL capability crosswalk](migration/oval-5.12.3-capability-crosswalk.md)
+18. [Security considerations](security/security-considerations.md)
+19. [SCAP 1.4 concept crosswalk](crosswalk/scap-1.4-concept-crosswalk.md)
+20. [SP 800-126r4 concept review](crosswalk/sp800-126r4-concept-review.md)
 
 ## Core design principles
 
