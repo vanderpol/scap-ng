@@ -56,6 +56,9 @@ jobs:
         run: |
           python scap-ng/tools/measure_split_source_fanout.py work/split-apache \
             --output work/apache-source-fanout.json
+      - name: Run focused Observation proof tests
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_prove_apache_observation.py -v
       - name: Measure repeated authoring graph
         run: |
           python scap-ng/tools/analyze_apache_authoring_reuse.py work/apache \
@@ -64,6 +67,11 @@ jobs:
         run: |
           python scap-ng/tools/prove_apache_observation_module.py work/apache \
             --output work/apache-module-proof.json
+      - name: Prove Observation extraction and flattening
+        run: |
+          python scap-ng/tools/prove_apache_observation.py work/apache \
+            --output work/apache-observation-proof.json \
+            --artifact-dir work/observation-prototype
       - uses: actions/upload-artifact@v4
         with:
           name: apache-authoring-reuse
