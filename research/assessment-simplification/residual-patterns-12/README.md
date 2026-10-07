@@ -30,7 +30,7 @@ Platforms:
 
 Successful coarse-family census:
 
-https://github.com/vanderpol/scap-ng/actions/runs/37549544079
+https://github.com/vanderpol/scap-ng/actions/runs/37550318735
 
 Tool:
 
@@ -60,7 +60,7 @@ These categories overlap:
 
 | Signal | Assessments |
 | --- | ---: |
-| Filters | 65 |
+| Filters | 23 |
 | Multi-Test composition | 65 |
 | Sets | 53 |
 | Non-direct Variable dataflow | 46 |
@@ -79,13 +79,17 @@ Observed Variable-function occurrences include:
 | unique | 3 |
 | arithmetic | 1 |
 
-The largest reason combinations are:
+The largest reason combinations after counting only substantive Filter entries are:
 
-- **32**: Sets + Filters;
+- **30**: Sets only;
 - **20**: multi-Test + nested evaluation;
 - **14**: multi-Test + non-direct dataflow + Variable functions;
-- **9**: Sets + Filters + multi-Test composition;
+- **10**: multi-Test + Sets;
 - **6**: Filters + non-direct dataflow.
+
+An earlier census incorrectly counted empty/presentation `filters` keys as
+actual Filters. The corrected run reduces substantive Filter use from 65 to 23
+without changing the 30-rule Set family.
 
 ## Highest-value recurring families
 
@@ -95,7 +99,8 @@ Census shape:
 
 - capability: `independent.textfilecontent54`;
 - one Test;
-- Set/Filter collection structure;
+- one Set collection structure;
+- no substantive Filters;
 - no Variable functions;
 - no nested evaluation.
 
@@ -116,11 +121,13 @@ union the observations, then apply one State expectation.
 
 **Research hypothesis:** this may deserve a first-class configuration-source or
 "primary + drop-ins" collection idiom rather than requiring authors to express
-ordinary configuration precedence/scope through generic Set machinery.
+ordinary configuration scope through generic Set machinery.
 
-Before proposing any syntax, inspect all 30 source graphs and determine whether
-their filters are merely collection-scope mechanics or whether some perform
-semantically substantive exclusion.
+The corrected census shows this family has **no substantive Filters**, which
+makes the repeated pattern cleaner than first measured. The next semantic
+question is whether these Sets merely union source locations or whether their
+meaning depends on configuration precedence/effective-value rules that the
+source OVAL does not itself model.
 
 ### 2. Alternative compliance paths — 10 RHEL Assessments
 
@@ -256,7 +263,7 @@ than adding another generic expression operator.
 
 Next deep dives should be:
 
-1. the 30-rule text-setting/drop-in Set+Filter family;
+1. the 30-rule text-setting/drop-in Set family;
 2. the 5-rule persistent mount option family;
 3. the dconf path-derivation family;
 4. the 6-rule file violation-query family;
