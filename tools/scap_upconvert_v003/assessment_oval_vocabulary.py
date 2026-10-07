@@ -16,7 +16,7 @@ import re
 # Pre-alpha implementation identity only. This is deliberately NOT the final
 # OVAL-successor standards name/identifier; that remains an OVAL Board decision.
 WORKING_ASSESSMENT_SPECIFICATION_ID = "scap-ng.pre-alpha.assessment"
-WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.2.0"
+WORKING_ASSESSMENT_SPECIFICATION_VERSION = "0.3.0"
 
 _NATIVE_DATATYPE_MAP = {
     "string": "string",
@@ -174,8 +174,9 @@ def align_assessment_vocabulary(document: dict) -> dict:
     Input is the current collection_graph=True converter shape:
     collections / tests / assertion / item_quantifier.
 
-    Output uses:
-    objects / states / tests / check_existence / check / state_operator.
+    Output is the faithful pre-modernization 0.3 Assessment graph using
+    Objects / States / Tests / Variables. Later accepted 0.3 authoring passes
+    may localize private components and normalize canonical presentation.
     """
     result = _normalize_native_scalar_literals(copy.deepcopy(document))
     assessment = result.get("assessment")
