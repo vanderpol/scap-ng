@@ -555,11 +555,18 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     tests=a.get("tests") or {}
     private_variable_payloads=[]
 
-    # Restore private Variable references before taking copies of Objects/States
-    # back to Assessment scope because recorded paths describe the rendered tree.
-    # Rebuild the final Variable map only after other locality reversals have
-    # restored any inline Objects inside surviving Variable expressions.
-    for row in identity.get("inlined_variables",[]):
+    # Restore localized Variables dependency-first. A binding may have been
+    # localized inside a local Variable that was itself later localized into a
+    # Test/Object/State consumer. Recreate the outer Variable registry entry
+    # before following any recorded variables.<id>... path inside it.
+    variable_rows=list(identity.get("inlined_variables",[]))
+    variable_rows.sort(
+        key=lambda row: (
+            1 if row.get("path") and row["path"][0]=="variables" else 0,
+            len(row.get("path") or []),
+        )
+    )
+    for row in variable_rows:
         parent,last=path_parent(a,row["path"])
         node=parent[last]
         if (
@@ -575,17 +582,15 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         private_variable_payloads.append((original,payload))
         parent[last]={"variable":original}
 
-    # Recreate localized Variable entries temporarily before restoring any
-    # Variable-local Objects. Their recorded paths still use
-    # variables.<id>... from the faithful graph, even when the Variable itself
-    # was subsequently localized into its sole consumer.
-    if private_variable_payloads:
-        variables=copy.deepcopy(a.get("variables") or {})
-        for original,payload in private_variable_payloads:
-            if original in variables and variables[original] != payload:
-                raise ValueError(f"private Variable payload mismatch for {original!r}")
-            variables[original]=copy.deepcopy(payload)
-        a["variables"]=variables
+        # Make this restored Variable immediately addressable so a later
+        # nested-variable row can resolve its original registry path.
+        variables=a.get("variables")
+        if not isinstance(variables,dict):
+            variables={}
+            a["variables"]=variables
+        if original in variables and variables[original] != payload:
+            raise ValueError(f"private Variable payload mismatch for {original!r}")
+        variables[original]=copy.deepcopy(payload)
 
     # Copy States only after private Variable references have been restored.
     # Otherwise a retained top-level State containing a localized constant or
