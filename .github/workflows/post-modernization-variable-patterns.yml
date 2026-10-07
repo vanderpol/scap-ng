@@ -125,6 +125,8 @@ jobs:
           funcs=Counter()
           contexts=Counter()
           static_contexts=Counter()
+          static_single_contexts=Counter()
+          static_signatures=Counter()
           fanout=Counter()
           refusal=Counter()
           patterns=Counter()
@@ -141,6 +143,7 @@ jobs:
                   "compile_time_static_constants",
                   "compile_time_static_locals",
                   "compile_time_static_variables_with_multiple_consumers",
+                  "compile_time_static_single_consumer_variables",
                   "runtime_variables",
                   "variable_dependency_edges",
               ):
@@ -155,6 +158,12 @@ jobs:
               contexts.update(r.get("consumer_context_counts") or {})
               static_contexts.update(
                   r.get("compile_time_static_consumer_context_counts") or {}
+              )
+              static_single_contexts.update(
+                  r.get("compile_time_static_single_consumer_context_counts") or {}
+              )
+              static_signatures.update(
+                  r.get("compile_time_static_context_signature_counts") or {}
               )
               fanout.update(r.get("fanout_bucket_counts") or {})
               refusal.update(r.get("foreach_v1_refusal_reason_counts") or {})
@@ -193,6 +202,8 @@ jobs:
                   "function_counts":dict(funcs),
                   "consumer_context_counts":dict(contexts),
                   "compile_time_static_consumer_context_counts":dict(static_contexts),
+                  "compile_time_static_single_consumer_context_counts":dict(static_single_contexts),
+                  "compile_time_static_context_signature_counts":dict(static_signatures),
                   "fanout_bucket_counts":dict(fanout),
                   "foreach_v1_refusal_reason_counts":dict(refusal),
                   "unique_pattern_signatures":len(patterns),
