@@ -145,6 +145,33 @@ rather than either:
 - copying the graph into every Rule Assessment; or
 - creating a testless file named `*.assessment.yaml`.
 
+## Apache executable prototype
+
+The research prototype now emits a real source artifact:
+
+`shared/observations/apache-httpd-discovery.observation.yaml`
+
+and three representative rewritten consumer Assessments.
+
+For the pinned Apache 2.4 corpus:
+
+- **15** Rule Assessments match the exact shared discovery graph;
+- **4 Objects + 11 Variables** move behind the Observation boundary;
+- public export surface: **2 typed value streams**;
+- `httpd_executable`: **21** consumer references;
+- `primary_and_included_configs`: **18** consumer references;
+- rejected eligible consumers: **0**;
+- flatten/re-expansion to every faithful converted Assessment: **passed**.
+
+Focused negative coverage rejects private Observation-node access.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37619423430
+
+This proves source extraction and exact flattening only. Runtime execution,
+status/completeness propagation, package-manifest typing, cycle handling, and
+collector reuse remain research before promotion.
+
 ## Open naming decision
 
 The final standard term is intentionally unresolved. Candidates include:
