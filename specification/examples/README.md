@@ -14,9 +14,19 @@ parses.
 Completed review iterations preserve their exact example set immutably under
 `review/iterations/`.
 
-## Source examples
+## Active 0.3 source candidate
 
-Start with these small native Assessment examples:
+The current six-benchmark 0.3 human-review candidate is generated from pinned
+SCAP 1.4 sources and includes complete faithful-versus-modernized authoring trees:
+
+- [0.3 candidate review build](https://github.com/vanderpol/scap-ng/actions/runs/37649993955)
+- [combined six-benchmark artifact](https://github.com/vanderpol/scap-ng/actions/runs/37649993955/artifacts/11496651572)
+
+This is prerelease review material, not accepted 0.3 syntax.
+
+## Frozen 0.2 source examples
+
+For small checked-in examples, start here:
 
 - [UNIX file](../../board/review-content/0.2.0/content/unix-file.assessment.yaml)
 - [Windows registry](../../board/review-content/0.2.0/content/registry.assessment.yaml)
@@ -30,6 +40,10 @@ stress cases, see
 [Assessment feature samples](../../board/review-content/0.2.0/FEATURE-SAMPLES.md).
 
 ## Result examples
+
+The checked-in result fixtures below are the frozen 0.2 baseline. They remain
+useful examples, but they SHALL be revalidated/version-labeled for 0.3 before a
+0.3 prerelease is published.
 
 For a complete linked Assessment Result example, including Test/State/entity
 comparison, Items, provenance, completeness, conditional execution, and reused
