@@ -79,6 +79,66 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
             {"test_state":2},
         )
 
+
+    def test_consumer_local_states_duplicate_reused_test_state_and_roundtrip(self):
+        source=self.base()
+        rendered,identity=inline_private(source,inline_state_consumers=True)
+        a=rendered["assessment"]
+        self.assertIsInstance(a["tests"]["one"]["states"][1],dict)
+        self.assertIsInstance(a["tests"]["two"]["states"][0],dict)
+        self.assertNotIn("shared-state",a.get("states",{}))
+        rows=[
+            row for row in identity["inlined_state_consumer_occurrences"]
+            if row["state"]=="shared-state"
+        ]
+        self.assertEqual(len(rows),2)
+        self.assertEqual({row["consumer"] for row in rows},{"test"})
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_consumer_local_filter_state_roundtrip(self):
+        source={
+            "assessment":{
+                "id":"filter-state-locality",
+                "mode":"automated",
+                "objects":{
+                    "a":{"capability":"unix.file","select":{"path":{"value":"/a"}}},
+                    "b":{"capability":"unix.file","select":{"path":{"value":"/b"}}},
+                    "combined":{
+                        "capability":"unix.file",
+                        "set":{
+                            "operator":"union",
+                            "operands":[
+                                {"object":"a","filters":[{"state":"only-root","action":"include"}]},
+                                {"object":"b","filters":[{"state":"only-root","action":"include"}]},
+                            ],
+                        },
+                    },
+                },
+                "states":{
+                    "only-root":{
+                        "capability":"unix.file",
+                        "state":{"field":"user_id","value":"0"},
+                    },
+                },
+                "tests":{"one":{"capability":"unix.file","object":"combined"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_set_operands=True,
+            inline_state_consumers=True,
+        )
+        a=rendered["assessment"]
+        combined=a["tests"]["one"]["object"]
+        for operand in combined["set"]["operands"]:
+            self.assertIsInstance(operand["filters"][0]["state"],dict)
+        self.assertNotIn("states",a)
+        rows=identity["inlined_state_consumer_occurrences"]
+        self.assertEqual(len(rows),2)
+        self.assertEqual({row["consumer"] for row in rows},{"filter"})
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_variable_reference_prevents_object_inlining(self):
         source=self.base()
         # Reuse private-object from a Variable to make it independently addressable.
