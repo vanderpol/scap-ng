@@ -107,6 +107,23 @@ class StaticLiteralCollectionTests(unittest.TestCase):
         self.assertNotIn("prefix", rendered["assessment"]["variables"])
         self.assertEqual(proof.reexpand_constants(rendered, identity), source)
 
+    def test_no_static_constant_is_exact_noop(self):
+        source={
+            "assessment":{
+                "variables":{
+                    "runtime":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"values":{"object":"users","field":"home_dir"}},
+                    }
+                }
+            }
+        }
+        rendered,identity=proof.inline_constants(copy.deepcopy(source))
+        self.assertEqual(identity,[])
+        self.assertEqual(rendered,source)
+        self.assertEqual(proof.reexpand_constants(rendered,identity),source)
+
     def test_list_constant_outside_direct_value_fails_closed(self):
         source = {
             "assessment": {
