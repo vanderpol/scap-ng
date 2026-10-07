@@ -29,6 +29,10 @@ Open the run's **Artifacts** section and download
 not used here because they are not reliable navigation links for all GitHub
 sessions.
 
+## Explicitly deferred beyond 0.3
+
+See the concise [deferred/out-of-scope list](../../specification/deferred-after-0.3.md). Deferred research is not part of the normative 0.3 review package.
+
 ## Historical 0.2.0 baseline — review closed
 
 The 0.2.0 package is frozen historical reference only. OVAL Board review has moved
