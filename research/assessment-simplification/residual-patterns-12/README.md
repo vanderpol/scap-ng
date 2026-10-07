@@ -231,9 +231,20 @@ Examples SV-258013, SV-258020 and SV-258026 use the same graph:
 
 This is another domain concept hidden behind generic Variable operations.
 
-**Research hypothesis:** a typed dconf/configuration capability may be more
-meaningful than teaching ordinary authors to build paths with
-`object_values + concat`.
+**Follow-up result:** the broader RHEL 9 converted corpus contains 14 automated
+Assessments touching `/etc/dconf/db` and 7 reading
+`/etc/dconf/profile/user`, but only these three use this exact
+profile-value -> derived-lock-directory graph. That is too narrow, by itself,
+to justify a new dconf-specific capability.
+
+The graph fits a more general bounded `foreach` proof class instead:
+one ObjectComponent projection, only singleton literal prefix/suffix operands,
+and one target Object selector with `var_check: at least one`. See
+[foreach-07](../foreach-07/README.md).
+
+General `concat` remains review-required because two collection-valued
+operands can form a Cartesian product. The AIDE path construction in SV-258134
+is a concrete counterexample.
 
 ### 6. Windows event-log path derivation — 3 Server 2025 Assessments
 
