@@ -267,6 +267,53 @@ This still does not prove that unioning source locations models configuration
 precedence or effective-value semantics. It only proves that the existing Set
 graph can be presented more locally without structural loss.
 
+## Retained-component reason census
+
+A follow-up census classified why components still remained Assessment-scoped
+after direct locality and the bounded private Set-operand rule.
+
+Across the same 676 RHEL 9 + Windows Server 2025 Assessments, the original
+1,087 Objects fell to **107**. Those 107 break down as:
+
+| Reason the Object remained named | Count |
+| --- | ---: |
+| Referenced only by graph/dataflow, not directly by a Test | 73 |
+| Directly shared by multiple Tests | 19 |
+| Referenced by one Test plus other graph/dataflow | 15 |
+
+Only **34 / 1,087 original Objects (3.1%)** therefore have any direct
+same-Assessment sharing pressure after the bounded locality transforms. The 73
+graph-only survivors are candidates for further consumer-local placement
+(Variable, Set, Filter, or another explicit dataflow construct), not evidence
+that an Assessment-wide Object registry is normally useful.
+
+The 858 original States fell to **125**:
+
+| Reason the State remained named | Count |
+| --- | ---: |
+| Graph/filter-side reference | 57 |
+| Shared by multiple Tests | 40 |
+| Unreferenced or otherwise outside the direct-reference classifier | 28 |
+
+This motivates a stronger research hypothesis:
+
+> **Local to the semantic consumer; explicit shared acquisition only when
+> collection identity is genuinely shared.**
+
+For States, the consumer may be a Test or Filter. A shared State is a predicate,
+so future research can test whether repeated consumers may carry local copies
+while provenance retains the source identity.
+
+Objects require a stricter boundary. Copying one shared Object into two Tests
+can change acquisition identity, collection timing/caching, completeness, and
+evidence. The stronger Object-local model therefore SHALL NOT be justified by
+textual duplication. Genuine shared acquisition should instead be evaluated
+against the project's explicit shared collection-execution / Item-materialization
+model.
+
+This census is evidence for further research only. It does not change the
+0.3.0 schema.
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
