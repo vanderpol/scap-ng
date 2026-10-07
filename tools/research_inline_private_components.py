@@ -202,6 +202,7 @@ def inline_private(
     inline_private_set_operands: bool = False,
     inline_private_filtered_set_operands: bool = False,
     inline_state_consumers: bool = False,
+    inline_variable_object_consumers: bool = False,
 ) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
@@ -224,6 +225,7 @@ def inline_private(
         },
         "inlined_objects":{},
         "inlined_set_operand_objects":[],
+        "inlined_variable_objects":[],
         "inlined_states":{},
         "inlined_state_consumer_occurrences":[],
         "shared_objects":[],
@@ -280,6 +282,50 @@ def inline_private(
                     "filter_count":len(filters) if isinstance(filters,list) else 0,
                 })
                 remove_objects.add(child_id)
+
+    if inline_variable_object_consumers:
+        # Bounded v4 locality experiment: inline a leaf Object only when the
+        # faithful graph contains exactly one reference to it and that sole
+        # reference is an Object-valued edge inside one Variable expression.
+        # This does not duplicate acquisition and does not touch Sets or
+        # Objects also used by Tests/other graph consumers.
+        variables=a.get("variables") or {}
+
+        def replace_variable_object_ref(value: Any, object_id: str, payload: dict, path: list[Any]) -> list[list[Any]]:
+            hits=[]
+            if isinstance(value,dict):
+                for key,child in list(value.items()):
+                    if key=="object" and child==object_id:
+                        value[key]=copy.deepcopy(payload)
+                        hits.append(path+[key])
+                    else:
+                        hits.extend(replace_variable_object_ref(child,object_id,payload,path+[key]))
+            elif isinstance(value,list):
+                for index,child in enumerate(value):
+                    hits.extend(replace_variable_object_ref(child,object_id,payload,path+[index]))
+            return hits
+
+        for object_id,payload in list(objects.items()):
+            if (
+                refs.get(object_id)!=1
+                or contexts.get(object_id)!={"variable":1}
+                or not isinstance(payload,dict)
+                or isinstance(payload.get("set"),dict)
+            ):
+                continue
+            hits=replace_variable_object_ref(
+                variables,object_id,payload,["variables"]
+            )
+            if len(hits)!=1:
+                # Fail closed. Generic scalar-reference accounting said there
+                # was exactly one Variable reference, but this bounded authoring
+                # form only recognizes an explicit {object:<id>} edge.
+                continue
+            identity["inlined_variable_objects"].append({
+                "object":object_id,
+                "path":hits[0],
+            })
+            remove_objects.add(object_id)
 
     for test_id,test in tests.items():
         obj=test.get("object")
@@ -419,10 +465,23 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         states.setdefault(original,payload)
         parent[last]=original
 
+    # Restore Variable-local Object payloads while their recorded rendered
+    # paths are still present.
+    variable_local_payloads=[]
+    for row in identity.get("inlined_variable_objects",[]):
+        parent,last=path_parent(a,row["path"])
+        payload=copy.deepcopy(parent[last])
+        variable_local_payloads.append((row["object"],payload))
+        parent[last]=row["object"]
+
     # Copy top-level Objects only after consumer-local State references have
     # been restored. Otherwise a stale pre-restoration copy can reintroduce
     # inline Filter-State payloads when the Object map is written back.
     objects=copy.deepcopy(a.get("objects") or {})
+    for original,payload in variable_local_payloads:
+        if original in objects and objects[original] != payload:
+            raise ValueError(f"Variable-local Object payload mismatch for {original!r}")
+        objects[original]=payload
 
     for original,path in identity.get("inlined_objects",{}).items():
         parts=path.split(".")
@@ -550,6 +609,14 @@ def main():
         ),
     )
     ap.add_argument(
+        "--inline-variable-object-consumers",
+        action="store_true",
+        help=(
+            "Research v4: localize a single-use leaf Object into the one "
+            "Variable expression that consumes it through an explicit object edge."
+        ),
+    )
+    ap.add_argument(
         "--inline-state-consumers",
         action="store_true",
         help=(
@@ -581,6 +648,7 @@ def main():
         "inline_private_set_operands":bool(args.inline_private_set_operands),
         "inline_private_filtered_set_operands":bool(args.inline_private_filtered_set_operands),
         "inline_state_consumers":bool(args.inline_state_consumers),
+        "inline_variable_object_consumers":bool(args.inline_variable_object_consumers),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -592,7 +660,7 @@ def main():
         "named_refs_before":0,"named_refs_after":0,
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
-        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
+        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_variable_objects":0,"inlined_states":0,
         "inlined_state_consumer_occurrences":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
@@ -608,6 +676,7 @@ def main():
             inline_private_set_operands=args.inline_private_set_operands,
             inline_private_filtered_set_operands=args.inline_private_filtered_set_operands,
             inline_state_consumers=args.inline_state_consumers,
+            inline_variable_object_consumers=args.inline_variable_object_consumers,
         )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
@@ -631,6 +700,7 @@ def main():
             "after":after,
             "inlined_objects":len(identity["inlined_objects"]),
             "inlined_set_operand_objects":len(identity["inlined_set_operand_objects"]),
+            "inlined_variable_objects":len(identity["inlined_variable_objects"]),
             "inlined_states":len(identity["inlined_states"]),
             "inlined_state_consumer_occurrences":len(identity["inlined_state_consumer_occurrences"]),
             "shared_objects":len(identity["shared_objects"]),
@@ -670,6 +740,7 @@ def main():
         totals["bytes_after"]+=after["normalized_bytes"]
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
+        totals["inlined_variable_objects"]+=row["inlined_variable_objects"]
         totals["inlined_states"]+=row["inlined_states"]
         totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
         for reason,count in row["retained_object_reason_counts"].items():
