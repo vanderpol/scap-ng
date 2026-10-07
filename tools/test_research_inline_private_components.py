@@ -194,6 +194,71 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         self.assertIsInstance(operand["filters"][0]["state"],dict)
         self.assertEqual(reexpand(rendered,identity),source)
 
+
+    def test_recursive_object_graph_locality_roundtrips(self):
+        source={
+            "assessment":{
+                "id":"recursive-object-locality",
+                "mode":"automated",
+                "objects":{
+                    "leaf":{
+                        "capability":"unix.file",
+                        "select":{"path":{"value":"/tmp"}},
+                    },
+                    "middle":{
+                        "capability":"unix.file",
+                        "source":{"object":"leaf"},
+                    },
+                    "outer":{
+                        "capability":"unix.file",
+                        "source":{"object":"middle"},
+                    },
+                },
+                "tests":{"one":{"capability":"unix.file","object":"outer"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_object_consumers=True,
+        )
+        outer=rendered["assessment"]["tests"]["one"]["object"]
+        self.assertIsInstance(outer["source"]["object"],dict)
+        middle=outer["source"]["object"]
+        self.assertIsInstance(middle["source"]["object"],dict)
+        self.assertNotIn("objects",rendered["assessment"])
+        self.assertEqual(
+            [row["object"] for row in identity["inlined_object_graph_objects"]],
+            ["leaf","middle"],
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_reused_object_graph_child_stays_named(self):
+        source={
+            "assessment":{
+                "id":"shared-object-graph-child",
+                "mode":"automated",
+                "objects":{
+                    "leaf":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                    "left":{"capability":"unix.file","source":{"object":"leaf"}},
+                    "right":{"capability":"unix.file","source":{"object":"leaf"}},
+                },
+                "tests":{
+                    "one":{"capability":"unix.file","object":"left"},
+                    "two":{"capability":"unix.file","object":"right"},
+                },
+                "evaluate":{"all":[{"test":"one"},{"test":"two"}]},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_private_object_consumers=True,
+        )
+        self.assertIn("leaf",rendered["assessment"]["objects"])
+        self.assertEqual(identity["inlined_object_graph_objects"],[])
+        self.assertEqual(reexpand(rendered,identity),source)
+
+
     def test_variable_only_object_localizes_and_roundtrips(self):
         source=self.base()
         rendered,identity=inline_private(
