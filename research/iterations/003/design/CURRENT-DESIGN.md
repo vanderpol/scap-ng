@@ -28,7 +28,7 @@
 - **Object** is authored resource selection/acquisition. **Collection** is the runtime act of evaluating an Object and producing Items plus status/completeness; it is not an authored synonym for Object.
 - A Test may consume another first-class node directly when that is the natural semantic source; `variable.value` is the established example and does not require an artificial Object wrapper.
 - Test, Object, and State/predicate capabilities remain independently typed where those nodes exist.
-- Source/presentation mapping order has no execution meaning; forward references are valid. For readability, authored content should present metadata/inputs and the explicit `evaluate` summary before the implementation details when practical.
+- Source/presentation mapping order has no execution meaning; forward references are valid. 0.3 does not introduce a new normative placement rule for `evaluate`; presentation order remains an authoring/editor concern.
 - Named internal component IDs use meaningful lowercase kebab-case with the component type as a required suffix: `-object`, `-state`, `-variable`, `-test`, and `-input`. Inline/private components do not receive artificial IDs. See [component naming](../../../../specification/assessment/component-naming.md).
 - Private Objects and States are authored with their semantic consumer. Assessment-scoped reusable/referenceable acquisitions are declared under `shared_objects:`; use sites still use ordinary `object:` references.
 
