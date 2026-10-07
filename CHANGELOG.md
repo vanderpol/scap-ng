@@ -10,7 +10,7 @@ proposals are not listed as delivered features.
 
 - Defined the SCAP-NG core objectives and bidirectional objective-to-issue
   traceability so release work can be evaluated against explicit project goals
-  rather than feature novelty alone. [#184](https://github.com/vanderpol/scap-ng/issues/184)
+  rather than feature novelty alone. [#174](https://github.com/vanderpol/scap-ng/issues/174)
 - Simplified repository documentation and navigation, including a single active
   review entry point and clearer separation of specification, review,
   governance, and historical material. [#182](https://github.com/vanderpol/scap-ng/issues/182)
@@ -19,7 +19,7 @@ proposals are not listed as delivered features.
   specification at release checkpoints. [#180](https://github.com/vanderpol/scap-ng/issues/180)
 - Required every new commit to reference a GitHub issue that records why the
   work exists. [#181](https://github.com/vanderpol/scap-ng/issues/181)
-- Established this issue-linked release changelog process. [#183](https://github.com/vanderpol/scap-ng/issues/183)
+- Established this issue-linked release changelog process. [#181](https://github.com/vanderpol/scap-ng/issues/181)
 
 ### Language, schema, and results
 
