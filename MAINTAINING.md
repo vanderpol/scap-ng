@@ -10,6 +10,17 @@ The repository has extensive research history and broad CI coverage. Those are u
 
 A semantic language change is not accepted merely because schemas, converters, round-trip tests, Self-Assertion, or benchmark builds pass. Before a semantic change is treated as current design, a human reviewer must be able to understand what changed, why it changed, what existing semantics it affects, and what evidence supports it.
 
+## Commit traceability
+
+Every new commit SHALL reference at least one GitHub issue in the commit
+message. The issue is the durable record of why the work exists, what release or
+objective it serves, and what review/evidence is required.
+
+Use an explicit reference such as `(#181)` or `Refs #181`. One issue may
+cover several tightly related commits, and one commit may reference several
+issues. Do not create content-free placeholder issues simply to satisfy the
+rule. Existing historical commits are not rewritten.
+
 ## Normal development loop
 
 Use this order for ordinary work:
