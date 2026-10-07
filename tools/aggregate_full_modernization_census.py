@@ -94,6 +94,7 @@ def main() -> int:
     observation_exports = Counter()
     classes_by_kind = defaultdict(Counter)
     residuals_by_kind = defaultdict(Counter)
+    complex_residuals_by_kind = defaultdict(Counter)
     packages_with_observation = 0
     package_rows = []
 
@@ -117,6 +118,13 @@ def main() -> int:
             add_counts(classes_by_kind[kind], counts)
         for kind, counts in (s.get("residual_reason_counts_by_kind") or {}).items():
             add_counts(residuals_by_kind[kind], counts)
+        for assessment in report.get("assessments", []):
+            if assessment.get("classification") != "meaningfully_complex":
+                continue
+            kind = assessment.get("kind", "other")
+            complex_residuals_by_kind[kind].update(
+                assessment.get("residual_reasons") or []
+            )
 
         if int(s.get("observation_artifacts", 0) or 0) > 0:
             packages_with_observation += 1
@@ -152,6 +160,10 @@ def main() -> int:
         "residual_reason_counts": dict(residuals),
         "residual_reason_counts_by_kind": {
             kind: dict(counts) for kind, counts in sorted(residuals_by_kind.items())
+        },
+        "meaningfully_complex_residual_reason_counts_by_kind": {
+            kind: dict(counts)
+            for kind, counts in sorted(complex_residuals_by_kind.items())
         },
         "foreach_review_reason_counts": dict(foreach_reasons),
         "observation_consumer_counts": dict(observation_consumers),
@@ -222,7 +234,9 @@ def main() -> int:
     rc = summary.get("classification_counts_by_kind", {}).get("rule", {})
     rp = summary.get("rule_assessment_classification_pct", {})
     rule_residuals = (
-        summary.get("residual_reason_counts_by_kind", {}).get("rule", {})
+        summary.get(
+            "meaningfully_complex_residual_reason_counts_by_kind", {}
+        ).get("rule", {})
     )
 
     lines = [
