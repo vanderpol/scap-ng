@@ -70,6 +70,7 @@ class ApacheObservationProofTests(unittest.TestCase):
         exports=observation["observation"]["exports"]
         self.assertEqual(set(exports),set(EXPORTS.values()))
         for contract in exports.values():
+            self.assertEqual(contract["kind"],"values")
             self.assertEqual(contract["datatype"],"string")
             self.assertEqual(contract["cardinality"],"zero_or_more")
             self.assertIn("variable",contract)
