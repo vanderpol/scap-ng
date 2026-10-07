@@ -59,6 +59,18 @@ class V03VocabularyContractTests(unittest.TestCase):
             "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/match_quantifier",
         )
 
+    def test_03_private_objects_do_not_require_titles_but_shared_objects_do(self):
+        mapping=self.mapping("unix.file.json")
+        generated=generate(mapping,ROOT,schema_version="0.3.0")
+        self.assertNotIn("object_title",generated["$defs"]["object"]["required"])
+        self.assertIn("capability",generated["$defs"]["object"]["required"])
+
+        assessment_schema=json.loads((V03/"assessment.schema.json").read_text(encoding="utf-8"))
+        shared=(assessment_schema["properties"]["assessment"]["properties"]
+                ["shared_objects"]["additionalProperties"]["allOf"])
+        requirements=[set(row.get("required",[])) for row in shared if isinstance(row,dict)]
+        self.assertIn({"object_title"},requirements)
+
     def test_03_converter_emits_canonical_fields_and_values(self):
         mapping=self.mapping("windows.wmi.query.json")
         doc={"assessment":{

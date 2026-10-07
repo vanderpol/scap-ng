@@ -572,6 +572,25 @@ class V03ProductionMappingTests(unittest.TestCase):
         self.assertEqual(test["existence"],"none")
         self.assertEqual(test["match"],"all")
 
+    def test_v03_registry_rejects_deprecated_upward_traversal(self):
+        mapping=self.mapping("windows.registry.json")
+        doc={"assessment":{
+            "objects":{"registry-object":{
+                "object_title":"registry",
+                "capability":"windows.registry",
+                "select":{
+                    "hive":{"value":"HKEY_LOCAL_MACHINE","operation":"equals","datatype":"string"},
+                    "key":{"value":"Software","operation":"equals","datatype":"string"},
+                    "name":{"value":"Enabled","operation":"equals","datatype":"string"},
+                },
+                "behaviors":{"max_depth":"1","recurse_direction":"up"},
+            }},
+            "states":{},
+            "tests":{},
+        }}
+        with self.assertRaisesRegex(ValueError,"deprecated OVAL recurse_direction value: up"):
+            apply_capability_mapping(doc,mapping)
+
     def test_v03_registry_uses_native_hive_type_and_test_vocabulary(self):
         mapping=self.mapping("windows.registry.json")
         self.assertTrue(mapping["native"]["post_alignment_ready"])
@@ -584,6 +603,7 @@ class V03ProductionMappingTests(unittest.TestCase):
                     "key":{"value":"SOFTWARE\\\\Policies\\\\Example","operation":"equals","datatype":"string"},
                     "name":{"value":"Enabled","operation":"equals","datatype":"string"},
                 },
+                "behaviors":{"max_depth":"1","recurse_direction":"down"},
             }},
             "states":{
                 "enabled-state":{
@@ -635,6 +655,8 @@ class V03ProductionMappingTests(unittest.TestCase):
         obj=out["assessment"]["objects"]["policy-object"]
         self.assertEqual(obj["select"]["hive"],"local_machine")
         self.assertEqual(obj["select"]["key"]["operation"],"equals")
+        self.assertEqual(obj["traversal"],{"max_depth":1})
+        self.assertNotIn("behaviors",obj)
         state=out["assessment"]["states"]["enabled-state"]["state"]
         self.assertEqual(state["all"][0]["field"],"type")
         self.assertEqual(state["all"][0]["value"],"dword")

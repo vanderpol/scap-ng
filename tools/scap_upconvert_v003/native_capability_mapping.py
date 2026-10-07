@@ -307,6 +307,40 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
         obj.pop("behaviors",None)
 
 
+def _materialize_hierarchy_traversal(obj: dict, mapping: dict):
+    """Translate non-deprecated OVAL hierarchy recursion to native traversal."""
+    native_cfg=mapping.get("native") or {}
+    if native_cfg.get("traversal_definition")!="hierarchy_traversal":
+        return
+    if not isinstance(obj.get("select"),dict):
+        return
+
+    behaviors=obj.get("behaviors") or {}
+    direction=str(behaviors.get("recurse_direction","none"))
+    if direction=="up":
+        raise ValueError("unsupported deprecated OVAL recurse_direction value: up")
+    if direction not in {"none","down"}:
+        raise ValueError(f"unsupported OVAL recurse_direction value: {direction!r}")
+    try:
+        raw_depth=int(behaviors.get("max_depth",-1))
+    except (TypeError,ValueError) as exc:
+        raise ValueError(
+            f"invalid OVAL max_depth value: {behaviors.get('max_depth')!r}"
+        ) from exc
+    if raw_depth < -1:
+        raise ValueError(f"invalid OVAL max_depth value: {raw_depth}")
+
+    if direction=="down":
+        obj["traversal"]={"max_depth":None if raw_depth==-1 else raw_depth}
+
+    for key in ("max_depth","recurse_direction"):
+        behaviors.pop(key,None)
+    if behaviors:
+        obj["behaviors"]=behaviors
+    else:
+        obj.pop("behaviors",None)
+
+
 def _materialize_behavior_collection_parameters(obj: dict, mapping: dict):
     """Move reviewed OVAL behavior inputs into explicit native collection parameters."""
     native_cfg=mapping.get("native") or {}
@@ -566,6 +600,7 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             obj["select"]=renamed
 
         _materialize_file_traversal(obj,mapping)
+        _materialize_hierarchy_traversal(obj,mapping)
         if isinstance(obj.get("set"),dict):
             if obj.get("behaviors"):
                 raise ValueError(

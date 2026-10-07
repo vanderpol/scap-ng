@@ -467,7 +467,15 @@ def generate(mapping, repo_root, schema_version=None):
         if name in field_documentation:
             scalar_state_branches[-1]["description"] = field_documentation[name]
 
-    object_required = ["object_title", "capability"]
+    # In 0.3 the deep capability Object shape is shared by named
+    # shared_objects and consumer-local inline Objects. Inline/private Objects
+    # have structural identity from their consumer and SHALL NOT need duplicated
+    # title metadata; the Assessment schema separately requires object_title on
+    # named shared_objects.
+    object_required = (
+        ["capability"] if version == "0.3.0"
+        else ["object_title", "capability"]
+    )
 
     # 0.2 stays frozen on the inherited OVAL-aligned field names.
     # 0.3 uses the accepted native authoring names.
