@@ -39,7 +39,7 @@ def violations(document):
         if not isinstance(payload,dict) or not isinstance(payload.get('capability'),str):
             errors.append(f'assessment.objects.{name}: Object must declare capability')
     for name,payload in a.get('tests',{}).items():
-        if isinstance(payload,dict) and a.get('specification',{}).get('version') == '0.2.0' and 'reported_elements' not in payload:
+        if isinstance(payload,dict) and a.get('specification',{}).get('version') in {'0.2.0','0.3.0'} and 'reported_elements' not in payload:
             errors.append(f'assessment.tests.{name}: reported_elements is required; no hidden reporting default')
         if isinstance(payload,dict) and 'collect' in payload:
             errors.append(f'assessment.tests.{name}.collect: stale pre-alignment Collection reference; use object or direct native source')
