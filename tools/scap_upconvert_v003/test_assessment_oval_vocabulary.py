@@ -38,6 +38,10 @@ class VocabularyAlignmentTests(unittest.TestCase):
             }
         }
         result = align_assessment_vocabulary(source)["assessment"]
+        self.assertEqual(
+            result["specification"],
+            {"id":"scap-ng.pre-alpha.assessment","version":"0.3.0"},
+        )
         self.assertNotIn("collections", result)
         self.assertIn("config-object", result["objects"])
         self.assertEqual(result["tests"]["test-config"]["object"], "config-object")
