@@ -522,10 +522,9 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     out=copy.deepcopy(research_doc)
     a=out["assessment"]
     tests=a.get("tests") or {}
-    states=copy.deepcopy(a.get("states") or {})
     private_variable_payloads=[]
 
-    # Restore private Variable references before moving inline Objects/States
+    # Restore private Variable references before taking copies of Objects/States
     # back to Assessment scope because recorded paths describe the rendered tree.
     # Rebuild the final Variable map only after other locality reversals have
     # restored any inline Objects inside surviving Variable expressions.
@@ -544,6 +543,11 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         original=row["variable"]
         private_variable_payloads.append((original,payload))
         parent[last]={"variable":original}
+
+    # Copy States only after private Variable references have been restored.
+    # Otherwise a retained top-level State containing a localized constant or
+    # external Variable would be reintroduced from a stale pre-restoration copy.
+    states=copy.deepcopy(a.get("states") or {})
 
     # Restore consumer-local copies before moving any inline Objects back to
     # Assessment scope, because recorded paths describe the rendered tree.
