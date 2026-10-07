@@ -54,6 +54,46 @@ jobs:
             rule: SV-258004
             expect_rewrite: "true"
             expect_schema_valid: "true"
+          - label: Oracle Linux 9 KerberosAuthentication conditional
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+            rule: SV-270697
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253260 BitLocker conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253260
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253340 event log path conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253340
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253341 event log path conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253341
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253342 event log path conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253342
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253491 domain membership conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253491
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows 11 SV-253494 domain membership conditional
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rule: SV-253494
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
+          - label: Windows Server DNS SV-259341 forwarder conditional
+            artifact: U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+            rule: SV-259341
+            expect_rewrite: "either"
+            expect_schema_valid: "either"
           - label: Windows Server 2025 SV-278001
             artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
             rule: SV-278001
@@ -153,8 +193,10 @@ jobs:
           ]
           assert rows, evidence
           applied=[r for r in rows if r["conditional_modernization"].get("rewrite_performed")]
-          expect=os.environ["EXPECT_REWRITE"] == "true"
-          assert bool(applied) is expect, rows
+          expect_mode=os.environ["EXPECT_REWRITE"]
+          expect=(expect_mode == "true")
+          if expect_mode != "either":
+              assert bool(applied) is expect, rows
           for row in rows:
               report=row["conditional_modernization"]
               assert report["pattern_based"] is True
@@ -184,10 +226,11 @@ jobs:
               return False
 
           has_conditional=any(has_if(d["assessment"]["evaluate"]) for d in docs)
-          assert has_conditional is expect, docs
+          if expect_mode != "either":
+              assert has_conditional is expect, docs
           print(json.dumps({
               "rule":os.environ["RULE"],
-              "expected_rewrite":expect,
+              "expected_rewrite":expect_mode,
               "rewrites":sum(len(r["conditional_modernization"]["applied"]) for r in applied),
           },indent=2))
           PY
@@ -201,10 +244,12 @@ jobs:
           import json, os
           from pathlib import Path
           report=json.loads(Path("/tmp/conditional-schema.json").read_text())
-          expect=os.environ["EXPECT_SCHEMA_VALID"] == "true"
+          expect_mode=os.environ["EXPECT_SCHEMA_VALID"]
+          expect=(expect_mode == "true")
           valid=(report.get("invalid",0)==0)
-          assert valid is expect, report
-          if not expect:
+          if expect_mode != "either":
+              assert valid is expect, report
+          if expect_mode == "false":
               messages=[
                   err.get("message","")
                   for row in report.get("results",[])
