@@ -16,10 +16,7 @@ Every new commit SHALL reference at least one GitHub issue in the commit
 message. The issue is the durable record of why the work exists, what release or
 objective it serves, and what review/evidence is required.
 
-Use an explicit reference such as `(#181)` or `Refs #181`. One issue may
-cover several tightly related commits, and one commit may reference several
-issues. Do not create content-free placeholder issues simply to satisfy the
-rule. Existing historical commits are not rewritten.
+Use an explicit reference such as `(#181)` or `Refs #181`. One durable issue should normally cover a coherent workstream and may therefore span several related commits. Do not create issue-per-commit noise or content-free placeholder issues simply to satisfy the rule. One commit may reference several issues when appropriate. Existing historical commits are not rewritten.
 
 ## Normal development loop
 
