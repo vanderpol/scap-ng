@@ -85,7 +85,9 @@ This is a hard repository operating rule for issue and release planning.
 This is a hard repository rule.
 
 - `review/current/` is the only active external review target.
-- Completed review cycles are frozen immutably as `review/iterations/NNN/`.
+- The source and result examples presented for a prerelease SHALL be regenerated or revalidated against that exact specification/schema version.
+- Current examples may evolve with the active prerelease; a sample from an older prerelease SHALL NOT be presented as current merely because it still validates.
+- Completed review cycles are frozen immutably as `review/iterations/NNN/`, including the exact source/result example set reviewed.
 - Never revise a frozen iteration to reflect later design work; start a new current review cycle instead.
 - Review iteration numbers are provenance checkpoints and are independent of product/release version numbers.
 - Alpha, beta, RC, and stable releases must be promoted from a specific completed review iteration and record that source iteration plus commit/tag.
