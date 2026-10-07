@@ -217,6 +217,10 @@ def convert_case(case, source=None):
         if not parity['equal']:
             raise ValueError(f"{case['name']}: intermediate semantic roundtrip: {parity}")
     aligned = align_assessment_vocabulary(intermediate)
+    # This adapter reproduces the frozen 0.2.0 Board package even though the
+    # shared current converter now targets 0.3.0. Make the historical target
+    # explicit before applying the versioned 0.2 capability mappings.
+    aligned["assessment"]["specification"]["version"] = "0.2.0"
     # 0.2.0 requires an explicit reporting selection on every Test. The
     # conversion preserves the complete source evidence surface.
     for test in aligned.get("assessment", {}).get("tests", {}).values():
