@@ -239,6 +239,16 @@ def promote_to_research_03(doc:dict)->dict:
     return out
 
 
+def variable_kind_counts(a:dict)->Counter:
+    counts=Counter()
+    for payload in (a.get("variables") or {}).values():
+        if not isinstance(payload,dict):
+            counts["unknown"]+=1
+            continue
+        counts[str(payload.get("kind") or "unknown")]+=1
+    return counts
+
+
 def residual_reasons(rendered:dict,identity:dict,evalm:dict):
     a=rendered["assessment"]
     reasons=[]
@@ -247,8 +257,13 @@ def residual_reasons(rendered:dict,identity:dict,evalm:dict):
         "multiple_tests","multiple_tests_and_graph","test_and_graph"
     } for reason in retained.values()):
         reasons.append("shared_acquisition")
-    if a.get("variables"):
-        reasons.append("nontrivial_variable_graph")
+    variable_kinds=variable_kind_counts(a)
+    if variable_kinds.get("local",0) or variable_kinds.get("unknown",0):
+        reasons.append("derived_variable_graph")
+    if variable_kinds.get("external",0):
+        reasons.append("external_input_binding")
+    if variable_kinds.get("constant",0):
+        reasons.append("constant_binding")
     if contains_key(a,{"set","filters","filter"}):
         reasons.append("set_filter_semantics")
     if evalm["test_count"]>1:
@@ -271,7 +286,7 @@ def classify(rendered:dict,identity:dict,evalm:dict,*,observation_applied:bool,f
         return "bounded_dataflow"
     reasons=residual_reasons(rendered,identity,evalm)
     structural={
-        "shared_acquisition","nontrivial_variable_graph","set_filter_semantics",
+        "shared_acquisition","derived_variable_graph","set_filter_semantics",
         "nested_boolean_logic","repeated_test_reference","named_state_reuse",
         "named_object_graph",
     }
@@ -387,6 +402,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             inline_private_filtered_set_operands=True,
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
+            inline_private_variables=True,
         )
         expanded=reexpand(rendered,identity)
         if expanded!=foreach_doc:
@@ -397,6 +413,14 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         after=metrics(rendered)
         eval_after=evaluate_metrics(row["path"],rendered)
         sum_metrics(totals,after,"modernized_")
+        localized_variables=identity.get("inlined_variables") or []
+        totals["private_binding_variables_localized"]+=len(localized_variables)
+        totals["private_external_variables_localized"]+=sum(
+            row.get("kind")=="external" for row in localized_variables
+        )
+        totals["private_constant_variables_localized"]+=sum(
+            row.get("kind")=="constant" for row in localized_variables
+        )
 
         category=classify(
             rendered,identity,eval_after,
@@ -441,6 +465,15 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                 "inlined_objects":len(identity.get("inlined_objects") or {}),
                 "inlined_set_operand_objects":len(identity.get("inlined_set_operand_objects") or []),
                 "inlined_variable_objects":len(identity.get("inlined_variable_objects") or []),
+                "inlined_variables":len(identity.get("inlined_variables") or []),
+                "inlined_external_variables":sum(
+                    row.get("kind")=="external"
+                    for row in (identity.get("inlined_variables") or [])
+                ),
+                "inlined_constant_variables":sum(
+                    row.get("kind")=="constant"
+                    for row in (identity.get("inlined_variables") or [])
+                ),
                 "inlined_states":len(identity.get("inlined_states") or {}),
                 "inlined_state_consumer_occurrences":len(
                     identity.get("inlined_state_consumer_occurrences") or []
@@ -492,6 +525,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                 "consumer-local Object/State presentation",
                 "private Set-operand locality",
                 "Variable-local Object locality",
+                "single-use external/constant Variable locality",
                 "foreach.direct-object-component.at-least-one.v1",
                 "proven shared Observation extraction shapes",
             ],
