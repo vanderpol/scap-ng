@@ -83,8 +83,6 @@ work. Every open 0.3.0 issue is listed so both directions can be audited.
 | [#180 0.3 prerelease specification normalization](https://github.com/vanderpol/scap-ng/issues/180) | O2, O7 |
 | [#181 Require issue references in every commit](https://github.com/vanderpol/scap-ng/issues/181) | O7 |
 | [#182 0.3 documentation cleanup and navigation normalization](https://github.com/vanderpol/scap-ng/issues/182) | O2, O7 |
-| [#183 Maintain release changelog from issue-linked work](https://github.com/vanderpol/scap-ng/issues/183) | O7 |
-| [#184 Define and maintain release objectives and issue traceability](https://github.com/vanderpol/scap-ng/issues/184) | O7 |
 | [#185 Audit 0.3 changes for complexity versus objective value](https://github.com/vanderpol/scap-ng/issues/185) | O2, O3, O7, O8 |
 
 ## Coverage audit
