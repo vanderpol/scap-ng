@@ -8,8 +8,8 @@ full-corpus census.
 
 The output is author-review material, not normative schema-valid 0.3 content.
 Every structural locality transformation must mechanically re-expand to its
-pre-locality input. Observation extraction must flatten exactly to the faithful
-input before any later modernization is applied.
+pre-locality input. Deferred post-0.3 features may be measured for reviewer
+context but are not applied to the rendered candidate.
 """
 from __future__ import annotations
 
@@ -23,7 +23,6 @@ from typing import Any
 import yaml
 
 from measure_full_modernization_census import (
-    apply_observation,
     build_observation_plan,
     load_assessments,
     promote_to_research_03,
@@ -66,28 +65,6 @@ def promote_tree_spec_versions(root:Path)->None:
             path.write_text(dump_yaml(doc),encoding="utf-8")
 
 
-def resolve_observation_target(
-    candidate_root:Path,
-    assessment_relative_path:Path,
-    extracted:dict,
-)->list[Path]:
-    targets=[]
-    bindings=(extracted.get("assessment") or {}).get("observations") or {}
-    for binding in bindings.values():
-        if not isinstance(binding,dict):
-            continue
-        source=binding.get("source")
-        if not isinstance(source,str):
-            continue
-        target=(candidate_root/assessment_relative_path.parent/source).resolve()
-        root_resolved=candidate_root.resolve()
-        try:
-            target.relative_to(root_resolved)
-        except ValueError as exc:
-            raise ValueError(f"Observation source escapes candidate root: {source}") from exc
-        targets.append(target)
-    return targets
-
 
 def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     if output_root.exists():
@@ -100,7 +77,6 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     if candidate_errors:
         raise ValueError(f"Observation candidate errors: {candidate_errors}")
 
-    observation_targets={}
     assessment_rows=[]
     totals={
         "automated_assessments":0,
@@ -120,30 +96,16 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         original=copy.deepcopy(row["doc"])
         relative=Path(row["relative_path"])
         working=copy.deepcopy(original)
-        observation_applied=False
         observation_type=None
 
         planned=observation_plan.get(index)
         if planned is not None:
-            kind,observation,_=planned
-            extracted,restored,_=apply_observation(kind,working,observation)
-            if restored!=working:
-                detail=first_difference(working,restored) or "unknown difference"
-                raise ValueError(
-                    f"Observation flatten mismatch for {relative}: {detail}"
-                )
-            targets=resolve_observation_target(output_root,relative,extracted)
-            if not targets:
-                raise ValueError(f"Observation consumer has no source binding: {relative}")
-            for target in targets:
-                prior=observation_targets.get(target)
-                if prior is not None and prior!=observation:
-                    raise ValueError(f"Observation payload collision at {target}")
-                observation_targets[target]=copy.deepcopy(observation)
-            working=extracted
-            observation_applied=True
+            # Observation is intentionally deferred beyond normative 0.3.
+            # Keep the opportunity visible in review evidence but do not
+            # rewrite the accepted candidate tree.
+            kind,_,_=planned
             observation_type=kind
-            totals["observation_consumers"]+=1
+            totals["deferred_observation_opportunities"]+=1
 
         research=promote_to_research_03(working)
         foreach_doc,foreach_report=modernize_foreach_v1(research,enabled=True)
@@ -213,10 +175,6 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             },
         })
 
-    for target,observation in observation_targets.items():
-        target.parent.mkdir(parents=True,exist_ok=True)
-        target.write_text(dump_yaml(observation),encoding="utf-8")
-
     # Final presentation-only 0.3 review surface. This does not participate in
     # semantic equivalence claims above; it reconciles known 0.3 terminology
     # and redundant benchmark-local naming for human review.
@@ -229,12 +187,12 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     )
     report={
         "format":"scap-ng-0.3-human-review-render-0.1",
-        "status":"research_only_not_accepted_design",
+        "status":"accepted_0_3_requirements_review_candidate",
         "label":label,
         "source_root":str(source_root),
         "candidate_root":str(output_root),
         "proof":{
-            "observation_flatten_exact":True,
+            "deferred_observation_not_applied":True,
             "locality_reexpand_exact":True,
             "foreach_only_proven_v1":True,
             "review_surface_is_presentation_only":True,
@@ -245,11 +203,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "documents_changed":len(surface_report.get("document_changes") or []),
             "candidate_vocabulary":surface_report.get("candidate_vocabulary"),
         },
-        "observation_plan":observation_summary,
-        "observation_artifacts":[
-            str(path.relative_to(output_root.resolve()))
-            for path in sorted(observation_targets)
-        ],
+        "deferred_observation_opportunity_plan":observation_summary,
         "summary":totals,
         "assessments":assessment_rows,
     }
@@ -264,8 +218,8 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "only the currently proven modernization stack: consumer locality, private "
         "Set operands, Variable-local Objects, single-use external/constant and "
         "leaf-derived Variable locality, recursive private Object locality, "
-        "bounded foreach v1, and proven shared "
-        "Observation extraction.\n\n"
+        "and bounded foreach v1. Shared Observation opportunities are measured "
+        "separately but are deferred beyond normative 0.3 and are not rendered.\n\n"
         "The accompanying scorecard explains what changed and what deliberately "
         "remains complex. The review surface also applies the candidate 0.3 "
         "terminology/naming normalization tracked by issues #151-#156: shorter "
