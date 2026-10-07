@@ -47,6 +47,26 @@ def walk(value:Any):
 def count_key(value:Any,key:str)->int:
     return sum(isinstance(x,dict) and key in x for x in walk(value))
 
+
+def count_filters(value:Any)->int:
+    """Count actual Filter entries, not presentation keys such as filters: []."""
+    total=0
+    for node in walk(value):
+        if not isinstance(node,dict):
+            continue
+        filters=node.get("filters")
+        if isinstance(filters,list):
+            total += len(filters)
+        elif filters is not None:
+            total += 1
+        if "filter" in node:
+            item=node.get("filter")
+            if isinstance(item,list):
+                total += len(item)
+            elif item is not None:
+                total += 1
+    return total
+
 def collect_registry_ids(a:dict):
     registries={
         "tests":("T",a.get("tests") or a.get("checks") or {}),
@@ -209,7 +229,7 @@ def analyze(path:Path,doc:dict):
                     funcs[key]+=1
 
     sets=count_key(a,"set")
-    filters=count_key(a,"filters")+count_key(a,"filter")
+    filters=count_filters(a)
     eval_node=a.get("evaluate")
     eval_depth=max_eval_depth(eval_node)
     exact_cond=eval_contains_exact_complement(eval_node)
