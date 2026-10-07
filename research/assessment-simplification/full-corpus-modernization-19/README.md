@@ -71,8 +71,14 @@ Among the **2,106** complex Rule Assessments, overlapping residual causes are:
 - named Object graph: **154**;
 - repeated Test reference: **129**.
 
-The largest next research target is therefore the remaining Variable graph, not
-broader Test/evaluate simplification.
+**Important refinement in progress:** this first-pass classifier treats every
+surviving Variable as a nontrivial Variable graph. Follow-up analysis found that
+many Windows survivors are OVAL `external_variable` inputs or constants rather
+than derived dataflow. Therefore **30.45% is a conservative upper bound on
+meaningful structural complexity**, not the final dataflow-complexity rate.
+
+The next research step is classifying surviving Variables by source kind,
+expression/function family, fan-out, and chaining before revising that number.
 
 ## Evaluate checkpoint
 
