@@ -250,6 +250,48 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
             "test_and_graph",
         )
 
+    def test_private_constant_in_retained_top_level_state_roundtrips(self):
+        # Regression for RHEL SV-258042-style shape: the State remains top-level
+        # while its sole constant Variable reference is localized.
+        source={
+            "assessment":{
+                "id":"constant-in-retained-state",
+                "mode":"automated",
+                "objects":{
+                    "obj":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                },
+                "states":{
+                    "unused-state":{
+                        "capability":"unix.file",
+                        "state":{
+                            "field":"user_id",
+                            "value":{"variable":"anonymous-uids"},
+                        },
+                    },
+                },
+                "variables":{
+                    "anonymous-uids":{
+                        "kind":"constant",
+                        "datatype":"int",
+                        "expression":{"literal":["65534","65535"]},
+                    },
+                },
+                "tests":{
+                    "one":{"capability":"unix.file","object":"obj"},
+                },
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_state_consumers=True,
+            inline_private_variables=True,
+        )
+        embedded=rendered["assessment"]["states"]["unused-state"]["state"]["value"]["variable"]
+        self.assertIsInstance(embedded,dict)
+        self.assertEqual(identity["inlined_variables"][0]["variable"],"anonymous-uids")
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_reexpand_is_structurally_identical(self):
         source=self.base()
         rendered,identity=inline_private(source)
