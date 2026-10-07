@@ -155,10 +155,72 @@ def source_rule_resolver(package):
     SCAP datastreams may reuse the same OVAL id in distinct components. XCCDF
     check-content-ref therefore identifies automated content by both href and
     Definition id; flattening all OVAL components into one namespace is unsafe.
+
+    The selected-rule review CLI also accepts simple ZIPs containing standalone
+    XCCDF and OVAL XML documents. Preserve that historical input form while
+    applying the same href + Definition-id resolution rule.
     """
     from lxml import etree
 
-    _, _, datastream = find_datastream(package)
+    try:
+        _, _, datastream = find_datastream(package)
+    except ValueError as exc:
+        if "found 0" not in str(exc):
+            raise
+        benchmarks = []
+        oval_documents = []
+        with zipfile.ZipFile(package) as z:
+            for name in sorted(z.namelist()):
+                if not name.lower().endswith(".xml"):
+                    continue
+                root = ET.fromstring(z.read(name))
+                for node in root.iter():
+                    kind = local(node.tag)
+                    if kind == "Benchmark":
+                        benchmarks.append(node)
+                    elif kind == "oval_definitions":
+                        oval_documents.append((name, node))
+        if len(benchmarks) != 1:
+            raise ValueError(
+                f"Expected one source Benchmark, found {len(benchmarks)}"
+            )
+        if not oval_documents:
+            raise ValueError("No OVAL Definitions documents found")
+
+        def standalone_has_definition(root, definition_id):
+            for section in root:
+                if local(section.tag) != "definitions":
+                    continue
+                return any(
+                    child.get("id") == definition_id
+                    for child in section
+                )
+            return False
+
+        def resolve_standalone(href, definition_id):
+            matches = [
+                (name, root)
+                for name, root in oval_documents
+                if standalone_has_definition(root, definition_id)
+            ]
+            if href:
+                wanted = Path(href.lstrip("#")).name
+                narrowed = [
+                    row for row in matches
+                    if Path(row[0]).name == wanted
+                ]
+                if narrowed:
+                    matches = narrowed
+            if len(matches) != 1:
+                status = "unresolved" if not matches else "ambiguous"
+                raise ValueError(
+                    f"{status} OVAL check-content-ref: href={href!r} "
+                    f"definition={definition_id!r} matches={len(matches)}"
+                )
+            return matches[0][1]
+
+        return benchmarks[0], resolve_standalone
+
     components, component_refs = embedded_components(datastream)
     benchmarks = [
         root for root in components.values()
@@ -199,7 +261,6 @@ def source_rule_resolver(package):
 
     benchmark = ET.fromstring(etree.tostring(benchmarks[0], encoding="UTF-8"))
     return benchmark, resolve
-
 
 def write_yaml(path,doc):
     path.parent.mkdir(parents=True,exist_ok=True)
