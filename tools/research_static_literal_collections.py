@@ -1,0 +1,236 @@
+#!/usr/bin/env python3
+"""Research proof for replacing static constant Variables with native literals.
+
+Research only. This utility does not modify source files and does not define
+accepted SCAP-NG 0.3 semantics. It proves that a bounded transform can inline
+constant Variable values and structurally re-expand the original document.
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+from collections import Counter
+from pathlib import Path
+
+import yaml
+
+
+def walk_variable_refs(value, variable_id, path=()):
+    if isinstance(value, dict):
+        if value == {"variable": variable_id}:
+            yield path
+        for key, child in value.items():
+            yield from walk_variable_refs(child, variable_id, path + (key,))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from walk_variable_refs(child, variable_id, path + (index,))
+
+
+def path_parent(root, path):
+    node = root
+    for step in path[:-1]:
+        node = node[step]
+    return node, path[-1]
+
+
+def constant_literal(payload):
+    if not isinstance(payload, dict) or payload.get("kind") != "constant":
+        return None, False
+    expression = payload.get("expression")
+    if not isinstance(expression, dict) or set(expression) != {"literal"}:
+        return None, False
+    return copy.deepcopy(expression["literal"]), True
+
+
+def classify_collection_path(path):
+    text = "/".join(str(part) for part in path)
+    if "/states/" in f"/{text}/":
+        return "state_collection_ref"
+    if "/object/" in f"/{text}/" or "/objects/" in f"/{text}/":
+        return "object_collection_ref"
+    return "other_collection_ref"
+
+
+def inline_constants(document):
+    rendered = copy.deepcopy(document)
+    assessment = rendered.get("assessment")
+    if not isinstance(assessment, dict):
+        return rendered, []
+
+    variables = assessment.get("variables")
+    if not isinstance(variables, dict):
+        return rendered, []
+
+    proof = []
+    for variable_id, payload in list(variables.items()):
+        literal, supported = constant_literal(payload)
+        if not supported:
+            continue
+
+        refs = list(walk_variable_refs(assessment, variable_id))
+        if not refs:
+            continue
+
+        for path in refs:
+            parent, last = path_parent(assessment, path)
+            if parent[last] != {"variable": variable_id}:
+                raise ValueError(
+                    f"unexpected Variable reference shape for {variable_id!r} at {path!r}"
+                )
+
+            if isinstance(literal, list):
+                if not path or path[-1] != "value":
+                    raise ValueError(
+                        f"list constant {variable_id!r} is not a direct entity value at {path!r}"
+                    )
+                replacement = copy.deepcopy(literal)
+                mode = classify_collection_path(path)
+            elif path and path[-1] == "value":
+                replacement = copy.deepcopy(literal)
+                mode = "direct_scalar_ref"
+            else:
+                replacement = {"literal": copy.deepcopy(literal)}
+                mode = "expression_scalar_ref"
+
+            parent[last] = replacement
+            proof.append(
+                {
+                    "variable": variable_id,
+                    "path": list(path),
+                    "literal": copy.deepcopy(literal),
+                    "mode": mode,
+                    "payload": copy.deepcopy(payload),
+                }
+            )
+
+        variables.pop(variable_id)
+
+    if not variables:
+        assessment.pop("variables", None)
+
+    return rendered, proof
+
+
+def reexpand_constants(document, proof):
+    restored = copy.deepcopy(document)
+    assessment = restored["assessment"]
+    variables = assessment.setdefault("variables", {})
+
+    payloads = {}
+    for row in proof:
+        path = tuple(row["path"])
+        parent, last = path_parent(assessment, path)
+        expected = (
+            {"literal": row["literal"]}
+            if row["mode"] == "expression_scalar_ref"
+            else row["literal"]
+        )
+        if parent[last] != expected:
+            raise ValueError(
+                f"inline payload changed for {row['variable']!r} at {path!r}"
+            )
+        parent[last] = {"variable": row["variable"]}
+        payloads[row["variable"]] = copy.deepcopy(row["payload"])
+
+    for variable_id, payload in payloads.items():
+        variables[variable_id] = payload
+
+    return restored
+
+
+def yaml_metrics(document):
+    text = yaml.safe_dump(document, sort_keys=False, allow_unicode=True)
+    return len(text.splitlines()), len(text.encode("utf-8"))
+
+
+def build_report(root: Path):
+    counts = Counter()
+    mismatches = []
+    changed_files = []
+
+    for path in sorted(root.rglob("*.yaml")):
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(document, dict) or not isinstance(
+            document.get("assessment"), dict
+        ):
+            continue
+
+        rendered, proof = inline_constants(document)
+        if not proof:
+            continue
+
+        restored = reexpand_constants(rendered, proof)
+        if restored != document:
+            mismatches.append(str(path.relative_to(root)))
+            continue
+
+        before_lines, before_bytes = yaml_metrics(document)
+        after_lines, after_bytes = yaml_metrics(rendered)
+
+        variables = {row["variable"] for row in proof}
+        counts["files_changed"] += 1
+        counts["constant_variables_removed"] += len(variables)
+        counts["references_replaced"] += len(proof)
+        counts["before_lines"] += before_lines
+        counts["after_lines"] += after_lines
+        counts["before_bytes"] += before_bytes
+        counts["after_bytes"] += after_bytes
+        counts.update(row["mode"] for row in proof)
+
+        changed_files.append(
+            {
+                "path": str(path.relative_to(root)),
+                "constant_variables_removed": len(variables),
+                "references_replaced": len(proof),
+            }
+        )
+
+    report = {
+        "format": "scap-ng-static-literal-collection-proof-0.1",
+        "status": "research_only_not_accepted_design",
+        "root": str(root),
+        "summary": dict(counts),
+        "round_trip_mismatches": mismatches,
+        "changed_files": changed_files,
+    }
+
+    if counts["before_lines"]:
+        report["summary"]["line_change_percent"] = round(
+            100.0
+            * (counts["after_lines"] - counts["before_lines"])
+            / counts["before_lines"],
+            2,
+        )
+    if counts["before_bytes"]:
+        report["summary"]["byte_change_percent"] = round(
+            100.0
+            * (counts["after_bytes"] - counts["before_bytes"])
+            / counts["before_bytes"],
+            2,
+        )
+
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("root", type=Path)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+
+    report = build_report(args.root)
+    text = json.dumps(report, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(text, encoding="utf-8")
+    print(text, end="")
+
+    if report["round_trip_mismatches"]:
+        raise SystemExit(1)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
