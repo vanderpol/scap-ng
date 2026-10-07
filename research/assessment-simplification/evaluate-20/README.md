@@ -145,11 +145,53 @@ Any proposed compact form must preserve:
 - evidence/provenance;
 - source-order lineage where needed for migration.
 
-## Next
+## Review packet and working recommendation
 
-1. Render representative one-Test, flat-all/any, repeated-Test, and deeply
-   nested examples in the candidate presentations.
-2. Measure readability after consumer-local Object/State transformations.
-3. Determine whether implicit single-Test root belongs in authored syntax only
-   or canonical executable syntax.
-4. Prepare one concise #167 review packet with recommendation and counterexample.
+Generated review packets now cover the same-content single-Test, flat
+composition, repeated-Test, and deeply nested cases across the representative
+corpus.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37629447730
+
+Representative examples include:
+
+- RHEL 9 `SV-257948`: the same Test is used in both the negative guard and
+  positive branch;
+- RHEL 9 `SV-258004`: depth-4 alternative-path composition;
+- Windows Server 2025 `SV-278001`: depth-5 domain-controller branching;
+- Apache 2.4 `SV-214268`: five Tests under a simple flat `all`.
+
+Working recommendation for owner review:
+
+1. **Keep named Tests.** Their independent identity/result/evidence value is
+   real, and production trees reuse Test references.
+2. **Keep first-class `evaluate` when composition exists.** The tree is not
+   serialization residue; production content needs nested six-state
+   aggregation.
+3. **Do not nest Test definitions into `evaluate` for 0.3.** That saves little
+   and complicates Test identity, result reporting, and reuse.
+4. **Do not silently omit the root in canonical executable content.** A
+   single-Test authoring convenience may be offered by an editor/normalizer,
+   but it should expand to explicit `evaluate: {test: ...}` before canonical
+   validation/package compilation. This preserves the no-hidden-default
+   principle.
+5. **Prefer summary-first presentation for explicit composition:** metadata and
+   inputs/dependencies, then `evaluate`, then the named Tests and their local
+   implementation. Ordering is presentation-only and remains non-semantic.
+
+The fourth and fifth points are authoring/presentation recommendations, not
+accepted schema changes.
+
+## Six-state counterexample
+
+Ordinary procedural or host-language Boolean control cannot replace the
+composition tree. The pinned OVAL-derived tables include:
+
+- `AND(false, error) -> false`;
+- `OR(true, error) -> true`;
+- `ONE(true, true, error) -> false`;
+- `XOR(true, error) -> error`.
+
+The evaluation model therefore remains an explicit result-composition model,
+even if common authoring is made less verbose.
