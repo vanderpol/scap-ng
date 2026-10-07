@@ -179,11 +179,17 @@ Example SV-257918 effectively says:
 > From system command directories, find ordinary files not owned by root; there
 > SHALL be none.
 
-**Research hypothesis:** a positive authoring form such as "all matching files
-must satisfy State X" may be much clearer than expressing compliance as
-"collect failures by excluding good Items, then require none." The semantic
-proof must include incomplete/error collection and Filter behavior before any
-automatic rewrite.
+**Follow-up result:** [violation-query-14](../violation-query-14/README.md)
+found 41 RHEL Assessments using `none_exist` and 12 using both `none_exist`
+and exclusion Filters. Boolean/incomplete cases support the intuitive positive
+reading, but non-Boolean Filter-State results do not: the source Filter path
+becomes `error`, while ordinary positive State aggregation can remain
+`unknown`, `not evaluated`, or `not applicable`.
+
+Do **not** automatically rewrite this idiom into ordinary positive Test
+semantics. Locality/inlining is the preferred 0.3.0 readability improvement; a
+future positive spelling should be presentation shorthand that normatively
+desugars back to the violation-query graph.
 
 ### 4. Mounted state + persistent fstab option — 5 RHEL Assessments
 
