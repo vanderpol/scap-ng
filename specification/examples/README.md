@@ -4,9 +4,9 @@ This page is a short feature tour of SCAP-NG. Each section explains the practica
 difference from SCAP 1.4 and shows a small representative example. Full files and
 the complete review build are linked when more detail is useful.
 
-> **Status:** SCAP-NG 0.3.0 is pre-alpha. Established model features and pending
-> 0.3 modernization candidates are labeled separately. An example does not become
-> normative merely because it validates or appears on this page.
+> **Status:** SCAP-NG 0.3.0 is pre-alpha. Accepted 0.3 requirements and deferred
+> post-0.3 research are labeled separately. An example does not become normative
+> merely because it validates or appears on this page.
 
 ## Benchmark → Rule → Assessment
 
@@ -77,8 +77,9 @@ evaluate:
     - test: zone-has-rrsig-test
 ```
 
-Whether a one-Test `evaluate` root should remain mandatory is still being reviewed
-in [#167](https://github.com/vanderpol/scap-ng/issues/167).
+Canonical executable content keeps an explicit `evaluate` root even for a one-Test
+Assessment. This avoids a second hidden execution default while preserving one
+composition model.
 
 ## Conditional evaluation
 
@@ -102,9 +103,8 @@ evaluate:
 
 This does **not** mean arbitrary SCAP 1.4 Boolean graphs can be automatically
 rewritten as procedural branches; the production research found counterexamples.
-The 0.3 review in [#173](https://github.com/vanderpol/scap-ng/issues/173) is
-whether the inherited conditional form should remain unchanged or be simplified,
-not whether conditionals should be introduced.
+For 0.3 the inherited conditional form is retained unchanged. Broader
+`case`/`elseif` procedural syntax is not added.
 
 ## Manual Assessments
 
@@ -170,8 +170,8 @@ organizational_input:
         source: organization-policy
 ```
 
-Instance-targeting beyond explicit Assessment inputs is still under review in
-[#175](https://github.com/vanderpol/scap-ng/issues/175).
+Portable database/site/product-instance routing is deferred beyond 0.3; that
+remains an orchestration/vendor concern until a common cross-product contract is proven.
 
 ## Profiles and Tailoring
 
@@ -356,124 +356,91 @@ deprecated constructs are blockers rather than silently changed checks.
 
 This is central to [O1 — preserve meaning through migration](../objectives.md).
 
-# 0.3 modernization candidates under review
+# Accepted 0.3 authoring modernizations
 
-The following examples are intentionally visible because they are part of the
-0.3 design review. They are **not accepted merely because the research build is
-green**.
+These are part of the 0.3 requirement set. The final Board package will include
+schema-valid examples for each accepted form.
 
-## Candidate: consumer-local Objects, States, and simple bindings
+## Consumer-local components and shared Objects
 
-**SCAP 1.4:** Even a private Object or State normally has a global ID and lives
-away from its consuming Test.
+**SCAP 1.4:** Private Objects and States normally live in top-level registries and
+are reached by IDs even when only one semantic consumer exists.
 
-**0.3 candidate:** Put a private component beside the Test/Filter/Variable that
-uses it; keep a meaningful name only when the component is genuinely shared or
-independently addressable.
+**SCAP-NG 0.3:** Keep private acquisition/predicates with their consumer. Keep a
+named Object only when its acquisition identity is intentionally reusable or
+referenceable. Assessment-scoped named acquisitions are declared under
+`shared_objects:`; use sites still say simply `object: <name>-object`.
 
 ```yaml
+shared_objects:
+  users-object:
+    capability: unix.password
+    ...
+
 tests:
-  library-directory-owner:
-    capability: unix.file
+  home-permissions-test:
     object:
       capability: unix.file
-      select:
-        path:
-          value:
-            variable:
-              kind: constant
-              expression:
-                literal: [/lib, /lib64, /usr/lib, /usr/lib64]
-    states:
-      - state:
-          field: group_id
-          operation: less_than
-          value: 1000
+      ...
 ```
 
-The full-corpus evidence shows this removes most ordinary Object/State
-cross-referencing without changing the underlying semantics. Review decision:
-[#165](https://github.com/vanderpol/scap-ng/issues/165) and
-[#169](https://github.com/vanderpol/scap-ng/issues/169).
+The 65-package modernization census reduces top-level Objects from 13,402 to 491
+and States from 9,121 to 435 while preserving exact re-expansion.
 
-## Candidate: shared Observation
+## Static values without Variable plumbing
 
-**SCAP 1.4:** Splitting one monolithic OVAL document into one Assessment per Rule
-can duplicate expensive shared discovery/dataflow that was previously shared by
-many Definitions.
+**SCAP 1.4:** Fixed multi-valued constants often require named Variables because
+an XML entity can reference only one lexical body.
 
-**0.3 candidate:** A truthless Observation performs shared acquisition/dataflow
-once and exposes typed values; each Rule Assessment still owns its Tests and
-technical truth.
+**SCAP-NG 0.3:** Direct scalar or typed literal-array values are allowed where the
+source graph is compile-time static and source-equivalent quantifier behavior is
+explicit. Named Variables remain for genuine runtime computation/dataflow.
+
+This simplification does not replace Object-derived Variables or runtime
+iteration.
+
+## Runtime collection `for_each`
+
+**SCAP 1.4:** Object → ObjectComponent → Variable → target-Object plumbing, or
+shell/PowerShell loops, may be required simply to collect something for each Item
+from another collection.
+
+**SCAP-NG 0.3:** `for_each` expresses collection expansion directly while the
+Test keeps its original aggregation/existence boundary.
 
 ```yaml
-observation:
-  id: shared.apache.httpd.discovery
-  exports:
-    primary_and_included_configs:
-      kind: values
-      datatype: string
-      cardinality: zero_or_more
-    httpd_executable:
-      kind: values
-      datatype: string
+for_each:
+  item: user
+  in: users-object
+
+select:
+  directory:
+    from: user.home_dir
 ```
 
-This solves a real Apache/Windows/Linux reuse pattern, but adds a new artifact
-and runtime interface. It is receiving an explicit complexity/value decision in
-[#166](https://github.com/vanderpol/scap-ng/issues/166).
+Nested collected-data iteration is also an accepted 0.3 requirement. It remains
+collection iteration—not “run one Test per Item”—and must retain outer-binding
+lineage, explicit correlation, completeness/error semantics, and cycle/resource
+protection. The DNS benchmark is the primary nested proving family.
 
-## Reusable applicability Assessments
+# Deferred beyond normative 0.3
 
-**SCAP 1.4:** Repeated applicability may be represented through XCCDF/CPE and
-OVAL structures that are difficult to trace and may be duplicated across Rules.
+## Observation
 
-**SCAP-NG:** A Benchmark applicability catalog gives a condition a stable name
-and binds it once to an applicability Assessment. Many Rules can reference the
-same condition without copying its technical check.
+Shared Observation has demonstrated real value: the corpus proof found 9
+package-local Observation candidates and 69 consumers across Apache, Windows,
+RHEL, and Oracle Linux.
 
-```yaml
-applicability:
-  windows.camera-installed:
-    assessment: assessments/applicability/windows-camera-installed.assessment.yaml
+It is **deferred**, not rejected. A normative Observation would add a second
+cross-Assessment execution interface with typed exports, result/provenance,
+binding, manifest dependency/cycle, and cache/reuse contracts. Those contracts
+will be completed in a later version rather than rushed into the 0.3 Board
+checkpoint. See [#166](https://github.com/vanderpol/scap-ng/issues/166).
 
-rules:
-  - id: WN11-EXAMPLE-1
-    when: windows.camera-installed
-  - id: WN11-EXAMPLE-2
-    when: windows.camera-installed
-```
+## No separate shared-applicability artifact
 
-This reuse is already part of the applicability model. The open 0.3 question is
-whether cross-benchmark or more complex cases justify **another dedicated shared
-applicability construct**, or whether ordinary reusable Assessments and result
-reuse are sufficient. Review decision:
-[#178](https://github.com/vanderpol/scap-ng/issues/178).
-
-## Candidate: bounded `for_each`
-
-**SCAP 1.4:** Some checks require Object → ObjectComponent → Variable → target
-Object plumbing simply to apply the same collection to values from another
-collection.
-
-**0.3 candidate:** A narrow `for_each` form expresses that collection expansion
-directly while preserving one combined target population.
-
-```yaml
-objects:
-  initialization-files:
-    capability: unix.file
-    for_each:
-      item: user
-      in: users
-    select:
-      directory:
-        from: user.home_dir
-```
-
-The exact rewrite is uncommon in the measured corpus, so its value must justify
-the added language/conformance surface. Current review:
-[#164](https://github.com/vanderpol/scap-ng/issues/164).
+0.3 keeps applicability explicit and reuses ordinary applicability Assessments
+where useful. It does not add another dedicated sharing construct.
 
 ## Complete six-benchmark 0.3 review build
 
