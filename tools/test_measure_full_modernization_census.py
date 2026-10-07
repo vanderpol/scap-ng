@@ -42,6 +42,86 @@ class FullModernizationCensusTests(unittest.TestCase):
             self.assertEqual(s["modernized_states"],0)
             self.assertEqual(s["single_test_explicit_root_authoring_opportunities"],1)
 
+    def test_single_use_external_input_is_binding_not_dataflow_complexity(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.write_assessment(td,"external",{
+                "id":"benchmark.test.SV-ext.automated",
+                "version":1,
+                "mode":"automated",
+                "purpose":"assessment",
+                "class":"compliance",
+                "objects":{
+                    "obj":{"capability":"unix.file","select":{"path":"/tmp/example"}}
+                },
+                "states":{
+                    "state":{
+                        "capability":"unix.file",
+                        "state":{
+                            "field":"owner",
+                            "value":{"variable":"expected-owner"},
+                        },
+                    }
+                },
+                "variables":{
+                    "expected-owner":{
+                        "kind":"external",
+                        "datatype":"string",
+                        "input":{"required":True,"cardinality":"one_or_more"},
+                    }
+                },
+                "tests":{
+                    "test":{"capability":"unix.file","object":"obj","states":["state"]}
+                },
+                "evaluate":{"test":"test"},
+            })
+            report=build_report(Path(td),label="synthetic")
+            row=report["assessments"][0]
+            s=report["summary"]
+            self.assertEqual(row["classification"],"local_simple")
+            self.assertEqual(row["after"]["variables"],0)
+            self.assertEqual(s["private_external_variables_localized"],1)
+            self.assertNotIn("derived_variable_graph",row["residual_reasons"])
+
+    def test_local_derived_variable_remains_complex(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.write_assessment(td,"local-variable",{
+                "id":"benchmark.test.SV-local.automated",
+                "version":1,
+                "mode":"automated",
+                "purpose":"assessment",
+                "class":"compliance",
+                "objects":{
+                    "source":{"capability":"unix.file","select":{"path":"/tmp/source"}},
+                    "target":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "value":{"variable":"derived-path"},
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "derived-path":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"values":{"object":"source","field":"path"}},
+                    }
+                },
+                "tests":{
+                    "test":{"capability":"unix.file","object":"target"}
+                },
+                "evaluate":{"test":"test"},
+            })
+            report=build_report(Path(td),label="synthetic")
+            row=report["assessments"][0]
+            self.assertEqual(row["classification"],"meaningfully_complex")
+            self.assertIn("derived_variable_graph",row["residual_reasons"])
+            self.assertEqual(row["after"]["variables"],1)
+
     def test_shared_acquisition_is_retained_and_classified_complex(self):
         with tempfile.TemporaryDirectory() as td:
             self.write_assessment(td,"shared",{
