@@ -160,7 +160,7 @@ def metrics(doc: dict) -> dict:
     }
 
 
-def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> tuple[dict, dict]:
+def inline_private(\n    doc: dict,\n    *,\n    inline_private_set_operands: bool = False,\n    inline_state_consumers: bool = False,\n) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
     objects=a.get("objects") or {}
@@ -260,6 +260,63 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
     for name in remove_states:
         states.pop(name,None)
 
+    if inline_state_consumers and states:
+        occurrences=identity["inlined_state_consumer_occurrences"]
+
+        # Inline remaining named States into Test consumers. Single-use Test
+        # States were already handled above; this covers reused States.
+        for test_id,test in tests.items():
+            values=test.get("states")
+            if isinstance(values,str):
+                values=[values]
+                test["states"]=values
+            if not isinstance(values,list):
+                continue
+            for index,entry in enumerate(list(values)):
+                if isinstance(entry,str) and entry in states:
+                    values[index]=copy.deepcopy(states[entry])
+                    occurrences.append({
+                        "state":entry,
+                        "path":["tests",test_id,"states",index],
+                        "consumer":"test",
+                    })
+
+        # Set Filters are the other production consumer observed by the census.
+        # Keep this deliberately structural: only {state:<id>, action:...}
+        # filter references are localized.
+        def inline_filter_states(value: Any, path: list[Any]):
+            if isinstance(value,dict):
+                if (
+                    isinstance(value.get("state"),str)
+                    and value["state"] in states
+                    and "action" in value
+                ):
+                    original=value["state"]
+                    value["state"]=copy.deepcopy(states[original])
+                    occurrences.append({
+                        "state":original,
+                        "path":path+["state"],
+                        "consumer":"filter",
+                    })
+                for key,child in list(value.items()):
+                    if key=="state" and isinstance(child,dict) and "action" in value:
+                        continue
+                    inline_filter_states(child,path+[key])
+            elif isinstance(value,list):
+                for index,child in enumerate(value):
+                    inline_filter_states(child,path+[index])
+
+        inline_filter_states(a,[])
+
+        # Remove a State only when every surviving scalar reference to it was
+        # localized. Unsupported reference contexts therefore fail closed by
+        # leaving the State named.
+        remaining=scalar_reference_counts(a,set(states))
+        localized={row["state"] for row in occurrences}
+        for name in sorted(localized):
+            if remaining.get(name,0)==0:
+                states.pop(name,None)
+
     if objects:
         a["objects"]=objects
         identity["shared_objects"]=sorted(objects)
@@ -297,6 +354,23 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     tests=a.get("tests") or {}
     objects=copy.deepcopy(a.get("objects") or {})
     states=copy.deepcopy(a.get("states") or {})
+
+    def path_parent(root: Any, path: list[Any]):
+        current=root
+        for segment in path[:-1]:
+            current=current[segment]
+        return current,path[-1]
+
+    # Restore consumer-local copies before moving any inline Objects back to
+    # Assessment scope, because recorded paths describe the rendered tree.
+    for row in identity.get("inlined_state_consumer_occurrences",[]):
+        parent,last=path_parent(a,row["path"])
+        payload=copy.deepcopy(parent[last])
+        original=row["state"]
+        if original in states and states[original] != payload:
+            raise ValueError(f"consumer-local State payload mismatch for {original!r}")
+        states.setdefault(original,payload)
+        parent[last]=original
 
     for original,path in identity.get("inlined_objects",{}).items():
         parts=path.split(".")
@@ -414,6 +488,14 @@ def main():
             "serve only as Set operands."
         ),
     )
+    ap.add_argument(
+        "--inline-state-consumers",
+        action="store_true",
+        help=(
+            "Research v3: also localize every referenced State into its Test "
+            "or Set Filter consumer; retain unsupported/unreferenced States."
+        ),
+    )
     ap.add_argument("--label",required=True)
     args=ap.parse_args()
 
@@ -425,13 +507,17 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True)
     report={
         "format":(
-            "scap-ng-inline-private-components-research-0.2"
-            if args.inline_private_set_operands
-            else "scap-ng-inline-private-components-research-0.1"
+            "scap-ng-inline-private-components-research-0.3"
+            if args.inline_state_consumers
+            else (
+                "scap-ng-inline-private-components-research-0.2"
+                if args.inline_private_set_operands
+                else "scap-ng-inline-private-components-research-0.1"
+            )
         ),
         "status":"research_only_not_accepted_design",
         "label":args.label,
-        "inline_private_set_operands":bool(args.inline_private_set_operands),
+        "inline_private_set_operands":bool(args.inline_private_set_operands),\n        "inline_state_consumers":bool(args.inline_state_consumers),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -443,7 +529,7 @@ def main():
         "named_refs_before":0,"named_refs_after":0,
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
-        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
+        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,\n        "inlined_state_consumer_occurrences":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
         "retained_object_context_counts":{},
@@ -455,6 +541,7 @@ def main():
         rendered,identity=inline_private(
             doc,
             inline_private_set_operands=args.inline_private_set_operands,
+            inline_state_consumers=args.inline_state_consumers,
         )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
@@ -478,6 +565,7 @@ def main():
             "inlined_objects":len(identity["inlined_objects"]),
             "inlined_set_operand_objects":len(identity["inlined_set_operand_objects"]),
             "inlined_states":len(identity["inlined_states"]),
+            "inlined_state_consumer_occurrences":len(identity["inlined_state_consumer_occurrences"]),
             "shared_objects":len(identity["shared_objects"]),
             "shared_states":len(identity["shared_states"]),
             "retained_object_reason_counts":{},
@@ -510,7 +598,7 @@ def main():
         totals["bytes_after"]+=after["normalized_bytes"]
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
-        totals["inlined_states"]+=row["inlined_states"]
+        totals["inlined_states"]+=row["inlined_states"]\n        totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
         for reason,count in row["retained_object_reason_counts"].items():
             totals["retained_object_reason_counts"][reason]=totals["retained_object_reason_counts"].get(reason,0)+count
         for reason,count in row["retained_state_reason_counts"].items():
