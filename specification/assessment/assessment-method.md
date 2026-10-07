@@ -525,11 +525,12 @@ The following intentional native divergences remain:
 - OVAL generic `comment` metadata maps to the typed descriptive fields
   `test_title`, `object_title`, `state_title`, and `variable_title`.
 
-Tests SHALL retain the established behavior-affecting names `check_existence`,
-`check`, and `state_operator` when those inherited semantics are preserved.
-SCAP-NG SHALL NOT rename OVAL Test `check` to `item_quantifier` merely for
-stylistic clarity; instead, the specification SHALL define Item and Test
-aggregation precisely.
+SCAP-NG 0.3 Tests SHALL expose the inherited semantics through the native
+fields `existence`, `match`, and (when multiple States require composition)
+`states_match`. Migration maps OVAL Test `check_existence`, `check`, and
+`state_operator` to those fields without changing truth semantics. The shorter
+native field names do not merge their distinct semantic stages: existence,
+per-Item/State satisfaction, and State composition remain separately defined.
 
 Objects and States SHOULD be independently named in native Assessment source.
 Stable local identities support reuse, filters, result-to-source traceability,
