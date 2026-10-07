@@ -260,6 +260,35 @@ def analyze(path:Path,doc:dict):
         "shape":shape,
     }
 
+def coarse_motif_signature(row:dict)->dict:
+    """Return a deliberately coarse recurring-shape signature.
+
+    The signature ignores IDs, literal values, exact capability payloads and
+    exact graph fingerprint so repeated authoring/dataflow motifs can cluster.
+    """
+    variable_kinds=tuple(sorted(
+        (name,int(count))
+        for name,count in (row.get("variable_kinds") or {}).items()
+        if count
+    ))
+    function_names=tuple(sorted(
+        name for name,count in (row.get("function_counts") or {}).items()
+        if count and name not in {"values","object_values","object_component","variable_component"}
+    ))
+    return {
+        "residual_reasons":tuple(row.get("residual_reasons") or ()),
+        "variable_kinds":variable_kinds,
+        "function_names":function_names,
+        "has_sets":bool(row.get("sets")),
+        "has_filters":bool(row.get("filters")),
+        "evaluate_depth_bucket":min(int(row.get("evaluate_depth") or 0),3),
+    }
+
+
+def coarse_motif_key(signature:dict)->str:
+    return json.dumps(signature,sort_keys=True,separators=(",",":"))
+
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("root",type=Path)
@@ -296,6 +325,33 @@ def main():
         reason_counts.update(row["residual_reasons"])
         function_counts.update(row["function_counts"])
         variable_kind_counts.update(row["variable_kinds"])
+
+    motif_clusters=defaultdict(list)
+    motif_signatures={}
+    for row in residual:
+        signature=coarse_motif_signature(row)
+        key=coarse_motif_key(signature)
+        motif_clusters[key].append(row)
+        motif_signatures[key]=signature
+    ranked_motifs=sorted(
+        motif_clusters.items(),
+        key=lambda kv:(-len(kv[1]),kv[0]),
+    )
+    top_motifs=[]
+    for key,members in ranked_motifs[:args.top]:
+        signature=motif_signatures[key]
+        top_motifs.append({
+            "motif_key":key,
+            "count":len(members),
+            "percent_of_residual":round(100*len(members)/len(residual),2) if residual else 0.0,
+            "residual_reasons":list(signature["residual_reasons"]),
+            "variable_kinds":dict(signature["variable_kinds"]),
+            "function_names":list(signature["function_names"]),
+            "has_sets":signature["has_sets"],
+            "has_filters":signature["has_filters"],
+            "evaluate_depth_bucket":signature["evaluate_depth_bucket"],
+            "examples":[m["assessment_id"] for m in members[:12]],
+        })
 
     top=[]
     for fp,members in ranked[:args.top]:
