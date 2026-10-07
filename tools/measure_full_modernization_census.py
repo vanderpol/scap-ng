@@ -46,6 +46,7 @@ from research_inline_private_components import (
     reexpand,
     metrics,
     first_difference,
+    context_signature,
 )
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
 
@@ -314,6 +315,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
     foreach_review=Counter()
     observation_types=Counter()
     observation_exports=Counter()
+    retained_object_reasons=Counter()
+    retained_object_contexts=Counter()
+    retained_object_context_signatures=Counter()
     assessment_rows=[]
 
     applied_artifacts=set()
@@ -416,6 +420,17 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         eval_after=evaluate_metrics(row["path"],rendered)
         sum_metrics(totals,after,"modernized_")
         localized_variables=identity.get("inlined_variables") or []
+
+        object_reason_counts=Counter(identity.get("retained_object_reasons",{}).values())
+        object_context_counts=Counter()
+        object_context_signature_counts=Counter()
+        for object_context in (identity.get("retained_object_contexts") or {}).values():
+            object_context_signature_counts[context_signature(object_context)]+=1
+            object_context_counts.update(object_context)
+        retained_object_reasons.update(object_reason_counts)
+        retained_object_contexts.update(object_context_counts)
+        retained_object_context_signatures.update(object_context_signature_counts)
+
         totals["private_binding_variables_localized"]+=len(localized_variables)
         totals["private_external_variables_localized"]+=sum(
             row.get("kind")=="external" for row in localized_variables
@@ -470,6 +485,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             "residual_reasons":reasons,
             "locality":{
                 "inlined_objects":len(identity.get("inlined_objects") or {}),
+                "retained_object_reason_counts":dict(object_reason_counts),
+                "retained_object_context_counts":dict(object_context_counts),
+                "retained_object_context_signature_counts":dict(object_context_signature_counts),
                 "inlined_set_operand_objects":len(identity.get("inlined_set_operand_objects") or []),
                 "inlined_variable_objects":len(identity.get("inlined_variable_objects") or []),
                 "inlined_variables":len(identity.get("inlined_variables") or []),
@@ -514,6 +532,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         "foreach_review_reason_counts":dict(foreach_review),
         "observation_consumer_counts":dict(observation_types),
         "observation_export_reference_counts":dict(observation_exports),
+        "retained_object_reason_counts":dict(retained_object_reasons),
+        "retained_object_context_counts":dict(retained_object_contexts),
+        "retained_object_context_signature_counts":dict(retained_object_context_signatures),
         "object_scope_reduction_pct":reduction("baseline_objects","modernized_objects"),
         "state_scope_reduction_pct":reduction("baseline_states","modernized_states"),
         "variable_reduction_pct":reduction("baseline_variables","modernized_variables"),
