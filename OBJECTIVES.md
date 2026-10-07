@@ -80,6 +80,7 @@ work. Every open 0.3.0 issue is listed so both directions can be audited.
 | [#177 Thin/full Result profiles](https://github.com/vanderpol/scap-ng/issues/177) | O5, O7 |
 | [#178 Shared applicability authoring](https://github.com/vanderpol/scap-ng/issues/178) | O1, O2, O4, O6 |
 | [#179 Residual Set/Filter classification](https://github.com/vanderpol/scap-ng/issues/179) | O1, O2, O3 |
+| [#180 0.3 prerelease specification normalization](https://github.com/vanderpol/scap-ng/issues/180) | O2, O7 |
 
 ## Coverage audit
 
