@@ -20,6 +20,7 @@ This work explores ways to make accurate assessments easier for humans to author
 | [ansible-authoring-09](ansible-authoring-09/README.md) | Research-only Ansible-inspired authoring sketches | RHEL/Windows examples, manual automation review, organizational-input sketches |
 | [conditional-10](conditional-10/README.md) | Conditional-shaped OVAL Boolean trees | branch-shape census, six-state caveats, applicability/case research |
 | [locality-11](locality-11/README.md) | Inline private Object/State layout over the existing semantic model | 20-rule examples, full RHEL/Server 2025 census, structural round-trip evidence |
+| [residual-patterns-12](residual-patterns-12/README.md) | Recurring residual complexity after known simplification opportunities | RHEL/Windows motif census, prioritized modernization/capability candidates |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
