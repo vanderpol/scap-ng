@@ -1,9 +1,11 @@
 # Static literal collections versus Variables
 
-**Status:** research only; not accepted 0.3 semantics.
+**Status:** accepted 0.3 modernization evidence. Native typed literal
+collections are part of the 0.3 authoring model; automatic conversion remains
+bounded to exact, reversible static-Variable cases.
 
 Tracked by [#169](https://github.com/vanderpol/scap-ng/issues/169) and
-[#185](https://github.com/vanderpol/scap-ng/issues/185).
+[#188](https://github.com/vanderpol/scap-ng/issues/188).
 
 ## Design question
 
@@ -87,7 +89,7 @@ variables:
 not three separate named constant Variables solely to provide the prefix and
 suffix.
 
-## Proposed native rule
+## Accepted 0.3 rule
 
 1. Object and State entities MAY consume a typed literal collection directly.
 2. The value comparison quantifier remains explicit. A literal array does not
@@ -160,9 +162,13 @@ collection fan-out, artifact identity, result type, or cross-Assessment
 dependency. It therefore has a substantially smaller semantic/runtime surface
 than constructs intended for dynamic collection-derived values.
 
-## Promotion proof required
+## Conversion proof boundary
 
-Before any schema change:
+Automatic static folding SHALL apply only when the complete Variable use is in
+the proven literal-replacement class. If any reference is unsupported, the
+Variable remains named and the Assessment remains otherwise unchanged.
+
+The maintained proof covers:
 
 1. prove Object list-value round-trip independently;
 2. prove State list-value round-trip independently;
@@ -172,10 +178,16 @@ Before any schema change:
 5. prove literal operands inside `concat`/other supported functions without
    removing the dynamic Variable node;
 6. retain named constants when deliberate reuse is clearer than repetition;
-7. measure the full corpus only at the next intentional milestone checkpoint.
+7. full-corpus measurement with unsupported shapes left named rather than
+   treated as conversion failures.
 
-## Current recommendation
+List-valued constants used as operands of `concat` or another expression tree
+are **not** flattened into an array operand unless that expression class has its
+own exact equivalence proof. Scalar constant operands may be localized as
+ordinary scalar literals when exact.
 
-Continue the bounded proof. If the edge cases remain exact, make native literal
-collections the default conversion for static values and reserve named
-Variables for real dataflow, external input, or intentional reuse.
+## 0.3 direction
+
+Use native literal collections for static values when lossless. Reserve named
+Variables for runtime dataflow, external input, intentional reuse, or static
+shapes whose direct literal representation has not been proven.
