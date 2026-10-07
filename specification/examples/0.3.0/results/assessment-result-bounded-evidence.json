@@ -1,0 +1,108 @@
+{
+  "assessment_result": {
+    "result_schema_version": "0.3.0",
+    "execution_id": "example-bounded-evidence-1",
+    "assessment": {
+      "id": "example.large-population",
+      "version": 1
+    },
+    "purpose": "assessment",
+    "class": "compliance",
+    "mode": "automated",
+    "outcome": "false",
+    "logical_complete": true,
+    "population_complete": false,
+    "evidence_complete": false,
+    "tests": [
+      {
+        "id": "sampled-file-check",
+        "outcome": "false",
+        "check_existence": "at_least_one_exists",
+        "existence_outcome": "true",
+        "check": "all",
+        "state_operator": "AND",
+        "object_refs": ["large-file-population"],
+        "state_refs": ["required-state"],
+        "item_refs": ["file-1", "file-2"],
+        "per_item_results": [],
+        "reason": "The assessment was logically decisive before the complete population was retained as evidence."
+      }
+    ],
+    "objects": [
+      {
+        "id": "large-file-population",
+        "capability": "unix.file",
+        "status": "incomplete",
+        "item_refs": ["file-1", "file-2"],
+        "logical_complete": true,
+        "population_complete": false,
+        "stop_reason": "evidence_maximum_reached"
+      }
+    ],
+    "items": [
+      {
+        "id": "file-1",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "value": "/srv/example/1",
+            "status": "exists"
+          }
+        },
+        "provenance": {
+          "target_ref": "target-1",
+          "source_execution_ref": "collection-large-population-1"
+        }
+      },
+      {
+        "id": "file-2",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "value": "/srv/example/2",
+            "status": "exists"
+          }
+        },
+        "provenance": {
+          "target_ref": "target-1",
+          "source_execution_ref": "collection-large-population-1"
+        }
+      }
+    ],
+    "variables": [],
+    "diagnostics": [],
+    "evidence_summary": {
+      "observed_failures": 20,
+      "actual_failures": "unknown",
+      "maximum": 20,
+      "returned": 2,
+      "truncated_population": true,
+      "stop_reason": "evidence_maximum_reached"
+    },
+    "target_ref": "target-1",
+    "expression_execution": {
+      "assessment": "example.large-population",
+      "invocation_ref": "example-bounded-evidence-1",
+      "outcome": "false",
+      "executed_tests": ["sampled-file-check"],
+      "trace": [
+        {
+          "path": "example.large-population/evaluate",
+          "kind": "test",
+          "outcome": "false",
+          "test": "sampled-file-check",
+          "assessment": "example.large-population",
+          "reused": false,
+          "owner_invocation_ref": "example-bounded-evidence-1"
+        }
+      ],
+      "diagnostics": []
+    },
+    "field_uses": [],
+    "dependent_assessments": []
+  }
+}
