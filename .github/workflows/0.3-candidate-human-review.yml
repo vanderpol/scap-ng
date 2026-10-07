@@ -204,10 +204,11 @@ jobs:
           (root/"benchmarks").mkdir(parents=True,exist_ok=True)
           rows=[]
           for key,label in expected.items():
-              matches=list(Path("downloads").rglob(f"{key}/SCORECARD.json"))
-              if len(matches)!=1:
-                  raise SystemExit(f"{key}: expected one scorecard, found {len(matches)}")
-              source=matches[0].parent
+              source=Path("downloads")/f"candidate-review-{key}"
+              scorecard=source/"SCORECARD.json"
+              if not scorecard.is_file():
+                  raise SystemExit(f"{key}: missing {scorecard}")
+              matches=[scorecard]
               target=root/"benchmarks"/key
               shutil.copytree(source,target)
               score=json.loads((target/"SCORECARD.json").read_text())
