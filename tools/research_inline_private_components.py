@@ -384,7 +384,6 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     out=copy.deepcopy(research_doc)
     a=out["assessment"]
     tests=a.get("tests") or {}
-    objects=copy.deepcopy(a.get("objects") or {})
     states=copy.deepcopy(a.get("states") or {})
 
     def path_parent(root: Any, path: list[Any]):
@@ -403,6 +402,11 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
             raise ValueError(f"consumer-local State payload mismatch for {original!r}")
         states.setdefault(original,payload)
         parent[last]=original
+
+    # Copy top-level Objects only after consumer-local State references have
+    # been restored. Otherwise a stale pre-restoration copy can reintroduce
+    # inline Filter-State payloads when the Object map is written back.
+    objects=copy.deepcopy(a.get("objects") or {})
 
     for original,path in identity.get("inlined_objects",{}).items():
         parts=path.split(".")
