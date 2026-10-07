@@ -72,6 +72,80 @@ def semantic_variable_kind(variable: dict) -> str:
     return "unknown_" + str(source_kind or "kind")
 
 
+STATIC_FUNCTION_KEYS = {
+    "arithmetic", "begin", "concat", "count", "end", "escape_regex",
+    "glob_to_regex", "merge", "regex_capture", "split", "substring",
+    "unique", "values", "variable_component",
+}
+
+
+def compile_time_static_variables(variables: dict) -> dict[str, bool]:
+    """Classify Variables whose complete dependency closure is source-time static.
+
+    This is deliberately conservative research classification. Constants are
+    static. Local Variables are static only when their expression contains no
+    Object/Observation/external/runtime source, uses only known deterministic
+    expression forms, and every referenced Variable is itself static.
+    """
+    memo: dict[str, bool] = {}
+    visiting: set[str] = set()
+
+    def expression_static(value: Any) -> bool:
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return True
+        if isinstance(value, list):
+            return all(expression_static(child) for child in value)
+        if not isinstance(value, dict):
+            return False
+
+        if set(value) == {"variable"}:
+            ref = value.get("variable")
+            return isinstance(ref, str) and variable_static(ref)
+
+        # Structured runtime bindings such as Observation exports are not
+        # compile-time static Variable references.
+        if "observation" in value or "assessment" in value or "input" in value:
+            return False
+        if "object" in value or "object_values" in value or "object_component" in value:
+            return False
+
+        semantic_function_keys = set(value) & FUNCTION_KEYS
+        if semantic_function_keys - STATIC_FUNCTION_KEYS:
+            return False
+
+        return all(expression_static(child) for child in value.values())
+
+    def variable_static(variable_id: str) -> bool:
+        if variable_id in memo:
+            return memo[variable_id]
+        if variable_id in visiting:
+            memo[variable_id] = False
+            return False
+        payload = variables.get(variable_id)
+        if not isinstance(payload, dict):
+            memo[variable_id] = False
+            return False
+
+        visiting.add(variable_id)
+        kind = payload.get("kind")
+        if kind == "constant":
+            result = True
+        elif kind == "external":
+            result = False
+        elif kind == "local":
+            result = expression_static(payload.get("expression"))
+        else:
+            result = False
+        visiting.remove(variable_id)
+        memo[variable_id] = result
+        return result
+
+    return {
+        variable_id: variable_static(variable_id)
+        for variable_id in variables
+    }
+
+
 def expression_functions(variable: dict) -> Counter:
     counts = Counter()
     expression = variable.get("expression")
@@ -149,6 +223,12 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
     fanouts = Counter()
     reused = 0
     chained = 0
+    static_map = compile_time_static_variables(variables)
+    static_variables = 0
+    static_constants = 0
+    static_locals = 0
+    static_multiple_consumers = 0
+    static_consumer_contexts = Counter()
 
     for variable_id, payload in sorted(variables.items()):
         if not isinstance(payload, dict):
@@ -181,6 +261,17 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
         if contexts.get("variable", 0):
             chained += 1
 
+        is_static = bool(static_map.get(variable_id))
+        if is_static:
+            static_variables += 1
+            static_consumer_contexts.update(contexts)
+            if source_kind == "constant":
+                static_constants += 1
+            elif source_kind == "local":
+                static_locals += 1
+            if len(refs) >= 2:
+                static_multiple_consumers += 1
+
         rows.append({
             "variable_id": variable_id,
             "kind": kind,
@@ -190,6 +281,7 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
             "consumer_contexts": dict(contexts),
             "function_counts": dict(funcs),
             "foreach_v1_refusal_reasons": review_by_variable.get(variable_id, []),
+            "compile_time_static": is_static,
         })
 
     edges = dependency_edges(variables)
@@ -202,6 +294,12 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
         "fanout_bucket_counts": dict(fanouts),
         "variables_with_multiple_consumers": reused,
         "variables_consumed_by_variables": chained,
+        "compile_time_static_variables": static_variables,
+        "compile_time_static_constants": static_constants,
+        "compile_time_static_locals": static_locals,
+        "compile_time_static_variables_with_multiple_consumers": static_multiple_consumers,
+        "compile_time_static_consumer_context_counts": dict(static_consumer_contexts),
+        "runtime_variables": len(rows) - static_variables,
         "variable_dependency_edges": len(edges),
         "max_variable_chain_depth": longest_chain(variables, edges),
         "rows": rows,
@@ -243,6 +341,12 @@ def main() -> int:
     variable_chained = 0
     dependency_edges_total = 0
     max_chain_depth = 0
+    compile_time_static_total = 0
+    compile_time_static_constants = 0
+    compile_time_static_locals = 0
+    compile_time_static_multiple_consumers = 0
+    compile_time_static_contexts = Counter()
+    runtime_variables = 0
 
     for index, source_row in enumerate(all_rows):
         if source_row["kind"] != "rule":
@@ -307,6 +411,16 @@ def main() -> int:
         multiple_consumers += analysis["variables_with_multiple_consumers"]
         variable_chained += analysis["variables_consumed_by_variables"]
         dependency_edges_total += analysis["variable_dependency_edges"]
+        compile_time_static_total += analysis["compile_time_static_variables"]
+        compile_time_static_constants += analysis["compile_time_static_constants"]
+        compile_time_static_locals += analysis["compile_time_static_locals"]
+        compile_time_static_multiple_consumers += analysis[
+            "compile_time_static_variables_with_multiple_consumers"
+        ]
+        compile_time_static_contexts.update(
+            analysis["compile_time_static_consumer_context_counts"]
+        )
+        runtime_variables += analysis["runtime_variables"]
         max_chain_depth = max(
             max_chain_depth, analysis["max_variable_chain_depth"]
         )
@@ -356,6 +470,12 @@ def main() -> int:
         "fanout_bucket_counts": dict(fanout_buckets),
         "variables_with_multiple_consumers": multiple_consumers,
         "variables_consumed_by_variables": variable_chained,
+        "compile_time_static_variables": compile_time_static_total,
+        "compile_time_static_constants": compile_time_static_constants,
+        "compile_time_static_locals": compile_time_static_locals,
+        "compile_time_static_variables_with_multiple_consumers": compile_time_static_multiple_consumers,
+        "compile_time_static_consumer_context_counts": dict(compile_time_static_contexts),
+        "runtime_variables": runtime_variables,
         "variable_dependency_edges": dependency_edges_total,
         "max_variable_chain_depth": max_chain_depth,
         "foreach_v1_refusal_reason_counts": dict(refusal_reasons),
@@ -387,6 +507,10 @@ def main() -> int:
             "fanout_bucket_counts",
             "variables_with_multiple_consumers",
             "variables_consumed_by_variables",
+            "compile_time_static_variables",
+            "compile_time_static_constants",
+            "compile_time_static_locals",
+            "runtime_variables",
             "max_variable_chain_depth",
             "unique_variable_pattern_signatures",
         )
