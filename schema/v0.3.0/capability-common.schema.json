@@ -31,6 +31,9 @@
           ]
         },
         {
+          "$ref": "#/$defs/literal_collection"
+        },
+        {
           "$ref": "#/$defs/variable_reference"
         }
       ]
@@ -71,7 +74,14 @@
           "then": {
             "properties": {
               "value": {
-                "$ref": "#/$defs/variable_reference"
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
               }
             }
           }
@@ -80,7 +90,14 @@
           "if": {
             "properties": {
               "value": {
-                "$ref": "#/$defs/variable_reference"
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
               }
             },
             "required": [
@@ -139,7 +156,14 @@
           "then": {
             "properties": {
               "value": {
-                "$ref": "#/$defs/variable_reference"
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
               }
             }
           }
@@ -148,7 +172,14 @@
           "if": {
             "properties": {
               "value": {
-                "$ref": "#/$defs/variable_reference"
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
               }
             },
             "required": [
@@ -171,9 +202,7 @@
       ],
       "properties": {
         "state": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-state$"
+          "$ref": "#/$defs/state_use"
         },
         "action": {
           "type": "string",
@@ -188,9 +217,7 @@
     "test_reference_set": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1,
-        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-state$"
+        "$ref": "#/$defs/state_use"
       },
       "uniqueItems": true
     },
@@ -346,9 +373,7 @@
       ],
       "properties": {
         "object": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
+          "$ref": "#/$defs/object_use"
         },
         "filters": {
           "type": "array",
@@ -726,14 +751,11 @@
           "description": "Lexical name for one Item produced by the source Object."
         },
         "in": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Named source Object whose Items are bound by Object-level for_each.",
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
+          "$ref": "#/$defs/object_reference"
         }
       },
       "additionalProperties": false,
-      "description": "SCAP-NG 0.3.0 collection-expansion foreach binding. Cross-Object existence, field and datatype compatibility are semantic-validator responsibilities."
+      "description": "SCAP-NG 0.3 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit."
     },
     "foreach_selector_binding": {
       "type": "object",
@@ -748,7 +770,88 @@
         }
       },
       "additionalProperties": false,
-      "description": "A v1 foreach selector binding. Equality, compatible datatype and at-least-one projected-value semantics are intrinsic to the normative desugaring and are not redundantly authored."
+      "description": "Bind this selector from one field of a visible foreach lineage alias, e.g. user.home_dir. In a chained foreach, aliases inherited from the source Object remain correlated and visible."
+    },
+    "object_reference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
+    },
+    "state_reference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-state$"
+    },
+    "inline_object": {
+      "type": "object",
+      "required": [
+        "capability"
+      ],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "not": {
+        "required": [
+          "result"
+        ]
+      },
+      "additionalProperties": true,
+      "description": "Consumer-local Object. Capability-specific structure is validated against the corresponding generated capability schema and semantic rules."
+    },
+    "inline_state": {
+      "type": "object",
+      "required": [
+        "capability"
+      ],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "not": {
+        "required": [
+          "result"
+        ]
+      },
+      "additionalProperties": true,
+      "description": "Consumer-local State. Capability-specific structure is validated against the corresponding generated capability schema and semantic rules."
+    },
+    "object_use": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/object_reference"
+        },
+        {
+          "$ref": "#/$defs/inline_object"
+        }
+      ]
+    },
+    "state_use": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/state_reference"
+        },
+        {
+          "$ref": "#/$defs/inline_state"
+        }
+      ]
+    },
+    "literal_collection": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean"
+        ]
+      },
+      "description": "Non-empty ordered literal collection. Duplicates are preserved; datatype validity and source-equivalent matching quantifier are validated separately."
     }
   }
 }
