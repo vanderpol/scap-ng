@@ -136,7 +136,7 @@ class StaticLiteralCollectionTests(unittest.TestCase):
         self.assertEqual(rendered,source)
         self.assertEqual(proof.reexpand_constants(rendered,identity),source)
 
-    def test_list_constant_outside_direct_value_fails_closed(self):
+    def test_list_constant_outside_direct_value_stays_named(self):
         source = {
             "assessment": {
                 "variables": {
@@ -153,8 +153,45 @@ class StaticLiteralCollectionTests(unittest.TestCase):
                 }
             }
         }
-        with self.assertRaises(ValueError):
-            proof.inline_constants(copy.deepcopy(source))
+        rendered, identity = proof.inline_constants(copy.deepcopy(source))
+        self.assertEqual(identity, [])
+        self.assertEqual(rendered, source)
+        self.assertEqual(proof.reexpand_constants(rendered, identity), source)
+
+    def test_mixed_safe_and_unsupported_refs_are_atomic_noop(self):
+        source = {
+            "assessment": {
+                "variables": {
+                    "values": {
+                        "kind": "constant",
+                        "datatype": "string",
+                        "expression": {"literal": ["a", "b"]},
+                    },
+                    "derived": {
+                        "kind": "local",
+                        "datatype": "string",
+                        "expression": {"concat": [{"variable": "values"}]},
+                    },
+                },
+                "tests": {
+                    "t": {
+                        "object": {
+                            "select": {
+                                "path": {
+                                    "value": {"variable": "values"},
+                                    "datatype": "string",
+                                    "operation": "equals",
+                                    "variable_match": "one_or_more",
+                                }
+                            }
+                        }
+                    }
+                },
+            }
+        }
+        rendered, identity = proof.inline_constants(copy.deepcopy(source))
+        self.assertEqual(identity, [])
+        self.assertEqual(rendered, source)
 
 
 if __name__ == "__main__":
