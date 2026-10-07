@@ -1,0 +1,27 @@
+name: Violation-query modernization research
+
+on:
+  push:
+    paths:
+      - tools/research_violation_query_semantics.py
+      - tools/test_research_violation_query_semantics.py
+      - research/assessment-simplification/violation-query-14/**
+      - .github/workflows/violation-query-modernization-research.yml
+  pull_request:
+    paths:
+      - tools/research_violation_query_semantics.py
+      - tools/test_research_violation_query_semantics.py
+      - research/assessment-simplification/violation-query-14/**
+      - .github/workflows/violation-query-modernization-research.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run violation-query semantic proof
+        run: PYTHONPATH=tools python tools/test_research_violation_query_semantics.py -v
