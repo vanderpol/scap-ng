@@ -147,6 +147,23 @@ class ConditionalModernizationTests(unittest.TestCase):
         self.assertEqual(applied["enum_proof"]["right_values"],["4","5"])
         self.assertFalse(applied["enum_proof"]["exhaustive"])
 
+    def test_single_state_enum_guards_do_not_require_states_match(self):
+        source=self.enum_doc([1],[0])
+        a=source["assessment"]
+        a["tests"]["guard-a"].pop("states_match")
+        a["tests"]["guard-b"].pop("states_match")
+        result,report=modernize_conditionals_v1(source,enabled=True)
+        self.assertTrue(report["rewrite_performed"])
+        self.assertEqual(
+            report["applied"][0]["pattern_class"],
+            "mutually_exclusive_enum_guards",
+        )
+        self.assertEqual(result["assessment"]["evaluate"],{
+            "if":{"test":"guard-a"},
+            "then":{"test":"p"},
+            "else":{"all":[{"test":"guard-b"},{"test":"q"}]},
+        })
+
     def test_overlapping_enum_guards_are_not_rewritten(self):
         source=self.enum_doc([2,3],[3,4])
         result,report=modernize_conditionals_v1(source,enabled=True)
