@@ -23,8 +23,8 @@ See the [full objectives](specification/objectives.md) and
 - **Specification:** [specification/README.md](specification/README.md)
 - **Source and result samples:** [specification/examples/README.md](specification/examples/README.md)
 - **Current review:** [review/current/README.md](review/current/README.md)
-- **0.3.0 schema:** [schema/v0.3.0/README.md](schema/v0.3.0/README.md)
-- **0.2.0 frozen schema:** [schema/v0.2.0/README.md](schema/v0.2.0/README.md)
+- **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
+- **0.2.0 frozen schema:** [schema/v0.2.0/](schema/v0.2.0/)
 - **Open issues / 0.3 work:** [GitHub issues](https://github.com/vanderpol/scap-ng/issues)
 - **Governance and published votes:** [board/README.md](board/README.md)
 
