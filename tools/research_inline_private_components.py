@@ -223,6 +223,7 @@ def inline_private(
     inline_private_filtered_set_operands: bool = False,
     inline_state_consumers: bool = False,
     inline_variable_object_consumers: bool = False,
+    inline_private_object_consumers: bool = False,
     inline_private_variables: bool = False,
     inline_private_local_variables: bool = False,
 ) -> tuple[dict, dict]:
@@ -249,6 +250,7 @@ def inline_private(
         "inlined_objects":{},
         "inlined_set_operand_objects":[],
         "inlined_variable_objects":[],
+        "inlined_object_graph_objects":[],
         "inlined_variables":[],
         "inlined_states":{},
         "inlined_state_consumer_occurrences":[],
@@ -306,6 +308,75 @@ def inline_private(
                     "filter_count":len(filters) if isinstance(filters,list) else 0,
                 })
                 remove_objects.add(child_id)
+
+    if inline_private_object_consumers:
+        # Bounded v7 locality experiment: recursively localize an Object only
+        # when its sole Assessment reference is one explicit object:<id> edge
+        # inside exactly one other named Object. This preserves one acquisition
+        # identity and does not duplicate the child population.
+        def explicit_object_ref_paths(value: Any, object_id: str, path: list[Any]):
+            hits=[]
+            if isinstance(value,dict):
+                for key,child in value.items():
+                    if key=="object" and child==object_id:
+                        hits.append(path+[key])
+                    else:
+                        hits.extend(explicit_object_ref_paths(child,object_id,path+[key]))
+            elif isinstance(value,list):
+                for index,child in enumerate(value):
+                    hits.extend(explicit_object_ref_paths(child,object_id,path+[index]))
+            return hits
+
+        edges={}
+        for child_id,payload in objects.items():
+            if (
+                refs.get(child_id)!=1
+                or contexts.get(child_id)!={"object_graph":1}
+                or not isinstance(payload,dict)
+            ):
+                continue
+            matches=[]
+            for parent_id,parent in objects.items():
+                if parent_id==child_id or not isinstance(parent,dict):
+                    continue
+                for path in explicit_object_ref_paths(parent,child_id,[]):
+                    matches.append((parent_id,path))
+            if len(matches)==1:
+                edges[child_id]=matches[0]
+
+        # Process deepest descendants first so an embedded parent carries any
+        # already-localized child payload when it is itself localized.
+        def ancestor_depth(child_id: str, trail: tuple[str,...]=()) -> int:
+            if child_id in trail:
+                raise ValueError(f"Object dependency cycle in locality research: {child_id}")
+            row=edges.get(child_id)
+            if row is None:
+                return 0
+            parent_id,_=row
+            if parent_id not in edges:
+                return 1
+            return 1+ancestor_depth(parent_id,trail+(child_id,))
+
+        for child_id in sorted(edges,key=lambda name:(-ancestor_depth(name),name)):
+            parent_id,path=edges[child_id]
+            parent=objects.get(parent_id)
+            child=objects.get(child_id)
+            if not isinstance(parent,dict) or not isinstance(child,dict):
+                continue
+            holder=parent
+            for segment in path[:-1]:
+                holder=holder[segment]
+            last=path[-1]
+            if holder.get(last)!=child_id:
+                # A previous localization changed the path unexpectedly.
+                continue
+            holder[last]=copy.deepcopy(child)
+            identity["inlined_object_graph_objects"].append({
+                "object":child_id,
+                "parent_object":parent_id,
+                "path":path,
+            })
+            remove_objects.add(child_id)
 
     if inline_variable_object_consumers:
         # Bounded v4 locality experiment: inline a leaf Object only when the
@@ -633,6 +704,28 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         objects[original]=payload
         tests[test_id]["object"]=original
 
+    # Restore recursively localized Object-graph children outside-in. The
+    # inlining pass recorded deepest children first, so reverse order restores
+    # each parent before extracting its children.
+    for row in reversed(identity.get("inlined_object_graph_objects",[])):
+        child_id=row["object"]
+        parent_id=row["parent_object"]
+        parent=objects.get(parent_id)
+        if not isinstance(parent,dict):
+            raise ValueError(f"missing restored Object parent {parent_id!r}")
+        holder=parent
+        path=row["path"]
+        for segment in path[:-1]:
+            holder=holder[segment]
+        last=path[-1]
+        payload=copy.deepcopy(holder[last])
+        if not isinstance(payload,dict):
+            raise ValueError(f"missing inline Object payload for {child_id!r}")
+        if child_id in objects and objects[child_id] != payload:
+            raise ValueError(f"Object-graph payload mismatch for {child_id!r}")
+        objects[child_id]=payload
+        holder[last]=child_id
+
     # Restore bounded private Set-operand Objects after their parent Object
     # has been restored from a Test, if applicable.
     for row in identity.get("inlined_set_operand_objects",[]):
@@ -778,6 +871,14 @@ def main():
         ),
     )
     ap.add_argument(
+        "--inline-private-object-consumers",
+        action="store_true",
+        help=(
+            "Research v7: recursively localize a single-use Object into its "
+            "sole explicit Object-graph consumer."
+        ),
+    )
+    ap.add_argument(
         "--inline-private-variables",
         action="store_true",
         help=(
@@ -819,6 +920,7 @@ def main():
         "inline_private_filtered_set_operands":bool(args.inline_private_filtered_set_operands),
         "inline_state_consumers":bool(args.inline_state_consumers),
         "inline_variable_object_consumers":bool(args.inline_variable_object_consumers),
+        "inline_private_object_consumers":bool(args.inline_private_object_consumers),
         "inline_private_variables":bool(args.inline_private_variables),
         "inline_private_local_variables":bool(args.inline_private_local_variables),
         "source_root":str(args.input_root),
@@ -834,7 +936,7 @@ def main():
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
         "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_variable_objects":0,
-        "inlined_variables":0,"inlined_states":0,
+        "inlined_object_graph_objects":0,"inlined_variables":0,"inlined_states":0,
         "inlined_state_consumer_occurrences":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
@@ -851,6 +953,7 @@ def main():
             inline_private_filtered_set_operands=args.inline_private_filtered_set_operands,
             inline_state_consumers=args.inline_state_consumers,
             inline_variable_object_consumers=args.inline_variable_object_consumers,
+            inline_private_object_consumers=args.inline_private_object_consumers,
             inline_private_variables=args.inline_private_variables,
             inline_private_local_variables=args.inline_private_local_variables,
         )
@@ -877,6 +980,7 @@ def main():
             "inlined_objects":len(identity["inlined_objects"]),
             "inlined_set_operand_objects":len(identity["inlined_set_operand_objects"]),
             "inlined_variable_objects":len(identity["inlined_variable_objects"]),
+            "inlined_object_graph_objects":len(identity["inlined_object_graph_objects"]),
             "inlined_variables":len(identity["inlined_variables"]),
             "inlined_states":len(identity["inlined_states"]),
             "inlined_state_consumer_occurrences":len(identity["inlined_state_consumer_occurrences"]),
