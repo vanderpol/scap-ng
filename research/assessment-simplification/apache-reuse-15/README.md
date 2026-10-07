@@ -233,7 +233,23 @@ The Apache source already demonstrates that multi-installation and include
 semantics can matter. A reusable module must preserve those semantics unless a
 separately reviewed native collector intentionally changes them.
 
-Module extraction proof status: **executable research prototype added; full-corpus run pending.**
+Module extraction proof status: **passed on the pinned full Apache corpus.**
+
+The first bounded prototype extracts 4 Objects + 11 Variables into
+`scap-ng.apache.httpd.discovery`. Fifteen of the 22 Rule Assessments match the
+complete module shape. All 15 flatten back to the original converted Assessment
+with exact structural equality.
+
+Only two exports are actually consumed outside the module in those 15 Rules:
+
+- `httpd_executable` — 21 external references;
+- `primary_and_included_configs` — 18 external references.
+
+The prototype also declared `httpd_root` and `primary_config`, but the proof
+shows they are internal implementation details for this first reuse class and
+need not be public exports.
+
+Proof workflow: `Apache authoring reuse research`, run `37614728886`.
 
 ## Recommendation
 
