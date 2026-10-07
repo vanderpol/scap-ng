@@ -132,11 +132,16 @@ def _enum_guard_signature(assessment, expression):
     check = test.get("match", test.get("check"))
     if existence not in {"some", "at_least_one_exists", "only_one_exists"}:
         return None
-    if check != "all" or test.get("states_match") != "any":
+    if check != "all":
         return None
 
     state_ids = test.get("states")
     if not isinstance(state_ids, list) or not state_ids:
+        return None
+    states_match = test.get("states_match")
+    if len(state_ids) > 1 and states_match != "any":
+        return None
+    if len(state_ids) == 1 and states_match not in {None, "all", "any", "one", "odd"}:
         return None
 
     signatures = []
