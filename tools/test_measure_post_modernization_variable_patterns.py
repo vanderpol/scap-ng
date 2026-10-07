@@ -4,6 +4,7 @@ import unittest
 from measure_post_modernization_variable_patterns import (
     analyze_remaining_variables,
     compile_time_static_variables,
+    consumer_context,
     exact_variable_refs,
 )
 
@@ -21,6 +22,24 @@ class VariableResidualPatternTests(unittest.TestCase):
         paths=list(exact_variable_refs(value,"v"))
         self.assertEqual(len(paths),2)
         self.assertIn(("objects","o","select","path","value"),paths)
+
+    def test_consumer_context_tracks_local_object_and_state(self):
+        self.assertEqual(
+            consumer_context(("tests","t","object","select","path","value")),
+            "object",
+        )
+        self.assertEqual(
+            consumer_context(("tests","t","states","0","state","field","value")),
+            "state",
+        )
+        self.assertEqual(
+            consumer_context(("objects","o","filters","0","state","field","value")),
+            "state",
+        )
+        self.assertEqual(
+            consumer_context(("tests","t","check","value")),
+            "test",
+        )
 
     def test_compile_time_static_variable_closure(self):
         variables={
