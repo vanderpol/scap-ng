@@ -22,6 +22,7 @@ This work explores ways to make accurate assessments easier for humans to author
 | [locality-11](locality-11/README.md) | Inline private Object/State layout over the existing semantic model | 20-rule examples, full RHEL/Server 2025 census, structural round-trip evidence |
 | [residual-patterns-12](residual-patterns-12/README.md) | Recurring residual complexity after known simplification opportunities | RHEL/Windows motif census, prioritized modernization/capability candidates |
 | [fstab-13](fstab-13/README.md) | Typed persistent Linux mount configuration | 23-rule `/etc/fstab` census, OVAL 5.12.3 boundary, before/after example, fail-closed proof requirements |
+| [violation-query-14](violation-query-14/README.md) | Violation-query positive-form audit | 12-rule exclude+none-exist census, six-state counterexamples, presentation-only recommendation |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
