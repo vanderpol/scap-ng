@@ -92,7 +92,7 @@ def scalar_reference_contexts(node: Any, candidates: set[str]) -> dict[str, dict
     counts={name:{} for name in candidates}
 
     def classify(path: tuple[str, ...]) -> str:
-        if len(path)>=4 and path[0]=="tests":
+        if len(path)>=3 and path[0]=="tests":
             if path[2]=="object":
                 return "test_object"
             if path[2]=="states":
