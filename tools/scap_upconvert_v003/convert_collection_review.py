@@ -26,6 +26,10 @@ from scap_upconvert_v003.native_capability_mapping import apply_ready_capability
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
 from scap_upconvert_v003.conditional_modernization import modernize_conditionals_v1
 from validate_generated_capability_semantics import validate_assessment_capability_semantics
+from scap14_rule_splitter import (
+    find_datastream, embedded_components, oval_source_roots,
+    resolve_oval_components, OvalComponent, component_kind,
+)
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -144,6 +148,58 @@ def source_components(package):
                 seen[identity]=raw
                 sections[local(section.tag)].append(deepcopy(node))
     return benchmarks[0],combined
+
+def source_rule_resolver(package):
+    """Return the XCCDF Benchmark and an href-scoped OVAL document resolver.
+
+    SCAP datastreams may reuse the same OVAL id in distinct components. XCCDF
+    check-content-ref therefore identifies automated content by both href and
+    Definition id; flattening all OVAL components into one namespace is unsafe.
+    """
+    from lxml import etree
+
+    _, _, datastream = find_datastream(package)
+    components, component_refs = embedded_components(datastream)
+    benchmarks = [
+        root for root in components.values()
+        if component_kind(root) == "xccdf"
+    ]
+    if len(benchmarks) != 1:
+        raise ValueError(
+            f"Expected one embedded XCCDF Benchmark component, found {len(benchmarks)}"
+        )
+    oval_components = [
+        OvalComponent(component_id, root)
+        for component_id, root in oval_source_roots(package, components)
+    ]
+    if not oval_components:
+        raise ValueError("No OVAL Definitions components found")
+
+    cache = {}
+
+    def resolve(href, definition_id):
+        matches = resolve_oval_components(
+            oval_components,
+            definition_id,
+            href,
+            component_refs,
+        )
+        if len(matches) != 1:
+            status = "unresolved" if not matches else "ambiguous"
+            raise ValueError(
+                f"{status} OVAL check-content-ref: href={href!r} "
+                f"definition={definition_id!r} matches={len(matches)}"
+            )
+        component = matches[0]
+        if component.component_id not in cache:
+            cache[component.component_id] = ET.fromstring(
+                etree.tostring(component.root, encoding="UTF-8")
+            )
+        return cache[component.component_id]
+
+    benchmark = ET.fromstring(etree.tostring(benchmarks[0], encoding="UTF-8"))
+    return benchmark, resolve
+
 
 def write_yaml(path,doc):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -591,7 +647,7 @@ def main(argv=None):
     if not wanted:raise SystemExit('Select explicit Rules for the review; full regeneration is held')
     if args.output.exists() and any(args.output.iterdir()):raise SystemExit('Output directory must be new or empty')
     args.output.mkdir(parents=True,exist_ok=True)
-    xr,original=source_components(args.input)
+    xr,resolve_original=source_rule_resolver(args.input)
     all_records={r['id']:r for r in records(xr)}
     if wanted-set(all_records):raise SystemExit('Unknown Rule IDs: '+str(sorted(wanted-set(all_records))))
     evidence={'status':'prototype_collection_graph_review','source_sha256':digest,
@@ -605,7 +661,6 @@ def main(argv=None):
     evidence['reverse_validation_schema_sha256']=hashlib.sha256(args.schema.read_bytes()).hexdigest()
     failed=False
     with tempfile.TemporaryDirectory() as tmp:
-        original_path=Path(tmp)/'source.xml';ET.ElementTree(original).write(original_path,encoding='utf-8')
         for rid in sorted(wanted):
             rec=all_records[rid]
             result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
@@ -633,10 +688,18 @@ def main(argv=None):
                     result['selectors'][selector]=ref
                     continue
                 source_ref=c.find('x:check-content-ref',NS)
+                href=source_ref.get('href')
                 did=source_ref.get('name')
-                if did in done:
-                    result['selectors'][selector]=done[did]
+                source_key=(href,did)
+                if source_key in done:
+                    result['selectors'][selector]=done[source_key]
                     continue
+                original=resolve_original(href,did)
+                original_path=Path(tmp)/(rid+'-'+hashlib.sha256(
+                    ((href or '')+'\\0'+did).encode('utf-8')
+                ).hexdigest()[:12]+'-source.xml')
+                if not original_path.exists():
+                    ET.ElementTree(original).write(original_path,encoding='utf-8')
                 aid=rid+'.automated'+('' if not done else '-'+str(len(done)+1))
                 provenance={}
                 unsupported=unsupported_definition_features(original,did)
@@ -708,7 +771,7 @@ def main(argv=None):
                 if errors:raise ValueError('Current vocabulary guard: '+str(errors))
                 ref='assessments/automated/'+aid+'.assessment.yaml'
                 write_yaml(args.output/ref,native)
-                done[did]=ref;result['selectors'][selector]=ref
+                done[source_key]=ref;result['selectors'][selector]=ref
                 assessment_row={'status':'representation_comparator_equal',
                     'path':ref,'source_graph_bindings':provenance,
                     'tests':len(native['assessment']['tests']),
