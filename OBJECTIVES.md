@@ -1,116 +1,12 @@
-# SCAP-NG core objectives
+# Objective-to-issue traceability
 
-SCAP-NG design changes are judged against a small, stable set of project objectives.
-These explain **why** the project exists. Syntax changes, file-count reductions, or
-implementation techniques are means, not objectives.
+The normative project objectives are defined once in
+[specification/objectives.md](specification/objectives.md).
 
-A major semantic, authoring, packaging, results, conversion, conformance, or
-implementation change SHOULD advance at least one objective below.
+This page maps active work to those objectives. It exists to detect two defects:
 
-## O1 — Preserve meaning through migration
-
-Provide a practical forward path from SCAP 1.4 and OVAL into native SCAP-NG
-without silently changing supported policy or assessment semantics.
-
-Success means supported, non-deprecated content converts deterministically while
-preserving effective policy, assessment truth, applicability, inputs,
-dependencies, collection, Set/Filter behavior, evidence meaning, and provenance.
-Unsupported or deprecated constructs fail explicitly rather than being guessed.
-
-## O2 — Make authoring and review substantially simpler
-
-Reduce structural indirection, boilerplate, and legacy serialization burden so
-humans can understand, write, review, and maintain content more directly.
-
-Success means ordinary Rules are locally understandable; unnecessary named
-Objects, States, and Variables disappear; recurring dataflow has concise forms;
-terminology remains familiar unless a replacement is meaningfully clearer; and
-complexity is reduced rather than merely moved somewhere less visible.
-
-## O3 — Make semantics explicit and predictable
-
-Eliminate hidden defaults and scanner-specific guesses.
-
-Success means applicability, quantifiers, inputs, dependencies, targeting,
-redaction, provenance, and other behavior have explicit authored or
-schema-defined contracts. Independent conforming implementations should not need
-private assumptions to determine the same meaning.
-
-## O4 — Scale through safe reuse of content and collected facts
-
-Avoid duplicated content and repeated acquisition while preserving exact
-semantics at enterprise scale.
-
-Success means shared Assessments, Observations, collected facts, and caches are
-reused only through explicit contracts or proven semantic identity. Reuse must
-not erase policy identity, applicability, provenance, or evidence boundaries.
-
-## O5 — Produce smaller, more useful results
-
-Replace ARF-scale verbosity with results that explain what happened and retain
-the evidence needed for review, automation, and audit.
-
-Success means Results expose outcome, decisive reason/root cause, completeness,
-summary counters, provenance, bounded evidence samples, and deliberate
-redaction. Thin and full representations may differ in retained detail but SHALL
-NOT change technical truth.
-
-## O6 — Cover the complete policy lifecycle
-
-Support automated assessment, manual assessment, applicability, Organizational
-Input, profiles/tailoring, and direct policy/STIG publishing in one coherent
-model.
-
-Success means organizations such as DISA can move from prose/manual policy into
-native SCAP-NG without maintaining unrelated policy models, while delegated
-organizational values and manual results remain explicit, attributable, and
-auditable.
-
-## O7 — Be trustworthy, interoperable, and governable
-
-Make SCAP-NG implementable by multiple vendors and suitable for standards and
-community governance.
-
-Success means schemas and specifications are versioned and reproducible; OVAL
-mappings and intentional divergences are documented; integrity/signing and
-conformance requirements are clear; and schema-valid, migration-equivalent,
-runtime-conformant, human-accepted, and Board-ratified remain distinct claims.
-
-## O8 — Reduce implementation complexity and enable efficient execution
-
-Replace the monolithic SCAP/XML processing model with a modular,
-resource-efficient architecture that is easier to implement safely and can
-expose useful parallelism.
-
-This is not simply “replace XML with YAML/JSON.” The serialization choice is a
-means, not the goal.
-
-Success means:
-
-- native scanners do not require XML, XSD, XML canonicalization, or XML Digital
-  Signature processing for normal SCAP-NG execution;
-- native implementations can use straightforward typed data models and
-  memory-safe implementation stacks without a standards requirement forcing
-  legacy XML-processing libraries into the runtime;
-- Benchmark, Rule, Assessment, applicability, Observation, Profile, and related
-  content can be independently addressed instead of being one monolithic
-  datastream;
-- a manifest-based signed package provides integrity for the complete content
-  set without making the authoring model one giant document;
-- tools can validate, hash, cache, diff, load, or update individual components
-  rather than materializing an entire benchmark in memory when unnecessary;
-- split authoring produces focused version-control diffs and reduces merge
-  conflicts;
-- scanners can build an explicit dependency graph and schedule independent
-  Assessments concurrently, while Assessment dependencies, applicability, and
-  shared-acquisition contracts provide explicit ordering/dataflow constraints;
-- memory use, startup cost, concurrency, offline operation, and large-fleet
-  performance can be measured and improved independently.
-
-Legacy SCAP 1.4 conversion tooling still has to parse the authoritative legacy
-XML source. O8 applies to native SCAP-NG authoring, packaging, validation, and
-scanner execution; it does not pretend the migration boundary can avoid reading
-the format being migrated.
+- a major release issue that advances no stated SCAP-NG objective; or
+- a core objective with unfinished work but no issue tracking that work.
 
 ## 0.3.0 issue traceability
 
@@ -215,3 +111,4 @@ For each new major design issue or review packet:
 4. identify any objective it may trade off against;
 5. provide evidence and counterexamples;
 6. do not accept the change solely because CI is green or the representation is shorter.
+
