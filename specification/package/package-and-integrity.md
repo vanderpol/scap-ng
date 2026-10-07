@@ -20,15 +20,11 @@ A compiler/build process SHALL:
 
 ## 2. Source serialization
 
-SCAP-NG source MAY be authored using more than one supported serialization when
-those serializations represent the same object model.
+SCAP-NG source MAY use any supported serialization that represents the same
+object model. A repository SHOULD use one authoring serialization consistently.
 
-The current design permits JSON-compatible YAML and JSON as candidate source
-serializations.
-
-The final mandatory publisher serialization set remains under design.
-
-A repository SHOULD use one authoring serialization consistently.
+The supported serialization set is defined by the applicable SCAP-NG version
+or conformance profile.
 
 ## 3. Canonical compiled form
 
@@ -52,16 +48,15 @@ within the package.
 
 ## 5. Explicit source references versus compiled manifest resolution
 
-**Two different operations serve different users.** Authors need a direct and
-human-readable way to follow Benchmark → Rule → selected Assessment. Scanners
-need immutable, validated object lookup and package integrity without depending
-on the author's directory layout. The compiled package manifest serves this
-*runtime* need; it is **not** an additional author-maintained Assessment index.
+Authors need direct, readable source references. Scanners need immutable,
+validated object lookup independent of source-directory layout. The compiled
+package manifest provides runtime resolution and integrity; authors do not
+maintain a separate runtime index.
 
 ### 5.1 Authoring and compilation
 
-For the current file-backed authoring model, each Rule SHALL expose its named
-Assessment selections using explicit relative paths to Assessment YAML files.
+For file-backed authoring, each Rule SHALL expose its named Assessment
+selections using explicit relative paths to Assessment files.
 Those paths SHALL resolve relative to the **referring Rule file**, not to the
 process working directory or an implicitly chosen repository root.
 
@@ -73,7 +68,7 @@ directory convention SHALL determine an Assessment's semantic identity.
 Authors SHALL NOT be required to maintain a separate Policy file or Assessment
 lookup index.
 
-Illustrative source (field names remain pre-alpha):
+Illustrative source:
 
 ```yaml
 # rules/SV-257777.rule.yaml
@@ -117,26 +112,15 @@ Multiple named Rule selections MAY resolve to the same Assessment identity.
 The manifest need only bind that Assessment once; selected-choice identity
 SHALL remain available for results and provenance.
 
-### 5.3 Why this is useful
+### 5.3 Package identity
 
-The separation permits a source Assessment file to be moved or renamed
-without changing its logical identity; authoring references must be updated,
-but existing immutable packages continue to resolve their own contents.
-Packages need not preserve source directory layouts, and result records can
-refer to immutable package and Assessment identities instead of copying the
-complete source.
+The package identity SHOULD be immutable and content-derived from the package
+manifest or equivalent integrity material. Results SHOULD reference that
+immutable package identity.
 
-The package identity SHOULD be immutable and content-derived (for example,
-from a canonical manifest digest), and results SHOULD reference that immutable
-identity. Package-signature specifics and the final manifest serialization
-remain under design; the deterministic resolution and integrity requirements
-above are the intended behavior.
-
-Iteration 003 previously experimented with separate `index.json` and
-`manifest.json` files. Because both repeated package path and digest
-information, that design was consolidated into one `manifest.json`.
-The current experimental shape is implementation evidence, **not** an
-already-ratified final JSON schema.
+Source files may be moved or renamed without changing logical object identity.
+Compiled packages resolve their own immutable members through the manifest and
+do not depend on the original source layout.
 
 ## 6. Signing
 
@@ -209,28 +193,15 @@ Legacy source-signature verification, SCAP-NG content-package signing, and
 SCAP-NG result-package signing are therefore three distinct trust events. A
 successful event at one layer SHALL NOT be treated as proof of another.
 
-## 7. Historical authoring comments
+## 7. Migration and authoring metadata
 
-Comments used for migration provenance or author guidance are non-semantic.
+Authoring comments and migration evidence are non-semantic.
 
-The compiler SHOULD omit authoring comments from canonical scanner packages.
-
-A separate conversion report MAY preserve complete machine-readable legacy
-lineage.
-
-Conversion, normalization, source-defect, round-trip, and migration-audit
-evidence SHALL remain logically separate from the native executable content
-graph. Such evidence MAY reference native logical identities for traceability,
-but Benchmark, Rule, Assessment, Collection, and applicability objects SHALL
-NOT require that evidence in order to resolve or execute.
-
-The compiler SHALL NOT include detailed migration or repository-normalization
-evidence in a scanner package by default. If a future specification defines an
-optional provenance/audit package member, it SHALL be separately typed and
-SHALL NOT alter Assessment truth, collection semantics, or runtime reference
-resolution.
-
-Migration, conversion, and repository-normalization evidence SHALL remain outside the native scanner-facing content graph. Such evidence MAY reference native logical identities for traceability, but native Benchmark, Rule, Assessment, Collection, and applicability objects SHALL NOT depend on conversion evidence to execute. A compiler SHALL NOT include migration diagnostics, source-defect reports, round-trip traces, or normalization lineage in a scanner package by default. Any future standardized provenance package member SHALL be explicitly typed and separable from Assessment evaluation semantics.
+The compiler SHOULD omit authoring comments from scanner packages. Conversion,
+normalization, source-defect, round-trip, and migration-audit evidence SHALL
+remain separate from the executable content graph. Such evidence MAY reference
+native logical identities for traceability, but executable Benchmark, Rule,
+Assessment, and applicability content SHALL NOT depend on it.
 
 <!-- spec-nav:start -->
 
@@ -239,22 +210,3 @@ Migration, conversion, and repository-normalization evidence SHALL remain outsid
 **Specification navigation:** [← Previous: Manual Assessment](../assessment/manual-assessment.md) · [Contents](../README.md) · [Next: Results and Evidence →](../results/results.md)
 
 <!-- spec-nav:end -->
-
-
-## Candidate: schema-contract propagation into scanner packages
-
-**Status: pre-schema research placeholder.**
-
-The Benchmark is the authority for the authoring schema contract. A compiler
-SHOULD validate the full closed reference graph using that contract, then stamp
-its *resolved* NG content schema identifier/version into the compiled package
-manifest. The manifest's own `format_version` describes the **manifest layout**;
-it is not interchangeable with `ng_schema_version` (the SCAP-NG content model).
-
-Iteration-003 uses `ng_schema_version: null` in both the Benchmark and its
-review package manifest because no published NG assessment/JSON Schema is
-available. Such packages remain research artifacts and SHALL NOT be accepted
-by a production scanner as version-compatible merely because their JSON is
-parseable. An implementation SHALL reject unsupported or unresolved schema
-versions and conflicting nested declarations. A normalized scanner package
-SHALL NOT rely on unspecified or silently inherited execution semantics.
