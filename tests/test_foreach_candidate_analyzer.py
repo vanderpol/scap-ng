@@ -92,6 +92,68 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
         self.assertTrue(candidate["unary_concat_proof_class"]["eligible"])
         self.assertEqual(candidate["unary_concat_proof_class"]["reasons"],[])
 
+    def test_shared_unary_concat_is_proven_per_target_not_globally(self):
+        path=write_fixture("""\
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+ xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+ <tests>
+  <ind:textfilecontent54_test id="oval:x:tst:1" version="1" check="all"
+    check_existence="at_least_one_exists" comment="lock one">
+   <ind:object object_ref="oval:x:obj:2"/>
+  </ind:textfilecontent54_test>
+  <ind:textfilecontent54_test id="oval:x:tst:2" version="1" check="all"
+    check_existence="at_least_one_exists" comment="lock two">
+   <ind:object object_ref="oval:x:obj:3"/>
+  </ind:textfilecontent54_test>
+ </tests>
+ <objects>
+  <ind:textfilecontent54_object id="oval:x:obj:1" version="1" comment="dbs">
+   <ind:filepath>/etc/dconf/profile/user</ind:filepath>
+   <ind:pattern operation="pattern match">^system-db:(\\S+)\\s*$</ind:pattern>
+   <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+  </ind:textfilecontent54_object>
+  <ind:textfilecontent54_object id="oval:x:obj:2" version="1" comment="lock one">
+   <ind:path var_ref="oval:x:var:1" var_check="at least one"/>
+   <ind:filename operation="pattern match">.*</ind:filename>
+   <ind:pattern operation="pattern match">^/one$</ind:pattern>
+   <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+  </ind:textfilecontent54_object>
+  <ind:textfilecontent54_object id="oval:x:obj:3" version="1" comment="lock two">
+   <ind:path var_ref="oval:x:var:1" var_check="at least one"/>
+   <ind:filename operation="pattern match">.*</ind:filename>
+   <ind:pattern operation="pattern match">^/two$</ind:pattern>
+   <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+  </ind:textfilecontent54_object>
+ </objects><states/>
+ <variables>
+  <local_variable id="oval:x:var:1" version="1" datatype="string" comment="lock dirs">
+   <concat>
+    <literal_component>/etc/dconf/db/</literal_component>
+    <object_component object_ref="oval:x:obj:1" item_field="subexpression"/>
+    <literal_component>.d/locks</literal_component>
+   </concat>
+  </local_variable>
+ </variables>
+</oval_definitions>
+""")
+        try:
+            result=MOD.analyze_file(path)
+        finally:
+            path.unlink(missing_ok=True)
+        candidate=result["candidates"][0]
+        self.assertFalse(candidate["unary_concat_proof_class"]["eligible"])
+        self.assertIn(
+            "requires_single_target_consumer",
+            candidate["unary_concat_proof_class"]["reasons"],
+        )
+        scoped=candidate["target_scoped_unary_concat_proofs"]
+        self.assertEqual(len(scoped),2)
+        self.assertTrue(all(x["proof"]["eligible"] for x in scoped))
+        self.assertEqual(
+            MOD.summarize([result])["target_scoped_unary_concat_proof_class"],
+            {"eligible":2},
+        )
+
     def test_multi_source_concat_remains_cartesian_review_required(self):
         path=write_fixture("""\
 <oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
