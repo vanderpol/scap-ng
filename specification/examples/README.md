@@ -397,6 +397,59 @@ This solves a real Apache/Windows/Linux reuse pattern, but adds a new artifact
 and runtime interface. It is receiving an explicit complexity/value decision in
 [#166](https://github.com/vanderpol/scap-ng/issues/166).
 
+## Candidate: conditional / case authoring
+
+**SCAP 1.4:** Environment-dependent requirements are often encoded as nested
+OVAL `OR`/`AND` criteria with positive and negated guard Tests, which can make
+the author’s intent difficult to see.
+
+**0.3 candidate:** A declarative conditional/case form could make the
+environment choice locally obvious while retaining defined six-state semantics.
+
+```yaml
+evaluate:
+  case:
+    when:
+      test: server-is-domain-controller
+    then:
+      test: domain-controller-permissions
+    otherwise:
+      test: member-server-permissions
+```
+
+The production census found real role/configuration-dependent Rules, but a
+procedural if/else is **not generally equivalent** to the source OVAL six-state
+Boolean graph. Any accepted form must therefore have explicit semantics and a
+lossless migration rule. Review decision:
+[#173](https://github.com/vanderpol/scap-ng/issues/173).
+
+## Reusable applicability Assessments
+
+**SCAP 1.4:** Repeated applicability may be represented through XCCDF/CPE and
+OVAL structures that are difficult to trace and may be duplicated across Rules.
+
+**SCAP-NG:** A Benchmark applicability catalog gives a condition a stable name
+and binds it once to an applicability Assessment. Many Rules can reference the
+same condition without copying its technical check.
+
+```yaml
+applicability:
+  windows.camera-installed:
+    assessment: assessments/applicability/windows-camera-installed.assessment.yaml
+
+rules:
+  - id: WN11-EXAMPLE-1
+    when: windows.camera-installed
+  - id: WN11-EXAMPLE-2
+    when: windows.camera-installed
+```
+
+This reuse is already part of the applicability model. The open 0.3 question is
+whether cross-benchmark or more complex cases justify **another dedicated shared
+applicability construct**, or whether ordinary reusable Assessments and result
+reuse are sufficient. Review decision:
+[#178](https://github.com/vanderpol/scap-ng/issues/178).
+
 ## Candidate: bounded `for_each`
 
 **SCAP 1.4:** Some checks require Object → ObjectComponent → Variable → target
