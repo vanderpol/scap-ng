@@ -110,3 +110,43 @@ Not rewritten merely to reduce the complexity count:
 
 The detailed 61-package reports and logs remain in the workflow artifact rather
 than this repository.
+
+
+## Human-review package requirement
+
+The first candidate end-product review set will use six benchmarks:
+
+- RHEL 9;
+- Oracle Linux 9;
+- Windows Server 2025;
+- Windows 11;
+- Apache 2.4 UNIX Server;
+- Windows Server DNS.
+
+Each benchmark SHALL include a compact modernization scorecard generated from
+the same source pin and transformation reports as the candidate content.
+
+Required per-benchmark metrics:
+
+- Rule and automated Assessment counts;
+- faithful versus candidate top-level Objects, States, Variables, and named
+  references;
+- counts localized by type: Test/Object/State, Set operand, Variable-local
+  Object, external input, and constant Variable;
+- bounded `foreach` rewrites and explicit refusals/review-required cases;
+- Observation artifacts, consumers, export references, and factored
+  Object/Variable occurrences;
+- trivial single-Test `evaluate` roots versus real multi-Test/nested
+  composition;
+- final Assessment classification counts;
+- residual-complexity reasons;
+- normalized lines/bytes as secondary readability metrics;
+- source revision, workflow, and proof/round-trip status.
+
+The scorecard is explanatory evidence, not a quality score. A benchmark with
+more real complexity is not worse; the purpose is to show exactly what the
+modernization changed and what it deliberately retained.
+
+Human review starts only after external/constant Variable locality is resolved
+and these six benchmarks can be generated as coherent candidate end-product NG,
+not as a mixture of research representations.
