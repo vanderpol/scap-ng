@@ -1,0 +1,196 @@
+name: Post-modernization Variable pattern research
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/post-modernization-variable-patterns.yml
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  analyze:
+    name: Variable residuals - ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - label: Windows 2012/R2 DC
+            key: win2012-dc
+            artifact: U_MS_Windows_2012_and_2012_R2_DC_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: Windows 2012/R2 MS
+            key: win2012-ms
+            artifact: U_MS_Windows_2012_and_2012_R2_MS_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: IE11
+            key: ie11
+            artifact: U_MS_IE11_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV17-signed.zip
+          - label: RHEL 8
+            key: rhel8
+            artifact: U_RHEL_8_V2R8_STIG_SCAP_1-4_Benchmark-enhancedV22-signed.zip
+          - label: Windows Server 2016
+            key: win2016
+            artifact: U_MS_Windows_Server_2016_V2R8_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip
+          - label: RHEL 9
+            key: rhel9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - label: Windows Server DNS
+            key: dns
+            artifact: U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+          - label: Oracle Linux 8
+            key: ol8
+            artifact: U_Oracle_Linux_8_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV19-signed.zip
+          - label: Oracle Linux 9
+            key: ol9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+          - label: Ubuntu 24.04
+            key: ubuntu2404
+            artifact: U_CAN_Ubuntu_24-04_LTS_V1R5_STIG_SCAP_1-4_Benchmark-enhancedV7-signed.zip
+          - label: Firefox Linux
+            key: firefox-linux
+            artifact: U_MOZ_Firefox_Linux_V6R7_STIG_SCAP_1-4_Benchmark-enhancedV12-signed.zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate fresh faithful conversion
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+          KEY: ${{ matrix.key }}
+        run: |
+          python scap-ng/tools/generate_niwc_current_review.py "niwc/Current/$ARTIFACT" \
+            --output "work/source/$KEY" \
+            --split-root "work/split-$KEY" \
+            --source-revision "$NIWC_REVISION" \
+            --source-repository-path "Current/$ARTIFACT" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --summary "work/source/$KEY/source-generation.json"
+      - name: Classify surviving Variable graphs
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/measure_post_modernization_variable_patterns.py \
+            "work/source/$KEY" \
+            --label "$LABEL" \
+            --output "work/$KEY.variable-residuals.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: variable-residual-${{ matrix.key }}
+          path: work/*.variable-residuals.json
+          if-no-files-found: error
+
+  aggregate:
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: variable-residual-*
+          path: reports
+      - name: Aggregate exact pattern counts
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          reports=[
+              json.loads(p.read_text())
+              for p in sorted(Path("reports").rglob("*.variable-residuals.json"))
+          ]
+          if len(reports)!=11:
+              raise SystemExit(f"expected 11 reports, found {len(reports)}")
+
+          totals=Counter()
+          kinds=Counter()
+          funcs=Counter()
+          contexts=Counter()
+          fanout=Counter()
+          refusal=Counter()
+          patterns=Counter()
+          examples={}
+          packages=[]
+
+          for r in reports:
+              for key in (
+                  "complex_rules_with_variables",
+                  "remaining_variables",
+                  "variables_with_multiple_consumers",
+                  "variables_consumed_by_variables",
+                  "variable_dependency_edges",
+              ):
+                  totals[key]+=int(r.get(key,0) or 0)
+              totals["max_variable_chain_depth"]=max(
+                  totals["max_variable_chain_depth"],
+                  int(r.get("max_variable_chain_depth",0) or 0),
+              )
+              kinds.update(r.get("expression_kind_counts") or {})
+              funcs.update(r.get("function_counts") or {})
+              contexts.update(r.get("consumer_context_counts") or {})
+              fanout.update(r.get("fanout_bucket_counts") or {})
+              refusal.update(r.get("foreach_v1_refusal_reason_counts") or {})
+              for row in r.get("pattern_signature_counts") or []:
+                  key=json.dumps(row["signature"],sort_keys=True,separators=(",",":"))
+                  patterns[key]+=int(row["count"])
+              for row in r.get("top_patterns") or []:
+                  key=json.dumps(row["signature"],sort_keys=True,separators=(",",":"))
+                  examples.setdefault(key,[])
+                  for ex in row.get("examples") or []:
+                      if len(examples[key])<12:
+                          examples[key].append(ex["assessment_id"])
+              packages.append({
+                  "label":r["label"],
+                  "complex_rules_with_variables":r["complex_rules_with_variables"],
+                  "remaining_variables":r["remaining_variables"],
+                  "unique_patterns":r["unique_variable_pattern_signatures"],
+              })
+
+          ranked=[]
+          for key,count in patterns.most_common():
+              ranked.append({
+                  "count":count,
+                  "signature":json.loads(key),
+                  "examples":examples.get(key,[])[:12],
+              })
+
+          out={
+              "format":"scap-ng-post-modernization-variable-aggregate-0.1",
+              "status":"research_only_not_accepted_design",
+              "packages":packages,
+              "summary":{
+                  **dict(totals),
+                  "expression_kind_counts":dict(kinds),
+                  "function_counts":dict(funcs),
+                  "consumer_context_counts":dict(contexts),
+                  "fanout_bucket_counts":dict(fanout),
+                  "foreach_v1_refusal_reason_counts":dict(refusal),
+                  "unique_pattern_signatures":len(patterns),
+              },
+              "top_patterns":ranked[:40],
+          }
+          Path("variable-residual-aggregate.json").write_text(
+              json.dumps(out,indent=2,sort_keys=True)+"\n"
+          )
+          print(json.dumps(out["summary"],indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: variable-residual-aggregate
+          path: variable-residual-aggregate.json
+          if-no-files-found: error
