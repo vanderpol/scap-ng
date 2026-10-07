@@ -22,6 +22,8 @@ class StaticLiteralCollectionTests(unittest.TestCase):
                             "select": {
                                 "path": {
                                     "value": {"variable": "paths"},
+                                    "datatype": "string",
+                                    "operation": "equals",
                                     "variable_match": "only_one",
                                 }
                             }
@@ -35,6 +37,10 @@ class StaticLiteralCollectionTests(unittest.TestCase):
             rendered["assessment"]["tests"]["t"]["object"]["select"]["path"]["value"],
             ["/lib", "/usr/lib"],
         )
+        entity=rendered["assessment"]["tests"]["t"]["object"]["select"]["path"]
+        self.assertEqual(entity["datatype"],"string")
+        self.assertEqual(entity["operation"],"equals")
+        self.assertEqual(entity["variable_match"],"only_one")
         self.assertNotIn("variables", rendered["assessment"])
         self.assertEqual(proof.reexpand_constants(rendered, identity), source)
 
@@ -54,6 +60,8 @@ class StaticLiteralCollectionTests(unittest.TestCase):
                             {
                                 "state": {
                                     "value": {"variable": "permissions"},
+                                    "datatype": "string",
+                                    "operation": "equals",
                                     "variable_match": "all",
                                 }
                             }
@@ -67,6 +75,10 @@ class StaticLiteralCollectionTests(unittest.TestCase):
             rendered["assessment"]["tests"]["t"]["states"][0]["state"]["value"],
             ["read", "execute"],
         )
+        state_entity=rendered["assessment"]["tests"]["t"]["states"][0]["state"]
+        self.assertEqual(state_entity["datatype"],"string")
+        self.assertEqual(state_entity["operation"],"equals")
+        self.assertEqual(state_entity["variable_match"],"all")
         self.assertEqual(identity[0]["mode"], "state_collection_ref")
         self.assertEqual(proof.reexpand_constants(rendered, identity), source)
 
