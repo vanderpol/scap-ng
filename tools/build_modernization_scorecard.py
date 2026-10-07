@@ -34,15 +34,7 @@ def main()->int:
             bool((row.get("evaluate") or {}).get("single_test_explicit_root"))
             for row in rule_rows
         ),
-        "multi_test":sum(
-            int((row.get("evaluate") or {}).get("nodes",0))>1
-            and (
-                (row.get("classification")!="local_simple")
-                or True
-            )
-            and False
-            for row in []
-        ),
+        "multi_test":0,
         "nested_depth_gt_2":sum(
             int((row.get("evaluate") or {}).get("depth",0))>2
             for row in rule_rows
