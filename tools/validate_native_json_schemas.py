@@ -96,6 +96,8 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
         from capability_registry import draft_capabilities, load_mapping, mappings
         from generate_capability_schema import generate
         from reported_elements import generate_reporting_capability
+        from referencing import Registry, Resource
+
         declared_version = (assessment.get("specification") or {}).get("version")
         modern_versions = {"0.2.0", "0.3.0"}
         draft = (
@@ -104,73 +106,122 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
             else draft_capabilities(version="0.2.0")
         )
         legacy_v02_drafts = draft_capabilities(version="0.2.0")
-        for section, kind in [("objects", "object"), ("states", "state"), ("tests", "test")]:
+        root = Path(__file__).resolve().parents[1]
+        version_store = (
+            schema_store(root / f"schema/v{declared_version}")
+            if declared_version in modern_versions
+            else {}
+        )
+        registry = Registry().with_resources(
+            (uri, Resource.from_contents(schema))
+            for uri, schema in version_store.items()
+        )
+
+        def capability_node_errors(kind, node, path):
+            capability = node.get("capability") if isinstance(node, dict) else None
+            if not isinstance(capability, str):
+                return []
+            if declared_version not in modern_versions:
+                if capability in legacy_v02_drafts:
+                    return [ValidationError(
+                        "New capability requires specification 0.2.0",
+                        path=deque(path),
+                    )]
+                return []
+
+            try:
+                mapping = load_mapping(capability, declared_version)
+            except ValueError:
+                mapping = None
+                if allow_unpromoted_conversion_vocabulary:
+                    from scap_upconvert_v003.native_capability_mapping import source_capability
+                    candidates = [
+                        candidate for candidate in mappings(declared_version)
+                        if source_capability(candidate) == capability
+                        and not (candidate.get("native") or {}).get("post_alignment_ready", False)
+                    ]
+                    if len(candidates) == 1:
+                        return []
+                return [ValidationError(
+                    f"Unknown {declared_version} capability: {capability}",
+                    path=deque(path + ["capability"]),
+                )]
+
+            if (
+                allow_unpromoted_conversion_vocabulary
+                and not (mapping.get("native") or {}).get("post_alignment_ready", False)
+            ):
+                return []
+
+            generated = (
+                generate_reporting_capability(mapping, version=declared_version)
+                if kind == "test"
+                else generate(
+                    mapping,
+                    root,
+                    schema_version=declared_version,
+                )
+            )
+            if kind not in generated["$defs"]:
+                return [ValidationError(
+                    "Capability does not support this source node",
+                    path=deque(path),
+                )]
+            validator = Draft202012Validator(
+                generated["$defs"][kind],
+                registry=registry,
+            )
+            errors=[]
+            for error in validator.iter_errors(node):
+                error.path.extendleft(reversed(path))
+                errors.append(error)
+            return errors
+
+        named_sections = [
+            ("states", "state"),
+            ("tests", "test"),
+        ]
+        if declared_version == "0.3.0":
+            named_sections.insert(0, ("shared_objects", "object"))
+        else:
+            named_sections.insert(0, ("objects", "object"))
+
+        for section, kind in named_sections:
             nodes = assessment.get(section, {})
             if not isinstance(nodes, dict):
                 continue
             for identity, node in nodes.items():
-                capability = node.get("capability") if isinstance(node, dict) else None
-                if not isinstance(capability, str):
-                    continue
-                if declared_version not in modern_versions:
-                    if capability in legacy_v02_drafts:
-                        yield ValidationError(
-                            "New capability requires specification 0.2.0",
-                            path=["assessment", section, identity],
-                        )
-                    continue
-                try:
-                    mapping = load_mapping(capability, declared_version)
-                except ValueError:
-                    mapping = None
-                    if allow_unpromoted_conversion_vocabulary:
-                        # The converter bridge is limited to official SCAP 1.4/OVAL
-                        # vocabulary awaiting native promotion. Publisher/private
-                        # extensions are conversion blockers, not bridge vocabulary.
-                        from scap_upconvert_v003.native_capability_mapping import source_capability
-                        candidates = [
-                            candidate for candidate in mappings(declared_version)
-                            if source_capability(candidate) == capability
-                            and not (candidate.get("native") or {}).get("post_alignment_ready", False)
-                        ]
-                        if len(candidates) == 1:
-                            continue
-                    yield ValidationError(
-                        f"Unknown {declared_version} capability: {capability}",
-                        path=["assessment", section, identity, "capability"],
-                    )
-                    continue
-                if (
-                    allow_unpromoted_conversion_vocabulary
-                    and not (mapping.get("native") or {}).get("post_alignment_ready", False)
-                ):
-                    continue
-                generated = (
-                    generate_reporting_capability(mapping, version=declared_version)
-                    if kind == "test"
-                    else generate(
-                        mapping,
-                        Path(__file__).resolve().parents[1],
-                        schema_version=declared_version,
-                    )
+                yield from capability_node_errors(
+                    kind, node, ["assessment", section, identity]
                 )
-                if kind not in generated["$defs"]:
-                    yield ValidationError("Capability does not support this source node", path=["assessment", section, identity])
-                    continue
-                root = Path(__file__).resolve().parents[1]
-                store = schema_store(root / f"schema/v{declared_version}")
-                from referencing import Registry, Resource
-                registry = Registry().with_resources(
-                    (uri, Resource.from_contents(schema))
-                    for uri, schema in store.items()
-                )
-                validator = Draft202012Validator(
-                    generated["$defs"][kind],
-                    registry=registry,
-                )
-                for error in validator.iter_errors(node):
-                    error.path.extendleft(reversed(["assessment", section, identity]))
-                    yield error
+
+        # Consumer-local 0.3 components still require the exact same generated
+        # capability contracts as named components. Locate them structurally by
+        # typed object/state use sites rather than by an Assessment registry.
+        if declared_version == "0.3.0":
+            def inline_nodes(value, path=()):
+                if isinstance(value, dict):
+                    for key, child in value.items():
+                        child_path = path + (key,)
+                        if (
+                            key == "object"
+                            and isinstance(child, dict)
+                            and isinstance(child.get("capability"), str)
+                        ):
+                            yield "object", child, child_path
+                        elif (
+                            key == "state"
+                            and isinstance(child, dict)
+                            and isinstance(child.get("capability"), str)
+                        ):
+                            yield "state", child, child_path
+                        yield from inline_nodes(child, child_path)
+                elif isinstance(value, list):
+                    for index, child in enumerate(value):
+                        yield from inline_nodes(child, path + (index,))
+
+            for kind, node, path in inline_nodes(assessment, ("assessment",)):
+                yield from capability_node_errors(kind, node, list(path))
     assessment = doc.get("assessment")
     if not isinstance(assessment, dict) or assessment.get("mode") != "manual":
         return
