@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - tools/measure_evaluate_shapes.py
+      - tools/build_evaluate_review_packet.py
       - .github/workflows/evaluate-structure-research.yml
       - research/assessment-simplification/evaluate-20/**
   workflow_dispatch:
@@ -72,10 +73,21 @@ jobs:
           python scap-ng/tools/measure_evaluate_shapes.py "work/$KEY" \
             --label "$LABEL" \
             --output "work/$KEY.evaluate.json"
+      - name: Build concise human review packet
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/build_evaluate_review_packet.py "work/$KEY" \
+            --census "work/$KEY.evaluate.json" \
+            --label "$LABEL" \
+            --output "work/$KEY.evaluate-review.md"
       - uses: actions/upload-artifact@v4
         with:
           name: evaluate-shape-${{ matrix.key }}
-          path: work/*.evaluate.json
+          path: |
+            work/*.evaluate.json
+            work/*.evaluate-review.md
           if-no-files-found: error
 
   aggregate:
