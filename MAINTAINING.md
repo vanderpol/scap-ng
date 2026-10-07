@@ -105,9 +105,11 @@ The full-corpus workflow is intentionally manual-only. It provides broad confide
 
 ## Review lifecycle
 
-Review navigation has one active authority: [`board/README.md`](board/README.md) for the current external/Board review. Compact supporting summaries may live under `review/current/` without restating project status.
+`review/current/` is the single active human-review entry point. The root README and specification link there rather than maintaining a second review narrative under `board/`.
 
-When a review cycle is formally completed, preserve the exact reviewed state under an immutable `review/iterations/NNN/` checkpoint with the source commit/tag and any durable external artifact URL/hash. Later corrections belong to a new review cycle; do not rewrite a completed review checkpoint. Large generated products should stay in CI/evidence storage rather than being recommitted merely for review.
+Each prerelease/review checkpoint SHALL include source and result examples regenerated or revalidated against that exact specification/schema version. Current examples may evolve while the prerelease evolves; completed review iterations preserve the exact reviewed examples immutably under `review/iterations/NNN/`.
+
+When a review cycle is formally completed, preserve the reviewed state with the source commit/tag and any durable external artifact URL/hash. Later corrections belong to a new review cycle; do not rewrite a completed checkpoint. Large generated products should stay in CI/evidence storage rather than being recommitted merely for review.
 
 ## Version evolution
 
