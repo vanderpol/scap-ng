@@ -250,6 +250,128 @@ The prototype export surface has therefore been reduced to exactly those two.
 
 Proof workflow: `Apache authoring reuse research`, run `37614728886`.
 
+## Shared inventory Assessment alternative
+
+A potentially cleaner alternative is to reuse the existing Assessment artifact
+rather than introduce a separate source-time `module` document type.
+
+Conceptually:
+
+```yaml
+assessment:
+  id: shared.apache.httpd.discovery
+  version: 1
+  mode: automated
+  class: inventory
+  purpose: assessment
+
+  objects:
+    # private Apache discovery acquisition
+    ...
+
+  variables:
+    # private Apache discovery/dataflow
+    ...
+
+  exports:
+    httpd_executable:
+      variable: apache-path-httpd-or-apache2-variable
+      datatype: string
+      cardinality: zero_or_more
+
+    primary_and_included_configs:
+      variable: httpd-conf-merged-included-conf-files-from-include-refernces-in-variable
+      datatype: string
+      cardinality: zero_or_more
+```
+
+A consumer would reference only the typed exports:
+
+```yaml
+dependencies:
+  apache:
+    assessment: ../../shared/apache-httpd-discovery.assessment.yaml
+    expected_id: shared.apache.httpd.discovery
+    expected_version: 1
+    purpose: assessment
+
+tests:
+  keepalive:
+    object:
+      for_each:
+        item: config_path
+        in: apache.primary_and_included_configs
+      ...
+```
+
+The existing Apache extraction proof makes this attractive: the 15-Assessment
+proof class needs only two public outputs, `httpd_executable` and
+`primary_and_included_configs`. The other extracted Variables remain private
+implementation details.
+
+### What would have to change
+
+Current Assessment dependencies expose another Assessment's final technical
+result. Current Item-reuse research can import collected Items from a producer
+Object. Neither contract currently exports arbitrary Variable values.
+
+Therefore this alternative requires one new concept regardless of syntax:
+**typed observation exports from an Assessment**.
+
+The contract should preserve:
+
+- datatype and cardinality;
+- value-production status, including zero values versus error/unknown;
+- collection completeness inherited from source Objects;
+- provenance back to producer Objects/Variables and source Items;
+- same-target and binding identity;
+- versioned, statically resolved export names;
+- cycle detection;
+- materialization/provenance sufficient for standalone consumer results.
+
+Consumers SHALL NOT receive ambient access to the producer's internal Objects or
+Variable names. Only declared exports cross the boundary.
+
+### Result versus observation dependency
+
+The producer's final Assessment truth and its exported observations are separate
+products.
+
+A consumer may depend on the producer result when policy/evaluation actually
+needs that truth. Merely consuming `apache.primary_and_included_configs` does
+not mean the consumer inherits the producer's pass/fail outcome.
+
+This distinction avoids turning a discovery result into policy truth while still
+allowing the producer to be a legitimate inventory Assessment.
+
+### Runtime advantage
+
+Unlike a compile-time-only module, a shared executable Assessment creates a
+natural place for scanners to schedule Apache discovery once per target and
+reuse the resulting observations across many Rule Assessments.
+
+A compiler may still support flattening for standalone review/debugging, but
+runtime reuse becomes an optimization of the same explicit dependency graph
+rather than a separate feature.
+
+### Current preference
+
+This shared-Assessment alternative is now the preferred research direction over
+introducing a separate module artifact **if** typed observation exports can be
+specified cleanly without weakening standalone Assessment/result semantics.
+
+The key research question is no longer whether Apache discovery is reusable; the
+production proof established that. The question is whether Assessment exports
+can unify:
+
+1. source authoring reuse;
+2. runtime shared acquisition/dataflow; and
+3. explicit typed/provenanced observation consumption
+
+without conflating those observations with Assessment truth.
+
+No schema change is implied by this research note.
+
 ## Recommendation
 
 Prototype **source-time observation modules with typed exports** for 0.3.0
