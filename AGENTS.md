@@ -94,6 +94,7 @@ This is a hard repository rule.
 - Alpha, beta, RC, and stable releases must be promoted from a specific completed review iteration and record that source iteration plus commit/tag.
 - Do not create parallel active review trees under `research/`, `docs/`, `board/`, or another directory.
 - Development infrastructure such as tools, tests, CI, conversion scratch data, transition notes, and bulk source corpora stays outside `review/`.
+- Board/human-review artifacts SHALL contain only reviewer-facing source, result examples, concise scorecards, and navigation needed to evaluate the proposal. Raw modernization reports, residual-pattern dumps, render proofs, normalization logs, machine-only JSON, and other engineering evidence SHALL be published separately and SHALL NOT be bundled into the reviewer artifact.
 
 ## Mandatory current-design preflight
 
