@@ -28,22 +28,27 @@
 - **Object** is authored resource selection/acquisition. **Collection** is the runtime act of evaluating an Object and producing Items plus status/completeness; it is not an authored synonym for Object.
 - A Test may consume another first-class node directly when that is the natural semantic source; `variable.value` is the established example and does not require an artificial Object wrapper.
 - Test, Object, and State/predicate capabilities remain independently typed where those nodes exist.
-- Source/presentation mapping order has no execution meaning; forward references are valid. Recommended authored section order is metadata, `objects`, `variables`, `states`, `tests`, `evaluate`.
+- Source/presentation mapping order has no execution meaning; forward references are valid. For readability, authored content should present metadata/inputs and the explicit `evaluate` summary before the implementation details when practical.
 - Named internal component IDs use meaningful lowercase kebab-case with the component type as a required suffix: `-object`, `-state`, `-variable`, `-test`, and `-input`. Inline/private components do not receive artificial IDs. See [component naming](../../../../specification/assessment/component-naming.md).
+- Private Objects and States are authored with their semantic consumer. Assessment-scoped reusable/referenceable acquisitions are declared under `shared_objects:`; use sites still use ordinary `object:` references.
 
 ## Variables, Sets, Filters, and dataflow
 
-- Variables may reference named Objects, other Variables, or contain private embedded resource selection where supported.
+- Direct scalar and typed literal-array Object/State values replace source-time static Variable plumbing where exact and source-equivalent quantifier semantics are explicit.
+- Variables may reference named Objects, other Variables, or contain private embedded resource selection where supported; keep named Variables for genuine runtime derivation, chaining, external/runtime dataflow, or meaningful reuse.
 - Lossless conversion preserves meaningful shared Object boundaries and Variable dependency graphs; it does not duplicate a shared source Object merely for convenience.
 - Sets, Filters, object/variable components, functions, existence/cardinality, datatypes, comparisons, records, and dependency behavior must retain their effective semantics.
+- `for_each` is native collection expansion over collected Object/Item data. It is not evaluation iteration and SHALL preserve the original Test aggregation/existence boundary.
+- Nested `for_each` is part of the 0.3 requirement set. Inner collection scope must be explicit, outer-binding lineage preserved, correlation semantics deterministic, implicit Cartesian behavior forbidden, and incomplete/error/cycle/resource-limit behavior normative.
+- Shared Observation is deferred beyond normative 0.3. Cross-Assessment reusable acquisition remains research until its export/result/provenance/binding/manifest/cache contracts are complete.
 - Source identity remains available in migration provenance so distinct source nodes are not merged merely because payloads happen to match.
 
 ## Applicability and conditionals
 
 - Applicability is explicit authored assessment logic, not hidden scanner OS/domain-role classification.
 - CPE/platform identifiers are naming/mapping metadata unless backed by executable applicability logic.
-- Source-authored conditional scheduling is supported where defined.
-- General unrestricted IF/ELIF/ELSE authoring is not the current direction.
+- The inherited narrow `if/then/else` evaluation form is retained unchanged from 0.2.
+- Broader case/elseif/procedural conditional syntax is not part of 0.3.
 - Existing Boolean OVAL logic SHALL NOT be automatically rewritten as conditional execution merely because it appears equivalent; six-state outcomes, collection, evidence, and scheduling can differ.
 
 ## OVAL/SCAP migration
@@ -69,6 +74,8 @@
 
 ## Provenance and native-source cleanliness
 
+- Native source carries concise author/publisher provenance where reliably derivable. This metadata is non-executable and does not replace logical IDs or migration evidence.
+
 - Executable native Benchmark/Rule/Assessment/Object content does not embed XCCDF/OVAL/OCIL/CPE XML IDs, namespaces, href graphs, converter diagnostics, parity traces, or skipped-source-defect records merely for migration traceability.
 - Conversion/normalization evidence is emitted separately and may reference native logical IDs.
 - Native content must remain executable without migration evidence.
@@ -78,6 +85,9 @@
 - Results separate policy/Rule context from distinct Assessment executions and their Test/Object/Variable/Item evidence.
 - Execution identity, dependency scheduling, provenance, completeness, and outcome rationale are explicit.
 - Evidence caps or early termination may bound volume but must record completeness/truncation and must not change the normative verdict.
+- `reported_elements` is an explicit author-visible reporting projection and does not change technical truth; hidden capability-specific reporting defaults are not part of 0.3.
+- 0.3 defines one canonical result contract rather than separate normative thin/full profiles; projections/export choices may vary without changing truth.
+- Manual Assessment Results require the human assessor identity and assessment time, with organization/contact/evidence context available as appropriate.
 - Schema/representation validity, known-result evaluation, acquisition/collector conformance, live-target testing, migration equivalence, human acceptance, and Board ratification are separate evidence levels.
 
 ## Packaging
@@ -86,7 +96,7 @@
 - The current preferred container is deterministic ZIP with the `.scapng` extension.
 - Archive paths are storage locations, not semantic identity; logical IDs resolve through the manifest.
 - Migration/normalization evidence is not packaged by default.
-- Signing/trust profiles remain under development; self-signed demonstrations do not establish publisher trust.
+- 0.3 requires one simple interoperable signing/integrity path over deterministic bytes or a deterministic manifest-bound package/result. HSM/CAC/TPM/backend integration is an implementation concern rather than alternate content semantics.
 
 ## Frozen 0.2.0 review baseline
 
