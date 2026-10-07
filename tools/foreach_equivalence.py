@@ -215,6 +215,158 @@ def direct_foreach_preconditions(candidate):
     }
 
 
+UNARY_CONCAT_FOREACH_REWRITE_ID = (
+    "foreach.unary-concat-object-component.at-least-one.v1"
+)
+
+
+def unary_literal_concat_values(projected_values, *, prefix="", suffix=""):
+    """Map one collection-valued string operand through literal concat.
+
+    OVAL concat evaluates the Cartesian product of its operands.  When exactly
+    one operand is collection-valued and every other operand is a singleton
+    literal string, the product degenerates to a one-to-one map:
+
+        [prefix] x values x [suffix]
+
+    This helper deliberately supports only that bounded identity.
+    """
+    if not isinstance(prefix, str) or not isinstance(suffix, str):
+        raise TypeError("prefix and suffix must be literal strings")
+    out = []
+    for value in projected_values:
+        if not isinstance(value, str):
+            raise TypeError("first unary-concat proof class is string-only")
+        out.append(prefix + value + suffix)
+    return out
+
+
+def unary_concat_selection_equivalent(
+    items,
+    projected_values,
+    predicate: Callable,
+    *,
+    prefix="",
+    suffix="",
+):
+    """Prove selector-population identity after one unary concat mapping."""
+    transformed = unary_literal_concat_values(
+        projected_values,
+        prefix=prefix,
+        suffix=suffix,
+    )
+    return equivalent_population(
+        faithful_at_least_one_selection(items, transformed, predicate),
+        foreach_union_selection(items, transformed, predicate),
+    )
+
+
+def unary_concat_foreach_desugaring(
+    *,
+    source_object,
+    item_field,
+    prefix,
+    suffix,
+    target_object,
+    target_entity,
+    operation,
+    datatype,
+):
+    """Normative graph for unary derived collection expansion.
+
+    This is authoring shorthand only.  Runtime status is defined by the same
+    ObjectComponent -> concat -> Variable -> target-selector graph as faithful
+    OVAL conversion, including ObjectComponent zero-item error and OVAL
+    Function handling of non-complete sub-components.
+    """
+    projection = {
+        "kind": "object_component",
+        "object_ref": source_object,
+        "item_field": item_field,
+    }
+    operands = []
+    if prefix != "":
+        operands.append({"kind": "literal", "value": prefix, "datatype": "string"})
+    operands.append(projection)
+    if suffix != "":
+        operands.append({"kind": "literal", "value": suffix, "datatype": "string"})
+
+    variable = {
+        "kind": "local_variable",
+        "datatype": "string",
+        "expression": {
+            "kind": "concat",
+            "operands": operands,
+        },
+    }
+    return {
+        "rewrite_id": UNARY_CONCAT_FOREACH_REWRITE_ID,
+        "source_object": source_object,
+        "variable": variable,
+        "selector": {
+            "object_ref": target_object,
+            "entity": target_entity,
+            "operation": operation,
+            "datatype": datatype,
+            "variable": variable,
+            "var_check": "at least one",
+        },
+        "aggregation_boundary": "target_object_population",
+    }
+
+
+def unary_concat_foreach_preconditions(candidate):
+    """Fail-closed eligibility for the unary literal-concat proof class."""
+    reasons = []
+    if candidate.get("candidate_family") != "collection_expansion_at_least_one":
+        reasons.append("candidate_family_not_at_least_one_collection_expansion")
+
+    expression = candidate.get("expression", {})
+    if expression.get("kind") != "unary_concat_object_projection":
+        reasons.append("expression_is_not_unary_concat_object_projection")
+    if expression.get("collection_operands") != 1:
+        reasons.append("requires_exactly_one_collection_valued_operand")
+    if expression.get("dynamic_operands") != 1:
+        reasons.append("requires_exactly_one_dynamic_operand")
+    if expression.get("nested_functions", 0) != 0:
+        reasons.append("nested_functions_not_in_first_unary_concat_class")
+    if expression.get("source_datatype") != "string":
+        reasons.append("first_unary_concat_class_is_string_only")
+    if expression.get("record_field") is not None:
+        reasons.append("record_field_not_in_first_unary_concat_class")
+    if not isinstance(expression.get("prefix", ""), str):
+        reasons.append("prefix_is_not_singleton_literal_string")
+    if not isinstance(expression.get("suffix", ""), str):
+        reasons.append("suffix_is_not_singleton_literal_string")
+
+    targets = candidate.get("targets", [])
+    if len(targets) != 1:
+        reasons.append("requires_single_target_consumer")
+    variable_id = candidate.get("variable_id")
+    for target in targets:
+        if target.get("context") != "object_selector":
+            reasons.append("consumer_is_not_object_selector")
+        if target.get("var_check") != "at least one":
+            reasons.append("target_var_check_not_at_least_one")
+        if not target.get("tests"):
+            reasons.append("requires_directly_tested_target")
+        independent = [
+            entity
+            for entity in target.get("object_features", {}).get(
+                "variable_entities", []
+            )
+            if entity.get("var_ref") != variable_id
+        ]
+        if independent:
+            reasons.append("target_has_additional_variable_selectors")
+
+    return {
+        "rewrite_id": UNARY_CONCAT_FOREACH_REWRITE_ID,
+        "eligible": not reasons,
+        "reasons": sorted(set(reasons)),
+    }
+
+
 def _typed_value_key(value):
     """Normalize a result typed_value or primitive without losing datatype."""
     if isinstance(value, dict) and "value" in value:
