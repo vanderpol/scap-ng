@@ -2,7 +2,7 @@
 
 **Status:** pre-alpha working draft. SCAP-NG 0.3.0 is the active development version; 0.2.0 is the frozen earlier review baseline. This is not a released standard.
 
-This directory contains the proposed normative contract. Research records explain history/rationale; the specification describes expected content/processor behavior. Unresolved questions should remain visibly open rather than being silently normalized into requirements.
+These pages define the current SCAP-NG contract. Research and design-history records are non-normative; unresolved proposals remain outside the normative text until decided.
 
 ## Start here
 
@@ -41,6 +41,3 @@ This directory contains the proposed normative contract. Research records explai
 
 The [Assessment reference](assessment/reference/README.md) provides shared behavior, capability/field documentation, examples, and provenance. It supports the evolving specification/conformance work but does not replace normative semantics.
 
-## Relationship to current design
-
-The implementation/design authority is [CURRENT-DESIGN.md](../research/iterations/003/design/CURRENT-DESIGN.md). Material accepted decisions should be reconciled into this specification; historical research or old generated source does not override either document.
