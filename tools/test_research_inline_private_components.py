@@ -2,10 +2,18 @@
 import copy
 import unittest
 
-from research_inline_private_components import inline_private, reexpand
+from research_inline_private_components import context_signature, inline_private, reexpand
 
 
 class InlinePrivateComponentResearchTests(unittest.TestCase):
+    def test_context_signature_is_stable(self):
+        self.assertEqual(context_signature({"variable":1}),"variable:1")
+        self.assertEqual(
+            context_signature({"test_object":1,"variable":2}),
+            "test_object:1+variable:2",
+        )
+        self.assertEqual(context_signature({}),"unreferenced")
+
     def base(self):
         return {
             "assessment":{
