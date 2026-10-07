@@ -50,6 +50,7 @@ work. Every open 0.3.0 issue is listed so both directions can be audited.
 | [#121 Ambiguous duplicate manual response values](https://github.com/vanderpol/scap-ng/issues/121) | O3, O6 |
 | [#122 Typed DNS acquisition validation](https://github.com/vanderpol/scap-ng/issues/122) | O1, O3, O7 |
 | [#123 RHEL 9 xattr audit source coverage](https://github.com/vanderpol/scap-ng/issues/123) | O1, O7 |
+| [#125 Content-authored reported_elements](https://github.com/vanderpol/scap-ng/issues/125) | O3, O5 |
 | [#128 Complete feature corpus/vendor expected results](https://github.com/vanderpol/scap-ng/issues/128) | O1, O3, O7 |
 | [#131 Current coverage/new OVAL 6 tests audit](https://github.com/vanderpol/scap-ng/issues/131) | O1, O7 |
 | [#133 Repository cleanup / stale branches](https://github.com/vanderpol/scap-ng/issues/133) | O7 |
