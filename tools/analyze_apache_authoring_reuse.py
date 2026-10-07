@@ -47,6 +47,10 @@ def main()->int:
         aid=str(a.get("id") or "")
         if a.get("mode")!="automated" or not a.get("tests"):
             continue
+        # This study targets standalone STIG Rule Assessments, not the shared
+        # platform/applicability Assessment generated beside them.
+        if ".SV-" not in aid and not aid.startswith("SV-"):
+            continue
         rows.append({"path":str(path),"assessment_id":aid})
         for kind in ("objects","variables","states"):
             registry=a.get(kind) or {}
