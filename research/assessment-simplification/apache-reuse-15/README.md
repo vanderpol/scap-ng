@@ -250,20 +250,18 @@ The prototype export surface has therefore been reduced to exactly those two.
 
 Proof workflow: `Apache authoring reuse research`, run `37614728886`.
 
-## Shared inventory Assessment alternative
+## Observation artifact direction
 
-A potentially cleaner alternative is to reuse the existing Assessment artifact
-rather than introduce a separate source-time `module` document type.
+Subsequent 0.3 research separated truth-producing Assessments from reusable
+data producers. A testless Apache discovery file should therefore be an
+**Observation**, not an Assessment and not a generic source module.
 
-Conceptually:
+The same proven 4-Object + 11-Variable discovery subgraph becomes:
 
 ```yaml
-assessment:
+observation:
   id: shared.apache.httpd.discovery
   version: 1
-  mode: automated
-  class: inventory
-  purpose: assessment
 
   objects:
     # private Apache discovery acquisition
@@ -285,117 +283,45 @@ assessment:
       cardinality: zero_or_more
 ```
 
-A consumer would reference only the typed exports:
+Consumers reference only typed exports. The Observation does not produce
+Assessment truth. Its execution/result must instead preserve status,
+completeness, target/binding identity, values/Items, and provenance.
 
-```yaml
-dependencies:
-  apache:
-    assessment: ../../shared/apache-httpd-discovery.assessment.yaml
-    expected_id: shared.apache.httpd.discovery
-    expected_version: 1
-    purpose: assessment
+This separates three concerns cleanly:
 
-tests:
-  keepalive:
-    object:
-      for_each:
-        item: config_path
-        in: apache.primary_and_included_configs
-      ...
-```
+1. **Observation** — reusable acquisition/derivation;
+2. **Assessment** — Tests/evaluate and technical truth;
+3. **runtime reuse** — optional scheduling/caching of one Observation execution
+   across compatible consumers.
 
-The existing Apache extraction proof makes this attractive: the 15-Assessment
-proof class needs only two public outputs, `httpd_executable` and
-`primary_and_included_configs`. The other extracted Variables remain private
-implementation details.
+The compile/flatten proof remains useful: an authored consumer plus the
+Observation must be mechanically expandable to the faithful standalone
+Assessment graph.
 
-### What would have to change
+The source-fanout research also shows two reuse origins must be supported:
 
-Current Assessment dependencies expose another Assessment's final technical
-result. Current Item-reuse research can import collected Items from a producer
-Object. Neither contract currently exports arbitrary Variable values.
+- one original OVAL node can fan out into multiple Rule closures after splitting;
+- publishers can author semantically cloned discovery graphs under different
+  OVAL IDs, as Apache does.
 
-Therefore this alternative requires one new concept regardless of syntax:
-**typed observation exports from an Assessment**.
-
-The contract should preserve:
-
-- datatype and cardinality;
-- value-production status, including zero values versus error/unknown;
-- collection completeness inherited from source Objects;
-- provenance back to producer Objects/Variables and source Items;
-- same-target and binding identity;
-- versioned, statically resolved export names;
-- cycle detection;
-- materialization/provenance sufficient for standalone consumer results.
-
-Consumers SHALL NOT receive ambient access to the producer's internal Objects or
-Variable names. Only declared exports cross the boundary.
-
-### Result versus observation dependency
-
-The producer's final Assessment truth and its exported observations are separate
-products.
-
-A consumer may depend on the producer result when policy/evaluation actually
-needs that truth. Merely consuming `apache.primary_and_included_configs` does
-not mean the consumer inherits the producer's pass/fail outcome.
-
-This distinction avoids turning a discovery result into policy truth while still
-allowing the producer to be a legitimate inventory Assessment.
-
-### Runtime advantage
-
-Unlike a compile-time-only module, a shared executable Assessment creates a
-natural place for scanners to schedule Apache discovery once per target and
-reuse the resulting observations across many Rule Assessments.
-
-A compiler may still support flattening for standalone review/debugging, but
-runtime reuse becomes an optimization of the same explicit dependency graph
-rather than a separate feature.
-
-### Current preference
-
-This shared-Assessment alternative is now the preferred research direction over
-introducing a separate module artifact **if** typed observation exports can be
-specified cleanly without weakening standalone Assessment/result semantics.
-
-The key research question is no longer whether Apache discovery is reusable; the
-production proof established that. The question is whether Assessment exports
-can unify:
-
-1. source authoring reuse;
-2. runtime shared acquisition/dataflow; and
-3. explicit typed/provenanced observation consumption
-
-without conflating those observations with Assessment truth.
-
-No schema change is implied by this research note.
+Observation extraction may be more automatic for the first case. The second
+requires a stronger semantic-equivalence proof.
 
 ## Recommendation
 
-Prototype **typed observation exports from a shared inventory Assessment** as
-the first 0.3.0 reuse direction.
-
-Apache is the proving case because the production corpus has unusually high
-repetition and the extraction/re-expansion proof already establishes a bounded
-shared discovery subgraph. Reuse the existing Assessment artifact if that can
-cleanly carry both its own technical result and separately typed exported
-observations.
-
-Keep the source-time `module` design as a fallback if Assessment exports would
-force artificial truth semantics, weaken standalone results, or otherwise make
-the Assessment contract less coherent.
+Prototype a first-class research-only **Observation artifact** over the proven
+Apache discovery subgraph before the 65-benchmark modernization census.
 
 Before promotion:
 
-1. define export status/cardinality/completeness/provenance semantics;
-2. prototype producer and consumer syntax over the proven Apache subgraph;
-3. prove flattening/re-expansion against the faithful converted Assessments;
-4. prove same-target/binding and cycle rules; and
-5. demonstrate that a scanner can schedule the shared producer once without
-   changing consumer Test results or evidence semantics.
+1. generate a real `*.observation.yaml` producer and rewritten consumers;
+2. validate typed export references and private implementation boundaries;
+3. flatten every rewritten consumer and require exact structural equality with
+   its faithful converted Assessment;
+4. define candidate status/completeness/provenance and target/binding contracts;
+5. add negative fixtures for unknown exports, version mismatch, private-node
+   access, and dependency cycles; and
+6. measure how many other benchmarks expose reusable source fanout or semantic
+   clone groups that fit the same contract.
 
-Runtime collection caching remains a separate optimization; the authored
-dependency/export contract must be correct even when an implementation executes
-the producer more than once.
+No schema change is implied until #166 receives human acceptance.
