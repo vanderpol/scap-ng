@@ -25,6 +25,7 @@ This work explores ways to make accurate assessments easier for humans to author
 | [violation-query-14](violation-query-14/README.md) | Violation-query positive-form audit | 12-rule exclude+none-exist census, six-state counterexamples, presentation-only recommendation |
 | [apache-reuse-15](apache-reuse-15/README.md) | Reusable observation modules | Apache repeated discovery/dataflow census, source-time typed-export module hypothesis |
 | [windows-eventlog-16](windows-eventlog-16/README.md) | Windows event-log path residual | three-rule normalized-template proof, locality gains, remaining Variable boundary |
+| [shared-observation-17](shared-observation-17/README.md) | Shared observation artifact | truthless reusable data-provider role, source-directory/file-type proposal |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
