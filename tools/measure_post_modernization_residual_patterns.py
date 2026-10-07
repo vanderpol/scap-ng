@@ -271,6 +271,7 @@ def build_report(root:Path,label:str,top:int=40)->dict:
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
             inline_private_variables=True,
+            inline_private_local_variables=True,
         )
         expanded=reexpand(rendered,identity)
         if expanded!=foreach_doc:
