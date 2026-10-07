@@ -1,6 +1,6 @@
 # Full-corpus 0.3 modernization census
 
-**Status:** completed research checkpoint; no schema change or design acceptance.
+**Status:** historical research checkpoint. This run predates the 0.3 requirement freeze and applied Observation extraction. Observation is now deferred; current census tooling measures Observation opportunities without applying them. Final release statistics will come from the post-freeze rerun.
 
 Workflow:
 https://github.com/vanderpol/scap-ng/actions/runs/37632292259
@@ -92,7 +92,7 @@ first-class `evaluate` where composition exists.
 
 ## Scope boundary
 
-Applied automatically in this census only when existing proof was exact and
+Applied automatically in this **historical** census only when existing proof was exact and
 reversible:
 
 - consumer-local Object/State presentation;
