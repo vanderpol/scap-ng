@@ -219,6 +219,54 @@ This does not prove human preference. It does show that most of the current
 Object/State naming burden is not required by reuse in these production
 Assessments.
 
+## Recursive private Set-operand follow-up
+
+A bounded second locality experiment tested whether the same locality principle
+can apply one level deeper:
+
+> A leaf Object used exactly once as an **unfiltered Set operand** may inline
+> into that Set; if the Set Object is itself private to one Test, it may then
+> inline into the Test.
+
+The experiment deliberately refuses filtered operands, nested Set operands,
+reused Objects, Variable-referenced Objects, and other graph shapes.
+
+Successful workflow:
+
+https://github.com/vanderpol/scap-ng/actions/runs/37551115801
+
+Across the same **676** RHEL 9 + Windows Server 2025 Rule Assessments:
+
+| Measure | Direct locality | Recursive Set locality |
+| --- | ---: | ---: |
+| Top-level Objects remaining | 214 | **107** |
+| Object-scope reduction | 80.3% | **90.2%** |
+| Named component refs remaining | 433 | **326** |
+| Named-ref reduction | 78.8% | **84.0%** |
+| Additional private Set-operand Objects inlined | 0 | **107** |
+
+The gain is entirely RHEL in this proof class:
+
+- RHEL top-level Objects: 777 -> **40** (**94.9% reduction**);
+- RHEL named component refs: 1,250 -> **171** (**86.3% reduction**);
+- **107** private unfiltered Set-operand Objects were inlined;
+- all transformed Assessments mechanically re-expanded to structural equality
+  with the faithful source.
+
+Windows Server 2025 inlined **zero** additional Set operands because the
+remaining Windows Set operands are filtered or otherwise outside the proof
+class. They remain named.
+
+This is especially relevant to the 30-rule RHEL layered-configuration family
+identified in ../residual-patterns-12/: all 30 use exactly one \`union\` Set
+with two unfiltered Object-reference operands. The result suggests that much of
+their remaining authoring indirection may be removable through **recursive
+locality alone**, without inventing a new Set/effective-configuration syntax.
+
+This still does not prove that unioning source locations models configuration
+precedence or effective-value semantics. It only proves that the existing Set
+graph can be presented more locally without structural loss.
+
 ## Open questions before any 0.3.0 change
 
 - Are deterministic lexical IDs sufficient for result/evidence references to
