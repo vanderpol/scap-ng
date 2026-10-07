@@ -124,10 +124,24 @@ union the observations, then apply one State expectation.
 ordinary configuration scope through generic Set machinery.
 
 The corrected census shows this family has **no substantive Filters**, which
-makes the repeated pattern cleaner than first measured. The next semantic
-question is whether these Sets merely union source locations or whether their
-meaning depends on configuration precedence/effective-value rules that the
-source OVAL does not itself model.
+makes the repeated pattern cleaner than first measured. A topology pass over
+the exact 30-rule family found **30/30 identical Set topology**:
+
+- operator: `union`;
+- exactly two operands;
+- both operands are Object references;
+- neither operand has a Filter.
+
+That makes recursive locality a concrete first experiment: inline each private
+leaf Object into the Set operand, then inline the private Set Object into its
+Test. This preserves native Set semantics and may eliminate the remaining
+pointer chain without adding a new authoring construct.
+
+Only if that remains materially hard to read should a new "primary + drop-ins"
+or effective-configuration abstraction be considered. Separately, we still
+need to determine whether these Sets merely union source locations or whether
+the security requirement really depends on configuration precedence/effective
+value rules that the source OVAL does not itself model.
 
 ### 2. Alternative compliance paths — 10 RHEL Assessments
 
