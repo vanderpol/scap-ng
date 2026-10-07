@@ -152,7 +152,10 @@ jobs:
                   for k,v in r["summary"].items():
                       if isinstance(v,(int,float)) and not k.endswith("_percent"):
                           totals[k]=totals.get(k,0)+v
-                      elif k in ("retained_object_reason_counts","retained_state_reason_counts") and isinstance(v,dict):
+                      elif k in (
+                          "retained_object_reason_counts","retained_state_reason_counts",
+                          "retained_object_context_counts","retained_state_context_counts",
+                      ) and isinstance(v,dict):
                           bucket=totals.setdefault(k,{})
                           for reason,count in v.items():
                               bucket[reason]=bucket.get(reason,0)+count
