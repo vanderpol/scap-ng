@@ -242,6 +242,9 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
     static_constants = 0
     static_locals = 0
     static_multiple_consumers = 0
+    static_single_consumer = 0
+    static_single_consumer_contexts = Counter()
+    static_context_signatures = Counter()
     static_consumer_contexts = Counter()
 
     for variable_id, payload in sorted(variables.items()):
@@ -283,8 +286,13 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
                 static_constants += 1
             elif source_kind == "local":
                 static_locals += 1
+            signature = "+".join(sorted(contexts)) if contexts else "unreferenced"
+            static_context_signatures[signature] += 1
             if len(refs) >= 2:
                 static_multiple_consumers += 1
+            elif len(refs) == 1:
+                static_single_consumer += 1
+                static_single_consumer_contexts.update(contexts)
 
         rows.append({
             "variable_id": variable_id,
@@ -312,6 +320,9 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
         "compile_time_static_constants": static_constants,
         "compile_time_static_locals": static_locals,
         "compile_time_static_variables_with_multiple_consumers": static_multiple_consumers,
+        "compile_time_static_single_consumer_variables": static_single_consumer,
+        "compile_time_static_single_consumer_context_counts": dict(static_single_consumer_contexts),
+        "compile_time_static_context_signature_counts": dict(static_context_signatures),
         "compile_time_static_consumer_context_counts": dict(static_consumer_contexts),
         "runtime_variables": len(rows) - static_variables,
         "variable_dependency_edges": len(edges),
@@ -359,6 +370,9 @@ def main() -> int:
     compile_time_static_constants = 0
     compile_time_static_locals = 0
     compile_time_static_multiple_consumers = 0
+    compile_time_static_single_consumer = 0
+    compile_time_static_single_contexts = Counter()
+    compile_time_static_signatures = Counter()
     compile_time_static_contexts = Counter()
     runtime_variables = 0
 
@@ -431,6 +445,15 @@ def main() -> int:
         compile_time_static_multiple_consumers += analysis[
             "compile_time_static_variables_with_multiple_consumers"
         ]
+        compile_time_static_single_consumer += analysis[
+            "compile_time_static_single_consumer_variables"
+        ]
+        compile_time_static_single_contexts.update(
+            analysis["compile_time_static_single_consumer_context_counts"]
+        )
+        compile_time_static_signatures.update(
+            analysis["compile_time_static_context_signature_counts"]
+        )
         compile_time_static_contexts.update(
             analysis["compile_time_static_consumer_context_counts"]
         )
@@ -488,6 +511,9 @@ def main() -> int:
         "compile_time_static_constants": compile_time_static_constants,
         "compile_time_static_locals": compile_time_static_locals,
         "compile_time_static_variables_with_multiple_consumers": compile_time_static_multiple_consumers,
+        "compile_time_static_single_consumer_variables": compile_time_static_single_consumer,
+        "compile_time_static_single_consumer_context_counts": dict(compile_time_static_single_contexts),
+        "compile_time_static_context_signature_counts": dict(compile_time_static_signatures),
         "compile_time_static_consumer_context_counts": dict(compile_time_static_contexts),
         "runtime_variables": runtime_variables,
         "variable_dependency_edges": dependency_edges_total,
@@ -524,6 +550,8 @@ def main() -> int:
             "compile_time_static_variables",
             "compile_time_static_constants",
             "compile_time_static_locals",
+            "compile_time_static_single_consumer_variables",
+            "compile_time_static_variables_with_multiple_consumers",
             "runtime_variables",
             "max_variable_chain_depth",
             "unique_variable_pattern_signatures",
