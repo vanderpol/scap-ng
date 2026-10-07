@@ -87,6 +87,45 @@ def retention_reason(total_refs: int, direct_test_refs: int) -> str:
     return "unreferenced_or_other"
 
 
+def scalar_reference_contexts(node: Any, candidates: set[str]) -> dict[str, dict[str, int]]:
+    """Count candidate scalar references by broad semantic consumer context."""
+    counts={name:{} for name in candidates}
+
+    def classify(path: tuple[str, ...]) -> str:
+        if len(path)>=4 and path[0]=="tests":
+            if path[2]=="object":
+                return "test_object"
+            if path[2]=="states":
+                return "test_state"
+            return "test_other"
+        if "filters" in path or "filter" in path:
+            return "filter"
+        if path and path[0]=="variables":
+            return "variable"
+        if path and path[0]=="objects":
+            return "object_graph"
+        if path and path[0]=="states":
+            return "state_graph"
+        if path and path[0]=="evaluate":
+            return "evaluate"
+        return "other"
+
+    def visit(value: Any, path: tuple[str, ...]=()):
+        if isinstance(value,dict):
+            for key,child in value.items():
+                visit(child,path+(str(key),))
+        elif isinstance(value,list):
+            for i,child in enumerate(value):
+                visit(child,path+(str(i),))
+        elif isinstance(value,str) and value in counts:
+            context=classify(path)
+            bucket=counts[value]
+            bucket[context]=bucket.get(context,0)+1
+
+    visit(node)
+    return counts
+
+
 def normalized_text(doc: dict) -> str:
     return yaml.safe_dump(doc, sort_keys=False, width=120, allow_unicode=True)
 
@@ -129,6 +168,7 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
     tests=a.get("tests") or {}
     candidates=set(objects)|set(states)
     refs=scalar_reference_counts(a,candidates)
+    contexts=scalar_reference_contexts(a,candidates)
     direct_object_refs,direct_state_refs=direct_test_reference_counts(
         tests,set(objects),set(states)
     )
@@ -147,6 +187,8 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
         "shared_states":[],
         "retained_object_reasons":{},
         "retained_state_reasons":{},
+        "retained_object_contexts":{},
+        "retained_state_contexts":{},
     }
 
     remove_objects=set()
@@ -225,6 +267,10 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
             name:retention_reason(refs.get(name,0),direct_object_refs.get(name,0))
             for name in sorted(objects)
         }
+        identity["retained_object_contexts"]={
+            name:contexts.get(name,{})
+            for name in sorted(objects)
+        }
     else:
         a.pop("objects",None)
 
@@ -233,6 +279,10 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
         identity["shared_states"]=sorted(states)
         identity["retained_state_reasons"]={
             name:retention_reason(refs.get(name,0),direct_state_refs.get(name,0))
+            for name in sorted(states)
+        }
+        identity["retained_state_contexts"]={
+            name:contexts.get(name,{})
             for name in sorted(states)
         }
     else:
@@ -396,6 +446,8 @@ def main():
         "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
+        "retained_object_context_counts":{},
+        "retained_state_context_counts":{},
     }
 
     for path,doc in selected:
@@ -430,12 +482,20 @@ def main():
             "shared_states":len(identity["shared_states"]),
             "retained_object_reason_counts":{},
             "retained_state_reason_counts":{},
+            "retained_object_context_counts":{},
+            "retained_state_context_counts":{},
             "roundtrip_structural_identity":"passed",
         }
         for reason in identity["retained_object_reasons"].values():
             row["retained_object_reason_counts"][reason]=row["retained_object_reason_counts"].get(reason,0)+1
         for reason in identity["retained_state_reasons"].values():
             row["retained_state_reason_counts"][reason]=row["retained_state_reason_counts"].get(reason,0)+1
+        for contexts_for_object in identity["retained_object_contexts"].values():
+            for context,count in contexts_for_object.items():
+                row["retained_object_context_counts"][context]=row["retained_object_context_counts"].get(context,0)+count
+        for contexts_for_state in identity["retained_state_contexts"].values():
+            for context,count in contexts_for_state.items():
+                row["retained_state_context_counts"][context]=row["retained_state_context_counts"].get(context,0)+count
         report["selected"].append(row)
         for k in ("objects","states"):
             totals[k+"_before"]+=before[k]
@@ -455,6 +515,10 @@ def main():
             totals["retained_object_reason_counts"][reason]=totals["retained_object_reason_counts"].get(reason,0)+count
         for reason,count in row["retained_state_reason_counts"].items():
             totals["retained_state_reason_counts"][reason]=totals["retained_state_reason_counts"].get(reason,0)+count
+        for context,count in row["retained_object_context_counts"].items():
+            totals["retained_object_context_counts"][context]=totals["retained_object_context_counts"].get(context,0)+count
+        for context,count in row["retained_state_context_counts"].items():
+            totals["retained_state_context_counts"][context]=totals["retained_state_context_counts"].get(context,0)+count
 
     def reduction(before,after):
         return round(100*(before-after)/before,1) if before else 0.0
