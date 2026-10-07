@@ -379,6 +379,42 @@ jobs:
               "The full trees are there to verify that the representative examples are not special cases. Raw research evidence, residual dumps, and migration-audit JSON are intentionally excluded from this reviewer package.",
           ]
           (root/"REVIEW-GUIDE.md").write_text("\n".join(guide_lines)+"\n", encoding="utf-8")
+
+          release_info=[
+              "# SCAP-NG 0.3 Board-review candidate build",
+              "",
+              "- Schema version: \`0.3.0\`",
+              f"- SCAP-NG source commit: \`{os.environ['GITHUB_SHA']}\`",
+              f"- Pinned NIWC source revision: \`{os.environ['NIWC_REVISION']}\`",
+              f"- Build workflow: {os.environ['WORKFLOW_URL']}",
+              "- Deferred core design: Observation; evaluate redesign",
+              "",
+              "This metadata identifies the exact inputs for this review artifact.",
+          ]
+          (root/"BUILD-INFO.md").write_text("\n".join(release_info)+"\n",encoding="utf-8")
+          PY
+
+      - name: Build deterministic Board-review ZIP and SHA-256
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, zipfile
+
+          source=Path("work/scap-ng-0.3-human-review")
+          output=Path("work/scap-ng-0.3-board-review.zip")
+          epoch=(1980,1,1,0,0,0)
+          with zipfile.ZipFile(output,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zf:
+              for path in sorted(p for p in source.rglob("*") if p.is_file()):
+                  rel=(Path("scap-ng-0.3-human-review")/path.relative_to(source)).as_posix()
+                  info=zipfile.ZipInfo(rel,date_time=epoch)
+                  info.compress_type=zipfile.ZIP_DEFLATED
+                  info.external_attr=(0o100644 & 0xFFFF) << 16
+                  zf.writestr(info,path.read_bytes(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+          digest=hashlib.sha256(output.read_bytes()).hexdigest()
+          Path("work/scap-ng-0.3-board-review.zip.sha256").write_text(
+              f"{digest}  {output.name}\n",encoding="utf-8"
+          )
+          print(f"{output} sha256={digest}")
           PY
 
       - name: Reject engineering evidence from human-review package
@@ -428,6 +464,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: scap-ng-0.3-human-review-candidate
-          path: work/scap-ng-0.3-human-review
+          path: |
+            work/scap-ng-0.3-human-review
+            work/scap-ng-0.3-board-review.zip
+            work/scap-ng-0.3-board-review.zip.sha256
           if-no-files-found: error
           compression-level: 6
