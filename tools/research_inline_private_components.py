@@ -719,6 +719,14 @@ def main():
             "or Set Filter consumer; retain unsupported/unreferenced States."
         ),
     )
+    ap.add_argument(
+        "--inline-private-variables",
+        action="store_true",
+        help=(
+            "Research v5: localize single-use external/constant Variables at "
+            "their sole exact Variable reference. Local derived Variables remain named."
+        ),
+    )
     ap.add_argument("--label",required=True)
     args=ap.parse_args()
 
@@ -744,6 +752,7 @@ def main():
         "inline_private_filtered_set_operands":bool(args.inline_private_filtered_set_operands),
         "inline_state_consumers":bool(args.inline_state_consumers),
         "inline_variable_object_consumers":bool(args.inline_variable_object_consumers),
+        "inline_private_variables":bool(args.inline_private_variables),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -751,11 +760,13 @@ def main():
     totals={
         "objects_before":0,"objects_after":0,
         "states_before":0,"states_after":0,
+        "variables_before":0,"variables_after":0,
         "cross_refs_before":0,"cross_refs_after":0,
         "named_refs_before":0,"named_refs_after":0,
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
-        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_variable_objects":0,"inlined_states":0,
+        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_variable_objects":0,
+        "inlined_variables":0,"inlined_states":0,
         "inlined_state_consumer_occurrences":0,
         "retained_object_reason_counts":{},
         "retained_state_reason_counts":{},
@@ -772,6 +783,7 @@ def main():
             inline_private_filtered_set_operands=args.inline_private_filtered_set_operands,
             inline_state_consumers=args.inline_state_consumers,
             inline_variable_object_consumers=args.inline_variable_object_consumers,
+            inline_private_variables=args.inline_private_variables,
         )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
@@ -796,6 +808,7 @@ def main():
             "inlined_objects":len(identity["inlined_objects"]),
             "inlined_set_operand_objects":len(identity["inlined_set_operand_objects"]),
             "inlined_variable_objects":len(identity["inlined_variable_objects"]),
+            "inlined_variables":len(identity["inlined_variables"]),
             "inlined_states":len(identity["inlined_states"]),
             "inlined_state_consumer_occurrences":len(identity["inlined_state_consumer_occurrences"]),
             "shared_objects":len(identity["shared_objects"]),
@@ -822,7 +835,7 @@ def main():
             for context,count in contexts_for_state.items():
                 row["retained_state_context_counts"][context]=row["retained_state_context_counts"].get(context,0)+count
         report["selected"].append(row)
-        for k in ("objects","states"):
+        for k in ("objects","states","variables"):
             totals[k+"_before"]+=before[k]
             totals[k+"_after"]+=after[k]
         totals["cross_refs_before"]+=before["test_component_cross_references"]
@@ -836,6 +849,7 @@ def main():
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
         totals["inlined_variable_objects"]+=row["inlined_variable_objects"]
+        totals["inlined_variables"]+=row["inlined_variables"]
         totals["inlined_states"]+=row["inlined_states"]
         totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
         for reason,count in row["retained_object_reason_counts"].items():
@@ -865,6 +879,7 @@ def main():
         "byte_reduction_percent":reduction(totals["bytes_before"],totals["bytes_after"]),
         "object_scope_reduction_percent":reduction(totals["objects_before"],totals["objects_after"]),
         "state_scope_reduction_percent":reduction(totals["states_before"],totals["states_after"]),
+        "variable_scope_reduction_percent":reduction(totals["variables_before"],totals["variables_after"]),
     }
     (args.output/"report.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print(json.dumps(report["summary"],indent=2,sort_keys=True))
