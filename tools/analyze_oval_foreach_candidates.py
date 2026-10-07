@@ -377,6 +377,25 @@ def classify_candidate(
     else:
         proof = unary_concat_foreach_preconditions(result)
         result["unary_concat_proof_class"] = proof
+
+        # Full OVAL components often share one local Variable across multiple
+        # Tests/Rules. SCAP-NG conversion is Rule/Assessment scoped, so quantify
+        # whether each individual target consumer fits the proof class without
+        # declaring the shared source graph globally rewriteable.
+        scoped = []
+        for target in target_details:
+            scoped_candidate = {
+                **result,
+                "targets": [target],
+            }
+            scoped_proof = unary_concat_foreach_preconditions(scoped_candidate)
+            scoped.append({
+                "object_id": target["object_id"],
+                "entity": target["entity"],
+                "test_ids": [x["test_id"] for x in target.get("tests", [])],
+                "proof": scoped_proof,
+            })
+        result["target_scoped_unary_concat_proofs"] = scoped
     return result
 
 
@@ -482,6 +501,7 @@ def summarize(files: list[dict]) -> dict:
     derived_operations = Counter()
     proof_class = Counter()
     unary_concat_proof_class = Counter()
+    target_scoped_unary_concat_proof_class = Counter()
     projection_modes = Counter()
     parse_status = Counter()
     candidate_files = 0
@@ -501,6 +521,15 @@ def summarize(files: list[dict]) -> dict:
                 unary_concat_proof_class[
                     "eligible" if unary_proof.get("eligible") else "ineligible"
                 ] += 1
+            for scoped in candidate.get(
+                "target_scoped_unary_concat_proofs", []
+            ):
+                scoped_proof = scoped["proof"]
+                target_scoped_unary_concat_proof_class[
+                    "eligible"
+                    if scoped_proof.get("eligible")
+                    else "ineligible"
+                ] += 1
             if candidate.get("candidate_family") == "derived_projection":
                 for op in candidate.get("expression", {}).get("operations", []):
                     derived_operations[op] += 1
@@ -514,6 +543,9 @@ def summarize(files: list[dict]) -> dict:
         "first_proof_class": dict(sorted(proof_class.items())),
         "unary_concat_proof_class": dict(
             sorted(unary_concat_proof_class.items())
+        ),
+        "target_scoped_unary_concat_proof_class": dict(
+            sorted(target_scoped_unary_concat_proof_class.items())
         ),
         "derived_operations": dict(sorted(derived_operations.items())),
     }
@@ -529,7 +561,7 @@ def main(argv: list[str] | None = None) -> int:
     for path in iter_inputs(args.inputs):
         files.extend(analyze_input(path))
     report = {
-        "format": "scap-ng-foreach-candidate-analysis-0.3",
+        "format": "scap-ng-foreach-candidate-analysis-0.4",
         "rewrite_performed": False,
         "safe_automatic_enabled": False,
         "summary": summarize(files),
