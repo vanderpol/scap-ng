@@ -458,15 +458,15 @@ def inline_private(
                 for key,value in variables.items()
                 if key!=variable_id
             }
-            refs=list(exact_variable_ref_paths(search_surface,variable_id))
-            refs.extend(
+            variable_refs=list(exact_variable_ref_paths(search_surface,variable_id))
+            variable_refs.extend(
                 ("variables",)+path
                 for path in exact_variable_ref_paths(other_variables,variable_id)
             )
-            if len(refs)!=1:
+            if len(variable_refs)!=1:
                 continue
 
-            path=list(refs[0])
+            path=list(variable_refs[0])
             parent,last=path_parent(a,path)
             node=parent[last]
             if node!={"variable":variable_id}:
@@ -523,10 +523,12 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
     a=out["assessment"]
     tests=a.get("tests") or {}
     states=copy.deepcopy(a.get("states") or {})
-    variables=copy.deepcopy(a.get("variables") or {})
+    private_variable_payloads=[]
 
-    # Restore private Variables before moving inline Objects/States back to
-    # Assessment scope because recorded paths describe the rendered tree.
+    # Restore private Variable references before moving inline Objects/States
+    # back to Assessment scope because recorded paths describe the rendered tree.
+    # Rebuild the final Variable map only after other locality reversals have
+    # restored any inline Objects inside surviving Variable expressions.
     for row in identity.get("inlined_variables",[]):
         parent,last=path_parent(a,row["path"])
         node=parent[last]
@@ -540,9 +542,7 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
             )
         payload=copy.deepcopy(node["variable"])
         original=row["variable"]
-        if original in variables and variables[original] != payload:
-            raise ValueError(f"private Variable payload mismatch for {original!r}")
-        variables[original]=payload
+        private_variable_payloads.append((original,payload))
         parent[last]={"variable":original}
 
     # Restore consumer-local copies before moving any inline Objects back to
@@ -623,6 +623,11 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         a["states"]=states
     else:
         a.pop("states",None)
+    variables=copy.deepcopy(a.get("variables") or {})
+    for original,payload in private_variable_payloads:
+        if original in variables and variables[original] != payload:
+            raise ValueError(f"private Variable payload mismatch for {original!r}")
+        variables[original]=payload
     if variables or present.get("variables"):
         a["variables"]=variables
     else:
