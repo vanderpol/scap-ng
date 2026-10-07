@@ -156,7 +156,7 @@ console output.
 
 ```powershell
 python tools/validate_native_json_schemas.py work/current-review ^
-  --schema-dir schema/v0.2.0 ^
+  --schema-dir schema/v0.3.0 ^
   --report work/schema-validation.json
 ```
 
@@ -221,8 +221,9 @@ A self-signed test certificate demonstrates mechanics only; it does not establis
 
 **Script:** `tools/scap_upconvert_v003/convert_collection_review.py`
 
-The default remains faithful 0.2.0 output. Modernizers require an explicit
-0.3.0 target and are opt-in:
+This selected-Rule compatibility/research tool retains a historical 0.2.0
+default. The normal current full-review path above emits active 0.3 content.
+Selected-Rule modernizers still require an explicit 0.3.0 target and are opt-in:
 
 ```powershell
 python tools/scap_upconvert_v003/convert_collection_review.py ^
@@ -691,7 +692,7 @@ python tools/scap_ng_roundtrip_v003/summarize_current_corpus.py work/corpus-resu
 
 ```powershell
 python tools/generate_capability_schema.py ^
-  --mapping schema/v0.2.0/capability-mappings/supported/unix.file.json ^
+  --mapping schema/v0.3.0/capability-mappings/supported/unix.file.json ^
   --output work/unix.file.schema.json
 ```
 
