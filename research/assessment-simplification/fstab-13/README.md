@@ -327,10 +327,64 @@ This changes the recommendation:
 - a typed collector alone must not be used as justification to collapse the
   separate presence/projection/evaluation boundaries.
 
-The next proof target is non-complete collection and ObjectComponent status. If
-that cannot be represented through ordinary typed Object/Test mechanics without
-special cases, the compact form should remain an intentional reauthoring
-improvement rather than a lossless migration rewrite.
+The non-complete counterexample is now proven for the source processing model.
+The compact form therefore remains an intentional native-authoring improvement,
+not a lossless migration rewrite.
+
+## Non-complete collection counterexample
+
+The remaining status question is now sufficient to reject a compact one-Test
+form as a lossless automatic migration.
+
+The historical OVAL processing model defines the relevant chain as follows:
+
+1. an ObjectComponent backed by an `incomplete` Object is itself
+   `incomplete` when projected values exist;
+2. zero source Items is an ObjectComponent `error`;
+3. an OVAL Function evaluates only when its combined sub-component flag is
+   `complete`; any other sub-component status makes the Function `error`;
+4. the five real Rules put the ObjectComponent inside `split(',')`; and
+5. the separate fstab-row Test over an incomplete collected Object is
+   `unknown` for this existence/check shape.
+
+OVAL 5.12.3 still explicitly states that zero source Items is an
+ObjectComponent error. The OVAL Community issue discussing whether this should
+ever change remains open (OVAL-Community/OVAL#59).
+
+That produces these executable counterexamples:
+
+| Incomplete source observation | Faithful split-Variable graph | Compact typed Test |
+| --- | --- | --- |
+| no matching row observed | **error** | unknown |
+| first row observed and option present | **error** | unknown |
+| first row observed and option absent | **error** | false |
+
+For the faithful graph, the split/local-Variable path is `error` and the
+separate row-presence Test is `unknown`; OVAL AND therefore remains
+`error`.
+
+For an ordinary typed Test, incomplete collection remains `unknown` unless a
+seen item is already decisively false for `check: all`.
+
+This is a genuine result-semantic difference. One counterexample is enough to
+reject a general automatic collapse.
+
+### Decision from this phase
+
+**Do not automatically convert the five split-Variable Rules into one typed
+`linux.fstab` Test.**
+
+A native `linux.fstab` capability is still a strong authoring candidate, but
+there are now two distinct products:
+
+- **faithful migration:** retain the original result-producing graph unless a
+  shorthand normatively desugars to all of its status/value-production
+  boundaries; and
+- **native reauthoring:** use the clearer typed record model and accept that it
+  is a deliberate assessment modernization with its own semantics/provenance.
+
+This is the same design discipline used elsewhere in the project: improve the
+authoring surface without falsely claiming OVAL runtime equivalence.
 
 ## Before/after conclusion
 
@@ -358,14 +412,16 @@ Do **not** yet:
 - claim six-state migration equivalence.
 
 The complete-source zero/one/duplicate matrix is now covered by focused
-fixtures. Remaining proof work is:
+fixtures. Remaining work is no longer required to decide automatic collapse: the
+incomplete-source counterexample already rejects it. Follow-up research should
+instead focus on the quality of a **native** typed collector:
 
-- source collection `error`, `incomplete`, `not_collected`, and
-  `not_applicable`;
-- ObjectComponent status when the source is non-complete;
 - malformed option fields;
-- comments/whitespace/escaped-field parser-versus-regex cases; and
-- NFS/multi-row selection.
+- comments/whitespace/escaped-field parser behavior;
+- NFS/multi-row selection;
+- duplicate-row evidence and source-order reporting; and
+- how authoring provenance distinguishes native reauthoring from faithful
+  conversion.
 
 ## Human status
 
