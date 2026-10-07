@@ -8,6 +8,7 @@ from prove_apache_observation import (
     extract,
     flatten,
     observation_document,
+    validate_consumer_binding,
 )
 
 
@@ -63,6 +64,33 @@ class ApacheObservationProofTests(unittest.TestCase):
         observation=observation_document(source["assessment"])
         with self.assertRaisesRegex(ValueError,"private Observation node"):
             extract(source,observation)
+
+    def test_consumer_version_mismatch_fails_closed(self):
+        source=self.source()
+        observation=observation_document(source["assessment"])
+        extracted,_=extract(source,observation)
+        extracted["assessment"]["observations"]["apache"]["expected_version"]=999
+        with self.assertRaisesRegex(ValueError,"expected_version mismatch"):
+            validate_consumer_binding(extracted["assessment"],observation)
+
+    def test_consumer_id_mismatch_fails_closed(self):
+        source=self.source()
+        observation=observation_document(source["assessment"])
+        extracted,_=extract(source,observation)
+        extracted["assessment"]["observations"]["apache"]["expected_id"]="wrong.id"
+        with self.assertRaisesRegex(ValueError,"expected_id mismatch"):
+            validate_consumer_binding(extracted["assessment"],observation)
+
+    def test_unknown_export_fails_closed(self):
+        source=self.source()
+        observation=observation_document(source["assessment"])
+        extracted,_=extract(source,observation)
+        extracted["assessment"]["tests"]["one"]["variable"]={
+            "observation":"apache",
+            "export":"does_not_exist",
+        }
+        with self.assertRaisesRegex(ValueError,"unknown Observation export"):
+            validate_consumer_binding(extracted["assessment"],observation)
 
     def test_observation_exports_are_typed(self):
         source=self.source()
