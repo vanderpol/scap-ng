@@ -61,6 +61,17 @@ def consumer_context(path: tuple[str, ...]) -> str:
     return root
 
 
+def semantic_variable_kind(variable: dict) -> str:
+    source_kind = variable.get("kind")
+    if source_kind == "external":
+        return "external_input"
+    if source_kind == "constant":
+        return "constant_literal"
+    if source_kind == "local":
+        return expression_variable_kind(variable)
+    return "unknown_" + str(source_kind or "kind")
+
+
 def expression_functions(variable: dict) -> Counter:
     counts = Counter()
     expression = variable.get("expression")
@@ -132,6 +143,7 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
 
     rows = []
     expression_kinds = Counter()
+    source_kinds = Counter()
     function_counts = Counter()
     consumer_contexts = Counter()
     fanouts = Counter()
@@ -157,7 +169,9 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
         refs.extend(variable_refs)
         contexts = Counter(consumer_context(path) for path in refs)
         funcs = expression_functions(payload)
-        kind = expression_variable_kind(payload)
+        source_kind = str(payload.get("kind") or "unknown")
+        kind = semantic_variable_kind(payload)
+        source_kinds[source_kind] += 1
         expression_kinds[kind] += 1
         function_counts.update(funcs)
         consumer_contexts.update(contexts)
@@ -170,6 +184,7 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
         rows.append({
             "variable_id": variable_id,
             "kind": kind,
+            "source_kind": source_kind,
             "datatype": payload.get("datatype"),
             "consumer_count": len(refs),
             "consumer_contexts": dict(contexts),
@@ -180,6 +195,7 @@ def analyze_remaining_variables(assessment: dict, foreach_report: dict) -> dict:
     edges = dependency_edges(variables)
     return {
         "variables": len(rows),
+        "source_kind_counts": dict(source_kinds),
         "expression_kind_counts": dict(expression_kinds),
         "function_counts": dict(function_counts),
         "consumer_context_counts": dict(consumer_contexts),
@@ -215,6 +231,7 @@ def main() -> int:
 
     assessments = []
     expression_kinds = Counter()
+    source_kinds = Counter()
     function_counts = Counter()
     consumer_contexts = Counter()
     fanout_buckets = Counter()
@@ -282,6 +299,7 @@ def main() -> int:
             rendered["assessment"], foreach_report
         )
         variable_total += analysis["variables"]
+        source_kinds.update(analysis["source_kind_counts"])
         expression_kinds.update(analysis["expression_kind_counts"])
         function_counts.update(analysis["function_counts"])
         consumer_contexts.update(analysis["consumer_context_counts"])
@@ -331,6 +349,7 @@ def main() -> int:
         "label": args.label,
         "complex_rules_with_variables": complex_variable_rules,
         "remaining_variables": variable_total,
+        "source_kind_counts": dict(source_kinds),
         "expression_kind_counts": dict(expression_kinds),
         "function_counts": dict(function_counts),
         "consumer_context_counts": dict(consumer_contexts),
@@ -362,6 +381,7 @@ def main() -> int:
             "label",
             "complex_rules_with_variables",
             "remaining_variables",
+            "source_kind_counts",
             "expression_kind_counts",
             "function_counts",
             "fanout_bucket_counts",
