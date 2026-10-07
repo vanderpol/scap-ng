@@ -126,6 +126,16 @@ def scalar_reference_contexts(node: Any, candidates: set[str]) -> dict[str, dict
     return counts
 
 
+def context_signature(contexts: dict[str, int]) -> str:
+    if not contexts:
+        return "unreferenced"
+    return "+".join(
+        f"{name}:{count}"
+        for name,count in sorted(contexts.items())
+        if count
+    ) or "unreferenced"
+
+
 def normalized_text(doc: dict) -> str:
     return yaml.safe_dump(doc, sort_keys=False, width=120, allow_unicode=True)
 
@@ -588,6 +598,7 @@ def main():
         "retained_state_reason_counts":{},
         "retained_object_context_counts":{},
         "retained_state_context_counts":{},
+        "retained_object_context_signature_counts":{},
     }
 
     for path,doc in selected:
@@ -628,6 +639,7 @@ def main():
             "retained_state_reason_counts":{},
             "retained_object_context_counts":{},
             "retained_state_context_counts":{},
+            "retained_object_context_signature_counts":{},
             "roundtrip_structural_identity":"passed",
         }
         for reason in identity["retained_object_reasons"].values():
@@ -635,6 +647,10 @@ def main():
         for reason in identity["retained_state_reasons"].values():
             row["retained_state_reason_counts"][reason]=row["retained_state_reason_counts"].get(reason,0)+1
         for contexts_for_object in identity["retained_object_contexts"].values():
+            signature=context_signature(contexts_for_object)
+            row["retained_object_context_signature_counts"][signature]=(
+                row["retained_object_context_signature_counts"].get(signature,0)+1
+            )
             for context,count in contexts_for_object.items():
                 row["retained_object_context_counts"][context]=row["retained_object_context_counts"].get(context,0)+count
         for contexts_for_state in identity["retained_state_contexts"].values():
@@ -664,6 +680,10 @@ def main():
             totals["retained_object_context_counts"][context]=totals["retained_object_context_counts"].get(context,0)+count
         for context,count in row["retained_state_context_counts"].items():
             totals["retained_state_context_counts"][context]=totals["retained_state_context_counts"].get(context,0)+count
+        for signature,count in row["retained_object_context_signature_counts"].items():
+            totals["retained_object_context_signature_counts"][signature]=(
+                totals["retained_object_context_signature_counts"].get(signature,0)+count
+            )
 
     def reduction(before,after):
         return round(100*(before-after)/before,1) if before else 0.0
