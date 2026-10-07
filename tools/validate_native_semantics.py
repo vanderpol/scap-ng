@@ -32,12 +32,17 @@ def main():
     args = ap.parse_args()
 
     results = []
-    files = sorted(args.corpus_root.rglob("*.assessment.yaml"))
-    for path in files:
+    files = []
+    for path in sorted(args.corpus_root.rglob("*.yaml")):
         doc = load_yaml(path)
+        if not isinstance(doc.get("assessment"), dict):
+            continue
+        files.append((path, doc))
+
+    for path, doc in files:
         # Manual assessments have no Object/State/Test graph. They still count
         # in the census but semantic graph validation is not applicable.
-        assessment = doc.get("assessment", doc)
+        assessment = doc["assessment"]
         graph_applicable = any(
             key in assessment for key in ("shared_objects", "objects", "states", "tests", "variables")
         )
