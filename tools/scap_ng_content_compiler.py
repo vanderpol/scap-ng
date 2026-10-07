@@ -237,25 +237,33 @@ def validate_draft_expression_assessments(assessments, *, allow_unpromoted_conve
     supported_versions={"0.2.0","0.3.0"}
     validators_by_version={}
     root=Path(__file__).resolve().parents[1]
+    modern_capabilities=set()
+    for supported_version in supported_versions:
+        modern_capabilities.update(draft_capabilities(version=supported_version))
 
     for aid, assessment in assessments.items():
         version=(assessment.get("specification") or {}).get("version")
+        object_sections=["objects","shared_objects"]
+        observed_capabilities={
+            node["capability"]
+            for section in [*object_sections,"states","tests"]
+            for node in (
+                assessment.get(section,{})
+                if isinstance(assessment.get(section,{}),dict)
+                else {}
+            ).values()
+            if isinstance(node,dict) and isinstance(node.get("capability"),str)
+        }
         if version not in supported_versions:
+            if observed_capabilities.intersection(modern_capabilities):
+                raise ValueError(
+                    f"{aid}: new capability requires specification 0.2.0 or 0.3.0"
+                )
             continue
 
         named_object_section="shared_objects" if version=="0.3.0" else "objects"
         capabilities=draft_capabilities(version=version)
-        has_new_capability = any(
-            isinstance(node, dict)
-            and isinstance(node.get("capability"), str)
-            and node["capability"] in capabilities
-            for section in [named_object_section, "states", "tests"]
-            for node in (
-                assessment.get(section, {})
-                if isinstance(assessment.get(section, {}), dict)
-                else {}
-            ).values()
-        )
+        has_new_capability=bool(observed_capabilities.intersection(capabilities))
 
         if version not in validators_by_version:
             validators_by_version[version]=build_validators(root/f"schema/v{version}")
