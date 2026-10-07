@@ -273,12 +273,23 @@ with conditional-recognition correctness.
 ### 7. Windows role/domain user-right branches — recurring family
 
 Several Server 2025 Rules combine `windows.wmi.query` role/domain facts with
-`windows.userright` expectations. Some now match the generic mutually
-exclusive-enum conditional proof; others remain unproven and correctly stay in
-review.
+`windows.userright` expectations.
 
-Continue improving the proof classes generically. Rule IDs are fixtures only;
-the modernizer SHALL NOT contain product or Rule allowlists.
+**Follow-up result:** SV-278004, SV-278005, SV-278184, SV-278185, SV-278187 and
+SV-278188 now all match the generic mutually-exclusive-enum guard proof. The
+last two apparent failures (SV-278184/185) were stale CI expectations: the
+pattern recognizer had already proven and rewritten them.
+
+The proof does **not** assume the WMI `domainrole` values are exhaustive. For
+a disjoint-but-nonexhaustive pair, the native else branch retains the second
+guard, so a third role value cannot silently select the wrong requirement.
+
+This remains an intent-preserving authoring modernization, not a six-state
+lossless rewrite; non-Boolean guard outcomes still carry the documented
+semantic delta.
+
+Rule IDs remain fixtures only. The modernizer SHALL NOT contain product or Rule
+allowlists.
 
 ## Important design lesson
 
