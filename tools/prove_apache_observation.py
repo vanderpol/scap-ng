@@ -92,6 +92,7 @@ def observation_document(a:dict)->dict|None:
             "variables":{name:copy.deepcopy(variables[name]) for name in CORE_VARIABLES},
             "exports":{
                 alias:{
+                    "kind":"values",
                     "variable":node,
                     "datatype":"string",
                     "cardinality":"zero_or_more",
@@ -165,6 +166,7 @@ def result_shape(observation_doc:dict)->dict:
             "status":"complete",
             "exports":{
                 alias:{
+                    "kind":contract["kind"],
                     "datatype":contract["datatype"],
                     "cardinality":contract["cardinality"],
                     "status":"complete",
