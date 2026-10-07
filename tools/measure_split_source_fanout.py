@@ -26,6 +26,29 @@ def canonical_hash(node) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def node_summary(node) -> dict[str, Any]:
+    def attrs(e):
+        return {
+            local(k):v
+            for k,v in sorted(e.attrib.items(),key=lambda kv:local(kv[0]))
+            if local(k)!="id"
+        }
+    children=[]
+    for child in list(node)[:12]:
+        text=" ".join("".join(child.itertext()).split())
+        children.append({
+            "element":local(child.tag),
+            "attributes":attrs(child),
+            "text":text[:240] if text else None,
+        })
+    return {
+        "element":local(node.tag),
+        "comment":node.get("comment"),
+        "attributes":attrs(node),
+        "children":children,
+    }
+
+
 def main() -> int:
     ap=argparse.ArgumentParser()
     ap.add_argument("split_root",type=Path)
@@ -64,7 +87,13 @@ def main() -> int:
                 digest=canonical_hash(node)
                 rec=by_kind_id[kind].setdefault(
                     oid,
-                    {"id":oid,"payload_hashes":set(),"rules":set(),"occurrences":0},
+                    {
+                        "id":oid,
+                        "payload_hashes":set(),
+                        "rules":set(),
+                        "occurrences":0,
+                        "node_summary":node_summary(node),
+                    },
                 )
                 rec["payload_hashes"].add(digest)
                 rec["rules"].add(rule_id)
@@ -108,6 +137,7 @@ def main() -> int:
                     "occurrences":rec["occurrences"],
                     "rules":sorted(rec["rules"]),
                     "payload_hash":next(iter(rec["payload_hashes"])) if len(rec["payload_hashes"])==1 else None,
+                    "node_summary":rec["node_summary"],
                 })
         rows.sort(key=lambda x:(-x["rule_fanout"],x["id"]))
 
