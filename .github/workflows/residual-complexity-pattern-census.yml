@@ -97,6 +97,8 @@ jobs:
           reasons=Counter()
           functions=Counter()
           variable_kinds=Counter()
+          set_topologies=Counter()
+          set_topology_examples=defaultdict(list)
           cluster_counts=Counter()
           cluster_meta={}
           motif_counts=Counter()
@@ -111,6 +113,13 @@ jobs:
               functions.update(r["variable_function_counts"])
               variable_kinds.update(r["variable_kind_counts"])
               reason_combinations.update(r.get("residual_reason_combinations",{}))
+              for row in r.get("set_topology_counts",[]):
+                  key=json.dumps(row["topology"],sort_keys=True,separators=(",",":"))
+                  set_topologies[key]+=row["count"]
+                  for example in row.get("examples",[]):
+                      tagged=f"{r['label']}:{example}"
+                      if tagged not in set_topology_examples[key] and len(set_topology_examples[key])<20:
+                          set_topology_examples[key].append(tagged)
               for row in r["top_residual_shapes"]:
                   fp=row["shape_fingerprint"]
                   cluster_counts[fp]+=row["count"]
@@ -158,6 +167,14 @@ jobs:
                   "residual_reason_counts":dict(reasons),
                   "variable_function_counts":dict(functions),
                   "variable_kind_counts":dict(variable_kinds),
+                  "set_topology_counts":[
+                      {
+                          "topology":json.loads(key),
+                          "count":count,
+                          "examples":set_topology_examples[key],
+                      }
+                      for key,count in set_topologies.most_common()
+                  ],
                   "residual_reason_combinations":dict(reason_combinations),
                   "unique_coarse_pattern_families_observed_in_top_lists":len(coarse_counts),
               },
