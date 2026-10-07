@@ -71,6 +71,75 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         rendered,identity=inline_private(source)
         self.assertEqual(reexpand(rendered,identity),source)
 
+    def test_private_unfiltered_leaf_set_operands_inline_and_roundtrip(self):
+        source={
+            "assessment":{
+                "id":"set-example",
+                "mode":"automated",
+                "objects":{
+                    "base":{"capability":"independent.textfilecontent54","select":{"full_path":{"value":"/etc/a"}}},
+                    "dropin":{"capability":"independent.textfilecontent54","select":{"directory":{"value":"/etc/a.d"}}},
+                    "combined":{
+                        "capability":"independent.textfilecontent54",
+                        "set":{
+                            "operator":"union",
+                            "operands":[
+                                {"object":"base","filters":[]},
+                                {"object":"dropin","filters":[]},
+                            ],
+                        },
+                    },
+                },
+                "states":{},
+                "tests":{
+                    "one":{"capability":"independent.textfilecontent54","object":"combined"},
+                },
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(source,inline_private_set_operands=True)
+        test_object=rendered["assessment"]["tests"]["one"]["object"]
+        self.assertIsInstance(test_object,dict)
+        operands=test_object["set"]["operands"]
+        self.assertIsInstance(operands[0]["object"],dict)
+        self.assertIsInstance(operands[1]["object"],dict)
+        self.assertEqual(
+            {row["object"] for row in identity["inlined_set_operand_objects"]},
+            {"base","dropin"},
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_filtered_set_operand_stays_named(self):
+        source={
+            "assessment":{
+                "id":"filtered-set",
+                "mode":"automated",
+                "objects":{
+                    "base":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                    "combined":{
+                        "capability":"unix.file",
+                        "set":{
+                            "operator":"union",
+                            "operands":[
+                                {"object":"base","filters":[{"state":"some-state"}]},
+                            ],
+                        },
+                    },
+                },
+                "states":{"some-state":{"capability":"unix.file","state":{"field":"type","value":"file"}}},
+                "tests":{"one":{"capability":"unix.file","object":"combined"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(source,inline_private_set_operands=True)
+        # Parent Set may inline into the Test, but the filtered operand remains a ref.
+        self.assertEqual(
+            rendered["assessment"]["tests"]["one"]["object"]["set"]["operands"][0]["object"],
+            "base",
+        )
+        self.assertEqual(identity["inlined_set_operand_objects"],[])
+        self.assertEqual(reexpand(rendered,identity),source)
+
 
 if __name__=="__main__":
     unittest.main()
