@@ -122,6 +122,25 @@ Each prerelease/review checkpoint SHALL include source and result examples regen
 
 When a review cycle is formally completed, preserve the reviewed state with the source commit/tag and any durable external artifact URL/hash. Later corrections belong to a new review cycle; do not rewrite a completed checkpoint. Large generated products should stay in CI/evidence storage rather than being recommitted merely for review.
 
+## Release changelog
+
+Maintain `CHANGELOG.md` as the concise release-level record of material
+changes.
+
+- The active release uses an **Unreleased** section.
+- Every changelog entry SHALL link to the GitHub issue(s) that explain the work.
+- Record user-, author-, reviewer-, or implementer-visible changes, not every
+  mechanical commit.
+- Release notes are derived from issue-linked work assigned to the release
+  milestone; commit history is supporting evidence, not the source of meaning.
+- Deferred, rejected, or research-only proposals SHALL NOT be described as
+  delivered features.
+- At a release/freeze checkpoint, freeze the Unreleased entries under the
+  released version and date.
+- Historical commits that predate issue-linked commit discipline are not
+  rewritten; map their delivered change to the appropriate issue when preparing
+  the changelog.
+
 ## Specification release discipline
 
 The `specification/` tree is a versioned release artifact, not a live design
