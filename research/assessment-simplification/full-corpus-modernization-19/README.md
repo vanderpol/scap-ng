@@ -1,9 +1,9 @@
 # Full-corpus 0.3 modernization census
 
-**Status:** historical research checkpoint. This run predates the 0.3 requirement freeze and applied Observation extraction. Observation is now deferred; current census tooling measures Observation opportunities without applying them. Final release statistics will come from the post-freeze rerun.
+**Status:** post-freeze 0.3 research/evidence checkpoint. The transformations counted as applied below match the accepted 0.3 modernization direction; deferred Observation is measured but not applied.
 
 Workflow:
-https://github.com/vanderpol/scap-ng/actions/runs/37632292259
+https://github.com/vanderpol/scap-ng/actions/runs/37687785601
 
 Pinned NIWC revision:
 `8c8e5dff860af6b1290ee9273a282db24278f8d5`
@@ -19,102 +19,123 @@ The run regenerated all 65 individual NIWC Current packages from source:
 Measured automated Assessments: **7,165** total, including **6,916 Rule
 Assessments** and **249 applicability Assessments**.
 
-Exact/reversible research transforms produced:
+Exact/reversible modernization produced:
 
-| Measure | Faithful | Research view | Reduction |
+| Measure | Faithful | 0.3 research view | Reduction |
 | --- | ---: | ---: | ---: |
-| Top-level Objects | 13,402 | 1,197 | **91.07%** |
+| Top-level Objects | 13,402 | 544 | **95.94%** |
 | Top-level States | 9,121 | 435 | **95.23%** |
-| Named Variables | 2,250 | 2,002 | **11.02%** |
-| Named component references | 23,883 | 1,926 | **91.94%** |
+| Named Variables | 2,250 | 1,111 | **50.62%** |
+| Named component references | 23,883 | 1,326 | **94.45%** |
 
 Rule Assessment classifications:
 
 | Class | Count | Percent |
 | --- | ---: | ---: |
-| local/simple | **4,736** | **68.48%** |
-| bounded dataflow (`foreach`) | 22 | 0.32% |
-| shared Observation consumer | 52 | 0.75% |
-| meaningfully complex | **2,106** | **30.45%** |
+| local/simple | **5,283** | **76.39%** |
+| bounded dataflow (`for_each`) | 22 | 0.32% |
+| meaningfully complex | **1,611** | **23.29%** |
 
-The exact `foreach` v1 proof class is therefore useful but narrow: **22**
-rewrites across 6,916 Rules.
+The exact automatic `for_each` v1 rewrite class remains narrow: **22** rewrites
+across 6,916 Rules. DNS research separately shows additional nested runtime
+iteration hidden inside PowerShell; that evidence drives the accepted nested
+`for_each` authoring requirement rather than inflating this automatic-rewrite
+count.
 
-## Shared Observation result
+## Deferred Observation opportunity
 
-The census created **9 package-local Observation artifacts** with **69**
-automated consumers:
+Observation is **not applied** to the 0.3 research view.
 
-- Apache discovery: 20 consumers across UNIX Server/Site content;
-- Windows DomainRole: 43 consumers across Windows 10, Windows 11, and Server
-  2019/2022/2025;
-- RHEL/Oracle Linux dconf discovery: 6 consumers.
+The census still measures the proven opportunity so the research is not lost:
 
-Those artifacts factor **129 Object occurrences** and **226 Variable
-occurrences** into 15 unique Observation Objects and 24 unique Observation
-Variables within their packages.
+- **9** package-local candidate Observation artifacts;
+- **69** candidate consumers;
+- Apache discovery, Windows DomainRole, and RHEL/Oracle Linux dconf families.
 
-This strengthens Observation beyond the original Apache example: the same
-contract works for cloned value dataflow, source-shared Item acquisition, and
-mixed Item/value exports.
+Observation is deferred beyond normative 0.3 because its typed export,
+execution/result provenance, binding, manifest dependency/cycle, and cache/reuse
+contracts need to be completed as one interoperable design.
 
-## What remains meaningfully complex
+## Retained Object boundary
 
-Among the **2,106** complex Rule Assessments, overlapping residual causes are:
+After locality, top-level Objects remain only where identity/referenceability is
+meaningful.
 
-- nontrivial Variable graph: **1,073**;
-- real multi-Test composition: **1,055**;
-- Set/Filter semantics: **630**;
-- nested evaluation tree: **560**;
-- shared acquisition: **301**;
-- named State reuse: **214**;
-- named Object graph: **154**;
-- repeated Test reference: **129**.
+Retained reason counts:
 
-**Important refinement in progress:** this first-pass classifier treats every
-surviving Variable as a nontrivial Variable graph. Follow-up analysis found that
-many Windows survivors are OVAL `external_variable` inputs or constants rather
-than derived dataflow. Therefore **30.45% is a conservative upper bound on
-meaningful structural complexity**, not the final dataflow-complexity rate.
+- multiple Tests: **330**
+- graph-only: **110**
+- Test + graph: **98**
+- multiple Tests + graph: **6**
 
-The next research step is classifying surviving Variables by source kind,
-expression/function family, fan-out, and chaining before revising that number.
+The apparent **17** single-consumer `object_graph:1` cases are the proven
+`for_each` source population cases. They intentionally retain a named,
+referenceable collection identity rather than representing missed locality.
+
+This is the evidence basis for the 0.3 authoring rule:
+
+- private Object → local/inline with its consumer;
+- reusable/referenceable acquisition → named under `shared_objects:`.
+
+## Residual complexity
+
+Among the **1,611** meaningfully complex Rule Assessments, overlapping causes are:
+
+- real multi-Test composition: **1,052**
+- Set/Filter semantics: **636**
+- nested evaluation: **587**
+- shared acquisition: **332**
+- named State reuse: **214**
+- derived Variable graph: **166**
+- repeated Test reference: **147**
+- named Object graph: **72**
+- constant binding: **44**
+- external input binding: **21**
+
+These residuals are not targets to eliminate merely to make the percentage
+smaller. Existing evaluate, Set/Filter, and runtime Variable semantics remain
+when the complexity is real.
 
 ## Evaluate checkpoint
 
-Across the full corpus, **4,740 / 6,916 (68.5%)** Rule Assessments have a
-single-Test explicit root. That is strong evidence for editor/normalizer
-authoring convenience, but not for a hidden executable default.
+The corpus confirms that real composition remains important: more than one
+thousand Rule Assessments require multi-Test composition, with nested trees and
+repeated Test references present in production.
 
-Real composition remains necessary: **147** Rule Assessments repeat Test
-references, and representative trees reach depth 5. Keep named Tests and
-first-class `evaluate` where composition exists.
+0.3 therefore keeps the existing named-Test + explicit `evaluate` model.
+**Redesign of evaluate is deferred**: no implicit one-Test root, nested Test
+definition model, or new shorthand is added for this checkpoint.
 
-## Scope boundary
+## Applied scope
 
-Applied automatically in this **historical** census only when existing proof was exact and
-reversible:
+Applied only where the transform is exact/reversible:
 
 - consumer-local Object/State presentation;
-- private Set-operand and Variable-local Object locality;
-- bounded `foreach` v1;
-- proven Observation extraction shapes.
+- private Set-operand locality;
+- Variable-local Object locality;
+- recursive private Object-graph locality;
+- single-use external/constant/leaf-derived Variable locality where proven;
+- bounded `for_each` v1.
 
-Not rewritten merely to reduce the complexity count:
+Measured but not applied:
 
-- native conditional/case authoring;
+- deferred shared Observation extraction;
+- single-Test evaluate-root authoring ceremony.
+
+Not rewritten merely to reduce complexity:
+
+- broader conditional/case syntax;
 - typed `linux.fstab`;
 - violation-query positive spelling;
-- general concat/multi-source `foreach`;
+- general unproven multi-source `for_each`;
 - domain-specific semantic changes.
 
 The detailed 61-package reports and logs remain in the workflow artifact rather
 than this repository.
 
+## Human-review package
 
-## Human-review package requirement
-
-The first candidate end-product review set will use six benchmarks:
+The 0.3 review set uses:
 
 - RHEL 9;
 - Oracle Linux 9;
@@ -123,30 +144,9 @@ The first candidate end-product review set will use six benchmarks:
 - Apache 2.4 UNIX Server;
 - Windows Server DNS.
 
-Each benchmark SHALL include a compact modernization scorecard generated from
-the same source pin and transformation reports as the candidate content.
+Each benchmark carries a compact modernization scorecard. Observation opportunity
+may appear as deferred research evidence, but **no Observation artifact or
+consumer rewrite belongs in the normative 0.3 candidate tree**.
 
-Required per-benchmark metrics:
-
-- Rule and automated Assessment counts;
-- faithful versus candidate top-level Objects, States, Variables, and named
-  references;
-- counts localized by type: Test/Object/State, Set operand, Variable-local
-  Object, external input, and constant Variable;
-- bounded `foreach` rewrites and explicit refusals/review-required cases;
-- Observation artifacts, consumers, export references, and factored
-  Object/Variable occurrences;
-- trivial single-Test `evaluate` roots versus real multi-Test/nested
-  composition;
-- final Assessment classification counts;
-- residual-complexity reasons;
-- normalized lines/bytes as secondary readability metrics;
-- source revision, workflow, and proof/round-trip status.
-
-The scorecard is explanatory evidence, not a quality score. A benchmark with
-more real complexity is not worse; the purpose is to show exactly what the
-modernization changed and what it deliberately retained.
-
-Human review starts only after external/constant Variable locality is resolved
-and these six benchmarks can be generated as coherent candidate end-product NG,
-not as a mixture of research representations.
+Final IN / DEFER / OUT requirements are maintained in
+[#174](https://github.com/vanderpol/scap-ng/issues/174).
