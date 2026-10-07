@@ -122,6 +122,7 @@ jobs:
           kinds=Counter()
           funcs=Counter()
           contexts=Counter()
+          static_contexts=Counter()
           fanout=Counter()
           refusal=Counter()
           patterns=Counter()
@@ -134,6 +135,11 @@ jobs:
                   "remaining_variables",
                   "variables_with_multiple_consumers",
                   "variables_consumed_by_variables",
+                  "compile_time_static_variables",
+                  "compile_time_static_constants",
+                  "compile_time_static_locals",
+                  "compile_time_static_variables_with_multiple_consumers",
+                  "runtime_variables",
                   "variable_dependency_edges",
               ):
                   totals[key]+=int(r.get(key,0) or 0)
@@ -145,6 +151,9 @@ jobs:
               kinds.update(r.get("expression_kind_counts") or {})
               funcs.update(r.get("function_counts") or {})
               contexts.update(r.get("consumer_context_counts") or {})
+              static_contexts.update(
+                  r.get("compile_time_static_consumer_context_counts") or {}
+              )
               fanout.update(r.get("fanout_bucket_counts") or {})
               refusal.update(r.get("foreach_v1_refusal_reason_counts") or {})
               for row in r.get("pattern_signature_counts") or []:
@@ -181,6 +190,7 @@ jobs:
                   "expression_kind_counts":dict(kinds),
                   "function_counts":dict(funcs),
                   "consumer_context_counts":dict(contexts),
+                  "compile_time_static_consumer_context_counts":dict(static_contexts),
                   "fanout_bucket_counts":dict(fanout),
                   "foreach_v1_refusal_reason_counts":dict(refusal),
                   "unique_pattern_signatures":len(patterns),
