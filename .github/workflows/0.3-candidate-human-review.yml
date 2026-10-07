@@ -1,0 +1,279 @@
+name: 0.3 Candidate human review build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/0.3-candidate-human-review.yml
+      - tools/render_0_3_human_review_candidate.py
+      - tools/build_modernization_scorecard.py
+      - tools/measure_full_modernization_census.py
+      - tools/measure_post_modernization_residual_patterns.py
+      - tools/research_inline_private_components.py
+      - tools/scap_upconvert_v003/foreach_modernization.py
+      - tools/prove_apache_observation.py
+      - tools/prove_windows_domainrole_observation.py
+      - tools/prove_rhel_dconf_observation.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: candidate-0.3-human-review
+  cancel-in-progress: true
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  precheck:
+    name: Validate candidate rendering transforms
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Run focused modernization tests
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_inline_private_components.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_measure_full_modernization_census.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_measure_post_modernization_residual_patterns.py -v
+
+  render:
+    name: Candidate review - ${{ matrix.label }}
+    needs: precheck
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - key: rhel9
+            label: RHEL 9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - key: oracle-linux9
+            label: Oracle Linux 9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+          - key: windows11
+            label: Windows 11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: windows-server-2025
+            label: Windows Server 2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+          - key: apache-unix-server
+            label: Apache 2.4 UNIX Server
+            artifact: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+          - key: windows-server-dns
+            label: Windows Server DNS
+            artifact: U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+
+      - name: Fresh faithful conversion
+        env:
+          KEY: ${{ matrix.key }}
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          python scap-ng/tools/generate_niwc_current_review.py "niwc/Current/$ARTIFACT" \
+            --output "work/source/$KEY" \
+            --split-root "work/split-$KEY" \
+            --source-revision "$NIWC_REVISION" \
+            --source-repository-path "Current/$ARTIFACT" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --summary "work/source/$KEY/source-generation.json"
+
+      - name: Measure final modernization view
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/measure_full_modernization_census.py \
+            "work/source/$KEY" \
+            --label "$LABEL" \
+            --source-artifact "$ARTIFACT" \
+            --output "work/evidence/$KEY/modernization-report.json"
+
+      - name: Measure residual semantic patterns
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/measure_post_modernization_residual_patterns.py \
+            "work/source/$KEY" \
+            --label "$LABEL" \
+            --output "work/evidence/$KEY/residual-patterns.json" \
+            --top 100
+
+      - name: Render complete 0.3 candidate authoring tree
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/render_0_3_human_review_candidate.py \
+            "work/source/$KEY" \
+            --output-root "work/review/$KEY/candidate-authoring" \
+            --evidence-dir "work/evidence/$KEY" \
+            --label "$LABEL"
+          cp -R "work/source/$KEY" "work/review/$KEY/faithful-authoring"
+
+      - name: Build modernization scorecard
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python scap-ng/tools/build_modernization_scorecard.py \
+            --modernization-report "work/evidence/$KEY/modernization-report.json" \
+            --residual-report "work/evidence/$KEY/residual-patterns.json" \
+            --label "$LABEL" \
+            --source-revision "$NIWC_REVISION" \
+            --workflow-url "$WORKFLOW_URL" \
+            --output-json "work/review/$KEY/SCORECARD.json" \
+            --output-markdown "work/review/$KEY/SCORECARD.md"
+          cp "work/evidence/$KEY/render-report.json" "work/review/$KEY/RENDER-PROOF.json"
+          cp "work/evidence/$KEY/residual-patterns.json" "work/review/$KEY/RESIDUAL-PATTERNS.json"
+
+      - name: Verify candidate YAML parses
+        env:
+          KEY: ${{ matrix.key }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import yaml
+          root=Path("work/review")/os.environ["KEY"]/"candidate-authoring"
+          files=list(root.rglob("*.yaml"))
+          if not files:
+              raise SystemExit("candidate tree has no YAML")
+          for path in files:
+              yaml.safe_load(path.read_text(encoding="utf-8"))
+          print(f"parsed {len(files)} candidate YAML documents")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-review-${{ matrix.key }}
+          path: work/review/${{ matrix.key }}
+          if-no-files-found: error
+          compression-level: 6
+
+  assemble:
+    name: Assemble six-benchmark human review package
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: candidate-review-*
+          path: downloads
+      - name: Assemble and summarize
+        env:
+          NIWC_REVISION: ${{ env.NIWC_REVISION }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+
+          expected={
+              "rhel9":"RHEL 9",
+              "oracle-linux9":"Oracle Linux 9",
+              "windows11":"Windows 11",
+              "windows-server-2025":"Windows Server 2025",
+              "apache-unix-server":"Apache 2.4 UNIX Server",
+              "windows-server-dns":"Windows Server DNS",
+          }
+          root=Path("work/scap-ng-0.3-human-review")
+          (root/"benchmarks").mkdir(parents=True,exist_ok=True)
+          rows=[]
+          for key,label in expected.items():
+              matches=list(Path("downloads").rglob(f"{key}/SCORECARD.json"))
+              if len(matches)!=1:
+                  raise SystemExit(f"{key}: expected one scorecard, found {len(matches)}")
+              source=matches[0].parent
+              target=root/"benchmarks"/key
+              shutil.copytree(source,target)
+              score=json.loads((target/"SCORECARD.json").read_text())
+              if score.get("benchmark")!=label:
+                  raise SystemExit(f"{key}: label mismatch")
+              cls=score.get("rule_classifications") or {}
+              rows.append({
+                  "key":key,
+                  "label":label,
+                  "rules":score["assessment_counts"]["rules"],
+                  "objects":score["reduction_percent"]["objects"],
+                  "states":score["reduction_percent"]["states"],
+                  "variables":score["reduction_percent"]["variables"],
+                  "local_simple":cls.get("local_simple",0),
+                  "bounded":cls.get("bounded_dataflow",0),
+                  "observation":cls.get("shared_observation_consumer",0),
+                  "complex":cls.get("meaningfully_complex",0),
+              })
+
+          lines=[
+              "# SCAP-NG 0.3 candidate human-review package",
+              "",
+              "**Research-only. This package is for owner readability/design review; it is not a released 0.3 schema or Board-approved format.**",
+              "",
+              "For each benchmark, start with `SCORECARD.md`, then compare `candidate-authoring/` with `faithful-authoring/`. The candidate applies only transformations that have passed the current exact/reversible research gates. Remaining complexity is deliberately preserved rather than hidden.",
+              "",
+              f"- Pinned NIWC revision: `{os.environ['NIWC_REVISION']}`",
+              f"- Build workflow: {os.environ['WORKFLOW_URL']}",
+              "",
+              "## Benchmark scorecard summary",
+              "",
+              "| Benchmark | Rules | Object ↓ | State ↓ | Variable ↓ | Local/simple | foreach | Observation | Complex |",
+              "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+          ]
+          for row in rows:
+              lines.append(
+                  f"| {row['label']} | {row['rules']} | {row['objects']}% | "
+                  f"{row['states']}% | {row['variables']}% | {row['local_simple']} | "
+                  f"{row['bounded']} | {row['observation']} | {row['complex']} |"
+              )
+          lines += [
+              "",
+              "## What to review",
+              "",
+              "- Can an experienced OVAL/STIG author understand an ordinary Rule without chasing named Objects, States, or single-use Variables?",
+              "- Are the remaining named Variables clearly real shared/chained dataflow?",
+              "- Are localized UNION/DIFFERENCE/Filter forms clearer while retaining obvious semantics?",
+              "- Do Observation consumers make shared acquisition easier to understand without hiding policy truth?",
+              "- Does explicit `evaluate` remain useful when genuine composition exists, and feel like unnecessary ceremony only in the single-Test case?",
+              "- Are any candidate forms harder to review than the faithful conversion?",
+              "",
+              "Compiled `.scapng` packages are intentionally not included yet: the new authoring forms remain candidate semantics until human acceptance drives schema/compiler promotion.",
+              "",
+          ]
+          (root/"README.md").write_text("\\n".join(lines),encoding="utf-8")
+          (root/"REVIEW.json").write_text(json.dumps({
+              "format":"scap-ng-0.3-human-review-0.1",
+              "status":"research_only_pending_owner_review",
+              "source_revision":os.environ["NIWC_REVISION"],
+              "workflow_url":os.environ["WORKFLOW_URL"],
+              "benchmarks":rows,
+          },indent=2,sort_keys=True)+"\\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-0.3-human-review-candidate
+          path: work/scap-ng-0.3-human-review
+          if-no-files-found: error
+          compression-level: 6
