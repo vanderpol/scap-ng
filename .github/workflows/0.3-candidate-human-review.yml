@@ -260,7 +260,7 @@ jobs:
               "",
               "**Research-only. This package is for owner readability/design review; it is not a released 0.3 schema or Board-approved format.**",
               "",
-              "For each benchmark, start with `SCORECARD.md`, then compare `candidate-authoring/` with `faithful-authoring/`. The candidate applies only transformations that have passed the current exact/reversible research gates. Remaining complexity is deliberately preserved rather than hidden.",
+              "Start with `REVIEW-GUIDE.md`, then use each benchmark's `SCORECARD.md` and complete `candidate-authoring/` / `faithful-authoring/` trees as supporting evidence. The candidate applies only transformations that have passed the current exact/reversible research gates. Remaining complexity is deliberately preserved rather than hidden.",
               "",
               f"- Pinned NIWC revision: `{os.environ['NIWC_REVISION']}`",
               f"- Build workflow: {os.environ['WORKFLOW_URL']}",
@@ -291,6 +291,87 @@ jobs:
               "",
           ]
           (root/"README.md").write_text("\n".join(lines),encoding="utf-8")
+
+          guide = """# SCAP-NG 0.3 modernization review guide
+
+Start here before browsing the complete benchmark trees. These examples were
+chosen to expose the main modernization decisions and the cases deliberately
+left explicit.
+
+## 1. Consumer-local Object, State, and simple Variable scope
+
+**RHEL 9 — SV-257923**
+
+- [Faithful](benchmarks/rhel9/faithful-authoring/assessments/automated/benchmark.rhel_9.SV-257923.automated.assessment.yaml)
+- [Candidate](benchmarks/rhel9/candidate-authoring/assessments/automated/SV-257923.automated.yaml)
+
+Review whether the candidate is easier to understand when the Object, constant
+Variable, and filter States are placed at their semantic consumers.
+
+## 2. Bounded collection iteration
+
+**RHEL 9 — SV-258029**
+
+- [Faithful](benchmarks/rhel9/faithful-authoring/assessments/automated/benchmark.rhel_9.SV-258029.automated.assessment.yaml)
+- [Candidate](benchmarks/rhel9/candidate-authoring/assessments/automated/SV-258029.automated.yaml)
+
+Review the explicit `for_each` collection expansion. It preserves one Test
+aggregation boundary rather than turning the source population into independent
+per-item Tests.
+
+## 3. Shared Observation
+
+**Apache 2.4 UNIX — SV-214251**
+
+- [Faithful](benchmarks/apache-unix-server/faithful-authoring/assessments/automated/benchmark.apache_server_2-4_unix_server.SV-214251.automated.assessment.yaml)
+- [Candidate](benchmarks/apache-unix-server/candidate-authoring/assessments/automated/SV-214251.automated.yaml)
+- [Shared Apache discovery Observation](benchmarks/apache-unix-server/candidate-authoring/shared/observations/apache-httpd-discovery.observation.yaml)
+
+Review whether shared acquisition/dataflow is clearer as a truthless Observation
+with typed exports while each Rule Assessment retains its own Tests and truth.
+
+## 4. Set/Filter semantics intentionally retained
+
+**Oracle Linux 9 — SV-271608**
+
+- [Faithful](benchmarks/oracle-linux9/faithful-authoring/assessments/automated/benchmark.oracle_linux_9.SV-271608.automated.assessment.yaml)
+- [Candidate](benchmarks/oracle-linux9/candidate-authoring/assessments/automated/SV-271608.automated.yaml)
+
+This case is intentionally *not* replaced with a new generic construct. Review
+whether the localized UNION/Object form is understandable while keeping the set
+semantics explicit.
+
+## 5. Genuine multi-Test composition
+
+**Windows Server DNS — SV-259380**
+
+- [Faithful](benchmarks/windows-server-dns/faithful-authoring/assessments/automated/benchmark.ms_windows_server_dns.SV-259380.automated.assessment.yaml)
+- [Candidate](benchmarks/windows-server-dns/candidate-authoring/assessments/automated/SV-259380.automated.yaml)
+
+Use this case when reviewing whether an explicit `evaluate` tree remains useful
+for genuine composition.
+
+## 6. Simple single-Test evaluate
+
+Return to the candidate for **SV-271608** above. Its `evaluate` block only
+points at one Test. Compare that ceremony with the DNS composition case. This is
+the central readability question in issue #167; the package does not silently
+choose a new rule before human review.
+
+## Then browse the complete trees
+
+Each benchmark directory contains:
+
+- `SCORECARD.md` — structural summary;
+- `faithful-authoring/` — fidelity-first conversion;
+- `candidate-authoring/` — all currently proven exact/reversible
+  modernizations.
+
+The full trees are there to verify that the representative examples are not
+special cases. Raw research evidence, residual dumps, and migration-audit JSON
+are intentionally excluded from this reviewer package.
+"""
+          (root/"REVIEW-GUIDE.md").write_text(guide, encoding="utf-8")
           PY
 
       - name: Reject engineering evidence from human-review package
