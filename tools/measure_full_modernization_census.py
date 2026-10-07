@@ -407,6 +407,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             inline_private_filtered_set_operands=True,
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
+            inline_private_object_consumers=True,
             inline_private_variables=True,
             inline_private_local_variables=True,
         )
@@ -431,6 +432,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         retained_object_contexts.update(object_context_counts)
         retained_object_context_signatures.update(object_context_signature_counts)
 
+        totals["recursive_object_graph_objects_localized"]+=len(
+            identity.get("inlined_object_graph_objects") or []
+        )
         totals["private_binding_variables_localized"]+=len(localized_variables)
         totals["private_external_variables_localized"]+=sum(
             row.get("kind")=="external" for row in localized_variables
