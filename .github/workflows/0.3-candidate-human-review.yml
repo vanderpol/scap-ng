@@ -146,11 +146,8 @@ jobs:
             --label "$LABEL" \
             --source-revision "$NIWC_REVISION" \
             --workflow-url "$WORKFLOW_URL" \
-            --output-json "work/review/$KEY/SCORECARD.json" \
+            --output-json "work/evidence/$KEY/SCORECARD.json" \
             --output-markdown "work/review/$KEY/SCORECARD.md"
-          cp "work/evidence/$KEY/render-report.json" "work/review/$KEY/RENDER-PROOF.json"
-          cp "work/evidence/$KEY/review-surface-normalization.json" "work/review/$KEY/REVIEW-SURFACE.json"
-          cp "work/evidence/$KEY/residual-patterns.json" "work/review/$KEY/RESIDUAL-PATTERNS.json"
 
       - name: Verify candidate YAML parses
         env:
@@ -183,6 +180,13 @@ jobs:
           if-no-files-found: error
           compression-level: 6
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-evidence-${{ matrix.key }}
+          path: work/evidence/${{ matrix.key }}
+          if-no-files-found: error
+          compression-level: 6
+
   assemble:
     name: Assemble six-benchmark human review package
     needs: render
@@ -191,7 +195,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: candidate-review-*
-          path: downloads
+          path: downloads/review
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: candidate-evidence-*
+          path: downloads/evidence
       - name: Assemble and summarize
         env:
           NIWC_REVISION: ${{ env.NIWC_REVISION }}
@@ -213,14 +221,13 @@ jobs:
           (root/"benchmarks").mkdir(parents=True,exist_ok=True)
           rows=[]
           for key,label in expected.items():
-              source=Path("downloads")/f"candidate-review-{key}"
-              scorecard=source/"SCORECARD.json"
+              source=Path("downloads/review")/f"candidate-review-{key}"
+              scorecard=Path("downloads/evidence")/f"candidate-evidence-{key}"/"SCORECARD.json"
               if not scorecard.is_file():
                   raise SystemExit(f"{key}: missing {scorecard}")
-              matches=[scorecard]
               target=root/"benchmarks"/key
               shutil.copytree(source,target)
-              score=json.loads((target/"SCORECARD.json").read_text())
+              score=json.loads(scorecard.read_text())
               if score.get("benchmark")!=label:
                   raise SystemExit(f"{key}: label mismatch")
               cls=score.get("rule_classifications") or {}
