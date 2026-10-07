@@ -20,6 +20,7 @@ commit message, using an explicit issue number such as `(#181)` or
 
 - The referenced issue SHALL describe the actual purpose of the commit.
 - One issue MAY cover multiple tightly related commits.
+- Prefer one durable issue per coherent workstream; do not create an issue for every commit or trivial edit.
 - One commit MAY reference multiple issues.
 - Do not create empty placeholder issues merely to satisfy this rule.
 - Documentation, research, tests, tooling, schema, generated-maintenance, and
