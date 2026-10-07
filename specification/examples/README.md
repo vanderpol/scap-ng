@@ -48,13 +48,13 @@ assessment:
   purpose: assessment
 
   tests:
-    library-directory-owner:
+    library-directory-owner-test:
       capability: unix.file
       object: ...
       states: ...
 
   evaluate:
-    test: library-directory-owner
+    test: library-directory-owner-test
 ```
 
 The goal is not to hide evaluation semantics; it is to remove serialization
@@ -72,9 +72,9 @@ procedural code.
 ```yaml
 evaluate:
   all:
-    - test: zone-is-ad-integrated
-    - test: zone-is-dnssec-signed
-    - test: zone-has-rrsig
+    - test: zone-is-ad-integrated-test
+    - test: zone-is-dnssec-signed-test
+    - test: zone-has-rrsig-test
 ```
 
 Whether a one-Test `evaluate` root should remain mandatory is still being reviewed
