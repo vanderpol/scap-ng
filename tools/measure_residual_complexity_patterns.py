@@ -67,6 +67,54 @@ def count_filters(value:Any)->int:
                 total += 1
     return total
 
+def set_topologies(value:Any)->list[dict]:
+    """Describe authored Set topology without interpreting Set semantics."""
+    rows=[]
+    for node in walk(value):
+        if not isinstance(node,dict):
+            continue
+        set_node=node.get("set")
+        if not isinstance(set_node,dict):
+            continue
+        members=set_node.get("members")
+        if not isinstance(members,list):
+            members=[]
+        member_kinds=[]
+        capabilities=[]
+        selector_key_sets=[]
+        for member in members:
+            if not isinstance(member,dict):
+                member_kinds.append("other")
+                continue
+            if isinstance(member.get("collect"),dict):
+                member_kinds.append("collect")
+                collect=member["collect"]
+                cap=collect.get("capability")
+                if isinstance(cap,str):
+                    capabilities.append(cap)
+                select=collect.get("select")
+                if isinstance(select,dict):
+                    selector_key_sets.append(tuple(sorted(select)))
+            elif isinstance(member.get("object"),str):
+                member_kinds.append("object_ref")
+            else:
+                member_kinds.append("other")
+        rows.append({
+            "operator":set_node.get("operator"),
+            "member_count":len(members),
+            "member_kinds":member_kinds,
+            "member_capabilities":sorted(set(capabilities)),
+            "selector_key_sets":[list(x) for x in selector_key_sets],
+            "all_members_collect":bool(members) and all(x=="collect" for x in member_kinds),
+            "single_member_capability":len(set(capabilities))<=1,
+        })
+    return rows
+
+
+def set_topology_key(row:dict)->str:
+    return json.dumps(row,sort_keys=True,separators=(",",":"))
+
+
 def collect_registry_ids(a:dict):
     registries={
         "tests":("T",a.get("tests") or a.get("checks") or {}),
@@ -228,7 +276,8 @@ def analyze(path:Path,doc:dict):
                 if key in FUNCTION_KEYS:
                     funcs[key]+=1
 
-    sets=count_key(a,"set")
+    set_rows=set_topologies(a)
+    sets=len(set_rows)
     filters=count_filters(a)
     eval_node=a.get("evaluate")
     eval_depth=max_eval_depth(eval_node)
@@ -269,6 +318,7 @@ def analyze(path:Path,doc:dict):
         "variable_kinds":dict(var_kinds),
         "function_counts":dict(funcs),
         "sets":sets,
+        "set_topologies":set_rows,
         "filters":filters,
         "evaluate_depth":eval_depth,
         "evaluate_operator_counts":dict(eval_ops),
@@ -341,10 +391,17 @@ def main():
     reason_counts=Counter()
     function_counts=Counter()
     variable_kind_counts=Counter()
+    set_topology_counts=Counter()
+    set_topology_examples=defaultdict(list)
     for row in residual:
         reason_counts.update(row["residual_reasons"])
         function_counts.update(row["function_counts"])
         variable_kind_counts.update(row["variable_kinds"])
+        for topology in row.get("set_topologies",[]):
+            key=set_topology_key(topology)
+            set_topology_counts[key]+=1
+            if len(set_topology_examples[key])<15:
+                set_topology_examples[key].append(row["assessment_id"])
 
     motif_clusters=defaultdict(list)
     motif_signatures={}
@@ -419,6 +476,14 @@ def main():
         "residual_reason_counts":dict(reason_counts),
         "variable_kind_counts":dict(variable_kind_counts),
         "variable_function_counts":dict(function_counts),
+        "set_topology_counts":[
+            {
+                "topology":json.loads(key),
+                "count":count,
+                "examples":set_topology_examples[key],
+            }
+            for key,count in set_topology_counts.most_common()
+        ],
         "unique_residual_shapes":len(clusters),
         "unique_coarse_pattern_families":len(coarse_clusters),
         "residual_reason_combinations":dict(reason_combinations),
