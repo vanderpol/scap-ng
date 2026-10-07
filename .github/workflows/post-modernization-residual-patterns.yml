@@ -1,0 +1,160 @@
+name: Post-modernization residual pattern census
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/post-modernization-residual-patterns.yml
+      - tools/measure_post_modernization_residual_patterns.py
+      - tools/test_measure_post_modernization_residual_patterns.py
+      - tools/aggregate_post_modernization_residual_patterns.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-modernization-residual-patterns
+  cancel-in-progress: true
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  precheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - run: PYTHONPATH=scap-ng/tools python scap-ng/tools/test_measure_post_modernization_residual_patterns.py -v
+
+  analyze:
+    name: Residual patterns batch ${{ matrix.batch }}
+    needs: precheck
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0,1,2,3]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate and classify batch
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: |
+          PYTHONPATH=scap-ng/tools python - <<'PY'
+          import json, os, shutil, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path("scap-ng/tools").resolve()))
+          from generate_niwc_current_review import native_artifact_base
+
+          batch=int(os.environ["BATCH"])
+          revision=os.environ["NIWC_REVISION"]
+          files=sorted(
+              p for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip")
+              if "Consolidated" not in p.name
+          )
+          if len(files)!=65:
+              raise SystemExit(f"expected 65 packages, found {len(files)}")
+          selected=[p for i,p in enumerate(files) if i%4==batch]
+          base=Path("work/result")
+          for d in (base/"status",base/"reports",base/"logs"):
+              d.mkdir(parents=True,exist_ok=True)
+
+          for source in selected:
+              artifact=source.name
+              key=native_artifact_base(source.stem)
+              out=Path("work/generated")/key
+              split=Path("work")/f"split-{key}"
+              shutil.rmtree(out,ignore_errors=True)
+              shutil.rmtree(split,ignore_errors=True)
+              cmd=[
+                  sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+                  "--output",str(out),"--split-root",str(split),
+                  "--source-revision",revision,
+                  "--source-repository-path",f"Current/{artifact}",
+                  "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+                  "--summary",str(out/"source-generation.json"),
+              ]
+              proc=subprocess.run(cmd,capture_output=True,text=True)
+              log=proc.stdout+"\n"+proc.stderr
+              (base/"logs"/f"{key}.log").write_text(log,encoding="utf-8")
+              status={
+                  "artifact":artifact,"key":key,
+                  "status":"generated" if proc.returncode==0 else "blocked",
+                  "returncode":proc.returncode,
+                  "log_tail":"\n".join(log.splitlines()[-80:]),
+              }
+              if proc.returncode==0:
+                  report=base/"reports"/f"{key}.json"
+                  measured=subprocess.run([
+                      sys.executable,
+                      "scap-ng/tools/measure_post_modernization_residual_patterns.py",
+                      str(out),"--label",key,"--output",str(report),"--top","100",
+                  ],capture_output=True,text=True)
+                  (base/"logs"/f"{key}.patterns.log").write_text(
+                      measured.stdout+"\n"+measured.stderr,encoding="utf-8"
+                  )
+                  if measured.returncode!=0:
+                      status["status"]="analysis_failed"
+                      status["analysis_returncode"]=measured.returncode
+                      status["analysis_log_tail"]="\n".join(
+                          (measured.stdout+"\n"+measured.stderr).splitlines()[-80:]
+                      )
+                  else:
+                      data=json.loads(report.read_text())
+                      data["source_artifact"]=artifact
+                      report.write_text(json.dumps(data,indent=2,sort_keys=True)+"\n")
+              (base/"status"/f"{key}.json").write_text(
+                  json.dumps(status,indent=2,sort_keys=True)+"\n"
+              )
+              shutil.rmtree(out,ignore_errors=True)
+              shutil.rmtree(split,ignore_errors=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: residual-patterns-batch-${{ matrix.batch }}
+          path: work/result
+          if-no-files-found: error
+
+  aggregate:
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: residual-patterns-batch-*
+          path: downloads
+      - run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/aggregate_post_modernization_residual_patterns.py downloads \
+            --niwc-revision "$NIWC_REVISION" \
+            --output work/post-modernization-residual-patterns.json \
+            --markdown work/post-modernization-residual-patterns.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: post-modernization-residual-patterns
+          path: |
+            work/post-modernization-residual-patterns.json
+            work/post-modernization-residual-patterns.md
+            downloads
+          if-no-files-found: error
