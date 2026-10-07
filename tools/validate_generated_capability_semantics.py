@@ -1002,6 +1002,109 @@ def validate_v03_foreach(document):
     return diagnostics
 
 
+def _iter_inline_object_uses(node,path=()):
+    """Yield (path, Object payload) for consumer-local explicit object fields."""
+    if isinstance(node,dict):
+        for key,value in node.items():
+            child_path=path+(key,)
+            if key=="object" and isinstance(value,dict) and isinstance(value.get("capability"),str):
+                yield child_path,value
+            yield from _iter_inline_object_uses(value,child_path)
+    elif isinstance(node,list):
+        for index,value in enumerate(node):
+            yield from _iter_inline_object_uses(value,path+(index,))
+
+
+def _validate_object_payload(object_id,obj,objects,states,diagnostics):
+    """Apply capability and Set/Filter semantics to one named or inline Object."""
+    if not isinstance(obj,dict):
+        return
+    for row in validate_file_selection_object(obj):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_windows_registry_object(obj):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_macos_pwpolicy512_object(obj):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_windows_cmdlet_object(obj):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_panos_config_object(obj):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_equal_only_selectors(obj,"macos.plist511",("full_path","xpath")):
+        diagnostics.append({"object":object_id,**row})
+    for row in validate_equal_only_selectors(obj,"macos.systemprofiler",("xpath",)):
+        diagnostics.append({"object":object_id,**row})
+
+    def walk_set(expression):
+        if not isinstance(expression,dict):
+            return
+        for index,operand in enumerate(expression.get("operands") or []):
+            if not isinstance(operand,dict):
+                continue
+            used=operand.get("object")
+            if isinstance(used,str):
+                referenced=objects.get(used)
+                if referenced is None:
+                    diagnostics.append({
+                        "object":object_id,
+                        "code":"object.set_object_missing",
+                        "referenced_object":used,
+                        "message":"Set references an unknown shared Object",
+                    })
+                elif referenced.get("capability") != obj.get("capability"):
+                    diagnostics.append({
+                        "object":object_id,
+                        "code":"object.set_object_capability",
+                        "referenced_object":used,
+                        "message":"Set Object capability must match parent Object capability",
+                    })
+            elif isinstance(used,dict):
+                if used.get("capability") != obj.get("capability"):
+                    diagnostics.append({
+                        "object":object_id,
+                        "code":"object.inline_set_object_capability",
+                        "operand_index":index,
+                        "message":"Inline Set Object capability must match parent Object capability",
+                    })
+                _validate_object_payload(
+                    f"{object_id}.set[{index}]",used,objects,states,diagnostics
+                )
+
+            for fidx,flt in enumerate(operand.get("filters") or []):
+                if not isinstance(flt,dict):
+                    continue
+                state_use=flt.get("state")
+                if isinstance(state_use,str):
+                    state=states.get(state_use)
+                    if state is None:
+                        diagnostics.append({
+                            "object":object_id,
+                            "code":"object.filter_state_missing",
+                            "state":state_use,
+                            "message":"Object filter references an unknown State",
+                        })
+                    elif state.get("capability") != obj.get("capability"):
+                        diagnostics.append({
+                            "object":object_id,
+                            "code":"object.filter_state_capability",
+                            "state":state_use,
+                            "message":"Object filter State capability must match Object capability",
+                        })
+                elif isinstance(state_use,dict):
+                    if state_use.get("capability") != obj.get("capability"):
+                        diagnostics.append({
+                            "object":object_id,
+                            "code":"object.inline_filter_state_capability",
+                            "filter_index":fidx,
+                            "message":"Inline filter State capability must match Object capability",
+                        })
+
+            nested=operand.get("set")
+            if isinstance(nested,dict):
+                walk_set(nested)
+
+    walk_set(obj.get("set"))
+
+
 def validate_assessment_capability_semantics(document):
     """Validate current native Assessment cross-node capability semantics."""
     assessment=document.get("assessment",document)
@@ -1013,75 +1116,49 @@ def validate_assessment_capability_semantics(document):
     tests=assessment.get("tests") or {}
 
     for object_id,obj in objects.items():
-        for row in validate_file_selection_object(obj):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_windows_registry_object(obj):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_macos_pwpolicy512_object(obj):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_windows_cmdlet_object(obj):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_panos_config_object(obj):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_equal_only_selectors(obj,"macos.plist511",("full_path","xpath")):
-            diagnostics.append({"object":object_id,**row})
-        for row in validate_equal_only_selectors(obj,"macos.systemprofiler",("xpath",)):
-            diagnostics.append({"object":object_id,**row})
+        _validate_object_payload(object_id,obj,objects,states,diagnostics)
 
-        for referenced_object_id in _iter_set_object_refs(obj.get("set")):
-            referenced_object=objects.get(referenced_object_id)
-            if referenced_object is None:
-                diagnostics.append({
-                    "object":object_id,
-                    "code":"object.set_object_missing",
-                    "referenced_object":referenced_object_id,
-                    "message":"Set references an unknown Object",
-                })
-            elif referenced_object.get("capability") != obj.get("capability"):
-                diagnostics.append({
-                    "object":object_id,
-                    "code":"object.set_object_capability",
-                    "referenced_object":referenced_object_id,
-                    "message":"Set Object capability must match parent Object capability",
-                })
-
-        for flt in _iter_set_filters(obj.get("set")):
-            state_id=flt.get("state")
-            state=states.get(state_id)
-            if state is None:
-                diagnostics.append({
-                    "object":object_id,
-                    "code":"object.filter_state_missing",
-                    "state":state_id,
-                    "message":"Object filter references an unknown State",
-                })
-                continue
-            if state.get("capability") != obj.get("capability"):
-                diagnostics.append({
-                    "object":object_id,
-                    "code":"object.filter_state_capability",
-                    "state":state_id,
-                    "message":"Object filter State capability must match Object capability",
-                })
+    # Variable-local and other consumer-local Object payloads remain typed
+    # Objects even though they no longer have Assessment-scoped IDs.
+    for variable_id,variable in variables.items():
+        for path,obj in _iter_inline_object_uses(variable,("variables",variable_id)):
+            _validate_object_payload(
+                f"{variable_id}:"+"/".join(map(str,path)),obj,objects,states,diagnostics
+            )
 
     for test_id,test in tests.items():
+        effective_states=dict(states)
+        effective_test=dict(test)
+        effective_state_ids=[]
+
         if "object" in test:
-            object_id=test.get("object")
-            obj=objects.get(object_id)
-            if obj is None:
-                diagnostics.append({
-                    "test":test_id,
-                    "code":"test.object_missing",
-                    "object":object_id,
-                    "message":"Test references an unknown Object",
-                })
-            elif obj.get("capability") != test.get("capability"):
-                diagnostics.append({
-                    "test":test_id,
-                    "code":"test.object_capability",
-                    "object":object_id,
-                    "message":"Test and Object capabilities must match",
-                })
+            object_use=test.get("object")
+            if isinstance(object_use,str):
+                obj=objects.get(object_use)
+                if obj is None:
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.object_missing",
+                        "object":object_use,
+                        "message":"Test references an unknown shared Object",
+                    })
+                elif obj.get("capability") != test.get("capability"):
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.object_capability",
+                        "object":object_use,
+                        "message":"Test and Object capabilities must match",
+                    })
+            elif isinstance(object_use,dict):
+                if object_use.get("capability") != test.get("capability"):
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.inline_object_capability",
+                        "message":"Test and inline Object capabilities must match",
+                    })
+                _validate_object_payload(
+                    f"{test_id}.object",object_use,objects,states,diagnostics
+                )
 
         if "variable" in test:
             variable_id=test.get("variable")
@@ -1093,31 +1170,51 @@ def validate_assessment_capability_semantics(document):
                     "message":"Test references an unknown Variable",
                 })
 
-        for state_id in test.get("states") or []:
-            state=states.get(state_id)
-            if state is None:
-                diagnostics.append({
-                    "test":test_id,
-                    "code":"test.state_missing",
-                    "state":state_id,
-                    "message":"Test references an unknown State",
-                })
-            elif state.get("capability") != test.get("capability"):
-                diagnostics.append({
-                    "test":test_id,
-                    "code":"test.state_capability",
-                    "state":state_id,
-                    "message":"Test and State capabilities must match",
-                })
+        for index,state_use in enumerate(test.get("states") or []):
+            if isinstance(state_use,str):
+                state=states.get(state_use)
+                effective_state_ids.append(state_use)
+                if state is None:
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.state_missing",
+                        "state":state_use,
+                        "message":"Test references an unknown State",
+                    })
+                elif state.get("capability") != test.get("capability"):
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.state_capability",
+                        "state":state_use,
+                        "message":"Test and State capabilities must match",
+                    })
+            elif isinstance(state_use,dict):
+                synthetic=f"__inline_state_{index}"
+                effective_states[synthetic]=state_use
+                effective_state_ids.append(synthetic)
+                if state_use.get("capability") != test.get("capability"):
+                    diagnostics.append({
+                        "test":test_id,
+                        "code":"test.inline_state_capability",
+                        "state_index":index,
+                        "message":"Test and inline State capabilities must match",
+                    })
 
+        effective_test["states"]=effective_state_ids
         diagnostics.extend(
-            _validate_windows_registry_like_value_datatypes(test_id,test,states)
+            _validate_windows_registry_like_value_datatypes(
+                test_id,effective_test,effective_states
+            )
         )
         diagnostics.extend(
-            validate_windows_wuaupdatesearcher_states(test_id,test,states)
+            validate_windows_wuaupdatesearcher_states(
+                test_id,effective_test,effective_states
+            )
         )
         diagnostics.extend(
-            validate_windows_policy_state_ranges(test_id,test,states)
+            validate_windows_policy_state_ranges(
+                test_id,effective_test,effective_states
+            )
         )
 
     diagnostics.extend(validate_singleton_source_document(document))
