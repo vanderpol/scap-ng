@@ -382,8 +382,10 @@ def inline_private(
         # Bounded v4 locality experiment: inline a leaf Object only when the
         # faithful graph contains exactly one reference to it and that sole
         # reference is an Object-valued edge inside one Variable expression.
-        # This does not duplicate acquisition and does not touch Sets or
-        # Objects also used by Tests/other graph consumers.
+        # This does not duplicate acquisition and does not touch Objects also
+        # used by Tests/other graph consumers. A Set-backed Object is allowed:
+        # its Set semantics stay intact and any genuinely shared child Object
+        # remains a normal reference inside the localized payload.
         variables=a.get("variables") or {}
 
         def replace_variable_object_ref(value: Any, object_id: str, payload: dict, path: list[Any]) -> list[list[Any]]:
@@ -405,7 +407,6 @@ def inline_private(
                 refs.get(object_id)!=1
                 or contexts.get(object_id)!={"variable":1}
                 or not isinstance(payload,dict)
-                or isinstance(payload.get("set"),dict)
             ):
                 continue
             hits=replace_variable_object_ref(
