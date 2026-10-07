@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - tools/analyze_apache_authoring_reuse.py
+      - tools/measure_split_source_fanout.py
       - .github/workflows/apache-authoring-reuse-research.yml
       - research/assessment-simplification/apache-reuse-15/**
   workflow_dispatch:
@@ -48,8 +49,11 @@ jobs:
               "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
               "--summary",str(out/"source-generation.json"),
           ],check=True)
-          shutil.rmtree(split,ignore_errors=True)
           PY
+      - name: Measure source OVAL fanout introduced by Rule splitting
+        run: |
+          python scap-ng/tools/measure_split_source_fanout.py work/split-apache \
+            --output work/apache-source-fanout.json
       - name: Measure repeated authoring graph
         run: |
           python scap-ng/tools/analyze_apache_authoring_reuse.py work/apache \
@@ -63,6 +67,7 @@ jobs:
           name: apache-authoring-reuse
           path: |
             work/apache-authoring-reuse.json
+            work/apache-source-fanout.json
             work/apache-module-proof.json
             work/apache-httpd-discovery.module.json
           if-no-files-found: error
