@@ -111,6 +111,35 @@ Each prerelease/review checkpoint SHALL include source and result examples regen
 
 When a review cycle is formally completed, preserve the reviewed state with the source commit/tag and any durable external artifact URL/hash. Later corrections belong to a new review cycle; do not rewrite a completed checkpoint. Large generated products should stay in CI/evidence storage rather than being recommitted merely for review.
 
+## Specification release discipline
+
+The `specification/` tree is a versioned release artifact, not a live design
+notebook.
+
+Between prerelease/release checkpoints:
+
+- do not revise normative specification text as individual research findings are
+  discovered;
+- record proposed wording, rationale, evidence, and unresolved questions in
+  GitHub issues, research records, tests, and human-review packets;
+- keep candidate syntax and internal design history outside normative pages.
+
+When preparing a prerelease or release:
+
+1. collect the accepted changes for that version;
+2. update the specification in one deliberate normalization pass;
+3. remove obsolete rationale, prototype terminology, and duplicated
+   requirements rather than carrying the development history forward;
+4. regenerate or revalidate source/result examples against that exact
+   specification/schema version;
+5. review the resulting specification as a coherent document, not merely as a
+   set of accumulated diffs; and
+6. freeze the reviewed specification with the release/review checkpoint.
+
+Normative pages should state the current contract directly. Internal design
+history belongs in research/issues unless it is required to interpret a
+migration rule or normative requirement.
+
 ## Version evolution
 
 For a new schema version:
