@@ -31,8 +31,6 @@ CORE_VARIABLES=[
     "apache-path-httpd-or-apache2-variable",
 ]
 EXPORTS={
-    "filepath-httpd-root-variable":"httpd_root",
-    "filepath-http-conf-file-variable":"primary_config",
     "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable":"primary_and_included_configs",
     "apache-path-httpd-or-apache2-variable":"httpd_executable",
 }
