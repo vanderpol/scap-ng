@@ -105,13 +105,13 @@ def main()->int:
             "review_required_variables":s.get("foreach_review_required_variables",0),
             "review_reason_counts":s.get("foreach_review_reason_counts",{}),
         },
-        "observations":{
-            "artifacts":s.get("observation_artifacts",0),
-            "consumer_assessments":s.get("observation_consumer_assessments",0),
-            "consumer_counts":s.get("observation_consumer_counts",{}),
-            "export_references":s.get("observation_export_references",0),
-            "object_occurrences_factored":s.get("observation_object_occurrences_factored",0),
-            "variable_occurrences_factored":s.get("observation_variable_occurrences_factored",0),
+        "deferred_observation_opportunities":{
+            "candidate_artifacts":s.get("deferred_observation_candidate_artifacts",0),
+            "candidate_assessments":s.get("deferred_observation_candidate_assessments",0),
+            "candidate_counts":s.get("deferred_observation_candidate_counts",{}),
+            "export_references":s.get("deferred_observation_export_references",0),
+            "object_occurrences":s.get("deferred_observation_object_occurrences",0),
+            "variable_occurrences":s.get("deferred_observation_variable_occurrences",0),
         },
         "evaluate":eval_counts,
         "rule_classifications":(
@@ -181,15 +181,16 @@ def main()->int:
         f"- localized leaf derived Variables: **{score['locality']['leaf_derived_variables_localized']}**",
         f"- bounded foreach rewrites: **{score['foreach']['rewrites']}**; "
         f"review-required Variables: **{score['foreach']['review_required_variables']}**",
-        f"- Observation artifacts: **{score['observations']['artifacts']}**; "
-        f"consumers: **{score['observations']['consumer_assessments']}**; "
-        f"export refs: **{score['observations']['export_references']}**",
+        f"- deferred Observation opportunities: "
+        f"**{score['deferred_observation_opportunities']['candidate_artifacts']}** candidate artifacts; "
+        f"candidate consumers: **{score['deferred_observation_opportunities']['candidate_assessments']}**; "
+        f"export refs: **{score['deferred_observation_opportunities']['export_references']}** "
+        f"(measured, not applied)",
         "",
         "## Rule outcome",
         "",
         f"- local/simple: **{cls.get('local_simple',0)}**",
         f"- bounded dataflow: **{cls.get('bounded_dataflow',0)}**",
-        f"- Observation consumer: **{cls.get('shared_observation_consumer',0)}**",
         f"- meaningfully complex: **{cls.get('meaningfully_complex',0)}**",
         "",
         "## Composition and residual semantics",
