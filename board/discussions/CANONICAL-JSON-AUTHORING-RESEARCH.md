@@ -24,4 +24,4 @@ Successful compilation, schema validation, or self-round-trip is not enough. Any
 - Do not assume arbitrary Ansible modules, shell execution, or command-capable syntax is safe or equivalent.
 - Use independently reviewed examples and expected outcomes before admitting another authoring form.
 
-See [P053](../proposals/P053.md) for the current Board proposal and [SCAP 1.4 → SCAP-NG key changes](../SCAP-1.4-TO-SCAP-NG-KEY-CHANGES.md) for the current architecture summary.
+See [P053](../proposals/P053.md) for the current Board proposal, the [core objectives](../../specification/objectives.md) for design goals, and the [feature tour](../../specification/examples/README.md) for the current architecture/examples.
