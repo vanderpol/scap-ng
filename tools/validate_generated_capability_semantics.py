@@ -656,6 +656,15 @@ def _no_object_rule_id(capability):
     return NO_OBJECT_RULE_IDS.get(capability, f"{capability}.singleton_source")
 
 
+def _named_objects(assessment):
+    """Return the named Object registry across faithful/research and canonical 0.3 forms."""
+    shared=assessment.get("shared_objects")
+    legacy=assessment.get("objects")
+    if shared is not None and legacy is not None:
+        raise ValueError("Assessment cannot contain both shared_objects and objects")
+    return shared or legacy or {}
+
+
 def validate_singleton_source_document(document):
     assessment=document.get("assessment",document)
     diagnostics=[]
@@ -668,7 +677,7 @@ def validate_singleton_source_document(document):
                 "fields":["object"],
                 "message":"singleton-source capability Test must not reference an Object",
             })
-    for object_id,obj in (assessment.get("objects") or {}).items():
+    for object_id,obj in _named_objects(assessment).items():
         capability=obj.get("capability")
         if capability in SINGLETON_SOURCE_CAPABILITIES:
             diagnostics.append({
@@ -698,7 +707,7 @@ def validate_v03_foreach(document):
     if specification.get("version") != "0.3.0":
         return []
 
-    objects=assessment.get("objects") or {}
+    objects=_named_objects(assessment)
     tests=assessment.get("tests") or {}
     mappings=_load_v03_capability_mappings()
     diagnostics=[]
@@ -859,7 +868,7 @@ def validate_assessment_capability_semantics(document):
     assessment=document.get("assessment",document)
     diagnostics=[]
 
-    objects=assessment.get("objects") or {}
+    objects=_named_objects(assessment)
     variables=assessment.get("variables") or {}
     states=assessment.get("states") or {}
     tests=assessment.get("tests") or {}
