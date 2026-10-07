@@ -1,18 +1,20 @@
 # Full-corpus 0.3 modernization census plan
 
-**Status:** research execution plan; no accepted schema change.
+**Status:** exhaustive census running; no accepted schema change.
 
-## Trigger
+## Execution checkpoint
 
-Run the 65-package NIWC Current modernization census after these two prerequisites:
+Both prerequisites are now met:
 
-1. the Object/Variable locality pass has a stable bounded transform with exact
-   re-expansion; and
-2. the Apache proving case has an executable Observation artifact prototype
-   with typed exports and exact flatten/re-expansion proof.
+1. bounded Object/State/Variable-Object/Set locality re-expands exactly; and
+2. Observation extraction is proven on Apache values, Windows DomainRole Items,
+   and RHEL dconf mixed Item/value exports.
 
-Do not wait for every 0.3 feature to be normative. The purpose of this run is
-to decide what belongs in 0.3.
+The exhaustive workflow is:
+https://github.com/vanderpol/scap-ng/actions/workflows/full-0.3-modernization-census.yml
+
+It regenerates every package from pinned NIWC source before measurement. The
+purpose is to decide what belongs in 0.3, not to make every candidate normative.
 
 ## Two output views
 
