@@ -27,6 +27,8 @@ This work explores ways to make accurate assessments easier for humans to author
 | [windows-eventlog-16](windows-eventlog-16/README.md) | Windows event-log path residual | three-rule normalized-template proof, locality gains, remaining Variable boundary |
 | [shared-observation-17](shared-observation-17/README.md) | Shared observation artifact | truthless reusable data-provider role, source-directory/file-type proposal |
 | [0.3-candidates-18](0.3-candidates-18/README.md) | 0.3 modernization candidate matrix | concise evidence/status/blocker index and research exit criteria |
+| [full-corpus-modernization-19](full-corpus-modernization-19/README.md) | Full-corpus modernization checkpoint | 65-benchmark faithful-vs-modernized census plan and residual-complexity accounting |
+| [evaluate-20](evaluate-20/README.md) | Evaluate / criteria structure | production evaluate-shape census, Ansible comparison, composition/placement candidates |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
