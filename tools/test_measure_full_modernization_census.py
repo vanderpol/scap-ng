@@ -201,6 +201,69 @@ class FullModernizationCensusTests(unittest.TestCase):
             self.assertEqual(row["classification"],"meaningfully_complex")
             self.assertIn("shared_acquisition",row["residual_reasons"])
             self.assertEqual(row["after"]["objects"],1)
+            self.assertEqual(
+                report["summary"]["retained_object_reason_counts"],
+                {"multiple_tests":1},
+            )
+            self.assertEqual(
+                report["summary"]["retained_object_context_signature_counts"],
+                {"test_object:2":1},
+            )
+
+    def test_graph_only_object_scope_is_reported_separately_from_shared_acquisition(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.write_assessment(td,"graph-only",{
+                "id":"benchmark.test.SV-graph.automated",
+                "version":1,
+                "mode":"automated",
+                "purpose":"assessment",
+                "class":"compliance",
+                "objects":{
+                    "source":{"capability":"unix.file","select":{"path":"/tmp/source"}},
+                    "target":{
+                        "capability":"unix.file",
+                        "select":{
+                            "path":{
+                                "value":{"variable":"derived"},
+                                "operation":"equals",
+                                "datatype":"string",
+                                "variable_match":"all",
+                            }
+                        },
+                    },
+                },
+                "variables":{
+                    "derived":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{
+                            "concat":[
+                                {"values":{"object":"source","field":"path"}},
+                                {"variable":{"variable":"other"}},
+                            ]
+                        },
+                    },
+                    "other":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"literal":{"value":"/x","datatype":"string"}},
+                    },
+                },
+                "tests":{"test":{"capability":"unix.file","object":"target"}},
+                "evaluate":{"test":"test"},
+            })
+            report=build_report(Path(td),label="synthetic")
+            row=report["assessments"][0]
+            self.assertIn("named_object_graph",row["residual_reasons"])
+            self.assertNotIn("shared_acquisition",row["residual_reasons"])
+            self.assertEqual(
+                report["summary"]["retained_object_reason_counts"],
+                {"graph_only":1},
+            )
+            self.assertEqual(
+                report["summary"]["retained_object_context_signature_counts"],
+                {"variable:1":1},
+            )
 
 
 if __name__=="__main__":
