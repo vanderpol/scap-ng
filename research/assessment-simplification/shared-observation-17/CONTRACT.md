@@ -305,6 +305,58 @@ A better source-fanout proving case is a shared Object with meaningful
 selection/dataflow, such as the Windows `DomainRole` WMI query reused by four
 Server 2025 Rules.
 
+## Second production proof: Windows DomainRole Item export
+
+A second production proof now covers `kind: items`.
+
+The shared Observation is:
+
+```yaml
+observation:
+  id: shared.windows.computer-system-role
+  version: 1
+
+  objects:
+    computer-system-role:
+      capability: windows.wmi.query
+      collect:
+        namespace: root\\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
+
+  exports:
+    computer_system:
+      kind: items
+      object: computer-system-role
+      capability: windows.wmi.query
+```
+
+Pinned Windows Server 2025 conversion results:
+
+- **12 eligible Assessments**;
+- **0 rejected**;
+- 5 applicability Assessments;
+- 7 automated Rule Assessments;
+- local Tests/States/evaluate trees remain in each consumer;
+- exact flatten/re-expansion to the faithful converted Assessment: **passed for
+  all 12**.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37620448238
+
+This is the complementary proof to Apache:
+
+| Proof | Export kind | Shared content | Consumers |
+| --- | --- | --- | ---: |
+| Apache discovery | `values` | 4 Objects + 11 Variables | 15 |
+| Windows DomainRole | `items` | 1 meaningful WMI Object | 12 |
+
+Together they show Observation is not tied to one dataflow style.
+
+The Windows proof also reinforces separation from Assessment-result
+dependencies: consumers still own the policy predicates that interpret
+`DomainRole`; the Observation exports gathered data, not "domain member=true"
+or another policy truth.
+
 ## Remaining proof before 65-benchmark modernization census
 
 1. Add negative fixtures for unknown export, ID/version mismatch, and private
