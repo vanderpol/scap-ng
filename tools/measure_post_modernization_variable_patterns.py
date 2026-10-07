@@ -341,6 +341,13 @@ def main() -> int:
         "max_variable_chain_depth": max_chain_depth,
         "foreach_v1_refusal_reason_counts": dict(refusal_reasons),
         "unique_variable_pattern_signatures": len(patterns),
+        "pattern_signature_counts": [
+            {
+                "signature": json.loads(signature),
+                "count": len(members),
+            }
+            for signature, members in ranked
+        ],
         "top_patterns": top_patterns,
         "observation_plan": observation_summary,
         "observation_candidate_errors": observation_errors,
