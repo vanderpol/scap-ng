@@ -292,7 +292,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
 
     totals=Counter()
     classes=Counter()
+    classes_by_kind=defaultdict(Counter)
     residuals=Counter()
+    residuals_by_kind=defaultdict(Counter)
     foreach_review=Counter()
     observation_types=Counter()
     observation_exports=Counter()
@@ -402,8 +404,10 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             foreach_applied=foreach_applied,
         )
         classes[category]+=1
+        classes_by_kind[row["kind"]][category]+=1
         reasons=residual_reasons(rendered,identity,eval_after)
         residuals.update(reasons)
+        residuals_by_kind[row["kind"]].update(reasons)
 
         assessment_rows.append({
             "assessment_id":aid,
@@ -452,7 +456,13 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
     summary=dict(totals)
     summary.update({
         "classification_counts":dict(classes),
+        "classification_counts_by_kind":{
+            kind:dict(counts) for kind,counts in sorted(classes_by_kind.items())
+        },
         "residual_reason_counts":dict(residuals),
+        "residual_reason_counts_by_kind":{
+            kind:dict(counts) for kind,counts in sorted(residuals_by_kind.items())
+        },
         "foreach_review_reason_counts":dict(foreach_review),
         "observation_consumer_counts":dict(observation_types),
         "observation_export_reference_counts":dict(observation_exports),
