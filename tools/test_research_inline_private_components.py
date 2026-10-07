@@ -109,6 +109,76 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         )
         self.assertEqual(reexpand(rendered,identity),source)
 
+    def test_reused_set_operand_stays_named(self):
+        source={
+            "assessment":{
+                "id":"reused-set-operand",
+                "mode":"automated",
+                "objects":{
+                    "base":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                    "combined-a":{
+                        "capability":"unix.file",
+                        "set":{"operator":"union","operands":[{"object":"base","filters":[]}]},
+                    },
+                    "combined-b":{
+                        "capability":"unix.file",
+                        "set":{"operator":"union","operands":[{"object":"base","filters":[]}]},
+                    },
+                },
+                "states":{},
+                "tests":{
+                    "one":{"capability":"unix.file","object":"combined-a"},
+                    "two":{"capability":"unix.file","object":"combined-b"},
+                },
+                "evaluate":{"all":[{"test":"one"},{"test":"two"}]},
+            }
+        }
+        rendered,identity=inline_private(source,inline_private_set_operands=True)
+        self.assertEqual(
+            rendered["assessment"]["tests"]["one"]["object"]["set"]["operands"][0]["object"],
+            "base",
+        )
+        self.assertEqual(
+            rendered["assessment"]["tests"]["two"]["object"]["set"]["operands"][0]["object"],
+            "base",
+        )
+        self.assertNotIn("base",identity["inlined_set_operand_objects"])
+        self.assertEqual(reexpand(rendered,identity),source)
+
+    def test_nested_set_operand_object_stays_named(self):
+        source={
+            "assessment":{
+                "id":"nested-set-operand",
+                "mode":"automated",
+                "objects":{
+                    "leaf":{"capability":"unix.file","select":{"path":{"value":"/tmp"}}},
+                    "inner":{
+                        "capability":"unix.file",
+                        "set":{"operator":"union","operands":[{"object":"leaf","filters":[]}]},
+                    },
+                    "outer":{
+                        "capability":"unix.file",
+                        "set":{"operator":"union","operands":[{"object":"inner","filters":[]}]},
+                    },
+                },
+                "states":{},
+                "tests":{"one":{"capability":"unix.file","object":"outer"}},
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(source,inline_private_set_operands=True)
+        outer=rendered["assessment"]["tests"]["one"]["object"]
+        # The leaf may localize inside the named inner Set, but the inner Set
+        # itself is not collapsed as an operand because nested Set Objects are
+        # outside this bounded proof class.
+        self.assertEqual(outer["set"]["operands"][0]["object"],"inner")
+        self.assertIn("inner",rendered["assessment"]["objects"])
+        self.assertNotIn(
+            "inner",
+            {row["object"] for row in identity["inlined_set_operand_objects"]},
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
     def test_filtered_set_operand_stays_named(self):
         source={
             "assessment":{
