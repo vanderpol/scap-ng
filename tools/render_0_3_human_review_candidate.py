@@ -217,6 +217,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "locality_reexpand_exact":True,
             "foreach_only_proven_v1":True,
             "static_literal_roundtrip_exact":True,
+            "static_literal_folding_atomic_fail_closed":True,
             "review_surface_is_presentation_only":True,
         },
         "review_surface_normalization":{
@@ -235,7 +236,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     )
     (output_root/"CANDIDATE-STATUS.md").write_text(
         "# SCAP-NG 0.3 human-review candidate\n\n"
-        "**Research-only. Not a released schema or Board-approved format.**\n\n"
+        "**Pre-alpha Board-review candidate. Not a released or Board-approved standard.**\n\n"
         "This tree starts from the pinned faithful SCAP 1.4 conversion and applies "
         "only the currently proven modernization stack: consumer locality, private "
         "Set operands, Variable-local Objects, compile-time static literal "
@@ -248,9 +249,9 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "terminology/naming normalization tracked by issues #151-#156: shorter "
         "benchmark-local Assessment names, Test existence/match field names, "
         "one_or_more at-least-one spelling, full-word snake_case comparison "
-        "operations, and all/local/same filesystem scope. Human acceptance is "
-        "required before these forms become normative 0.3 schema/specification "
-        "semantics.\n",
+        "operations, and all/local/same filesystem scope. These are accepted "
+        "0.3 requirements and remain subject to Board review before any final "
+        "standardization claim.\n",
         encoding="utf-8",
     )
     return report
