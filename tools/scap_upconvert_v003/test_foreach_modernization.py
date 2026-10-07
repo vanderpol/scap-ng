@@ -326,6 +326,39 @@ class ForeachConverterModernization(unittest.TestCase):
         )
 
 
+    def test_filtered_direct_object_wrapper_preserves_foreach_rewrite(self):
+        source=fixture()
+        files=source["assessment"]["objects"]["files"]
+        wrapped={
+            "capability":"unix.file",
+            "object_title":files["object_title"],
+            "set":{
+                "operator":"union",
+                "operands":[{
+                    "object":{k:deepcopy(v) for k,v in files.items() if k!="object_title"},
+                    "filters":[{"action":"include","state":{
+                        "capability":"unix.file",
+                        "state_title":"directories only",
+                        "state":{
+                            "field":"type","value":"directory","operation":"equals",
+                            "datatype":"string","match":"all","existence":"one_or_more",
+                        },
+                    }}],
+                }],
+            },
+        }
+        source["assessment"]["objects"]["files"]=wrapped
+        result,report=modernize_foreach_v1(source,enabled=True)
+        self.assertTrue(report["rewrite_performed"],report)
+        self.assertEqual(report["applied"][0]["target_shape"],"filtered_set_operand")
+        outer=result["assessment"]["objects"]["files"]
+        operand=outer["set"]["operands"][0]
+        self.assertEqual(len(operand["filters"]),1)
+        inner=operand["object"]
+        self.assertEqual(inner["for_each"],{"item":"user","in":"users"})
+        self.assertEqual(inner["select"]["directory"],{"from":"user.home_dir"})
+        self.assertNotIn("variables",result["assessment"])
+
     def test_pinned_rhel_sv257889_source_rewrites_through_converter_path(self):
         root = Path(__file__).resolve().parents[2]
         source = ET.parse(

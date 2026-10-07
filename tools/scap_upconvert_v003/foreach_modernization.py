@@ -103,6 +103,55 @@ def _direct_projection(variable):
     }
 
 
+def _selector_consumer(objects, path):
+    """Resolve a proven Variable consumer to its concrete selector Object.
+
+    Direct OVAL Object filters are losslessly lowered before foreach analysis
+    as a one-operand union whose operand is an inline Object plus filters. That
+    wrapper does not change the selector/dataflow proof, so accept exactly that
+    native shape in addition to the ordinary named Object selector.
+    """
+    if (
+        len(path)==5
+        and path[0]=="objects"
+        and path[2]=="select"
+        and path[4]=="value"
+    ):
+        target_id=path[1]
+        target=objects.get(target_id)
+        return (target_id,target,path[3],("direct",)) if isinstance(target,dict) else None
+
+    if (
+        len(path)==9
+        and path[0]=="objects"
+        and path[2:7]==("set","operands",0,"object","select")
+        and path[8]=="value"
+    ):
+        target_id=path[1]
+        outer=objects.get(target_id)
+        if not isinstance(outer,dict):
+            return None
+        set_expr=outer.get("set")
+        if not (
+            isinstance(set_expr,dict)
+            and set_expr.get("operator")=="union"
+            and isinstance(set_expr.get("operands"),list)
+            and len(set_expr["operands"])==1
+        ):
+            return None
+        operand=set_expr["operands"][0]
+        if not (
+            isinstance(operand,dict)
+            and set(operand).issubset({"object","filters"})
+            and isinstance(operand.get("object"),dict)
+            and isinstance(operand.get("filters"),list)
+            and operand["filters"]
+        ):
+            return None
+        return target_id,operand["object"],path[7],("filtered_set_operand",)
+    return None
+
+
 def _candidate(document, variable_id):
     assessment = document.get("assessment", document)
     variables = assessment.get("variables") or {}
@@ -138,21 +187,12 @@ def _candidate(document, variable_id):
         reasons.append("single_target_consumer_required")
         return None, reasons
     path = refs[0]
-    if (
-        len(path) != 5
-        or path[0] != "objects"
-        or path[2] != "select"
-        or path[4] != "value"
-    ):
+    consumer=_selector_consumer(objects,path)
+    if consumer is None:
         reasons.append("consumer_must_be_object_selector")
         return None, reasons
 
-    target_id = path[1]
-    target_field = path[3]
-    target = objects.get(target_id)
-    if not isinstance(target, dict):
-        reasons.append("target_object_missing")
-        return None, reasons
+    target_id,target,target_field,target_shape = consumer
     if target_id == source_id:
         reasons.append("source_target_must_be_distinct")
         return None, reasons
@@ -234,6 +274,7 @@ def _candidate(document, variable_id):
         "datatype": compatible[0],
         "tests": sorted(direct_tests),
         "binding": _binding_alias(source),
+        "target_shape": target_shape[0],
     }, []
 
 
@@ -332,7 +373,11 @@ def modernize_foreach_v1(document, *, enabled=False):
     variables = assessment.get("variables") or {}
     for candidate in accepted:
         target_id = candidate["target_object"]
-        target = objects[target_id]
+        outer_target = objects[target_id]
+        if candidate.get("target_shape")=="filtered_set_operand":
+            target=outer_target["set"]["operands"][0]["object"]
+        else:
+            target=outer_target
         binding = candidate["binding"]
         if not _BINDING_RE.fullmatch(binding):
             raise ValueError(f"invalid generated foreach binding: {binding!r}")
@@ -353,7 +398,11 @@ def modernize_foreach_v1(document, *, enabled=False):
         rebuilt["select"][candidate["target_field"]] = {
             "from": f"{binding}.{candidate['source_field']}",
         }
-        objects[target_id] = rebuilt
+        if candidate.get("target_shape")=="filtered_set_operand":
+            outer_target["set"]["operands"][0]["object"]=rebuilt
+            objects[target_id]=outer_target
+        else:
+            objects[target_id]=rebuilt
         del variables[candidate["variable"]]
         report["applied"].append(candidate)
 
