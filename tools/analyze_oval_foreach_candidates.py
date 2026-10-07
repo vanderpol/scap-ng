@@ -5,16 +5,22 @@ This is a read-only research analyzer. It does not rewrite OVAL or SCAP-NG.
 It intentionally fails closed: direct projection candidates remain
 "review_required" until a separately reviewed equivalence rule exists.
 
-The first modeled family is:
+The modeled proof families are:
 
     source Object
       -> local_variable(object_component item_field=...)
       -> target Object entity var_ref
-      -> Test(s) over the target Object
 
-This shape is interesting because the Variable can be representation plumbing
-for collection expansion. The analyzer preserves the aggregation boundary: it
-does NOT infer per-source-item Test evaluation.
+and the bounded unary-transform form:
+
+    source Object
+      -> object_component
+      -> concat(singleton literals + one projected value)
+      -> target Object entity var_ref
+
+These shapes can be representation plumbing for collection expansion. General
+multi-input concat remains review-required. The analyzer preserves the target
+aggregation boundary and does NOT infer per-source-item Test evaluation.
 
 Inputs may be standalone OVAL XML, SCAP datastream XML containing embedded
 oval_definitions components, ZIP packages containing XML, or directories.
