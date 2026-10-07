@@ -27,9 +27,24 @@ proposals are not listed as delivered features.
 
 ### Language, schema, and results
 
-No unreviewed 0.3 research proposal is listed here as a delivered feature.
-Accepted 0.3 language/schema/result changes will be added as they pass the human
-promotion gate.
+- Made private Objects and States consumer-local and reserved `shared_objects:`
+  for reusable/referenceable acquisition identity. [#165](https://github.com/vanderpol/scap-ng/issues/165)
+- Standardized meaningful internal component IDs with required type suffixes
+  (`-object`, `-state`, `-variable`, `-test`, `-input`) and schema
+  enforcement. [#190](https://github.com/vanderpol/scap-ng/issues/190)
+- Added native scalar/typed literal collections for exact removal of static
+  Variable plumbing. [#188](https://github.com/vanderpol/scap-ng/issues/188)
+- Added collection `for_each`, including correlated nested lineage semantics,
+  while keeping Test/evaluate aggregation separate. [#164](https://github.com/vanderpol/scap-ng/issues/164) [#189](https://github.com/vanderpol/scap-ng/issues/189)
+- Canonicalized 0.3 existence/match/comparison/filesystem vocabulary and shorter
+  benchmark-local Assessment names. [#151](https://github.com/vanderpol/scap-ng/issues/151)
+- Kept explicit named-Test + `evaluate` composition unchanged for 0.3; redesign
+  is deferred. [#167](https://github.com/vanderpol/scap-ng/issues/167)
+- Deferred shared Observation beyond normative 0.3 while retaining its production
+  evidence for the next design cycle. [#166](https://github.com/vanderpol/scap-ng/issues/166)
+- Kept one explicit `reported_elements` model and one canonical result contract;
+  hidden reporting defaults and normative thin/full result profiles are out.
+  [#125](https://github.com/vanderpol/scap-ng/issues/125) [#170](https://github.com/vanderpol/scap-ng/issues/170) [#177](https://github.com/vanderpol/scap-ng/issues/177)
 
 ## Earlier checkpoints
 
