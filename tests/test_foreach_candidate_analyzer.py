@@ -48,11 +48,71 @@ class ForeachCandidateAnalyzerTests(unittest.TestCase):
             [],
         )
 
-    def test_concat_object_projection_is_not_direct_auto_candidate(self):
+    def test_unary_literal_concat_is_recognized_as_bounded_proof_candidate(self):
         path=write_fixture("""\
-<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
-<tests/><objects><unix:file_object id="oval:x:obj:1" version="1" comment="roots"/><unix:file_object id="oval:x:obj:2" version="1" comment="files"><unix:filepath var_ref="oval:x:var:1"/></unix:file_object></objects><states/>
-<variables><local_variable id="oval:x:var:1" version="1" datatype="string" comment="paths"><concat><object_component object_ref="oval:x:obj:1" item_field="filepath"/><literal_component>/child</literal_component></concat></local_variable></variables>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+ xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+ <tests>
+  <ind:textfilecontent54_test id="oval:x:tst:1" version="1" check="all"
+    check_existence="at_least_one_exists" comment="lock">
+   <ind:object object_ref="oval:x:obj:2"/>
+  </ind:textfilecontent54_test>
+ </tests>
+ <objects>
+  <ind:textfilecontent54_object id="oval:x:obj:1" version="1" comment="dbs">
+   <ind:filepath>/etc/dconf/profile/user</ind:filepath>
+   <ind:pattern operation="pattern match">^system-db:(\\S+)\\s*$</ind:pattern>
+   <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+  </ind:textfilecontent54_object>
+  <ind:textfilecontent54_object id="oval:x:obj:2" version="1" comment="locks">
+   <ind:path var_ref="oval:x:var:1" var_check="at least one"/>
+   <ind:filename operation="pattern match">.*</ind:filename>
+   <ind:pattern operation="pattern match">^/org/gnome/example$</ind:pattern>
+   <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+  </ind:textfilecontent54_object>
+ </objects><states/>
+ <variables>
+  <local_variable id="oval:x:var:1" version="1" datatype="string" comment="lock dirs">
+   <concat>
+    <literal_component>/etc/dconf/db/</literal_component>
+    <object_component object_ref="oval:x:obj:1" item_field="subexpression"/>
+    <literal_component>.d/locks</literal_component>
+   </concat>
+  </local_variable>
+ </variables>
+</oval_definitions>
+""")
+        try: candidate=MOD.analyze_file(path)["candidates"][0]
+        finally: path.unlink(missing_ok=True)
+        self.assertEqual(candidate["candidate_family"],"collection_expansion_at_least_one")
+        self.assertEqual(candidate["projection_mode"],"unary_literal_concat")
+        self.assertEqual(candidate["expression"]["prefix"],"/etc/dconf/db/")
+        self.assertEqual(candidate["expression"]["suffix"],".d/locks")
+        self.assertEqual(candidate["source"]["item_field"],"subexpression")
+        self.assertTrue(candidate["unary_concat_proof_class"]["eligible"])
+        self.assertEqual(candidate["unary_concat_proof_class"]["reasons"],[])
+
+    def test_multi_source_concat_remains_cartesian_review_required(self):
+        path=write_fixture("""\
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+ xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+<tests/>
+<objects>
+ <unix:file_object id="oval:x:obj:1" version="1" comment="roots"/>
+ <unix:file_object id="oval:x:obj:3" version="1" comment="names"/>
+ <unix:file_object id="oval:x:obj:2" version="1" comment="files">
+  <unix:filepath var_ref="oval:x:var:1"/>
+ </unix:file_object>
+</objects><states/>
+<variables>
+ <local_variable id="oval:x:var:1" version="1" datatype="string" comment="paths">
+  <concat>
+   <object_component object_ref="oval:x:obj:1" item_field="path"/>
+   <literal_component>/</literal_component>
+   <object_component object_ref="oval:x:obj:3" item_field="filename"/>
+  </concat>
+ </local_variable>
+</variables>
 </oval_definitions>
 """)
         try: candidate=MOD.analyze_file(path)["candidates"][0]
