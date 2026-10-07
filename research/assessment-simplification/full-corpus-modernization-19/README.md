@@ -3,7 +3,7 @@
 **Status:** post-freeze 0.3 research/evidence checkpoint. The transformations counted as applied below match the accepted 0.3 modernization direction; deferred Observation is measured but not applied.
 
 Workflow:
-https://github.com/vanderpol/scap-ng/actions/runs/37687785601
+https://github.com/vanderpol/scap-ng/actions/runs/37691979118
 
 Pinned NIWC revision:
 `8c8e5dff860af6b1290ee9273a282db24278f8d5`
@@ -25,7 +25,7 @@ Exact/reversible modernization produced:
 | --- | ---: | ---: | ---: |
 | Top-level Objects | 13,402 | 544 | **95.94%** |
 | Top-level States | 9,121 | 435 | **95.23%** |
-| Named Variables | 2,250 | 1,111 | **50.62%** |
+| Named Variables | 2,250 | 864 | **61.60%** |
 | Named component references | 23,883 | 1,326 | **94.45%** |
 
 Rule Assessment classifications:
@@ -41,6 +41,22 @@ across 6,916 Rules. DNS research separately shows additional nested runtime
 iteration hidden inside PowerShell; that evidence drives the accepted nested
 `for_each` authoring requirement rather than inflating this automatic-rewrite
 count.
+
+## Static Variable folding
+
+The accepted bounded static-literal pass removed **509 constant Variables** across
+**332 Assessments** and replaced **1,071 constant-Variable references** with
+direct scalar/typed-array literals.
+
+The transform is atomic and fail-closed per Variable:
+
+- every reference must be in a proven literal-replacement shape;
+- datatype, operation, and source-equivalent `variable_match` remain explicit;
+- unsupported shapes stay as named Variables rather than blocking the package or
+  being partially rewritten.
+
+This is why all **61** normally convertible packages still generate successfully
+and the known **4** SQL-extension blockers remain the only blocked packages.
 
 ## Deferred Observation opportunity
 
