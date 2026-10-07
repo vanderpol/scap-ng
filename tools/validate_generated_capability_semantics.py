@@ -25,6 +25,16 @@ class CapabilitySemanticError(ValueError):
     pass
 
 
+def _assessment_named_objects(assessment):
+    """Return the named Object registry for the active Assessment version."""
+    shared=assessment.get("shared_objects")
+    if isinstance(shared,dict):
+        return shared
+    # Compatibility for frozen 0.2 and faithful/research pre-normalization trees.
+    objects=assessment.get("objects")
+    return objects if isinstance(objects,dict) else {}
+
+
 def _is_variable_value(value):
     return (
         isinstance(value, dict)
@@ -67,6 +77,15 @@ def _native_literal_matches_datatype(value, datatype):
     return False
 
 
+def _native_literal_or_collection_matches_datatype(value, datatype):
+    if isinstance(value,list):
+        return bool(value) and all(
+            _native_literal_matches_datatype(item,datatype)
+            for item in value
+        )
+    return _native_literal_matches_datatype(value,datatype)
+
+
 def _iter_authored_predicates(node):
     """Yield scalar authored predicate dictionaries recursively."""
     if isinstance(node, dict):
@@ -105,6 +124,33 @@ def validate_v02_native_literal_types(document):
                             "representation for their declared datatype"
                         ),
                     })
+    return diagnostics
+
+
+def validate_v03_native_literal_types(document):
+    """Validate native 0.3 scalar/literal-collection JSON representations."""
+    assessment=document.get("assessment",document)
+    specification=assessment.get("specification") or {}
+    if specification.get("version") != "0.3.0":
+        return []
+
+    diagnostics=[]
+    for predicate in _iter_authored_predicates(assessment):
+        value=predicate.get("value")
+        datatype=predicate.get("datatype")
+        if _is_variable_value(value):
+            continue
+        if not _native_literal_or_collection_matches_datatype(value,datatype):
+            diagnostics.append({
+                "code":"assessment.native_literal_datatype",
+                "datatype":datatype,
+                "value":value,
+                "message":(
+                    "0.3 authored literal scalars/collections must be non-empty "
+                    "and every member must use the native JSON representation "
+                    "for the declared datatype"
+                ),
+            })
     return diagnostics
 
 
@@ -983,6 +1029,7 @@ def validate_assessment_capability_semantics(document):
 
     diagnostics.extend(validate_singleton_source_document(document))
     diagnostics.extend(validate_v02_native_literal_types(document))
+    diagnostics.extend(validate_v03_native_literal_types(document))
     diagnostics.extend(validate_v03_foreach(document))
     return diagnostics
 
