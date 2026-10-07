@@ -90,15 +90,15 @@ def main() -> int:
     classes = Counter()
     residuals = Counter()
     foreach_reasons = Counter()
-    observation_consumers = Counter()
-    observation_exports = Counter()
+    deferred_observation_consumers = Counter()
+    deferred_observation_exports = Counter()
     retained_object_reasons = Counter()
     retained_object_contexts = Counter()
     retained_object_context_signatures = Counter()
     classes_by_kind = defaultdict(Counter)
     residuals_by_kind = defaultdict(Counter)
     complex_residuals_by_kind = defaultdict(Counter)
-    packages_with_observation = 0
+    packages_with_deferred_observation = 0
     package_rows = []
 
     for report in reports:
@@ -114,8 +114,14 @@ def main() -> int:
         add_counts(classes, s.get("classification_counts") or {})
         add_counts(residuals, s.get("residual_reason_counts") or {})
         add_counts(foreach_reasons, s.get("foreach_review_reason_counts") or {})
-        add_counts(observation_consumers, s.get("observation_consumer_counts") or {})
-        add_counts(observation_exports, s.get("observation_export_reference_counts") or {})
+        add_counts(
+            deferred_observation_consumers,
+            s.get("deferred_observation_candidate_counts") or {},
+        )
+        add_counts(
+            deferred_observation_exports,
+            s.get("deferred_observation_export_reference_counts") or {},
+        )
         add_counts(retained_object_reasons, s.get("retained_object_reason_counts") or {})
         add_counts(retained_object_contexts, s.get("retained_object_context_counts") or {})
         add_counts(
@@ -135,8 +141,8 @@ def main() -> int:
                 assessment.get("residual_reasons") or []
             )
 
-        if int(s.get("observation_artifacts", 0) or 0) > 0:
-            packages_with_observation += 1
+        if int(s.get("deferred_observation_candidate_artifacts", 0) or 0) > 0:
+            packages_with_deferred_observation += 1
 
         package_rows.append({
             "source_artifact": report["source_artifact"],
@@ -148,7 +154,9 @@ def main() -> int:
             "rule_classifications": (
                 s.get("classification_counts_by_kind") or {}
             ).get("rule", {}),
-            "observation_artifacts": s.get("observation_artifacts", 0),
+            "deferred_observation_candidate_artifacts": s.get(
+                "deferred_observation_candidate_artifacts", 0
+            ),
             "foreach_rewrites": s.get("foreach_rewrites_applied", 0),
             "object_scope_reduction_pct": s.get("object_scope_reduction_pct", 0),
             "state_scope_reduction_pct": s.get("state_scope_reduction_pct", 0),
@@ -161,7 +169,7 @@ def main() -> int:
         "generated_packages": 61,
         "known_blocked_packages": 4,
         "unexpected_blocked_packages": 0,
-        "packages_with_observation_artifacts": packages_with_observation,
+        "packages_with_deferred_observation_candidates": packages_with_deferred_observation,
         "classification_counts": dict(classes),
         "classification_counts_by_kind": {
             kind: dict(counts) for kind, counts in sorted(classes_by_kind.items())
@@ -175,8 +183,8 @@ def main() -> int:
             for kind, counts in sorted(complex_residuals_by_kind.items())
         },
         "foreach_review_reason_counts": dict(foreach_reasons),
-        "observation_consumer_counts": dict(observation_consumers),
-        "observation_export_reference_counts": dict(observation_exports),
+        "deferred_observation_candidate_counts": dict(deferred_observation_consumers),
+        "deferred_observation_export_reference_counts": dict(deferred_observation_exports),
         "retained_object_reason_counts": dict(retained_object_reasons),
         "retained_object_context_counts": dict(retained_object_contexts),
         "retained_object_context_signature_counts": dict(retained_object_context_signatures),
@@ -220,10 +228,10 @@ def main() -> int:
                 "private Set-operand locality",
                 "Variable-local Object locality",
                 "foreach.direct-object-component.at-least-one.v1",
-                "proven shared Observation extraction shapes",
             ],
             "measured_not_applied": [
-                "single-Test explicit evaluate-root authoring ceremony"
+                "single-Test explicit evaluate-root authoring ceremony",
+                "proven shared Observation extraction shapes (deferred post-0.3)",
             ],
             "intentionally_not_rewritten": [
                 "conditional/case native authoring",
@@ -279,9 +287,11 @@ def main() -> int:
         f"({summary['named_reference_reduction_pct']}% reduction)",
         f"- foreach v1 rewrites: **{summary.get('foreach_rewrites_applied', 0)}** "
         f"across **{summary.get('foreach_rewritten_assessments', 0)}** Assessments",
-        f"- Observation artifacts: **{summary.get('observation_artifacts', 0)}** "
-        f"across **{summary.get('packages_with_observation_artifacts', 0)}** packages; "
-        f"consumer Assessments: **{summary.get('observation_consumer_assessments', 0)}**",
+        f"- deferred Observation opportunities: "
+        f"**{summary.get('deferred_observation_candidate_artifacts', 0)}** artifacts "
+        f"across **{summary.get('packages_with_deferred_observation_candidates', 0)}** packages; "
+        f"candidate consumers: **{summary.get('deferred_observation_candidate_assessments', 0)}** "
+        f"(measured, not applied)",
         "",
         "## Retained Object scope",
         "",
@@ -311,9 +321,6 @@ def main() -> int:
         f"({rp.get('local_simple', 0)}%)",
         f"- bounded dataflow: **{rc.get('bounded_dataflow', 0)}** "
         f"({rp.get('bounded_dataflow', 0)}%)",
-        f"- shared Observation consumer: "
-        f"**{rc.get('shared_observation_consumer', 0)}** "
-        f"({rp.get('shared_observation_consumer', 0)}%)",
         f"- meaningfully complex: **{rc.get('meaningfully_complex', 0)}** "
         f"({rp.get('meaningfully_complex', 0)}%)",
         "",
