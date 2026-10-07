@@ -134,6 +134,17 @@ jobs:
             --label "$LABEL"
           cp -R "work/source/$KEY" "work/review/$KEY/faithful-authoring"
 
+          # Converter/audit/provenance JSON is engineering evidence, not
+          # reviewer-facing native authoring. Preserve one copy separately.
+          mkdir -p "work/evidence/$KEY/source-tree"
+          find "work/source/$KEY" -type f -name '*.json' -print0 | while IFS= read -r -d '' file; do
+            rel="${file#work/source/$KEY/}"
+            mkdir -p "work/evidence/$KEY/source-tree/$(dirname "$rel")"
+            cp "$file" "work/evidence/$KEY/source-tree/$rel"
+          done
+          find "work/review/$KEY/candidate-authoring" -type f -name '*.json' -delete
+          find "work/review/$KEY/faithful-authoring" -type f -name '*.json' -delete
+
       - name: Build modernization scorecard
         env:
           KEY: ${{ matrix.key }}
@@ -280,14 +291,52 @@ jobs:
               "",
           ]
           (root/"README.md").write_text("\\n".join(lines),encoding="utf-8")
-          (root/"REVIEW.json").write_text(json.dumps({
-              "format":"scap-ng-0.3-human-review-0.1",
-              "status":"research_only_pending_owner_review",
-              "source_revision":os.environ["NIWC_REVISION"],
-              "workflow_url":os.environ["WORKFLOW_URL"],
-              "benchmarks":rows,
-          },indent=2,sort_keys=True)+"\\n")
           PY
+
+      - name: Reject engineering evidence from human-review package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root=Path("work/scap-ng-0.3-human-review")
+          forbidden_names={
+              "SCORECARD.json",
+              "RENDER-PROOF.json",
+              "REVIEW-SURFACE.json",
+              "RESIDUAL-PATTERNS.json",
+              "REVIEW.json",
+              "modernization-report.json",
+              "residual-patterns.json",
+              "render-report.json",
+              "review-surface-normalization.json",
+              "source-generation.json",
+              "evidence.json",
+              "applicability-evidence.json",
+              "grouping-provenance.json",
+              "profile-selection-audit.json",
+              "profile-selection-provenance.json",
+              "rule-source-audit.json",
+              "validation.json",
+          }
+          leaks=[]
+          for path in root.rglob("*"):
+              if not path.is_file():
+                  continue
+              if path.name in forbidden_names:
+                  leaks.append(str(path))
+              if path.suffix==".json" and (
+                  "candidate-authoring" in path.parts or
+                  "faithful-authoring" in path.parts
+              ):
+                  leaks.append(str(path))
+          if leaks:
+              raise SystemExit(
+                  "engineering evidence leaked into human-review artifact:\\n"
+                  + "\\n".join(sorted(set(leaks)))
+              )
+          print("human-review artifact contains no raw engineering evidence files")
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: scap-ng-0.3-human-review-candidate
