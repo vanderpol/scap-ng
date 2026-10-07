@@ -22,8 +22,12 @@ Representative full-benchmark candidate artifacts are produced by the
 [0.3 candidate human-review workflow](https://github.com/vanderpol/scap-ng/actions/workflows/0.3-candidate-human-review.yml).
 
 Current successful six-benchmark candidate:
-[workflow run 37649993955](https://github.com/vanderpol/scap-ng/actions/runs/37649993955) ·
-[combined artifact](https://github.com/vanderpol/scap-ng/actions/runs/37649993955/artifacts/11496651572).
+[workflow run 37662165669](https://github.com/vanderpol/scap-ng/actions/runs/37662165669).
+
+Open the run's **Artifacts** section and download
+`scap-ng-0.3-human-review-candidate`. Direct artifact URLs are intentionally
+not used here because they are not reliable navigation links for all GitHub
+sessions.
 
 ## Frozen 0.2.0 baseline
 
