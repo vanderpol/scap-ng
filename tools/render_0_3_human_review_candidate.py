@@ -32,6 +32,10 @@ from research_inline_private_components import (
     inline_private,
     reexpand,
 )
+from research_static_literal_collections import (
+    inline_constants,
+    reexpand_constants,
+)
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
 from normalize_0_3_review_surface import normalize_tree
 
@@ -82,6 +86,8 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "automated_assessments":0,
         "deferred_observation_opportunities":0,
         "foreach_rewrites":0,
+        "static_constant_variables_removed":0,
+        "static_literal_references_replaced":0,
         "localized_set_operand_objects":0,
         "localized_variable_objects":0,
         "localized_object_graph_objects":0,
@@ -112,8 +118,19 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         rewrites=int(foreach_report["stats"].get("rewrites_applied",0) or 0)
         totals["foreach_rewrites"]+=rewrites
 
+        static_doc,static_proof=inline_constants(foreach_doc)
+        static_restored=reexpand_constants(static_doc,static_proof)
+        if static_restored!=foreach_doc:
+            detail=first_difference(foreach_doc,static_restored) or "unknown difference"
+            raise ValueError(
+                f"static-literal round-trip mismatch for {relative}: {detail}"
+            )
+        static_variables={row["variable"] for row in static_proof}
+        totals["static_constant_variables_removed"]+=len(static_variables)
+        totals["static_literal_references_replaced"]+=len(static_proof)
+
         rendered,identity=inline_private(
-            foreach_doc,
+            static_doc,
             inline_private_set_operands=True,
             inline_private_filtered_set_operands=True,
             inline_state_consumers=True,
@@ -123,8 +140,8 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             inline_private_local_variables=True,
         )
         expanded=reexpand(rendered,identity)
-        if expanded!=foreach_doc:
-            detail=first_difference(foreach_doc,expanded) or "unknown difference"
+        if expanded!=static_doc:
+            detail=first_difference(static_doc,expanded) or "unknown difference"
             raise ValueError(f"locality round-trip mismatch for {relative}: {detail}")
 
         outpath=output_root/relative
@@ -162,6 +179,10 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "kind":row["kind"],
             "deferred_observation_opportunity":observation_type,
             "foreach_rewrites":rewrites,
+            "static_literals":{
+                "constant_variables_removed":len(static_variables),
+                "references_replaced":len(static_proof),
+            },
             "localized":{
                 "test_objects":len(identity.get("inlined_objects") or {}),
                 "test_states":len(identity.get("inlined_states") or {}),
@@ -195,6 +216,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "deferred_observation_not_applied":True,
             "locality_reexpand_exact":True,
             "foreach_only_proven_v1":True,
+            "static_literal_roundtrip_exact":True,
             "review_surface_is_presentation_only":True,
         },
         "review_surface_normalization":{
@@ -216,9 +238,10 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "**Research-only. Not a released schema or Board-approved format.**\n\n"
         "This tree starts from the pinned faithful SCAP 1.4 conversion and applies "
         "only the currently proven modernization stack: consumer locality, private "
-        "Set operands, Variable-local Objects, single-use external/constant and "
-        "leaf-derived Variable locality, recursive private Object locality, "
-        "and bounded foreach v1. Shared Observation opportunities are measured "
+        "Set operands, Variable-local Objects, compile-time static literal "
+        "folding, single-use external/constant and leaf-derived Variable locality, "
+        "recursive private Object locality, and bounded foreach v1. Shared "
+        "Observation opportunities are measured "
         "separately but are deferred beyond normative 0.3 and are not rendered.\n\n"
         "The accompanying scorecard explains what changed and what deliberately "
         "remains complex. The review surface also applies the candidate 0.3 "
