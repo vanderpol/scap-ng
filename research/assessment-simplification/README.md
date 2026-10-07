@@ -23,6 +23,8 @@ This work explores ways to make accurate assessments easier for humans to author
 | [residual-patterns-12](residual-patterns-12/README.md) | Recurring residual complexity after known simplification opportunities | RHEL/Windows motif census, prioritized modernization/capability candidates |
 | [fstab-13](fstab-13/README.md) | Typed persistent Linux mount configuration | 23-rule `/etc/fstab` census, OVAL 5.12.3 boundary, before/after example, fail-closed proof requirements |
 | [violation-query-14](violation-query-14/README.md) | Violation-query positive-form audit | 12-rule exclude+none-exist census, six-state counterexamples, presentation-only recommendation |
+| [apache-reuse-15](apache-reuse-15/README.md) | Reusable observation modules | Apache repeated discovery/dataflow census, source-time typed-export module hypothesis |
+| [windows-eventlog-16](windows-eventlog-16/README.md) | Windows event-log path residual | three-rule normalized-template proof, locality gains, remaining Variable boundary |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
