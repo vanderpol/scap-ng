@@ -224,6 +224,7 @@ def inline_private(
     inline_state_consumers: bool = False,
     inline_variable_object_consumers: bool = False,
     inline_private_variables: bool = False,
+    inline_private_local_variables: bool = False,
 ) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
@@ -434,16 +435,27 @@ def inline_private(
             if remaining.get(name,0)==0:
                 states.pop(name,None)
 
-    if inline_private_variables:
-        # Bounded v5 locality experiment: localize only single-use external or
-        # constant Variables. These carry input/static-binding data, not derived
-        # runtime dataflow. Local Variables remain named for separate research.
+    if inline_private_variables or inline_private_local_variables:
+        # Bounded v5/v6 Variable locality experiments.
+        #
+        # v5 localizes single-use external/constant Variables.
+        # v6 additionally localizes a single-use local/derived Variable only
+        # when its sole consumer is outside the Variable registry and its own
+        # payload does not depend on another named Variable. This intentionally
+        # refuses chains and shared dataflow while testing whether leaf derived
+        # expressions need an Assessment-scoped name.
         variables=a.get("variables") or {}
         for variable_id,payload in list(variables.items()):
-            if (
-                not isinstance(payload,dict)
-                or payload.get("kind") not in {"external","constant"}
-            ):
+            if not isinstance(payload,dict):
+                continue
+            kind=payload.get("kind")
+            if kind in {"external","constant"}:
+                if not inline_private_variables:
+                    continue
+            elif kind=="local":
+                if not inline_private_local_variables:
+                    continue
+            else:
                 continue
 
             # Count exact structured references across the complete Assessment
@@ -467,6 +479,25 @@ def inline_private(
                 continue
 
             path=list(variable_refs[0])
+
+            if kind=="local":
+                # Keep Variable-to-Variable chains named in this bounded proof.
+                if path and path[0]=="variables":
+                    continue
+                # Also keep a local Variable named if its expression depends on
+                # any other named Variable. This avoids recursively embedding a
+                # dependency graph before that ordering/provenance case is
+                # separately proven.
+                dependent=False
+                for other_id in variables:
+                    if other_id==variable_id:
+                        continue
+                    if any(exact_variable_ref_paths(payload,other_id)):
+                        dependent=True
+                        break
+                if dependent:
+                    continue
+
             parent,last=path_parent(a,path)
             node=parent[last]
             if node!={"variable":variable_id}:
@@ -733,7 +764,16 @@ def main():
         action="store_true",
         help=(
             "Research v5: localize single-use external/constant Variables at "
-            "their sole exact Variable reference. Local derived Variables remain named."
+            "their sole exact Variable reference."
+        ),
+    )
+    ap.add_argument(
+        "--inline-private-local-variables",
+        action="store_true",
+        help=(
+            "Research v6: also localize a single-use local/derived Variable "
+            "when it has no named-Variable dependency and its sole consumer is "
+            "outside the Variable registry."
         ),
     )
     ap.add_argument("--label",required=True)
@@ -762,6 +802,7 @@ def main():
         "inline_state_consumers":bool(args.inline_state_consumers),
         "inline_variable_object_consumers":bool(args.inline_variable_object_consumers),
         "inline_private_variables":bool(args.inline_private_variables),
+        "inline_private_local_variables":bool(args.inline_private_local_variables),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -793,6 +834,7 @@ def main():
             inline_state_consumers=args.inline_state_consumers,
             inline_variable_object_consumers=args.inline_variable_object_consumers,
             inline_private_variables=args.inline_private_variables,
+            inline_private_local_variables=args.inline_private_local_variables,
         )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
