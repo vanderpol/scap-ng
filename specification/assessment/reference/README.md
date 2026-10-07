@@ -28,6 +28,8 @@ inherited behavior.
 
 Today, these documents explain and link existing contracts. Shared evaluation
 rules remain maintained in [Assessment evaluation semantics](../../../research/iterations/003/design/assessment-evaluation-semantics.md).
+Accepted 0.3 collection iteration is documented in
+[Collection `for_each`](../foreach.md).
 Native structural mappings remain in [the capability mapping catalog](../../../schema/v0.1.0/capability-mappings/README.md).
 The [0.2.0 schema guide](../../../schema/v0.2.0/README.md) owns the current draft
 expression/result slice. This first documentation pass does not move or replace
