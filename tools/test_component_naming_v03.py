@@ -41,6 +41,7 @@ def valid_assessment():
             },
             "shared_objects": {
                 "forward-zones-object": {
+                    "object_title": "Forward zones",
                     "capability": "independent.shellcommand",
                 }
             },
