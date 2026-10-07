@@ -269,12 +269,17 @@ def generate(mapping, repo_root, schema_version=None):
             dtypes = source_datatypes(field)
             enum_values = mapping["native"].get("selector_value_enums", {}).get(name)
             if enum_values:
-                selector_schema = {
-                    "oneOf": [
-                        {"type": "string", "enum": list(enum_values)},
-                        {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
-                    ]
-                }
+                variants = [
+                    {"type": "string", "enum": list(enum_values)},
+                    {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
+                ]
+                if version == "0.3.0":
+                    variants.append({
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {"type": "string", "enum": list(enum_values)},
+                    })
+                selector_schema = {"oneOf": variants}
             else:
                 selector_schema = generic_entity_schema(dtypes, state=False, version=version)
             if name in mapping["native"].get("nullable_selectors", ["name"]):
@@ -444,12 +449,17 @@ def generate(mapping, repo_root, schema_version=None):
             },
         }
         if name in state_value_enums:
-            props["value"] = {
-                "oneOf": [
-                    {"type": "string", "enum": list(state_value_enums[name])},
-                    {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
-                ]
-            }
+            variants = [
+                {"type": "string", "enum": list(state_value_enums[name])},
+                {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
+            ]
+            if version == "0.3.0":
+                variants.append({
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string", "enum": list(state_value_enums[name])},
+                })
+            props["value"] = {"oneOf": variants}
         scalar_state_branches.append({
             "properties": props,
             "required": ["field"],
@@ -486,15 +496,19 @@ def generate(mapping, repo_root, schema_version=None):
     }
     if test_source_kind != "none":
         test_required.insert(2, test_source_field)
-        test_properties[test_source_field] = {"type": "string", "minLength": 1}
-        if version == "0.3.0":
-            suffix_patterns = {
-                "object": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$",
-                "variable": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+        if version == "0.3.0" and test_source_kind == "object":
+            test_properties[test_source_field] = {
+                "$ref": f"{common_capability_schema_id}#/$defs/object_use"
             }
-            pattern = suffix_patterns.get(test_source_kind)
-            if pattern:
-                test_properties[test_source_field]["pattern"] = pattern
+        else:
+            test_properties[test_source_field] = {"type": "string", "minLength": 1}
+            if version == "0.3.0":
+                suffix_patterns = {
+                    "variable": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+                }
+                pattern = suffix_patterns.get(test_source_kind)
+                if pattern:
+                    test_properties[test_source_field]["pattern"] = pattern
 
     collected_field_properties = {
         name: collected_value_schema(
