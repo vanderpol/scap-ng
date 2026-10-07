@@ -1,64 +1,77 @@
-# Residual complex-pattern census
+# Residual production-complexity pattern research
 
 > **RESEARCH ONLY — NOT AN ACCEPTED SCAP-NG DESIGN**
 >
-> This directory records recurring complexity patterns that remain after the
-> already-known simplification opportunities (locality, foreach, and strict
-> conditional shapes) are separated out. It does not authorize new schema or
-> converter behavior.
+> This study does not change the 0.3.0 schema, converter contract, capability
+> semantics, or Board-review baseline. It identifies recurring semantic shapes
+> in the remaining complex production content so future modernization work is
+> driven by measured reuse rather than isolated examples.
 
 ## Question
 
-After removing the common/simple cases, are the remaining complex Assessments
-mostly one-off OVAL graphs, or do they fall into a small number of recurring
-semantic patterns that could justify additional modernization?
+After accounting for the simpler/local Assessment population and the already
+studied foreach and conditional patterns, is the remaining real-world
+complexity:
 
-## Production basis
+1. a small number of recurring semantic patterns that deserve clearer native
+   representation; or
+2. mostly irreducible one-off OVAL graphs?
+
+## Corpus
 
 Pinned NIWC revision:
 
 `8c8e5dff860af6b1290ee9273a282db24278f8d5`
 
-Fresh current conversions were generated for:
+Platforms:
 
-- RHEL 9 V2R9;
-- Windows Server 2025 V1R1.
+- RHEL 9;
+- Windows Server 2025.
 
-Successful census:
+Successful coarse-family census:
 
-https://github.com/vanderpol/scap-ng/actions/runs/37549807776
+https://github.com/vanderpol/scap-ng/actions/runs/37549544079
 
 Tool:
 
 `tools/measure_residual_complexity_patterns.py`
 
-The census is descriptive only. It does not modify source or assume that two
-similar graphs are semantically interchangeable.
-
-## Overall result
+## First result
 
 Across **703 automated Assessments**:
 
-- **119 (16.93%)** were classified as residual-complex by the conservative
-  research criteria;
-- RHEL 9: **93 / 435 = 21.38%**;
-- Windows Server 2025: **26 / 268 = 9.70%**.
+| Platform | Automated | Residual complex | Percent |
+| --- | ---: | ---: | ---: |
+| RHEL 9 | 435 | 93 | 21.38% |
+| Windows Server 2025 | 268 | 26 | 9.70% |
+| **Total** | **703** | **119** | **16.93%** |
 
-Residual feature counts overlap:
+The first exact structural fingerprint was intentionally too strict and yielded
+one exact shape per residual Assessment. A second coarse fingerprint abstracts
+IDs, titles, literals and exact cardinalities while retaining capabilities,
+Variable-function families, Set/Filter presence, Test-count bands and
+evaluation structure. That exposes recurring families.
 
-| Residual signal | Assessments |
+The residual population is therefore **not** a random long tail.
+
+## Aggregate residual signals
+
+These categories overlap:
+
+| Signal | Assessments |
 | --- | ---: |
 | Filters | 65 |
 | Multi-Test composition | 65 |
 | Sets | 53 |
 | Non-direct Variable dataflow | 46 |
-| Nested evaluation not already an exact complementary conditional | 29 |
+| Nested evaluation not covered by exact-complement conditional recognition | 29 |
 | Variable functions | 25 |
 
-Variable-function occurrences in the residual population:
+Observed Variable-function occurrences include:
 
 | Function | Occurrences |
 | --- | ---: |
+| values/object-derived values | 48 |
 | concat | 23 |
 | regex_capture | 8 |
 | split | 5 |
@@ -66,184 +79,202 @@ Variable-function occurrences in the residual population:
 | unique | 3 |
 | arithmetic | 1 |
 
-The important result is that **the residual population is not uniformly
-complicated**. Coarser clustering exposes several repeated families.
+The largest reason combinations are:
 
-## Largest recurring families
+- **32**: Sets + Filters;
+- **20**: multi-Test + nested evaluation;
+- **14**: multi-Test + non-direct dataflow + Variable functions;
+- **9**: Sets + Filters + multi-Test composition;
+- **6**: Filters + non-direct dataflow.
 
-### 1. Layered text configuration using Set/Filter machinery — 30 Rules
+## Highest-value recurring families
 
-The largest coarse family contains **30 RHEL 9 Assessments** using
-`independent.textfilecontent54`, one Set, two Filters, one Test, and no
-Variable functions.
+### 1. Text setting from primary file + drop-in files — 30 RHEL Assessments
 
-Representative Rules include:
+Census shape:
 
-- SV-257784 — systemd Ctrl-Alt-Delete burst configuration;
-- SV-257982 — SSH logging;
-- SV-257984 — SSH blank-password policy;
-- SV-257985 — SSH root login;
-- SV-257986 — SSH PAM;
-- SV-258068 — shell inactivity timeout;
-- SV-258084 — sudo reauthentication;
-- multiple password-complexity and authentication settings.
+- capability: `independent.textfilecontent54`;
+- one Test;
+- Set/Filter collection structure;
+- no Variable functions;
+- no nested evaluation.
 
-This family deserves a dedicated semantic review. The likely author intent is
-often "evaluate a setting across the applicable base configuration and drop-in
-configuration sources," while OVAL expresses the acquisition using generic Set
-and Filter graphs.
+This family alone is **25.2% of the entire two-platform residual population**
+and **32.3% of the RHEL residual**.
 
-**Do not yet replace this with a new construct.** Configuration precedence,
-duplicate definitions, include/drop-in semantics, and effective-versus-present
-configuration must be proven for each domain. A typed effective-configuration
-collector may be a better solution than another general-purpose language
-feature.
+Examples include:
 
-### 2. Alternative compliance/configuration paths — 10 Rules
+- SV-257784 — `CtrlAltDelBurstAction` from `system.conf` plus
+  `system.conf.d/*.conf`;
+- SV-257982 — SSH `LogLevel` from `sshd_config` plus
+  `sshd_config.d/*`;
+- SV-258005 — SSH `IgnoreRhosts` from the primary config plus drop-ins.
 
-Ten RHEL Rules share a three-to-five-Test `all/any` family, including the
-kernel-module disable checks.
+The older maintained converted views make the underlying intent especially
+clear: collect the same setting from a primary file and a drop-in directory,
+union the observations, then apply one State expectation.
 
-These are not ordinary if/else. They describe multiple acceptable evidence
-paths/configuration locations. The conditional research already uses these as a
-negative control.
+**Research hypothesis:** this may deserve a first-class configuration-source or
+"primary + drop-ins" collection idiom rather than requiring authors to express
+ordinary configuration precedence/scope through generic Set machinery.
 
-Preliminary direction: keep ordinary `any/all` unless a higher-level typed
-capability makes the alternatives disappear naturally.
+Before proposing any syntax, inspect all 30 source graphs and determine whether
+their filters are merely collection-scope mechanics or whether some perform
+semantically substantive exclusion.
 
-### 3. Constant-list selector + filtered file search — 6 Rules
+### 2. Alternative compliance paths — 10 RHEL Assessments
 
-Exactly six closely related RHEL Rules cover system command/library
-files/directories and ownership/group ownership:
+Census shape:
 
-- SV-257918 through SV-257923.
+- `independent.textfilecontent54`;
+- 3–5 Tests;
+- nested `all` + `any`;
+- no Sets, Filters or Variables.
 
-The current graph uses a constant Variable containing a list of directories,
-feeds that Variable into a file selector, excludes out-of-scope or already-good
-Items with Filters, and asserts that no violating Items remain.
+Examples include SV-257804, SV-257806, SV-257807, SV-257880, SV-257983,
+SV-257994, SV-258003, SV-258006, SV-258009 and SV-258232.
 
-This is a strong candidate for a **small authoring/normalization improvement**,
-not a general computation feature. Questions to test:
+Some are already known **not** to be if/else. For example the kernel-module
+cases represent multiple acceptable configuration paths and correctly remain
+ordinary `any`.
 
-1. Can a private constant-list Variable be safely inlined into the selector?
-2. Can the same semantics be expressed more directly as "for all in these
-   directories, after excluding symlinks/directories as appropriate, expect
-   owner/group X" instead of "collect violations then assert none exist"?
-3. Would a typed file-scope/list selector make the Variable disappear without
-   changing collection completeness or filesystem traversal behavior?
+**Research direction:** classify these as explicit alternatives rather than
+trying to eliminate Boolean composition indiscriminately.
 
-### 4. Parsed fstab mount-option lists — 5 Rules
+### 3. Enumerate files/directories and report only violations — 6 RHEL Assessments
 
-Five RHEL Rules share the same structure:
+Examples SV-257918 through SV-257923 use `unix.file` with a constant list of
+directories, recursion and exclusion filters. Representative intent:
 
-- SV-257866;
-- SV-257870;
-- SV-257871;
-- SV-257872;
-- SV-257873.
+- enumerate files in known system-command/library directories;
+- exclude objects that already satisfy the requirement;
+- exclude non-target types such as directories/symlinks;
+- assert that no violating Items remain.
 
-They parse an `/etc/fstab` row using textfilecontent54, extract the comma-
-separated mount options, `split` the string, and then test the derived list
-while separately testing the active mount.
+This is a common **violation-query** idiom.
 
-This looks more like a **missing typed configuration capability** than a need
-for richer expression syntax.
+Example SV-257918 effectively says:
 
-Research candidate: model configured mount entries directly (for example a
-future typed mount/fstab configuration collector) so authors can compare
-configured and active mount options without regex + split plumbing.
+> From system command directories, find ordinary files not owned by root; there
+> SHALL be none.
 
-No capability name is proposed or accepted here.
+**Research hypothesis:** a positive authoring form such as "all matching files
+must satisfy State X" may be much clearer than expressing compliance as
+"collect failures by excluding good Items, then require none." The semantic
+proof must include incomplete/error collection and Filter behavior before any
+automatic rewrite.
 
-### 5. Derived configuration path via concat — 3 Rules
+### 4. Mounted state + persistent fstab option — 5 RHEL Assessments
 
-SV-258013, SV-258020, and SV-258026 form a repeated RHEL family. A value is
-extracted from configuration content and then concatenated with fixed path
-segments to locate another configuration resource.
+Examples:
 
-This resembles the already-proven foreach/direct-projection pattern but adds a
-simple transformation/template step.
+- SV-257866
+- SV-257870
+- SV-257871
+- SV-257872
+- SV-257873
 
-Research questions:
+Each repeats the same basic graph:
 
-- Is a bounded `for_each` projection with an explicit path template sufficient?
-- Is a local derived selector expression clearer than a global Variable?
-- Do these examples justify a general transform feature, or are they better
-  handled by typed domain collectors such as dconf-aware acquisition?
+1. verify an active `linux.partition` mount has an option;
+2. parse the corresponding `/etc/fstab` row;
+3. extract the comma-delimited option string;
+4. `split` it into values;
+5. verify the desired option is present; and
+6. separately prove the mount exists in `/etc/fstab`.
 
-Do not broaden foreach v1 until the semantic mapping is proven.
+This is not primarily a general Variable-language problem. It is a recurring
+**persistent mount configuration** domain concept.
 
-## Windows recurring families
+**Research hypothesis:** consider whether `linux.partition` should expose
+configured/persistent mount facts in addition to active mount facts, or whether
+a sibling typed capability should do so. A native collector/parser could avoid
+reimplementing fstab parsing through regex + split while preserving typed
+evidence.
 
-### Event-log path resolution — 3 Rules
+### 5. Dconf database-name -> locks-directory derivation — at least 3 RHEL Assessments
 
-SV-278043, SV-278044, and SV-278045 form one repeated family involving:
+Examples SV-258013, SV-258020 and SV-258026 use the same graph:
 
-- Registry-derived event-log path;
-- `%SystemRoot%`/absolute path handling;
-- concat/regex_capture Variables;
-- file-effective-rights evaluation;
-- conditional Boolean structure.
+1. parse `/etc/dconf/profile/user` for `system-db:<name>`;
+2. derive `/etc/dconf/db/<name>.d/locks` with `concat`;
+3. search the derived directory for a required locked key;
+4. require both the database declaration and the lock.
 
-The conditional modernizer successfully detects and rewrites the branch shape,
-but the remaining dataflow is still complex. The current production regression
-also exposes pre-existing 0.3 Windows mapping/alignment gaps in these Assessments
-(registry predicate vocabulary and existence vocabulary); those failures are
-not caused by the conditional expression itself.
+This is another domain concept hidden behind generic Variable operations.
 
-This family is a good candidate for a typed Windows event-log/file-location
-abstraction after the 0.3 mapping issues are corrected.
+**Research hypothesis:** a typed dconf/configuration capability may be more
+meaningful than teaching ordinary authors to build paths with
+`object_values + concat`.
 
-### Domain/role-sensitive user-right checks — repeated family
+### 6. Windows event-log path derivation — 3 Server 2025 Assessments
 
-Several Windows Server 2025 Rules use target-role/domain state to select the
-relevant user-right requirement. These are being handled by the separate
-pattern-based conditional modernization research.
+SV-278043, SV-278044 and SV-278045 form a repeated family using:
 
-No STIG IDs are encoded in the matcher. Production Rules are regression
-fixtures only.
+- Windows registry;
+- Windows file effective rights;
+- Sets/Filters;
+- `concat + regex_capture + values`;
+- a role/path conditional.
 
-### Other Windows dataflow families
+The conditional branch itself is now recognized by the generic conditional
+modernizer. The remaining complexity is path derivation from registry data and
+permission assessment.
 
-The residual census also retains:
+The current 0.3 conversion of these Rules also exposes a separate known
+`windows.registry` post-alignment mapping gap. That gap must not be confused
+with conditional-recognition correctness.
 
-- registry-derived AD data-file paths and file-effective-rights checks;
-- FTP/site configuration path construction;
-- certificate/key discovery patterns;
-- other small Variable families.
+### 7. Windows role/domain user-right branches — recurring family
 
-These should be reviewed after the higher-frequency RHEL families because they
-may be better solved with typed Windows collectors rather than new generic
-expression features.
+Several Server 2025 Rules combine `windows.wmi.query` role/domain facts with
+`windows.userright` expectations. Some now match the generic mutually
+exclusive-enum conditional proof; others remain unproven and correctly stay in
+review.
 
-## Working prioritization
+Continue improving the proof classes generically. Rule IDs are fixtures only;
+the modernizer SHALL NOT contain product or Rule allowlists.
 
-The current evidence suggests this order for further research:
+## Important design lesson
 
-1. **Finish conditional pattern proof classes** already underway.
-2. **Review the 30-rule layered configuration Set/Filter family** for effective
-   configuration semantics.
-3. **Prototype constant-list Variable inlining / direct all-item expectation**
-   on SV-257918–SV-257923.
-4. **Model the five fstab split cases as a typed configuration collector** and
-   compare complexity/evidence semantics.
-5. **Test bounded transformed foreach/local-selector syntax** on the three
-   concat/path cases.
-6. Then inspect the smaller one-off function families (count/unique,
-   regex_capture, arithmetic) and decide whether they justify language features.
+The recurring families suggest at least three different kinds of
+"modernization":
 
-The goal is not to eliminate every OVAL feature. The goal is to determine which
-recurring production patterns can become smaller and clearer **without losing
-typed acquisition, evidence, error, cardinality, or six-state semantics**.
+1. **presentation/locality modernization** — inline private Objects/States;
+2. **evaluation modernization** — turn proven environment branches into native
+   conditionals while leaving alternatives as `any`;
+3. **domain modernization** — replace generic regex/Variable/Set plumbing with a
+   typed concept such as persistent mount configuration, dconf locks, or
+   configuration files with drop-ins.
 
-## Relationship to modernization stats
+These should not be collapsed into one generic graph simplifier.
 
-Modernization/normalization effectiveness should be measurable on every run.
+A domain-specific modernization may yield a much larger readability improvement
+than adding another generic expression operator.
 
-Current modernization output now includes per-Assessment stats and aggregated
-`modernization-stats.json` / `evidence.json` totals for foreach and
-conditional passes. The repository normalizer also emits a structured
-`stats` section while retaining its historical `summary` block.
+## Priority order
 
-The stats are evidence, not acceptance criteria: a higher rewrite percentage is
-not desirable if it weakens semantic guarantees.
+Next deep dives should be:
+
+1. the 30-rule text-setting/drop-in Set+Filter family;
+2. the 5-rule persistent mount option family;
+3. the dconf path-derivation family;
+4. the 6-rule file violation-query family;
+5. remaining Windows role/domain conditional guards;
+6. Windows event-log path derivation after the registry mapping boundary is
+   clean.
+
+For each family:
+
+- read the STIG requirement/check text;
+- inspect the exact OVAL graph;
+- identify the security-domain concept;
+- propose a simpler native representation only if it is materially clearer;
+- prove conversion conditions and counterexamples;
+- measure how many production Assessments match;
+- add run statistics to the modernizer;
+- fail closed outside the proof class.
+
+## Status
+
+**Research only; pattern census complete, family semantic review in progress.**
