@@ -1,0 +1,61 @@
+assessment:
+  id: foreach-nested-lineage
+  version: 1
+  assessment_title: Preserve correlated user lineage through nested file collection
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+
+  shared_objects:
+    users-object:
+      object_title: Selected local users
+      capability: unix.password
+      select:
+        username:
+          value: .+
+          operation: pattern_match
+          datatype: string
+
+    home-files-object:
+      object_title: Files found in each selected home directory
+      capability: unix.file
+      for_each:
+        item: user
+        in: users-object
+      select:
+        directory:
+          from: user.home_dir
+        name:
+          value: '.+'
+          operation: pattern_match
+          datatype: string
+      filesystem: all
+
+    correlated-home-files-object:
+      object_title: Files recollected with explicit inherited user lineage
+      capability: unix.file
+      for_each:
+        item: file
+        in: home-files-object
+      select:
+        directory:
+          from: user.home_dir
+        name:
+          from: file.name
+      filesystem: all
+
+  tests:
+    correlated-home-files-test:
+      test_title: Nested collection retains one correlated target population
+      reported_elements: compared
+      capability: unix.file
+      object: correlated-home-files-object
+      existence: optional
+      match: all
+
+  evaluate:
+    test: correlated-home-files-test
