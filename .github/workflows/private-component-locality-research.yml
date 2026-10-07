@@ -197,6 +197,24 @@ jobs:
             --inline-private-local-variables \
             --label "$LABEL"
           cp "work/private-local-variable-census/$KEY/report.json" "work/research/$KEY/private-local-variable-census-report.json"
+      - name: Measure recursive Object-graph locality
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/object-graph-local-census/$KEY" \
+            --all-assessments \
+            --metrics-only \
+            --inline-private-set-operands \
+            --inline-private-filtered-set-operands \
+            --inline-state-consumers \
+            --inline-variable-object-consumers \
+            --inline-private-object-consumers \
+            --inline-private-variables \
+            --inline-private-local-variables \
+            --label "$LABEL"
+          cp "work/object-graph-local-census/$KEY/report.json" "work/research/$KEY/object-graph-local-census-report.json"
       - uses: actions/upload-artifact@v4
         with:
           name: private-component-locality-${{ matrix.key }}
@@ -226,6 +244,7 @@ jobs:
           variable_local_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("variable-local-census-report.json"))]
           private_variable_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("private-variable-census-report.json"))]
           private_local_variable_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("private-local-variable-census-report.json"))]
+          object_graph_local_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("object-graph-local-census-report.json"))]
           def aggregate(reports):
               totals={}
               for r in reports:
@@ -290,6 +309,10 @@ jobs:
               "private_leaf_derived_variable_full_census":{
                   "packages":[{"label":r["label"],"summary":r["summary"]} for r in private_local_variable_census_reports],
                   "summary":aggregate(private_local_variable_census_reports),
+              },
+              "recursive_object_graph_full_census":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in object_graph_local_census_reports],
+                  "summary":aggregate(object_graph_local_census_reports),
               },
           }
           Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
