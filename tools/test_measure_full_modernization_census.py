@@ -246,7 +246,12 @@ class FullModernizationCensusTests(unittest.TestCase):
                     "other":{
                         "kind":"local",
                         "datatype":"string",
-                        "expression":{"literal":{"value":"/x","datatype":"string"}},
+                        "expression":{
+                            "concat":[
+                                {"values":{"object":"source","field":"path"}},
+                                {"literal":{"value":"/x","datatype":"string"}},
+                            ]
+                        },
                     },
                 },
                 "tests":{"test":{"capability":"unix.file","object":"target"}},
@@ -262,7 +267,7 @@ class FullModernizationCensusTests(unittest.TestCase):
             )
             self.assertEqual(
                 report["summary"]["retained_object_context_signature_counts"],
-                {"variable:1":1},
+                {"variable:2":1},
             )
 
 
