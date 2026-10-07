@@ -118,6 +118,7 @@ jobs:
               raise SystemExit(f"expected 11 reports, found {len(reports)}")
 
           totals=Counter()
+          source_kinds=Counter()
           kinds=Counter()
           funcs=Counter()
           contexts=Counter()
@@ -140,6 +141,7 @@ jobs:
                   totals["max_variable_chain_depth"],
                   int(r.get("max_variable_chain_depth",0) or 0),
               )
+              source_kinds.update(r.get("source_kind_counts") or {})
               kinds.update(r.get("expression_kind_counts") or {})
               funcs.update(r.get("function_counts") or {})
               contexts.update(r.get("consumer_context_counts") or {})
@@ -175,6 +177,7 @@ jobs:
               "packages":packages,
               "summary":{
                   **dict(totals),
+                  "source_kind_counts":dict(source_kinds),
                   "expression_kind_counts":dict(kinds),
                   "function_counts":dict(funcs),
                   "consumer_context_counts":dict(contexts),
