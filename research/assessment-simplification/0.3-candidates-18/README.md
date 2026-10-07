@@ -2,7 +2,7 @@
 
 **Status:** historical research checkpoint only. This is an index, not a specification.
 
-> **Superseded for release scope:** final 0.3 IN / DEFER / OUT dispositions are maintained in [#174](https://github.com/vanderpol/scap-ng/issues/174), with the canonical deferred list in [`specification/deferred-after-0.3.md`](../../../specification/deferred-after-0.3.md). Candidate labels below record the state of the research at this checkpoint and do not override those later decisions.
+> **Superseded for release scope:** final 0.3 IN / DEFER / OUT dispositions are maintained in [#174](https://github.com/vanderpol/scap-ng/issues/174). Candidate labels below record the state of the research at this checkpoint and do not override those later decisions.
 
 Tracking issue: #174.
 
@@ -26,8 +26,8 @@ Tracking issue: #174.
    which flows are semantically necessary versus repeatable authoring plumbing.
 2. **Review the 630 complex Set/Filter Rules** after Variable classification;
    avoid adding syntax merely to reduce the residual count.
-3. **Finalize the small authoring core:** consumer-local Object/State, bounded
-   foreach, Observation, and retained evaluate composition.
+3. **Release decision is now complete:** locality and `for_each` are IN;
+   Observation and `evaluate` redesign are deferred from the 0.3 modernization delta.
 4. Prepare compact before/after/counterexample examples for owner/Board review.
 
 ## Research exit criterion
