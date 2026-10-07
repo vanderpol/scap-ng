@@ -1,0 +1,60 @@
+name: Apache authoring reuse research
+
+on:
+  push:
+    paths:
+      - tools/analyze_apache_authoring_reuse.py
+      - .github/workflows/apache-authoring-reuse-research.yml
+      - research/assessment-simplification/apache-reuse-15/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+  ARTIFACT: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Convert pinned Apache benchmark
+        run: |
+          python - <<'PY'
+          import os, shutil, subprocess, sys
+          from pathlib import Path
+          source=Path("niwc/Current")/os.environ["ARTIFACT"]
+          out=Path("work/apache")
+          split=Path("work/split-apache")
+          subprocess.run([
+              sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+              "--output",str(out),
+              "--split-root",str(split),
+              "--source-revision",os.environ["NIWC_REVISION"],
+              "--source-repository-path","Current/"+os.environ["ARTIFACT"],
+              "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+              "--summary",str(out/"source-generation.json"),
+          ],check=True)
+          shutil.rmtree(split,ignore_errors=True)
+          PY
+      - name: Measure repeated authoring graph
+        run: |
+          python scap-ng/tools/analyze_apache_authoring_reuse.py work/apache             --output work/apache-authoring-reuse.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apache-authoring-reuse
+          path: work/apache-authoring-reuse.json
+          if-no-files-found: error
