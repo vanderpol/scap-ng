@@ -620,7 +620,6 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             # one-operand union whose inline Object is the unfiltered source.
             title=obj.get("object_title")
             base=copy.deepcopy(obj)
-            base.pop("object_title",None)
             obj.clear()
             obj["capability"]=native
             if title is not None:
