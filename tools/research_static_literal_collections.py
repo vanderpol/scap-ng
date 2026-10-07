@@ -73,18 +73,22 @@ def inline_constants(document):
         if not refs:
             continue
 
+        # Automatic folding is atomic per Variable. If any reference is not in
+        # the proven literal-replacement class, leave the Variable and every
+        # reference unchanged rather than partially rewriting or failing the
+        # containing Assessment/package.
+        planned = []
+        supported = True
         for path in refs:
             parent, last = path_parent(assessment, path)
             if parent[last] != {"variable": variable_id}:
-                raise ValueError(
-                    f"unexpected Variable reference shape for {variable_id!r} at {path!r}"
-                )
+                supported = False
+                break
 
             if isinstance(literal, list):
                 if not path or path[-1] != "value":
-                    raise ValueError(
-                        f"list constant {variable_id!r} is not a direct entity value at {path!r}"
-                    )
+                    supported = False
+                    break
                 replacement = copy.deepcopy(literal)
                 mode = classify_collection_path(path)
             elif path and path[-1] == "value":
@@ -93,8 +97,14 @@ def inline_constants(document):
             else:
                 replacement = {"literal": copy.deepcopy(literal)}
                 mode = "expression_scalar_ref"
+            planned.append((path, replacement, mode))
 
-            parent[last] = replacement
+        if not supported:
+            continue
+
+        for path, replacement, mode in planned:
+            parent, last = path_parent(assessment, path)
+            parent[last] = copy.deepcopy(replacement)
             proof.append(
                 {
                     "variable": variable_id,
