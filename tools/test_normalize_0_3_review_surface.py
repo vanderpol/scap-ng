@@ -22,24 +22,35 @@ class ReviewSurfaceNormalizationTests(unittest.TestCase):
                 "assessment":{
                     "id":"benchmark.rhel_9.SV-1.automated",
                     "mode":"automated",
+                    "objects":{
+                        "sample-object-2":{
+                            "capability":"unix.file",
+                            "select":{"path":{"value":"/x","datatype":"string","operation":"equal"}},
+                        }
+                    },
+                    "states":{
+                        "state-root-owned":{
+                            "capability":"unix.file",
+                            "state":{"field":"owner","value":"root","operation":"equal"},
+                        }
+                    },
+                    "variables":{
+                        "threshold-variable-2":{
+                            "kind":"constant",
+                            "datatype":"integer",
+                            "expression":{"literal":1},
+                        }
+                    },
                     "tests":{
-                        "t":{
+                        "test-file-owner":{
                             "check_existence":"some",
                             "check":"any",
                             "states_match":"any",
-                            "object":{
-                                "capability":"unix.file",
-                                "select":{
-                                    "path":{
-                                        "value":"/x",
-                                        "datatype":"string",
-                                        "operation":"equal",
-                                    }
-                                },
-                                "filesystem":"any",
-                            },
+                            "object":"sample-object-2",
+                            "states":["state-root-owned"],
                         }
                     },
+                    "evaluate":{"test":"test-file-owner"},
                 }
             },sort_keys=False),encoding="utf-8")
             (rp/"SV-1.rule.yaml").write_text(yaml.safe_dump({
@@ -62,17 +73,19 @@ class ReviewSurfaceNormalizationTests(unittest.TestCase):
             doc=yaml.safe_load(candidate.read_text())
             a=doc["assessment"]
             self.assertEqual(a["id"],"SV-1.automated")
-            t=a["tests"]["t"]
+            self.assertIn("sample-2-object",a["objects"])
+            self.assertIn("root-owned-state",a["states"])
+            self.assertIn("threshold-2-variable",a["variables"])
+            self.assertIn("file-owner-test",a["tests"])
+            t=a["tests"]["file-owner-test"]
             self.assertNotIn("check_existence",t)
             self.assertNotIn("check",t)
             self.assertEqual(t["existence"],"one_or_more")
             self.assertEqual(t["match"],"one_or_more")
             self.assertEqual(t["states_match"],"any")
-            self.assertEqual(
-                t["object"]["select"]["path"]["operation"],
-                "equals",
-            )
-            self.assertEqual(t["object"]["filesystem"],"all")
+            self.assertEqual(t["object"],"sample-2-object")
+            self.assertEqual(t["states"],["root-owned-state"])
+            self.assertEqual(a["evaluate"]["test"],"file-owner-test")
 
             rule=yaml.safe_load((rp/"SV-1.rule.yaml").read_text())["rule"]
             choice=rule["assessment_choices"]["automated"]
