@@ -48,6 +48,10 @@ from research_inline_private_components import (
     first_difference,
     context_signature,
 )
+from research_static_literal_collections import (
+    inline_constants,
+    reexpand_constants,
+)
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
 
 
