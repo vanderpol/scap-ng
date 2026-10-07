@@ -1,0 +1,134 @@
+name: Evaluate structure research
+
+on:
+  push:
+    paths:
+      - tools/measure_evaluate_shapes.py
+      - .github/workflows/evaluate-structure-research.yml
+      - research/assessment-simplification/evaluate-20/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: rhel9
+            label: RHEL 9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - key: oracle-linux9
+            label: Oracle Linux 9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+          - key: windows11
+            label: Windows 11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: windows-server-2025
+            label: Windows Server 2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+          - key: apache24
+            label: Apache 2.4 UNIX Server
+            artifact: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+          - key: tomcat9
+            label: Apache Tomcat 9
+            artifact: U_Apache_Tomcat_Application_Server_9_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Convert pinned benchmark
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+          KEY: ${{ matrix.key }}
+        run: |
+          python scap-ng/tools/generate_niwc_current_review.py "niwc/Current/$ARTIFACT" \
+            --output "work/$KEY" \
+            --split-root "work/split-$KEY" \
+            --source-revision "$NIWC_REVISION" \
+            --source-repository-path "Current/$ARTIFACT" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --summary "work/$KEY/source-generation.json"
+      - name: Measure evaluate shapes
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/measure_evaluate_shapes.py "work/$KEY" \
+            --label "$LABEL" \
+            --output "work/$KEY.evaluate.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evaluate-shape-${{ matrix.key }}
+          path: work/*.evaluate.json
+          if-no-files-found: error
+
+  aggregate:
+    needs: measure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: evaluate-shape-*
+          path: reports
+      - name: Aggregate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("*.evaluate.json"))]
+          totals=Counter()
+          roots=Counter(); buckets=Counter(); max_depth=0; max_nodes=0
+          packages=[]
+          for r in reports:
+              s=r["summary"]; packages.append({"label":r["label"],"summary":s})
+              for k in (
+                  "assessments","trivial_single_test_evaluate","flat_test_operator",
+                  "nested_evaluate_depth_gt_2","assessments_with_repeated_test_refs",
+                  "assessments_with_unreferenced_tests",
+              ):
+                  totals[k]+=s[k]
+              roots.update(s["evaluate_root_counts"])
+              buckets.update(s["test_count_buckets"])
+              max_depth=max(max_depth,s["max_evaluate_depth"])
+              max_nodes=max(max_nodes,s["max_evaluate_nodes"])
+          n=totals["assessments"]
+          summary={
+              **dict(totals),
+              "evaluate_root_counts":dict(roots),
+              "test_count_buckets":dict(buckets),
+              "trivial_single_test_percent":round(100*totals["trivial_single_test_evaluate"]/n,1) if n else 0,
+              "flat_test_operator_percent":round(100*totals["flat_test_operator"]/n,1) if n else 0,
+              "nested_evaluate_percent":round(100*totals["nested_evaluate_depth_gt_2"]/n,1) if n else 0,
+              "max_evaluate_depth":max_depth,
+              "max_evaluate_nodes":max_nodes,
+          }
+          out={
+              "format":"scap-ng-evaluate-shape-aggregate-0.1",
+              "status":"research_only_not_accepted_design",
+              "packages":packages,
+              "summary":summary,
+          }
+          Path("evaluate-shape-aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(out,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evaluate-shape-aggregate
+          path: evaluate-shape-aggregate.json
