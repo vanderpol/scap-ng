@@ -4,7 +4,7 @@
   "x-scap-ng-version": "0.3.0",
   "x-last-modified": "2026-10-07",
   "title": "SCAP-NG Assessment v0.3.0 draft",
-  "description": "Versioned SCAP-NG Assessment 0.3.0 draft. Automated mode includes conditional expressions, dependencies, intrinsic applicability and reported_elements; manual mode uses the colocated 0.3.0 manual contract.",
+  "description": "Versioned SCAP-NG Assessment 0.3.0 draft. Automated mode includes consumer-local Objects/States, shared_objects for reusable/referenceable acquisition, typed literal collections, collection for_each (including chained/nested lineage), inherited conditional expressions, dependencies, intrinsic applicability and reported_elements; manual mode uses the colocated 0.3.0 manual contract.",
   "type": "object",
   "required": [
     "assessment"
@@ -79,14 +79,13 @@
         },
         "states": {
           "type": "object",
-          "description": "Optional named predicates/States. Omit when Tests do not require separate State predicates.",
+          "description": "Optional named States retained only when independent/reusable predicate identity is meaningful. Private States are authored inline with their consumer.",
           "additionalProperties": {
-            "type": "object",
-            "not": {
-              "required": [
-                "result"
-              ]
-            }
+            "allOf": [
+              {
+                "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/inline_state"
+              }
+            ]
           },
           "propertyNames": {
             "type": "string",
@@ -118,16 +117,12 @@
                 "minLength": 1
               },
               "object": {
-                "type": "string",
-                "minLength": 1,
-                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
+                "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/object_use"
               },
               "states": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "minLength": 1,
-                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-state$"
+                  "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/state_use"
                 },
                 "uniqueItems": true
               },
@@ -307,14 +302,13 @@
         "evidence_guidance": {},
         "shared_objects": {
           "type": "object",
-          "description": "Assessment-scoped named resource-selection/acquisition Objects. Use only when acquisition identity is intentionally reusable/referenceable (including named for_each sources); private Objects belong with their semantic consumer.",
+          "description": "Assessment-scoped named Objects with meaningful reusable/referenceable acquisition identity. Private Objects are authored inline with their consumer.",
           "additionalProperties": {
-            "type": "object",
-            "not": {
-              "required": [
-                "result"
-              ]
-            }
+            "allOf": [
+              {
+                "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/inline_object"
+              }
+            ]
           },
           "propertyNames": {
             "type": "string",
