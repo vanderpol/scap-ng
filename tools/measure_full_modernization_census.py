@@ -4,13 +4,13 @@
 This is a research census, not a converter and not an accepted 0.3 authoring
 implementation. It starts from the faithful current conversion and applies only
 bounded transformations with existing exact proof contracts:
-- shared Observation extraction for the proven Apache/Windows/dconf shapes;
 - foreach v1 for its fail-closed proven class;
 - consumer-local Object/State/Set/Variable-Object presentation with exact
   structural re-expansion.
 
-Semantic-change candidates such as conditional/case authoring and linux.fstab
-are reported separately by their dedicated research and are not rewritten here.
+Deferred/non-0.3 features such as shared Observation, broader conditional/case
+authoring, and linux.fstab are measured separately and are not applied to the
+accepted 0.3 candidate stack.
 """
 from __future__ import annotations
 
@@ -340,6 +340,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
 
         planned=observation_plan.get(index)
         if planned is not None:
+            # Observation is deferred from normative 0.3. Preserve the exact
+            # proof/census as a future opportunity, but do not rewrite accepted
+            # candidate content through an Observation artifact.
             kind,obs,fp=planned
             extracted,restored,info=apply_observation(kind,working,obs)
             if restored!=working:
@@ -347,11 +350,9 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                 raise ValueError(
                     f"Observation round-trip mismatch for {row['relative_path']}: {detail}"
                 )
-            working=extracted
-            observation_applied=True
             observation_types[kind]+=1
-            totals["observation_consumer_assessments"]+=1
-            totals["observation_export_references"]+=info["export_reference_count"]
+            totals["deferred_observation_candidate_assessments"]+=1
+            totals["deferred_observation_export_references"]+=info["export_reference_count"]
             for export,count in info["export_reference_counts"].items():
                 observation_exports[f"{kind}:{export}"]+=count
             artifact_key=(kind,fp)
@@ -366,15 +367,16 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                     "variables":len(contract.get("variables") or {}),
                     "exports":len(contract.get("exports") or {}),
                 }
-                totals["observation_artifacts"]+=1
-                totals["observation_unique_objects"]+=len(contract.get("objects") or {})
-                totals["observation_unique_variables"]+=len(contract.get("variables") or {})
+                totals["deferred_observation_candidate_artifacts"]+=1
+                totals["deferred_observation_unique_objects"]+=len(contract.get("objects") or {})
+                totals["deferred_observation_unique_variables"]+=len(contract.get("variables") or {})
             contract=obs["observation"]
-            totals["observation_object_occurrences_factored"]+=len(contract.get("objects") or {})
-            totals["observation_variable_occurrences_factored"]+=len(contract.get("variables") or {})
+            totals["deferred_observation_object_occurrences"]+=len(contract.get("objects") or {})
+            totals["deferred_observation_variable_occurrences"]+=len(contract.get("variables") or {})
             observation_info={
                 "type":kind,
                 "fingerprint":fp,
+                "status":"deferred_post_0_3",
                 **info,
             }
 
@@ -534,8 +536,8 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
             for kind,counts in sorted(complex_residuals_by_kind.items())
         },
         "foreach_review_reason_counts":dict(foreach_review),
-        "observation_consumer_counts":dict(observation_types),
-        "observation_export_reference_counts":dict(observation_exports),
+        "deferred_observation_candidate_counts":dict(observation_types),
+        "deferred_observation_export_reference_counts":dict(observation_exports),
         "retained_object_reason_counts":dict(retained_object_reasons),
         "retained_object_context_counts":dict(retained_object_contexts),
         "retained_object_context_signature_counts":dict(retained_object_context_signatures),
@@ -568,10 +570,10 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
                 "single-use external/constant Variable locality",
                 "single-use leaf derived Variable locality",
                 "foreach.direct-object-component.at-least-one.v1",
-                "proven shared Observation extraction shapes",
             ],
             "measured_not_applied":[
                 "single-Test evaluate-root authoring ceremony",
+                "proven shared Observation extraction shapes (deferred post-0.3)",
             ],
             "intentionally_not_rewritten":[
                 "conditional/case native authoring",
@@ -583,7 +585,7 @@ def build_report(root:Path,*,label:str,source_artifact:str|None=None):
         },
         "observation_plan":observation_summary,
         "observation_candidate_errors":candidate_errors,
-        "observation_artifacts":applied_artifact_contracts,
+        "deferred_observation_candidates":applied_artifact_contracts,
         "summary":summary,
         "assessments":assessment_rows,
     }
