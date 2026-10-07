@@ -130,6 +130,32 @@ def normalized_text(doc: dict) -> str:
     return yaml.safe_dump(doc, sort_keys=False, width=120, allow_unicode=True)
 
 
+def first_difference(expected: Any, actual: Any, path: str="$") -> str | None:
+    if type(expected) is not type(actual):
+        return f"{path}: type {type(expected).__name__} != {type(actual).__name__}"
+    if isinstance(expected,dict):
+        if set(expected) != set(actual):
+            missing=sorted(set(expected)-set(actual))
+            extra=sorted(set(actual)-set(expected))
+            return f"{path}: keys missing={missing} extra={extra}"
+        for key in expected:
+            found=first_difference(expected[key],actual[key],f"{path}.{key}")
+            if found:
+                return found
+        return None
+    if isinstance(expected,list):
+        if len(expected)!=len(actual):
+            return f"{path}: list length {len(expected)} != {len(actual)}"
+        for index,(left,right) in enumerate(zip(expected,actual)):
+            found=first_difference(left,right,f"{path}[{index}]")
+            if found:
+                return found
+        return None
+    if expected != actual:
+        return f"{path}: expected={expected!r} actual={actual!r}"
+    return None
+
+
 def metrics(doc: dict) -> dict:
     a=doc.get("assessment",{})
     tests=a.get("tests") or {}
@@ -553,7 +579,8 @@ def main():
         )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
-            raise SystemExit(f"round-trip structural mismatch: {path}")
+            detail=first_difference(doc,expanded) or "unknown structural difference"
+            raise SystemExit(f"round-trip structural mismatch: {path}: {detail}")
         after=metrics(rendered)
 
         relname=path.stem.replace(".assessment","")+".inline-private.yaml"
