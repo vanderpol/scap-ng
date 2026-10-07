@@ -43,6 +43,7 @@ jobs:
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_inline_private_components.py -v
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_measure_full_modernization_census.py -v
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_measure_post_modernization_residual_patterns.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_normalize_0_3_review_surface.py -v
 
   render:
     name: Candidate review - ${{ matrix.label }}
@@ -148,6 +149,7 @@ jobs:
             --output-json "work/review/$KEY/SCORECARD.json" \
             --output-markdown "work/review/$KEY/SCORECARD.md"
           cp "work/evidence/$KEY/render-report.json" "work/review/$KEY/RENDER-PROOF.json"
+          cp "work/evidence/$KEY/review-surface-normalization.json" "work/review/$KEY/REVIEW-SURFACE.json"
           cp "work/evidence/$KEY/residual-patterns.json" "work/review/$KEY/RESIDUAL-PATTERNS.json"
 
       - name: Verify candidate YAML parses
@@ -163,8 +165,15 @@ jobs:
           if not files:
               raise SystemExit("candidate tree has no YAML")
           for path in files:
-              yaml.safe_load(path.read_text(encoding="utf-8"))
-          print(f"parsed {len(files)} candidate YAML documents")
+              doc=yaml.safe_load(path.read_text(encoding="utf-8"))
+              text=path.read_text(encoding="utf-8")
+              if "check_existence:" in text:
+                  raise SystemExit(f"legacy check_existence remains: {path}")
+              if "filesystem: any" in text:
+                  raise SystemExit(f"legacy filesystem any remains: {path}")
+              if path.parent.name in {"automated","manual","applicability"} and path.name.startswith("benchmark."):
+                  raise SystemExit(f"redundant benchmark Assessment filename remains: {path}")
+          print(f"parsed and presentation-audited {len(files)} candidate YAML documents")
           PY
 
       - uses: actions/upload-artifact@v4
