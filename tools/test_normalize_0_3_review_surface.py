@@ -73,7 +73,8 @@ class ReviewSurfaceNormalizationTests(unittest.TestCase):
             doc=yaml.safe_load(candidate.read_text())
             a=doc["assessment"]
             self.assertEqual(a["id"],"SV-1.automated")
-            self.assertIn("sample-2-object",a["objects"])
+            self.assertNotIn("objects",a)
+            self.assertIn("sample-2-object",a["shared_objects"])
             self.assertIn("root-owned-state",a["states"])
             self.assertIn("threshold-2-variable",a["variables"])
             self.assertIn("file-owner-test",a["tests"])
