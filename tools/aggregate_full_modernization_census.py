@@ -227,6 +227,9 @@ def main() -> int:
                 "consumer-local Object/State presentation",
                 "private Set-operand locality",
                 "Variable-local Object locality",
+                "recursive private Object-graph locality",
+                "single-use external/constant Variable locality",
+                "single-use leaf-derived Variable locality",
                 "foreach.direct-object-component.at-least-one.v1",
             ],
             "measured_not_applied": [
