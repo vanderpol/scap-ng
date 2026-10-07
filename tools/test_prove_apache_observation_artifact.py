@@ -21,6 +21,7 @@ class ApacheObservationPrototypeTests(unittest.TestCase):
         variables={name:{"kind":"local","datatype":"string","expression":{"literal":name}} for name in CORE_VARIABLES}
         exported_source=next(iter(EXPORTS))
         private_source=next(name for name in CORE_VARIABLES if name not in EXPORTS)
+        objects["local-object"]={"capability":"x","value":"local"}
         return {
             "assessment":{
                 "id":"SV-test",
@@ -31,7 +32,7 @@ class ApacheObservationPrototypeTests(unittest.TestCase):
                 "tests":{
                     "one":{
                         "capability":"x",
-                        "object":CORE_OBJECTS[0],
+                        "object":"local-object",
                         "some_exported_value":exported_source,
                     }
                 },
@@ -67,11 +68,7 @@ class ApacheObservationPrototypeTests(unittest.TestCase):
     def test_private_node_reference_is_rejected(self):
         source,private_source=self.source()
         observation=observation_payload(source["assessment"])
-        # Remove the private reference before extraction so extraction itself
-        # succeeds, then inject a forbidden private reference afterward.
         source2=copy.deepcopy(source)
-        source2["assessment"]["tests"]["one"]["object"]="local-object"
-        source2["assessment"]["objects"]["local-object"]={"capability":"x","value":"local"}
         observation=observation_payload(source2["assessment"])
         extracted,_=extract(source2,observation)
         extracted["assessment"]["tests"]["one"]["bad_private_ref"]=private_source
