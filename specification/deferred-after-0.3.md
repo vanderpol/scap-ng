@@ -2,19 +2,29 @@
 
 **Status:** authoritative scope boundary for the 0.3 OVAL Board checkpoint.
 
-The 0.3 requirement set is maintained in [#174](https://github.com/vanderpol/scap-ng/issues/174). This page lists work that remains valuable but is **not normative 0.3 language/runtime**.
+The 0.3 requirement set is maintained in [#174](https://github.com/vanderpol/scap-ng/issues/174).
 
-## Deferred semantic/runtime work
+## Core design deferred from 0.3
+
+Only two core assessment-language design topics are intentionally deferred:
 
 | Item | 0.3 boundary | Why deferred |
 | --- | --- | --- |
 | [#166 Shared Observation](https://github.com/vanderpol/scap-ng/issues/166) | No normative Observation artifact/export/result contract in 0.3. | Production value is proven, but typed exports, execution/result provenance, binding identity, manifest dependency/cycle handling, and cache/reuse semantics need a complete interoperable contract. |
-| [#168 Typed `linux.fstab` capability](https://github.com/vanderpol/scap-ng/issues/168) | Existing faithful checks remain; no new persistent-mount capability in 0.3. | Useful native capability, but domain-specific and requires its own collection/order/duplicate/completeness/result semantics. |
-| [#175 Organizational Input instance targeting](https://github.com/vanderpol/scap-ng/issues/175) | Organizational Input supplies expected policy State only; database/site/product-instance routing remains outside core 0.3. | Portable cross-product targeting semantics are not yet demonstrated. |
-| [#44 Broad Assessment composition/runtime collection reuse](https://github.com/vanderpol/scap-ng/issues/44) | No general cross-Assessment import/include/runtime-cache language in 0.3. | Binding, execution DAG, cache identity, short-circuiting, result reuse, evidence, and cycle semantics are too large to add safely now. |
-| [#54 Rich structured Manual interaction](https://github.com/vanderpol/scap-ng/issues/54) | 0.3 keeps simple Manual Assessment procedure + normalized outcome + provenance. | Typed multi-question/branching OCIL-like flows are useful but not required for the dominant STIG manual case. |
-| [#48 Target ownership / organization / POC metadata](https://github.com/vanderpol/scap-ng/issues/48) | Optional enterprise enrichment does not block the 0.3 core result contract. | Valuable for aggregation/routing, but not part of assessment truth and can mature independently. |
-| [#53 Full deviation/adjudication lifecycle](https://github.com/vanderpol/scap-ng/issues/53) | 0.3 preserves the principle that technical truth is not erased by policy disposition; the complete standing-deviation lifecycle/scoring model is later work. | Scope, expiration, revocation, scoring, effective outcome, and adjudication vocabulary need separate policy/results design. |
+| [#167 `evaluate` redesign](https://github.com/vanderpol/scap-ng/issues/167) | Keep the existing named-Test + explicit `evaluate` model unchanged for 0.3. No implicit one-Test root, nested Test-definition model, new shorthand, or canonical placement redesign. | Real multi-Test/six-state composition still requires `evaluate`; redesigning it now would create a second canonical authoring model without enough benefit for this checkpoint. |
+
+These are **deferred, not rejected**. Their research remains available for the next design cycle.
+
+## Other future work outside the 0.3 core design
+
+The following work is also not normative 0.3 language/runtime, but it is peripheral to the central authoring-modernization freeze rather than part of the core deferred design list:
+
+- [#168 typed `linux.fstab` capability](https://github.com/vanderpol/scap-ng/issues/168)
+- [#175 Organizational Input instance/database/site targeting](https://github.com/vanderpol/scap-ng/issues/175)
+- [#44 broad Assessment composition/runtime collection reuse](https://github.com/vanderpol/scap-ng/issues/44)
+- [#54 rich structured Manual interaction](https://github.com/vanderpol/scap-ng/issues/54)
+- [#48 target ownership / organization / POC enrichment](https://github.com/vanderpol/scap-ng/issues/48)
+- [#53 full deviation/adjudication lifecycle](https://github.com/vanderpol/scap-ng/issues/53)
 
 ## Explicitly out, not deferred
 
@@ -33,4 +43,4 @@ Optional tooling can continue without changing 0.3 semantics:
 - XLSX manual-audit output (#159)
 - repository normalization/deduplication tooling (#41)
 
-The rule for the Board checkpoint is simple: **deferred work may be shown as future research, but it SHALL NOT appear in the normative 0.3 schema/examples/package as accepted behavior.**
+The Board-review rule is simple: **Observation and evaluate redesign are the two deferred core design topics. Deferred or future work SHALL NOT appear in the normative 0.3 schema/examples/package as accepted behavior.**
