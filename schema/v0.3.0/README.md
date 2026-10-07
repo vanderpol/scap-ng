@@ -30,31 +30,20 @@ disabled pending its own equivalence gate.
 4. [Assessment result schema](assessment-result.schema.json)
 5. [Packaging schema](package.schema.json)
 
-For the current foreach research/proof package, see
+For accepted 0.3 collection-iteration semantics, see
+[Collection `for_each`](../../specification/assessment/foreach.md). Historical
+automatic-modernization proof remains under
 [foreach-07](../../research/assessment-simplification/foreach-07/README.md).
 
-## Foreach v1 integration
+## Collection `for_each`
 
-The first 0.3.0 `for_each` form is intentionally narrow:
+0.3 supports typed collection expansion from a named `shared_objects` source,
+including correlated chained/nested collection lineage. The semantic validator
+checks source existence, acyclic dependency, lexical alias scope, datatype
+compatibility, and consumption. Independent Cartesian expansion is not implicit.
 
-```yaml
-for_each:
-  item: user
-  in: users
+Automatic SCAP 1.4 modernization remains fail-closed to transformation classes
+with an exact equivalence proof; native language support is broader than the
+currently proven automatic rewrite class.
 
-select:
-  directory:
-    from: user.home_dir
-```
-
-Its normative meaning remains the faithful
-Object -> ObjectComponent -> local Variable -> target Object selector graph with
-at-least-one selector quantification and one combined target Object population.
-
-The 0.3.0 semantic validator rejects unsupported v1 shapes such as missing
-source Objects, mismatched aliases, incompatible source/target datatypes,
-multiple bound selectors, helper targets not directly used by a Test, and
-independent additional Variable selectors.
-
-See the [foreach research/proof package](../../research/assessment-simplification/foreach-07/README.md)
-for the production proof and explicit exclusions.
+See [Collection `for_each`](../../specification/assessment/foreach.md).
