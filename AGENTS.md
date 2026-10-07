@@ -79,6 +79,17 @@ The `specification/` tree is release output, not an active research notebook.
 - After that checkpoint, leave the specification unchanged until the next
   prerelease/release promotion.
 
+## Release changelog invariant
+
+- `CHANGELOG.md` SHALL summarize material delivered changes by release.
+- The active release SHALL have an **Unreleased** section.
+- Every changelog entry SHALL link to the GitHub issue(s) that explain the work.
+- Do not list research-only, deferred, or rejected proposals as delivered
+  features.
+- At release/freeze, freeze the Unreleased entries under that version/date.
+- Release notes SHALL be derived from issue-linked release work, not reconstructed
+  from chat history or commit messages alone.
+
 ## Versioned schema snapshot invariant
 
 This is a hard repository rule for every SCAP-NG schema version.
