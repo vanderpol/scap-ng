@@ -587,11 +587,17 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             continue
         test["capability"]=native
         if "check_existence" in test:
-            test["check_existence"]=_translate(
-                mapping,"existence",test["check_existence"]
-            )
+            translated=_translate(mapping,"existence",test.pop("check_existence"))
+            if mapping.get("specification_version")=="0.3.0":
+                test["existence"]=translated
+            else:
+                test["check_existence"]=translated
         if "check" in test:
-            test["check"]=_translate(mapping,"check",test["check"])
+            translated=_translate(mapping,"check",test.pop("check"))
+            if mapping.get("specification_version")=="0.3.0":
+                test["match"]=translated
+            else:
+                test["check"]=translated
         if "state_operator" in test:
             legacy_operator=test.pop("state_operator")
             test["states_match"]=LOGICAL_OPERATOR.get(
