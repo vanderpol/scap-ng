@@ -45,6 +45,24 @@ This is a hard repository operating rule for ChatGPT, Codex, and other autonomou
 - If no owner decision is required, the default action is **continue executing**.
 - Completion claims SHALL describe the actual completed task and its verification state; partial progress SHALL be labeled as partial and SHALL NOT be used as a reason to end execution.
 
+## Specification release invariant
+
+The `specification/` tree is release output, not an active research notebook.
+
+- Between prerelease/release checkpoints, do not edit normative specification
+  pages merely because research, implementation, or review discovers a possible
+  improvement.
+- Record proposed changes in GitHub issues, research records, tests, and review
+  packets until the next specification promotion.
+- Candidate syntax, unresolved design questions, implementation history, and
+  superseded prototypes SHALL NOT be added to normative specification pages.
+- During prerelease/release preparation, consolidate accepted changes into the
+  specification in one bounded pass, remove obsolete development rationale and
+  duplication, regenerate/revalidate the examples, and review the specification
+  as a coherent whole.
+- After that checkpoint, leave the specification unchanged until the next
+  prerelease/release promotion.
+
 ## Versioned schema snapshot invariant
 
 This is a hard repository rule for every SCAP-NG schema version.
