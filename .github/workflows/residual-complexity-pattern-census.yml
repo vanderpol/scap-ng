@@ -99,6 +99,8 @@ jobs:
           variable_kinds=Counter()
           cluster_counts=Counter()
           cluster_meta={}
+          motif_counts=Counter()
+          motif_meta={}
           coarse_counts=Counter()
           coarse_meta={}
           reason_combinations=Counter()
@@ -113,6 +115,10 @@ jobs:
                   fp=row["shape_fingerprint"]
                   cluster_counts[fp]+=row["count"]
                   cluster_meta.setdefault(fp,row)
+              for row in r.get("top_coarse_motifs",[]):
+                  key=row["motif_key"]
+                  motif_counts[key]+=row["count"]
+                  motif_meta.setdefault(key,row)
               for row in r.get("top_coarse_pattern_families",[]):
                   fp=row["coarse_fingerprint"]
                   coarse_counts[fp]+=row["count"]
@@ -130,6 +136,11 @@ jobs:
                   round(100*count/totals["residual"],2) if totals["residual"] else 0
               )
               coarse_ranked.append(row)
+          coarse=[]
+          for key,count in motif_counts.most_common(50):
+              row=dict(motif_meta[key])
+              row["aggregate_count"]=count
+              coarse.append(row)
           out={
               "format":"scap-ng-residual-complexity-pattern-census-aggregate-0.1",
               "status":"research_only_not_accepted_design",
@@ -151,6 +162,7 @@ jobs:
                   "unique_coarse_pattern_families_observed_in_top_lists":len(coarse_counts),
               },
               "top_coarse_pattern_families":coarse_ranked,
+              "top_coarse_motifs":coarse,
               "top_residual_shapes":ranked,
           }
           Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
