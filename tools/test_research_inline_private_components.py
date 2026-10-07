@@ -66,6 +66,18 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
             identity["retained_state_reasons"]["shared-state"],
             "multiple_tests",
         )
+        self.assertEqual(
+            identity["retained_object_contexts"]["shared-object"],
+            {"test_object":2},
+        )
+        self.assertEqual(
+            identity["retained_object_contexts"]["variable-source"],
+            {"variable":1},
+        )
+        self.assertEqual(
+            identity["retained_state_contexts"]["shared-state"],
+            {"test_state":2},
+        )
 
     def test_variable_reference_prevents_object_inlining(self):
         source=self.base()
