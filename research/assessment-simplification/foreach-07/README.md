@@ -203,6 +203,101 @@ contradictory semantic change. For any source status not fully determined by the
 current normative material, the graph-desugaring definition remains the
 authoritative SCAP-NG behavior rather than an invented loop-specific rule.
 
+## Second bounded candidate: unary literal concat
+
+A second production pattern is now narrow enough for the same desugaring
+approach:
+
+```
+source Object
+  -> object_component(item_field)
+  -> concat(literal-prefix, projected-value, literal-suffix)
+  -> local Variable
+  -> target Object selector var_ref(var_check="at least one")
+```
+
+This is **not** general `concat` support. OVAL `concat` forms the Cartesian
+product of its operands. The bounded identity is safe only when exactly one
+operand is collection-valued and every other operand is a singleton string
+literal. In that case the Cartesian product degenerates to a one-to-one map.
+
+The candidate transformation identifier is:
+
+`foreach.unary-concat-object-component.at-least-one.v1`
+
+Its normative meaning is the original graph above. The shorthand SHALL preserve
+the ObjectComponent and concat status boundaries; in particular, zero source
+Items remain an ObjectComponent error and a non-complete source is not silently
+treated as a complete list.
+
+### Real RHEL 9 example
+
+SV-258013, SV-258020 and SV-258026 derive dconf lock directories from
+`system-db:<name>` entries in `/etc/dconf/profile/user`:
+
+```yaml
+expression:
+  concat:
+    - literal: /etc/dconf/db/
+    - object_values:
+        # project system-db capture
+        field: subexpression
+    - literal: .d/locks
+```
+
+The target TextFileContent Object then uses those strings as its `path`
+selector with `variable_check: at least one`.
+
+A native authoring sketch can make the relationship visible without deleting
+the semantic nodes:
+
+```yaml
+foreach:
+  item:
+    collect: dconf-user-databases
+    field: subexpression
+  bind: database
+  map:
+    concat:
+      - /etc/dconf/db/
+      - database
+      - .d/locks
+  into:
+    collect:
+      capability: independent.textfilecontent54
+      select:
+        path: each
+        filename:
+          operation: pattern match
+          value: .*
+```
+
+The concrete syntax is still research. The important part is the desugaring,
+not the spelling.
+
+### Boundary examples
+
+The same RHEL corpus contains useful counterexamples:
+
+- **SV-258134 (AIDE)** concatenates values from two independent collected
+  sources. That can create a Cartesian product and is **not** this proof class.
+- **SV-258042** builds a regex consumed through filtering/state logic rather
+  than the first target-Object-selector class.
+- **SV-258174** derives a shell command; even though it has one collected
+  operand, shell-command acquisition and selector-quantifier details require a
+  separate review class.
+- multi-source, nested-function, `var_check=all`, shared-consumer, record-field
+  and non-string cases remain rejected by this first unary-concat proof.
+
+Focused helpers and tests live in:
+
+- `tools/foreach_equivalence.py`;
+- `tools/test_foreach_unary_concat.py`; and
+- `tools/analyze_oval_foreach_candidates.py`.
+
+The analyzer reports this proof class separately from both direct projection and
+general derived/`concat` candidates.
+
 ## Automatic rejection / review-required conditions
 
 The first modernization pass should refuse or require human review when any of
