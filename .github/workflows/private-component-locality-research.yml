@@ -97,6 +97,31 @@ jobs:
             --metrics-only \
             --label "$LABEL"
           cp "work/census/$KEY/report.json" "work/research/$KEY/census-report.json"
+      - name: Measure recursive private Set-operand locality
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/recursive-census/$KEY" \
+            --all-assessments \
+            --metrics-only \
+            --inline-private-set-operands \
+            --label "$LABEL"
+          cp "work/recursive-census/$KEY/report.json" "work/research/$KEY/recursive-census-report.json"
+      - name: Render recursive locality review examples
+        env:
+          KEY: ${{ matrix.key }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          python scap-ng/tools/research_inline_private_components.py "work/source/$KEY" \
+            --output "work/recursive-sample/$KEY" \
+            --count 10 \
+            --inline-private-set-operands \
+            --label "$LABEL"
+          mkdir -p "work/research/$KEY/recursive"
+          find "work/recursive-sample/$KEY" -maxdepth 1 -type f ! -name report.json -exec cp {} "work/research/$KEY/recursive/" \;
+          cp "work/recursive-sample/$KEY/report.json" "work/research/$KEY/recursive-sample-report.json"
       - uses: actions/upload-artifact@v4
         with:
           name: private-component-locality-${{ matrix.key }}
@@ -119,6 +144,8 @@ jobs:
           from pathlib import Path
           sample_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("report.json"))]
           census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("census-report.json"))]
+          recursive_sample_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("recursive-sample-report.json"))]
+          recursive_census_reports=[json.loads(p.read_text()) for p in sorted(Path("reports").rglob("recursive-census-report.json"))]
           def aggregate(reports):
               totals={}
               for r in reports:
@@ -130,6 +157,7 @@ jobs:
               return {
                   **totals,
                   "cross_reference_reduction_percent":reduction(totals.get("cross_refs_before",0),totals.get("cross_refs_after",0)),
+                  "named_component_reference_reduction_percent":reduction(totals.get("named_refs_before",0),totals.get("named_refs_after",0)),
                   "line_reduction_percent":reduction(totals.get("lines_before",0),totals.get("lines_after",0)),
                   "byte_reduction_percent":reduction(totals.get("bytes_before",0),totals.get("bytes_after",0)),
                   "object_scope_reduction_percent":reduction(totals.get("objects_before",0),totals.get("objects_after",0)),
@@ -145,6 +173,14 @@ jobs:
               "full_census":{
                   "packages":[{"label":r["label"],"summary":r["summary"]} for r in census_reports],
                   "summary":aggregate(census_reports),
+              },
+              "recursive_set_operand_sample":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in recursive_sample_reports],
+                  "summary":aggregate(recursive_sample_reports),
+              },
+              "recursive_set_operand_full_census":{
+                  "packages":[{"label":r["label"],"summary":r["summary"]} for r in recursive_census_reports],
+                  "summary":aggregate(recursive_census_reports),
               },
           }
           Path("aggregate.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
