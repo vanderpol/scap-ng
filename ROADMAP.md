@@ -5,16 +5,17 @@ Updated: 2026-10-07.
 SCAP-NG 0.3.0 is the active pre-alpha development version. The 0.2.0 schema is
 the frozen earlier review baseline.
 
-## Current — stabilize the 0.3 language
+## Current — publish the 0.3 Board checkpoint
 
-- Finish the bounded modernization research and human-review candidate set.
-- Resolve terminology and authoring questions only where they make content
-  meaningfully clearer or more interoperable.
-- Promote accepted changes into the 0.3 schemas, specification, converter, and
-  compiler together.
-- Regenerate/revalidate source and result examples for the exact prerelease.
-- Use focused tests and the fast integration set during development; use the full
-  NIWC corpus only for intentional checkpoints.
+- Finish implementation/tests for the frozen 0.3 requirement set in #174.
+- Regenerate the six-benchmark review package with the final accepted build stack.
+- Run the final pinned 65-package migration/modernization checkpoint.
+- Reconcile the concise feature tour, schemas, migration docs, and release notes.
+- Publish one immutable prerelease review package with source/build provenance.
+
+Observation and evaluate redesign are deferred beyond 0.3; do not reopen them
+during checkpoint stabilization unless an implementation blocker proves the
+frozen requirements inconsistent.
 
 ## Next — prove independent implementation
 
