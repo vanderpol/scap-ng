@@ -279,6 +279,59 @@ proven:
 Outside that class, conversion must retain the faithful
 `textfilecontent54`/Variable graph.
 
+## First executable proof
+
+Focused fixtures now model the five split-Variable Rules for the bounded case
+where the underlying text collection is **complete** and the source
+`instance=1` selection is preserved.
+
+Files:
+
+- `tools/research_fstab_semantics.py`
+- `tools/test_research_fstab_semantics.py`
+- `.github/workflows/fstab-modernization-research.yml`
+
+The complete-source matrix proves:
+
+| Source situation | Faithful graph | Compact typed candidate |
+| --- | --- | --- |
+| no matching row | false | false |
+| first row contains required option | true | true |
+| first row lacks required option | false | false |
+| first duplicate lacks option, later duplicate has it | false | false |
+| first duplicate has option, later duplicate lacks it | true | true |
+
+The duplicate cases are important: source `instance=1` is semantic, so a later
+matching row cannot rescue or invalidate the first matching row.
+
+The fixture deliberately rejects empty option captures and parser/regex lexical
+differences rather than silently broadening the proof class.
+
+### Why this still does not permit an automatic converter rewrite
+
+The proof depends on the source collection being `complete`. Collection status
+is a **runtime result**, not a static property a converter can establish.
+
+Therefore `source_collection_status == complete` cannot be a legitimate
+compile-time precondition for rewriting published content. Non-complete source
+status, ObjectComponent value status, and the surrounding OVAL six-state
+aggregation remain part of the source semantics.
+
+This changes the recommendation:
+
+- the compact one-Test `linux.fstab` form is promising **native authoring**;
+- it is **not** currently a safe automatic migration target;
+- faithful migration must retain the source graph unless a typed shorthand is
+  normatively defined to desugar to equivalent source-status/value-production
+  behavior; and
+- a typed collector alone must not be used as justification to collapse the
+  separate presence/projection/evaluation boundaries.
+
+The next proof target is non-complete collection and ObjectComponent status. If
+that cannot be represented through ordinary typed Object/Test mechanics without
+special cases, the compact form should remain an intentional reauthoring
+improvement rather than a lossless migration rewrite.
+
 ## Before/after conclusion
 
 The typed form is materially easier to read because it states the security
@@ -304,15 +357,14 @@ Do **not** yet:
 - collapse live and persistent checks;
 - claim six-state migration equivalence.
 
-The next proof work should build a small result matrix for:
+The complete-source zero/one/duplicate matrix is now covered by focused
+fixtures. Remaining proof work is:
 
-- no matching row;
-- one matching row;
-- duplicate matching rows;
-- matching row without the option;
-- malformed option field;
-- source collection error/incomplete;
-- comments/whitespace/escaped-field cases; and
+- source collection `error`, `incomplete`, `not_collected`, and
+  `not_applicable`;
+- ObjectComponent status when the source is non-complete;
+- malformed option fields;
+- comments/whitespace/escaped-field parser-versus-regex cases; and
 - NFS/multi-row selection.
 
 ## Human status
