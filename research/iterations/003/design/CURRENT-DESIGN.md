@@ -2,7 +2,7 @@
 
 **Authoritative working-design checkpoint.** Historical experiments, generated trees, old proposal prose, and dated transition notes do not override this file. Material decisions should be reflected here when accepted by the project owner.
 
-**Current status:** SCAP-NG 0.2.0 is technically frozen for bounded human/OVAL Board review at schema baseline `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
+**Current status:** SCAP-NG 0.3.0 is the active pre-alpha development line. SCAP-NG 0.2.0 remains the frozen earlier review baseline at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`.
 
 ## Architecture
 
@@ -87,9 +87,9 @@
 - Migration/normalization evidence is not packaged by default.
 - Signing/trust profiles remain under development; self-signed demonstrations do not establish publisher trust.
 
-## Current 0.2.0 review boundary
+## Frozen 0.2.0 review baseline
 
-- The schema meaning is frozen at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d` while human/OVAL Board review proceeds.
+- The 0.2.0 schema meaning is frozen at `7cd8b1242d7fb4a2eb9b5f49c7ec3f48b2dd622d`; new semantic work belongs to 0.3.0.
 - The six converter-produced Board cases under `board/review-content/0.2.0/` are pending human acceptance.
 - ESX/VMware expansion and the two Kubernetes OVAL 6-only Tests are deferred pending recorded guidance/decisions.
 - Full runtime equivalence remains unproven; round-trip/source-reference/schema checks alone do not establish scanner equivalence.
