@@ -34,7 +34,10 @@ def main()->int:
             bool((row.get("evaluate") or {}).get("single_test_explicit_root"))
             for row in rule_rows
         ),
-        "multi_test":0,
+        "multi_test":sum(
+            int((row.get("after") or {}).get("tests",0))>1
+            for row in rule_rows
+        ),
         "nested_depth_gt_2":sum(
             int((row.get("evaluate") or {}).get("depth",0))>2
             for row in rule_rows
@@ -44,12 +47,6 @@ def main()->int:
             for row in rule_rows
         ),
     }
-    # The per-assessment row does not persist test_count, so use residual
-    # reasons to count real multi-Test composition.
-    eval_counts["multi_test"]=sum(
-        "multiple_tests_evaluate" in (row.get("residual_reasons") or [])
-        for row in rule_rows
-    )
 
     baseline={
         "objects":s.get("baseline_objects",0),
@@ -93,7 +90,11 @@ def main()->int:
         "candidate":candidate,
         "reduction_percent":reductions,
         "locality":{
-            "binding_variables_localized":s.get("private_binding_variables_localized",0),
+            "variables_localized_total":s.get("private_binding_variables_localized",0),
+            "binding_variables_localized":(
+                s.get("private_external_variables_localized",0)
+                + s.get("private_constant_variables_localized",0)
+            ),
             "external_variables_localized":s.get("private_external_variables_localized",0),
             "constant_variables_localized":s.get("private_constant_variables_localized",0),
             "leaf_derived_variables_localized":s.get("private_local_variables_localized",0),
@@ -173,6 +174,7 @@ def main()->int:
         "",
         "## Applied modernization",
         "",
+        f"- localized Variables total: **{score['locality']['variables_localized_total']}**",
         f"- localized external/constant bindings: **{score['locality']['binding_variables_localized']}** "
         f"(external {score['locality']['external_variables_localized']}, "
         f"constant {score['locality']['constant_variables_localized']})",
