@@ -1022,6 +1022,7 @@ def main():
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
         totals["inlined_variable_objects"]+=row["inlined_variable_objects"]
+        totals["inlined_object_graph_objects"]+=row["inlined_object_graph_objects"]
         totals["inlined_variables"]+=row["inlined_variables"]
         totals["inlined_states"]+=row["inlined_states"]
         totals["inlined_state_consumer_occurrences"]+=row["inlined_state_consumer_occurrences"]
