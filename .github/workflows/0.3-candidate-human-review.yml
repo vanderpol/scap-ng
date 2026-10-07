@@ -258,7 +258,7 @@ jobs:
                   "variables":score["reduction_percent"]["variables"],
                   "local_simple":cls.get("local_simple",0),
                   "bounded":cls.get("bounded_dataflow",0),
-                  "observation":cls.get("shared_observation_consumer",0),
+                  "deferred_observation":score.get("deferred_observation_opportunities",{}).get("candidate_assessments",0),
                   "complex":cls.get("meaningfully_complex",0),
               })
 
@@ -274,14 +274,14 @@ jobs:
               "",
               "## Benchmark scorecard summary",
               "",
-              "| Benchmark | Rules | Object ↓ | State ↓ | Variable ↓ | Local/simple | foreach | Observation | Complex |",
+              "| Benchmark | Rules | Object ↓ | State ↓ | Variable ↓ | Local/simple | foreach | Deferred Observation opportunities | Complex |",
               "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
           ]
           for row in rows:
               lines.append(
                   f"| {row['label']} | {row['rules']} | {row['objects']}% | "
                   f"{row['states']}% | {row['variables']}% | {row['local_simple']} | "
-                  f"{row['bounded']} | {row['observation']} | {row['complex']} |"
+                  f"{row['bounded']} | {row['deferred_observation']} | {row['complex']} |"
               )
           lines += [
               "",
@@ -290,7 +290,7 @@ jobs:
               "- Can an experienced OVAL/STIG author understand an ordinary Rule without chasing named Objects, States, or single-use Variables?",
               "- Are the remaining named Variables clearly real shared/chained dataflow?",
               "- Are localized UNION/DIFFERENCE/Filter forms clearer while retaining obvious semantics?",
-              "- Do Observation consumers make shared acquisition easier to understand without hiding policy truth?",
+              "- Are deferred Observation opportunities clearly absent from accepted candidate syntax while their future value remains measurable?",
               "- Does explicit `evaluate` remain useful when genuine composition exists, and feel like unnecessary ceremony only in the single-Test case?",
               "- Are any candidate forms harder to review than the faithful conversion?",
               "",
@@ -322,15 +322,9 @@ jobs:
               "",
               "Review the explicit `for_each` collection expansion. It preserves one Test aggregation boundary rather than turning the source population into independent per-item Tests.",
               "",
-              "## 3. Shared Observation",
+              "## 3. Deferred Observation boundary",
               "",
-              "**Apache 2.4 UNIX — SV-214251**",
-              "",
-              "- [Faithful](benchmarks/apache-unix-server/faithful-authoring/assessments/automated/benchmark.apache_server_2-4_unix_server.SV-214251.automated.assessment.yaml)",
-              "- [Candidate](benchmarks/apache-unix-server/candidate-authoring/assessments/automated/SV-214251.automated.yaml)",
-              "- [Shared Apache discovery Observation](benchmarks/apache-unix-server/candidate-authoring/shared/observations/apache-httpd-discovery.observation.yaml)",
-              "",
-              "Review whether shared acquisition/dataflow is clearer as a truthless Observation with typed exports while each Rule Assessment retains its own Tests and truth.",
+              "Observation is deliberately **not** rendered into the 0.3 candidate tree. The scorecards may report proven future Observation opportunities, but accepted 0.3 authoring remains ordinary Assessment content.",
               "",
               "## 4. Set/Filter semantics intentionally retained",
               "",
