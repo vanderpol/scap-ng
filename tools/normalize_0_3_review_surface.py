@@ -233,6 +233,27 @@ def dump_yaml(value:Any)->str:
     return yaml.safe_dump(value,sort_keys=False,width=120,allow_unicode=True)
 
 
+
+def promote_shared_objects(doc:dict,changes:list[dict])->dict:
+    """Rename the post-locality 0.3 named Object registry to shared_objects."""
+    assessment=doc.get("assessment")
+    if not isinstance(assessment,dict):
+        return doc
+    if "objects" not in assessment:
+        return doc
+    if "shared_objects" in assessment:
+        raise ValueError("Assessment cannot contain both objects and shared_objects")
+    out=copy.deepcopy(doc)
+    a=out["assessment"]
+    payload=a.pop("objects")
+    a["shared_objects"]=payload
+    changes.append({
+        "path":["assessment","shared_objects"],
+        "original_key":"objects",
+        "candidate_key":"shared_objects",
+    })
+    return out
+
 def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any:
     if isinstance(value,list):
         return [
@@ -360,6 +381,7 @@ def normalize_tree(root:Path)->dict:
         local_changes=[]
         candidate=normalize_scalar_tree(doc,(),local_changes)
         candidate=normalize_assessment_component_ids(candidate,local_changes)
+        candidate=promote_shared_objects(candidate,local_changes)
         candidate=replace_strings(candidate,file_map,id_map,local_changes)
         if candidate!=doc:
             path.write_text(dump_yaml(candidate),encoding="utf-8")
@@ -402,6 +424,7 @@ def normalize_tree(root:Path)->dict:
             "comparison_operations":"full-word snake_case",
             "filesystem_scope":["all","local","same"],
             "named_component_ids":"<meaningful-name>-<component-type>",
+            "named_object_registry":"shared_objects",
             "component_type_suffixes":[
                 "-object","-state","-variable","-test","-input"
             ],
