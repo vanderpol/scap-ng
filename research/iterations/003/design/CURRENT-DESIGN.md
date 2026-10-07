@@ -105,4 +105,4 @@
 6. Do not encode a materially ambiguous semantic choice merely because one implementation passes tests.
 7. Use the full NIWC corpus only for intentional milestones/freezes/Board deliverables.
 
-See [MAINTAINING.md](../../../../MAINTAINING.md) for the human acceptance process, [the 0.2.0 freeze record](../../../../transition/0.2.0-freeze-record-2026-10-04.md) for technical evidence, and [the OVAL Board packet](../../../../board/README.md) for current review questions.
+See [MAINTAINING.md](../../../../MAINTAINING.md) for the human acceptance process, [the 0.2.0 freeze record](../../../../transition/0.2.0-freeze-record-2026-10-04.md) for technical evidence, and [review/current](../../../../review/current/README.md) for current review questions.
