@@ -278,6 +278,75 @@ class InlinePrivateComponentResearchTests(unittest.TestCase):
         )
         self.assertEqual(reexpand(rendered,identity),source)
 
+
+    def test_variable_local_set_object_keeps_shared_child_reference(self):
+        source={
+            "assessment":{
+                "id":"variable-local-set-object",
+                "mode":"automated",
+                "objects":{
+                    "users":{
+                        "capability":"unix.password",
+                        "select":{"username":{"value":".*"}},
+                    },
+                    "non-system-users":{
+                        "capability":"unix.password",
+                        "set":{
+                            "operator":"difference",
+                            "operands":[
+                                {"object":"users","filters":[]},
+                            ],
+                        },
+                    },
+                    "root-users":{
+                        "capability":"unix.password",
+                        "set":{
+                            "operator":"intersection",
+                            "operands":[
+                                {"object":"users","filters":[]},
+                            ],
+                        },
+                    },
+                },
+                "variables":{
+                    "homes":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"values":{"object":"non-system-users","field":"home_dir"}},
+                    },
+                    "root-homes":{
+                        "kind":"local",
+                        "datatype":"string",
+                        "expression":{"values":{"object":"root-users","field":"home_dir"}},
+                    },
+                },
+                "tests":{
+                    "one":{"capability":"unix.password","object":"users"},
+                },
+                "evaluate":{"test":"one"},
+            }
+        }
+        rendered,identity=inline_private(
+            source,
+            inline_variable_object_consumers=True,
+        )
+        a=rendered["assessment"]
+        embedded=a["variables"]["homes"]["expression"]["values"]["object"]
+        self.assertIsInstance(embedded,dict)
+        self.assertEqual(
+            embedded["set"]["operands"][0]["object"],
+            "users",
+        )
+        self.assertNotIn("non-system-users",a["objects"])
+        self.assertNotIn("root-users",a["objects"])
+        self.assertIn("users",a["objects"])
+        self.assertEqual(
+            {row["object"] for row in identity["inlined_variable_objects"]},
+            {"non-system-users","root-users"},
+        )
+        self.assertEqual(reexpand(rendered,identity),source)
+
+
     def test_test_and_variable_shared_object_does_not_localize_to_variable(self):
         source=self.base()
         source["assessment"]["variables"]["other"]={
