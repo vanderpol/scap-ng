@@ -68,7 +68,7 @@ def count_filters(value:Any)->int:
     return total
 
 def set_topologies(value:Any)->list[dict]:
-    """Describe authored Set topology without interpreting Set semantics."""
+    """Describe current native Set topology without interpreting Set semantics."""
     rows=[]
     for node in walk(value):
         if not isinstance(node,dict):
@@ -76,37 +76,43 @@ def set_topologies(value:Any)->list[dict]:
         set_node=node.get("set")
         if not isinstance(set_node,dict):
             continue
-        members=set_node.get("members")
-        if not isinstance(members,list):
-            members=[]
-        member_kinds=[]
-        capabilities=[]
-        selector_key_sets=[]
-        for member in members:
-            if not isinstance(member,dict):
-                member_kinds.append("other")
+        operands=set_node.get("operands")
+        if not isinstance(operands,list):
+            operands=set_node.get("members")
+        if not isinstance(operands,list):
+            operands=[]
+
+        operand_kinds=[]
+        object_refs=[]
+        inline_capabilities=[]
+        filter_counts=[]
+        for operand in operands:
+            if not isinstance(operand,dict):
+                operand_kinds.append("other")
+                filter_counts.append(0)
                 continue
-            if isinstance(member.get("collect"),dict):
-                member_kinds.append("collect")
-                collect=member["collect"]
-                cap=collect.get("capability")
+            filters=operand.get("filters")
+            filter_counts.append(len(filters) if isinstance(filters,list) else (1 if filters else 0))
+            if isinstance(operand.get("object"),str):
+                operand_kinds.append("object_ref")
+                object_refs.append(operand["object"])
+            elif isinstance(operand.get("collect"),dict):
+                operand_kinds.append("inline_collect")
+                cap=operand["collect"].get("capability")
                 if isinstance(cap,str):
-                    capabilities.append(cap)
-                select=collect.get("select")
-                if isinstance(select,dict):
-                    selector_key_sets.append(tuple(sorted(select)))
-            elif isinstance(member.get("object"),str):
-                member_kinds.append("object_ref")
+                    inline_capabilities.append(cap)
             else:
-                member_kinds.append("other")
+                operand_kinds.append("other")
+
         rows.append({
             "operator":set_node.get("operator"),
-            "member_count":len(members),
-            "member_kinds":member_kinds,
-            "member_capabilities":sorted(set(capabilities)),
-            "selector_key_sets":[list(x) for x in selector_key_sets],
-            "all_members_collect":bool(members) and all(x=="collect" for x in member_kinds),
-            "single_member_capability":len(set(capabilities))<=1,
+            "operand_count":len(operands),
+            "operand_kinds":operand_kinds,
+            "object_ref_count":len(object_refs),
+            "inline_capabilities":sorted(set(inline_capabilities)),
+            "operand_filter_counts":filter_counts,
+            "all_object_refs":bool(operands) and all(x=="object_ref" for x in operand_kinds),
+            "all_operands_unfiltered":all(x==0 for x in filter_counts),
         })
     return rows
 
