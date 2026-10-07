@@ -43,16 +43,30 @@ def exact_variable_refs(value: Any, variable_id: str, path=()):
 
 
 def consumer_context(path: tuple[str, ...]) -> str:
+    """Classify the semantic consumer, including components localized under Tests."""
     if not path:
         return "other"
+
     root = path[0]
     if root == "variables":
         return "variable"
-    if root == "objects":
-        return "object"
     if root == "states":
         return "state"
+    if root == "objects":
+        # A Filter-local State can live lexically inside an Object after the
+        # locality transform; classify by semantic consumer rather than root.
+        tail = path[2:] if len(path) > 2 else ()
+        if "state" in tail or "states" in tail:
+            return "state"
+        return "object"
     if root == "tests":
+        # Consumer-local authoring places private Objects and States beneath
+        # the Test. Do not collapse their Variable references into "test".
+        tail = path[2:] if len(path) > 2 else ()
+        if "states" in tail or "state" in tail:
+            return "state"
+        if "object" in tail or "objects" in tail:
+            return "object"
         return "test"
     if root == "evaluate":
         return "evaluate"
