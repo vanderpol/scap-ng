@@ -35,13 +35,51 @@ def path_parent(root, path):
     return node, path[-1]
 
 
+def native_literal(value, datatype):
+    """Normalize constant lexical values to the native JSON representation."""
+    if isinstance(value,list):
+        if not value:
+            raise ValueError("constant literal collection must not be empty")
+        return [native_literal(item,datatype) for item in value]
+    if datatype=="integer":
+        if isinstance(value,int) and not isinstance(value,bool):
+            return value
+        if isinstance(value,str):
+            return int(value,10)
+        raise ValueError(f"invalid integer constant literal: {value!r}")
+    if datatype=="float":
+        if isinstance(value,bool):
+            raise ValueError(f"invalid float constant literal: {value!r}")
+        if isinstance(value,(int,float)):
+            return float(value)
+        if isinstance(value,str):
+            return float(value)
+        raise ValueError(f"invalid float constant literal: {value!r}")
+    if datatype=="boolean":
+        if isinstance(value,bool):
+            return value
+        if isinstance(value,str):
+            normalized=value.strip().lower()
+            if normalized in {"true","1"}:
+                return True
+            if normalized in {"false","0"}:
+                return False
+        raise ValueError(f"invalid boolean constant literal: {value!r}")
+    return copy.deepcopy(value)
+
+
 def constant_literal(payload):
     if not isinstance(payload, dict) or payload.get("kind") != "constant":
         return None, False
     expression = payload.get("expression")
     if not isinstance(expression, dict) or set(expression) != {"literal"}:
         return None, False
-    return copy.deepcopy(expression["literal"]), True
+    try:
+        return native_literal(expression["literal"],payload.get("datatype")), True
+    except (TypeError,ValueError):
+        # Fail closed at the transform boundary: malformed/non-native constants
+        # remain named for ordinary validation instead of being partially folded.
+        return None, False
 
 
 def classify_collection_path(path):

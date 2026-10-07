@@ -212,6 +212,31 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                     {row["code"] for row in rows},
                 )
 
+    def test_foreach_directory_binding_allows_traversal(self):
+        doc={
+            "assessment":{
+                "specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.3.0"},
+                "shared_objects":{},
+                "states":{},
+                "tests":{
+                    "files-test":{
+                        "capability":"unix.file",
+                        "object":{
+                            "capability":"unix.file",
+                            "for_each":{"item":"user","in":"users-object"},
+                            "select":{
+                                "directory":{"from":"user.home_dir"},
+                                "name":entity("^\\\\.",operation="pattern_match"),
+                            },
+                            "filesystem":"all",
+                            "traversal":{"max_depth":1,"recurse":"symlinks"},
+                        },
+                    }
+                },
+            }
+        }
+        self.assertEqual(validate_assessment_capability_semantics(doc),[])
+
     def test_v03_canonical_file_operations_are_semantically_equivalent(self):
         clean={
             "assessment":{

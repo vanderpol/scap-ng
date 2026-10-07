@@ -44,6 +44,33 @@ class StaticLiteralCollectionTests(unittest.TestCase):
         self.assertNotIn("variables", rendered["assessment"])
         self.assertEqual(proof.reexpand_constants(rendered, identity), source)
 
+    def test_integer_collection_uses_native_json_integers_and_round_trips(self):
+        source={
+            "assessment":{
+                "variables":{
+                    "uids":{
+                        "kind":"constant",
+                        "datatype":"integer",
+                        "expression":{"literal":["65534","65535","4294967294","4294967295"]},
+                    }
+                },
+                "tests":{
+                    "t":{"states":[{"state":{
+                        "value":{"variable":"uids"},
+                        "datatype":"integer",
+                        "operation":"not_equal",
+                        "variable_match":"all",
+                    }}]}
+                },
+            }
+        }
+        rendered,identity=proof.inline_constants(source)
+        self.assertEqual(
+            rendered["assessment"]["tests"]["t"]["states"][0]["state"]["value"],
+            [65534,65535,4294967294,4294967295],
+        )
+        self.assertEqual(proof.reexpand_constants(rendered,identity),source)
+
     def test_state_collection_round_trip(self):
         source = {
             "assessment": {

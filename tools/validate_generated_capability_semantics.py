@@ -193,8 +193,14 @@ def validate_file_selection_object(obj):
         })
 
     directory=select.get("directory")
+    directory_is_exact_binding=(
+        isinstance(directory,dict)
+        and set(directory)=={"from"}
+        and isinstance(directory.get("from"),str)
+    )
     if (
         isinstance(directory, dict)
+        and not directory_is_exact_binding
         and directory.get("operation") not in EQUALITY_OPERATIONS
         and traversal is not None
     ):

@@ -525,6 +525,53 @@ class V03ProductionMappingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"missing Variable"):
             apply_capability_mapping(doc,self.mapping("variable.value.json"))
 
+    def test_v03_windows_file_maps_direct_filters_without_loss(self):
+        mapping=self.mapping("windows.file.json")
+        self.assertTrue(mapping["native"]["post_alignment_ready"])
+        doc={"assessment":{
+            "objects":{"cert-files-object":{
+                "object_title":"certificate files",
+                "capability":"windows.file",
+                "select":{
+                    "path":{"value":"C:\\\\Temp","operation":"equals","datatype":"string"},
+                    "filename":{"value":"\\\\.[Pp]12$","operation":"pattern match","datatype":"string"},
+                },
+                "filters":[{"action":"exclude","state":"adobe-state"}],
+                "behaviors":{"max_depth":"1","recurse_direction":"down"},
+            }},
+            "states":{"adobe-state":{
+                "state_title":"Adobe exception",
+                "capability":"windows.file",
+                "state":{
+                    "field":"filepath","value":"Adobe.+Preflight\\\\.p12$",
+                    "operation":"pattern match","datatype":"string",
+                    "entity_check":"all","entity_existence":"at_least_one_exists",
+                },
+            }},
+            "tests":{"cert-test":{
+                "test_title":"certificate files removed",
+                "capability":"windows.file","object":"cert-files-object",
+                "check_existence":"none_exist","check":"all","states":[],
+            }},
+        }}
+        out=apply_capability_mapping(doc,mapping)
+        obj=out["assessment"]["objects"]["cert-files-object"]
+        self.assertEqual(obj["set"]["operator"],"union")
+        operand=obj["set"]["operands"][0]
+        self.assertEqual(operand["filters"],[{"action":"exclude","state":"adobe-state"}])
+        base=operand["object"]
+        self.assertEqual(base["capability"],"windows.file")
+        self.assertEqual(base["select"]["directory"]["operation"],"equals")
+        self.assertEqual(base["select"]["name"]["operation"],"pattern_match")
+        self.assertEqual(base["traversal"],{"max_depth":1,"recurse":"junctions_and_directories"})
+        self.assertEqual(base["filesystem"],"all")
+        state=out["assessment"]["states"]["adobe-state"]["state"]
+        self.assertEqual(state["field"],"full_path")
+        self.assertEqual(state["operation"],"pattern_match")
+        test=out["assessment"]["tests"]["cert-test"]
+        self.assertEqual(test["existence"],"none")
+        self.assertEqual(test["match"],"all")
+
     def test_v03_registry_uses_native_hive_type_and_test_vocabulary(self):
         mapping=self.mapping("windows.registry.json")
         self.assertTrue(mapping["native"]["post_alignment_ready"])

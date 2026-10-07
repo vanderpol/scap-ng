@@ -577,7 +577,23 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
 
         if isinstance(obj.get("set"),dict):
             obj["set"]=_transform_set(obj["set"])
-        obj.pop("filters",None)
+
+        direct_filters=copy.deepcopy(obj.pop("filters",None) or [])
+        if direct_filters and not isinstance(obj.get("set"),dict):
+            # OVAL permits filters directly on an Object. Native 0.3 keeps
+            # filters on Set operands, so represent the same population as a
+            # one-operand union whose inline Object is the unfiltered source.
+            title=obj.get("object_title")
+            base=copy.deepcopy(obj)
+            base.pop("object_title",None)
+            obj.clear()
+            obj["capability"]=native
+            if title is not None:
+                obj["object_title"]=title
+            obj["set"]={
+                "operator":"union",
+                "operands":[{"object":base,"filters":direct_filters}],
+            }
 
     states=assessment.get("states") or {}
     for state in states.values():
