@@ -188,6 +188,7 @@ def inline_private(
         "inlined_objects":{},
         "inlined_set_operand_objects":[],
         "inlined_states":{},
+        "inlined_state_consumer_occurrences":[],
         "shared_objects":[],
         "shared_states":[],
         "retained_object_reasons":{},
