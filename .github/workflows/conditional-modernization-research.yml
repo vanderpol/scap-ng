@@ -237,3 +237,74 @@ jobs:
           path: |
             out
             /tmp/conditional-schema.json
+
+
+  aggregate-stats:
+    name: Aggregate conditional modernization stats
+    needs: production
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: conditional-modernization-*
+          path: reports
+      - name: Aggregate modernization statistics
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          paths=sorted(Path("reports").rglob("modernization-stats.json"))
+          totals=Counter()
+          patterns=Counter()
+          reasons=Counter()
+          rows=[]
+          for path in paths:
+              doc=json.loads(path.read_text())
+              stats=doc.get("conditional") or {}
+              rows.append({
+                  "artifact_path":str(path),
+                  "stats":stats,
+              })
+              for key in (
+                  "assessments_examined",
+                  "assessments_rewritten",
+                  "expression_nodes_examined",
+                  "branch_like_nodes_examined",
+                  "rewrite_candidates_proven",
+                  "rewrites_applied",
+                  "review_required_nodes",
+              ):
+                  totals[key]+=int(stats.get(key,0) or 0)
+              patterns.update(stats.get("applied_pattern_counts") or {})
+              reasons.update(stats.get("review_reason_counts") or {})
+
+          branch=totals["branch_like_nodes_examined"]
+          examined=totals["assessments_examined"]
+          out={
+              "format":"scap-ng-conditional-modernization-matrix-stats-0.1",
+              "artifacts_examined":len(paths),
+              "summary":{
+                  **dict(totals),
+                  "applied_pattern_counts":dict(patterns),
+                  "review_reason_counts":dict(reasons),
+                  "rewrite_rate_pct_of_branch_like":(
+                      round(100*totals["rewrites_applied"]/branch,2) if branch else 0.0
+                  ),
+                  "assessment_rewrite_rate_pct":(
+                      round(100*totals["assessments_rewritten"]/examined,2) if examined else 0.0
+                  ),
+              },
+              "runs":rows,
+          }
+          Path("conditional-modernization-matrix-stats.json").write_text(
+              json.dumps(out,indent=2,sort_keys=True)+"\n"
+          )
+          print(json.dumps(out["summary"],indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conditional-modernization-matrix-stats
+          path: conditional-modernization-matrix-stats.json
