@@ -32,4 +32,4 @@ This work explores ways to make accurate assessments easier for humans to author
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
-For current SCAP-NG authority use [the specification](../../specification/README.md), [CURRENT-DESIGN](../iterations/003/design/CURRENT-DESIGN.md), and [the Board review page](../../board/README.md). Research success does not imply runtime equivalence, feature adoption, or Board approval.
+For current SCAP-NG authority use [the specification](../../specification/README.md), [CURRENT-DESIGN](../iterations/003/design/CURRENT-DESIGN.md), and [review/current](../../review/current/README.md). Research success does not imply runtime equivalence, feature adoption, or Board approval.
