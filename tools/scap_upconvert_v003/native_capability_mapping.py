@@ -13,6 +13,38 @@ from pathlib import Path
 
 LOGICAL_OPERATOR = {"AND": "all", "OR": "any", "ONE": "one", "XOR": "odd"}
 
+
+V03_COMMON_CROSSWALK = {
+    "operation": {
+        "equals": "equals",
+        "not equal": "not_equal",
+        "case insensitive equals": "case_insensitive_equals",
+        "case insensitive not equal": "case_insensitive_not_equal",
+        "greater than": "greater_than",
+        "greater than or equal": "greater_than_or_equal",
+        "less than": "less_than",
+        "less than or equal": "less_than_or_equal",
+        "bitwise and": "bitwise_and",
+        "bitwise or": "bitwise_or",
+        "pattern match": "pattern_match",
+        "subset of": "subset_of",
+        "superset of": "superset_of",
+    },
+    "check": {
+        "all": "all",
+        "at least one": "one_or_more",
+        "only one": "one",
+        "none satisfy": "none",
+    },
+    "existence": {
+        "all_exist": "all",
+        "at_least_one_exists": "one_or_more",
+        "none_exist": "none",
+        "only_one_exists": "one",
+        "any_exist": "optional",
+    },
+}
+
 COMMON_CROSSWALK = {
     "operation": {
         "equals": "equal",
@@ -72,6 +104,10 @@ def source_capability(mapping: dict) -> str:
 def _translate(mapping: dict, group: str, value):
     table=dict(COMMON_CROSSWALK.get(group) or {})
     table.update((mapping.get("migration_crosswalk") or {}).get(group) or {})
+    if mapping.get("specification_version") == "0.3.0":
+        # 0.3 canonical vocabulary deliberately supersedes 0.2 presentation
+        # aliases even when an older copied mapping still documents them.
+        table.update(V03_COMMON_CROSSWALK.get(group) or {})
     if value in table:
         translated=table[value]
         if isinstance(translated,str) and translated.startswith("migration_error"):
@@ -204,16 +240,26 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
         raise ValueError(f"unsupported OVAL recurse_direction value: {direction!r}")
 
     filesystem_source=str(behaviors.get("recurse_file_system","all"))
-    filesystem={
-        "all":"any",
-        "local":"local",
-        "defined":"same",
-    }.get(filesystem_source)
-    if filesystem is None:
+    traversal_crosswalk=(mapping.get("migration_crosswalk") or {}).get("traversal") or {}
+    mapped=traversal_crosswalk.get(f"recurse_file_system.{filesystem_source}")
+    if isinstance(mapped,str) and mapped.startswith("migration_error"):
         raise ValueError(
             f"unsupported OVAL recurse_file_system value: {filesystem_source!r}"
         )
-    obj["filesystem"]=filesystem
+    if mapped is None:
+        mapped={
+            "all":"all" if mapping.get("specification_version")=="0.3.0" else "any",
+            "local":"local",
+            "defined":"same",
+        }.get(filesystem_source)
+    if mapped is None:
+        raise ValueError(
+            f"unsupported OVAL recurse_file_system value: {filesystem_source!r}"
+        )
+    # 0.3 canonical scope restores OVAL 'all'; 0.2 remains frozen as 'any'.
+    if mapping.get("specification_version")=="0.3.0" and mapped=="any":
+        mapped="all"
+    obj["filesystem"]=mapped
 
     recurse_source=str(
         behaviors.get(
