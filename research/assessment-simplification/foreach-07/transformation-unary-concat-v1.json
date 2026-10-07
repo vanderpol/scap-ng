@@ -1,0 +1,98 @@
+{
+  "id": "foreach.unary-concat-object-component.at-least-one.v1",
+  "status": "research_proposal",
+  "release_target": "0.3.0",
+  "source_pattern": {
+    "variable_kind": "local",
+    "expression_kind": "concat",
+    "collection_valued_operands": 1,
+    "dynamic_operands": 1,
+    "other_operands": "singleton_string_literals",
+    "nested_functions": false,
+    "record_field": null,
+    "consumer_context": "object_selector",
+    "effective_var_check": "at least one",
+    "target_consumer_count_after_rule_scoping": 1,
+    "target_directly_tested": true,
+    "target_additional_independent_variable_selectors": false
+  },
+  "preserved": [
+    "source_object_identity",
+    "source_object_sets",
+    "source_object_filters",
+    "source_collection_status",
+    "object_component_status",
+    "concat_function_status",
+    "literal_prefix_suffix_order",
+    "projected_datatype",
+    "projected_multiplicity",
+    "target_selector_operation",
+    "target_selector_datatype",
+    "target_object_population",
+    "test_check_existence",
+    "test_check",
+    "state_semantics",
+    "source_item_provenance",
+    "target_item_population"
+  ],
+  "desugaring": {
+    "graph": [
+      "source_object",
+      "object_component(item_field)",
+      "concat(singleton_literals + projected_value)",
+      "local_variable",
+      "target_object_selector(var_check=at least one)",
+      "target_object_population",
+      "test"
+    ],
+    "aggregation_boundary": "target_object_population",
+    "mapping": "one projected value -> one transformed selector value"
+  },
+  "reject_if": [
+    "two_or_more_collection_valued_operands",
+    "two_or_more_dynamic_operands",
+    "nested_function_present",
+    "record_field_present",
+    "effective_var_check_not_at_least_one",
+    "target_not_directly_tested",
+    "target_has_independent_variable_selector",
+    "non_string_mapping",
+    "evaluation_iteration",
+    "acquisition_semantics_change"
+  ],
+  "shared_source_variable": {
+    "global_rewrite_allowed": false,
+    "rule_scoped_proof_allowed": true,
+    "requirement": "Each selected Rule/Assessment target consumer must independently satisfy the proof class after reachability scoping."
+  },
+  "evidence_equivalence": {
+    "canonical_fields": [
+      "source_object_ref",
+      "source_item_refs",
+      "source_item_projected_value_pairs",
+      "concat_status",
+      "transformed_selector_values",
+      "combined_target_item_refs",
+      "downstream_test_outcome"
+    ],
+    "parent_child_target_correlation_required": false
+  },
+  "automatic_rewrite_enabled": false,
+  "authoring_syntax": {
+    "for_each": {
+      "item": "<binding-name>",
+      "in": "<source-object-id>"
+    },
+    "map": {
+      "concat": [
+        "<literal-prefix>",
+        "<binding-name>.<source-item-field>",
+        "<literal-suffix>"
+      ]
+    },
+    "selector_binding": {
+      "from": "<mapped-value>"
+    },
+    "note": "Concrete spelling remains research. Normative behavior is the desugared OVAL-aligned graph, not independent loop semantics."
+  }
+}
