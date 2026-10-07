@@ -20,7 +20,10 @@ pending human acceptance even when CI is green.
 
 Representative full-benchmark candidate artifacts are produced by the
 [0.3 candidate human-review workflow](https://github.com/vanderpol/scap-ng/actions/workflows/0.3-candidate-human-review.yml).
-Use its latest successful artifact for whole-benchmark readability review.
+
+Current successful six-benchmark candidate:
+[workflow run 37649993955](https://github.com/vanderpol/scap-ng/actions/runs/37649993955) ·
+[combined artifact](https://github.com/vanderpol/scap-ng/actions/runs/37649993955/artifacts/11496651572).
 
 ## Frozen 0.2.0 baseline
 
