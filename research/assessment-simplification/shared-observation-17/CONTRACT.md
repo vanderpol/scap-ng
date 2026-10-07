@@ -42,19 +42,25 @@ observation:
       cardinality: zero_or_more
 ```
 
-The final language may also support an Item export:
+Item exports are now also proven in production conversion, both alone and
+alongside a derived value export:
 
 ```yaml
 exports:
-  configuration_files:
+  databases:
     kind: items
-    object: configuration-files
-    capability: unix.file
+    object: dconf-user-databases-object
+    capability: independent.textfilecontent54
+
+  lock_directories:
+    kind: values
+    variable: dconf-user-database-locks-directories-variable
+    datatype: string
+    cardinality: zero_or_more
 ```
 
-Only `kind: values` is proven by the current Apache prototype. `kind: items`
-remains a candidate that should reuse the existing Item/materialization work
-rather than invent a parallel representation.
+The Item representation should still reuse the existing Item/materialization
+contract rather than invent an Observation-specific format.
 
 ## Execution identity
 
@@ -152,7 +158,7 @@ share one field silently.
 
 ## Item exports
 
-A future `kind: items` export should reuse:
+A `kind: items` export should reuse:
 
 - Object collection-result status/completeness;
 - canonical collected Items;
@@ -357,16 +363,66 @@ dependencies: consumers still own the policy predicates that interpret
 `DomainRole`; the Observation exports gathered data, not "domain member=true"
 or another policy truth.
 
-## Remaining proof before 65-benchmark modernization census
+## Third production proof: RHEL dconf mixed exports
 
-1. Add negative fixtures for unknown export, ID/version mismatch, and private
-   implementation access.
-2. Decide whether Observation source may consume Organizational Inputs and, if
-   so, make those bindings part of execution identity.
-3. Define the minimal value-export provenance record.
-4. Align Item exports with the existing Item materialization contract.
-5. Add consumer-result provenance for reused Observation execution.
-6. Validate the contract against at least one source-ID-fanout family in
-   addition to Apache's publisher-clone family.
+The RHEL 9 source-level reuse case proves one Observation can expose gathered
+Items and a derived value stream without owning policy truth.
 
-These are research gates, not blockers to documenting the candidate syntax.
+Source nodes shared by SV-258013, SV-258020, and SV-258026:
+
+- Object: `dconf user databases` from `/etc/dconf/profile/user`;
+- Variable: `dconf user database locks directories`.
+
+Observation exports:
+
+- `databases`: `kind: items`;
+- `lock_directories`: `kind: values`, string, `zero_or_more`.
+
+Pinned RHEL 9 result:
+
+- **3 eligible Rule Assessments**;
+- **0 rejected**;
+- each consumer uses both exports once;
+- exact flatten/re-expansion: **passed for all 3**.
+
+Workflow:
+https://github.com/vanderpol/scap-ng/actions/runs/37628881725
+
+This is the source-ID-fanout counterpart to Apache's publisher-clone proof and
+closes the source-side proof needed for the modernization census.
+
+## Runtime/result checkpoint
+
+The executable prototypes now establish these candidate requirements:
+
+- binding fails closed on unknown export and Observation ID/version mismatch;
+- private Observation nodes are not consumer-addressable;
+- execution identity includes Observation ID, version, content digest, target
+  identity, and effective input/binding identity;
+- top-level status characterizes execution, not Assessment truth;
+- authored export cardinality and observed runtime cardinality remain distinct;
+- Item and value exports carry provenance back to the Observation execution and
+  source Object/Variable;
+- consumers retain the Test/State/evaluate logic that maps data/status into the
+  six-state Assessment result.
+
+The dconf artifact includes an illustrative result with execution ID, digest,
+target/binding identity, completeness, diagnostics, per-export status, Item
+references, runtime value cardinality, and provenance. It is a research
+contract, not an accepted result schema.
+
+## Remaining before normative 0.3 promotion
+
+These no longer block the **source-modernization census**, but they do block
+normative Observation promotion:
+
+1. decide whether Observation source may consume Organizational Inputs and make
+   any such bindings part of execution identity;
+2. align the exact Item-export result fields with the existing Item
+   materialization/import schema rather than only the current conceptual match;
+3. add executable consumer-result provenance/reuse fixtures, including
+   incomplete/error propagation;
+4. define package-manifest typing, dependency-cycle rejection, and runtime cache
+   freshness rules.
+
+No schema change is implied by the successful research proofs.
