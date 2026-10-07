@@ -60,6 +60,8 @@ def metrics(doc: dict) -> dict:
             refs+=sum(isinstance(x,str) for x in st)
         elif isinstance(st,str):
             refs+=1
+    named_candidates=set(objects)|set(states)
+    named_refs=sum(scalar_reference_counts(a,named_candidates).values())
     text=normalized_text(doc)
     return {
         "objects":len(objects),
@@ -67,12 +69,13 @@ def metrics(doc: dict) -> dict:
         "tests":len(tests),
         "variables":len(variables),
         "test_component_cross_references":refs,
+        "named_component_cross_references":named_refs,
         "normalized_lines":len(text.splitlines()),
         "normalized_bytes":len(text.encode("utf-8")),
     }
 
 
-def inline_private(doc: dict) -> tuple[dict, dict]:
+def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> tuple[dict, dict]:
     out=copy.deepcopy(doc)
     a=out["assessment"]
     objects=a.get("objects") or {}
@@ -89,6 +92,7 @@ def inline_private(doc: dict) -> tuple[dict, dict]:
             "states":"states" in a,
         },
         "inlined_objects":{},
+        "inlined_set_operand_objects":[],
         "inlined_states":{},
         "shared_objects":[],
         "shared_states":[],
@@ -96,6 +100,45 @@ def inline_private(doc: dict) -> tuple[dict, dict]:
 
     remove_objects=set()
     remove_states=set()
+
+    if inline_private_set_operands:
+        # Bounded v2 locality experiment: inline only leaf Objects that are used
+        # exactly once as an unfiltered Set operand of another top-level Object.
+        # Do not recurse through nested Sets, filters, Variables, or other graph
+        # edges. This specifically tests whether common union-of-private-sources
+        # layouts can become local without changing Set semantics.
+        for parent_id,parent in list(objects.items()):
+            if not isinstance(parent,dict):
+                continue
+            set_node=parent.get("set")
+            if not isinstance(set_node,dict):
+                continue
+            operands=set_node.get("operands")
+            if not isinstance(operands,list):
+                continue
+            for index,operand in enumerate(operands):
+                if not isinstance(operand,dict):
+                    continue
+                child_id=operand.get("object")
+                filters=operand.get("filters")
+                if (
+                    not isinstance(child_id,str)
+                    or child_id not in objects
+                    or refs.get(child_id)!=1
+                    or (isinstance(filters,list) and filters)
+                    or (filters not in (None,[]) and not isinstance(filters,list))
+                ):
+                    continue
+                child=objects[child_id]
+                if not isinstance(child,dict) or isinstance(child.get("set"),dict):
+                    continue
+                operand["object"]=copy.deepcopy(child)
+                identity["inlined_set_operand_objects"].append({
+                    "object":child_id,
+                    "parent_object":parent_id,
+                    "operand_index":index,
+                })
+                remove_objects.add(child_id)
 
     for test_id,test in tests.items():
         obj=test.get("object")
@@ -152,6 +195,21 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         payload=copy.deepcopy(tests[test_id]["object"])
         objects[original]=payload
         tests[test_id]["object"]=original
+
+    # Restore bounded private Set-operand Objects after their parent Object
+    # has been restored from a Test, if applicable.
+    for row in identity.get("inlined_set_operand_objects",[]):
+        child_id=row["object"]
+        parent_id=row["parent_object"]
+        index=row["operand_index"]
+        parent=objects.get(parent_id)
+        if not isinstance(parent,dict):
+            raise ValueError(f"missing restored Set parent {parent_id!r}")
+        operands=((parent.get("set") or {}).get("operands") or [])
+        operand=operands[index]
+        payload=copy.deepcopy(operand["object"])
+        objects[child_id]=payload
+        operand["object"]=child_id
 
     # Restore states in test-order without depending on dict insertion order.
     by_test={}
@@ -239,6 +297,14 @@ def main():
                     help="Measure every eligible STIG Rule Assessment instead of a diverse sample.")
     ap.add_argument("--metrics-only",action="store_true",
                     help="Write only report.json; do not emit transformed YAML/identity files.")
+    ap.add_argument(
+        "--inline-private-set-operands",
+        action="store_true",
+        help=(
+            "Research v2: also inline single-use unfiltered leaf Objects that "
+            "serve only as Set operands."
+        ),
+    )
     ap.add_argument("--label",required=True)
     args=ap.parse_args()
 
@@ -249,9 +315,14 @@ def main():
 
     args.output.mkdir(parents=True,exist_ok=True)
     report={
-        "format":"scap-ng-inline-private-components-research-0.1",
+        "format":(
+            "scap-ng-inline-private-components-research-0.2"
+            if args.inline_private_set_operands
+            else "scap-ng-inline-private-components-research-0.1"
+        ),
         "status":"research_only_not_accepted_design",
         "label":args.label,
+        "inline_private_set_operands":bool(args.inline_private_set_operands),
         "source_root":str(args.input_root),
         "selected":[],
         "summary":{},
@@ -260,14 +331,18 @@ def main():
         "objects_before":0,"objects_after":0,
         "states_before":0,"states_after":0,
         "cross_refs_before":0,"cross_refs_after":0,
+        "named_refs_before":0,"named_refs_after":0,
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
-        "inlined_objects":0,"inlined_states":0,
+        "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
     }
 
     for path,doc in selected:
         before=metrics(doc)
-        rendered,identity=inline_private(doc)
+        rendered,identity=inline_private(
+            doc,
+            inline_private_set_operands=args.inline_private_set_operands,
+        )
         expanded=reexpand(rendered,identity)
         if expanded != doc:
             raise SystemExit(f"round-trip structural mismatch: {path}")
@@ -288,6 +363,7 @@ def main():
             "before":before,
             "after":after,
             "inlined_objects":len(identity["inlined_objects"]),
+            "inlined_set_operand_objects":len(identity["inlined_set_operand_objects"]),
             "inlined_states":len(identity["inlined_states"]),
             "shared_objects":len(identity["shared_objects"]),
             "shared_states":len(identity["shared_states"]),
@@ -299,11 +375,14 @@ def main():
             totals[k+"_after"]+=after[k]
         totals["cross_refs_before"]+=before["test_component_cross_references"]
         totals["cross_refs_after"]+=after["test_component_cross_references"]
+        totals["named_refs_before"]+=before["named_component_cross_references"]
+        totals["named_refs_after"]+=after["named_component_cross_references"]
         totals["lines_before"]+=before["normalized_lines"]
         totals["lines_after"]+=after["normalized_lines"]
         totals["bytes_before"]+=before["normalized_bytes"]
         totals["bytes_after"]+=after["normalized_bytes"]
         totals["inlined_objects"]+=row["inlined_objects"]
+        totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
         totals["inlined_states"]+=row["inlined_states"]
 
     def reduction(before,after):
@@ -313,6 +392,9 @@ def main():
         **totals,
         "assessments":len(selected),
         "cross_reference_reduction_percent":reduction(totals["cross_refs_before"],totals["cross_refs_after"]),
+        "named_component_reference_reduction_percent":reduction(
+            totals["named_refs_before"],totals["named_refs_after"]
+        ),
         "line_reduction_percent":reduction(totals["lines_before"],totals["lines_after"]),
         "byte_reduction_percent":reduction(totals["bytes_before"],totals["bytes_after"]),
         "object_scope_reduction_percent":reduction(totals["objects_before"],totals["objects_after"]),
