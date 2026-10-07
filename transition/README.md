@@ -5,7 +5,7 @@ This directory preserves **dated continuity, freeze, recovery, and handoff recor
 For current authority use:
 
 - [root project README](../README.md)
-- [OVAL Board review](../board/README.md)
+- [current review](../review/current/README.md)
 - [draft specification](../specification/README.md)
 - [current design](../research/iterations/003/design/CURRENT-DESIGN.md)
 - [maintenance process](../MAINTAINING.md)
