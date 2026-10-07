@@ -41,6 +41,52 @@ def scalar_reference_counts(node: Any, candidates: set[str]) -> dict[str, int]:
     return counts
 
 
+def direct_test_reference_counts(
+    tests: dict[str, Any],
+    object_ids: set[str],
+    state_ids: set[str],
+) -> tuple[dict[str, int], dict[str, int]]:
+    """Count only the direct Test -> Object/State edges.
+
+    The difference between these counts and scalar_reference_counts() is graph
+    plumbing: Variable, Set, Filter, or other non-Test references.
+    """
+    object_counts={name:0 for name in object_ids}
+    state_counts={name:0 for name in state_ids}
+    for test in tests.values():
+        if not isinstance(test,dict):
+            continue
+        obj=test.get("object")
+        if isinstance(obj,str) and obj in object_counts:
+            object_counts[obj]+=1
+        states=test.get("states")
+        if isinstance(states,str):
+            states=[states]
+        if isinstance(states,list):
+            for state in states:
+                if isinstance(state,str) and state in state_counts:
+                    state_counts[state]+=1
+    return object_counts,state_counts
+
+
+def retention_reason(total_refs: int, direct_test_refs: int) -> str:
+    """Explain why a named component cannot be Test-local under the v1 rule."""
+    graph_refs=max(0,total_refs-direct_test_refs)
+    if direct_test_refs >= 2 and graph_refs:
+        return "multiple_tests_and_graph"
+    if direct_test_refs >= 2:
+        return "multiple_tests"
+    if direct_test_refs == 1 and graph_refs:
+        return "test_and_graph"
+    if direct_test_refs == 0 and graph_refs:
+        return "graph_only"
+    if direct_test_refs == 1:
+        # A one-Test-only node should have been inlined. Keeping this category
+        # makes the census fail visibly if a later transform leaves one behind.
+        return "unexpected_single_test_only"
+    return "unreferenced_or_other"
+
+
 def normalized_text(doc: dict) -> str:
     return yaml.safe_dump(doc, sort_keys=False, width=120, allow_unicode=True)
 
@@ -83,6 +129,9 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
     tests=a.get("tests") or {}
     candidates=set(objects)|set(states)
     refs=scalar_reference_counts(a,candidates)
+    direct_object_refs,direct_state_refs=direct_test_reference_counts(
+        tests,set(objects),set(states)
+    )
 
     identity={
         "status":"research_only_not_accepted_design",
@@ -96,6 +145,8 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
         "inlined_states":{},
         "shared_objects":[],
         "shared_states":[],
+        "retained_object_reasons":{},
+        "retained_state_reasons":{},
     }
 
     remove_objects=set()
@@ -170,12 +221,20 @@ def inline_private(doc: dict, *, inline_private_set_operands: bool = False) -> t
     if objects:
         a["objects"]=objects
         identity["shared_objects"]=sorted(objects)
+        identity["retained_object_reasons"]={
+            name:retention_reason(refs.get(name,0),direct_object_refs.get(name,0))
+            for name in sorted(objects)
+        }
     else:
         a.pop("objects",None)
 
     if states:
         a["states"]=states
         identity["shared_states"]=sorted(states)
+        identity["retained_state_reasons"]={
+            name:retention_reason(refs.get(name,0),direct_state_refs.get(name,0))
+            for name in sorted(states)
+        }
     else:
         a.pop("states",None)
 
@@ -335,6 +394,8 @@ def main():
         "lines_before":0,"lines_after":0,
         "bytes_before":0,"bytes_after":0,
         "inlined_objects":0,"inlined_set_operand_objects":0,"inlined_states":0,
+        "retained_object_reason_counts":{},
+        "retained_state_reason_counts":{},
     }
 
     for path,doc in selected:
@@ -367,8 +428,14 @@ def main():
             "inlined_states":len(identity["inlined_states"]),
             "shared_objects":len(identity["shared_objects"]),
             "shared_states":len(identity["shared_states"]),
+            "retained_object_reason_counts":{},
+            "retained_state_reason_counts":{},
             "roundtrip_structural_identity":"passed",
         }
+        for reason in identity["retained_object_reasons"].values():
+            row["retained_object_reason_counts"][reason]=row["retained_object_reason_counts"].get(reason,0)+1
+        for reason in identity["retained_state_reasons"].values():
+            row["retained_state_reason_counts"][reason]=row["retained_state_reason_counts"].get(reason,0)+1
         report["selected"].append(row)
         for k in ("objects","states"):
             totals[k+"_before"]+=before[k]
@@ -384,6 +451,10 @@ def main():
         totals["inlined_objects"]+=row["inlined_objects"]
         totals["inlined_set_operand_objects"]+=row["inlined_set_operand_objects"]
         totals["inlined_states"]+=row["inlined_states"]
+        for reason,count in row["retained_object_reason_counts"].items():
+            totals["retained_object_reason_counts"][reason]=totals["retained_object_reason_counts"].get(reason,0)+count
+        for reason,count in row["retained_state_reason_counts"].items():
+            totals["retained_state_reason_counts"][reason]=totals["retained_state_reason_counts"].get(reason,0)+count
 
     def reduction(before,after):
         return round(100*(before-after)/before,1) if before else 0.0
