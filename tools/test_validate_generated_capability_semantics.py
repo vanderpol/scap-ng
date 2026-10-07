@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import unittest
+import copy
 import json
 from pathlib import Path
 
@@ -210,6 +211,40 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                     f"{capability}.literal_name_characters",
                     {row["code"] for row in rows},
                 )
+
+    def test_v03_canonical_file_operations_are_semantically_equivalent(self):
+        clean={
+            "assessment":{
+                "specification":{"id":"scap-ng.pre-alpha.assessment","version":"0.3.0"},
+                "shared_objects":{
+                    "text-object":{
+                        "capability":"independent.textfilecontent54",
+                        "select":{
+                            "directory":entity("/etc",operation="case_insensitive_equals"),
+                            "name":entity("example.conf",operation="equals"),
+                            "pattern":entity("^setting=",operation="pattern_match"),
+                            "instance":entity(1,operation="equals",datatype="integer"),
+                        },
+                    }
+                },
+                "states":{},
+                "tests":{},
+            }
+        }
+        self.assertEqual(validate_assessment_capability_semantics(clean),[])
+
+        patterned=copy.deepcopy(clean)
+        patterned["assessment"]["shared_objects"]["text-object"]["select"]["directory"][
+            "operation"
+        ]="pattern_match"
+        patterned["assessment"]["shared_objects"]["text-object"]["traversal"]={
+            "max_depth":1,"recurse":"directories"
+        }
+        rows=validate_assessment_capability_semantics(patterned)
+        self.assertIn(
+            "independent.textfilecontent54.pattern_directory_no_traversal",
+            {row["code"] for row in rows},
+        )
 
     def test_file_hash_reuses_file_selection_semantics(self):
         rows=validate_assessment_capability_semantics({

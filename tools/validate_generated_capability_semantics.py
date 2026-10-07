@@ -154,6 +154,14 @@ def validate_v03_native_literal_types(document):
     return diagnostics
 
 
+EQUALITY_OPERATIONS={
+    "equal", "equal_ci",
+    "equals", "case_insensitive_equals",
+}
+EXACT_EQUALITY_OPERATIONS={"equal","equals"}
+PATTERN_OPERATIONS={"match","pattern_match"}
+
+
 FILE_SELECTION_CAPABILITIES={
     "unix.file",
     "file.hash",
@@ -187,7 +195,7 @@ def validate_file_selection_object(obj):
     directory=select.get("directory")
     if (
         isinstance(directory, dict)
-        and directory.get("operation") not in {"equal","equal_ci"}
+        and directory.get("operation") not in EQUALITY_OPERATIONS
         and traversal is not None
     ):
         diagnostics.append({
@@ -198,16 +206,16 @@ def validate_file_selection_object(obj):
 
     if capability == "independent.textfilecontent54":
         pattern=select.get("pattern")
-        if isinstance(pattern,dict) and pattern.get("operation") != "match":
+        if isinstance(pattern,dict) and pattern.get("operation") not in PATTERN_OPERATIONS:
             diagnostics.append({
                 "code":"independent.textfilecontent54.pattern_operation",
                 "fields":["pattern"],
-                "message":"textfilecontent54 pattern selector must use match operation",
+                "message":"textfilecontent54 pattern selector must use pattern-match semantics",
             })
 
     if capability == "independent.xmlfilecontent":
         xpath=select.get("xpath")
-        if isinstance(xpath,dict) and xpath.get("operation") != "equal":
+        if isinstance(xpath,dict) and xpath.get("operation") not in EXACT_EQUALITY_OPERATIONS:
             diagnostics.append({
                 "code":"independent.xmlfilecontent.xpath_equal",
                 "fields":["xpath"],
@@ -217,7 +225,7 @@ def validate_file_selection_object(obj):
     if capability == "independent.yamlfilecontent":
         for field in ("content","yamlpath"):
             value=select.get(field)
-            if isinstance(value,dict) and value.get("operation") != "equal":
+            if isinstance(value,dict) and value.get("operation") not in EXACT_EQUALITY_OPERATIONS:
                 diagnostics.append({
                     "code":f"independent.yamlfilecontent.{field}_equal",
                     "fields":[field],
@@ -244,7 +252,7 @@ def validate_file_selection_object(obj):
     elif isinstance(name, dict):
         value=name.get("value")
         variable=_is_variable_value(value)
-        pattern=name.get("operation") == "match"
+        pattern=name.get("operation") in PATTERN_OPERATIONS
         if value == "" and not (variable or pattern):
             diagnostics.append({
                 "code":f"{capability}.name_empty",
@@ -282,7 +290,7 @@ def validate_equal_only_selectors(obj, capability, fields):
     select=obj.get("select") or {}
     for field in fields:
         value=select.get(field)
-        if isinstance(value,dict) and value.get("operation") != "equal":
+        if isinstance(value,dict) and value.get("operation") not in EXACT_EQUALITY_OPERATIONS:
             diagnostics.append({
                 "code":f"{capability}.{field}_equal",
                 "fields":[field],
@@ -295,7 +303,7 @@ def validate_panos_config_object(obj):
     if obj.get("capability") != "panos.config":
         return []
     xpath=(obj.get("select") or {}).get("xpath")
-    if isinstance(xpath,dict) and xpath.get("operation") != "equal":
+    if isinstance(xpath,dict) and xpath.get("operation") not in EXACT_EQUALITY_OPERATIONS:
         return [{
             "code":"panos.config.xpath_equal",
             "fields":["xpath"],
@@ -319,7 +327,7 @@ def validate_macos_pwpolicy512_object(obj):
         })
     for field in ("authenticator_password","directory_node","xpath"):
         value=select.get(field)
-        if isinstance(value,dict) and value.get("operation") != "equal":
+        if isinstance(value,dict) and value.get("operation") not in EXACT_EQUALITY_OPERATIONS:
             diagnostics.append({
                 "code":f"macos.pwpolicy512.{field}_equal",
                 "fields":[field],
@@ -408,7 +416,7 @@ def _validate_windows_registry_like_value_datatypes(test_id,test,states):
         payload=state.get("state") or {}
         if (
             payload.get("field")=="type"
-            and payload.get("operation")=="equal"
+            and payload.get("operation") in EXACT_EQUALITY_OPERATIONS
             and isinstance(payload.get("value"),str)
         ):
             exact_types.append(payload["value"])
@@ -489,7 +497,7 @@ def validate_windows_registry_object(obj):
 
     if (
         isinstance(key,dict)
-        and key.get("operation") != "equal"
+        and key.get("operation") not in EQUALITY_OPERATIONS
         and obj.get("traversal") is not None
     ):
         diagnostics.append({

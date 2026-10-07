@@ -536,6 +536,7 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
             renamed={}
             enum_selectors=set((native_cfg.get("selector_value_enums") or {}).keys())
             selector_value_crosswalk=native_cfg.get("selector_value_crosswalk") or {}
+            selector_source_operations=native_cfg.get("selector_source_operations") or {}
             for key,value in obj["select"].items():
                 native_key=selector_map.get(key,key)
                 if isinstance(value,dict) and bool(value.get("nil",False)):
@@ -550,7 +551,11 @@ def apply_capability_mapping(document: dict, mapping: dict) -> dict:
                     if isinstance(value,dict) and "variable" in value:
                         renamed[native_key]=copy.deepcopy(value)
                     elif isinstance(value,dict) and "value" in value:
-                        raw=_extract_collector_value(value,mapping)
+                        raw=_extract_collector_value(
+                            value,
+                            mapping,
+                            allowed_source_operations=selector_source_operations.get(key),
+                        )
                         group=selector_value_crosswalk.get(native_key)
                         renamed[native_key]=_translate(mapping,group,raw) if group else raw
                     else:

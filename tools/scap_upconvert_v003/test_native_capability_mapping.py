@@ -533,7 +533,7 @@ class V03ProductionMappingTests(unittest.TestCase):
                 "object_title":"Policy value",
                 "capability":"windows.registry",
                 "select":{
-                    "hive":{"value":"HKEY_LOCAL_MACHINE","operation":"equals","datatype":"string"},
+                    "hive":{"value":"HKEY_LOCAL_MACHINE","operation":"case insensitive equals","datatype":"string"},
                     "key":{"value":"SOFTWARE\\\\Policies\\\\Example","operation":"equals","datatype":"string"},
                     "name":{"value":"Enabled","operation":"equals","datatype":"string"},
                 },
