@@ -26,6 +26,7 @@ This work explores ways to make accurate assessments easier for humans to author
 | [apache-reuse-15](apache-reuse-15/README.md) | Reusable observation modules | Apache repeated discovery/dataflow census, source-time typed-export module hypothesis |
 | [windows-eventlog-16](windows-eventlog-16/README.md) | Windows event-log path residual | three-rule normalized-template proof, locality gains, remaining Variable boundary |
 | [shared-observation-17](shared-observation-17/README.md) | Shared observation artifact | truthless reusable data-provider role, source-directory/file-type proposal |
+| [0.3-candidates-18](0.3-candidates-18/README.md) | 0.3 modernization candidate matrix | concise evidence/status/blocker index and research exit criteria |
 
 The 12 case dossiers preserve source-specific analysis and are intentionally separate records rather than repeated project-status documentation.
 
