@@ -575,6 +575,18 @@ def reexpand(research_doc: dict, identity: dict) -> dict:
         private_variable_payloads.append((original,payload))
         parent[last]={"variable":original}
 
+    # Recreate localized Variable entries temporarily before restoring any
+    # Variable-local Objects. Their recorded paths still use
+    # variables.<id>... from the faithful graph, even when the Variable itself
+    # was subsequently localized into its sole consumer.
+    if private_variable_payloads:
+        variables=copy.deepcopy(a.get("variables") or {})
+        for original,payload in private_variable_payloads:
+            if original in variables and variables[original] != payload:
+                raise ValueError(f"private Variable payload mismatch for {original!r}")
+            variables[original]=copy.deepcopy(payload)
+        a["variables"]=variables
+
     # Copy States only after private Variable references have been restored.
     # Otherwise a retained top-level State containing a localized constant or
     # external Variable would be reintroduced from a stale pre-restoration copy.
