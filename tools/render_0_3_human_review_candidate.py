@@ -108,6 +108,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "foreach_rewrites":0,
         "localized_set_operand_objects":0,
         "localized_variable_objects":0,
+        "localized_object_graph_objects":0,
         "localized_variables":0,
         "localized_external_variables":0,
         "localized_constant_variables":0,
@@ -155,6 +156,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             inline_private_filtered_set_operands=True,
             inline_state_consumers=True,
             inline_variable_object_consumers=True,
+            inline_private_object_consumers=True,
             inline_private_variables=True,
             inline_private_local_variables=True,
         )
@@ -173,6 +175,9 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         )
         totals["localized_variable_objects"]+=len(
             identity.get("inlined_variable_objects") or []
+        )
+        totals["localized_object_graph_objects"]+=len(
+            identity.get("inlined_object_graph_objects") or []
         )
         totals["localized_variables"]+=len(localized_vars)
         totals["localized_external_variables"]+=sum(
@@ -200,6 +205,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
                 "test_states":len(identity.get("inlined_states") or {}),
                 "set_operand_objects":len(identity.get("inlined_set_operand_objects") or []),
                 "variable_objects":len(identity.get("inlined_variable_objects") or []),
+                "object_graph_objects":len(identity.get("inlined_object_graph_objects") or []),
                 "variables":len(localized_vars),
                 "state_consumer_occurrences":len(
                     identity.get("inlined_state_consumer_occurrences") or []
@@ -257,7 +263,8 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
         "This tree starts from the pinned faithful SCAP 1.4 conversion and applies "
         "only the currently proven modernization stack: consumer locality, private "
         "Set operands, Variable-local Objects, single-use external/constant and "
-        "leaf-derived Variable locality, bounded foreach v1, and proven shared "
+        "leaf-derived Variable locality, recursive private Object locality, "
+        "bounded foreach v1, and proven shared "
         "Observation extraction.\n\n"
         "The accompanying scorecard explains what changed and what deliberately "
         "remains complex. The review surface also applies the candidate 0.3 "
