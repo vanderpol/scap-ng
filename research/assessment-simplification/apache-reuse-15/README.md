@@ -240,14 +240,13 @@ The first bounded prototype extracts 4 Objects + 11 Variables into
 complete module shape. All 15 flatten back to the original converted Assessment
 with exact structural equality.
 
-Only two exports are actually consumed outside the module in those 15 Rules:
+Only two exports are consumed outside the module in those 15 Rules:
 
 - `httpd_executable` — 21 external references;
 - `primary_and_included_configs` — 18 external references.
 
-The prototype also declared `httpd_root` and `primary_config`, but the proof
-shows they are internal implementation details for this first reuse class and
-need not be public exports.
+The prototype export surface has therefore been reduced to exactly those two.
+`httpd_root` and `primary_config` remain private implementation details.
 
 Proof workflow: `Apache authoring reuse research`, run `37614728886`.
 
