@@ -1007,7 +1007,7 @@ contains multiple corresponding entity instances, evaluation SHALL preserve
 the OVAL 5.12.3 many-to-many aggregation order:
 
 1. compare one system/item entity value against each Variable value;
-2. combine those comparison results with that State entity's `var_check`;
+2. combine those comparison results with the State entity's `value_match` (OVAL `var_check`);
 3. repeat for each corresponding system/item entity instance;
 4. combine the per-instance results with that State entity's `entity_check`;
 5. combine distinct entity/predicate results inside the State using the
@@ -1017,7 +1017,7 @@ the OVAL 5.12.3 many-to-many aggregation order:
 7. combine item results at the Test level using the Test's `check`.
 
 These scopes SHALL remain independent. A producer or evaluator SHALL NOT
-commute, merge or substitute `var_check`, `entity_check`, State operator,
+commute, merge or substitute `value_match` (OVAL `var_check`), `entity_check`, State operator,
 `state_operator`, or Test `check` merely because a particular two-valued
 example happens to produce the same result. Error/unknown/not-evaluated/not-
 applicable propagation occurs at each aggregation layer.

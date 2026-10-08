@@ -38,7 +38,7 @@ literal or Variable reference, `match`, and `existence`. A State must use
 Datatype validity does not mean every comparison operation is meaningful for
 every type. Typed operation compatibility and the [shared aggregation contract](shared-behavior.md)
 remain applicable. If the expected value references a multi-valued Variable,
-preserve `variable_match` before entity `match`. `states_match` combines multiple
+preserve `value_match` before entity `match`. `states_match` combines multiple
 States independently from those inner quantifiers, and Test `match` combines
 the per-Item results.
 

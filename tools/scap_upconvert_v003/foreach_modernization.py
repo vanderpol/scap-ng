@@ -202,15 +202,15 @@ def _candidate(document, variable_id):
     if not isinstance(predicate, dict):
         reasons.append("target_selector_missing")
         return None, reasons
-    allowed = {"value", "operation", "datatype", "variable_match"}
+    allowed = {"value", "operation", "datatype", "value_match"}
     if set(predicate) != allowed:
         reasons.append("target_selector_has_unproven_semantics")
     if predicate.get("value") != {"variable": variable_id}:
         reasons.append("target_selector_variable_mismatch")
     if predicate.get("operation") not in {"equal","equals"}:
         reasons.append("target_operation_not_equal")
-    if predicate.get("variable_match") not in {"any","one_or_more","at_least_one","at least one"}:
-        reasons.append("target_variable_match_not_any")
+    if predicate.get("value_match") not in {"any","one_or_more","at_least_one","at least one"}:
+        reasons.append("target_value_match_not_any")
 
     # v1 excludes any second Variable-fed selector/collector input on the target.
     target_refs = list(_all_variable_refs(target))

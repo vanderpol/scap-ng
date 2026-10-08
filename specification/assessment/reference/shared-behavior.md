@@ -40,11 +40,11 @@ favorable State comparison. Without States, the Test checks existence only.
 | Test `match: all/any/one/none` | Combine per-Item State satisfaction | `all/at least one/only one/none satisfy` |
 | Test `states_match` | Combine multiple States for one Item | Test `state_operator` |
 | State predicate `match` | Combine corresponding Item entity instances | `entity_check` |
-| State predicate `variable_match` | Combine comparisons against Variable values | `var_check` |
+| State predicate `value_match` | Combine comparisons against Variable values | `var_check` |
 | State predicate `existence` | Check corresponding entity existence/status | State entity `check_existence` |
 
 These are separate scopes. For each Item entity, compare against Variable values,
-combine those rows with `variable_match`, then combine corresponding entities
+combine those rows with `value_match`, then combine corresponding entities
 with predicate `match`. Combine predicates within a State, States within an
 Item, and finally Items within a Test. Reordering those stages can change results.
 

@@ -41,7 +41,8 @@ used as a replacement for class.
 ## 2. Check / match quantifier
 
 OVAL `CheckEnumeration` is used for Test `check`, State/entity
-`entity_check`, and variable `var_check`.
+`entity_check` (native observed `match`) and expected-value `var_check`
+(native `value_match` for literals, Inputs or Variables).
 
 | OVAL 5.12.3 | NG 0.2.0 match vocabulary | Current interpretation | Disposition |
 |---|---|---|---|

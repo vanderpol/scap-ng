@@ -56,7 +56,7 @@ Artifact paths:
 
 The fixed system-library directory list is emitted directly as a typed literal
 collection such as `[/lib, /lib64, /usr/lib, /usr/lib64]`. Source-equivalent
-`variable_match` remains explicit. Only compile-time constants are folded;
+`value_match` remains explicit. Only compile-time constants are folded;
 genuine runtime/dataflow Variables remain named.
 
 ## 3. Direct Variable evaluation without a legacy Variable Object

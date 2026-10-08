@@ -50,7 +50,7 @@ def fixture():
                             "value": {"variable": "home-dirs"},
                             "operation": "equal",
                             "datatype": "string",
-                            "variable_match": "any",
+                            "value_match": "any",
                         },
                         "name": {
                             "value": r"^\.[^\s\.]+",
@@ -243,18 +243,18 @@ class ForeachConverterModernization(unittest.TestCase):
     def test_wrong_quantifier_fails_closed(self):
         source = fixture()
         source["assessment"]["objects"]["files"]["select"]["directory"][
-            "variable_match"
+            "value_match"
         ] = "all"
         result, report = modernize_foreach_v1(source, enabled=True)
         self.assertEqual(result, source)
         self.assertFalse(report["rewrite_performed"])
         self.assertIn(
-            "target_variable_match_not_any",
+            "target_value_match_not_any",
             report["review_required"][0]["reasons"],
         )
         self.assertEqual(report["stats"]["review_required_variables"],1)
         self.assertEqual(
-            report["stats"]["review_reason_counts"]["target_variable_match_not_any"],
+            report["stats"]["review_reason_counts"]["target_value_match_not_any"],
             1,
         )
 
@@ -269,7 +269,7 @@ class ForeachConverterModernization(unittest.TestCase):
                 "operation": "equal",
                 "datatype": "string",
                 "match": "all",
-                "variable_match": "any",
+                "value_match": "any",
                 "existence": "some",
             },
         }
@@ -312,7 +312,7 @@ class ForeachConverterModernization(unittest.TestCase):
             "value": {"variable": "other"},
             "operation": "equal",
             "datatype": "string",
-            "variable_match": "any",
+            "value_match": "any",
         }
         result, report = modernize_foreach_v1(source, enabled=True)
         self.assertEqual(result, source)

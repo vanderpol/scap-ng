@@ -20,7 +20,7 @@ class LiteralVariableCheckTests(unittest.TestCase):
         self.assertEqual("equals",state["operation"])
         self.assertEqual("all",state["match"])
         self.assertEqual("one_or_more",state["existence"])
-        self.assertNotIn("variable_match",state)
+        self.assertNotIn("value_match",state)
         self.assertTrue(any(x.get("reason")=="single-literal State value has one comparison operand" for x in edits))
 
     def test_rewritten_actual_ntuser_filter_passes_generated_state_schema(self):
@@ -57,21 +57,39 @@ class LiteralVariableCheckTests(unittest.TestCase):
                   "operation":"equals","datatype":"string","match":"all",
                   "existence":"one_or_more","variable_match":"one_or_more"}
         state,_=change_state(original)
-        self.assertEqual("one_or_more",state["variable_match"])
+        self.assertEqual("one_or_more",state["value_match"])
+
+    def test_old_key_is_renamed_for_native_v03_output(self):
+        old={"field":"type","value":{"input":"authorized-types"},
+             "operation":"equals","datatype":"string",
+             "match":"all","existence":"one_or_more","variable_match":"one"}
+        state,edits=change_state(old)
+        self.assertNotIn("variable_match",state)
+        self.assertEqual(state["value_match"],"one")
+        self.assertTrue(any(e.get("original_key")=="variable_match" and
+                            e.get("candidate_key")=="value_match" for e in edits))
+
+    def test_ambiguous_legacy_and_new_keys_are_rejected(self):
+        old={"field":"type","value":{"input":"authorized-types"},
+             "operation":"equals","datatype":"string",
+             "match":"all","existence":"one_or_more",
+             "variable_match":"all","value_match":"one"}
+        with self.assertRaisesRegex(ValueError,"conflicting variable_match and value_match"):
+            change_state(old)
 
     def test_collection_retains_quantifier(self):
         original={"field":"type","value":["dword","string"],"operation":"equals",
                   "datatype":"string","match":"all","existence":"one_or_more",
                   "variable_match":"one_or_more"}
         state,_=change_state(original)
-        self.assertEqual("one_or_more",state["variable_match"])
+        self.assertEqual("one_or_more",state["value_match"])
 
     def test_different_quantifier_never_dropped_by_heuristic(self):
         original={"field":"type","value":"","operation":"equals",
                   "datatype":"string","match":"all","existence":"one_or_more",
                   "variable_match":"none"}
         state,_=change_state(original)
-        self.assertEqual("none",state["variable_match"])
+        self.assertEqual("none",state["value_match"])
 
 
 if __name__=="__main__":

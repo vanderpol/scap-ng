@@ -215,10 +215,10 @@ select:
       - /usr/lib64
     operation: equals
     datatype: string
-    variable_match: one
+    value_match: one
 ```
 
-This changes **authoring**, not the required behavior. This converter snapshot still spells the expected-value quantifier `variable_match`; the agreed 0.3 name is `value_match` ([#194](https://github.com/vanderpol/scap-ng/issues/194), not yet complete).
+This changes **authoring**, not the required behavior. `value_match` controls comparisons against expected values (including literal arrays, Inputs and Variables); it is distinct from observed-entity `match` and existence. This is the finalized 0.3 vocabulary; conversion and six-state regression are tracked in [#194](https://github.com/vanderpol/scap-ng/issues/194).
 
 ### Runtime collection `for_each`
 
@@ -348,7 +348,7 @@ states:
         input: approved-filesystem-types-input
       operation: equals
       datatype: string
-      variable_match: one_or_more
+      value_match: one_or_more
       match: one_or_more
       existence: one_or_more
 ```

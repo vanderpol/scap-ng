@@ -268,6 +268,10 @@ def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any
         new_key=key
         # Test-level field names only. Entity predicates already use
         # existence/match and must not be renamed.
+        if key=="variable_match":
+            if "value_match" in value:
+                raise ValueError(f"conflicting variable_match and value_match at {path}")
+            new_key="value_match"
         if len(path)>=2 and path[-2]=="tests":
             if key=="check_existence":
                 new_key="existence"
@@ -278,7 +282,7 @@ def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any
 
         if new_key=="existence" and isinstance(normalized,str):
             normalized=EXISTENCE.get(normalized,normalized)
-        elif new_key in {"match","variable_match"} and isinstance(normalized,str):
+        elif new_key in {"match","value_match"} and isinstance(normalized,str):
             # states_match is intentionally excluded: it is a logical operator,
             # where any means OR, not a CheckEnumeration quantifier.
             normalized=MATCH.get(normalized,normalized)
@@ -298,23 +302,23 @@ def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any
         out[new_key]=normalized
     # When a legacy State predicates against exactly one literal value,
     # source var_check=at_least_one is a one-element aggregation and has no
-    # independent outcome. Native 0.3 reserves variable_match for Variable,
+    # independent outcome. Native 0.3 reserves value_match for Variable,
     # Input, or array operands. Drop only the provably neutral single-literal
     # one_or_more modifier; keep or reject all other comparison semantics.
     if (
         "field" in out and "operation" in out and "datatype" in out
-        and out.get("variable_match")=="one_or_more"
+        and out.get("value_match")=="one_or_more"
         and isinstance(out.get("value"),(str,int,float,bool))
     ):
         changes.append({
-            "path":[str(x) for x in path+("variable_match",)],
-            "original_key":"variable_match",
+            "path":[str(x) for x in path+("value_match",)],
+            "original_key":"value_match",
             "candidate_key":None,
             "original_value":"one_or_more",
             "candidate_value":None,
             "reason":"single-literal State value has one comparison operand",
         })
-        del out["variable_match"]
+        del out["value_match"]
     # Older OVAL Test CheckEnumeration can redundantly spell "none exist"
     # alongside an explicit zero-collected-items existence check. In that
     # precise state-free case, match is irrelevant; use the explicit native

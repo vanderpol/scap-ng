@@ -158,7 +158,7 @@ def _native_scalar_predicate(payload: dict, mapping: dict, *, record_field=False
     if bool(payload.get("mask",False)):
         out["redact_result"]=True
     if "variable_check" in payload:
-        out["variable_match"]=_translate(
+        out["value_match"]=_translate(
             mapping,"check",payload.get("variable_check","all")
         )
     # OVAL record fields have no independent check_existence attribute. A State
@@ -185,7 +185,7 @@ def _native_object_predicate(payload: dict, mapping: dict):
     if bool(payload.get("mask",False)) or bool(payload.get("redact_result",False)):
         out["redact_result"]=True
     if "variable_check" in payload:
-        out["variable_match"]=_translate(
+        out["value_match"]=_translate(
             mapping,"check",payload.get("variable_check","all")
         )
     return out

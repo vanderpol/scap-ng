@@ -42,7 +42,7 @@ Stage-2 output SHOULD be regression-tested against the Stage-1 baseline.
 | extend_definition | reusable/named assertion or Assessment reference | Preserve referenced Definition truth semantics; do not duplicate or simplify unless proven equivalent. |
 | Test | collection + assertion contract using a Capability | Split collection semantics from result assertion while preserving check/check_existence behavior. |
 | Object | collection selector | Preserve target selection, behaviors, set membership, variable bindings, and object operations. |
-| State | assertion condition | Preserve datatype, operation, entity_check, var_check, and state-level semantics. |
+| State | assertion condition | Preserve datatype, operation, observed `match` (`entity_check`), expected `value_match` (`var_check`), and State-level semantics. |
 | Variable | Parameter, Organizational Input, derived value, or local constant | Classification depends on semantic role, not XML element name alone. |
 | constant_variable | constant/derived local value | Preserve datatype and ordered values. |
 | external_variable | typed Parameter / Organizational Input binding | May supply expected-state data only in native NG. Legacy uses that affect execution require lossless compatibility or review. |
@@ -59,7 +59,7 @@ Stage-2 output SHOULD be regression-tested against the Stage-1 baseline.
 | check | explicit item/result quantifier | OVAL defaults SHALL be made explicit in Stage 1. |
 | check_existence | explicit existence/cardinality requirement | OVAL defaults SHALL be made explicit in Stage 1. |
 | entity_check | explicit entity/value quantifier | Preserve explicitly. |
-| var_check | explicit variable-value quantifier | Preserve explicitly. |
+| var_check | `value_match` (expected-value quantifier) | Preserve explicitly for Variables, literal collections, and Organizational Inputs. |
 | negate | Boolean `not` | Preserve at the same logical scope. |
 | applicability-class Definition | Platform or applicability Assessment | Classify by semantic role after preserving source truth. |
 | compliance-class Definition | compliance Assessment | Bind explicitly from the Rule. |
