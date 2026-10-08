@@ -289,3 +289,57 @@ jobs:
           path: work/board-review
           if-no-files-found: error
           compression-level: 6
+
+  announce-six-run:
+    name: Announce representative run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Publish run ID on release gate issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "<!-- scap-ng-six-anchor-run -->"
+            echo "### Latest six-anchor 0.3 conversion regression"
+            echo ""
+            echo "- Result: **running**"
+            echo "- Run: ${RUN_URL}"
+            echo "- Source SHA: \`${SOURCE_SHA}\`"
+          } > "${RUNNER_TEMP}/six-run.md"
+          gh issue comment 202 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/six-run.md"
+
+  publish-six-run:
+    name: Report representative conversion verdict
+    needs: [convert]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Post aggregate matrix outcome
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RESULT: ${{ needs.convert.result }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "<!-- scap-ng-six-anchor-run -->"
+            echo "### Latest six-anchor 0.3 conversion regression"
+            echo ""
+            echo "- Result: **${RESULT}**"
+            echo "- Run: ${RUN_URL}"
+            echo "- Source SHA: \`${SOURCE_SHA}\`"
+            echo "- Inspect each matrix job and downloadable evidence at the run link."
+            echo ""
+            echo "Passing conversion is not proof of scanner/runtime equivalence."
+          } > "${RUNNER_TEMP}/six-run.md"
+          gh issue comment 202 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/six-run.md"
