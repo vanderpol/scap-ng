@@ -26,12 +26,20 @@ migration evidence:
   Object entries by **95.68%**, State entries by **100%**, Variables by **59.69%**,
   and named component references by **94.42%**.
 
-Those percentages describe **authoring-structure reduction**, not scanner runtime
-performance. The point is that authors and reviewers can see the same supported
-assessment meaning with far less graph indirection. See the
-[0.3 modernization review guide](../../review/current/REVIEW-GUIDE.md) for real
-before/after STIG examples and the [current review page](../../review/current/README.md)
-for the validated build and corpus evidence.
+**How these numbers were measured:** the final census used the pinned current
+NIWC SCAP 1.4 corpus (65 packages; 61 convertible; 6,916 Rule Assessments). For
+each generated Assessment, it compared the fidelity-first SCAP-NG conversion
+with the same content after only accepted, exact/reversible 0.3 authoring
+transformations. The percentages above count **top-level named graph
+structures/references**, not source XML bytes and not scanner runtime. For
+perspective, normalized serialized output decreased by only **3.13% in bytes**
+and **5.20% in lines**—the much larger reductions are specifically the
+indirection an author or reviewer must navigate.
+
+See the [0.3 modernization review guide](../../review/current/REVIEW-GUIDE.md)
+for real before/after STIG examples and the
+[current review page](../../review/current/README.md) for the validated build,
+pinned corpus revision, and full census evidence.
 
 ## Benchmark → Rule → Assessment
 
