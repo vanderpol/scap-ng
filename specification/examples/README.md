@@ -8,6 +8,8 @@ the complete review build are linked when more detail is useful.
 > post-0.3 research are labeled separately. An example does not become normative
 > merely because it validates or appears on this page.
 
+**Current 0.3 verification:** The [six-benchmark regression](https://github.com/vanderpol/scap-ng/actions/runs/37809832500) completed source conversion, 0.3 schema and Assessment-semantic validation, package-graph validation, exact normalization and compilation. Its downloadable `scap-ng-board-representative-review` artifact contains two Linux benchmarks, two Windows benchmarks, Windows Server DNS and Apache 2.4 UNIX Server. See [source-linked gate measurements](../../research/iterations/003/evidence/validation-gates-2026-10-08/README.md). The separately tracked [65-source 0.3 checkpoint](https://github.com/vanderpol/scap-ng/issues/202) remains a distinct release gate; scanner-runtime equivalence is not established by these static checks.
+
 **Source-first example policy:** Prefer a real published DISA STIG Rule for every
 feature, with Rule ID, benchmark/version, original check text or automation,
 native assessment, and a concrete explanation of the improvement. Distinguish
