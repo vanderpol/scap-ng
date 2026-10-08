@@ -166,24 +166,83 @@ The referenced file tests the real `gnome-shell` package using `linux.rpminfo` o
 
 ## Organizational Input
 
-**SCAP 1.4:** Organization-specific requirements can involve XCCDF Values, Tailoring, external OVAL variables, or scanner interaction.
+**SCAP 1.4:** Organization-specific requirements can involve XCCDF Values,
+Tailoring, external OVAL variables, or scanner interaction. **SCAP-NG 0.3:**
+An organization supplies typed, approved values in a separate Input Set,
+without changing the publisher's Test logic.
 
-**SCAP-NG 0.3:** Organizational Input provides typed values with provenance; it cannot rewrite Tests. **Real site policy cannot be inferred from a vendor STIG**, so this example necessarily remains explicitly **native illustrative content**, not a generated NIWC Rule. The repository's [organization-approved time-source example](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml) contains:
+**Completed example — fictional Production Operations team.** A publisher
+requires approved time servers but cannot know which servers each organization
+authorizes. An infrastructure engineer supplies the values, and a security
+manager approves them. This is the **complete authored input file**, not an
+automatic NIWC conversion or a live organization's policy:
 
 ```yaml
 organizational_input:
   id: example.production-site
+  version: 1
+  purpose: Supply organization-approved values delegated by the publisher.
+
+  benchmark:
+    id: example.linux.security-policy
+    version: V1R1
+
+  intended_scope:
+    organization: Example Organization
+    organizational_unit: Production Operations
+    system_or_environment: production
+    description: Descriptive only; does not cause automatic scanner selection.
+
   values:
     approved_time_sources:
       - ntp1.example.test
       - ntp2.example.test
+
   value_provenance:
     approved_time_sources:
       authority: Example Network Time Service Standard
       reference: EXAMPLE-NET-TIME-001
+
+  effective_from: '2026-10-01T00:00:00-04:00'
+  expires_at: null
+
+  provenance:
+    organization: Example Organization
+    supplied_by:
+      id:
+        scheme: directory
+        value: policy-author@example.test
+      display_name: Example Policy Author
+      role: Infrastructure Policy Engineer
+    supplied_at: '2026-10-01T09:00:00-04:00'
+    source_system: Example Configuration Management Repository
+    authorized_by:
+      id:
+        scheme: directory
+        value: approver@example.test
+      display_name: Example Approver
+      role: Security Manager
+    authorized_at: '2026-10-01T10:00:00-04:00'
+    authorization_reference: EXAMPLE-CHANGE-1234
+    authorization_status: approved
+    contact:
+      email: security@example.test
 ```
 
-The full authored file carries approval, source, and date metadata. Database/instance targeting is deferred beyond normative 0.3.
+**Provenance is required**, not an afterthought. The 0.3 schema requires
+`provenance.organization`, `supplied_by`, `supplied_at`, and
+`authorization_status`. It also supports the approver, authorization date
+and reference, contact, and source system. Optional `value_provenance`
+can distinguish different authorities for individual Parameters.
+
+The Benchmark declares the Parameter's type and constraints; the separate
+Input Set supplies its approved value. An Assessment Request **must explicitly
+bind** the Input Set—`intended_scope` alone never selects targets. Missing
+required input produces `not_evaluated`, rather than inventing a pass/fail.
+
+See the [complete example file](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml),
+[worked integration example](../../research/iterations/003/examples/organizational-input/README.md),
+and [0.3 JSON Schema](../../schema/v0.3.0/organizational-input.schema.json).
 
 ## Profiles and Tailoring
 
