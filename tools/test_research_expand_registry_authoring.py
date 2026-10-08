@@ -20,6 +20,7 @@ class RegistryAuthoringExpansionTests(unittest.TestCase):
   self.assertEqual(x["states"][0]["state"]["all"][1], {"field":"value", "value":1, "operation":"equals", "datatype":"integer", "match":"all", "existence":"one_or_more"})
   self.assertEqual(x["object"]["select"]["hive"], "local_machine")
   self.assertIsNone(x["test_title"])
+  self.assertIsNone(x["states"][0]["state_title"])
   self.assertEqual(x["object"]["select"]["key"]["value"], r"SYSTEM\CurrentControlSet\Control\Lsa")
  def test_native_v03_schema_accepts_expansion(self):
   from pathlib import Path
