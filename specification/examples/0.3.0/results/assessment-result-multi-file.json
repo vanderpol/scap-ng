@@ -1,0 +1,389 @@
+{
+  "assessment_result": {
+    "result_schema_version": "0.3.0",
+    "execution_id": "example-config-tree-owner-1",
+    "assessment": {
+      "id": "example.config-tree-owner",
+      "version": 1
+    },
+    "purpose": "assessment",
+    "class": "compliance",
+    "mode": "automated",
+    "outcome": "false",
+    "logical_complete": true,
+    "population_complete": true,
+    "evidence_complete": true,
+    "tests": [
+      {
+        "id": "all-config-tree-owned-by-root",
+        "outcome": "false",
+        "check_existence": "at_least_one_exists",
+        "existence_outcome": "true",
+        "check": "all",
+        "state_operator": "AND",
+        "object_refs": [
+          "config-tree"
+        ],
+        "state_refs": [
+          "owner-root"
+        ],
+        "item_refs": [
+          "config-directory",
+          "config-agent-file",
+          "config-network-file"
+        ],
+        "per_item_results": [
+          {
+            "item_ref": "config-directory",
+            "outcome": "true",
+            "state_results": [
+              {
+                "state_ref": "owner-root",
+                "outcome": "true",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "true",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 0,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "true",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 0; expected UID 0."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "item_ref": "config-agent-file",
+            "outcome": "false",
+            "state_results": [
+              {
+                "state_ref": "owner-root",
+                "outcome": "false",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "false",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 1001,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "false",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 1001,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 1001; expected UID 0."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "item_ref": "config-network-file",
+            "outcome": "true",
+            "state_results": [
+              {
+                "state_ref": "owner-root",
+                "outcome": "true",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "true",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 0,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "true",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 0; expected UID 0."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "reason": {
+          "code": "value_mismatch",
+          "message": "1 of 3 collected files/directories has owner UID 1001; expected UID 0 for all three."
+        }
+      }
+    ],
+    "objects": [
+      {
+        "id": "config-tree",
+        "capability": "unix.file",
+        "status": "complete",
+        "item_refs": [
+          "config-directory",
+          "config-agent-file",
+          "config-network-file"
+        ],
+        "logical_complete": true,
+        "population_complete": true,
+        "stop_reason": null
+      }
+    ],
+    "items": [
+      {
+        "id": "config-directory",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "value": "/etc/example.d",
+            "status": "exists"
+          },
+          "file_type": {
+            "datatype": "string",
+            "value": "directory",
+            "status": "exists"
+          },
+          "owner_uid": {
+            "datatype": "integer",
+            "value": 0,
+            "status": "exists"
+          },
+          "owner_user_name": {
+            "datatype": "string",
+            "value": "root",
+            "status": "exists"
+          },
+          "group_id": {
+            "datatype": "integer",
+            "value": 0,
+            "status": "exists"
+          },
+          "mode": {
+            "datatype": "string",
+            "value": "0755",
+            "status": "exists"
+          },
+          "size_bytes": {
+            "datatype": "integer",
+            "value": 4096,
+            "status": "exists"
+          }
+        },
+        "provenance": {
+          "target_ref": "target-1",
+          "source_execution_ref": "collection-config-tree-1"
+        }
+      },
+      {
+        "id": "config-agent-file",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "value": "/etc/example.d/agent.conf",
+            "status": "exists"
+          },
+          "file_type": {
+            "datatype": "string",
+            "value": "regular",
+            "status": "exists"
+          },
+          "owner_uid": {
+            "datatype": "integer",
+            "value": 1001,
+            "status": "exists"
+          },
+          "owner_user_name": {
+            "datatype": "string",
+            "value": "example-user",
+            "status": "exists"
+          },
+          "group_id": {
+            "datatype": "integer",
+            "value": 0,
+            "status": "exists"
+          },
+          "mode": {
+            "datatype": "string",
+            "value": "0644",
+            "status": "exists"
+          },
+          "size_bytes": {
+            "datatype": "integer",
+            "value": 1280,
+            "status": "exists"
+          }
+        },
+        "provenance": {
+          "target_ref": "target-1",
+          "source_execution_ref": "collection-config-tree-1"
+        }
+      },
+      {
+        "id": "config-network-file",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "value": "/etc/example.d/network.conf",
+            "status": "exists"
+          },
+          "file_type": {
+            "datatype": "string",
+            "value": "regular",
+            "status": "exists"
+          },
+          "owner_uid": {
+            "datatype": "integer",
+            "value": 0,
+            "status": "exists"
+          },
+          "owner_user_name": {
+            "datatype": "string",
+            "value": "root",
+            "status": "exists"
+          },
+          "group_id": {
+            "datatype": "integer",
+            "value": 0,
+            "status": "exists"
+          },
+          "mode": {
+            "datatype": "string",
+            "value": "0640",
+            "status": "exists"
+          },
+          "size_bytes": {
+            "datatype": "integer",
+            "value": 320,
+            "status": "exists"
+          }
+        },
+        "provenance": {
+          "target_ref": "target-1",
+          "source_execution_ref": "collection-config-tree-1"
+        }
+      }
+    ],
+    "variables": [],
+    "diagnostics": [],
+    "evidence_summary": {
+      "observed_failures": 1,
+      "actual_failures": 1,
+      "maximum": 50,
+      "returned": 1,
+      "truncated_population": false,
+      "stop_reason": "complete"
+    },
+    "target_ref": "target-1",
+    "expression_execution": {
+      "assessment": "example.config-tree-owner",
+      "invocation_ref": "example-config-tree-owner-1",
+      "outcome": "false",
+      "executed_tests": [
+        "all-config-tree-owned-by-root"
+      ],
+      "trace": [
+        {
+          "path": "example.config-tree-owner/evaluate",
+          "kind": "test",
+          "outcome": "false",
+          "test": "all-config-tree-owned-by-root",
+          "assessment": "example.config-tree-owner",
+          "reused": false,
+          "owner_invocation_ref": "example-config-tree-owner-1"
+        }
+      ],
+      "diagnostics": []
+    },
+    "field_uses": [
+      {
+        "test_ref": "all-config-tree-owned-by-root",
+        "item_ref": "config-directory",
+        "used_elements": [
+          "owner_uid"
+        ],
+        "required_elements": [
+          "full_path"
+        ],
+        "relationship": "direct"
+      },
+      {
+        "test_ref": "all-config-tree-owned-by-root",
+        "item_ref": "config-agent-file",
+        "used_elements": [
+          "owner_uid"
+        ],
+        "required_elements": [
+          "full_path"
+        ],
+        "relationship": "direct"
+      },
+      {
+        "test_ref": "all-config-tree-owned-by-root",
+        "item_ref": "config-network-file",
+        "used_elements": [
+          "owner_uid"
+        ],
+        "required_elements": [
+          "full_path"
+        ],
+        "relationship": "direct"
+      }
+    ],
+    "dependent_assessments": []
+  }
+}
