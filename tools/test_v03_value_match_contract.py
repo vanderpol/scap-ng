@@ -66,6 +66,8 @@ class ValueMatchContract(unittest.TestCase):
                 {"input": "approved-types"},
                 ["ext4", "xfs"],
             ):
+                if kind == "object_entity_base" and "input" in operand:
+                    continue  # Collection selectors cannot consume Organizational Input.
                 with self.subTest(kind=kind, operand=operand):
                     good = self.base(kind, operand)
                     self.assertEqual(list(validator.iter_errors(good)), [])
@@ -76,6 +78,21 @@ class ValueMatchContract(unittest.TestCase):
                     legacy["variable_match"] = legacy.pop("value_match")
                     self.assertTrue(list(validator.iter_errors(legacy)),
                                     "0.3 must not accept the obsolete key")
+
+    def test_organizational_input_is_for_expected_state_not_collection_selectors(self):
+        for operand in ({"input":"approved-types"},
+                        {"variable":"approved-types-variable"},
+                        ["ext4","xfs"]):
+            object_pred=self.base("object_entity_base",operand)
+            state_pred=self.base("state_entity_base",operand)
+            object_errors=list(self.validators["object_entity_base"].iter_errors(object_pred))
+            state_errors=list(self.validators["state_entity_base"].iter_errors(state_pred))
+            self.assertEqual(state_errors,[])
+            if "input" in operand:
+                self.assertTrue(object_errors,
+                    "Organizational Input must never redirect collection targets")
+            else:
+                self.assertEqual(object_errors,[])
 
     def test_scalar_does_not_require_or_allow_multivalue_modifier(self):
         for kind, validator in self.validators.items():
