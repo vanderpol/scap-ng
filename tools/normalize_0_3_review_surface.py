@@ -254,6 +254,52 @@ def promote_shared_objects(doc:dict,changes:list[dict])->dict:
     })
     return out
 
+# #202: static Variable folding can expose OVAL registry-type literals
+# after the capability mapper has already handled the original State. The
+# exact mapping remains the published OVAL -> native vocabulary crosswalk.
+# Apply it only to literal type predicates of the matching capability.
+def _canonicalize_registry_type_literals(node:Any, capability:str,
+                                         path:tuple[Any,...],
+                                         changes:list[dict])->None:
+    if not isinstance(node,dict):
+        return
+    mapping_file=(
+        Path(__file__).resolve().parents[1]/"schema"/"v0.3.0"/
+        "capability-mappings"/"supported"/f"{capability}.json"
+    )
+    mapping=json.loads(mapping_file.read_text(encoding="utf-8"))
+    crosswalk=(mapping.get("migration_crosswalk") or {}).get("registry_type") or {}
+    def walk(item:Any,location:tuple[Any,...])->None:
+        if isinstance(item,list):
+            for n,child in enumerate(item):
+                walk(child,location+(n,))
+            return
+        if not isinstance(item,dict):
+            return
+        if (item.get("field")=="type"
+            and item.get("operation") in {"equals","not_equal",
+                    "case_insensitive_equals","case_insensitive_not_equal"}):
+            old=item.get("value")
+            if isinstance(old,str) and old in crosswalk:
+                new=crosswalk[old]
+                # A special migration artifact is not a valid literal.
+                # Preserve it for schema rejection rather than fabricating
+                # an equivalent native value.
+                if new!="variable_reference_artifact_not_native_value" and new!=old:
+                    item["value"]=new
+                    changes.append({
+                        "path":[str(x) for x in location+("value",)],
+                        "original_value":old,
+                        "candidate_value":new,
+                        "reason":"registry type source-to-native vocabulary crosswalk",
+                        "capability":capability,
+                    })
+        for name,child in item.items():
+            if isinstance(child,(dict,list)):
+                walk(child,location+(name,))
+    walk(node,path)
+
+
 def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any:
     if isinstance(value,list):
         return [
@@ -337,6 +383,13 @@ def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any
             "reason":"zero-collected-items Test has no State matches to aggregate",
         })
         out["match"]="all"
+    # Re-run the *exact* approved registry type enum crosswalk only after
+    # constant folding; the original variable reference was not lexical.
+    # Scope to this actual State wrapper, not unrelated type fields.
+    if out.get("capability") in {"windows.registry","windows.ntuser"} and isinstance(out.get("state"),dict):
+        _canonicalize_registry_type_literals(
+            out["state"],out["capability"],path+("state",),changes
+        )
     return out
 
 
