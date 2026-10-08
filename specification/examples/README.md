@@ -329,6 +329,40 @@ against the supplied policy value. These are **illustrative authoring fragments*
 from the worked fixture, not a claim that this fictional benchmark was
 converted from a published STIG.
 
+**The exact identifiers that link the files** are shown below. Notice that
+the organization does **not** supply an Assessment input ID: it supplies the
+**Benchmark Parameter ID**; the Rule explicitly translates that into the
+Assessment input name.
+
+| From | Reference | Resolves to |
+| --- | --- | --- |
+| Input Set `values.approved_time_sources` | `approved_time_sources` | Benchmark `parameters[].id` |
+| Rule `inputs.required_time_sources.parameter` | `approved_time_sources` | Same Benchmark Parameter |
+| Rule `inputs` mapping key | `required_time_sources` | Assessment `inputs.required_time_sources` |
+| Assessment Variable `approved-sources.input` | `required_time_sources` | That supplied Assessment input |
+| State `value.variable` | `approved-sources` | Assessment Variable |
+| Test `states` entry | `state-source-approved` | State using the supplied value |
+| Root `evaluate.test` | `test-time-sources` | Test performing the comparison |
+
+The Assessment Request separately selects **which Input Set** applies:
+`organizational_input.id: example.production-site` and
+`source: site.organizational-input.yaml`. Its matching
+`benchmark.id` and `benchmark.version` guard against supplying values
+for a different Benchmark.
+
+In other words, the path that carries the actual expected value is:
+
+```text
+values.approved_time_sources = [ntp1.example.test, ntp2.example.test]
+    -> Benchmark Parameter approved_time_sources
+    -> Rule maps approved_time_sources to required_time_sources
+    -> Assessment input required_time_sources
+    -> Variable approved-sources
+    -> State state-source-approved: hostname compared to approved-sources
+    -> Test test-time-sources
+    -> evaluate: test-time-sources
+```
+
 **1. Publisher's Benchmark** declares *what* the organization must supply,
 without inventing its server names:
 
