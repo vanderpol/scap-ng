@@ -127,11 +127,11 @@ def readable_slug(value: str | None, *, maximum: int = 72) -> str:
 
 
 def neutralize_shared_title(value: str, benchmark_labels: set[str]) -> str:
-    """Remove source-benchmark branding from a cross-benchmark shared filename label.
+    """Strip platform-specific branding from a cross-benchmark reusable display label.
 
-    This changes only the generated shared filename/ID. Authored Assessment and
-    Test titles remain unchanged. A cross-benchmark shared filename should describe
-    the reusable check rather than whichever source benchmark supplied the title.
+    Apply only when a check is provably shared across distinct benchmarks.
+    Original Assessment titles remain in the normalizer's source/consumer
+    provenance report and the source Rule policy/title remains unchanged.
     """
     text = value.strip()
     labels = {x.lower() for x in benchmark_labels}
@@ -147,9 +147,11 @@ def neutralize_shared_title(value: str, benchmark_labels: set[str]) -> str:
         text = re.sub(r"\bWindows\s+(?:10|11)\b", "Windows", text, flags=re.I)
 
     if linux_family:
+        text = re.sub(r"^\s*(?:OL\d{2}|RHEL-?\d{2})-\d{2}-\d+\s*[-:]?\s*", "", text, flags=re.I)
         text = re.sub(r"\bRed\s+Hat\s+Enterprise\s+Linux\s+\d+\b", "Linux", text, flags=re.I)
         text = re.sub(r"\bRHEL\s*\d+\b", "Linux", text, flags=re.I)
         text = re.sub(r"\bOracle\s+Linux\s+\d+\b", "Linux", text, flags=re.I)
+        text = re.sub(r"\bOL\s*\d+\b", "Linux", text, flags=re.I)
 
     return re.sub(r"\s+", " ", text).strip()
 
@@ -774,6 +776,18 @@ def main() -> int:
         shared_path = (output / shared_rel_path) if output is not None else None
 
         assessment["id"] = shared_id
+        benchmark_labels = {
+            str(consumer.get("benchmark"))
+            for row in group
+            for consumer in row.get("consumers", [])
+            if consumer.get("benchmark")
+        }
+        if len(benchmark_labels) > 1:
+            source_title = assessment.get("assessment_title")
+            if isinstance(source_title, str) and source_title.strip():
+                neutral_title = neutralize_shared_title(source_title, benchmark_labels)
+                if neutral_title:
+                    assessment["assessment_title"] = neutral_title
         # This is a new canonical Assessment identity, not a continuation of
         # whichever source file sorts first.
         assessment["version"] = 1
