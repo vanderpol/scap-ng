@@ -66,31 +66,41 @@ vulnerability assertions. The Rule owns assertion metadata, applicability,
 parameters, remediation and named Assessment selections. Assessment owns the
 evaluation method. A separate Policy file SHALL NOT be introduced.
 
-Source Assessment references SHALL be explicit relative YAML paths resolved
-from the referring Rule file, independent of process working directory. Missing
-references, wrong document types and package-boundary escapes SHALL fail. Stable
-Assessment identities come from document contents rather than filename guesses.
-Compiled packages resolve logical identities through explicit manifest bindings.
-No author-maintained Assessment index is required for locating YAML sources.
+**0.3 authoring decision (tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199)):**
+cross-file references SHALL use stable logical identities, not paths relative to
+the referring source file. This applies to Benchmark → Rule, Rule → Assessment,
+dependencies, shared Assessments and other inter-document references. The build
+indexes eligible documents by kind, logical ID and version in the declared
+source/import scope. Missing, ambiguous, incorrectly typed or incompatible
+references SHALL fail. Authors SHALL NOT maintain a separate Assessment index.
 
-The old full RHEL 9 Rule source still uses ID-only selection references and is
-historical output. The current [full RHEL9 review](../review/rhel9-current-full/README.md)
-places relative paths directly on all 445 Rules. Its proposed field names are
-`assessment_choices` and `default_assessment_choice`; these vocabulary names
-remain subject to owner review, while named selector/default semantics are preserved.
+**Implementation gap:** The current 0.3 converter and compiler still emit and
+resolve source-relative file paths. They translate those paths to logical IDs
+in the compiled manifest, but they have **not yet implemented** author-facing
+logical-ID resolution. Their path-based form is transitional and SHALL NOT be
+advertised as the final 0.3 authoring design. Signed scanner bundles will
+continue to use resolved logical references rather than source paths.
+
+The previously generated [full RHEL9 review](../review/rhel9-current-full/README.md)
+places relative paths on its Rules; those files document a transitional build,
+not the final 0.3 reference contract. Under the logical-ID model, the
+equivalent author-facing shape is:
 
 ```yaml
 rule:
   id: SV-257777
   assessment_choices:
     default:
-      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+      assessment: rhel9.sv-257777.automated
     automated:
-      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+      assessment: rhel9.sv-257777.automated
     manual:
-      assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+      assessment: rhel9.sv-257777.manual
   default_assessment_choice: default
 ```
+
+The identifiers above are illustrative pending migration of the generator,
+schemas and compiler. The explicit choice and default semantics are unchanged.
 
 This section supersedes earlier Rule → Policy → Assessment guidance. The
 relative-path decision is retained without restoring the superseded Policy layer.
