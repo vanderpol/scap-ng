@@ -40,11 +40,11 @@ class StateItemCastingContractTests(unittest.TestCase):
 
     def test_item_stdout_line_remains_string_only(self):
         item=self.generated["$defs"]["collected_item"]
-        # Traverse schema to locate collected field datatype restrictions.
-        text=json.dumps(item,sort_keys=True)
-        self.assertIn('"stdout_line"',text)
-        self.assertIn('"string"',text)
-        self.assertNotIn('"integer"',text)
+        field=item["allOf"][1]["properties"]["fields"]["properties"]["stdout_line"]
+        self.assertEqual(["string"], sorted(set(
+            part["properties"]["datatype"]["enum"][0]
+            for part in (field["items"]["allOf"][1],)
+        )))
 
     def test_mapping_explicitly_separates_two_datatype_contracts(self):
         native=self.mapping["native"]
