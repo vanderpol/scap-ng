@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import copy
 
-OPERATIONS = {"equals", "not_equals", "pattern match", "case insensitive equals"}
+OPERATIONS = {"equals", "not_equal", "pattern_match", "case_insensitive_equals"}
 HIVES = {"classes_root", "current_config", "current_user", "current_user_local_settings", "local_machine", "users"}
 TYPES = {"string": "string", "expand_string": "string", "multi_string": "string", "dword": "integer", "dword_big_endian": "integer", "qword": "integer", "binary": "binary"}
 
@@ -69,9 +69,9 @@ def expand_registry_test(test):
     if kind["value"] == "multi_string":
         raise AuthoringError("REG_MULTI_SZ native element mapping is not yet specified")
     val = predicate(expect["value"], datatype=datatype, context="registry value")
-    if expect["match"] not in {"all", "one_or_more", "any", "one", "odd"}:
+    if expect["match"] not in {"all", "one_or_more", "one", "none"}:
         raise AuthoringError("unsupported explicit match")
-    if expect["existence"] not in {"one_or_more", "none", "all"}:
+    if expect["existence"] not in {"one_or_more", "none", "all", "one", "optional"}:
         raise AuthoringError("unsupported explicit existence")
     result = {
         "test_title": None,
