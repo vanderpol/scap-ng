@@ -24,12 +24,12 @@ Representative full-benchmark candidate artifacts are produced by the
 [0.3 candidate human-review workflow](https://github.com/vanderpol/scap-ng/actions/workflows/0.3-candidate-human-review.yml).
 
 Current successful **6/6** six-benchmark owner-review candidate:
-[workflow run 37706133572](https://github.com/vanderpol/scap-ng/actions/runs/37706133572).
+[workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654).
 
 Open the run's **Artifacts** section and download
 `scap-ng-0.3-human-review-candidate`. The deterministic inner review ZIP has
-SHA-256 `3ad806c1578656fed4e807bae1f37d54f77730f842539236f9e956ab2e1c8ae5`
-and identifies SCAP-NG source commit `d266e2fbf6e384e66dd3d8e0d1109e03be07b6e8`.
+SHA-256 `fb887034148eebf31d9518f7a95f2d6fcd35f4a0317a5f4979d8cd924f14eece`
+and identifies SCAP-NG source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`.
 Direct artifact URLs are intentionally not used here because they are not
 reliable navigation links for all GitHub sessions.
 
