@@ -6,39 +6,31 @@ The first examples show STIG-based content and understandable results. Next come
 
 ## Benchmark → Rule → Assessment
 
-**SCAP 1.4:** XCCDF generally embeds the complete Rule definitions inside the Benchmark, and those Rules reference separate OVAL checks. **SCAP-NG:** The Benchmark instead **lists references to individual Rule files**. Each Rule owns its policy text and references its available automated/manual Assessment files. The Benchmark does **not** contain the full Rule definitions.
+**SCAP 1.4:** Rules are embedded in the Benchmark and refer to external check content. **SCAP-NG:** Each Rule is an independent, readable file and selects the Assessment that performs the check.
 
-The file relationship is:
+The **agreed 0.3 authoring target** is to link these files by *logical ID*, not filenames or `../` paths. For example:
 
-```text
-benchmark.yaml
-  rules:
-    - rules/SV-257923.rule.yaml
-              |
-              v
-rules/SV-257923.rule.yaml
-  assessment_choices:
-    automated: ../assessments/automated/SV-257923.automated.yaml
-    manual:    ../assessments/manual/SV-257923.manual.yaml
-```
-
-This is a **structural illustration** (showing only one Rule), not the entire RHEL 9 Benchmark. In the actual Benchmark, `rules:` is a list of Rule-file paths; the Rule file contains the title, severity, rationale, remediation, and Assessment bindings. The compiler resolves the references and the compiled package manifest identifies the corresponding logical members.
-
-**Converted RHEL 9 SV-257923**, from `benchmarks/rhel9/candidate-authoring/rules/SV-257923.rule.yaml`:
+`benchmark.yaml`:
 
 ```yaml
-rule:
-  id: SV-257923
-  title: RHEL 9 library directories must be group-owned by root or a system account.
-  assessment_choices:
-    automated:
-      assessment: ../assessments/automated/SV-257923.automated.yaml
-    manual:
-      assessment: ../assessments/manual/SV-257923.manual.yaml
-  default_assessment_choice: default
+rules:
+  - SV-257923
 ```
 
-The complete Rule also carries severity, rationale, references, and remediation.
+`SV-257923.rule.yaml`:
+
+```yaml
+id: SV-257923
+assessment_choices:
+  automated:
+    assessment: rhel9.sv-257923.automated
+  manual:
+    assessment: rhel9.sv-257923.manual
+```
+
+The names above are illustrative identifiers, not copied from the current build. The compiler will locate each document, validate the reference, and include the referenced content in the package. Authors will not need to maintain relative directory paths.
+
+**Implementation status:** The current converted samples and compiler still use relative paths. The logical-ID authoring change is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199). See the [implementation note](#cross-file-reference-implementation-status) at the bottom for the current path-based example.
 
 ## Automated Assessments
 
@@ -656,6 +648,20 @@ Literal PowerShell `foreach` occurs inside some `independent.shellcommand`
 code. Those loops are **opaque executed program text**, not SCAP-NG `for_each`
 semantics; translating them would require a separately reviewed and
 equivalence-tested native collector replacement.
+
+### Cross-file reference implementation status
+
+**Current implementation (transitional):** The converter currently writes relative source paths, and the compiler resolves them to logical object identities in the packaged manifest. For example, the real RHEL 9 SV-257923 Rule currently uses:
+
+```yaml
+assessment_choices:
+  automated:
+    assessment: ../assessments/automated/SV-257923.automated.yaml
+  manual:
+    assessment: ../assessments/manual/SV-257923.manual.yaml
+```
+
+**Accepted 0.3 target, not yet implemented:** Benchmark-to-Rule, Rule-to-Assessment, and other cross-file authored references will use stable logical identities. The compiler will index and resolve them, fail on missing/ambiguous or incorrectly typed targets, and keep physical paths out of the runtime graph. This supports shared Assessments and file moves without rewriting every consumer. See [#199](https://github.com/vanderpol/scap-ng/issues/199) for migration and regression acceptance criteria.
 
 ### Source and validation notes
 
