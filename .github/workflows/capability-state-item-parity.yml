@@ -4,8 +4,15 @@ on:
     branches: [main]
     paths:
       - schema/v0.1.0/capability-mappings/**
+      - schema/v0.3.0/capability-mappings/**
+      - schema/v0.3.0/capability-common.schema.json
       - third_party/scap-1.4-schemas/oval_5.12.3/**
       - tools/audit_capability_state_item_parity.py
+      - tools/validate_generated_capability_semantics.py
+      - tools/test_registry_inline_datatype_semantics.py
+      - tools/research_expand_registry_authoring.py
+      - tools/test_research_expand_registry_authoring.py
+      - research/iterations/003/examples/stig-derived/SV-278217/readable-authoring.prototype.yaml
       - .github/workflows/capability-state-item-parity.yml
   workflow_dispatch:
 
@@ -21,12 +28,13 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install schema validation dependency
-        run: python -m pip install --disable-pip-version-check jsonschema
+        run: python -m pip install --disable-pip-version-check jsonschema pyyaml referencing
       - name: Audit Object subset and State Item parity
         id: audit
         continue-on-error: true
         run: |
           python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json
+          python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json
       - name: Generate and meta-validate every reviewed capability schema
         run: |
           PYTHONPATH=tools python - <<'PY'
@@ -36,13 +44,13 @@ jobs:
           from generate_capability_schema import generate
 
           root=Path('.').resolve()
-          mapping_dir=root/'schema/v0.1.0/capability-mappings'
+          mapping_dirs=[root/'schema/v0.1.0/capability-mappings', root/'schema/v0.3.0/capability-mappings/supported']
           checked=0
           failures=[]
-          for path in sorted(mapping_dir.glob('*.json')):
+          for path in (p for directory in mapping_dirs for p in sorted(directory.glob('*.json'))):
               try:
                   mapping=json.loads(path.read_text(encoding='utf-8'))
-                  schema=generate(mapping,root)
+                  schema=generate(mapping,root,schema_version=mapping.get('specification_version','0.1.0'))
                   Draft202012Validator.check_schema(schema)
                   checked += 1
               except Exception as exc:
@@ -54,6 +62,10 @@ jobs:
           if failures:
               raise SystemExit(1)
           PY
+      - name: Regression test inline Registry type semantics and authored expansion
+        run: |
+          PYTHONPATH=tools python -m unittest -v tools/test_registry_inline_datatype_semantics.py tools/test_research_expand_registry_authoring.py
+          PYTHONPATH=tools python tools/research_expand_registry_authoring.py research/iterations/003/examples/stig-derived/SV-278217/readable-authoring.prototype.yaml --output /tmp/sv-278217.canonical.json --validate-v03
       - name: Upload parity report
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,9 +73,11 @@ jobs:
           name: capability-state-item-parity
           path: |
             capability-state-item-parity.json
+            capability-state-item-parity-v03.json
             generated-capability-schema-validation.json
       - name: Enforce parity
         if: steps.audit.outcome != 'success'
         run: |
           cat capability-state-item-parity.json
+          cat capability-state-item-parity-v03.json
           exit 1
