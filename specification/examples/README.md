@@ -182,44 +182,44 @@ The referenced file tests the real `gnome-shell` package using `linux.rpminfo` o
 
 ## Organizational Input
 
-**SCAP 1.4:** Organization-specific expected values can involve XCCDF Values,
-Tailoring, external OVAL variables, or scanner-specific interaction.
+**SCAP 1.4:** Organization-specific requirements can involve XCCDF Values, Tailoring, external OVAL variables, or scanner interaction.
 
-**SCAP-NG:** Organizational Input supplies typed expected values with provenance.
-It may fill an allowed input slot, but it does not rewrite Tests or inject commands.
+**SCAP-NG 0.3:** Organizational Input provides typed values with provenance; it cannot rewrite Tests. **Real site policy cannot be inferred from a vendor STIG**, so this example necessarily remains explicitly **native illustrative content**, not a generated NIWC Rule. The repository's [organization-approved time-source example](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml) contains:
 
 ```yaml
 organizational_input:
-  id: site-time-source
+  id: example.production-site
   values:
-    approved_time_source:
-      value: time.example.mil
-      provenance:
-        source: organization-policy
+    approved_time_sources:
+      - ntp1.example.test
+      - ntp2.example.test
+  value_provenance:
+    approved_time_sources:
+      authority: Example Network Time Service Standard
+      reference: EXAMPLE-NET-TIME-001
 ```
 
-Portable database/site/product-instance routing is deferred beyond 0.3; that
-remains an orchestration/vendor concern until a common cross-product contract is proven.
+The full authored file carries approval, source, and date metadata. Database/instance targeting is deferred beyond normative 0.3.
 
 ## Profiles and Tailoring
 
-**SCAP 1.4:** Profile inheritance and selection can require resolving Benchmark,
-Group, Rule, Profile, `select`, and refinement behavior together.
+**SCAP 1.4:** Profile selection and refinement require resolving multiple XCCDF structures. **SCAP-NG 0.3:** The default is explicit, and publisher Profiles record Rule-selection differences.
 
-**SCAP-NG:** The Benchmark exposes an explicit default selection. Publisher
-Profiles remain compact by recording deviations, while external Tailoring records
-the organization's policy choices separately.
+**Converted RHEL 9** `benchmarks/rhel9/candidate-authoring/benchmark.yaml` sets `default_selection: true`. Its real `CAT_I_Only` profile disables non-CAT-I Rules. Excerpt (only the first three disable entries shown):
 
 ```yaml
 default_selection: true
 profiles:
   - id: CAT_I_Only
+    title: CAT I Only
     disabled_rules:
       - SV-257778
       - SV-257779
+      - SV-257781
+      # More disabled Rules in the complete source
 ```
 
-**The result excerpts below are conformance fixtures, not real target scans.** They demonstrate 0.3 result fields with synthetic outcomes and evidence. They must not be described as scanner-generated proof. Full JSON examples and their provenance are indexed in the [result-fixture overview](0.3.0/results/README.md).
+An external Tailoring example needs invented local policy decisions; the [RHEL 9 worked tailoring fixture](../../research/iterations/003/examples/tailoring-all-options/tailoring/rhel9-example.tailoring.yaml) explicitly identifies its authorization and exceptions as fictional rather than claiming publisher approval.
 
 ## Compact Benchmark and Rule Results
 
@@ -393,127 +393,101 @@ includes schema-valid production-derived coverage for each accepted form.
 
 ## Consumer-local components and shared Objects
 
-**SCAP 1.4:** Private Objects and States normally live in top-level registries and
-are reached by IDs even when only one semantic consumer exists.
+**SCAP 1.4:** Even private Objects/States live in separate registries. **SCAP-NG 0.3:** Keep the private parts with the Test, while preserving named acquisitions when they are genuinely referenced.
 
-**SCAP-NG 0.3:** Keep private acquisition/predicates with their consumer. Keep a
-named Object only when its acquisition identity is intentionally reusable or
-referenceable. Assessment-scoped named acquisitions are declared under
-`shared_objects:`; use sites still say simply `object: <name>-object`.
+**Converted RHEL 9 SV-258029** combines a shared dconf directory acquisition with a private `independent.textfilecontent54` Object. From `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-258029.automated.yaml` (the shared Object's Set/Filter and the private select fields continue in the full file):
 
 ```yaml
 shared_objects:
-  users-object:
-    capability: unix.password
-    ...
-
+  dconf-database-directories-object:
+    capability: unix.file
+    set:
+      operator: union
+      # Operands and Filter remain in the full file
 tests:
-  home-permissions-test:
+  dconf-disable-restart-buttons-true-test:
+    capability: independent.textfilecontent54
     object:
-      capability: unix.file
-      ...
+      capability: independent.textfilecontent54
+      for_each:
+        item: item
+        in: dconf-database-directories-object
 ```
 
-The final corpus census confirms that this locality model applies broadly, not
-just to hand-picked examples; the headline measurements are summarized above.
+The [review guide](../../review/current/REVIEW-GUIDE.md) links the complete faithful and modernized files.
 
 ## Static values without Variable plumbing
 
-**SCAP 1.4:** Fixed multi-valued constants often require named Variables because
-an XML entity can reference only one lexical body.
+**SCAP 1.4:** Static multi-value constants often require separate Variables. **SCAP-NG 0.3:** Inline exact compile-time literals while retaining datatype and source quantifiers.
 
-**SCAP-NG 0.3:** Direct scalar or typed literal-array values are allowed where the
-source graph is compile-time static and source-equivalent quantifier behavior is
-explicit. Named Variables remain for genuine runtime computation/dataflow.
-
-This simplification does not replace Object-derived Variables or runtime
-iteration.
-
-Example:
+**Converted RHEL 9 SV-257923** puts the actual library directory set directly in a `unix.file` selector. From `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-257923.automated.yaml`:
 
 ```yaml
 select:
-  shell:
-    value: ["/bin/bash", "/bin/sh"]
+  directory:
+    value:
+      - /lib
+      - /lib64
+      - /usr/lib
+      - /usr/lib64
+    operation: equals
     datatype: string
-    variable_match: one_or_more
+    variable_match: one
 ```
 
-The literal collection keeps the source-equivalent datatype and quantifier;
-array syntax does not silently mean OR/ANY.
+Unlike static constants, runtime values remain named. This is a reduction in graph indirection, not a change in compliance logic.
 
 ## Predictable named component IDs
 
-**SCAP 1.4:** IDs often encode XML type/version namespaces and generated source
-identity, which makes repository searching noisy.
+**SCAP 1.4:** Internal OVAL identifiers are often difficult to interpret by inspection. **SCAP-NG 0.3:** Descriptive kebab-case names carry the component-type suffix.
 
-**SCAP-NG 0.3:** Named internal components use meaningful kebab-case IDs ending
-in their type.
-
-```yaml
-shared_objects:
-  forward-zones-object: ...
-
-variables:
-  zone-names-variable: ...
-
-tests:
-  zone-signing-test: ...
-```
-
-Inline/private components do not receive artificial IDs solely to satisfy the
-naming convention.
+**Converted RHEL 9 SV-258045** uses actual names such as `interactive-users-object`, `count-passwd-entries-variable`, `count-unique-uids-variable`, and `uids-unique-test`. These are taken from `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-258045.automated.yaml`. Private inline components do not receive artificial IDs.
 
 ## Runtime collection `for_each`
 
-**SCAP 1.4:** Object → ObjectComponent → Variable → target-Object plumbing, or
-shell/PowerShell loops, may be required simply to collect something for each Item
-from another collection.
+**SCAP 1.4:** Object → ObjectComponent → Variable → Object chains may exist simply to feed each collected Item into another collection.
 
-**SCAP-NG 0.3:** `for_each` expresses collection expansion directly while the
-Test keeps its original aggregation/existence boundary.
+**SCAP-NG 0.3:** **RHEL 9 SV-258029** is a *mechanically converted* use of collection iteration. This actual excerpt belongs to its text-file Test Object:
 
 ```yaml
 for_each:
-  item: user
-  in: users-object
-
+  item: item
+  in: dconf-database-directories-object
 select:
   directory:
-    from: user.home_dir
+    from: item.directory
 ```
 
-Nested collected-data iteration is also an accepted 0.3 requirement. It remains
-collection iteration—not “run one Test per Item”—and must retain outer-binding
-lineage, explicit correlation, completeness/error semantics, and cycle/resource
-protection.
+This expands a collection, not one Test per Item, and does not change Test aggregation.
+
+**Nested production case — Windows Server DNS SV-259388:** The original PowerShell code iterates zones and A/AAAA hosts and checks RRSIG responses. Native correlated nested iteration is illustrated in the [0.3 review guide](../../review/current/REVIEW-GUIDE.md), but it is **production-derived native authoring, not an automatic rewrite**: the converter cannot prove arbitrary PowerShell semantics, so the real generated candidate retains the command.
+
+## Direct Variable evaluation
+
+**SCAP 1.4:** Comparing computed values can require an artificial Variable Object. **SCAP-NG 0.3:** The real **RHEL 9 SV-258045** UID-uniqueness check uses `variable.value` directly, retaining both runtime Variables.
 
 ```yaml
-shared_objects:
-  zones-object: ...
-
-  hosts-object:
-    for_each:
-      item: zone
-      in: zones-object
-    select:
-      zone:
-        from: zone.name
-
-  dnssec-responses-object:
-    for_each:
-      item: host
-      in: hosts-object
-    select:
-      name:
-        from: host.fqdn
-      zone:
-        from: zone.name
+tests:
+  uids-unique-test:
+    capability: variable.value
+    variable: count-passwd-entries-variable
+    states:
+      - capability: variable.value
+        state:
+          field: value
+          value:
+            variable: count-unique-uids-variable
+          operation: equals
+          datatype: integer
 ```
 
-Here the inner collection inherits the correlated outer `zone` lineage; this
-does not imply an independent Cartesian product. The DNS benchmark is the primary
-production proving family.
+This is an excerpt: explicit quantifiers and reporting fields remain in `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-258045.automated.yaml`.
+
+## Localized Set and Filter semantics
+
+**SCAP 1.4:** Separate Objects may be necessary even for one check's local Set. **SCAP-NG 0.3:** **Oracle Linux 9 SV-271608**, verifying MFA certificate status checking, puts the two SSSD configuration-file acquisitions inside the Test's Object while **retaining their `union` operator**. The underlying files are `/etc/sssd/sssd.conf` and `/etc/sssd/conf.d/*.conf`. See `benchmarks/oracle-linux9/candidate-authoring/assessments/automated/SV-271608.automated.yaml`.
+
+The same principle applies to Filters: locality is a presentation improvement, not a reason to alter set membership or filter action.
 
 # Deferred beyond normative 0.3
 
