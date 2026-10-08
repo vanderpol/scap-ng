@@ -879,15 +879,16 @@ The canonical terms are:
 - `maximum`: the configured maximum number of failure-evidence records to
   retain/return; this is an evidence maximum, **not** a compliance threshold;
 - `returned`: failure-evidence records actually retained in the result;
-- `truncated_population`: whether the returned failure evidence represents
-  only part of the known/observed failing population;
+- `truncated_population`: whether only a portion of the **observed**
+  failing Items has been retained as failure evidence. It is distinct from
+  `population_complete` and does not assert that evaluation stopped;
 - `logical_complete`: enough evaluation occurred to determine the Assessment
   truth/result;
 - `population_complete`: the relevant population was evaluated completely;
-- `evidence_complete`: all evidence required by the configured retention
-  policy was retained;
-- `stop_reason`: why evaluation stopped, including
-  `evidence_maximum_reached` where appropriate.
+- `evidence_complete`: all eligible supporting evidence was retained, rather
+  than omitted by an evidence cap or other output restriction;
+- `stop_reason`: why collection/evaluation stopped (for example, `complete`
+  or an **independent** scanner resource budget), not the evidence cap alone.
 
 A fully evaluated example may report:
 
@@ -908,14 +909,36 @@ A fully evaluated example may report:
         returned: 3
         truncated_population: false
 
-If evaluation is deliberately stopped after 20 failures because the configured
-evidence maximum has been reached, the result may instead report:
+When the scanner **evaluates all 50,000 Items**, finds 12 mismatches and
+retains only 5 failing examples, the Test result reports:
+
+    evaluation:
+      logical_complete: true
+      population_complete: true
+      evidence_complete: false
+      stop_reason: complete
+      evaluated_items: 50000
+
+    summary:
+      observed_failures: 12
+      actual_failures: 12
+
+    evidence:
+      failures:
+        maximum: 5
+        returned: 5
+        truncated_population: true
+
+An independent scanner resource budget might instead stop the evaluation
+early. If the scanner has encountered 20 failures among 1,847 evaluated
+Items, retained 2 of those observed failures, and can already prove the
+technical outcome false, it can report:
 
     evaluation:
       logical_complete: true
       population_complete: false
       evidence_complete: false
-      stop_reason: evidence_maximum_reached
+      stop_reason: scanner_collection_budget_reached
       evaluated_items: 1847
 
     summary:
@@ -924,9 +947,13 @@ evidence maximum has been reached, the result may instead report:
 
     evidence:
       failures:
-        maximum: 20
-        returned: 20
+        maximum: 2
+        returned: 2
         truncated_population: true
+
+That result cannot claim to know the total failure population. A diagnostic
+run may raise the **reporting maximum** while keeping the same authored
+content and the same independently configured scanner safety limits.
 
 The word `threshold` SHOULD NOT be used for this evidence-retention setting,
 because it may incorrectly imply that compliance truth changes when the value
