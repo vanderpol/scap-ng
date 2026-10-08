@@ -441,45 +441,72 @@ def _conjunctive_state_leaves(payload):
 def _validate_windows_registry_like_value_datatypes(test_id,test,states):
     if test.get("capability") not in {"windows.registry","windows.ntuser"}:
         return []
-    leaves=[]
+
+    groups=[]
     for state_id in test.get("states") or []:
         state=states.get(state_id)
         if isinstance(state,dict):
-            leaves.extend((state_id,leaf) for leaf in _conjunctive_state_leaves(state.get("state")))
-    exact_types={
-        payload["value"]
-        for _,payload in leaves
-        if payload.get("field")=="type"
-        and payload.get("operation") in EXACT_EQUALITY_OPERATIONS
-        and isinstance(payload.get("value"),str)
-    }
-    # An ambiguous disjunction or conflicting type assertion must never be
-    # simplified to an inferred Registry type by this type-compatibility rule.
-    if len(exact_types)!=1:
-        return []
-    registry_type=next(iter(exact_types))
-    allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
-    if not allowed:
-        return []
+            leaves=[(state_id,leaf) for leaf in
+                    _conjunctive_state_leaves(state.get("state"))]
+            groups.append(leaves)
+
+    # A Test can combine different States with ANY/ONE/ODD, which are
+    # alternatives rather than guarantees. Cross-State narrowing is only
+    # sound with explicit ALL; each State's own conjunction can still be
+    # checked individually.
+    check_groups=list(groups)
+    if len(groups)>1 and test.get("states_match")=="all":
+        check_groups.append([item for group in groups for item in group])
+
     diagnostics=[]
-    for state_id,payload in leaves:
-        if payload.get("field")!="value":
-            continue
-        value=payload.get("value")
-        if isinstance(value,dict) and set(value) in ({"variable"},{"input"}):
-            continue
-        datatype=payload.get("datatype")
-        if datatype not in allowed:
+    for leaves in check_groups:
+        exact_types={
+            payload["value"]
+            for _,payload in leaves
+            if payload.get("field")=="type"
+            and payload.get("operation") in EXACT_EQUALITY_OPERATIONS
+            and isinstance(payload.get("value"),str)
+        }
+        if len(exact_types)>1:
             diagnostics.append({
                 "test":test_id,
-                "state":state_id,
-                "code":f"{test.get('capability')}.value_type_datatype",
-                "registry_type":registry_type,
-                "datatype":datatype,
-                "allowed_datatypes":sorted(allowed),
-                "message":"registry value datatype is incompatible with exact asserted registry type",
+                "code":f"{test.get('capability')}.conflicting_registry_types",
+                "registry_types":sorted(exact_types),
+                "message":"Conjunctive State asserts incompatible registry types",
             })
-    return diagnostics
+            continue
+        if len(exact_types)!=1:
+            continue
+        registry_type=next(iter(exact_types))
+        allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
+        if not allowed:
+            continue
+        for state_id,payload in leaves:
+            if payload.get("field")!="value":
+                continue
+            value=payload.get("value")
+            if isinstance(value,dict) and set(value) in ({"variable"},{"input"}):
+                continue
+            datatype=payload.get("datatype")
+            if datatype not in allowed:
+                diagnostics.append({
+                    "test":test_id,
+                    "state":state_id,
+                    "code":f"{test.get('capability')}.value_type_datatype",
+                    "registry_type":registry_type,
+                    "datatype":datatype,
+                    "allowed_datatypes":sorted(allowed),
+                    "message":"registry value datatype is incompatible with exact asserted registry type",
+                })
+    # One mismatch per State/field even if both its local and test-wide ALL
+    # conjunction lead to the same diagnostic.
+    unique={}
+    for finding in diagnostics:
+        signature=(finding["code"],finding.get("state"),
+                   finding.get("registry_type"),finding.get("datatype"),
+                   tuple(finding.get("registry_types",())))
+        unique[signature]=finding
+    return list(unique.values())
 
 
 def _valid_xml_date_literal(value):
