@@ -1,0 +1,45 @@
+name: Markdown navigation and duplication audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - tools/audit_markdown_links.py
+      - .github/workflows/documentation-cross-reference-audit.yml
+  pull_request:
+    paths:
+      - '**/*.md'
+      - tools/audit_markdown_links.py
+      - .github/workflows/documentation-cross-reference-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs_audit:
+    name: Audit all Markdown paths and section anchors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan all Markdown (historical links reported, never rewritten)
+        run: |
+          python tools/audit_markdown_links.py . \
+            --output documentation-audit.json \
+            --summary documentation-audit.md
+      - name: Publish concise summary
+        if: always()
+        run: |
+          if test -f documentation-audit.md; then cat documentation-audit.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Save full machine-readable audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: markdown-cross-reference-audit
+          path: |
+            documentation-audit.json
+            documentation-audit.md
+          if-no-files-found: error
