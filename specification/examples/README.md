@@ -25,6 +25,34 @@ Board showcase rather than inventing a result.
 
 The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
+## Finding features inside the six-benchmark review ZIP
+
+The [validated review bundle from run 37813594321](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) contains `scap-ng-board-representative-review`. Search its **`authoring/` directory using the exact YAML keys** below. Counts describe that one bundle, not all 65 source packages.
+
+| Search string | Actual instances | Example location in the ZIP |
+| --- | ---: | --- |
+| `for_each:` (**underscore**, not `foreach`) | 8 instances in 7 Assessments | `authoring/shared/assessments/all-local-interactive-user-home-directories-are-0750-or-less.assessment.yaml` |
+| `shared_objects:` | 79 | `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml` |
+| `filters:`, `set:` | 248 filters, 163 Sets | `authoring/ms_windows_11/assessments/applicability/condition.bluetooth-installation.yaml` |
+| `value:` followed by a YAML list | 48 list-valued predicates in 31 files | `authoring/ms_windows_11/assessments/automated/SV-253274.automated.yaml` |
+| `evaluate:`, `all:`, `any:` | 883 evaluate entries; composite logical expressions | `authoring/ms_windows_server_2025/assessments/automated/SV-278001.automated.yaml` |
+| `record:` | 86 | `authoring/ms_windows_11/assessments/applicability/condition.windows-domain-member-workstation.yaml` |
+| `reported_elements:` | 1,390, all set to `all` | Automated Assessments; **not** a demonstration of selective redaction |
+| `assessment_choices:` | 1,567 Rules | `authoring/ms_windows_server_2025/rules/SV-278001.rule.yaml` |
+| `groups:`, `profiles:` | Both appear in all six Benchmarks | `authoring/rhel_9/benchmark.yaml` |
+
+**Not in this six-benchmark authoring bundle:** native `if:/then:/else:`
+conditional branches, Organizational Input `inputs:` bindings, selective
+`reported_elements` redaction, cross-Assessment dependency/import examples,
+and generated assessment/benchmark result samples. These features need
+separately identified, source-backed showcase examples; their absence
+must not be hidden by claiming this ZIP demonstrates every 0.3 feature.
+
+Literal PowerShell `foreach` occurs inside some `independent.shellcommand`
+code. Those loops are **opaque executed program text**, not SCAP-NG `for_each`
+semantics; translating them would require a separately reviewed and
+equivalence-tested native collector replacement.
+
 ## Real-world design cases — 0.3.0 review
 
 **Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. Retain this case as the main lossless-authoring and SCAP 1.4 side-by-side usability gate.
