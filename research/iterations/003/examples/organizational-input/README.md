@@ -1,43 +1,32 @@
 # Organizational Input worked example
 
-**Status:** pre-alpha design fixture
+**Status:** pre-alpha **integration research fixture**, not an end-to-end scanner validation.
+The Assessment now uses the *supported* `linux.partition` capability and a
+consumer-local Object/State. Direct `value.input` binding remains a separate
+unproven evaluator/compilation capability (issue #193).
 
-This example demonstrates an organization-defined expected value without
-Tailoring the publisher requirement.
+An illustrative publisher delegates the allowed filesystem types for the
+`/home` mount to the organization. The organization approves `ext4` and
+`xfs`. The Assessment selects the `/home` partition and checks its reported
+`fs_type` against the approved values. These values are fictitious, not DISA
+requirements. This scenario does not claim the organization may override a
+publisher-defined requirement.
 
-Scenario: the publisher requires a system to use the organization's approved
-time sources, but cannot publish the actual server names because they are
-site-specific.
+1. `benchmark-parameter.yaml`: unresolved typed Parameter `approved_filesystem_types`.
+2. `rule-fragment.yaml`: binds Parameter to Assessment `approved-filesystem-types-input`.
+3. `time-source.assessment.yaml`: independent `linux.partition` Test with
+   `fs_type` State consuming the approved input directly.
+4. `site.organizational-input.yaml`: organization-approved values and attribution.
+5. `assessment-request.yaml`: explicit request-time Input Set reference.
+6. `resolved-context.yaml`: illustrative resolved binding and missing-input result.
 
-The flow is:
+Files are illustrative fragments and a research Assessment, **not** a complete
+schema-valid Benchmark/Rule package. Missing approved input yields
+`not_evaluated` with `missing_organizational_input`. The Input Set cannot
+change collector selectors, operations or executable Tests. The proposed
+`in` comparison is research only; this fixture retains explicit
+`equals` and `variable_match: one_or_more` semantics.
 
-```text
-Benchmark Parameter declaration (unresolved)
-        ↓
-explicit Rule -> Assessment input binding
-        ↓
-Organizational Input Set supplies the value
-        ↓
-Assessment Request explicitly binds that Input Set
-        ↓
-policy resolution validates + freezes the value
-        ↓
-Assessment executes against the supplied expected state
-```
-
-The important boundaries are:
-
-- the Benchmark declares **what input is required**, its type/cardinality and
-  constraints;
-- the Assessment declares **what typed input it consumes** without knowing the
-  Benchmark Parameter ID;
-- the Rule binds the Benchmark Parameter to the selected Assessment input;
-- the organization supplies the value in a separate versioned Input Set;
-- the Assessment Request explicitly chooses the Input Set;
-- scope metadata never causes implicit scanner selection;
-- missing required input produces `not_evaluated` with
-  `missing_organizational_input`, not pass/fail/not-applicable;
-- Organizational Input cannot select Tests, change collection, inject commands,
-  or otherwise modify executable Assessment semantics.
-
-All names, people and organizations below are fictional.
+Template generation is the publisher/build's primary responsibility for
+predeclared organization inputs; scanner-generated templates for arbitrary
+Rule/State Tailoring remain a separate Board research topic (#196).
