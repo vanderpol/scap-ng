@@ -50,6 +50,9 @@ def expand_registry_test(test):
         obj[name] = predicate(select[name], datatype="string", context=name)
     if obj["hive"]["value"] not in HIVES or obj["hive"]["operation"] != "equals":
         raise AuthoringError("invalid native registry hive selector")
+    # Native windows.registry mapping defines hive as an enumeration scalar.
+    # Do not emit an object-entity triple for this field.
+    obj["hive"] = obj["hive"]["value"]
     states = test["states"]
     if not isinstance(states, list) or len(states) != 1:
         raise AuthoringError("exactly one State expected")
@@ -71,6 +74,7 @@ def expand_registry_test(test):
     if expect["existence"] not in {"one_or_more", "none", "all"}:
         raise AuthoringError("unsupported explicit existence")
     result = {
+        "test_title": None,
         "capability": "windows.registry",
         "object": {"capability": "windows.registry", "select": obj},
         "states": [{"capability": "windows.registry", "state": {"all": [
