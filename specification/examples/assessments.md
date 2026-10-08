@@ -10,7 +10,7 @@ For policy context, see the [Benchmark and Rule examples](README.md). This page 
 
 ### 1. The Rule points to an Assessment
 
-The **real RHEL 9 STIG Rule SV-257851** requires the `/home` filesystem to use the `nosuid` mount option. In SCAP-NG, a Rule selects its automated or manual Assessment by **logical ID**, not by a `../assessments/` file path:
+The **real RHEL 9 STIG Rule SV-257851** requires the `/home` filesystem to use the `nosuid` mount option. In SCAP-NG, a Rule selects its automated or manual Assessment by **logical ID**, without embedding filesystem locations in the Rule:
 
 ```yaml
 rule:
