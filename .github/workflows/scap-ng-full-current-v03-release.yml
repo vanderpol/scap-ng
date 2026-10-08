@@ -247,7 +247,6 @@ jobs:
         run: |
           python scap-ng/tools/validate_native_json_schemas.py work/candidate-current \
             --schema-dir scap-ng/schema/v0.3.0 \
-            --allow-unpromoted-conversion-vocabulary \
             --report work/evidence/schema-validation-before-normalization.json
       - name: Diagnose source-backed 0.3 schema failures
         if: failure()
@@ -290,7 +289,6 @@ jobs:
         run: |
           python scap-ng/tools/validate_native_json_schemas.py work/normalized-current \
             --schema-dir scap-ng/schema/v0.3.0 \
-            --allow-unpromoted-conversion-vocabulary \
             --report work/evidence/schema-validation-after-normalization.json
       - name: Diagnose normalized 0.3 schema failures
         if: failure()
@@ -319,13 +317,13 @@ jobs:
 
       - name: Compile unnormalized corpus baseline
         run: |
-          python scap-ng/tools/scap_ng_content_compiler.py work/candidate-current             --output-dir work/packages-before --metrics work/evidence/compiler-before.json             --allow-unpromoted-conversion-vocabulary             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+          python scap-ng/tools/scap_ng_content_compiler.py work/candidate-current             --output-dir work/packages-before --metrics work/evidence/compiler-before.json                         --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
       - name: Compile normalized corpus
         run: |
-          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-after --metrics work/evidence/compiler-after.json             --allow-unpromoted-conversion-vocabulary             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-after --metrics work/evidence/compiler-after.json                         --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
       - name: Compile normalized corpus with self-signed CMS test certificate
         run: |
-          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-signed-test --metrics work/evidence/compiler-signed-test.json             --allow-unpromoted-conversion-vocabulary             --sign-self-signed-test-cert --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-signed-test --metrics work/evidence/compiler-signed-test.json                         --sign-self-signed-test-cert --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
       - name: Build compact evidence report
         run: |
           python - <<'PY'
