@@ -34,6 +34,9 @@
 
 ## Variables, Sets, Filters, and dataflow
 
+- **Variable minimization is a design requirement:** native authors SHOULD express literals, typed arrays, direct Assessment inputs, and collection iteration where they are sufficient, without pass-through Variables. Variables are retained where actual computation, dynamic dependency, source-semantic aggregation, or genuine reuse requires them.
+- Conversion/normalization SHALL eliminate Variable indirection only when type, cardinality, result-state behavior, provenance and collection/evaluation semantics are preserved; unsupported cases stay explicit rather than being silently rewritten.
+- Direct typed Assessment-input references in expected State values are a targeted 0.3 simplification candidate; syntax and validator/evaluator support are not yet established and SHALL NOT be portrayed as implemented.
 - Direct scalar and typed literal-array Object/State values replace source-time static Variable plumbing where exact and source-equivalent quantifier semantics are explicit.
 - Variables may reference named Objects, other Variables, or contain private embedded resource selection where supported; keep named Variables for genuine runtime derivation, chaining, external/runtime dataflow, or meaningful reuse.
 - Lossless conversion preserves meaningful shared Object boundaries and Variable dependency graphs; it does not duplicate a shared source Object merely for convenience.
