@@ -479,7 +479,18 @@ def _validate_windows_registry_like_value_datatypes(test_id,test,states):
             continue
         registry_type=next(iter(exact_types))
         allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
+        # A type-only assertion remains valid, but a value comparison cannot
+        # silently claim type fidelity for an unmodelled Registry representation.
         if not allowed:
+            for state_id,payload in leaves:
+                if payload.get("field")=="value":
+                    diagnostics.append({
+                        "test":test_id,
+                        "state":state_id,
+                        "code":f"{test.get('capability')}.unsupported_type_value_encoding",
+                        "registry_type":registry_type,
+                        "message":"Registry type has no verified native value encoding; do not infer a datatype",
+                    })
             continue
         for state_id,payload in leaves:
             if payload.get("field")!="value":
