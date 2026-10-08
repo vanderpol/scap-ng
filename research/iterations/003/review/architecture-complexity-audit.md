@@ -4,6 +4,21 @@
 **Objective:** maximum useful capability with minimum authored surface, while preserving type safety, provenance, collection behavior, and OVAL six-state semantics.
 **Board gate:** do not describe an architectural decision as stable if a near-term breaking redesign is already anticipated.
 
+## Real-STIG example acceptance gate
+
+Every Board showcase feature SHOULD use an identifiable published DISA STIG
+Rule wherever feasible. Document Benchmark/version, SV/V IDs, source manual
+check or automated OVAL graph, native example, provenance, and *what new
+capability or simplicity is proved*. For a proposed manual-to-automated
+conversion, demonstrate collection feasibility, exact manual intent,
+organizational input authority, and pass/fail/unknown/error handling; never
+claim automation based only on a plausible Assessment. Synthetic policy
+fixtures are research-only and do not count toward showcase coverage.
+Specifically replace the invented filesystem-policy Organizational Input
+walkthrough with a real STIG-derived case before Board release if a
+technically defensible case can be demonstrated; otherwise present it as
+research outside the main feature tour.
+
 ## Decision rubric
 
 Classify each candidate **keep / simplify / consolidate / remove / research**. Compare authoring token/line count, number of independent concepts/IDs, implementation burden, result clarity, and compiled bytes **separately**. Require a paired real-content example, counterexample, exact conversion mapping and conformance tests before any normative simplification. A shorter YAML example alone is insufficient.
