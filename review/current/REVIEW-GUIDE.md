@@ -17,7 +17,7 @@ materials, not this compact Board artifact.
 
 | SCAP 1.4 mechanism | SCAP-NG 0.3 improvement | Where in the ZIP |
 | --- | --- | --- |
-| Separately identified OVAL Object/State for a private Test | Keep private Object and State beside the Test | `authoring/rhel_9/assessments/automated/SV-257851.automated.yaml` |
+| Separately identified OVAL Object/State for a private Test | Keep private Object and State beside the Test | `authoring/shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml` |
 | Shared acquisition across checks | Explicit named `shared_objects:` only when reuse is needed | `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml` |
 | Static Variable plus collection plumbing | Preserve typed literal collections directly | `authoring/ms_windows_11/assessments/automated/SV-253274.automated.yaml` |
 | ObjectComponent → Variable → selector iteration | Use `for_each:` to express a proven collection expansion | `authoring/shared/assessments/all-local-interactive-user-home-directories-are-0750-or-less.assessment.yaml` |
