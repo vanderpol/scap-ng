@@ -21,6 +21,13 @@ Board showcase rather than inventing a result.
 
 The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
+## Real-world design cases — 0.3.0 review
+
+**Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. Retain this case as the main lossless-authoring and SCAP 1.4 side-by-side usability gate.
+
+**Focused companion: [Windows Server 2025 SV-278217 — DWORD Registry type/value](../../research/iterations/003/examples/stig-derived/SV-278217/README.md).** Tests whether streamlined authoring preserves `REG_DWORD` versus `REG_SZ` versus `REG_MULTI_SZ`, numeric type and explicit existence. This is **also proposed research syntax** and does **not** replace the NTP case.
+
+
 ## Benchmark → Rule → Assessment
 
 **SCAP 1.4:** XCCDF generally embeds the complete Rule definitions inside the Benchmark, and those Rules reference separate OVAL checks. **SCAP-NG:** The Benchmark instead **lists references to individual Rule files**. Each Rule owns its policy text and references its available automated/manual Assessment files. The Benchmark does **not** contain the full Rule definitions.
