@@ -36,8 +36,9 @@ See the concise [deferred/out-of-scope list](../../specification/deferred-after-
 
 ## Historical 0.2.0 baseline — review closed
 
-The 0.2.0 package is frozen historical reference only. OVAL Board review has moved
-to the forthcoming 0.3 checkpoint; do not spend review time on 0.2.
+The 0.2.0 package is frozen historical reference only. The stable 0.3
+owner-review candidate replaces it as the active review target; do not spend
+review time on 0.2.
 
 - [0.2.0 schema](../../schema/v0.2.0/README.md)
 - [0.2.0 source samples](../../board/review-content/0.2.0/README.md)

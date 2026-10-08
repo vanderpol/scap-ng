@@ -8,4 +8,4 @@ Use the maintained sources instead:
 - **What changed and what it looks like:** [feature tour and examples](../specification/examples/README.md)
 - **What reviewers should examine now:** [current 0.3 review](../review/current/README.md)
 
-SCAP-NG 0.2 is frozen historical reference. The forthcoming 0.3 checkpoint is the active OVAL Board review target.
+SCAP-NG 0.2 is frozen historical reference. The stable 0.3 owner-review candidate is the active review target; OVAL Board publication follows owner acceptance.

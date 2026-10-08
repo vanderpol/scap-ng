@@ -7,11 +7,13 @@ It was opened from the frozen 0.2.0 baseline and is now versioned entirely as
 0.3.0. Files in this directory SHALL resolve to other 0.3.0 files, not back to
 the frozen 0.2.0 tree.
 
-The 0.2.0 tree remains unchanged as historical reference. Active OVAL Board
-review has moved to the forthcoming 0.3 checkpoint; new semantic work belongs here. The narrow Object-level `for_each`
-collection-expansion v1 authoring/validation construct is now integrated into
-this active pre-alpha tree; automatic SCAP 1.4 converter modernization remains
-disabled pending its own equivalence gate.
+The 0.2.0 tree remains unchanged as historical reference. The stable 0.3
+owner-review candidate is the active review target; Board publication follows
+owner acceptance. Object-level `for_each`, including correlated nested
+collection lineage, is integrated into this active pre-alpha tree. Automatic
+SCAP 1.4 modernization is enabled only for transformation classes with an exact
+equivalence proof; the current direct ObjectComponent → Variable → selector
+class is proven and exercised by the review candidate.
 
 ## Change discipline
 
