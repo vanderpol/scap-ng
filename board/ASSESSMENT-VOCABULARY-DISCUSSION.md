@@ -72,7 +72,7 @@ check:
   collect: linux.partition
   where:
     mount_point:
-      matches_regex: '.*\/home'
+      matches_regex: '.*\\/home'
       datatype: string
   expect:
     mount_options:
@@ -99,7 +99,7 @@ checks:
       capability: linux.partition
       select:
         mount_point:
-          matches_regex: '.*\/home'
+          matches_regex: '.*\\/home'
           datatype: string
     expect:
       - capability: linux.partition
@@ -123,7 +123,7 @@ This reads as *inspect partitions → select the mount → expect the option →
 
 ## What must not change just because the words change
 
-- **Source selection:** The regex remains `.*\/home` in the proposal examples and the source-derived regex text in A must be preserved **exactly under YAML decoding and regex processing**. Replacing it with a literal `/home` would potentially change the selected resources. The prototype must prove exact literal/regex semantics.
+- **Source selection:** All three examples preserve the source regex scalar `.*\\/home` (two literal backslash characters in the authored YAML). The source-derived regex text must be preserved **exactly under YAML decoding and regex processing**. Replacing it with a literal `/home` would potentially change the selected resources. The prototype must prove exact literal/regex semantics.
 - **Different quantifier scopes:** Test `existence: one_or_more` applies to collected Items; Test `match: all` combines Item outcomes. State `existence: one_or_more` applies to observed field instances; State `match: one_or_more` combines State field comparisons. These cannot be silently collapsed.
 - **Technical outcomes:** `true`, `false`, `error`, `unknown`, `not_evaluated` and `not_applicable` retain their meanings. A policy pass is not universally identical to an Assessment's technical `true`.
 - **Capabilities, collection, evidence:** Multiple capabilities, missing or incomplete Items, typed selectors and expectations, reporting/redaction rules, and evidence/provenance remain explicit. `evidence` must not silently become a collection limit or permission to omit required proof.
