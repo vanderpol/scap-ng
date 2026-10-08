@@ -110,6 +110,7 @@ class ValueMatchContract(unittest.TestCase):
         validator=Draft202012Validator(generated["$defs"]["state"],
                                         registry=self.registry)
         state={
+            "state_title":"Expected registry type",
             "capability":"windows.ntuser",
             "state":{"field":"type", "value":["dword","string"],
                      "operation":"equals", "datatype":"string",
