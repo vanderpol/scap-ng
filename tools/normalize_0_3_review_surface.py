@@ -296,6 +296,24 @@ def normalize_scalar_tree(value:Any,path:tuple[Any,...],changes:list[dict])->Any
                 "candidate_value":copy.deepcopy(normalized),
             })
         out[new_key]=normalized
+    # Older OVAL Test CheckEnumeration can redundantly spell "none exist"
+    # alongside an explicit zero-collected-items existence check. In that
+    # precise state-free case, match is irrelevant; use the explicit native
+    # neutral quantifier "all" rather than smuggling a deprecated keyword
+    # into the SCAP-NG schema. Reject ambiguous source instead of guessing.
+    if len(path)>=2 and path[-2]=="tests" and out.get("match")=="none exist":
+        if out.get("existence")!="none" or out.get("states"):
+            raise ValueError(f"Cannot losslessly lower 'none exist' Test at {path}: "
+                             "requires explicit existence:none and no States")
+        changes.append({
+            "path":[str(x) for x in path+("match",)],
+            "original_key":"match",
+            "candidate_key":"match",
+            "original_value":"none exist",
+            "candidate_value":"all",
+            "reason":"zero-collected-items Test has no State matches to aggregate",
+        })
+        out["match"]="all"
     return out
 
 
