@@ -249,6 +249,21 @@ jobs:
             --schema-dir scap-ng/schema/v0.3.0 \
             --allow-unpromoted-conversion-vocabulary \
             --report work/evidence/schema-validation-before-normalization.json
+      - name: Diagnose source-backed 0.3 schema failures
+        if: failure()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("work/evidence/schema-validation-before-normalization.json")
+          if p.exists():
+              report=json.loads(p.read_text(encoding="utf-8"))
+              for row in report.get("results",[]):
+                  if not row.get("valid",True):
+                      print("INVALID",row.get("path"))
+                      for e in row.get("errors",[]):
+                          print("  ",e.get("path"), e.get("message"))
+          PY
       - name: Validate fresh native Assessment graph semantics
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/candidate-current \
@@ -277,6 +292,21 @@ jobs:
             --schema-dir scap-ng/schema/v0.3.0 \
             --allow-unpromoted-conversion-vocabulary \
             --report work/evidence/schema-validation-after-normalization.json
+      - name: Diagnose normalized 0.3 schema failures
+        if: failure()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("work/evidence/schema-validation-after-normalization.json")
+          if p.exists():
+              report=json.loads(p.read_text(encoding="utf-8"))
+              for row in report.get("results",[]):
+                  if not row.get("valid",True):
+                      print("INVALID",row.get("path"))
+                      for e in row.get("errors",[]):
+                          print("  ",e.get("path"), e.get("message"))
+          PY
       - name: Validate normalized native Assessment graph semantics
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/normalized-current \
