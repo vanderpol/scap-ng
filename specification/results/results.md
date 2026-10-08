@@ -822,6 +822,41 @@ failure counts and completeness SHALL be distinguished from returned examples.
 Implementations SHALL NOT require a consumer to retrieve another Assessment
 Result merely to resolve the logical Test/Item/Variable explanation.
 
+### Selecting retained system evidence
+
+An Assessment Result SHALL report the outcome of every evaluated Test,
+regardless of its technical result. It SHALL NOT retain every passing system
+Item merely because that Item was examined. For ordinary compliance checks,
+the default Test-local evidence set SHOULD prioritize decisive witnesses:
+
+- Retain concrete violating Items needed to explain a false result, subject
+  to reporting limits and mandatory failure-evidence rules.
+- Retain matching Items when their presence is needed to explain a true
+  result (for example, one approved time server satisfying an existence rule).
+- Represent proven absence using the tested target, existence result and
+  population/completeness status; SHALL NOT invent a collected Item.
+- Omit routine passing Items that add no material proof. Inventory-purpose
+  Assessments MAY retain relevant positive inventory observations, within
+  the same explicit disclosure and resource restrictions.
+
+These selection rules apply to all six technical outcomes and to conditional
+or nested evaluations; a missing/error/unknown outcome must retain its
+applicable reason, collection status and completeness rather than a misleading
+pass/fail witness. Observed mismatch counts, known versus unknown actual
+mismatches, evaluated-Item counts, retained-Item counts and completeness
+SHALL reflect execution independently of what observations were serialized.
+Ordinary passing Items intentionally omitted under this evidence-selection
+policy SHALL NOT by themselves be reported as retention-cap truncation.
+When otherwise reportable evidence is omitted because an effective cap was
+reached, truncation SHALL be explicit.
+
+The publisher controls only the existing `reported_elements` and redaction
+restrictions on disclosure, not whether to include passing/failing Items or
+how many Items to retain. Evidence retention limits, optional expanded
+diagnostic reporting and effective override provenance are scanner/application
+or Assessment Request responsibilities. They SHALL NOT alter policy truth,
+collection semantics, scoring or the signed Assessment source content.
+
 Large auxiliary evidence such as complete command output, packet captures,
 screenshots or other bulky artifacts MAY be stored as separate integrity-bound
 result-package members referenced by stable identity and digest. Moving these
