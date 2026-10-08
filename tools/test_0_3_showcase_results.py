@@ -105,6 +105,27 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
                                         self.assertEqual(comparison["item_value"]["value"], value)
                                         self.assertEqual(comparison["expected_value"]["value"], 0)
 
+    def test_two_tests_can_interpret_the_same_observed_file_differently(self):
+        result = json.loads(
+            (EXAMPLE_DIR / "assessment-result-multi-file.json").read_text()
+        )["assessment_result"]
+        self.assertEqual(len(result["tests"]), 2)
+        owner, mode = result["tests"]
+        owner_item = next(
+            row["item"] for row in owner["per_item_results"]
+            if row["item_ref"] == "config-agent-file"
+        )
+        mode_item = mode["per_item_results"][0]["item"]
+        self.assertEqual(owner_item, mode_item, "Repeated observation must not diverge")
+        owner_cmp = next(
+            row for row in owner["per_item_results"]
+            if row["item_ref"] == "config-agent-file"
+        )["state_results"][0]["entity_results"][0]["comparison_results"][0]
+        mode_cmp = mode["per_item_results"][0]["state_results"][0]["entity_results"][0]["comparison_results"][0]
+        self.assertEqual((owner_cmp["item_value"]["value"], owner_cmp["expected_value"]["value"]), (1001, 0))
+        self.assertEqual((mode_cmp["item_value"]["value"], mode_cmp["expected_value"]["value"]), ("0644", "0600"))
+        self.assertEqual(result["evidence_summary"]["observed_failures"], 2)
+
     def test_debug_override_changes_retention_not_assessment(self):
         normal = json.loads((EXAMPLE_DIR / "assessment-result-bounded-evidence.json").read_text())["assessment_result"]
         debug = json.loads((EXAMPLE_DIR / "assessment-result-diagnostic-override.json").read_text())["assessment_result"]
