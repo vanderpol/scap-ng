@@ -4,10 +4,10 @@ effective_policy:
     version: V1R1
 
   parameters:
-    approved_time_sources:
+    approved_filesystem_types:
       value:
-        - ntp1.example.test
-        - ntp2.example.test
+        - ext4
+        - xfs
       source: organizational_input
       input_set:
         id: example.production-site
@@ -18,14 +18,14 @@ effective_policy:
   assessment_binding:
     rule: EXAMPLE-ORG-INPUT-001
     selector: automated
-    assessment: shared.time-source-approved
+    assessment: shared.home-filesystem-approved
     inputs:
-      required-time-sources-input:
-        parameter: approved_time_sources
+      approved-filesystem-types-input:
+        parameter: approved_filesystem_types
 
 missing_input_result:
-  assessment: shared.time-source-approved
+  assessment: shared.home-filesystem-approved
   outcome: not_evaluated
   reason:
     code: missing_organizational_input
-    parameter: approved_time_sources
+    parameter: approved_filesystem_types
