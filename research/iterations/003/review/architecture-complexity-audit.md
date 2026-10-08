@@ -69,3 +69,10 @@ Classify each candidate **keep / simplify / consolidate / remove / research**. C
 5. Produce a short recommendation matrix separating **pre-Board blockers** from consciously deferred post-0.3 features. Present major design choices to owner before adopting them; reserve 0.3 freeze until current tests and review content agree.
 
 **No automatic design/schema changes are authorized by this research report.**
+
+## Fourth pass: Board example repaired in part; conformance blocked
+
+- **Fixed naming drift** on main: renamed Assessment input `required_time_sources` → `required-time-sources-input` consistently in the worked Assessment, Rule fragment, resolved-context fixture, and examples README. Confirmed against `assessment.schema.json`'s required `-input` suffix. **This does not validate the whole example.**
+- **Additional concrete schema drift remains:** the same worked Assessment retains old `objects:` and `states:` layouts, nonconforming names (`object-configured-time-sources`, `state-source-approved`, `test-time-sources`), legacy Test `check`/`check_existence`, and no required `reported_elements` in that Test. Current 0.3 format instead uses `shared_objects` for genuinely reused Objects and suffix IDs. Do not mechanically rename until proper selection, collection, and matching semantics are established.
+- **Illustrative capability unresolved:** worked NTP Assessment names `linux.chrony`; code search only found it in this fixture and README, not an implemented capability mapping. Treat the example as **conceptual only**, not an executable conformance demonstration. A real supported capability/collected Item example should replace it before labeling it validated. Existing README describes it as a design fixture but its placement alongside valid samples risks reader confusion.
+- **Scope of verification performed:** JSON parsing of the two relevant 0.3 schema files and static inspection of their requirements; no end-to-end YAML schema validation, scanner evaluation, 65-benchmark corpus run or proof of correct runtime collection in this pass.
