@@ -5,10 +5,12 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, RefResolver
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +67,31 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
                     )
                     self.fail(f"{example_name} failed {schema_name}:\n{details}")
 
+
+    def test_assessment_intro_contains_real_inline_rule_and_local_object(self):
+        example_page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
+            encoding="utf-8"
+        )
+        main_page = (ROOT / "specification" / "examples" / "README.md").read_text(
+            encoding="utf-8"
+        )
+        intro = example_page.split("## Manual Assessments", 1)[0]
+        blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", intro)
+        self.assertEqual(len(blocks), 2, "Start with Rule linkage and the real Assessment YAML")
+        rule = yaml.safe_load(blocks[0])["rule"]
+        assessment = yaml.safe_load(blocks[1])
+        self.assertEqual(rule["id"], "SV-257851")
+        choices = rule["assessment_choices"]
+        self.assertIn("automated", choices)
+        self.assertIn("manual", choices)
+        self.assertEqual(choices["default"], choices["automated"])
+        test = assessment["tests"]["home-mounted-nosuid-option-test"]
+        self.assertEqual(test["object"]["capability"], "linux.partition")
+        self.assertIn("mount_point", test["object"]["select"])
+        self.assertEqual(test["states"][0]["state"]["field"], "mount_options")
+        self.assertEqual(test["states"][0]["state"]["value"], "nosuid")
+        self.assertEqual(assessment["evaluate"]["test"], "home-mounted-nosuid-option-test")
+        self.assertIn("assessments.md#automated-assessments", main_page)
 
     def test_inline_collected_items_and_comparisons(self):
         for name in (
