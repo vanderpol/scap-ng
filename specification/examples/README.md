@@ -117,9 +117,45 @@ Details: [applicability Assessment example](assessments.md#applicability-assessm
 
 ## Readable Benchmark and Rule results
 
-A Benchmark Result answers **how many Rules passed, failed, or could not be evaluated**. A Rule Result gives a concise outcome/reason and refers to the detailed Assessment Result. This replaces the need to manually correlate several layers of an ARF report for an initial diagnosis.
+A Benchmark Result answers **how many Rules passed, failed, or could not be evaluated**, then gives a readable finding for each evaluated Rule. The detailed technical evidence is kept in a referenced Assessment Result.
 
-The [0.3 Benchmark Result example](0.3.0/results/benchmark-result.json) demonstrates these fields with **synthetic conformance data, not a live scan**. For root-cause Test/State/Item evidence, see the [Assessment Result example](assessments.md#assessment-results-that-explain-the-root-cause).
+The current [0.3 Benchmark Result fixture](0.3.0/results/benchmark-result.json) is **synthetic, not a live scan**. It contains two illustrative failed Rules; the excerpt below shows its policy summary and one finding:
+
+```json
+{
+  "summary": {
+    "total": 2,
+    "pass": 0,
+    "fail": 2,
+    "not_applicable": 0,
+    "not_evaluated": 0,
+    "error": 0,
+    "unknown": 0
+  },
+  "rule_results": [{
+    "rule_id": "rule-file-owner",
+    "outcome": "fail",
+    "message": "Observed UID 1001; expected UID 0.",
+    "reason": {
+      "code": "value_mismatch",
+      "message": "The collected file owner did not match the required owner."
+    },
+    "evidence_refs": ["config-file-1"]
+  }]
+}
+```
+
+The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#assessment-results-that-explain-the-root-cause).
+
+### How Scan, Benchmark, and Assessment Results fit together
+
+**SCAP 1.4** commonly packages several result layers together in ARF XML. **SCAP-NG** gives each layer a distinct role:
+
+- [Scan Result](0.3.0/results/scan-result.json) identifies the scanner run and targets, and indexes Benchmark and Assessment Results.
+- [Benchmark Result](0.3.0/results/benchmark-result.json) summarizes compliance and reports Rule outcomes and readable findings.
+- [Automated Assessment Result](0.3.0/results/assessment-result.json) and [Manual Assessment Result](0.3.0/results/manual-assessment-result.json) preserve underlying technical evidence and assessor provenance. Their examples are explained on the [Assessment page](assessments.md).
+
+All linked files are [0.3 synthetic result fixtures](0.3.0/results/README.md), not observed host assessments.
 
 ## Active Directory Forest — a complete manual STIG example
 
