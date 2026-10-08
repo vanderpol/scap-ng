@@ -167,3 +167,69 @@ def validate_benchmark_organizational_input_links(document: dict) -> list[dict]:
                         errors.append({"code":"organizational_input.authority_mismatch",
                                        "path":path+".authority_summary."+key})
     return errors
+
+
+def validate_organizational_consumption_links(
+    benchmark_document: dict, assessment_results_by_execution_id: dict
+) -> list[dict]:
+    """Check published Rule input summary against available Assessment executions.
+
+    The caller passes verified results indexed by their execution_id. This
+    cross-file guard does NOT replace package-level reference completeness
+    validation: a missing Assessment Result is not treated as proof it consumed
+    no input. Run only with a complete validated package to certify coverage.
+    """
+    benchmark = benchmark_document.get("benchmark_result", {})
+    if not isinstance(benchmark, dict):
+        return [{"code":"benchmark.invalid", "path":"benchmark_result"}]
+    registry = (benchmark.get("effective_policy") or {}).get("organizational_inputs") or {}
+    errors = []
+    for index, rule in enumerate(benchmark.get("rule_results") or []):
+        if not isinstance(rule, dict):
+            continue
+        declared = {row.get("organizational_input_ref") for row in
+                    (rule.get("organizational_inputs") or [])
+                    if isinstance(row,dict)}
+        consumed = set()
+        have_all = True
+        for instance in rule.get("instances") or []:
+            execution = instance.get("assessment_result_ref")
+            if execution is None:
+                continue
+            document = assessment_results_by_execution_id.get(execution)
+            if document is None:
+                have_all = False
+                continue
+            assessment = document.get("assessment_result", document)
+            if not isinstance(assessment, dict):
+                errors.append({"code":"assessment.invalid", "path":f"rule_results[{index}].instances"})
+                continue
+            for entry in assessment.get("consumed_organizational_inputs") or []:
+                if not isinstance(entry, dict):
+                    continue
+                ref = entry.get("organizational_input_ref")
+                consumed.add(ref)
+                authoritative = registry.get(ref)
+                path = f"assessment_results[{execution}].consumed_organizational_inputs"
+                if authoritative is None:
+                    errors.append({"code":"assessment.unknown_organizational_input_ref", "path":path})
+                    continue
+                if authoritative.get("redacted") is True and "value" in entry:
+                    errors.append({"code":"assessment.redacted_registry_leak", "path":path})
+                if ("value" in authoritative and "value" in entry
+                        and authoritative["value"] != entry["value"]):
+                    errors.append({"code":"assessment.organizational_input_value_mismatch", "path":path})
+        if not have_all:
+            # Without a complete package a claimed "no inputs" cannot be
+            # verified. In normal CI the package-reference validator handles
+            # missing invocations; this function does not guess their contents.
+            continue
+        for ref in consumed - declared:
+            errors.append({"code":"rule.missing_consumed_organizational_input",
+                           "path":f"rule_results[{index}].organizational_inputs",
+                           "organizational_input_ref":ref})
+        for ref in declared - consumed:
+            errors.append({"code":"rule.unconsumed_organizational_input",
+                           "path":f"rule_results[{index}].organizational_inputs",
+                           "organizational_input_ref":ref})
+    return errors

@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, RefResolver
-from validate_v03_rule_result_semantics import validate_rule_result_semantics, validate_benchmark_organizational_input_links
+from validate_v03_rule_result_semantics import validate_rule_result_semantics, validate_benchmark_organizational_input_links, validate_organizational_consumption_links
 
 ROOT = Path(__file__).resolve().parents[1]
 S = ROOT / "schema" / "v0.3.0"
@@ -97,6 +97,46 @@ class RuleFindingSemanticsTests(unittest.TestCase):
         entry["organizational_input_ref"] = "example-site-owner-policy"
         entry["effective_value"] = {"status": "exists", "value": 0}
         self.assertTrue(list(self.validator.iter_errors(doc)))
+
+    def test_input_used_by_assessment_must_be_exposed_on_rule(self):
+        doc = self.org_doc()
+        file = json.loads((E / "assessment-result-organizational-input.json").read_text())
+        execution = file["assessment_result"]["execution_id"]
+        expected = {execution: file}
+        # Rule instance 2 is manual and no Assessment file is supplied here:
+        # comparison is partial for that Rule but complete for the automated Rule.
+        self.assertEqual(validate_organizational_consumption_links(doc, expected), [])
+        rule = doc["benchmark_result"]["rule_results"][0]
+        rule.pop("organizational_inputs")
+        self.assertIn("rule.missing_consumed_organizational_input",
+                      {e["code"] for e in validate_organizational_consumption_links(doc, expected)})
+
+    def test_unconsumed_or_wrongly_bound_input_is_not_silently_reported(self):
+        doc = self.org_doc()
+        file = json.loads((E / "assessment-result-organizational-input.json").read_text())
+        execution = file["assessment_result"]["execution_id"]
+        expected = {execution: file}
+        file["assessment_result"]["consumed_organizational_inputs"] = []
+        self.assertIn("rule.unconsumed_organizational_input",
+                      {e["code"] for e in validate_organizational_consumption_links(doc, expected)})
+        file["assessment_result"]["consumed_organizational_inputs"] = [{
+            "input":"approved-owner-uid-input",
+            "organizational_input_ref":"nonexistent",
+            "materialized":True
+        }]
+        self.assertIn("assessment.unknown_organizational_input_ref",
+                      {e["code"] for e in validate_organizational_consumption_links(doc, expected)})
+
+    def test_org_input_redacted_at_registry_is_protected_at_assessment(self):
+        doc = self.org_doc()
+        file = json.loads((E / "assessment-result-organizational-input.json").read_text())
+        execution = file["assessment_result"]["execution_id"]
+        canonical = doc["benchmark_result"]["effective_policy"]["organizational_inputs"]["example-site-owner-policy"]
+        canonical["redacted"] = True
+        canonical.pop("value")
+        self.assertIn("assessment.redacted_registry_leak",
+                      {e["code"] for e in
+                       validate_organizational_consumption_links(doc, {execution:file})})
 
     def test_finding_matches_authoritative_assessment_witness(self):
         rule = self.doc()["benchmark_result"]["rule_results"][0]
