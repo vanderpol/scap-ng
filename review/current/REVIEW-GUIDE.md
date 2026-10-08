@@ -185,7 +185,7 @@ Conditional evaluation, Organizational Input, explicit `reported_elements`,
 manual Assessments/results, profiles/tailoring, applicability, packaging, and
 compact results are part of the broader SCAP-NG design but are not new 0.3
 modernization transformations. The
-[examples tour](../../specification/examples/README.md) covers those separately.
+[Benchmark/Rule examples](../../specification/examples/README.md) and [Assessment examples](../../specification/examples/assessments.md) cover those separately.
 
 ## Then browse the complete trees
 
