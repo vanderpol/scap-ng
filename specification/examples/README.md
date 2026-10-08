@@ -355,8 +355,7 @@ Assessment input name.
 | Input Set `values.approved_time_sources` | `approved_time_sources` | Benchmark `parameters[].id` |
 | Rule `inputs.required_time_sources.parameter` | `approved_time_sources` | Same Benchmark Parameter |
 | Rule `inputs` mapping key | `required_time_sources` | Assessment `inputs.required_time_sources` |
-| Assessment Variable `approved-sources.input` | `required_time_sources` | That supplied Assessment input |
-| State `value.variable` | `approved-sources` | Assessment Variable |
+| State `value.input` | `required_time_sources` | The same declared Assessment input, referenced directly |
 | Test `states` entry | `state-source-approved` | State using the supplied value |
 | Root `evaluate.test` | `test-time-sources` | Test performing the comparison |
 
@@ -426,11 +425,11 @@ One Input Set may supply several Parameters, and one Parameter may have
 several explicitly declared consumer locations, but there is no implicit
 broadcast to unrelated checks.
 
-**3. The Assessment** declares `required_time_sources` as an input and uses
-that expected value when checking the time-source hostnames collected from the
-target. The State consumes that input **directly**, with no pass-through Variable:
+**3. The Assessment** declares `required_time_sources` as an input.
+The **simplified membership form under research** would read:
 
 ```yaml
+# PROPOSED AUTHORING SYNTAX — not yet valid 0.3 schema
 inputs:
   required_time_sources:
     datatype: string
@@ -441,14 +440,43 @@ states:
     capability: linux.chrony
     state:
       field: hostname
-      operation: equals
-      datatype: string
-      variable_match: one_or_more
-      match: one_or_more
-      existence: one_or_more
+      operation: in
       value:
         input: required_time_sources
 ```
+
+This makes the intended comparison visible: *a collected hostname is in the
+approved list*. The enclosing Test must still explicitly specify whether
+**all collected servers** must satisfy that State, and how missing/incomplete
+collection is handled. The `in` proposal does not settle those semantics.
+
+**Implementation status:** `operation: in` is **research only**, not accepted
+or executable 0.3 syntax (see [membership research](../../research/iterations/003/design/membership-comparison-research.md)).
+The [currently authored fixture](../../research/iterations/003/examples/organizational-input/time-source.assessment.yaml)
+instead uses `operation: equals`, an explicit `variable_match: one_or_more`,
+and a **direct** `value: {input: required_time_sources}` reference; it has
+no pass-through Variable. That direct-input path still requires full
+semantic/evaluator conformance testing. The short proposal above intentionally
+omits additional required fields and is not a standalone valid Assessment.
+
+**Why the binding lives in the Rule, not only the Assessment.** The
+Assessment answers a reusable technical question—*is every configured time
+source on the supplied approved list?*—without knowing which Benchmark or
+organization owns that list. The Rule owns the published requirement and
+explicitly connects its Benchmark Parameter `approved_time_sources` to the
+generic Assessment input `required_time_sources`. Two Rule contexts could
+reuse the same Assessment with different publisher-declared Parameters,
+without cloning the Test. This is also a policy-to-execution audit boundary.
+
+The downside is **another name and mapping to follow**, especially when an
+Assessment is used by just one Rule. A possible future simplification is to
+generate the Rule's `organizational_input_requirements` (Test/State/slot
+discovery index) from its input binding plus the Assessment's actual input
+consumers. It should not require an author to manually maintain a second,
+potentially inconsistent linkage. We have **not** removed the Rule binding:
+putting a Benchmark-specific Parameter ID inside a reusable Assessment would
+couple policy to technical logic, while implicit identical-name matching would
+hide a critical contract.
 
 **4. The Assessment Request** explicitly selects the approved Input Set:
 
