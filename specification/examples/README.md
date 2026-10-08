@@ -387,6 +387,30 @@ assessment_choices:
         parameter: approved_time_sources
 ```
 
+The Rule also declares **exactly where that value is consumed**. This is
+Rule-level discoverability metadata; the Assessment remains authoritative
+about how the comparison works:
+
+```yaml
+organizational_input_requirements:
+  automated:
+    - input: approved_time_sources
+      required: true
+      uses:
+        - test: test-time-sources
+          state: state-source-approved
+          state_slot: hostname
+```
+
+This is the precise destination: the `hostname` expected-State field used
+by `test-time-sources`. The scanner can identify the consumer before
+execution, validate that the Rule's declaration agrees with the Assessment,
+and report missing/invalid input against that exact location. The supplied
+list does **not** apply globally to every Test or State in the Benchmark.
+One Input Set may supply several Parameters, and one Parameter may have
+several explicitly declared consumer locations, but there is no implicit
+broadcast to unrelated checks.
+
 **3. The Assessment** declares `required_time_sources` as an input and uses
 that expected value when checking the time-source hostnames collected from the
 target. The original worked fixture expresses that connection as:
