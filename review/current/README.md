@@ -4,7 +4,7 @@ This is the single active human-review entry point.
 
 ## Start here — one review path
 
-1. **Understand the changes:** [90-second 0.3 feature showcase](../../specification/examples/README.md#90-second-03-showcase). Each accepted modernization links to a specific real STIG source example.
+1. **Start with the basics:** [Benchmark → Rule → Assessment examples](../../specification/examples/README.md#benchmark--rule--assessment). Read the first few examples before browsing advanced features.
 2. **Compare before and after:** [0.3 modernization review guide](REVIEW-GUIDE.md), including explicit boundaries for conversions that remain fail-closed.
 3. **Inspect all six actual benchmark trees:** open [the latest verified end-to-end six-anchor build](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) and download the **`scap-ng-board-representative-review`** artifact under *Artifacts*. Its `authoring/` tree includes two Linux, two Windows, DNS and Apache STIGs; the build also produced normalized and compiled packages.
 
