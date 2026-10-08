@@ -1,6 +1,6 @@
 # SCAP-NG 0.3 examples — Assessments
 
-Start with [real Benchmark and Rule policy examples](README.md). This page covers **how requirements are checked**, from simple converted Assessments to 0.3 authoring modernizations. Practical examples come first; engineering indexes, exception boundaries and statistics are collected at the bottom.
+For policy context, see the [Benchmark and Rule examples](README.md). This page covers **how requirements are checked**, from simple converted Assessments to 0.3 authoring modernizations. Practical examples come first; engineering indexes, exception boundaries and statistics are collected at the bottom.
 
 **Provenance:** automatic/manual Assessment snippets are from named STIG conversions unless explicitly labeled *illustrative*, *research*, or *synthetic result fixture*. Source paths refer to the six-benchmark review ZIP, not committed generated trees. SCAP-NG 0.3.0 is still pre-alpha.
 
@@ -387,7 +387,7 @@ Full example: [0.3 Scan Result](0.3.0/results/scan-result.json).
 
 ## Real-world design cases — 0.3.0 review
 
-**Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. Retain this case as the main lossless-authoring and SCAP 1.4 side-by-side usability gate.
+**Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. This example supports side-by-side comparison of original requirements and proposed authoring.
 
 **Focused companion: [Windows Server 2025 SV-278217 — DWORD Registry type/value](../../research/iterations/003/examples/stig-derived/SV-278217/README.md).** Tests whether streamlined authoring preserves `REG_DWORD` versus `REG_SZ` versus `REG_MULTI_SZ`, numeric type and explicit existence. This is **also proposed research syntax** and does **not** replace the NTP case.
 
@@ -468,7 +468,7 @@ assessment:
 
 The publisher refers to the stable Assessment ID; the build resolves it within a declared source/import scope, checks the type and version, rejects cycles, and packages the dependency. The alias `platform-applicable` remains local to the requesting Assessment.
 
-**Current implementation differs:** the existing [research fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml) uses a relative file path and a duplicate `expected_id`. Both the compiler and schema must be migrated before the logical-ID version is a valid 0.3 file; this is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199). Do not treat the target syntax as executable current content. For the current dependency contract, see [Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
+**Current implementation differs:** the existing [research fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml) uses a relative file path and a duplicate `expected_id`. Both the compiler and schema must be migrated before the logical-ID version is a valid 0.3 file; this is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199). The target syntax is not yet executable. For the current dependency contract, see [Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
 
 ## Detailed reference and evidence
 
@@ -514,9 +514,8 @@ conditional branches, Organizational Input `inputs:` bindings, selective
 `reported_elements` redaction, cross-Assessment dependency/import examples,
 and **observed** assessment/benchmark result samples. Synthetic 0.3 result
 fixtures are [maintained in Git](0.3.0/results/README.md) and staged into
-future review ZIPs as `results/synthetic-fixtures/`. They must never be
-presented as live scanner results; do not claim the converted six-benchmark
-`authoring/` tree demonstrates every 0.3 feature.
+future review ZIPs as `results/synthetic-fixtures/`. They are not live scanner results, and the six-benchmark
+`authoring/` tree does not demonstrate every 0.3 feature.
 
 Literal PowerShell `foreach` occurs inside some `independent.shellcommand`
 code. Those loops are **opaque executed program text**, not SCAP-NG `for_each`
@@ -537,16 +536,6 @@ the complete review build are linked when more detail is useful.
 
 **Measured reuse (six-benchmark reference):** The verified [normalizer report from run 37809832500](https://github.com/vanderpol/scap-ng/actions/runs/37809832500) records **3,007 referenced Assessment instances → 2,433 unique definitions** after exact semantic normalization: **574 duplicate definitions avoided (19.09%)**, over **1,567 Rules** in six benchmarks. This is a reduction in *distinct repository Assessment definitions*, not a claim of fewer Rules, faster runtime scans, or 19.09% smaller standalone bundles. Source: `representative-board-conversion-evidence` artifact, `normalizer-report.json`.
 
-**Source-first example policy:** Prefer a real published DISA STIG Rule for every
-feature, with Rule ID, benchmark/version, original check text or automation,
-native assessment, and a concrete explanation of the improvement. Distinguish
-(a) faithfully converted automated checks, (b) formerly manual checks with
-*demonstrated and validated* new automation, and (c) real checks extended by
-explicit publisher-delegated organizational values. Never imply a synthetic
-requirement was part of a STIG. A fictional fixture may explain an unproven
-feature, but it must be marked research-only and does not count as proof of
-modernization. If no defensible real case exists, leave the feature out of the
-Board showcase rather than inventing a result.
 
 Some historical source excerpts were originally drawn from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
@@ -628,10 +617,4 @@ checkpoint. See [#166](https://github.com/vanderpol/scap-ng/issues/166).
 0.3 keeps applicability explicit and reuses ordinary applicability Assessments
 where useful. It does not add another dedicated sharing construct.
 
-### Version rule
-
-Examples presented for a prerelease must be regenerated or revalidated against
-that exact schema/specification version. Completed review iterations preserve the
-exact reviewed example set under `review/iterations/`; later changes start a new
-review checkpoint.
 
