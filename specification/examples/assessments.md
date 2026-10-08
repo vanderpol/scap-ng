@@ -326,7 +326,7 @@ behavior; a lossless converter cannot guess that choice. See the
 [existing conformance fixtures](../../tests/conditional-0.2.0/README.md)
 and [source-pattern research](../../research/assessment-simplification/conditional-10/README.md).
 
-#### Organizational Input
+### Organizational Input
 
 **SCAP 1.4:** Site-specific expected values often require a chain of XCCDF
 Value → Tailoring → external OVAL Variable. **SCAP-NG:** The publisher declares
