@@ -45,6 +45,20 @@ proposals are not listed as delivered features.
 - Kept one explicit `reported_elements` model and one canonical result contract;
   hidden reporting defaults and normative thin/full result profiles are out.
   [#125](https://github.com/vanderpol/scap-ng/issues/125) [#170](https://github.com/vanderpol/scap-ng/issues/170) [#177](https://github.com/vanderpol/scap-ng/issues/177)
+- Renamed the expected-value quantifier to `value_match` in 0.3 for
+  Variables, literal arrays and direct Organizational Inputs; preserved OVAL
+  `var_check` meaning and independent observed `match`/`existence`.
+  [#194](https://github.com/vanderpol/scap-ng/issues/194)
+- Resolved native Rule, Assessment, dependency and applicability authoring
+  references by logical ID at compilation; transitional source-path support
+  remains for imported content. [#199](https://github.com/vanderpol/scap-ng/issues/199)
+- Added typed compact Rule Result findings and Test-centered bounded
+  Assessment evidence without claiming actual scanner results.
+  [#203](https://github.com/vanderpol/scap-ng/issues/203) [#205](https://github.com/vanderpol/scap-ng/issues/205)
+- Added schema-level restrictions, compiler linkage checks and typed policy
+  freezing for direct expected-State Organizational Inputs. Native scanner
+  evaluation conformance remains an open gate.
+  [#193](https://github.com/vanderpol/scap-ng/issues/193)
 
 ## Earlier checkpoints
 

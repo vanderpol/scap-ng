@@ -1,20 +1,29 @@
 # SCAP-NG development roadmap
 
-Updated: 2026-10-07.
+Updated: 2026-10-08.
 
-SCAP-NG 0.3.0 is the active pre-alpha development version. The 0.2.0 schema is
-the frozen earlier review baseline.
+SCAP-NG 0.3.0 is the active pre-alpha checkpoint. The 0.2.0 schema is
+historical evidence, not a content-reproduction requirement.
 
-## Current — owner review, then publish the 0.3 Board checkpoint
+## Current — validate, review, then publish 0.3
 
-The frozen 0.3 requirement set is implemented and the six-benchmark owner-review
-candidate is 6/6 schema/semantic green. The pinned 65-package checkpoint also
-completed with only the four known explicit blockers.
+The six-benchmark review candidate has passed an earlier full authoring build.
+The **active-0.3 full-corpus release gate is not yet green**: the previous run
+found 25 Google Chrome Registry-type semantic failures after conversion;
+the exact OVAL-to-native crosswalk fix is now in regression testing.
+The [new 65-source run](https://github.com/vanderpol/scap-ng/actions/runs/37838382899)
+is the relevant correctness checkpoint, not the earlier modernization census.
 
-- Complete owner review of the stable candidate and its modernization examples.
-- Make only blocker/correctness fixes during review; do not add new 0.3 features.
-- After owner acceptance, publish one immutable prerelease review package with
-  SHA-256 and source/build provenance.
+- Confirm the latest code's smoke/current-design and six-benchmark conversion,
+  schema, semantic, normalization and compilation gates.
+- Pass the active 0.3 full corpus: 61 supported packages, four explicit
+  deprecated SQL-extension blockers, zero unexplained semantic errors.
+- Review the complete current six-benchmark sample and result contracts,
+  then publish a permanent SHA-256-identified GitHub prerelease asset
+  **only after owner acceptance**.
+
+No new feature design is required merely to make 0.3 larger. Correctness
+repairs and explicitly accepted input/result contracts remain in scope.
 
 Observation and evaluate redesign are deferred beyond 0.3; do not reopen them
 during checkpoint stabilization unless an implementation blocker proves the
