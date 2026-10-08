@@ -10,22 +10,24 @@ The first examples show STIG-based content and understandable results. Next come
 
 The **agreed 0.3 authoring target** is to link these files by *logical ID*, not filenames or `../` paths. For example:
 
-`benchmark.yaml`:
+`benchmark.yaml` (fragment):
 
 ```yaml
-rules:
-  - SV-257923
+benchmark:
+  rules:
+    - SV-257923
 ```
 
-`SV-257923.rule.yaml`:
+`SV-257923.rule.yaml` (fragment):
 
 ```yaml
-id: SV-257923
-assessment_choices:
-  automated:
-    assessment: rhel9.sv-257923.automated
-  manual:
-    assessment: rhel9.sv-257923.manual
+rule:
+  id: SV-257923
+  assessment_choices:
+    automated:
+      assessment: rhel9.sv-257923.automated
+    manual:
+      assessment: rhel9.sv-257923.manual
 ```
 
 The names above are illustrative identifiers, not copied from the current build. The compiler will locate each document, validate the reference, and include the referenced content in the package. Authors will not need to maintain relative directory paths.
