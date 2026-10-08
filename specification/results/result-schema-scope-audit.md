@@ -77,10 +77,11 @@ validation error.
 The audit made these corrections:
 
 - Rule Result is a compact policy-facing child of Benchmark Result.
-  `expected_state`, `observed_state`, `organizational_inputs`, and
-  `evidence_summary` were removed from Rule scope. For 0.3, bounded
-  `findings` and optional `finding_counts` restore a useful typed
-  explanation without restoring the detailed child execution graph.
+  `expected_state`, `observed_state`, full Organizational Input execution
+  and authority records, and `evidence_summary` were removed from Rule
+  scope. For 0.3, bounded `findings`, optional `finding_counts`, and
+  concise organization-defined expected values linked to canonical
+  provenance restore useful context without duplicating the Assessment graph.
 - Benchmark Result now references the Scan-level target with `target_ref`;
   run-wide `scanner` and full `target` records are no longer duplicated.
 - Detailed Test/Object/Item/State/Entity/Variable schemas are explicitly closed
