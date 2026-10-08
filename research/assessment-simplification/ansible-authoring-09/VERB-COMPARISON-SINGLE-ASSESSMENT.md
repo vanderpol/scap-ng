@@ -84,4 +84,6 @@ This speculative shorthand keeps a named check for result provenance and preserv
 
 **Discussion boundary:** This page is only about naming and the readability of one simple Assessment. It does not propose adopting Ansible modules, Jinja, arbitrary shell commands, implicit defaults, or a second accepted SCAP-NG language. A syntax change would need a separately reviewed schema/compiler mapping, counterexamples and independent semantic tests.
 
+**Feasibility, costs, and terminology risks:** [research finding and bounded 0.4 recommendation](VOCABULARY-FEASIBILITY-2026-10-08.md). This evaluates which changes could be authoring-only and which would require deeper semantic/schema work.
+
 Further background: [earlier Ansible-inspired research](README.md) and its [straw-man vocabulary](STRAW-MAN-SYNTAX.md). The accepted current language remains in the [0.3 Assessment specification](../../../specification/assessment/assessment-method.md). The broader post-0.3 architecture discussion is tracked in [issue #197](https://github.com/vanderpol/scap-ng/issues/197).
