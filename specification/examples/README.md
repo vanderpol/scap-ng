@@ -515,7 +515,7 @@ assembly pass in the linked run. The package REVIEW-GUIDE maps every accepted
 production-derived native-authoring example when automatic conversion must
 remain fail-closed.
 
-[Open the current successful workflow run](https://github.com/vanderpol/scap-ng/actions/runs/37705450998)
+[Open the current successful workflow run](https://github.com/vanderpol/scap-ng/actions/runs/37706133572)
 and download `scap-ng-0.3-human-review-candidate` from its **Artifacts** section.
 
 Direct Actions artifact URLs are intentionally not used because they are not
