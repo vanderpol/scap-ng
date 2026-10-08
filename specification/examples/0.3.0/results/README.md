@@ -12,6 +12,9 @@ about a live target scan.
 - [Assessment Result](assessment-result.json) — Test, State, entity comparison,
   collected Item, provenance, completeness, field use, and bounded evidence
   summary for one automated failure.
+- [Multi-file Assessment Result](assessment-result-multi-file.json) —
+  three collected file/directory Items with their full paths, typed owner/group,
+  mode and size fields, per-Item comparisons, and one decisive ownership failure.
 - [Bounded-evidence Assessment Result](assessment-result-bounded-evidence.json) —
   logically decisive result with an intentionally incomplete retained
   population and explicit evidence cap.
