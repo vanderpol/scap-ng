@@ -13,14 +13,14 @@ assessment:
       required: true
       description: Approved time-source hostnames.
 
-  objects:
-    object-configured-time-sources:
+  shared_objects:
+    configured-time-sources-object:
       object_title: Configured time sources
       capability: linux.chrony
       select: {}
 
   states:
-    state-source-approved:
+    approved-time-source-state:
       state_title: Time source is approved
       capability: linux.chrony
       state:
@@ -34,14 +34,15 @@ assessment:
           input: required-time-sources-input
 
   tests:
-    test-time-sources:
+    time-sources-test:
       test_title: All configured time sources are approved
       capability: linux.chrony
-      object: object-configured-time-sources
-      check_existence: at_least_one_exists
-      check: all
+      object: configured-time-sources-object
+      reported_elements: all
+      existence: one_or_more
+      match: all
       states:
-        - state-source-approved
+        - approved-time-source-state
 
   evaluate:
-    test: test-time-sources
+    test: time-sources-test
