@@ -1,0 +1,36 @@
+# Research-only Ansible-inspired vocabulary comparison, NOT 0.3 schema-valid.
+# Same fields, nesting, values, cardinality and expected result as the paired variant.
+# Do not interpret Ansible-inspired keys as real Ansible playbook syntax.
+assessment:
+  id: windows.server2025.sv-278217
+  version: 1
+  assessment_title: Prevent anonymous enumeration of shares
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  checks:
+    restrict-anonymous-test:
+      capability: windows.registry
+      target:
+        where:
+          hive:
+            equals: local_machine
+          key:
+            equals: 'SYSTEM\CurrentControlSet\Control\Lsa'
+          name:
+            equals: RestrictAnonymous
+      assertions:
+        - expect:
+            type:
+              equals: dword
+            value:
+              equals: 1
+            match: all
+            existence: one_or_more
+      reported_elements: all
+      existence: one_or_more
+      match: all
+
+  verify:
+    check: restrict-anonymous-test
