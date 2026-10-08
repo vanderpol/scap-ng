@@ -157,6 +157,17 @@ def validate_organizational_consumption_links(
             for entry in assessment.get("consumed_organizational_inputs") or []:
                 if not isinstance(entry, dict):
                     continue
+                # An absent/invalid Organizational Input produces a
+                # not_evaluated reason, not an effective expected value.
+                # Only successfully materialized bindings are reflected in
+                # Rule-level effective policy values. No guessed defaults.
+                if entry.get("materialized") is not True:
+                    if "value" in entry:
+                        errors.append({
+                            "code": "assessment.unmaterialized_input_value",
+                            "path": f"assessment_results[{execution}].consumed_organizational_inputs",
+                        })
+                    continue
                 ref = entry.get("organizational_input_ref")
                 consumed.add(ref)
                 authoritative = registry.get(ref)

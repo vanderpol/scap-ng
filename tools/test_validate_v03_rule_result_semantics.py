@@ -185,6 +185,23 @@ class RuleFindingSemanticsTests(unittest.TestCase):
                       {row["code"] for row in validate_organizational_consumption_links(
                           document, results)})
 
+    def test_unmaterialized_input_does_not_invent_rule_expected_value(self):
+        document = json.loads((E / "benchmark-result-organizational-input.json").read_text())
+        results = self.complete_organizational_execution_results()
+        rule = document["benchmark_result"]["rule_results"][0]
+        assessment = results["example-file-owner-1"]["assessment_result"]
+        binding = assessment["consumed_organizational_inputs"][0]
+        binding["materialized"] = False
+        binding.pop("value")
+        assessment["outcome"] = "not_evaluated"
+        rule["outcome"] = "not_evaluated"
+        rule["organizational_inputs"] = []
+        self.assertEqual(validate_organizational_consumption_links(document, results), [])
+        binding["value"] = 0
+        self.assertIn("assessment.unmaterialized_input_value",
+                      {entry["code"] for entry in validate_organizational_consumption_links(
+                          document, results)})
+
     def test_missing_assessment_result_is_not_certified_as_complete(self):
         document = json.loads((E / "benchmark-result-organizational-input.json").read_text())
         results = self.complete_organizational_execution_results()
