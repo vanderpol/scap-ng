@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.3.0/assessment-result.schema.json",
   "x-scap-ng-version": "0.3.0",
-  "x-last-modified": "2026-10-06",
+  "x-last-modified": "2026-10-08",
   "title": "SCAP-NG Assessment Result draft v0.3.0 strawman",
   "description": "Detailed execution result for one Assessment invocation, including Test outcomes, collected Items, bindings, completeness, and diagnostics. Pre-alpha strawman.",
   "type": "object",
@@ -24,14 +24,14 @@
         "evidence_complete",
         "tests",
         "objects",
-        "items",
         "variables",
         "diagnostics",
         "mode",
         "target_ref",
         "expression_execution",
         "field_uses",
-        "dependent_assessments"
+        "dependent_assessments",
+        "evidence_retention"
       ],
       "properties": {
         "result_schema_version": {
@@ -95,7 +95,8 @@
           "type": "array",
           "items": {
             "$ref": "test-result.schema.json"
-          }
+          },
+          "description": "Test-centered technical results. Retained system Item values and State comparisons are adjacent to the Test verdict. Standalone Assessment scans do not require a Benchmark."
         },
         "objects": {
           "type": "array",
@@ -108,7 +109,8 @@
           "type": "array",
           "items": {
             "$ref": "collected-item.schema.json"
-          }
+          },
+          "description": "Optional additional collected Items needed by collection/variable results but not represented under a Test. The canonical retained Items for Test interpretation are embedded in tests[].per_item_results[].item; duplicate copies here SHOULD NOT be emitted."
         },
         "variables": {
           "type": "array",
@@ -578,6 +580,79 @@
         },
         "item_materialization": {
           "$ref": "item-materialization.schema.json"
+        },
+        "evidence_retention": {
+          "type": "object",
+          "description": "Effective application/run-controlled retained Item limit, never an evaluation threshold and never a reason to fork Benchmark/Assessment content. An operator override changes reporting volume only, subject to separately enforced resource limits and reported_elements/redaction.",
+          "required": [
+            "scope",
+            "maximum_items",
+            "source"
+          ],
+          "properties": {
+            "scope": {
+              "const": "per_test"
+            },
+            "maximum_items": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "description": "Maximum retained Test-local per-Item records per Test. Null requests no item-count cap, still subject to scanner resource safety controls and content redaction."
+            },
+            "source": {
+              "enum": [
+                "scanner_configuration",
+                "run_request",
+                "operator_override"
+              ]
+            },
+            "override_reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operator_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "source": {
+                    "const": "operator_override"
+                  }
+                },
+                "required": [
+                  "source"
+                ]
+              },
+              "then": {
+                "required": [
+                  "override_reason"
+                ]
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "override_reason"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "operator_ref"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false,
