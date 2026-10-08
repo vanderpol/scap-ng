@@ -158,7 +158,7 @@ An evidence cap limits retained examples, **not what the Test evaluates**. If ac
 
 **SCAP 1.4:** Applicability can be scattered among CPE, XCCDF, and OVAL. **SCAP-NG:** Applicability refers to explicit technical Assessments.
 
-The converted RHEL 9 Benchmark has an applicability check for the `gnome-shell` package. The **agreed 0.3 logical-ID form** for that relationship is illustrated below (the current converter still emits path references until [#199](https://github.com/vanderpol/scap-ng/issues/199) is implemented):
+The converted RHEL 9 Benchmark has an applicability check for the `gnome-shell` package. Here is the **current logical-ID authoring form**, which the compiler resolves; legacy converter output may still contain transitional paths ([#199](https://github.com/vanderpol/scap-ng/issues/199)):
 
 ```yaml
 applicability:
@@ -387,7 +387,7 @@ assessment:
 
 The publisher refers to the stable Assessment ID; the build resolves it within a declared source/import scope, checks the type and version, rejects cycles, and packages the dependency. The alias `platform-applicable` remains local to the requesting Assessment.
 
-**Status:** planned ID-based syntax, **not yet executable**; the existing dependency fixture still uses older references. Compiler/schema migration is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199), while broader cross-Assessment collection sharing is deferred ([#44](https://github.com/vanderpol/scap-ng/issues/44)).
+**Status:** logical-ID dependency compilation is implemented and regression-tested, including version/purpose checks and cycle rejection ([#199](https://github.com/vanderpol/scap-ng/issues/199)). Full migration of generated source is ongoing; broader cross-Assessment runtime collection sharing is deferred ([#44](https://github.com/vanderpol/scap-ng/issues/44)).
 
 ### Two research-only design studies
 

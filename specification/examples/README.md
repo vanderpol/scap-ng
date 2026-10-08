@@ -170,7 +170,7 @@ Two optional presentations are rendered **from the native SCAP-NG content**, not
 
 [Download the verified Active Directory Forest pilot artifact](https://github.com/vanderpol/scap-ng/actions/runs/37821933656/artifacts/11570215522) from the [successful validation run](https://github.com/vanderpol/scap-ng/actions/runs/37821933656). It contains native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. The [workflow](https://github.com/vanderpol/scap-ng/actions/workflows/stig-manual-audit-outputs.yml) regenerates these files from its pinned DISA manual when the artifact expires.
 
-That run passed the conversion audit, optional-output checks, and validation of the Benchmark, Rule, and Manual Assessment documents against **both 0.2 and 0.3 schemas**. Source authoring is still path-based; the separate logical-ID migration remains unfinished ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example demonstrates the manual-audit path; the RHEL 9 example above demonstrates automated checking.
+That historical pilot passed conversion, optional-output checks, and native-document validation. The compiler now accepts logical Assessment IDs even though this pilot's converter still emits transitional paths ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example shows manual auditing; the RHEL 9 walkthrough shows automated checks.
 
 ## What comes next?
 
@@ -184,6 +184,6 @@ This material is not needed to understand the policy examples.
 
 ### Cross-file reference implementation status
 
-The [worked RHEL 9 example](assessments.md#1-the-rule-chooses-how-to-check-the-requirement) shows the agreed **logical-ID** authoring notation. At this pre-alpha checkpoint, the current compiler still resolves legacy source-path references; migration to native logical-ID lookup is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
+The [worked RHEL 9 example](assessments.md#1-the-rule-chooses-how-to-check-the-requirement) uses the **current logical-ID authoring form**. The compiler resolves those IDs and packages their verified references; legacy converted source paths are accepted only during migration ([#199](https://github.com/vanderpol/scap-ng/issues/199)).
 
 For measured authoring reductions, source provenance and the broader census, see the [Assessment page's optional evidence](assessments.md#evidence-and-further-reading-optional). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.

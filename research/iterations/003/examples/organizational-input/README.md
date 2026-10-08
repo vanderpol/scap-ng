@@ -2,8 +2,7 @@
 
 **Status:** pre-alpha **integration research fixture**, not an end-to-end scanner validation.
 The Assessment now uses the *supported* `linux.partition` capability and a
-consumer-local Object/State. Direct `value.input` binding remains a separate
-unproven evaluator/compilation capability (issue #193).
+consumer-local Object/State. Direct `value.input` now has compiler-time Parameter/Rule/State binding checks and a separate typed policy-input freezing helper. Actual scanner execution and complete native result conformance remain unproven (issue #193).
 
 An illustrative publisher delegates the allowed filesystem types for the
 `/home` mount to the organization. The organization approves `ext4` and
@@ -25,7 +24,7 @@ schema-valid Benchmark/Rule package. Missing approved input yields
 `not_evaluated` with `missing_organizational_input`. The Input Set cannot
 change collector selectors, operations or executable Tests. The proposed
 `in` comparison is research only; this fixture retains explicit
-`equals` and `variable_match: one_or_more` semantics.
+`equals` and `value_match: one_or_more` semantics.
 
 Template generation is the publisher/build's primary responsibility for
 predeclared organization inputs; scanner-generated templates for arbitrary
