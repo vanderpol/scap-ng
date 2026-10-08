@@ -1,4 +1,4 @@
-"""Regression coverage for Registry type/value compatibility in inline States."""
+"""State comparison datatypes are independent of collected Registry Item datatypes."""
 import copy
 import unittest
 from validate_generated_capability_semantics import validate_assessment_capability_semantics
@@ -25,20 +25,32 @@ def mismatches(document):
 class InlineRegistryTypeTests(unittest.TestCase):
     def test_dword_integer_accepted(self):
         self.assertEqual([], mismatches(fixture()))
-    def test_dword_string_rejected(self):
-        self.assertTrue(mismatches(fixture(value="1", datatype="string")))
-    def test_qword_string_rejected(self):
-        self.assertTrue(mismatches(fixture(kind="qword", value="1", datatype="string")))
+    def test_dword_string_state_cast_is_not_forbidden(self):
+        self.assertEqual([], mismatches(fixture(value="1", datatype="string")))
+    def test_qword_string_state_cast_is_not_forbidden(self):
+        self.assertEqual([], mismatches(fixture(kind="qword", value="1", datatype="string")))
+    def test_real_cached_logons_reg_sz_numeric_comparison_is_valid(self):
+        # Both real Windows 11 SV-253447 and Server 2025 SV-278181
+        # explicitly compare numeric limits against collected REG_SZ text.
+        for limit in (10, 4):
+            with self.subTest(limit=limit):
+                f=fixture(kind="string", value=limit, datatype="integer")
+                leaf=f["assessment"]["tests"]["registry-type-value-test"]["states"][0]["state"]["all"][1]
+                leaf["operation"]="less_than_or_equal"
+                findings=validate_assessment_capability_semantics(f)
+                self.assertNotIn("windows.registry.value_type_datatype",
+                                 {d.get("code") for d in findings})
+
     def test_string_string_accepted(self):
         self.assertEqual([], mismatches(fixture(kind="string", value="hello", datatype="string")))
-    def test_ntuser_dword_string_rejected(self):
-        self.assertTrue(mismatches(fixture(capability="windows.ntuser", value="1", datatype="string")))
-    def test_named_compound_state_rejected(self):
+    def test_ntuser_dword_string_state_cast_is_not_forbidden(self):
+        self.assertEqual([], mismatches(fixture(capability="windows.ntuser", value="1", datatype="string")))
+    def test_named_compound_state_comparison_cast_is_not_forbidden(self):
         f=fixture(value="1",datatype="string")
         state=f["assessment"]["tests"]["registry-type-value-test"]["states"][0]
         f["assessment"]["states"]={"registry-expected-state":state}
         f["assessment"]["tests"]["registry-type-value-test"]["states"]=["registry-expected-state"]
-        self.assertTrue(mismatches(f))
+        self.assertEqual([],mismatches(f))
     def test_alternative_states_do_not_infer_one_global_type(self):
         f=fixture()
         test=f["assessment"]["tests"]["registry-type-value-test"]
@@ -53,7 +65,7 @@ class InlineRegistryTypeTests(unittest.TestCase):
         test["states_match"]="any"
         self.assertEqual([],mismatches(f))
 
-    def test_conjunctive_states_preserve_cross_field_validation(self):
+    def test_conjunctive_states_preserve_casting_permission(self):
         f=fixture()
         test=f["assessment"]["tests"]["registry-type-value-test"]
         test["states"]=[
