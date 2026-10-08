@@ -1,23 +1,13 @@
-# Windows 11 full-review example
+# Windows 11 review example
 
-This is the stable reviewer-facing entry point for the generated Windows 11 SCAP-NG example.
+Inspect Windows 11 beside RHEL 9 in the
+[verified six-benchmark review build](https://github.com/vanderpol/scap-ng/actions/runs/37839525823).
+Download `scap-ng-board-representative-review` and browse
+`authoring/ms_windows_11/` for the Benchmark, Rules, and Assessments.
+Use the generated `REVIEW.json` to locate typed-array and Set/Filter examples.
 
-## Purpose
-
-Use this example to inspect the current Benchmark → Rule → Assessment model on Windows content and compare it with the RHEL 9 example.
-
-The exhaustive generated tree is evidence, not normative source. During repository rebaselining, bulk generated output is being separated from the main review repository. Representative examples and summaries remain in the review surface; exhaustive generated proof belongs in `vanderpol/scap-ng-evidence`.
-
-## Provenance
-
-Original generated tree:
-
-`research/iterations/003/review/windows11-current-full/`
-
-Original tree identity:
-
-`4fbdf03c11a43fe608fd96c2f13947f3cd78b443`
-
-The pre-rebaseline Git tag/history remains the recovery source for the original generated tree.
-
-Current validation and source-accounting summaries remain tracked through the evidence migration ledger while the bulk tree is prepared for removal from the active working tree.
+The original pre-rebaseline Windows 11 tree is preserved in Git history,
+not the current repository. For the maintained explanation, begin with the
+[review guide](../REVIEW-GUIDE.md) and the
+[Assessment showcase](../../../specification/examples/assessments.md).
+Do not mistake the ZIP's synthetic result fixtures for real scanner output.

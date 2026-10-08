@@ -30,7 +30,7 @@ class is proven and exercised by the review candidate.
 2. [Shared capability primitives](capability-common.schema.json)
 3. [Supported capability mappings](capability-mappings/supported/)
 4. [Assessment result schema](assessment-result.schema.json)
-5. [Packaging schema](package.schema.json)
+5. [Package manifest schema](package-manifest.schema.json)
 
 For accepted 0.3 collection-iteration semantics, see
 [Collection `for_each`](../../specification/assessment/foreach.md). Historical

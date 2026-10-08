@@ -131,7 +131,7 @@ def audit(root: Path):
             reason = None
             if target == 'outside':
                 reason = 'escapes_repository'
-            elif not target.is_file():
+            elif not (target.is_file() or target.is_dir()):
                 reason = 'missing_target'
             elif anchor and target.suffix.lower() == '.md':
                 if slug(anchor) not in fragments.get(target, set()):

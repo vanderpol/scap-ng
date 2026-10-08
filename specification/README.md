@@ -33,7 +33,7 @@ These pages define the current SCAP-NG contract. Research and design-history rec
 - SCAP-NG preserves the meaning of supported SCAP 1.4 and OVAL content while using simpler native structures instead of reproducing XML and legacy packaging mechanics.
 - Behavior that can affect an assessment result is explicit. Content should not depend on hidden defaults or vendor-specific assumptions.
 - Established SCAP and OVAL concepts and terminology are reused when they remain accurate; new concepts are introduced only when they provide a clear benefit.
-- Content is modular and reusable. Shared Assessments, Observations, or collected facts must not change policy meaning, provenance, or assessment results.
+- Content is modular and reusable. Shared Assessments and reusable collected facts must not change policy meaning, provenance, or assessment results. A shared Observation artifact model remains deferred beyond 0.3.
 - Results explain both **what happened and why**, with clear completeness and bounded evidence rather than unnecessary result volume.
 - Independent implementations should reach the same meaning and results from the specification and conformance material; schema validation alone is not proof of conformance.
 

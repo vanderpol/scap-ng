@@ -178,7 +178,7 @@ SCAP-NG keeps familiar OVAL concepts (Test, Object, State, Variable, Item) but p
 
 **SCAP 1.4:** Even private Objects/States live in separate registries. **SCAP-NG 0.3:** Keep the private parts with the Test, while preserving named acquisitions when they are genuinely referenced.
 
-**Real converted RHEL 9 SV-258029:** a shared dconf directory acquisition feeds a private text-file Object (excerpt; full Set/Filter/select fields are in the [review guide](../../review/current/REVIEW-GUIDE.md#1-consumer-local-components-plus-a-genuinely-shared-object)):
+**Real converted RHEL 9 SV-258029:** a shared dconf directory acquisition feeds a private text-file Object (excerpt; full Set/Filter/select fields are in the [review guide](../../review/current/REVIEW-GUIDE.md#what-to-review)):
 
 ```yaml
 shared_objects:
@@ -197,7 +197,7 @@ tests:
         in: dconf-database-directories-object
 ```
 
-The [review guide](../../review/current/REVIEW-GUIDE.md) links the complete faithful and modernized files.
+The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real current ZIP paths; detailed before/after research remains separate.
 
 ### Static values without Variable plumbing
 
@@ -268,7 +268,7 @@ This is an excerpt; the full converted example also includes explicit quantifier
 
 ### Localized Set and Filter semantics
 
-**SCAP 1.4:** Separate Objects may be necessary even for one check's local Set. **SCAP-NG 0.3:** **Oracle Linux 9 SV-271608**, verifying MFA certificate status checking, puts the two SSSD configuration-file acquisitions inside the Test's Object while **retaining their `union` operator**. The underlying files are `/etc/sssd/sssd.conf` and `/etc/sssd/conf.d/*.conf`. See its [source-linked review](../../review/current/REVIEW-GUIDE.md#6-set-and-filter-semantics-remain-explicit).
+**SCAP 1.4:** Separate Objects may be necessary even for one check's local Set. **SCAP-NG 0.3:** **Oracle Linux 9 SV-271608**, verifying MFA certificate status checking, puts the two SSSD configuration-file acquisitions inside the Test's Object while **retaining their `union` operator**. The underlying files are `/etc/sssd/sssd.conf` and `/etc/sssd/conf.d/*.conf`. See its [source-linked review](../../review/current/REVIEW-GUIDE.md#what-to-review).
 
 The same principle applies to Filters: locality is a presentation improvement, not a reason to alter set membership or filter action.
 
@@ -304,7 +304,7 @@ must not silently rewrite a source Boolean graph**.
 **Real Windows Server 2025 SV-278001:** Domain controllers and other servers
 have different Registry-permission requirements. The converted 0.3 Assessment
 preserves the source `evaluate: all/any/not` expression; see
-[SV-278001 in the actual review bundle](../../review/current/REVIEW-GUIDE.md#7-explicit-evaluate-where-composition-is-real).
+[SV-278001 in the actual review bundle](../../review/current/REVIEW-GUIDE.md#what-to-review).
 
 Conceptually a publisher might author:
 
@@ -401,7 +401,7 @@ The examples above show how to read and write an Assessment; you don't need the 
 
 ### Where to find real source files
 
-The [0.3 six-benchmark review package](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) contains real converted Linux, Windows, DNS and Apache authoring sources. The [review guide](../../review/current/REVIEW-GUIDE.md) identifies each before/after Rule and Assessment. Search the downloadable `authoring/` tree for **`for_each:`** (not `foreach`), `shared_objects:`, `evaluate:`, or `assessment_choices:`.
+The [0.3 six-benchmark review package](https://github.com/vanderpol/scap-ng/actions/runs/37839525823) contains real converted Linux, Windows, DNS and Apache authoring sources. The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real converted Rule and Assessment source paths. Search the downloadable `authoring/` tree for **`for_each:`** (not `foreach`), `shared_objects:`, `evaluate:`, or `assessment_choices:`.
 
 In this pinned six-benchmark artifact there are **8 `for_each:` occurrences across 7 Assessments** and **79 `shared_objects:` occurrences**; these numbers describe a single build, not an entire standard or runtime scan. The checked `reported_elements:` entries in that bundle are all `all`—the bundle does **not** demonstrate selective redaction, native conditionals, Organizational Input binding, cross-Assessment result reuse, or *live* scanner output. See the [fixture catalog](0.3.0/results/README.md) for expressly synthetic results.
 
