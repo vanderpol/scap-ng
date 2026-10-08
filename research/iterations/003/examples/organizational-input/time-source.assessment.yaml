@@ -19,21 +19,19 @@ assessment:
       capability: linux.chrony
       select: {}
 
-  variables:
-    approved-sources:
-      variable_title: Approved time sources
-      datatype: string
-      input: required_time_sources
-
   states:
     state-source-approved:
       state_title: Time source is approved
       capability: linux.chrony
       state:
         field: hostname
-        operation: pattern_match
+        operation: equals
+        datatype: string
+        variable_match: one_or_more
+        match: one_or_more
+        existence: one_or_more
         value:
-          variable: approved-sources
+          input: required_time_sources
 
   tests:
     test-time-sources:
