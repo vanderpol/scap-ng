@@ -12,7 +12,23 @@ The excerpts below are from the **validated 0.3.0 candidate** produced by [workf
 
 ## Benchmark → Rule → Assessment
 
-**SCAP 1.4:** XCCDF Rules reference separate OVAL checks. **SCAP-NG:** A Rule identifies its available automated and manual Assessments without hiding policy text inside technical checks.
+**SCAP 1.4:** XCCDF generally embeds the complete Rule definitions inside the Benchmark, and those Rules reference separate OVAL checks. **SCAP-NG:** The Benchmark instead **lists references to individual Rule files**. Each Rule owns its policy text and references its available automated/manual Assessment files. The Benchmark does **not** contain the full Rule definitions.
+
+The file relationship is:
+
+```text
+benchmark.yaml
+  rules:
+    - rules/SV-257923.rule.yaml
+              |
+              v
+rules/SV-257923.rule.yaml
+  assessment_choices:
+    automated: ../assessments/automated/SV-257923.automated.yaml
+    manual:    ../assessments/manual/SV-257923.manual.yaml
+```
+
+This is a **structural illustration** (showing only one Rule), not the entire RHEL 9 Benchmark. In the actual Benchmark, `rules:` is a list of Rule-file paths; the Rule file contains the title, severity, rationale, remediation, and Assessment bindings. The compiler resolves the references and the compiled package manifest identifies the corresponding logical members.
 
 **Converted RHEL 9 SV-257923**, from `benchmarks/rhel9/candidate-authoring/rules/SV-257923.rule.yaml`:
 
