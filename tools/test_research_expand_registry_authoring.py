@@ -42,6 +42,20 @@ class RegistryAuthoringExpansionTests(unittest.TestCase):
   errors = list(document_errors(validators["assessment.schema.json"], assessment))
   self.assertEqual([], [str(e) for e in errors])
 
+ def test_sv278217_fixture_compiles_without_changing_meaning(self):
+  from pathlib import Path
+  import yaml
+  from research_expand_registry_authoring import expand_registry_assessment
+  root = Path(__file__).resolve().parents[1]
+  path = root / "research/iterations/003/examples/stig-derived/SV-278217/readable-authoring.prototype.yaml"
+  authored = yaml.safe_load(path.read_text(encoding="utf-8"))
+  canonical = expand_registry_assessment(authored)
+  test = canonical["assessment"]["tests"]["restrict-anonymous-test"]
+  self.assertEqual(test["object"]["select"]["hive"], "local_machine")
+  self.assertEqual(test["states"][0]["state"]["all"][0]["value"], "dword")
+  self.assertEqual(test["states"][0]["state"]["all"][1]["value"], 1)
+  self.assertEqual(test["states"][0]["state"]["all"][1]["datatype"], "integer")
+
  def test_refuse_string_one(self):
   t=copy.deepcopy(TEST); t["states"][0]["expect"]["value"]={"equals":"1"}
   with self.assertRaises(AuthoringError): expand_registry_test(t)
