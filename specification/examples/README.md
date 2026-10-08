@@ -41,149 +41,144 @@ for real before/after STIG examples and the
 [current review page](../../review/current/README.md) for the validated build,
 pinned corpus revision, and full census evidence.
 
+The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
+
 ## Benchmark → Rule → Assessment
 
-**SCAP 1.4:** Policy lives in XCCDF while automated checks commonly live in
-separate OVAL content connected through check-system, href, names, and legacy IDs.
+**SCAP 1.4:** XCCDF Rules reference separate OVAL checks. **SCAP-NG:** A Rule identifies its available automated and manual Assessments without hiding policy text inside technical checks.
 
-**SCAP-NG:** A Benchmark contains Rules, and each Rule directly names its available
-Assessments. Policy text stays with the Rule; technical evaluation stays with the
-Assessment.
+**Converted RHEL 9 SV-257923**, from `benchmarks/rhel9/candidate-authoring/rules/SV-257923.rule.yaml`:
 
 ```yaml
 rule:
   id: SV-257923
-  title: RHEL 9 library directories must be group-owned correctly.
+  title: RHEL 9 library directories must be group-owned by root or a system account.
   assessment_choices:
     automated:
       assessment: ../assessments/automated/SV-257923.automated.yaml
     manual:
       assessment: ../assessments/manual/SV-257923.manual.yaml
-  default_assessment_choice: automated
+  default_assessment_choice: default
 ```
 
-This keeps the policy requirement readable without embedding or duplicating the
-technical check.
+The complete Rule also carries severity, rationale, references, and remediation.
 
 ## Automated Assessments
 
-**SCAP 1.4:** OVAL Definitions, Tests, Objects, States, and Variables are usually
-separate graph nodes that must be followed by ID to understand one check.
+**SCAP 1.4:** One OVAL check may require chasing separate Test, Object and State IDs. **SCAP-NG:** Keep private Object/State content beside its Test.
 
-**SCAP-NG:** Automated Assessments retain the useful OVAL concepts and six-state
-truth model, but use meaningful names and a compact authoring structure.
+**Converted RHEL 9 SV-257851:** the `/home` mount must have `nosuid`. The following is from `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-257851.automated.yaml`, omitting presentation fields:
 
 ```yaml
-assessment:
-  id: SV-257923.automated
-  mode: automated
-  class: compliance
-  purpose: assessment
-
-  tests:
-    library-directory-owner-test:
-      capability: unix.file
-      object: ...
-      states: ...
-
-  evaluate:
-    test: library-directory-owner-test
+tests:
+  home-mounted-nosuid-option-test:
+    capability: linux.partition
+    object:
+      capability: linux.partition
+      select:
+        mount_point:
+          value: .*\\/home
+          operation: pattern_match
+          datatype: string
+    states:
+      - capability: linux.partition
+        state:
+          field: mount_options
+          value: nosuid
+          operation: equals
+          datatype: string
+          match: one_or_more
+          existence: one_or_more
+    reported_elements: all
+    existence: one_or_more
+    match: all
+evaluate:
+  test: home-mounted-nosuid-option-test
 ```
 
-The goal is not to hide evaluation semantics; it is to remove serialization
-indirection that does not help the author.
+The full Assessment preserves required metadata and its explicit execution root.
 
 ## Explicit evaluation logic
 
-**SCAP 1.4:** OVAL `criteria` can express powerful Boolean decision trees, but the
-logic is often separated from the Tests it references.
+**SCAP 1.4:** `criteria` composes Boolean Tests, sometimes with many references. **SCAP-NG:** `evaluate` preserves genuine multi-Test logic instead of burying it in execution code.
 
-**SCAP-NG:** `evaluate` keeps multi-Test composition explicit and uses meaningful
-Test names. Genuine decision trees remain visible rather than being hidden in
-procedural code.
+**Converted Windows Server DNS SV-259388**, in `benchmarks/windows-server-dns/candidate-authoring/assessments/automated/SV-259388.automated.yaml`, retains three ways to satisfy the Rule: caching-only, AD-integrated zones, or both IPv4 and IPv6 RRSIG checks:
+
+```yaml
+evaluate:
+  any:
+    - test: dns-server-caching-only-there-no-forward-or-reverse-lookup-test
+    - test: all-forward-lookup-zones-if-any-integrated-active-directory-test
+    - all:
+        - test: there-at-least-one-rrsig-resource-record-signature-associated-each-test
+        - test: there-at-least-one-rrsig-resource-record-signature-associated-each-2-test
+```
+
+This is the actual converted tree, not a fabricated `evaluate` example.
+
+## Conditional evaluation
+
+**SCAP 1.4:** Environment-sensitive checks can use nested guard Tests, which are hard to recognize as role-dependent requirements. **SCAP-NG:** Native content supports explicit `if/then/else`, but source OVAL Boolean graphs cannot generally be converted into procedural branches without changing six-state outcomes.
+
+**Converted Windows Server 2025 SV-278001** checks `HKEY_LOCAL_MACHINE\\SYSTEM` registry permissions differently for domain controllers and other servers. The 0.3 candidate **correctly preserves** the source's guarded Boolean expression. From `benchmarks/windows-server-2025/candidate-authoring/assessments/automated/SV-278001.automated.yaml`:
 
 ```yaml
 evaluate:
   all:
-    - test: zone-is-ad-integrated-test
-    - test: zone-is-dnssec-signed-test
-    - test: zone-has-rrsig-test
+    - test: default-permissions-hkey-local-machine-security-registry-key-maintained-test
+    - test: default-non-domain-controller-permissions-hkey-local-machine-software-registry-test
+    - any:
+        - all:
+            - test: system-windows-domain-controller-test
+            - test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
+        - all:
+            - not:
+                test: system-windows-domain-controller-test
+            - test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
 ```
 
-Canonical executable content keeps an explicit `evaluate` root even for a one-Test
-Assessment. This avoids a second hidden execution default while preserving one
-composition model.
-
-## Conditional evaluation
-
-**SCAP 1.4:** Environment-dependent logic is commonly represented through nested
-OVAL criteria and guard Tests, so intentionally conditional authoring may be
-difficult to recognize at a glance.
-
-**SCAP-NG:** Explicit `if/then/else` evaluation is already part of the frozen
-0.2 baseline. It lets native content state an intentional conditional directly
-while retaining defined six-state outcomes.
-
-```yaml
-evaluate:
-  if:
-    test: server-is-domain-controller
-  then:
-    test: domain-controller-permissions
-  else:
-    test: member-server-permissions
-```
-
-This does **not** mean arbitrary SCAP 1.4 Boolean graphs can be automatically
-rewritten as procedural branches; the production research found counterexamples.
-For 0.3 the inherited conditional form is retained unchanged. Broader
-`case`/`elseif` procedural syntax is not added.
+For an *authored* `if/then/else` form, use the [conditional conformance suite](../../tests/conditional-0.2.0/README.md), explicitly labeled as a fixture. It is **not** the output for SV-278001. [Production conditional research](../../research/assessment-simplification/conditional-10/README.md) demonstrates why the rewrite is unsafe for error, unknown, not-evaluated, and not-applicable outcomes. The conditional syntax itself predates 0.3.
 
 ## Manual Assessments
 
-**SCAP 1.4:** Manual STIG procedures are commonly carried as XCCDF Check Text and
-may require separate product-specific workflows to record the human determination.
+**SCAP 1.4:** Manual STIG Check Text generally lives in XCCDF. **SCAP-NG:** The real procedure becomes a first-class Assessment with explicit recorded responses.
 
-**SCAP-NG:** Manual checks are first-class Assessments using the same
-Benchmark → Rule → Assessment model as automated checks.
+**Converted RHEL 9 SV-257851**, from `benchmarks/rhel9/candidate-authoring/assessments/manual/SV-257851.manual.yaml`: the full procedure directs the assessor to verify the `/home` `nosuid` mount. Response excerpt:
 
 ```yaml
 assessment:
   id: SV-257851.manual
   mode: manual
-  class: compliance
-  procedure: Verify /home is mounted with the nosuid option ...
   response:
     type: compliance
     choices:
       - value: pass
-        outcome: true
+        label: Pass
+        outcome: 'true'
       - value: fail
-        outcome: false
+        label: Fail
+        outcome: 'false'
+    allow_comment: true
+    allow_evidence: true
 ```
 
-Manual results preserve who made the determination, when it was made, and the
-supporting evidence. See the
-[0.3 manual Assessment Result](0.3.0/results/manual-assessment-result.json).
+The [0.3 Manual Assessment Result](0.3.0/results/manual-assessment-result.json) illustrates attribution and evidence **using synthetic result data**, not an actual assessment.
 
 ## Explicit applicability
 
-**SCAP 1.4:** Applicability may be spread across XCCDF platform references, CPE
-dictionaries, and check content.
+**SCAP 1.4:** Applicability can be scattered among CPE, XCCDF, and OVAL. **SCAP-NG:** Applicability refers to explicit technical Assessments.
 
-**SCAP-NG:** Applicability is an explicit technical determination. Inventory facts
-such as CPE may be captured, but a product identifier alone does not silently
-decide applicability.
+**Converted RHEL 9 candidate** `benchmarks/rhel9/candidate-authoring/applicability.yaml` contains:
 
 ```yaml
-platform:
-  id: product.rhel_9
-  applicability:
-    operator: any
-    conditions:
-      - rhel-9-platform-assessment
-      - compatible-rhel-9-platform-assessment
+applicability:
+  id: benchmark.rhel_9.applicability
+  conditions:
+    benchmark.rhel_9.condition.gnome-shell-package:
+      assessment: assessments/applicability/condition.gnome-shell-package.yaml
 ```
+
+The referenced file tests the real `gnome-shell` package using `linux.rpminfo` or `linux.dpkginfo`. Product identifiers may be captured as inventory, but not silently used to decide applicability.
 
 ## Organizational Input
 
@@ -223,6 +218,8 @@ profiles:
       - SV-257778
       - SV-257779
 ```
+
+**The result excerpts below are conformance fixtures, not real target scans.** They demonstrate 0.3 result fields with synthetic outcomes and evidence. They must not be described as scanner-generated proof. Full JSON examples and their provenance are indexed in the [result-fixture overview](0.3.0/results/README.md).
 
 ## Compact Benchmark and Rule Results
 
