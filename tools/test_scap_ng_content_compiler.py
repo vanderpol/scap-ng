@@ -129,6 +129,39 @@ class ContentCompilerTests(unittest.TestCase):
                 "example.platform.assessment",
             )
 
+    def test_logical_id_reference_and_relocated_assessment(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "corpus"
+            bench = root / "sample"
+            dump(bench / "benchmark.yaml", {"benchmark": {
+                "id": "sample", "version": {"value": "1"}, "rules": ["R1"], "profiles": []}})
+            assessment = {"assessment": {
+                "id": "sample.R1", "version": 1, "assessment_title": None,
+                "mode": "automated", "class": "compliance", "purpose": "assessment",
+                "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.1.0"},
+                "objects": {}, "states": {}, "tests": {}, "evaluate": {}}}
+            path = bench / "assessments" / "automated" / "original.yaml"
+            dump(path, assessment)
+            rule = {"rule": {"id": "R1",
+                     "assessment_choices": {"automated": {"assessment": "sample.R1"}},
+                     "default_assessment_choice": "automated"}}
+            dump(bench / "rules" / "R1.rule.yaml", rule)
+            _, members, index = compile_benchmark(root, bench)
+            r1 = json.loads(members[index["R1"]["path"]])["rule"]
+            self.assertEqual(r1["assessment_choices"]["automated"]["assessment"], "sample.R1")
+            moved = bench / "assessments" / "automated" / "renamed.yaml"
+            path.rename(moved)
+            _, members2, index2 = compile_benchmark(root, bench)
+            r2 = json.loads(members2[index2["R1"]["path"]])["rule"]
+            self.assertEqual(r1, r2)
+            dump(root / "shared" / "assessments" / "duplicate.yaml", assessment)
+            with self.assertRaisesRegex(ValueError, "ambiguous Assessment identity"):
+                compile_benchmark(root, bench)
+            rule["rule"]["assessment_choices"]["automated"]["assessment"] = "missing.id"
+            dump(bench / "rules" / "R1.rule.yaml", rule)
+            with self.assertRaisesRegex(ValueError, "unresolved Assessment identity"):
+                compile_benchmark(root, bench)
+
     def test_runtime_manifest_omits_authoring_source_paths_and_verifies_graph(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"corpus"

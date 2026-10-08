@@ -2,7 +2,7 @@
 """Compile current SCAP-NG YAML authoring trees into deterministic .scapng bundles.
 
 This experimental compiler consumes freshly generated current-design source.
-It resolves Rule Assessment paths to logical Assessment IDs, emits a canonical
+It resolves Rule Assessment logical IDs (and legacy converter paths), emits a canonical
 manifest, and can optionally sign the exact manifest bytes with a generated
 self-signed X.509 test certificate using detached CMS/PKCS#7.
 
@@ -309,6 +309,56 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
     object_index: dict[str, dict] = {}
     assessment_docs: dict[str, tuple[Path, dict]] = {}
 
+    # #199: logical identity resolution is scoped to this Benchmark's
+    # Assessments and explicitly supplied corpus's shared Assessments.
+    # Build lazily to avoid reparsing generated legacy path-based sources.
+    logical_index = None
+
+    def resolve_source_assessment(from_path, reference, *, expected_version=None, expected_purpose=None):
+        nonlocal logical_index
+        legacy_path = ("/" in reference or "\\\\" in reference
+                       or reference.endswith((".yaml", ".yml")))
+        if legacy_path:
+            target, doc = resolve_assessment(source_root, from_path, reference)
+        else:
+            if logical_index is None:
+                logical_index = {}
+                candidates = set()
+                for directory in (benchmark_dir / "assessments",
+                                  benchmark_dir / "shared", source_root / "shared"):
+                    if directory.is_dir():
+                        candidates.update(directory.rglob("*.yaml"))
+                        candidates.update(directory.rglob("*.yml"))
+                for candidate in sorted(candidates):
+                    if not candidate.resolve().is_relative_to(source_root.resolve()):
+                        raise ValueError(f"Assessment source escapes declared scope: {candidate}")
+                    value = load_yaml(candidate)
+                    assessment = value.get("assessment")
+                    if assessment is None:
+                        continue
+                    if not isinstance(assessment, dict) or not assessment.get("id"):
+                        raise ValueError(f"{candidate}: invalid Assessment identity")
+                    logical_index.setdefault(assessment["id"], []).append((candidate, value))
+            matches = logical_index.get(reference, [])
+            if expected_version is not None:
+                matches = [row for row in matches
+                           if row[1]["assessment"].get("version") == expected_version]
+            if len(matches) != 1:
+                if not matches:
+                    raise ValueError(f"{from_path}: unresolved Assessment identity {reference}"
+                                     f" (version={expected_version})")
+                raise ValueError(f"{from_path}: ambiguous Assessment identity {reference}: "
+                                 + ", ".join(str(row[0]) for row in matches))
+            target, doc = matches[0]
+        if not target.resolve().is_relative_to(source_root.resolve()):
+            raise ValueError(f"{from_path}: Assessment reference escapes source root")
+        actual = doc["assessment"]
+        if expected_version is not None and actual.get("version") != expected_version:
+            raise ValueError(f"{from_path}: Assessment {reference} version mismatch")
+        if expected_purpose is not None and actual.get("purpose") != expected_purpose:
+            raise ValueError(f"{from_path}: Assessment {reference} purpose mismatch")
+        return target, doc
+
     def remember_assessment(aid, source_path, doc):
         previous = assessment_docs.get(aid)
         if previous is not None and previous[0] != source_path:
@@ -359,8 +409,8 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
                 updated = json.loads(json.dumps(row))
                 ref = updated.get("assessment")
                 if isinstance(ref, str):
-                    target, assessment_doc = resolve_assessment(
-                        source_root, applicability_path, ref
+                    target, assessment_doc = resolve_source_assessment(
+                        applicability_path, ref
                     )
                     aid = assessment_doc["assessment"]["id"]
                     remember_assessment(aid, target, assessment_doc)
@@ -372,8 +422,8 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
                 if not isinstance(row, dict) or not isinstance(row.get("assessment"), str):
                     conditions.append(row)
                     continue
-                target, assessment_doc = resolve_assessment(
-                    source_root, applicability_path, row["assessment"]
+                target, assessment_doc = resolve_source_assessment(
+                    applicability_path, row["assessment"]
                 )
                 aid = assessment_doc["assessment"]["id"]
                 remember_assessment(aid, target, assessment_doc)
@@ -408,8 +458,8 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
         for selector, choice in choices.items():
             if not isinstance(choice, dict) or not isinstance(choice.get("assessment"), str):
                 continue
-            target, assessment_doc = resolve_assessment(
-                source_root, rule_path, choice["assessment"]
+            target, assessment_doc = resolve_source_assessment(
+                rule_path, choice["assessment"], expected_version=choice.get("expected_version")
             )
             aid = assessment_doc["assessment"]["id"]
             remember_assessment(aid, target, assessment_doc)
@@ -439,7 +489,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
         for alias, dependency in compiled_doc["assessment"].get("dependencies", {}).items():
             if not isinstance(dependency, dict) or not isinstance(dependency.get("assessment"), str):
                 raise ValueError(f"{aid}: invalid Assessment dependency {alias}")
-            target_path, target_doc = resolve_assessment(source_root, source_path, dependency["assessment"])
+            target_path, target_doc = resolve_source_assessment(source_path, dependency["assessment"], expected_version=dependency.get("expected_version"), expected_purpose=dependency.get("purpose"))
             # Resolve symlinks too; lexical containment alone is insufficient.
             if not target_path.resolve().is_relative_to(source_root.resolve()):
                 raise ValueError(f"{aid}: dependency escapes corpus root: {alias}")
