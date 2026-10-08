@@ -156,17 +156,17 @@ An evidence cap limits retained examples, **not what the Test evaluates**. If ac
 
 **SCAP 1.4:** Applicability can be scattered among CPE, XCCDF, and OVAL. **SCAP-NG:** Applicability refers to explicit technical Assessments.
 
-**Converted RHEL 9 candidate** `benchmarks/rhel9/candidate-authoring/applicability.yaml` contains:
+The converted RHEL 9 Benchmark has an applicability check for the `gnome-shell` package. The **agreed 0.3 logical-ID form** for that relationship is illustrated below (the current converter still emits path references until [#199](https://github.com/vanderpol/scap-ng/issues/199) is implemented):
 
 ```yaml
 applicability:
   id: benchmark.rhel_9.applicability
   conditions:
     benchmark.rhel_9.condition.gnome-shell-package:
-      assessment: assessments/applicability/condition.gnome-shell-package.yaml
+      assessment: condition.gnome-shell-package
 ```
 
-The referenced file tests the real `gnome-shell` package using `linux.rpminfo` or `linux.dpkginfo`. Product identifiers may be captured as inventory, but not silently used to decide applicability.
+The Assessment checks whether the package is installed using `linux.rpminfo` or `linux.dpkginfo`. Product identifiers may be captured as inventory, but not silently used to decide applicability.
 
 
 ## Authoring improvements
