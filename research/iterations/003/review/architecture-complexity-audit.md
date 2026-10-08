@@ -46,6 +46,20 @@ Classify each candidate **keep / simplify / consolidate / remove / research**. C
 
 **No schema or validator changes made.** These are implementation-backed findings, not corpus statistics or conformance proof.
 
+## Third pass: confirmed schema/example drift and redundant contract surface
+
+### Confirmed Board-showcase inconsistency — action required
+
+`schema/v0.3.0/assessment.schema.json` requires keys in `assessment.inputs` to match `^[a-z0-9]+(?:-[a-z0-9]+)*-input$` (lowercase kebab-case and `-input` suffix). `specification/assessment/component-naming.md` affirms the same rule. However, `research/iterations/003/examples/organizational-input/time-source.assessment.yaml`, its Rule binding, and `specification/examples/README.md` use `required_time_sources`. **This is a verifiable mismatch**, independently of the still-incomplete direct State-input implementation. A consistent rename, such as `required-time-sources-input`, needs to propagate through Assessment contract, State reference, Rule binding, and the README identifier crosswalk; it is not just a cosmetic fix. Apply with regression checks to avoid wrong references. **Pre-Board blocker for examples.**
+
+### Mandatory discovery metadata
+
+`schema/v0.3.0/rule.schema.json` requires `organizational_input_requirements` for **all** Rules (even those without any required input), while `assessment_choices.*.inputs` already captures Parameter → Assessment-input binding. The authored `uses` list then repeats exact Test/State/slot consumer locations. This is mechanically derivable only if input-consumer references and all choice-resolution paths are statically discoverable; no proof yet of sufficiency for dynamic bindings. Test against multiple consumers, manual choices and nested semantic references before removing. Strongest authoring simplification candidate, but **do not assume generation is trivial**.
+
+### Validation boundaries
+
+`tools/validate_native_semantics.py` delegates to `validate_assessment_capability_semantics`; that function validates a local Assessment graph, not the full bundle-level cross-document parameter resolution. A green Assessment validator is necessary but insufficient to establish end-to-end Organizational Input conformance. An integrated test must verify publisher Parameter identity, Rule binding, Assessment contract and State usage, input set eligibility and provenance, and result treatment for missing values.
+
 ## Work remaining before a design freeze / Board release
 
 1. Build a reproducible, pinned baseline from fresh 0.3 conversion and normalization, then run JSON Schema and semantic validators. Count files, failures and provenance classifications.
