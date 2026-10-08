@@ -6,38 +6,9 @@ For policy context, see the [Benchmark and Rule examples](README.md). This page 
 
 ## Automated Assessments
 
-**SCAP 1.4:** One OVAL check may require chasing separate Test, Object and State IDs. **SCAP-NG:** Keep private Object/State content beside its Test.
+**SCAP 1.4:** An OVAL check commonly requires following separate Test, Object, and State IDs. **SCAP-NG:** A private Object and State may live directly with their Test, making the check easier to read.
 
-**Converted RHEL 9 SV-257851:** the `/home` mount must have `nosuid`. The following is from `benchmarks/rhel9/candidate-authoring/assessments/automated/SV-257851.automated.yaml`, omitting presentation fields:
-
-```yaml
-tests:
-  home-mounted-nosuid-option-test:
-    capability: linux.partition
-    object:
-      capability: linux.partition
-      select:
-        mount_point:
-          value: .*\\/home
-          operation: pattern_match
-          datatype: string
-    states:
-      - capability: linux.partition
-        state:
-          field: mount_options
-          value: nosuid
-          operation: equals
-          datatype: string
-          match: one_or_more
-          existence: one_or_more
-    reported_elements: all
-    existence: one_or_more
-    match: all
-evaluate:
-  test: home-mounted-nosuid-option-test
-```
-
-The full Assessment preserves required metadata and its explicit execution root.
+Start with the [real RHEL 9 `nosuid` Assessment](README.md#the-automated-assessment--the-actual-check) immediately after the Benchmark → Rule → Assessment linkage. This page continues with manual Assessments, technical results, and more advanced examples rather than repeating the same introductory YAML.
 
 ## Manual Assessments
 
