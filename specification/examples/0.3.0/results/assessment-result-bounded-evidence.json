@@ -21,11 +21,150 @@
         "existence_outcome": "true",
         "check": "all",
         "state_operator": "AND",
-        "object_refs": ["large-file-population"],
-        "state_refs": ["required-state"],
-        "item_refs": ["file-1", "file-2"],
-        "per_item_results": [],
-        "reason": "The assessment was logically decisive before the complete population was retained as evidence."
+        "object_refs": [
+          "large-file-population"
+        ],
+        "state_refs": [
+          "required-state"
+        ],
+        "item_refs": [
+          "file-1",
+          "file-2"
+        ],
+        "per_item_results": [
+          {
+            "item_ref": "file-1",
+            "item": {
+              "id": "file-1",
+              "capability": "unix.file",
+              "status": "exists",
+              "fields": {
+                "full_path": {
+                  "datatype": "string",
+                  "value": "/srv/example/1",
+                  "status": "exists"
+                },
+                "owner_uid": {
+                  "datatype": "integer",
+                  "value": 1001,
+                  "status": "exists"
+                }
+              },
+              "provenance": {
+                "target_ref": "target-1",
+                "source_execution_ref": "collection-large-population-1"
+              }
+            },
+            "outcome": "false",
+            "state_results": [
+              {
+                "state_ref": "required-state",
+                "outcome": "false",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "false",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 1001,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "false",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 1001,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 1001; expected 0."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "item_ref": "file-2",
+            "item": {
+              "id": "file-2",
+              "capability": "unix.file",
+              "status": "exists",
+              "fields": {
+                "full_path": {
+                  "datatype": "string",
+                  "value": "/srv/example/2",
+                  "status": "exists"
+                },
+                "owner_uid": {
+                  "datatype": "integer",
+                  "value": 1002,
+                  "status": "exists"
+                }
+              },
+              "provenance": {
+                "target_ref": "target-1",
+                "source_execution_ref": "collection-large-population-1"
+              }
+            },
+            "outcome": "false",
+            "state_results": [
+              {
+                "state_ref": "required-state",
+                "outcome": "false",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "false",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 1002,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "false",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 1002,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 1002; expected 0."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "reason": "The assessment was logically decisive before the complete population was retained as evidence.",
+        "item_summary": {
+          "evaluated_items": 20,
+          "observed_mismatches": 20,
+          "actual_mismatches": "unknown",
+          "returned_items": 2,
+          "truncated_evidence": true
+        }
       }
     ],
     "objects": [
@@ -33,44 +172,13 @@
         "id": "large-file-population",
         "capability": "unix.file",
         "status": "incomplete",
-        "item_refs": ["file-1", "file-2"],
+        "item_refs": [
+          "file-1",
+          "file-2"
+        ],
         "logical_complete": true,
         "population_complete": false,
         "stop_reason": "evidence_maximum_reached"
-      }
-    ],
-    "items": [
-      {
-        "id": "file-1",
-        "capability": "unix.file",
-        "status": "exists",
-        "fields": {
-          "full_path": {
-            "datatype": "string",
-            "value": "/srv/example/1",
-            "status": "exists"
-          }
-        },
-        "provenance": {
-          "target_ref": "target-1",
-          "source_execution_ref": "collection-large-population-1"
-        }
-      },
-      {
-        "id": "file-2",
-        "capability": "unix.file",
-        "status": "exists",
-        "fields": {
-          "full_path": {
-            "datatype": "string",
-            "value": "/srv/example/2",
-            "status": "exists"
-          }
-        },
-        "provenance": {
-          "target_ref": "target-1",
-          "source_execution_ref": "collection-large-population-1"
-        }
       }
     ],
     "variables": [],
@@ -88,7 +196,9 @@
       "assessment": "example.large-population",
       "invocation_ref": "example-bounded-evidence-1",
       "outcome": "false",
-      "executed_tests": ["sampled-file-check"],
+      "executed_tests": [
+        "sampled-file-check"
+      ],
       "trace": [
         {
           "path": "example.large-population/evaluate",
@@ -103,6 +213,11 @@
       "diagnostics": []
     },
     "field_uses": [],
-    "dependent_assessments": []
+    "dependent_assessments": [],
+    "evidence_retention": {
+      "scope": "per_test",
+      "maximum_items": 2,
+      "source": "scanner_configuration"
+    }
   }
 }
