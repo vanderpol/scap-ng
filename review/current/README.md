@@ -4,7 +4,7 @@ This is the single active human-review entry point.
 
 ## Start here — one review path
 
-1. **Start with the policy:** [real Benchmark and Rule examples](../../specification/examples/README.md), with actual STIG titles, discussion, identifiers, fixes and publisher Profiles.
+1. **Start with the policy:** [Benchmark and Rule examples](../../specification/examples/README.md), with actual STIG titles, discussion, identifiers, fixes and publisher Profiles.
 2. **Then inspect the checks:** [automated and manual Assessment examples](../../specification/examples/assessments.md), including readable results and 0.3 modernizations.
 3. **Compare before and after:** [0.3 modernization review guide](REVIEW-GUIDE.md), including boundaries for conversions that remain fail-closed.
 4. **Inspect all six actual benchmark trees:** open [the latest verified end-to-end six-anchor build](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) and download the **`scap-ng-board-representative-review`** artifact under *Artifacts*. Its `authoring/` tree includes two Linux, two Windows, DNS and Apache STIGs; the build also produced normalized and compiled packages.
@@ -25,9 +25,7 @@ See the concise [deferred/out-of-scope list](../../specification/deferred-after-
 
 ## Historical 0.2.0 baseline — review closed
 
-The 0.2.0 package is frozen historical reference only. The stable 0.3
-owner-review candidate replaces it as the active review target; do not spend
-review time on 0.2.
+The 0.2.0 package is preserved as historical reference. The 0.3 candidate is the active review target.
 
 - [0.2.0 schema](../../schema/v0.2.0/README.md)
 - [0.2.0 source samples](../../board/review-content/0.2.0/README.md)
