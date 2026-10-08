@@ -10,7 +10,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 ## RHEL 9 Benchmark
 
-From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37813594321), excerpted without changing the shown fields:
+From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37839525823), excerpted without changing the shown fields:
 
 ```yaml
 benchmark:
