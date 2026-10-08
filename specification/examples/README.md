@@ -306,7 +306,7 @@ parameters:
 ```yaml
 assessment_choices:
   automated:
-    assessment: time-source.assessment.yaml
+    assessment: home-filesystem.assessment.yaml
     inputs:
       approved-filesystem-types-input:
         parameter: approved_filesystem_types
