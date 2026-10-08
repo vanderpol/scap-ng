@@ -364,6 +364,15 @@ def generate(mapping, repo_root, schema_version=None):
     item_meta = {}
     field_map = mapping["native"].get("state_field_map", {})
     datatype_overrides = mapping["native"].get("field_datatypes", {})
+    # State predicate datatype controls comparison/casting, whereas collected
+    # Item datatype controls evidence representation. These are distinct in
+    # OVAL: string Item data may be compared as an explicit integer State.
+    # 0.1/0.2 schemas are frozen; separate overrides apply only to 0.3.
+    state_datatype_overrides = (
+        mapping["native"].get("state_field_datatypes", {})
+        if version == "0.3.0" else {}
+    )
+
     for source_name, native_name in field_map.items():
         state_field = state_fields.get(source_name)
         if state_field is None:
@@ -384,7 +393,7 @@ def generate(mapping, repo_root, schema_version=None):
             "multiple": item_field.get("maxOccurs") not in (None, "1"),
         }
         state_names.append(native_name)
-        state_meta[native_name] = meta
+        state_meta[native_name] = {**meta, "datatypes": state_datatype_overrides.get(native_name, dtypes)}
         item_meta[native_name] = meta
 
     native_added_state_fields = mapping["native"].get("native_added_state_fields", {})
@@ -401,7 +410,7 @@ def generate(mapping, repo_root, schema_version=None):
             "multiple": item_field.get("maxOccurs") not in (None, "1"),
         }
         state_names.append(native_name)
-        state_meta[native_name] = meta
+        state_meta[native_name] = {**meta, "datatypes": state_datatype_overrides.get(native_name, dtypes)}
         item_meta[native_name] = meta
 
     item_only_map = mapping["native"].get("item_only_field_map", {})
