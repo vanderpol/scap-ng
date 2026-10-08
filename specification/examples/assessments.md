@@ -401,7 +401,7 @@ The examples above show how to read and write an Assessment; you don't need the 
 
 ### Where to find real source files
 
-The [0.3 six-benchmark review package](https://github.com/vanderpol/scap-ng/actions/runs/37839525823) contains real converted Linux, Windows, DNS and Apache authoring sources. The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real converted Rule and Assessment source paths. Search the downloadable `authoring/` tree for **`for_each:`** (not `foreach`), `shared_objects:`, `evaluate:`, or `assessment_choices:`.
+The [0.3 six-benchmark review package](https://github.com/vanderpol/scap-ng/actions/runs/37849528026) contains real converted Linux, Windows, DNS and Apache authoring sources. The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real converted Rule and Assessment source paths. Search the downloadable `authoring/` tree for **`for_each:`** (not `foreach`), `shared_objects:`, `evaluate:`, or `assessment_choices:`.
 
 In this pinned six-benchmark artifact there are **8 `for_each:` occurrences across 7 Assessments** and **79 `shared_objects:` occurrences**; these numbers describe a single build, not an entire standard or runtime scan. The checked `reported_elements:` entries in that bundle are all `all`—the bundle does **not** demonstrate selective redaction, native conditionals, Organizational Input binding, cross-Assessment result reuse, or *live* scanner output. See the [fixture catalog](0.3.0/results/README.md) for expressly synthetic results.
 

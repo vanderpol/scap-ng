@@ -1,54 +1,45 @@
-# SCAP-NG development roadmap
+# SCAP-NG roadmap
 
-Updated: 2026-10-08.
+Updated: October 8, 2026. **0.3.0 is the active pre-alpha release checkpoint**;
+0.2.0 is historical and does not require rebuilding as a 0.3 gate.
 
-SCAP-NG 0.3.0 is the active pre-alpha checkpoint. The 0.2.0 schema is
-historical evidence, not a content-reproduction requirement.
+## Now — finish the 0.3 checkpoint
 
-## Current — validate, review, then publish 0.3
+The [first full 65-source active-0.3 pipeline](https://github.com/vanderpol/scap-ng/actions/runs/37838382899)
+**succeeded** on `799d083`: 61 supported generated benchmark packages, four
+known nonstandard SQL-extension source blockers, schema and semantic checks,
+graph checks, normalization, compilation and test signing.
+The [follow-up run](https://github.com/vanderpol/scap-ng/actions/runs/37846666574)
+covers subsequent Organizational Input and Result changes and must pass
+independently. The [six-benchmark regression](https://github.com/vanderpol/scap-ng/actions/runs/37849528026)
+and [current documentation audit](https://github.com/vanderpol/scap-ng/actions/runs/37849528014)
+have passed at the later documentation checkpoint.
 
-The six-benchmark review candidate has passed an earlier full authoring build.
-The **active-0.3 full-corpus release gate is not yet green**: the previous run
-found 25 Google Chrome Registry-type semantic failures after conversion;
-the exact OVAL-to-native crosswalk fix is now in regression testing.
-The [new 65-source run](https://github.com/vanderpol/scap-ng/actions/runs/37838382899)
-is the relevant correctness checkpoint, not the earlier modernization census.
+Finish the final full-corpus gate, reconcile any real correctness failures,
+and obtain owner acceptance. Then publish a durable, checksum-identified
+review/prerelease package; an expiring Actions ZIP is not the final release
+asset. Keep the [release issue](https://github.com/vanderpol/scap-ng/issues/191)
+as the single authoritative release checklist.
 
-- Confirm the latest code's smoke/current-design and six-benchmark conversion,
-  schema, semantic, normalization and compilation gates.
-- Pass the active 0.3 full corpus: 61 supported packages, four explicit
-  deprecated SQL-extension blockers, zero unexplained semantic errors.
-- Review the complete current six-benchmark sample and result contracts,
-  then publish a permanent SHA-256-identified GitHub prerelease asset
-  **only after owner acceptance**.
+No new 0.3 feature design is required. Shared Observation and changes to
+`evaluate` are deferred; see the
+[scope boundary](specification/deferred-after-0.3.md).
 
-No new feature design is required merely to make 0.3 larger. Correctness
-repairs and explicitly accepted input/result contracts remain in scope.
+## Next — independent implementation and conformance
 
-Observation and evaluate redesign are deferred beyond 0.3; do not reopen them
-during checkpoint stabilization unless an implementation blocker proves the
-frozen requirements inconsistent.
+Build and exercise a reference evaluator/scanner, compare actual vendor
+execution against independently reviewed oracles, and test collected Item
+semantics, redaction, evidence retention, signing, caching, offline operation
+and enterprise-scale performance. Full automated Self-Assertion
+generation/execution/comparison is targeted at 1.0
+([#206](https://github.com/vanderpol/scap-ng/issues/206)).
 
-## Next — prove independent implementation
+## Later — governance and standards
 
-- Expand conformance/known-result coverage.
-- Build a minimal reference evaluator/scanner and perform differential execution.
-- Validate acquisition/collector behavior separately from schema/converter proof.
-- Measure packaging, memory use, concurrency, caching, offline behavior, and
-  enterprise-scale performance.
+Stabilize trust and packaging profiles, vendor-facing conformance material,
+versioned releases, and the standards path.
 
-## Later — release and standards path
-
-- Stabilize deterministic packaging and signing/trust profiles.
-- Complete implementation guidance and vendor-facing conformance material.
-- Promote releases from immutable reviewed checkpoints.
-- Carry accepted semantics and governance decisions into broader standards work.
-
-The [core objectives](specification/objectives.md) define why changes belong in
-SCAP-NG. [Objective-to-issue traceability](OBJECTIVES.md) maps active 0.3 work to
-those goals.
-
+[Core objectives](specification/objectives.md) ·
 [Current review](review/current/README.md) ·
-[Open issues](https://github.com/vanderpol/scap-ng/issues) ·
-[Specification](specification/README.md) ·
-[Current design](research/iterations/003/design/CURRENT-DESIGN.md)
+[Draft specification](specification/README.md) ·
+[Issues](https://github.com/vanderpol/scap-ng/issues)

@@ -10,7 +10,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 ## RHEL 9 Benchmark
 
-From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37839525823), excerpted without changing the shown fields:
+From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37849528026), excerpted without changing the shown fields:
 
 ```yaml
 benchmark:
@@ -176,7 +176,7 @@ That historical pilot passed conversion, optional-output checks, and native-docu
 
 Read the [Assessment examples](assessments.md) to see how that Rule is evaluated, including automated and manual checks, `for_each`, static values, direct Variable evaluation, conditional branches, Organization Input and bounded evidence. The [0.3 result fixture catalog](0.3.0/results/README.md) separately shows Scan, Benchmark, Automated Assessment and Manual Assessment results.
 
-The six-benchmark set passed conversion, schema/semantics, normalization and compilation in [run 37819025184](https://github.com/vanderpol/scap-ng/actions/runs/37819025184); the **full 65-source active-0.3 release gate remains open** after additional semantic-validation failures ([#202](https://github.com/vanderpol/scap-ng/issues/202)). Neither static validation nor synthetic results establish scanner-runtime equivalence.
+The six-benchmark set passed conversion, schema/semantics, normalization and compilation in [run 37849528026](https://github.com/vanderpol/scap-ng/actions/runs/37849528026). The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
 
 ## Technical reference (optional)
 
