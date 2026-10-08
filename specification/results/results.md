@@ -247,11 +247,33 @@ in the detailed Assessment Result through the preserved Test/State/Entity and
 effective input-binding data. Authoritative observations SHALL be retained
 through collected Items and the corresponding State/Entity/Test results.
 
-A Rule Result MAY reference the Assessment Result or a bounded evidence member
-needed for ordinary reporting, but SHALL NOT embed an independent
-`expected_state`, `observed_state`, or equivalent technical mini-graph.
-This avoids creating two separately evolving sources of truth for the same
-evaluation.
+A Rule Result SHALL have a bounded `findings` array. When reportable
+decisive evidence exists, comparison findings SHALL contain the subject/field,
+comparison operation, typed expected and observed values, policy outcome, and
+the contributing Rule-instance identity. When a required resource is missing,
+a missing-resource finding SHALL describe the required predicate and observed
+existence/collection status, without fabricating an Item.
+
+For multi-item checks a Rule Result MAY have compact `finding_counts`, recording
+the number of evaluated Items, observed violations, known or unknown actual
+violations, population completeness, retained Item witnesses and truncation.
+Returned examples SHALL NOT be mistaken for the full population. Both passing
+and failing Rules SHOULD include safe decisive findings where available.
+Manual and unresolved checks MAY have `findings: []`, with the Rule message,
+reason and Assessment references still explaining the outcome.
+
+Findings SHALL be a **deterministic, bounded projection** of authoritative
+Assessment execution, not a second Test evaluation or a copy of the full
+Test/Object/State/Item graph. `expected_state`, `observed_state`, and full
+execution-node arrays SHALL NOT be embedded in Rule Results. The Rule's basic
+cause SHALL be understandable without opening detailed Assessment Results;
+those results remain authoritative for collection, tests, provenance, and
+standalone Assessment scanning.
+
+Every Rule Result SHALL be embedded in its Benchmark Result's
+`rule_results[]`. `rule-result.schema.json` validates that embedded record;
+it does not create separate standalone Rule Result files. Optional standalone
+Rule events in a SIEM export are derived, non-authoritative projections.
 
 Organizational Input values that affect execution SHALL be retained in the
 Assessment Result's effective/consumed input bindings and in the Benchmark
@@ -616,10 +638,13 @@ These states SHALL NOT be represented as `fail`, `not_applicable`, or generic
 `error` merely because policy data was unavailable or unsupported.
 
 The Benchmark Result SHALL identify whether the scanner advertises
-Organizational Input capability. Rule Results SHALL continue to contain
-`expected_state` even in the not-evaluated cases; unresolved slots MAY omit or
-redact the value but SHALL retain enough structure/source information to show
-what expected State could not be resolved.
+Organizational Input capability. In a not-evaluated input-dependent Rule, the
+Rule message and structured reason SHALL identify the unresolved Parameter;
+`findings` SHALL NOT invent an observed value or an obsolete `expected_state`
+object. When evaluation succeeded using an authorized Organizational Input,
+safe typed expected/observed values MAY be copied into its decisive comparison
+finding, while input provenance remains in the canonical Benchmark registry
+and Assessment binding records.
 
 Versioned result schemas SHOULD validate these standardized reason codes and
 required result surfaces. Semantic validators SHALL additionally verify

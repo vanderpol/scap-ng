@@ -130,12 +130,24 @@ The current [0.3 Benchmark Result fixture](0.3.0/results/benchmark-result.json) 
       "code": "value_mismatch",
       "message": "The collected file owner did not match the required owner."
     },
-    "evidence_refs": ["config-file-1"]
+    "evidence_refs": ["config-file-1"],
+    "findings": [{
+      "kind": "comparison",
+      "instance_id": "instance-1",
+      "subject": {"kind": "file", "identifier": "/etc/example.conf"},
+      "field": "owner_uid",
+      "operation": "equals",
+      "expected": {"datatype": "integer", "status": "exists", "value": 0},
+      "observed": {"datatype": "integer", "status": "exists", "value": 1001},
+      "outcome": "fail",
+      "test_ref": "file-owner-is-root",
+      "item_ref": "config-file-1"
+    }]
   }]
 }
 ```
 
-The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#after-scanning-assessment-results-that-explain-why).
+The typed observed-versus-expected finding is **already inside the Benchmark Result**; readers need not open any additional file to see the essential cause. The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For complete Test/State/Item execution detail, see [Assessment Results that explain the root cause](assessments.md#after-scanning-assessment-results-that-explain-why).
 
 ### How Scan, Benchmark, and Assessment Results fit together
 

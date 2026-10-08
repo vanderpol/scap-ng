@@ -20,7 +20,7 @@ Each layer has one primary responsibility:
 | --- | --- | --- |
 | Scan Result | run identity, scanner identity, targets, package/index references, signature status | effective Benchmark policy, Rule outcomes, Assessment execution graphs |
 | Benchmark Result | Benchmark identity, target reference, effective policy, summary, collection of Rule Results | full scanner/target records, detailed Assessment execution |
-| Rule Result | effective Rule policy context, Rule outcome/reason, selected Assessment identity, invocation references, compact applicability disposition | collected Items, State/entity values, Variables, Test/Object graphs, bounded-evidence accounting, consumed Organizational Input execution detail |
+| Rule Result | effective Rule policy context, outcome/reason, selected Assessment identity, invocation references, applicability, **compact typed decisive findings** and optional population counts | raw collected Item records, full State/entity trees, Variables, Test/Object execution graphs, full evidence ledger, consumed Organizational Input provenance |
 | Assessment Result | one Assessment invocation, technical truth, Test/Object/Item/State/Entity/Variable graph, effective bindings, consumed Organizational Inputs, completeness and detailed evidence accounting | Benchmark policy aggregation or run-wide scanner/target inventory |
 | Test Result | one Test's aggregation and per-Item State results | Rule policy or run/Benchmark metadata |
 | Object Collection Result | one Object collection execution and Item references | State comparison or Rule policy |
@@ -30,8 +30,15 @@ Each layer has one primary responsibility:
 | Variable Result | one resolved runtime Variable value set and provenance | run/Benchmark/Rule policy |
 
 A derived SIEM/JSONL projection may intentionally denormalize these layers for
-query convenience. That projection is not authoritative schema ownership and
-must not drive duplication back into canonical results.
+query convenience. That projection is not authoritative schema ownership.
+
+**0.3 intentional overlap (#203):** A Rule Result in its parent Benchmark Result
+may repeat a limited, typed actual-versus-expected fact and associated
+subject because readers must understand why the Rule passed/failed without
+joining a Test/Object/State/Item graph. These facts are deterministic
+projections, not independently evaluated truth or full collected Item records.
+Collection counts distinguish evaluated Items from returned evidence. Detailed
+Assessment Results remain authoritative and independently scannable.
 
 ## What went wrong
 
@@ -61,9 +68,11 @@ validation error.
 
 The audit made these corrections:
 
-- Rule Result is now a compact policy-facing child of Benchmark Result.
+- Rule Result is a compact policy-facing child of Benchmark Result.
   `expected_state`, `observed_state`, `organizational_inputs`, and
-  `evidence_summary` were removed from Rule scope.
+  `evidence_summary` were removed from Rule scope. For 0.3, bounded
+  `findings` and optional `finding_counts` restore a useful typed
+  explanation without restoring the detailed child execution graph.
 - Benchmark Result now references the Scan-level target with `target_ref`;
   run-wide `scanner` and full `target` records are no longer duplicated.
 - Detailed Test/Object/Item/State/Entity/Variable schemas are explicitly closed

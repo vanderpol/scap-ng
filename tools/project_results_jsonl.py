@@ -96,6 +96,12 @@ def project_scan(
                 "instances": rule.get("instances", []),
                 "evidence_refs": rule.get("evidence_refs", []),
             }
+            # Preserve 0.1/0.2 frozen projections; new 0.3 fields are
+            # copied only when present in the authoritative Benchmark Result.
+            if "findings" in rule:
+                event["findings"] = rule["findings"]
+            if "finding_counts" in rule:
+                event["finding_counts"] = rule["finding_counts"]
             events.append(event)
 
     return events

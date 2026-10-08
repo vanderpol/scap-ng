@@ -6,9 +6,10 @@ about a live target scan.
 
 - [Scan Result](scan-result.json) — run/target index and references to normalized
   Benchmark and Assessment Results.
-- [Benchmark Result](benchmark-result.json) — policy-facing counters, Rule
-  outcomes, concise messages, reasons, applicability, and references to detailed
-  Assessment Results.
+- [Benchmark Result](benchmark-result.json) — policy-facing counters and
+  **embedded Rule Results**. Its automated Rule contains a typed owner-UID
+  comparison; the manual Rule has an explanatory message and Assessment
+  reference without fabricating collected Items.
 - [Assessment Result](assessment-result.json) — one Test with its collected file attributes, expected-versus-observed owner comparison, and provenance together.
 - [Multi-file Assessment Result](assessment-result-multi-file.json) — three files/directories, each reported beside its Test outcome with typed system attributes and comparisons.
 - [Bounded-evidence Assessment Result](assessment-result-bounded-evidence.json) — 20 observed failures, two retained Item details, incomplete population.
