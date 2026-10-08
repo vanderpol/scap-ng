@@ -239,6 +239,7 @@ jobs:
           root.mkdir(parents=True,exist_ok=True)
           shutil.copytree("work/board-source",root/"authoring")
           shutil.copytree("work/board-packages",root/"packages")
+          shutil.copytree("scap-ng/specification/examples/0.3.0/results",root/"results"/"synthetic-fixtures")
 
           normalizer=json.loads(Path("work/normalizer-report.json").read_text())
           review={
@@ -254,6 +255,7 @@ jobs:
               "layout":{
                   "authoring":"Readable normalized native SCAP-NG authoring trees intended for ongoing editing/maintenance; exact duplicate Assessments are shared under shared/assessments with meaningful names.",
                   "packages":"Compiled .scapng packages from the same source trees.",
+                  "results":"Explicitly synthetic 0.3 result schema fixtures; not observed target scan output.",
               },
               "shared_assessment_groups":normalizer["summary"]["exact_duplicate_groups"],
               "duplicate_assessment_definitions_avoided":normalizer["summary"]["duplicate_assessment_definitions_avoided"],
@@ -262,6 +264,7 @@ jobs:
           (root/"README.md").write_text(
               "# SCAP-NG representative OVAL Board review build\n\n"
               "Start with `authoring/` to review the maintainable native SCAP-NG source model, then inspect `packages/` for compiled distribution examples.\n\n"
+              "The `results/synthetic-fixtures/` directory contains illustrative 0.3 Scan, Benchmark, automated/manual Assessment and bounded-evidence Results. These are not scanner output from the six STIGs.\n\n"
               "This intentionally small review set contains RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025, Apache 2.4 UNIX Server, and Windows Server DNS.\n"
               "The paired Linux and Windows operating-system benchmarks intentionally make cross-benchmark shared Assessment reuse visible; the DNS and Apache Server benchmarks demonstrate service-specific coverage alongside operating-system STIGs.\n"
               "The exhaustive 65-package corpus remains regression evidence and is not part of this human-review artifact.\n",
