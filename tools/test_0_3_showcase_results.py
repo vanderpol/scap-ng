@@ -221,6 +221,9 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         without_item = copy.deepcopy(valid)
         del without_item["assessment_result"]["tests"][0]["per_item_results"][0]["item"]
         self.assertTrue(list(validator.iter_errors(without_item)))
+        without_summary = copy.deepcopy(valid)
+        del without_summary["assessment_result"]["tests"][0]["item_summary"]
+        self.assertTrue(list(validator.iter_errors(without_summary)))
         without_policy = copy.deepcopy(valid)
         del without_policy["assessment_result"]["evidence_retention"]
         self.assertTrue(list(validator.iter_errors(without_policy)))
