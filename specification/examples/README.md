@@ -79,7 +79,7 @@ The **Rule owns the requirement and fix**; its [automated Assessment](assessment
 
 **See the [complete worked Rule → Assessment example](assessments.md#automated-assessments)**, with both the real Rule's `assessment_choices` and the inline `object`, `states`, and `evaluate` YAML. Those examples are deliberately kept together on the Assessment page so a reader can follow the relationship without jumping back and forth.
 
-Source authoring still uses relative paths, resolved at packaging. The planned logical-ID form is tracked separately in [#199](https://github.com/vanderpol/scap-ng/issues/199).
+The **agreed 0.3 authoring contract** uses stable Assessment IDs instead of relative file paths. The remaining compiler/converter migration is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199); the linked walkthrough clearly labels its ID-based sample as the intended format.
 
 ## Publisher Profiles
 
@@ -172,6 +172,6 @@ This material is not needed to understand the policy examples.
 
 ### Cross-file reference implementation status
 
-The [worked RHEL 9 example](assessments.md#the-rule-points-to-an-assessment) shows the converter's actual path-based Assessment references. The compiler resolves them to Assessment IDs inside compiled packages; future source-level logical-ID references remain under [#199](https://github.com/vanderpol/scap-ng/issues/199).
+The [worked RHEL 9 example](assessments.md#the-rule-points-to-an-assessment) shows the agreed **logical-ID** authoring notation. At this pre-alpha checkpoint, the current compiler still resolves legacy source-path references; migration to native logical-ID lookup is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
 For measured assessment reductions, the exact `for_each:` search index, source provenance and broader census, see the [Assessment page's detailed evidence](assessments.md#detailed-reference-and-evidence). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.
