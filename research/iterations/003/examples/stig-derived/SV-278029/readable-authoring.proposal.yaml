@@ -1,0 +1,111 @@
+# Proposed SCAP-NG 0.3 authoring surface — NOT a current schema-valid Assessment.
+# Intent is to make real SV-278029 comprehensible to a Windows administrator.
+# Requires logical-reference resolution (#199), selector/State syntax (#200),
+# PDC Emulator detection, parsed NTP peers and explicit branch-result semantics.
+assessment:
+  id: example.sv-278029-windows-time
+  version: 1
+  assessment_title: Windows Server 2025 time synchronization
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  # Stable logical IDs — compiler resolves immutable, versioned content.
+  # windows.domain-joined is a proposed normalized ID for existing legacy content.
+  # windows.local-pdc-emulator is NOT YET IMPLEMENTED.
+  dependencies:
+    domain-joined:
+      assessment: windows.domain-joined
+      version: 1
+      purpose: applicability
+    local-pdc-emulator:
+      assessment: windows.local-pdc-emulator
+      version: 1
+      purpose: applicability
+
+  inputs:
+    authorized-time-sources-input:
+      datatype: string
+      cardinality: one_or_more
+      required: true
+      description: Approved time sources supplied by an authorized Input Set.
+
+  tests:
+    uses-domain-time-test:
+      capability: windows.registry
+      object:
+        select:
+          hive:
+            equals: local_machine
+          key:
+            equals: 'SYSTEM\CurrentControlSet\Services\W32Time\Parameters'
+          name:
+            equals: Type
+      states:
+        - expect:
+            value:
+              equals: NT5DS
+            # Explicit evidence-match quantifiers, pending concise syntax design.
+            entity_match: all
+            entity_existence: one_or_more
+      reported_elements: all
+      existence: one_or_more
+      match: all
+
+    uses-ntp-time-test:
+      capability: windows.registry
+      object:
+        select:
+          hive:
+            equals: local_machine
+          key:
+            equals: 'SYSTEM\CurrentControlSet\Services\W32Time\Parameters'
+          name:
+            equals: Type
+      states:
+        - expect:
+            value:
+              equals: NTP
+            entity_match: all
+            entity_existence: one_or_more
+      reported_elements: all
+      existence: one_or_more
+      match: all
+
+    approved-ntp-peers-test:
+      # A typed windows.time.peers collector is PROPOSED, not yet supported.
+      # Reading raw registry NtpServer and checking equals would be incorrect:
+      # it may contain multiple peers, commas, flags, and whitespace.
+      capability: windows.time.peers
+      object:
+        collect:
+          source: windows-time-client
+      states:
+        - expect:
+            # Explicitly require EVERY configured parsed peer to be authorized.
+            every_peer:
+              in:
+                input: authorized-time-sources-input
+            entity_match: all
+            entity_existence: one_or_more
+      reported_elements: all
+      existence: one_or_more
+      match: all
+
+  evaluate:
+    if:
+      all:
+        - assessment: domain-joined
+        - not:
+            assessment: local-pdc-emulator
+    then:
+      test: uses-domain-time-test
+    else:
+      if:
+        test: uses-ntp-time-test
+      then:
+        test: approved-ntp-peers-test
+      else:
+        # Source check wording leaves this case insufficiently specified.
+        # Never treat not_applicable or pass as an implicit default.
+        return: unknown
