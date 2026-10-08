@@ -100,7 +100,8 @@ jobs:
               report=json.loads(path.read_text(encoding="utf-8"))
               count=report.get("checked",report.get("mapping_count",report.get("checked_source_items","-")))
               failures=report.get("failures",report.get("structural_errors",[]))
-              status="PASS" if not failures else f"FAIL: {len(failures)}"
+              failure_count=failures if isinstance(failures,int) else len(failures)
+              status="PASS" if failure_count==0 else f"FAIL: {failure_count}"
               rows.append(f"| {label} | {status} | {count} |")
           summary="### SCAP-NG datatype and Item fidelity\n\n| Report | Status | Mappings or Items checked |\n|---|---|---|\n"+"\n".join(rows)+"\n"
           target=Path(__import__("os").environ["GITHUB_STEP_SUMMARY"])
