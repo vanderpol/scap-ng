@@ -262,320 +262,133 @@ The referenced file tests the real `gnome-shell` package using `linux.rpminfo` o
 
 ## Organizational Input
 
-**SCAP 1.4:** Organization-specific requirements can involve XCCDF Values,
-Tailoring, external OVAL variables, or scanner interaction. **SCAP-NG 0.3:**
-An organization supplies typed, approved values in a separate Input Set,
-without changing the publisher's Test logic.
+**SCAP 1.4:** Site-specific expected values often require XCCDF Values,
+Tailoring and OVAL external Variables. **SCAP-NG:** A Benchmark declares a
+typed organization-resolved Parameter; a Rule maps it to an Assessment input;
+the Assessment consumes the value directly. The Input Set is supplied and
+authorized independently, without changing publisher Test logic.
 
-**Completed example — fictional Production Operations team.** A publisher
-requires approved time servers but cannot know which servers each organization
-authorizes. An infrastructure engineer supplies the values, and a security
-manager approves them. This is the **complete authored input file**, not an
-automatic NIWC conversion or a live organization's policy:
+**Worked example (fictional policy, real supported capability):** The publisher
+requires the filesystem mounted at `/home` to have an organization-approved
+type. The organization approves `ext4` and `xfs`. Unlike an earlier example
+built around an unimplemented `linux.chrony` collector, this uses the supported
+`linux.partition` mapping, which exposes `mount_point` as a selector and
+`fs_type` as a State field. **This is still an integration research fixture:
+direct input resolution and evaluator behavior have not been proved
+end-to-end.** The fictional rule is not a DISA requirement.
 
-```yaml
-organizational_input:
-  id: example.production-site
-  version: 1
-  purpose: Supply organization-approved values delegated by the publisher.
+The explicit linkage is:
 
-  benchmark:
-    id: example.linux.security-policy
-    version: V1R1
-
-  intended_scope:
-    organization: Example Organization
-    organizational_unit: Production Operations
-    system_or_environment: production
-    description: Descriptive only; does not cause automatic scanner selection.
-
-  values:
-    approved_time_sources:
-      - ntp1.example.test
-      - ntp2.example.test
-
-  value_provenance:
-    approved_time_sources:
-      authority: Example Network Time Service Standard
-      reference: EXAMPLE-NET-TIME-001
-
-  effective_from: '2026-10-01T00:00:00-04:00'
-  expires_at: null
-
-  provenance:
-    organization: Example Organization
-    supplied_by:
-      id:
-        scheme: directory
-        value: policy-author@example.test
-      display_name: Example Policy Author
-      role: Infrastructure Policy Engineer
-    supplied_at: '2026-10-01T09:00:00-04:00'
-    source_system: Example Configuration Management Repository
-    authorized_by:
-      id:
-        scheme: directory
-        value: approver@example.test
-      display_name: Example Approver
-      role: Security Manager
-    authorized_at: '2026-10-01T10:00:00-04:00'
-    authorization_reference: EXAMPLE-CHANGE-1234
-    authorization_status: approved
-    contact:
-      email: security@example.test
-```
-
-**Provenance is required**, not an afterthought. The 0.3 schema requires
-`provenance.organization`, `supplied_by`, `supplied_at`, and
-`authorization_status`. It also supports the approver, authorization date
-and reference, contact, and source system. Optional `value_provenance`
-can distinguish different authorities for individual Parameters.
-
-The Benchmark declares the Parameter's type and constraints; the separate
-Input Set supplies its approved value. An Assessment Request **must explicitly
-bind** the Input Set—`intended_scope` alone never selects targets. Missing
-required input produces `not_evaluated`, rather than inventing a pass/fail.
-
-### Who creates the Organizational Input file?
-
-**Two distinct template-generation use cases should be kept separate:**
-
-1. **Publisher-generated templates (primary, current design):** When a
-   Benchmark explicitly delegates a Parameter to an organization, the content
-   author/build pipeline can publish a ready-to-fill template with the
-   Benchmark. Its allowed fields come from the publisher's Parameter and
-   Assessment-input contracts. Users should not have to write YAML from
-   scratch.
-2. **Scanner-generated templates (potential future Tailoring capability):**
-   If the OVAL Board decides Tailoring may use Organizational Input to vary
-   otherwise fixed expected-state values, a scanner could inspect a *chosen*
-   Rule/Assessment and generate a tailored input template for its eligible
-   State fields—even where the publisher did not predeclare Organizational
-   Input. This is more powerful than merely regenerating a publisher template,
-   and **is not authorized by the current 0.3 design**. It would require an
-   explicit policy-deviation contract, value-type/quantifier restrictions,
-   approval and provenance, and results identifying the changed policy.
-
-Both paths should ultimately produce understandable, machine-validated
-inputs, but the second would change the effective security requirement and
-cannot masquerade as an unchanged publisher STIG evaluation. Generation must
-never automatically authorize or apply an override.
-
-A generated template for the fictional time-source Parameter might begin as
-follows (illustrative **template**, deliberately not a completed or valid Input
-Set; placeholders must be supplied before use):
-
-```yaml
-organizational_input:
-  id: REPLACE-WITH-UNIQUE-INPUT-SET-ID
-  version: 1
-  purpose: Organization-authorized policy values
-  benchmark:
-    id: example.linux.security-policy
-    version: V1R1
-  values:
-    approved_time_sources: []  # REQUIRED: one or more approved hostnames
-  provenance:
-    organization: REPLACE-WITH-ORGANIZATION
-    supplied_by: REPLACE-WITH-IDENTITY
-    supplied_at: REPLACE-WITH-ISO-8601-TIMESTAMP
-    authorization_status: REPLACE-WITH-STATUS
-```
-
-The **completed** file above shows the result after the organization supplies
-values and authorization. A usable generator must represent missing fields as
-unresolved placeholders or prompts, not silently insert values that pass
-validation. Template content must be derived from the authoritative
-Benchmark/Rule/Assessment contracts, and a scanner must still validate the
-completed Input Set.
-
-**More complex inputs:** Parameters should support bounded typed lists, sets,
-and structured records where the technical Assessment genuinely needs them.
-A scanner could generate appropriate prompts for those structures, including
-required fields and restrictions. This is **organization-delegated expected
-state**, not arbitrary Test or State editing. A future OVAL Board discussion
-could consider integration with Tailoring, but that is not permission in 0.3
-to override fixed publisher requirements.
-
-**Implementation status:** A common schema exists for completed Input Sets;
-a normative interoperable *template-generation format and generator* have
-not yet been established. They need separate specification and conformance
-testing before being advertised as implemented.
-
-### How that value reaches a real check
-
-The Input Set is only one part of the workflow. In the same **fictional
-time-server example**, the publisher declares a required Parameter, the Rule
-binds it to the Assessment, and the Assessment compares collected system data
-against the supplied policy value. These are **illustrative authoring fragments**
-from the worked fixture, not a claim that this fictional benchmark was
-converted from a published STIG.
-
-**The exact identifiers that link the files** are shown below. Notice that
-the organization does **not** supply an Assessment input ID: it supplies the
-**Benchmark Parameter ID**; the Rule explicitly translates that into the
-Assessment input name.
-
-| From | Reference | Resolves to |
+| Owner | Authored identity | Meaning |
 | --- | --- | --- |
-| Input Set `values.approved_time_sources` | `approved_time_sources` | Benchmark `parameters[].id` |
-| Rule `inputs.required-time-sources-input.parameter` | `approved_time_sources` | Same Benchmark Parameter |
-| Rule `inputs` mapping key | `required-time-sources-input` | Assessment `inputs.required-time-sources-input` |
-| State `value.input` | `required-time-sources-input` | The same declared Assessment input, referenced directly |
-| Test `states` entry | `approved-time-source-state` | State using the supplied value |
-| Root `evaluate.test` | `time-sources-test` | Test performing the comparison |
+| Input Set | `values.approved_filesystem_types` | Organization-approved `[ext4, xfs]` |
+| Benchmark | `parameters[].id: approved_filesystem_types` | Publisher-delegated type/constraints |
+| Rule | `inputs.approved-filesystem-types-input.parameter` | Bind Parameter to Assessment contract |
+| Assessment | `inputs.approved-filesystem-types-input` | Named typed input |
+| State in Test | `value.input: approved-filesystem-types-input` | Compare collected `fs_type` against approved values |
 
-The Assessment Request separately selects **which Input Set** applies:
-`organizational_input.id: example.production-site` and
-`source: site.organizational-input.yaml`. Its matching
-`benchmark.id` and `benchmark.version` guard against supplying values
-for a different Benchmark.
-
-In other words, the path that carries the actual expected value is:
-
-```text
-values.approved_time_sources = [ntp1.example.test, ntp2.example.test]
-    -> Benchmark Parameter approved_time_sources
-    -> Rule maps approved_time_sources to required-time-sources-input
-    -> Assessment input required-time-sources-input
-    -> State approved-time-source-state: hostname compared directly to required-time-sources-input
-    -> Test time-sources-test
-    -> evaluate: time-sources-test
-```
-
-**1. Publisher's Benchmark** declares *what* the organization must supply,
-without inventing its server names:
+**Benchmark Parameter fragment:**
 
 ```yaml
 parameters:
-  - id: approved_time_sources
+  - id: approved_filesystem_types
     resolution: organization
     datatype: string
     cardinality: one_or_more
     required: true
-    description: Hostnames of organization-approved time sources.
+    constraints:
+      min_items: 1
+      unique_items: true
 ```
 
-**2. The Rule** connects that policy Parameter to the Assessment's named input:
+**Rule binding (fragment):**
 
 ```yaml
 assessment_choices:
   automated:
     assessment: time-source.assessment.yaml
     inputs:
-      required-time-sources-input:
-        parameter: approved_time_sources
+      approved-filesystem-types-input:
+        parameter: approved_filesystem_types
 ```
 
-The Rule also declares **exactly where that value is consumed**. This is
-Rule-level discoverability metadata; the Assessment remains authoritative
-about how the comparison works:
+**Assessment Test (fragment):**
 
 ```yaml
-organizational_input_requirements:
-  automated:
-    - input: approved_time_sources
-      required: true
-      uses:
-        - test: time-sources-test
-          state: approved-time-source-state
-          state_slot: hostname
-```
-
-This is the precise destination: the `hostname` expected-State field used
-by `time-sources-test`. The scanner can identify the consumer before
-execution, validate that the Rule's declaration agrees with the Assessment,
-and report missing/invalid input against that exact location. The supplied
-list does **not** apply globally to every Test or State in the Benchmark.
-One Input Set may supply several Parameters, and one Parameter may have
-several explicitly declared consumer locations, but there is no implicit
-broadcast to unrelated checks.
-
-**3. The Assessment** declares `required-time-sources-input` as an input.
-The **simplified membership form under research** would read:
-
-```yaml
-# PROPOSED AUTHORING SYNTAX — not yet valid 0.3 schema
 inputs:
-  required-time-sources-input:
+  approved-filesystem-types-input:
     datatype: string
     cardinality: one_or_more
     required: true
-states:
-  approved-time-source-state:
-    capability: linux.chrony
-    state:
-      field: hostname
-      operation: in
-      value:
-        input: required-time-sources-input
+tests:
+  home-filesystem-test:
+    capability: linux.partition
+    object:
+      capability: linux.partition
+      select:
+        mount_point:
+          value: /home
+          operation: equals
+          datatype: string
+    states:
+      - capability: linux.partition
+        state:
+          field: fs_type
+          operation: equals
+          datatype: string
+          variable_match: one_or_more
+          match: one_or_more
+          existence: one_or_more
+          value:
+            input: approved-filesystem-types-input
+    reported_elements: all
+    existence: one_or_more
+    match: all
+evaluate:
+  test: home-filesystem-test
 ```
 
-This makes the intended comparison visible: *a collected hostname is in the
-approved list*. The enclosing Test must still explicitly specify whether
-**all collected servers** must satisfy that State, and how missing/incomplete
-collection is handled. The `in` proposal does not settle those semantics.
+The State consumes an input **without a pass-through Variable**. The
+`variable_match` quantifier makes the expected-value aggregation explicit;
+`match: all` on the Test applies to collected partitions. The shorter
+`operation: in` expression is [under research](../../research/iterations/003/design/membership-comparison-research.md),
+not valid 0.3 syntax.
 
-**Implementation status:** `operation: in` is **research only**, not accepted
-or executable 0.3 syntax (see [membership research](../../research/iterations/003/design/membership-comparison-research.md)).
-The [currently authored fixture](../../research/iterations/003/examples/organizational-input/time-source.assessment.yaml)
-instead uses `operation: equals`, an explicit `variable_match: one_or_more`,
-and a **direct** `value: {input: required-time-sources-input}` reference; it has
-no pass-through Variable. That direct-input path still requires full
-semantic/evaluator conformance testing. The short proposal above intentionally
-omits additional required fields and is not a standalone valid Assessment.
+**Completed Organization Input Set:** The separate
+[example Input Set](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml)
+records `approved_filesystem_types: [ext4, xfs]`, source/authority,
+organization, supplier, timestamps, approver and authorization status. These
+values are fictional. The
+[Assessment Request](../../research/iterations/003/examples/organizational-input/assessment-request.yaml)
+explicitly selects that Input Set; descriptive scope metadata never selects a
+target implicitly. Missing required input produces `not_evaluated`, not an
+invented pass/fail.
 
-**Why the binding lives in the Rule, not only the Assessment.** The
-Assessment answers a reusable technical question—*is every configured time
-source on the supplied approved list?*—without knowing which Benchmark or
-organization owns that list. The Rule owns the published requirement and
-explicitly connects its Benchmark Parameter `approved_time_sources` to the
-generic Assessment input `required-time-sources-input`. Two Rule contexts could
-reuse the same Assessment with different publisher-declared Parameters,
-without cloning the Test. This is also a policy-to-execution audit boundary.
+**Why is the binding in the Rule?** The Assessment remains reusable and does
+not hard-code the Benchmark's policy Parameter ID. Different Rules may bind
+different authorized policy Parameters to its same technical input. The
+additional Rule-level `organizational_input_requirements` discovery map may
+ultimately be generated at compilation instead of authored twice; this is
+still an architecture-audit question, not an accepted change.
 
-The downside is **another name and mapping to follow**, especially when an
-Assessment is used by just one Rule. A possible future simplification is to
-generate the Rule's `organizational_input_requirements` (Test/State/slot
-discovery index) from its input binding plus the Assessment's actual input
-consumers. It should not require an author to manually maintain a second,
-potentially inconsistent linkage. We have **not** removed the Rule binding:
-putting a Benchmark-specific Parameter ID inside a reusable Assessment would
-couple policy to technical logic, while implicit identical-name matching would
-hide a critical contract.
+### Who provides templates?
 
-**4. The Assessment Request** explicitly selects the approved Input Set:
+For **publisher-delegated Organizational Input**, the preferred path is for
+the content author/build process to generate a ready-to-fill, typed Input Set
+template at publication. The scanner should be able to present or validate
+it; people should not author complex YAML from scratch.
 
-```yaml
-assessment_request:
-  id: example-production-scan
-  benchmark:
-    id: example.linux.security-policy
-    version: V1R1
-  organizational_input:
-    id: example.production-site
-    version: 1
-    source: site.organizational-input.yaml
-```
+If the OVAL Board later permits Tailoring of otherwise fixed expected-State
+values, a scanner could generate an input template for an eligible
+Rule/Assessment on demand. That is **a different, future capability**, requiring
+policy-deviation identity, approval, precise State-slot bindings and semantics.
+It is not an authority to overwrite published requirements in 0.3. See
+[issue #196](https://github.com/vanderpol/scap-ng/issues/196).
 
-**5. At execution**, the processor validates and freezes the approved values
-(`ntp1.example.test` and `ntp2.example.test`) and evaluates the target's
-configured time servers against them. The Input Set supplies **expected
-policy data**, never commands, collector selection, or a changed Test. If the
-required input is missing, the dependent Assessment is `not_evaluated`
-with reason `missing_organizational_input`—not a guessed pass or fail.
-
-The [full Assessment fixture](../../research/iterations/003/examples/organizational-input/time-source.assessment.yaml),
-[Rule binding](../../research/iterations/003/examples/organizational-input/rule-fragment.yaml),
-[Benchmark Parameter](../../research/iterations/003/examples/organizational-input/benchmark-parameter.yaml),
-[Assessment Request](../../research/iterations/003/examples/organizational-input/assessment-request.yaml),
-and [resolved policy example](../../research/iterations/003/examples/organizational-input/resolved-context.yaml)
-show the complete connection. Their design-fixture status is distinct from
-the validated converted STIG examples above.
-
-See the [complete example file](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml),
-[worked integration example](../../research/iterations/003/examples/organizational-input/README.md),
-and [0.3 JSON Schema](../../schema/v0.3.0/organizational-input.schema.json).
+The [worked files](../../research/iterations/003/examples/organizational-input/README.md)
+illustrate the Benchmark Parameter, Rule fragment, Assessment, Input Set,
+request and resolved context. **The integrated fixture remains research-only
+until schema, compiler and evaluator conformance are demonstrated.**
 
 ## Profiles and Tailoring
 
