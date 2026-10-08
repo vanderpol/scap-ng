@@ -354,7 +354,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
             raise ValueError(f"{from_path}: Assessment reference escapes source root")
         actual = doc["assessment"]
         if expected_version is not None and actual.get("version") != expected_version:
-            raise ValueError(f"{from_path}: Assessment {reference} version mismatch")
+            raise ValueError(f"{from_path}: Assessment {reference} expected_version mismatch")
         if expected_purpose is not None and actual.get("purpose") != expected_purpose:
             raise ValueError(f"{from_path}: Assessment {reference} purpose mismatch")
         return target, doc
