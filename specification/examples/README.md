@@ -130,9 +130,9 @@ Two optional presentations are rendered **from the native SCAP-NG content**, not
 - **HTML review:** browse Rule titles, severity, discussion, check procedure, and fix text.
 - **Excel audit checklist:** the same policy and check text, with controlled results, evidence/notes, evaluator, and review-date fields.
 
-[View the Active Directory Forest HTML and Excel pilot workflow](https://github.com/vanderpol/scap-ng/actions/workflows/stig-manual-audit-outputs.yml). Open a successful run and find the `active-directory-forest-stig-manual-pilot` artifact; it contains native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. The workflow regenerates these examples from its pinned DISA manual.
+[Download the verified Active Directory Forest pilot artifact](https://github.com/vanderpol/scap-ng/actions/runs/37821933656/artifacts/11570215522) from the [successful validation run](https://github.com/vanderpol/scap-ng/actions/runs/37821933656). It contains native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. The [workflow](https://github.com/vanderpol/scap-ng/actions/workflows/stig-manual-audit-outputs.yml) regenerates these files from its pinned DISA manual when the artifact expires.
 
-The manual pilot uses the earlier path-based authoring and conversion validation. The workflow additionally checks its Benchmark, Rule, and Manual Assessment documents against the **0.3 schemas**; source-level logical-ID resolution is a separate, unfinished change ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example demonstrates the manual-audit path; the RHEL 9 example above demonstrates automated checking.
+That run passed the conversion audit, optional-output checks, and validation of the Benchmark, Rule, and Manual Assessment documents against **both 0.2 and 0.3 schemas**. Source authoring is still path-based; the separate logical-ID migration remains unfinished ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example demonstrates the manual-audit path; the RHEL 9 example above demonstrates automated checking.
 
 ## What comes next?
 
