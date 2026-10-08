@@ -22,29 +22,26 @@
         "rule-file-owner": "automated",
         "rule-home-nosuid": "manual"
       },
-      "parameters": {
-        "approved_owner_uid": 0
-      },
+      "parameters": {},
       "organizational_inputs": {
-        "example-site-owner-policy": {
-          "parameter": "approved_owner_uid",
-          "value": 0,
+        "org-file-owner": {
+          "parameter": "site_approved_file_owner_uid",
           "source": "organizational_input",
+          "value": 0,
+          "redacted": false,
           "input_set": {
-            "id": "example.production-site",
+            "id": "example.production-security-values",
             "version": 1
           },
           "provenance": {
             "organization": "Example Organization",
-            "supplied_by": "Example Security Engineer",
+            "supplied_by": "Example Security Administrator",
             "supplied_at": "2026-10-08T10:00:00Z",
-            "authorized_by": "Example Security Manager",
-            "authorized_at": "2026-10-08T10:05:00Z",
-            "authorization_reference": "EXAMPLE-POLICY-2026",
             "authorization_status": "approved",
-            "source_system": "Example site policy service"
+            "authorization_reference": "EXAMPLE-SEC-42"
           },
-          "redacted": false
+          "effective_from": "2026-10-01T00:00:00Z",
+          "expires_at": null
         }
       }
     },
@@ -60,7 +57,7 @@
     "rule_results": [
       {
         "rule_id": "rule-file-owner",
-        "title": "The configuration file must be owned by root.",
+        "title": "The organization-designated configuration file owner must be used.",
         "severity": "medium",
         "outcome": "fail",
         "assessment": {
@@ -68,7 +65,7 @@
           "version": 1,
           "mode": "automated"
         },
-        "message": "Observed UID 1001; expected UID 0.",
+        "message": "Organization-approved owner UID 0; observed UID 1001.",
         "reason": {
           "code": "value_mismatch",
           "message": "The collected file owner did not match the required owner."
@@ -122,16 +119,14 @@
         ],
         "organizational_inputs": [
           {
-            "organizational_input_ref": "example-site-owner-policy",
-            "parameter": "approved_owner_uid",
-            "effective_value": {
-              "datatype": "integer",
-              "status": "exists",
-              "value": 0
-            },
-            "authority_summary": {
+            "parameter": "site_approved_file_owner_uid",
+            "organizational_input_ref": "org-file-owner",
+            "value": 0,
+            "redacted": false,
+            "provenance_summary": {
               "organization": "Example Organization",
-              "authorization_reference": "EXAMPLE-POLICY-2026"
+              "authorization_reference": "EXAMPLE-SEC-42",
+              "effective_from": "2026-10-01T00:00:00Z"
             }
           }
         ]

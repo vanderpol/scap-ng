@@ -102,6 +102,10 @@ def project_scan(
                 event["findings"] = rule["findings"]
             if "finding_counts" in rule:
                 event["finding_counts"] = rule["finding_counts"]
+            # 0.3 compact organization-defined expected policy value and
+            # canonical provenance ref; never copy the full Benchmark registry.
+            if "organizational_inputs" in rule:
+                event["organizational_inputs"] = rule["organizational_inputs"]
             events.append(event)
 
     return events

@@ -20,7 +20,7 @@ Each layer has one primary responsibility:
 | --- | --- | --- |
 | Scan Result | run identity, scanner identity, targets, package/index references, signature status | effective Benchmark policy, Rule outcomes, Assessment execution graphs |
 | Benchmark Result | Benchmark identity, target reference, effective policy, summary, collection of Rule Results | full scanner/target records, detailed Assessment execution |
-| Rule Result | effective Rule policy context, outcome/reason, selected Assessment identity, invocation references, applicability, **compact typed decisive findings** and optional population counts | raw collected Item records, full State/entity trees, Variables, Test/Object execution graphs, full evidence ledger, consumed Organizational Input provenance |
+| Rule Result | effective Rule policy context, outcome/reason, selected Assessment identity, invocation references, applicability, **compact typed decisive findings** and optional population counts | raw collected Item records, full State/entity trees, Variables, Test/Object execution graphs, full evidence ledger, complete Organizational Input supplier/authorization records (compact policy value + canonical registry reference is permitted) |
 | Assessment Result | one Assessment invocation, technical truth, Test/Object/Item/State/Entity/Variable graph, effective bindings, consumed Organizational Inputs, completeness and detailed evidence accounting | Benchmark policy aggregation or run-wide scanner/target inventory |
 | Test Result | one Test's aggregation and per-Item State results | Rule policy or run/Benchmark metadata |
 | Object Collection Result | one Object collection execution and Item references | State comparison or Rule policy |
@@ -28,6 +28,14 @@ Each layer has one primary responsibility:
 | State Result | one State evaluation for one Item | Rule policy |
 | Entity Result | one State-entity comparison/aggregation | run/Benchmark/Rule policy |
 | Variable Result | one resolved runtime Variable value set and provenance | run/Benchmark/Rule policy |
+
+**0.3 Organizational Input contract (#203):** A Rule consuming Organizational
+Input exposes only its compact effective expected value (or explicit redaction),
+Benchmark Parameter and stable reference to the authoritative Benchmark Result
+provenance assertion. This is **not** the full consumed-input execution record
+or a second authority source. The Assessment Result owns Test/State slot use,
+while Benchmark Result owns supplier/authorizer/timestamps. Cross-result
+reference/value equality requires semantic conformance checks.
 
 A derived SIEM/JSONL projection may intentionally denormalize these layers for
 query convenience. That projection is not authoritative schema ownership.

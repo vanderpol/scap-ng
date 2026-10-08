@@ -11,6 +11,8 @@ about a live target scan.
   **embedded Rule Results**. Its automated Rule contains a typed owner-UID
   comparison; the manual Rule has an explanatory message and Assessment
   reference without fabricating collected Items.
+- [Organizational Input Benchmark Result](benchmark-result-organizational-input.json) — **synthetic**, with one authoritative approved value/provenance record and concise Rule-level value and reference.
+- [Matching Organizational Input Assessment Result](assessment-result-organizational-input.json) — **synthetic**, records the exact consumed State input and stable provenance reference without copying supplier/authorizer details.
 - [Assessment Result](assessment-result.json) — one Test with its collected file attributes, expected-versus-observed owner comparison, and provenance together.
 - [Passing, routine Items omitted](assessment-result-pass-omitted.json) — **synthetic** complete evaluation of 10,000 file-owner comparisons, zero failures and zero retained system Items; no evidence truncation.
 - [Passing, decisive positive witness](assessment-result-pass-witness.json) — **synthetic** required file observed with UID 0, retaining its typed Item and comparison as useful proof of success.

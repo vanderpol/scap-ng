@@ -149,6 +149,70 @@ class RuleFindingSemanticsTests(unittest.TestCase):
         rule["finding_counts"]["actual_violations"] = 12
         self.assertTrue(list(self.validator.iter_errors(doc)))
 
+    def test_organizational_input_value_and_provenance_are_linked_not_duplicated(self):
+        doc = json.loads((E / "benchmark-result-organizational-input.json").read_text())
+        assessment = json.loads((E / "assessment-result-organizational-input.json").read_text())
+        self.assertEqual(list(self.validator.iter_errors(doc)), [])
+        rule = doc["benchmark_result"]["rule_results"][0]
+        registry = doc["benchmark_result"]["effective_policy"]["organizational_inputs"]
+        consumed = assessment["assessment_result"]["consumed_organizational_inputs"]
+        required = {entry["organizational_input_ref"] for entry in consumed
+                    if entry["materialized"]}
+        self.assertEqual(
+            validate_rule_result_semantics(
+                rule, organizational_input_registry=registry,
+                required_organizational_input_refs=required,
+            ), [],
+        )
+        self.assertEqual(rule["organizational_inputs"][0]["value"], 0)
+        self.assertNotIn("supplied_by", rule["organizational_inputs"][0])
+        self.assertIn("supplied_by", registry["org-file-owner"]["provenance"])
+
+    def test_organizational_input_mismatch_unknown_ref_and_missing_disclosure(self):
+        doc = json.loads((E / "benchmark-result-organizational-input.json").read_text())
+        rule = doc["benchmark_result"]["rule_results"][0]
+        registry = doc["benchmark_result"]["effective_policy"]["organizational_inputs"]
+        params = {"organizational_input_registry":registry,
+                  "required_organizational_input_refs":{"org-file-owner"}}
+        rule["organizational_inputs"][0]["value"] = 17
+        self.assertIn("organizational_input.value_mismatch",
+                      [e["code"] for e in validate_rule_result_semantics(rule, **params)])
+        rule["organizational_inputs"][0]["value"] = 0
+        rule["organizational_inputs"][0]["provenance_summary"]["authorization_reference"] = "FALSE-42"
+        self.assertIn("organizational_input.provenance_mismatch",
+                      [e["code"] for e in validate_rule_result_semantics(rule, **params)])
+        rule["organizational_inputs"][0]["provenance_summary"]["authorization_reference"] = "EXAMPLE-SEC-42"
+        rule["organizational_inputs"][0]["organizational_input_ref"] = "unrecognized"
+        failures = [e["code"] for e in validate_rule_result_semantics(rule, **params)]
+        self.assertIn("organizational_input.unknown_ref", failures)
+        self.assertIn("organizational_input.consumed_ref_not_exposed", failures)
+        rule["organizational_inputs"] = []
+        self.assertIn("organizational_input.consumed_ref_not_exposed",
+                      [e["code"] for e in validate_rule_result_semantics(rule, **params)])
+
+    def test_organizational_input_redaction_and_no_duplicate_policy_values(self):
+        doc = json.loads((E / "benchmark-result-organizational-input.json").read_text())
+        rule = doc["benchmark_result"]["rule_results"][0]
+        registry = doc["benchmark_result"]["effective_policy"]["organizational_inputs"]
+        entry = rule["organizational_inputs"][0]
+        entry["redacted"] = True
+        self.assertTrue(list(self.validator.iter_errors(doc)),
+                        "schema must prohibit a redacted value being copied")
+        entry.pop("value")
+        self.assertEqual(list(self.validator.iter_errors(doc)), [])
+        self.assertEqual(validate_rule_result_semantics(
+            rule, organizational_input_registry=registry), [])
+        registry["org-file-owner"]["redacted"] = True
+        registry["org-file-owner"].pop("value")
+        self.assertEqual(validate_rule_result_semantics(
+            rule, organizational_input_registry=registry), [])
+        entry["redacted"] = False
+        entry["value"] = 0
+        failures = [e["code"] for e in validate_rule_result_semantics(
+            rule, organizational_input_registry=registry)]
+        self.assertIn("organizational_input.authority_redaction_violation", failures)
+        self.assertIn("organizational_input.value_mismatch", failures)
+
     def test_wrong_instance_and_retained_count(self):
         rule = self.doc()["benchmark_result"]["rule_results"][0]
         rule["findings"][0]["instance_id"] = "unbound"

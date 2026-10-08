@@ -8,7 +8,11 @@ scanner or an independent source of assessment truth.
 from __future__ import annotations
 
 
-def validate_rule_result_semantics(rule: dict) -> list[dict]:
+def validate_rule_result_semantics(
+    rule: dict, *,
+    organizational_input_registry: dict | None = None,
+    required_organizational_input_refs: set[str] | None = None,
+) -> list[dict]:
     errors = []
 
     def report(code: str, path: str):
@@ -40,6 +44,56 @@ def validate_rule_result_semantics(rule: dict) -> list[dict]:
                 reported_ids.add((finding["instance_id"], finding["item_ref"]))
         elif finding["kind"] == "missing" and "item_ref" in finding:
             report("finding.fabricated_missing_item", f"{path}.item_ref")
+
+    # Rule-level data is a bounded view of the authoritative Benchmark-level
+    # provenance registry, never a second independently supplied policy value.
+    # The caller passes consumed refs from authoritative Assessment Results when
+    # those documents are available. Schema validation runs first.
+    seen_refs = set()
+    seen_parameters = set()
+    for index, entry in enumerate(rule.get("organizational_inputs") or []):
+        path = f"organizational_inputs[{index}]"
+        if not isinstance(entry, dict):
+            report("organizational_input.invalid", path)
+            continue
+        ref, parameter = entry.get("organizational_input_ref"), entry.get("parameter")
+        if not isinstance(ref, str) or not ref:
+            report("organizational_input.invalid_ref", f"{path}.organizational_input_ref")
+            continue
+        if ref in seen_refs or parameter in seen_parameters:
+            report("organizational_input.duplicate", path)
+        seen_refs.add(ref)
+        seen_parameters.add(parameter)
+        if entry.get("redacted") is True and "value" in entry:
+            report("organizational_input.redacted_value_leak", f"{path}.value")
+        if organizational_input_registry is None:
+            continue
+        source = organizational_input_registry.get(ref)
+        if not isinstance(source, dict):
+            report("organizational_input.unknown_ref", f"{path}.organizational_input_ref")
+            continue
+        if parameter != source.get("parameter"):
+            report("organizational_input.parameter_mismatch", f"{path}.parameter")
+        if source.get("redacted") is True and entry.get("redacted") is not True:
+            report("organizational_input.authority_redaction_violation", f"{path}.redacted")
+        if entry.get("redacted") is not True:
+            if "value" not in source or source["value"] != entry.get("value"):
+                report("organizational_input.value_mismatch", f"{path}.value")
+        summary = entry.get("provenance_summary")
+        if isinstance(summary, dict):
+            provenance = source.get("provenance") or {}
+            for field in ("organization", "authorization_reference"):
+                if field in summary and summary[field] != provenance.get(field):
+                    report("organizational_input.provenance_mismatch",
+                           f"{path}.provenance_summary.{field}")
+            for field in ("effective_from", "expires_at"):
+                if field in summary and summary[field] != source.get(field):
+                    report("organizational_input.provenance_mismatch",
+                           f"{path}.provenance_summary.{field}")
+    if required_organizational_input_refs is not None:
+        for missing in sorted(required_organizational_input_refs - seen_refs):
+            report("organizational_input.consumed_ref_not_exposed",
+                   f"organizational_inputs[{missing!r}]")
 
     counts = rule.get("finding_counts")
     if counts is not None:

@@ -243,32 +243,35 @@
     },
     "organizational_inputs": {
       "type": "array",
-      "description": "Effective organization-supplied expected-state values actually used by this Rule, each linked to exactly one authoritative Benchmark Result organizational-input registry entry. Empty/absent only when the Rule did not consume Organizational Input. Never duplicates the complete authority or contact record.",
+      "description": "Concise organization-defined expected policy values actually used by this Rule, each linked to the single authoritative Benchmark Result effective_policy.organizational_inputs assertion. Omit for Rules that consume no Organizational Input. Full supplier/authorization records remain at Benchmark scope; do not copy execution graphs.",
       "items": {
         "type": "object",
         "required": [
-          "organizational_input_ref",
           "parameter",
-          "effective_value"
+          "organizational_input_ref",
+          "redacted"
         ],
         "properties": {
-          "organizational_input_ref": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Exact key in benchmark_result.effective_policy.organizational_inputs; not an Input Set filename."
-          },
           "parameter": {
             "type": "string",
             "minLength": 1,
-            "description": "Benchmark Parameter ID resolved by the Rule's selected Assessment."
+            "description": "Effective organization-resolved Benchmark Parameter."
           },
-          "effective_value": {
-            "$ref": "result-types.schema.json#/$defs/typed_value",
-            "description": "Typed resolved value shown to a Rule reader. Redaction SHALL be at least as restrictive as the canonical registry."
+          "organizational_input_ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Exact key in benchmark_result.effective_policy.organizational_inputs, not a source filename."
           },
-          "authority_summary": {
+          "value": {
+            "description": "Effective expected policy value; the same typed JSON value as the authoritative assertion, unless disclosure is restricted."
+          },
+          "redacted": {
+            "type": "boolean",
+            "description": "Explicit policy-value redaction indicator; never combine true with value."
+          },
+          "provenance_summary": {
             "type": "object",
-            "description": "Optional small reviewer-facing context; complete provenance lives in the Benchmark Result registry.",
+            "description": "Optional concise nonauthoritative authority summary from the referenced Benchmark assertion, not a second provenance truth.",
             "properties": {
               "organization": {
                 "type": "string",
@@ -277,11 +280,45 @@
               "authorization_reference": {
                 "type": "string",
                 "minLength": 1
+              },
+              "effective_from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expires_at": {
+                "type": "string",
+                "format": "date-time"
               }
             },
             "additionalProperties": false
           }
         },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "redacted": {
+                  "const": true
+                }
+              },
+              "required": [
+                "redacted"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "value"
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        ],
         "additionalProperties": false
       }
     },

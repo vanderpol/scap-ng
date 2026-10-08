@@ -142,6 +142,21 @@ class ProjectionTests(unittest.TestCase):
         self.assertNotIn("evidence_summary", event)
         self.assertNotIn("organizational_inputs", event)
 
+    def test_03_organizational_value_and_provenance_ref_are_projected(self):
+        benchmark=benchmark_doc()
+        rule=benchmark["benchmark_result"]["rule_results"][0]
+        rule["organizational_inputs"]=[{
+            "parameter":"org_file_owner",
+            "organizational_input_ref":"org-input-1",
+            "value":0,
+            "redacted":False,
+        }]
+        event=project_scan(
+            scan_doc(),{"benchmark-results/example.json":benchmark}
+        )[1]
+        self.assertEqual(event["organizational_inputs"],rule["organizational_inputs"])
+        self.assertNotIn("provenance",event["organizational_inputs"][0])
+
     def test_non_boolean_rule_outcomes_are_preserved(self):
         for outcome in ("error", "unknown", "not_evaluated", "not_applicable"):
             with self.subTest(outcome=outcome):
