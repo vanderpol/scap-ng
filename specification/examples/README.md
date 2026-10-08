@@ -91,6 +91,41 @@ rule:
 
 The compiler must discover IDs in a declared scope, reject missing or ambiguous references, and package immutable resolved identities. **Implementation is not yet complete** ([#199](https://github.com/vanderpol/scap-ng/issues/199)); the real transitional source-path form is documented [below](#cross-file-reference-implementation-status).
 
+## The automated Assessment — the actual check
+
+Following the Rule's automated choice leads to a **real converted RHEL 9 Assessment** checking that the `/home` mount includes the `nosuid` option. Here is the core check (metadata and other fields omitted):
+
+```yaml
+tests:
+  home-mounted-nosuid-option-test:
+    capability: linux.partition
+    object:
+      capability: linux.partition
+      select:
+        mount_point:
+          value: .*\\/home
+          operation: pattern_match
+          datatype: string
+    states:
+      - capability: linux.partition
+        state:
+          field: mount_options
+          value: nosuid
+          operation: equals
+          datatype: string
+          match: one_or_more
+          existence: one_or_more
+    reported_elements: all
+    existence: one_or_more
+    match: all
+evaluate:
+  test: home-mounted-nosuid-option-test
+```
+
+Reading this top to bottom: **`test`** names the check, its local **`object`** selects the `/home` filesystem, the local **`state`** says which mount option is required, and **`evaluate`** selects the Test whose technical outcome is returned. There is no need to jump to separate Object and State files just to understand this simple check.
+
+This excerpt is from the real converted RHEL 9 `SV-257851` automated Assessment, not a new proposed syntax. For standalone automated/manual Assessments, the Test-centered **result format**, and modern features, continue to the [Assessment examples](assessments.md).
+
 ## Publisher Profiles
 
 The RHEL 9 Benchmark defines **11 publisher Profiles**. The `CAT_I_Only` Profile includes:
@@ -145,7 +180,7 @@ The current [0.3 Benchmark Result fixture](0.3.0/results/benchmark-result.json) 
 }
 ```
 
-The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#assessment-results-that-explain-the-root-cause).
+The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#assessment-results-actual-system-data-beside-every-test).
 
 ### How Scan, Benchmark, and Assessment Results fit together
 
