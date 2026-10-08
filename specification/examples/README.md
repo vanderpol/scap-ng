@@ -8,6 +8,31 @@ the complete review build are linked when more detail is useful.
 > post-0.3 research are labeled separately. An example does not become normative
 > merely because it validates or appears on this page.
 
+## 0.3 at a glance
+
+SCAP-NG 0.3 is now backed by both focused conformance tests and production-scale
+migration evidence:
+
+- **6/6 representative benchmarks pass** schema and semantic validation: RHEL 9,
+  Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and
+  Apache 2.4 UNIX.
+- The final **65-package NIWC census converts 61 packages**, with the remaining
+  **4 blocked only by the already-known unsupported SQL extension** and **0
+  unexpected blockers**.
+- Proven automatic modernization found **55 real `for_each` rewrites** and folded
+  **509 compile-time constant Variables** while keeping runtime/dataflow Variables
+  explicit.
+- Across 6,916 Rule Assessments, the modernized authoring view reduces top-level
+  Object entries by **95.68%**, State entries by **100%**, Variables by **59.69%**,
+  and named component references by **94.42%**.
+
+Those percentages describe **authoring-structure reduction**, not scanner runtime
+performance. The point is that authors and reviewers can see the same supported
+assessment meaning with far less graph indirection. See the
+[0.3 modernization review guide](../../review/current/REVIEW-GUIDE.md) for real
+before/after STIG examples and the [current review page](../../review/current/README.md)
+for the validated build and corpus evidence.
+
 ## Benchmark → Rule → Assessment
 
 **SCAP 1.4:** Policy lives in XCCDF while automated checks commonly live in
@@ -384,9 +409,8 @@ tests:
       ...
 ```
 
-The post-freeze 65-package census removes more than 95% of top-level Object/State
-registry entries while preserving exact re-expansion. Final checkpoint counts are
-regenerated from the frozen build stack rather than copied from earlier research runs.
+The final corpus census confirms that this locality model applies broadly, not
+just to hand-picked examples; the headline measurements are summarized above.
 
 ## Static values without Variable plumbing
 
@@ -505,23 +529,12 @@ checkpoint. See [#166](https://github.com/vanderpol/scap-ng/issues/166).
 0.3 keeps applicability explicit and reuses ordinary applicability Assessments
 where useful. It does not add another dedicated sharing construct.
 
-## Complete six-benchmark 0.3 review build
+## Review the complete 0.3 sample set
 
-The current generated review set contains RHEL 9, Oracle Linux 9, Windows 11,
-Windows Server 2025, Windows Server DNS, and Apache 2.4 UNIX Server, with
-faithful and modernized authoring trees. All six benchmark jobs plus package
-assembly pass in the linked run. The package REVIEW-GUIDE maps every accepted
-0.3 modernization to real converted content or a clearly labeled
-production-derived native-authoring example when automatic conversion must
-remain fail-closed.
-
-[Open the current successful workflow run](https://github.com/vanderpol/scap-ng/actions/runs/37706133572)
-and download `scap-ng-0.3-human-review-candidate` from its **Artifacts** section.
-
-Direct Actions artifact URLs are intentionally not used because they are not
-durable navigation links. At the stable 0.3 review checkpoint, the reviewed ZIP
-will be published as a versioned GitHub Release asset with its SHA-256 and linked
-here.
+Start with the maintained [modernization review guide](../../review/current/REVIEW-GUIDE.md),
+then use the six complete faithful/candidate benchmark trees and scorecards in the
+validated owner-review artifact. The [current review page](../../review/current/README.md)
+is the single source for the active build, provenance, and download instructions.
 
 ## Current 0.3 result files
 
