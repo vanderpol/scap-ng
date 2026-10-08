@@ -73,6 +73,18 @@ def main():
             encoding="utf-8",
         )
     print(json.dumps({k: v for k, v in summary.items() if k != "results"}, indent=2))
+    if summary["invalid"]:
+        # Preserve full diagnostics in the JSON report, but print a bounded
+        # actionable sample in the job log. Otherwise a corpus failure only
+        # shows a count and requires downloading a large CI artifact.
+        limit = 25
+        invalid_rows = (row for row in results if not row["valid"])
+        for row in list(invalid_rows)[:limit]:
+            print(f"INVALID Assessment {row['path']}")
+            for diagnostic in row["diagnostics"][:5]:
+                print("  " + json.dumps(diagnostic, ensure_ascii=False, sort_keys=True))
+        if summary["invalid"] > limit:
+            print(f"... {summary['invalid'] - limit} additional invalid Assessments; see --report JSON")
     return 1 if summary["invalid"] else 0
 
 
