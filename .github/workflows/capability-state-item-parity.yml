@@ -129,3 +129,33 @@ jobs:
           cat capability-state-item-parity.json
           cat capability-state-item-parity-v03.json
           exit 1
+
+  publish-audit-run:
+    name: Publish audit run link
+    needs: [parity]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Record reproducible CI run on issue 201
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PARITY_RESULT: ${{ needs.parity.result }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "<!-- scap-ng-v03-fidelity-ci-run -->"
+            echo "### Latest automated SCAP-NG 0.3 datatype fidelity run"
+            echo ""
+            echo "- Result: **${PARITY_RESULT}**"
+            echo "- Run: ${RUN_URL}"
+            echo "- Source SHA: \`${SOURCE_SHA}\`"
+            echo "- CI reports: run artifacts and job logs at the run link"
+            echo ""
+            echo "This automated result does not certify the full 65-benchmark corpus."
+          } > "${RUNNER_TEMP}/scap-ng-fidelity-ci-comment.md"
+          gh issue comment 201 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/scap-ng-fidelity-ci-comment.md"
