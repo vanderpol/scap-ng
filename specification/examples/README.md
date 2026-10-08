@@ -137,6 +137,23 @@ evaluate:
             - test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
 ```
 
+A **native authoring alternative derived from this same real STIG Rule** could put the role choice at the point of decision:
+
+```yaml
+evaluate:
+  all:
+    - test: default-permissions-hkey-local-machine-security-registry-key-maintained-test
+    - test: default-non-domain-controller-permissions-hkey-local-machine-software-registry-test
+    - if:
+        test: system-windows-domain-controller-test
+      then:
+        test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
+      else:
+        test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
+```
+
+This is **source-derived native syntax, not generated candidate output**: a publisher choosing it must accept the defined conditional behavior for non-Boolean role results. The source-equivalent converter does not silently make that policy choice. For example, if the role Test is `unknown` and *both* permission Tests are `false`, the original Boolean expression is `false` but the conditional branch cannot be selected and returns `unknown`.
+
 For an *authored* `if/then/else` form, use the [conditional conformance suite](../../tests/conditional-0.2.0/README.md), explicitly labeled as a fixture. It is **not** the output for SV-278001. [Production conditional research](../../research/assessment-simplification/conditional-10/README.md) demonstrates why the rewrite is unsafe for error, unknown, not-evaluated, and not-applicable outcomes. The conditional syntax itself predates 0.3.
 
 ## Manual Assessments
@@ -220,6 +237,8 @@ profiles:
 ```
 
 An external Tailoring example needs invented local policy decisions; the [RHEL 9 worked tailoring fixture](../../research/iterations/003/examples/tailoring-all-options/tailoring/rhel9-example.tailoring.yaml) explicitly identifies its authorization and exceptions as fictional rather than claiming publisher approval.
+
+**Result provenance:** All result snippets in the following sections are deliberately **synthetic 0.3 conformance fixtures**, not results produced by scanning a real STIG target. They demonstrate the output schema and root-cause/completeness fields; source Assessment conversion and observed target evidence are separate claims. See the [fixture index](0.3.0/results/README.md).
 
 ## Compact Benchmark and Rule Results
 
