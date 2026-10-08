@@ -27,7 +27,7 @@ rule:
       assessment: SV-257851.manual
 ```
 
-The Rule and requirement are real; the **ID-based links show the agreed authoring design**, not the current converter's output. Compiler support for resolving these IDs is still pending ([#199](https://github.com/vanderpol/scap-ng/issues/199)).
+The Rule and requirement are real. The **compiler now resolves these logical IDs** to Assessment source files and packages them automatically. Existing SCAP 1.4 converter output still uses transitional relative paths; migrating generated content and verifying all cross-file reference types remains tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
 ### 2. The automated check keeps its Object and State nearby
 

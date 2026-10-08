@@ -396,6 +396,9 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
 
     compiled_benchmark = json.loads(json.dumps(benchmark_doc))
     applicability_path = benchmark_dir / "applicability.yaml"
+    declared_applicability = compiled_benchmark["benchmark"].get("applicability_catalog")
+    if not applicability_path.exists() and declared_applicability:
+        raise ValueError(f"{benchmark_path}: unresolved applicability_catalog {declared_applicability}")
     if applicability_path.exists():
         applicability_doc = load_yaml(applicability_path)
         app_root = applicability_doc.get("applicability") or {}
@@ -439,6 +442,11 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
             }
         }
         app_id = app_root.get("id") or f"{benchmark['id']}.applicability"
+        if declared_applicability not in (None, "applicability.yaml", app_id):
+            raise ValueError(
+                f"{benchmark_path}: applicability_catalog {declared_applicability!r} "
+                f"does not resolve to catalog identity {app_id!r}"
+            )
         add_object(
             app_id,
             "applicability_catalog",

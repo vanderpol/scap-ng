@@ -77,7 +77,7 @@ def validate_package(root: Path, reference_root: Path | None = None, documents=N
             for folder in (root / "assessments", root / "shared",
                            root / "rules", reference_root / "shared")
         )
-        if allowed:
+        if allowed or (kind == "applicability" and candidate == root / "applicability.yaml"):
             scoped_index.setdefault(payload["id"], []).append((candidate, kind, payload))
 
     resolved_files = {}

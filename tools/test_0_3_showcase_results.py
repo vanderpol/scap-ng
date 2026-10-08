@@ -119,7 +119,7 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
             self.assertNotIn("/", reference, "Authors use IDs, not file paths")
             self.assertNotIn("\\", reference, "Authors use IDs, not file paths")
             self.assertFalse(reference.endswith(".yaml"))
-        self.assertIn("Compiler support for resolving these IDs is still pending", intro)
+        self.assertIn("compiler now resolves these logical IDs", intro)
         test = assessment["tests"]["home-mounted-nosuid-option-test"]
         self.assertEqual(test["object"]["capability"], "linux.partition")
         self.assertIn("mount_point", test["object"]["select"])

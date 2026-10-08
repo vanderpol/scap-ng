@@ -90,6 +90,20 @@ class NativePackageGraphValidationTests(unittest.TestCase):
             errors = validate_package(package, reference_root=corpus)
             self.assertIn("reference_ambiguous", {row["code"] for row in errors})
 
+    def test_benchmark_logical_catalog_reference(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self.build_valid(root)
+            benchmark_path = root / "benchmark.yaml"
+            benchmark = yaml.safe_load(benchmark_path.read_text())
+            benchmark["benchmark"]["applicability_catalog"] = "b.applicability"
+            write(benchmark_path, benchmark)
+            self.assertEqual(validate_package(root), [])
+            benchmark["benchmark"]["applicability_catalog"] = "missing.catalog"
+            write(benchmark_path, benchmark)
+            self.assertIn("reference_missing",
+                          {row["code"] for row in validate_package(root)})
+
     def test_logical_id_wrong_type_and_version_are_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

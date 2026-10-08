@@ -180,6 +180,28 @@ class ContentCompilerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unresolved Rule source reference"):
                 compile_benchmark(root, bench)
 
+    def test_applicability_catalog_logical_identity_and_no_silent_fallback(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "corpus"
+            bench = root / "example"
+            catalog = {"applicability": {"id": "example.platform", "conditions": {}}}
+            dump(bench / "benchmark.yaml", {"benchmark": {
+                "id": "example", "version": {"value": "1"},
+                "rules": [], "profiles": [],
+                "applicability_catalog": "example.platform"}})
+            dump(bench / "applicability.yaml", catalog)
+            _, members, index = compile_benchmark(root, bench)
+            compiled = json.loads(members[index["example"]["path"]])["benchmark"]
+            self.assertEqual(compiled["applicability_catalog"], "example.platform")
+            dump(bench / "benchmark.yaml", {"benchmark": {
+                "id": "example", "version": {"value": "1"},
+                "rules": [], "profiles": [], "applicability_catalog": "wrong.id"}})
+            with self.assertRaisesRegex(ValueError, "does not resolve to catalog identity"):
+                compile_benchmark(root, bench)
+            (bench / "applicability.yaml").unlink()
+            with self.assertRaisesRegex(ValueError, "unresolved applicability_catalog"):
+                compile_benchmark(root, bench)
+
     def test_runtime_manifest_omits_authoring_source_paths_and_verifies_graph(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"corpus"

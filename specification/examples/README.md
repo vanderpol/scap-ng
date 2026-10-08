@@ -79,7 +79,7 @@ The **Rule owns the requirement and fix**; its [automated Assessment](assessment
 
 **See the [complete worked Rule → Assessment example](assessments.md#start-here-the-rule-and-its-automated-assessment)**, with both the real Rule's `assessment_choices` and the inline `object`, `states`, and `evaluate` YAML. Those examples are deliberately kept together on the Assessment page so a reader can follow the relationship without jumping back and forth.
 
-The **agreed 0.3 authoring contract** uses stable Assessment IDs instead of relative file paths. The remaining compiler/converter migration is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199); the linked walkthrough clearly labels its ID-based sample as the intended format.
+The **0.3 authoring contract** uses stable Assessment IDs instead of relative file paths. The compiler now supports this format; legacy converter output still uses a transitional path bridge. Full source migration and remaining linkage tests are tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
 ## Publisher Profiles
 
