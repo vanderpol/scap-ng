@@ -361,44 +361,13 @@ along with assessor identity, time, comments, and evidence references.
 Full example:
 [0.3 Manual Assessment Result](0.3.0/results/manual-assessment-result.json).
 
-## Normalized Scan, Benchmark, and Assessment results
-
-**SCAP 1.4:** ARF commonly packages several result layers into one XML document,
-which can make reuse, streaming, indexing, and selective retrieval awkward.
-
-**SCAP-NG:** Scan, Benchmark, and Assessment Results are independently addressable.
-The Scan Result indexes targets and result members without duplicating the
-detailed Assessment graph.
-
-```json
-{
-  "benchmark_results": [{
-    "benchmark_result_ref": "benchmark-result.json",
-    "target_ref": "target-1"
-  }],
-  "assessment_result_refs": [
-    "assessment-result.json",
-    "manual-assessment-result.json"
-  ]
-}
-```
-
-Full example: [0.3 Scan Result](0.3.0/results/scan-result.json).
+Run-level summaries and result indexing are shown alongside the policy in the [Benchmark and Rule results](README.md#readable-benchmark-and-rule-results).
 
 ## Real-world design cases — 0.3.0 review
 
 **Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. This example supports side-by-side comparison of original requirements and proposed authoring.
 
 **Focused companion: [Windows Server 2025 SV-278217 — DWORD Registry type/value](../../research/iterations/003/examples/stig-derived/SV-278217/README.md).** Tests whether streamlined authoring preserves `REG_DWORD` versus `REG_SZ` versus `REG_MULTI_SZ`, numeric type and explicit existence. This is **also proposed research syntax** and does **not** replace the NTP case.
-
-## Current 0.3 result files
-
-- [Result example overview](0.3.0/results/README.md)
-- [Scan Result](0.3.0/results/scan-result.json)
-- [Benchmark Result](0.3.0/results/benchmark-result.json)
-- [Automated Assessment Result](0.3.0/results/assessment-result.json)
-- [Bounded-evidence Assessment Result](0.3.0/results/assessment-result-bounded-evidence.json)
-- [Manual Assessment Result](0.3.0/results/manual-assessment-result.json)
 
 ## Additional authoring details
 
