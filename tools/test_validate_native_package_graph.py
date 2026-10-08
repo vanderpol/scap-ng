@@ -69,6 +69,44 @@ class NativePackageGraphValidationTests(unittest.TestCase):
             self.assertIn("reference_escape",{r["code"] for r in rows})
 
 
+    def test_native_logical_ids_resolve_without_author_paths(self):
+        with tempfile.TemporaryDirectory() as td:
+            corpus = Path(td)
+            package = corpus / "pkg"
+            self.build_valid(package)
+            registry_path = package / "applicability.yaml"
+            registry = yaml.safe_load(registry_path.read_text())
+            registry["applicability"]["conditions"]["platform.rhel"]["assessment"] = "platform.rhel"
+            write(registry_path, registry)
+            rule_path = package / "rules/R1.rule.yaml"
+            rule = yaml.safe_load(rule_path.read_text())
+            rule["rule"]["assessment_choices"]["default"]["assessment"] = "R1.auto"
+            write(rule_path, rule)
+            self.assertEqual(validate_package(package, reference_root=corpus), [])
+            original = package / "assessments/R1.assessment.yaml"
+            original.rename(package / "assessments/moved.yaml")
+            self.assertEqual(validate_package(package, reference_root=corpus), [])
+            write(corpus / "shared/assessments/copy.yaml", {"assessment": {"id": "R1.auto"}})
+            errors = validate_package(package, reference_root=corpus)
+            self.assertIn("reference_ambiguous", {row["code"] for row in errors})
+
+    def test_logical_id_wrong_type_and_version_are_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self.build_valid(root)
+            rule_path = root / "rules/R1.rule.yaml"
+            rule = yaml.safe_load(rule_path.read_text())
+            rule["rule"]["assessment_choices"]["default"] = {
+                "assessment": "R1.auto", "expected_version": 8}
+            write(rule_path, rule)
+            errors = validate_package(root)
+            self.assertIn("reference_missing", {row["code"] for row in errors})
+            rule["rule"]["assessment_choices"]["default"] = {"assessment": "R1.auto"}
+            write(rule_path, rule)
+            write(root / "assessments/R1.assessment.yaml", {"rule": {"id": "R1.auto"}})
+            errors = validate_package(root)
+            self.assertIn("reference_wrong_type", {row["code"] for row in errors})
+
     def test_missing_assessment_reference(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); self.build_valid(root)

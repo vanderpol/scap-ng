@@ -65,24 +65,64 @@ def validate_package(root: Path, reference_root: Path | None = None, documents=N
         except ValueError:
             return owner.relative_to(reference_root).as_posix()
 
-    def resolve(owner: Path, ref, expected_kind):
-        if not isinstance(ref,str) or not ref:
-            diagnostics.append({"code":"reference_invalid","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind})
+    # Mirror the content compiler's declared import scope: current Benchmark
+    # (including its local shared directory) plus corpus-level shared.
+    # Do not accidentally bind another Benchmark's same-named Assessment.
+    scoped_index = {}
+    for candidate, (kind, payload) in documents.items():
+        if not isinstance(payload, dict) or not payload.get("id"):
+            continue
+        allowed = any(
+            candidate.is_relative_to(folder)
+            for folder in (root / "assessments", root / "shared",
+                           root / "rules", reference_root / "shared")
+        )
+        if allowed:
+            scoped_index.setdefault(payload["id"], []).append((candidate, kind, payload))
+
+    resolved_files = {}
+    def resolve(owner: Path, ref, expected_kind, expected_version=None, expected_purpose=None):
+        if not isinstance(ref, str) or not ref:
+            diagnostics.append({"code": "reference_invalid", "owner": owner_display(owner),
+                                "reference": ref, "expected_kind": expected_kind})
             return None
-        target=(owner.parent/ref).resolve()
-        try:
-            target.relative_to(reference_root)
-        except ValueError:
-            diagnostics.append({"code":"reference_escape","owner":owner_display(owner),"reference":ref})
+        if "/" in ref or "\\\\" in ref or ref.endswith((".yaml", ".yml")):
+            target = (owner.parent / ref).resolve()
+            if not target.is_relative_to(reference_root):
+                diagnostics.append({"code": "reference_escape", "owner": owner_display(owner),
+                                    "reference": ref})
+                return None
+            found = documents.get(target)
+            if found is None:
+                diagnostics.append({"code": "reference_missing", "owner": owner_display(owner),
+                                    "reference": ref, "expected_kind": expected_kind})
+                return None
+            kind, payload = found
+        else:
+            matches = scoped_index.get(ref, [])
+            if expected_version is not None:
+                matches = [entry for entry in matches
+                           if entry[2].get("version") == expected_version]
+            if len(matches) != 1:
+                diagnostics.append({"code": "reference_missing" if not matches else "reference_ambiguous",
+                                    "owner": owner_display(owner),
+                                    "reference": ref, "expected_kind": expected_kind})
+                return None
+            target, kind, payload = matches[0]
+        if kind != expected_kind:
+            diagnostics.append({"code": "reference_wrong_type", "owner": owner_display(owner),
+                                "reference": ref, "expected_kind": expected_kind,
+                                "actual_kind": kind})
             return None
-        found=documents.get(target)
-        if found is None:
-            diagnostics.append({"code":"reference_missing","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind})
+        if expected_version is not None and payload.get("version") != expected_version:
+            diagnostics.append({"code": "reference_version_mismatch", "owner": owner_display(owner),
+                                "reference": ref, "expected_version": expected_version})
             return None
-        kind,payload=found
-        if kind!=expected_kind:
-            diagnostics.append({"code":"reference_wrong_type","owner":owner_display(owner),"reference":ref,"expected_kind":expected_kind,"actual_kind":kind})
+        if expected_purpose is not None and payload.get("purpose") != expected_purpose:
+            diagnostics.append({"code": "reference_purpose_mismatch", "owner": owner_display(owner),
+                                "reference": ref, "expected_purpose": expected_purpose})
             return None
+        resolved_files[(owner, ref)] = target
         return payload
 
     rule_ids=benchmark.get("rules") or []
@@ -94,7 +134,7 @@ def validate_package(root: Path, reference_root: Path | None = None, documents=N
     conditions=(registry or {}).get("conditions") or {}
 
     if registry:
-        reg_path=(bench_path.parent/app_ref).resolve()
+        reg_path=resolved_files[(bench_path, app_ref)]
         for cid,binding in conditions.items():
             if not isinstance(binding,dict):
                 diagnostics.append({"code":"applicability_binding_invalid","condition":cid})
@@ -119,7 +159,8 @@ def validate_package(root: Path, reference_root: Path | None = None, documents=N
             if not isinstance(choice,dict):
                 diagnostics.append({"code":"rule_choice_invalid","rule":rid,"selector":selector})
                 continue
-            resolve(path,choice.get("assessment"),"assessment")
+            resolve(path, choice.get("assessment"), "assessment",
+                    expected_version=choice.get("expected_version"))
         unresolved=set(rule.get("applicability") or [])-set(conditions)
         if unresolved:
             diagnostics.append({"code":"rule_applicability_missing","rule":rid,"conditions":sorted(unresolved)})
