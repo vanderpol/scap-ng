@@ -25,9 +25,9 @@ The poll is **nonbinding**. Choosing words is not a decision to adopt a second l
 | Require field instances to exist / satisfy | State `existence`, `match` | `expect.*.existence`, `expect.*.match` | `field_values.existence`, `field_values.satisfy` |
 | Choose / combine technical results | `evaluate` / `test` | implicit one-`check` root in this sketch | explicit `evaluate` / `check` |
 | Specify visible result fields | `reported_elements` | `report.elements` | `evidence.fields` |
-| Remain independently typed | Test, Object and State capabilities | one `collect` suggests a shortcut — **unresolved** | capabilities explicit at each scope |
+| Declare capability / preserve type identity | Test, inline Object, inline State **all explicitly repeat it** | one `collect` declaration (proposed) | one typed `check` declaration (proposed) |
 
-The terms in B and C are *discussion candidates*, not approved enumerations. `inspect` is meant to denote read-only **assessment intent**, not to ban safe collector execution; `expect` is comparison, not remediation. This table is not a complete language mapping.
+The terms in B and C are *discussion candidates*, not approved enumerations. `inspect` denotes read-only **assessment intent**, not a ban on safe collector execution; `expect` means comparison, not remediation. **Separate structural question:** the active 0.3 schema currently requires `capability` on the Test and its inline Object and State, and the semantic validator requires these to match. B and C *propose* declaring it once, with a precise lexical binding rule; this reduction is **not implemented in 0.3**. A reflects actual 0.3, while B/C compare experimental authoring. Do not choose a vocabulary merely because it has fewer repeated `capability` lines. [Architecture tracking #197](https://github.com/vanderpol/scap-ng/issues/197).
 
 ## Same real source requirement
 
@@ -87,7 +87,7 @@ check:
     elements: all
 ```
 
-This reads as *collect partitions → where the mount point matches → expect `nosuid` → require matching Items → report fields*. The compact shape hides the independent Test/Object/State capability declarations and drops the explicit single-Test `evaluate`; a production translator would need to reconstruct both without ambiguity. This is **not Ansible playbook syntax**.
+This reads as *collect partitions → where the mount point matches → expect `nosuid` → require matching Items → report fields*. It also proposes a single capability declaration and an implicit single-check evaluation root. Neither shorthand is supported by the 0.3 schema; a production translator would need to materialize and validate both deterministically. This is **not Ansible playbook syntax**.
 
 ## C — Inspection-oriented (research-only syntax)
 
@@ -96,14 +96,12 @@ checks:
   home-mounted-nosuid-option-test:
     capability: linux.partition
     inspect:
-      capability: linux.partition
       select:
         mount_point:
           matches_regex: '.*\\/home'
           datatype: string
     expect:
-      - capability: linux.partition
-        field: mount_options
+      - field: mount_options
         equals: nosuid
         datatype: string
         field_values:
@@ -119,14 +117,14 @@ evaluate:
   check: home-mounted-nosuid-option-test
 ```
 
-This reads as *inspect partitions → select the mount → expect the option → apply explicit Item and field-value constraints → retain evidence → evaluate a named check*. It keeps independent capability declarations and a visible root. It is slightly longer than B by design, not a claim of better scanner behavior.
+This reads as *inspect partitions → select the mount → expect the option → apply explicit Item and field-value constraints → retain evidence → evaluate a named check*. The **single** `capability` on this named Check is proposed to determine the private inline Object/State capability; unlike B it also retains an explicit evaluation root. This lexical binding is **not yet a valid 0.3 construct** and must be proven safe rather than assumed.
 
 ## What must not change just because the words change
 
 - **Source selection:** All three examples preserve the source regex scalar `.*\\/home` (two literal backslash characters in the authored YAML). The source-derived regex text must be preserved **exactly under YAML decoding and regex processing**. Replacing it with a literal `/home` would potentially change the selected resources. The prototype must prove exact literal/regex semantics.
 - **Different quantifier scopes:** Test `existence: one_or_more` applies to collected Items; Test `match: all` combines Item outcomes. State `existence: one_or_more` applies to observed field instances; State `match: one_or_more` combines State field comparisons. These cannot be silently collapsed.
 - **Technical outcomes:** `true`, `false`, `error`, `unknown`, `not_evaluated` and `not_applicable` retain their meanings. A policy pass is not universally identical to an Assessment's technical `true`.
-- **Capabilities, collection, evidence:** Multiple capabilities, missing or incomplete Items, typed selectors and expectations, reporting/redaction rules, and evidence/provenance remain explicit. `evidence` must not silently become a collection limit or permission to omit required proof.
+- **Capabilities, collection, evidence:** 0.3 requires independent capability fields on Test/inline Object/inline State even when equal; the validator rejects mismatches. A hypothetical one-declaration private-component binding (as in B/C) must resolve capability deterministically, keep independently named/shared and nested components correctly typed, and fail on incompatible cross-capability use. Missing/incomplete Items, typed selectors and expectations, reporting/redaction rules, and evidence/provenance remain explicit. `evidence` must not silently become a collection limit or permission to omit required proof.
 - **More complicated Assessments:** Multi-Test `evaluate`, named Test results, Set/Filter/Variable algebra, correlated `for_each` Item populations, and Organizational Input must be representable without inventing Ansible-like procedural semantics.
 - **No hidden defaults:** A shorter authoring presentation would need a strict, versioned, lossless translation to the canonical typed model or an equally explicit canonical schema. The current two speculative excerpts **do not** meet that bar.
 
