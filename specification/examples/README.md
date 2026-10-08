@@ -419,9 +419,9 @@ Assessment input name.
 | From | Reference | Resolves to |
 | --- | --- | --- |
 | Input Set `values.approved_time_sources` | `approved_time_sources` | Benchmark `parameters[].id` |
-| Rule `inputs.required_time_sources.parameter` | `approved_time_sources` | Same Benchmark Parameter |
-| Rule `inputs` mapping key | `required_time_sources` | Assessment `inputs.required_time_sources` |
-| State `value.input` | `required_time_sources` | The same declared Assessment input, referenced directly |
+| Rule `inputs.required-time-sources-input.parameter` | `approved_time_sources` | Same Benchmark Parameter |
+| Rule `inputs` mapping key | `required-time-sources-input` | Assessment `inputs.required-time-sources-input` |
+| State `value.input` | `required-time-sources-input` | The same declared Assessment input, referenced directly |
 | Test `states` entry | `state-source-approved` | State using the supplied value |
 | Root `evaluate.test` | `test-time-sources` | Test performing the comparison |
 
@@ -436,9 +436,9 @@ In other words, the path that carries the actual expected value is:
 ```text
 values.approved_time_sources = [ntp1.example.test, ntp2.example.test]
     -> Benchmark Parameter approved_time_sources
-    -> Rule maps approved_time_sources to required_time_sources
-    -> Assessment input required_time_sources
-    -> State state-source-approved: hostname compared directly to required_time_sources
+    -> Rule maps approved_time_sources to required-time-sources-input
+    -> Assessment input required-time-sources-input
+    -> State state-source-approved: hostname compared directly to required-time-sources-input
     -> Test test-time-sources
     -> evaluate: test-time-sources
 ```
@@ -463,7 +463,7 @@ assessment_choices:
   automated:
     assessment: time-source.assessment.yaml
     inputs:
-      required_time_sources:
+      required-time-sources-input:
         parameter: approved_time_sources
 ```
 
@@ -491,13 +491,13 @@ One Input Set may supply several Parameters, and one Parameter may have
 several explicitly declared consumer locations, but there is no implicit
 broadcast to unrelated checks.
 
-**3. The Assessment** declares `required_time_sources` as an input.
+**3. The Assessment** declares `required-time-sources-input` as an input.
 The **simplified membership form under research** would read:
 
 ```yaml
 # PROPOSED AUTHORING SYNTAX — not yet valid 0.3 schema
 inputs:
-  required_time_sources:
+  required-time-sources-input:
     datatype: string
     cardinality: one_or_more
     required: true
@@ -508,7 +508,7 @@ states:
       field: hostname
       operation: in
       value:
-        input: required_time_sources
+        input: required-time-sources-input
 ```
 
 This makes the intended comparison visible: *a collected hostname is in the
@@ -520,7 +520,7 @@ collection is handled. The `in` proposal does not settle those semantics.
 or executable 0.3 syntax (see [membership research](../../research/iterations/003/design/membership-comparison-research.md)).
 The [currently authored fixture](../../research/iterations/003/examples/organizational-input/time-source.assessment.yaml)
 instead uses `operation: equals`, an explicit `variable_match: one_or_more`,
-and a **direct** `value: {input: required_time_sources}` reference; it has
+and a **direct** `value: {input: required-time-sources-input}` reference; it has
 no pass-through Variable. That direct-input path still requires full
 semantic/evaluator conformance testing. The short proposal above intentionally
 omits additional required fields and is not a standalone valid Assessment.
@@ -530,7 +530,7 @@ Assessment answers a reusable technical question—*is every configured time
 source on the supplied approved list?*—without knowing which Benchmark or
 organization owns that list. The Rule owns the published requirement and
 explicitly connects its Benchmark Parameter `approved_time_sources` to the
-generic Assessment input `required_time_sources`. Two Rule contexts could
+generic Assessment input `required-time-sources-input`. Two Rule contexts could
 reuse the same Assessment with different publisher-declared Parameters,
 without cloning the Test. This is also a policy-to-execution audit boundary.
 
