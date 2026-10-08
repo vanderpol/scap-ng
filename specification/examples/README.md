@@ -25,6 +25,25 @@ Board showcase rather than inventing a result.
 
 The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
+## 90-second 0.3 showcase
+
+These examples demonstrate *what changed*, not merely which syntax is permitted. The source Rule is retained; only the explicitly described authoring structure is simplified.
+
+| Improvement over SCAP 1.4 | Start with this real STIG Rule | Evidence |
+| --- | --- | --- |
+| Private Object/State beside the Test; shared acquisition remains named | **RHEL 9 SV-258029** | [Converted before/after](../../review/current/REVIEW-GUIDE.md#1-consumer-local-components-plus-a-genuinely-shared-object) |
+| Static Variables become typed literal arrays | **RHEL 9 SV-257923** | [Before/after](../../review/current/REVIEW-GUIDE.md#2-static-typed-values-without-variable-plumbing) |
+| Runtime Variable evaluated directly, without its legacy Variable Object | **RHEL 9 SV-258045** | [Before/after](../../review/current/REVIEW-GUIDE.md#3-direct-variable-evaluation-without-a-legacy-variable-object) |
+| Multi-pass ObjectComponent Variable becomes native `for_each:` | **RHEL 9 SV-258029** | [Before/after](../../review/current/REVIEW-GUIDE.md#4-runtime-collection-for_each) |
+| Set membership and filters remain explicit without global graph navigation | **Oracle Linux 9 SV-271608** | [Before/after](../../review/current/REVIEW-GUIDE.md#6-set-and-filter-semantics-remain-explicit) |
+| Complex checks retain precise, readable `evaluate:` logic | **Windows Server 2025 SV-278001** | [Real converted example](#explicit-evaluation-logic) |
+| Stable component names replace opaque generated references | **RHEL 9 SV-258029** | [Naming example](../../review/current/REVIEW-GUIDE.md#8-meaningful-component-ids) |
+| A single reusable Assessment serves multiple Rules/benchmarks | **Six-benchmark normalized set** | [Verified exact-reuse measurements](../../research/iterations/003/evidence/validation-gates-2026-10-08/README.md) |
+
+**Included but separately labeled:** [0.3 Scan/Benchmark/Assessment result fixtures](0.3.0/results/README.md) demonstrate smaller, explainable results and bounded evidence; they are **synthetic**, not reports from a live host. [SV-278029](../../research/iterations/003/examples/stig-derived/SV-278029/README.md) illustrates conditional authoring and Organizational Input against an actual STIG requirement, but the proposed authoring is **not executable or validated 0.3 content**. [DNS SV-259388](../../review/current/REVIEW-GUIDE.md#5-nested-for_each-production-dns-use-case-fail-closed-conversion) explains correlated nested collection research; its existing PowerShell loop was **not** automatically replaced.
+
+**What this proves:** source-conversion and static schema/semantic/package tests on selected benchmarks. **What it does not prove:** target scanner runtime equivalence, automatic conversion of opaque shell scripts, or implementation of every research proposal.
+
 ## Finding features inside the six-benchmark review ZIP
 
 The [validated review bundle from run 37813594321](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) contains `scap-ng-board-representative-review`. Search its **`authoring/` directory using the exact YAML keys** below. Counts describe that one bundle, not all 65 source packages.
@@ -44,9 +63,11 @@ The [validated review bundle from run 37813594321](https://github.com/vanderpol/
 **Not in this six-benchmark authoring bundle:** native `if:/then:/else:`
 conditional branches, Organizational Input `inputs:` bindings, selective
 `reported_elements` redaction, cross-Assessment dependency/import examples,
-and generated assessment/benchmark result samples. These features need
-separately identified, source-backed showcase examples; their absence
-must not be hidden by claiming this ZIP demonstrates every 0.3 feature.
+and **observed** assessment/benchmark result samples. Synthetic 0.3 result
+fixtures are [maintained in Git](0.3.0/results/README.md) and staged into
+future review ZIPs as `results/synthetic-fixtures/`. They must never be
+presented as live scanner results; do not claim the converted six-benchmark
+`authoring/` tree demonstrates every 0.3 feature.
 
 Literal PowerShell `foreach` occurs inside some `independent.shellcommand`
 code. Those loops are **opaque executed program text**, not SCAP-NG `for_each`
