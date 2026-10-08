@@ -55,18 +55,18 @@ maintain a separate runtime index.
 
 ### 5.1 Authoring and compilation
 
-For file-backed authoring, each Rule SHALL expose its named Assessment
-selections using explicit relative paths to Assessment files.
-Those paths SHALL resolve relative to the **referring Rule file**, not to the
-process working directory or an implicitly chosen repository root.
+For native 0.3 authoring, each Rule SHALL identify its selected Assessment by
+**logical ID**, optionally specifying `expected_version` where multiple
+eligible versions exist. The compiler uses the supplied source scope (the
+Benchmark and eligible shared content), indexes actual Assessment identities,
+and rejects missing, ambiguous, incompatible, wrong-kind, or out-of-scope
+references. An author SHALL NOT maintain a separate Policy/Assessment index or
+write filesystem traversal paths.
 
-The compiler SHALL normalize paths, enforce the declared source boundary,
-verify referenced files exist and contain Assessment objects, and read their
-actual logical identities and versions. It SHALL reject missing, ambiguous,
-incompatible, or boundary-escaping links. Neither a filename nor a containing
-directory convention SHALL determine an Assessment's semantic identity.
-Authors SHALL NOT be required to maintain a separate Policy file or Assessment
-lookup index.
+Legacy converted source MAY use relative paths temporarily. The compiler
+verifies these within the declared source boundary and replaces them with
+logical identities before packaging. Filename and directory placement SHALL
+NOT determine semantic identity.
 
 Illustrative source:
 
@@ -76,9 +76,9 @@ rule:
   id: SV-257777
   assessment_choices:
     automated:
-      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+      assessment: rhel9.sv-257777.automated
     manual:
-      assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+      assessment: rhel9.sv-257777.manual
   default_assessment_choice: automated
 ```
 
@@ -91,8 +91,8 @@ to the object's declared type and exact immutable package member. The entry
 SHALL include sufficient integrity information, including a content digest,
 to detect modification or substitution. Content size SHOULD also be recorded.
 
-The compiler SHALL resolve Rule-owned source paths and named Assessment
-selections into logical object references and construct the manifest
+The compiler SHALL resolve authored logical references (and transitional
+converter source paths) into exact packaged objects and construct the manifest
 **automatically**. An author SHALL NOT create or synchronize a separate
 Assessment index by hand.
 

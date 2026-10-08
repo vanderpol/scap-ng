@@ -137,7 +137,7 @@ Illustrative structure:
     rule:
       assessment_choices:
         automated:
-          assessment: ../assessments/time-source-check.assessment.yaml
+          assessment: time-source-check
           inputs:
             required_time_sources:
               parameter: approved_time_sources

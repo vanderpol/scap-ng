@@ -175,13 +175,15 @@ Method used when alternatives exist.
 
 ### Authoring links versus scanner resolution
 
-In human-authored source, each Rule-owned Assessment selection is an explicit
-**relative path** to an Assessment YAML file. These paths are resolved and
-validated during compilation; authors are not required to maintain a separate
-Policy file or Assessment index. In the compiled package, logical IDs and
-selected-Assessment bindings are resolved to exact package members using the
-automatically constructed **package manifest**. A scanner SHALL NOT infer
-filenames or use authoring paths at runtime. See [Source, Compilation,
+In native 0.3 source, a Rule-owned Assessment selection SHALL identify the
+Assessment by **stable logical ID**. A matching Assessment must be found
+unambiguously within the declared compilation source scope; when multiple
+versions are eligible, the author SHALL select a specific version. Missing,
+duplicate, incompatible and escaped references cause compilation failure.
+Authors SHALL NOT maintain a separate Assessment index. Existing converter
+outputs may temporarily use source-relative paths as a migration input only;
+the compiler normalizes them to logical IDs. The package manifest binds those
+IDs to immutable members, and scanners SHALL NOT infer filenames. See [Source, Compilation,
 Packaging, and Integrity](../package/package-and-integrity.md#5-explicit-source-references-versus-compiled-manifest-resolution)
 for the normative source-resolution, integrity and failure contract.
 
