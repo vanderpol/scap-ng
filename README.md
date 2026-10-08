@@ -21,7 +21,7 @@ See the [full objectives](specification/objectives.md) and
 ## Start here
 
 - **Specification:** [specification/README.md](specification/README.md)
-- **Source and result samples:** [specification/examples/README.md](specification/examples/README.md)
+- **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
 - **Current review:** [review/current/README.md](review/current/README.md)
 - **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
 - **0.2.0 frozen schema:** [schema/v0.2.0/](schema/v0.2.0/)
