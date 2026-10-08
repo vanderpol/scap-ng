@@ -9,6 +9,12 @@ Source: DISA Microsoft Windows Server 2025 STIG, **WN25-00-000440 / V-278029**, 
 **What this example proves:** the *human readability of a proposed native representation* of a real, conditional STIG check. **What it does not prove:** a working Windows collector, exact OVAL/SCAP 1.4 equivalence, semantic conformance, completed Organizational Input implementation, or actual Windows target evaluation.
 
 
+## Readability-first 0.3 authoring proposal (October 2026)
+
+[**Review the regenerated, human-editable sample**](readable-authoring.proposal.yaml). This is a **proposed source authoring syntax**, not current schema-valid or scanner-executable 0.3 content. It uses logical Assessment identities instead of `../` paths, explicit `equals:` comparisons rather than inline `{value, operation, datatype}` triples, readable expected States, and a clearly marked proposed parsed-NTP-peer collector. Compiler resolution and typed expansion are not implemented. The linked [current 0.3-shaped research file](current-0.3-shape.research.yaml) remains as a comparison, not the recommended authoring surface.
+
+**Source ambiguity remains unresolved:** non-NTP time types in the fallback branch must not silently pass, and the missing PDC Emulator Assessment cannot be assumed. Proposed `return: unknown` is also not valid in today's expression schema.
+
 ## Concrete 0.3 comparison (new)
 
 - [Closest current 0.3 authoring shape](current-0.3-shape.research.yaml) — actual `tests`, inline `object`/`states`, and nested `if/then/else` using currently supported mapping names; **research-only and not semantically validated**.
