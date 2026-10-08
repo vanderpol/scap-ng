@@ -21,6 +21,27 @@ class RegistryAuthoringExpansionTests(unittest.TestCase):
   self.assertEqual(x["object"]["select"]["hive"], "local_machine")
   self.assertIsNone(x["test_title"])
   self.assertEqual(x["object"]["select"]["key"]["value"], r"SYSTEM\CurrentControlSet\Control\Lsa")
+ def test_native_v03_schema_accepts_expansion(self):
+  from pathlib import Path
+  from validate_native_json_schemas import build_validators, document_errors
+  root = Path(__file__).resolve().parents[1]
+  validators = build_validators(root / "schema/v0.3.0")
+  assessment = {
+   "assessment": {
+    "id": "research.registry-type-check",
+    "version": 1,
+    "assessment_title": "Registry type and value fidelity",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.3.0"},
+    "tests": {"restrict-anonymous-test": expand_registry_test(TEST)},
+    "evaluate": {"test": "restrict-anonymous-test"},
+   }
+  }
+  errors = list(document_errors(validators["assessment.schema.json"], assessment))
+  self.assertEqual([], [str(e) for e in errors])
+
  def test_refuse_string_one(self):
   t=copy.deepcopy(TEST); t["states"][0]["expect"]["value"]={"equals":"1"}
   with self.assertRaises(AuthoringError): expand_registry_test(t)
