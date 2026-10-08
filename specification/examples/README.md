@@ -357,8 +357,7 @@ values.approved_time_sources = [ntp1.example.test, ntp2.example.test]
     -> Benchmark Parameter approved_time_sources
     -> Rule maps approved_time_sources to required_time_sources
     -> Assessment input required_time_sources
-    -> Variable approved-sources
-    -> State state-source-approved: hostname compared to approved-sources
+    -> State state-source-approved: hostname compared directly to required_time_sources
     -> Test test-time-sources
     -> evaluate: test-time-sources
 ```
@@ -413,7 +412,7 @@ broadcast to unrelated checks.
 
 **3. The Assessment** declares `required_time_sources` as an input and uses
 that expected value when checking the time-source hostnames collected from the
-target. The original worked fixture expresses that connection as:
+target. The State consumes that input **directly**, with no pass-through Variable:
 
 ```yaml
 inputs:
@@ -421,18 +420,18 @@ inputs:
     datatype: string
     cardinality: one_or_more
     required: true
-variables:
-  approved-sources:
-    datatype: string
-    input: required_time_sources
 states:
   state-source-approved:
     capability: linux.chrony
     state:
       field: hostname
-      operation: pattern_match
+      operation: equals
+      datatype: string
+      variable_match: one_or_more
+      match: one_or_more
+      existence: one_or_more
       value:
-        variable: approved-sources
+        input: required_time_sources
 ```
 
 **4. The Assessment Request** explicitly selects the approved Input Set:
