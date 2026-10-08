@@ -14,7 +14,7 @@ publisher-defined requirement.
 
 1. `benchmark-parameter.yaml`: unresolved typed Parameter `approved_filesystem_types`.
 2. `rule-fragment.yaml`: binds Parameter to Assessment `approved-filesystem-types-input`.
-3. `time-source.assessment.yaml`: independent `linux.partition` Test with
+3. `home-filesystem.assessment.yaml`: independent `linux.partition` Test with
    `fs_type` State consuming the approved input directly.
 4. `site.organizational-input.yaml`: organization-approved values and attribution.
 5. `assessment-request.yaml`: explicit request-time Input Set reference.
