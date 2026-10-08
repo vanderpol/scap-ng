@@ -77,7 +77,7 @@ class InlineRegistryTypeTests(unittest.TestCase):
                 "datatype":"string","match":"all","existence":"one_or_more"}},
         ]
         test["states_match"]="all"
-        self.assertTrue(mismatches(f))
+        self.assertEqual([],mismatches(f))
 
     def test_conflicting_types_in_same_conjunction_rejected(self):
         f=fixture()
