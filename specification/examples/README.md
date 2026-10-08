@@ -275,7 +275,7 @@ built around an unimplemented `linux.chrony` collector, this uses the supported
 `linux.partition` mapping, which exposes `mount_point` as a selector and
 `fs_type` as a State field. **This is still an integration research fixture:
 direct input resolution and evaluator behavior have not been proved
-end-to-end.** The fictional rule is not a DISA requirement.
+end-to-end.** The fictional rule is not a DISA requirement. **Provenance clarification:** this is a newly authored, hypothetical policy requirement built on a supported OVAL-derived collection capability. It is **not** a converted DISA rule, not a known formerly manual STIG check, and not evidence of a manual-to-automated conversion. No legacy Rule ID or SCAP 1.4 source definition is claimed.
 
 The explicit linkage is:
 
