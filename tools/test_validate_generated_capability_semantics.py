@@ -435,7 +435,7 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
                 )
 
 
-    def test_ntuser_registry_type_value_datatype(self):
+    def test_ntuser_registry_type_does_not_override_state_comparison_datatype(self):
         doc={
             "assessment":{
                 "objects":{},
@@ -453,7 +453,10 @@ class UnixFileSemanticValidationTests(unittest.TestCase):
             }
         }
         rows=validate_assessment_capability_semantics(doc)
-        self.assertIn("windows.ntuser.value_type_datatype",{r["code"] for r in rows})
+        # A typed State comparison may request a cast of collected Item data.
+        # The static validator must not equate REG_DWORD storage with the
+        # State's explicitly chosen string comparison datatype (OVAL §5.3.6.5).
+        self.assertNotIn("windows.ntuser.value_type_datatype",{r["code"] for r in rows})
 
     def test_macos_equality_only_selectors(self):
         for capability, field in (("macos.plist511","full_path"),("macos.plist511","xpath"),("macos.systemprofiler","xpath")):
