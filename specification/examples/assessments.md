@@ -10,21 +10,21 @@ For policy context, see the [Benchmark and Rule examples](README.md). This page 
 
 ### 1. The Rule points to an Assessment
 
-Here is **real converted RHEL 9 STIG Rule SV-257851**. Its requirement is that the `/home` filesystem use the `nosuid` mount option. These `assessment_choices` are the actual current source-path form (the rest of the Rule is omitted):
+The **real RHEL 9 STIG Rule SV-257851** requires the `/home` filesystem to use the `nosuid` mount option. In SCAP-NG, a Rule selects its automated or manual Assessment by **logical ID**, not by a `../assessments/` file path:
 
 ```yaml
 rule:
   id: SV-257851
   assessment_choices:
     default:
-      assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
+      assessment: home-is-mounted-with-the-nosuid-option
     automated:
-      assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
+      assessment: home-is-mounted-with-the-nosuid-option
     manual:
-      assessment: ../assessments/manual/SV-257851.manual.yaml
+      assessment: SV-257851.manual
 ```
 
-The automated choice leads to the technical check; the manual choice leads to a human procedure. The `default` and `automated` selections can share one Assessment. The compiler resolves these relative source paths when packaging content. Logical-ID references are [planned but not yet supported in authoring](https://github.com/vanderpol/scap-ng/issues/199).
+This is the **agreed 0.3 logical-ID authoring form**, using the real STIG Rule and meaningful Assessment names; it is **not yet the current converter's output**. The compiler should resolve each ID when building a package. That compiler migration remains tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199). Authors should not need to maintain relative paths.
 
 ### 2. The actual Assessment, with a local Object and State
 
