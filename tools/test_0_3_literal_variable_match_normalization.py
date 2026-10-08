@@ -23,6 +23,35 @@ class LiteralVariableCheckTests(unittest.TestCase):
         self.assertNotIn("variable_match",state)
         self.assertTrue(any(x.get("reason")=="single-literal State value has one comparison operand" for x in edits))
 
+    def test_rewritten_actual_ntuser_filter_passes_generated_state_schema(self):
+        from pathlib import Path
+        import json
+        from jsonschema import Draft202012Validator
+        from referencing import Registry, Resource
+        from generate_capability_schema import generate
+        from validate_native_json_schemas import schema_store
+
+        root=Path(__file__).resolve().parents[1]
+        mapping=json.loads((root/"schema/v0.3.0/capability-mappings/supported/windows.ntuser.json").read_text())
+        generated=generate(mapping,root,schema_version="0.3.0")
+        sources=schema_store(root/"schema/v0.3.0")
+        registry=Registry().with_resources(
+            (uri,Resource.from_contents(schema)) for uri,schema in sources.items()
+        )
+        authored={
+            "state_title":"This state filters out all items where the type and value were not collected",
+            "capability":"windows.ntuser",
+            "state":{
+                "field":"type","value":"","operation":"equals","datatype":"string",
+                "match":"all","variable_match":"one_or_more","existence":"one_or_more",
+            },
+        }
+        rewritten,_=change_state(authored["state"])
+        authored["state"]=rewritten
+        v=Draft202012Validator(generated["$defs"]["state"],registry=registry)
+        errors=list(v.iter_errors(authored))
+        self.assertEqual([], [str(e) for e in errors])
+
     def test_true_variable_reference_retains_required_quantifier(self):
         original={"field":"type","value":{"variable":"expected-type-variable"},
                   "operation":"equals","datatype":"string","match":"all",
