@@ -121,6 +121,19 @@ A Benchmark Result answers **how many Rules passed, failed, or could not be eval
 
 The [0.3 Benchmark Result example](0.3.0/results/benchmark-result.json) demonstrates these fields with **synthetic conformance data, not a live scan**. For root-cause Test/State/Item evidence, see the [Assessment Result example](assessments.md#assessment-results-that-explain-the-root-cause).
 
+## Active Directory Forest — a complete manual STIG example
+
+The **Active Directory Forest V3R2 STIG** provides a smaller example of the same architecture: **7 Rules** from the DISA manual become a SCAP-NG Benchmark, 7 standalone Rules, and 7 Manual Assessments retaining the check procedure and remediation. The converter also records a source-to-native conversion audit.
+
+Two optional presentations are rendered **from the native SCAP-NG content**, not from a separate XCCDF reader:
+
+- **HTML review:** browse Rule titles, severity, discussion, check procedure, and fix text.
+- **Excel audit checklist:** the same policy and check text, with controlled results, evidence/notes, evaluator, and review-date fields.
+
+[View the Active Directory Forest HTML and Excel pilot workflow](https://github.com/vanderpol/scap-ng/actions/workflows/stig-manual-audit-outputs.yml). Open a successful run and find the `active-directory-forest-stig-manual-pilot` artifact; it contains native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. The workflow regenerates these examples from its pinned DISA manual.
+
+The manual pilot uses the earlier path-based authoring and conversion validation. The workflow additionally checks its Benchmark, Rule, and Manual Assessment documents against the **0.3 schemas**; source-level logical-ID resolution is a separate, unfinished change ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example demonstrates the manual-audit path; the RHEL 9 example above demonstrates automated checking.
+
 ## What comes next?
 
 Read the [Assessment examples](assessments.md) to see how that Rule is evaluated, including automated and manual checks, `for_each`, static values, direct Variable evaluation, conditional branches, Organization Input and bounded evidence. The [0.3 result fixture catalog](0.3.0/results/README.md) separately shows Scan, Benchmark, Automated Assessment and Manual Assessment results.
