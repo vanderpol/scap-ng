@@ -33,8 +33,10 @@ jobs:
         id: audit
         continue-on-error: true
         run: |
-          python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json
-          python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json
+          status=0
+          python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json || status=1
+          python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json || status=1
+          exit "$status"
       - name: Generate and meta-validate every reviewed capability schema
         run: |
           PYTHONPATH=tools python - <<'PY'
