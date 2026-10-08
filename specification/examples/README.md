@@ -336,6 +336,57 @@ Input Set supplies its approved value. An Assessment Request **must explicitly
 bind** the Input Set—`intended_scope` alone never selects targets. Missing
 required input produces `not_evaluated`, rather than inventing a pass/fail.
 
+### Who creates the Organizational Input file?
+
+**Users should fill in a generated template, not author YAML from scratch.**
+The content publisher/build process is the preferred source of a distributable
+template because it already knows the Benchmark's organization-resolved
+Parameters, their types/cardinalities/constraints, and which Assessment inputs
+consume them. A scanner should also be able to generate an equivalent template
+on demand, or render a form from the same contract. Templates are **not**
+permission to overwrite publisher-defined State values.
+
+A generated template for the fictional time-source Parameter might begin as
+follows (illustrative **template**, deliberately not a completed or valid Input
+Set; placeholders must be supplied before use):
+
+```yaml
+organizational_input:
+  id: REPLACE-WITH-UNIQUE-INPUT-SET-ID
+  version: 1
+  purpose: Organization-authorized policy values
+  benchmark:
+    id: example.linux.security-policy
+    version: V1R1
+  values:
+    approved_time_sources: []  # REQUIRED: one or more approved hostnames
+  provenance:
+    organization: REPLACE-WITH-ORGANIZATION
+    supplied_by: REPLACE-WITH-IDENTITY
+    supplied_at: REPLACE-WITH-ISO-8601-TIMESTAMP
+    authorization_status: REPLACE-WITH-STATUS
+```
+
+The **completed** file above shows the result after the organization supplies
+values and authorization. A usable generator must represent missing fields as
+unresolved placeholders or prompts, not silently insert values that pass
+validation. Template content must be derived from the authoritative
+Benchmark/Rule/Assessment contracts, and a scanner must still validate the
+completed Input Set.
+
+**More complex inputs:** Parameters should support bounded typed lists, sets,
+and structured records where the technical Assessment genuinely needs them.
+A scanner could generate appropriate prompts for those structures, including
+required fields and restrictions. This is **organization-delegated expected
+state**, not arbitrary Test or State editing. A future OVAL Board discussion
+could consider integration with Tailoring, but that is not permission in 0.3
+to override fixed publisher requirements.
+
+**Implementation status:** A common schema exists for completed Input Sets;
+a normative interoperable *template-generation format and generator* have
+not yet been established. They need separate specification and conformance
+testing before being advertised as implemented.
+
 ### How that value reaches a real check
 
 The Input Set is only one part of the workflow. In the same **fictional
