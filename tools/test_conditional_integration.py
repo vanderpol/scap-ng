@@ -153,6 +153,28 @@ class ConditionalIntegrationTests(unittest.TestCase):
             self.result_validator.validate(result)
             self.assertEqual(result["outcome"], "true")
 
+    def test_compiler_logical_dependency_omits_redundant_expected_id(self):
+        # Native 0.3 authors name the dependency by its logical identity.
+        # The compiler derives legacy normalized expected_id for runtime
+        # compatibility, without requiring the author to maintain two IDs.
+        def change(assessment):
+            if assessment["id"] == "conditional.dependent":
+                role = assessment["dependencies"]["role"]
+                role["assessment"] = "conditional.role"
+                role.pop("expected_id", None)
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            benchmark, members, index = compile_benchmark(root, self.tree(root, change=change))
+            self.assertIn("conditional.role", index)
+            source = json.loads(members[index["conditional.dependent"]["path"]])["assessment"]
+            self.assertEqual(source["dependencies"]["role"]["assessment"], "conditional.role")
+            self.assertEqual(source["dependencies"]["role"]["expected_id"], "conditional.role")
+            self.assertEqual(source["dependencies"]["role"]["expected_version"], 1)
+            package = root / "logical-dependency.scapng"
+            write_bundle(package, benchmark, members, index,
+                         sign_self_signed=False, provenance={})
+            self.assertEqual(verify_bundle(package)["benchmark_id"], "conditional.benchmark")
+
     def test_compiler_rejects_missing_reference_in_unselected_branch(self):
         def change(a):
             if a["id"] == "conditional.local":
