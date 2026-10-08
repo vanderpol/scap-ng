@@ -217,7 +217,7 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
                     },
                 })
 
-    def test_exact_registry_type_constrains_value_datatype(self):
+    def test_registry_comparison_datatype_is_not_collected_item_type(self):
         base_states={
             "type-state":{
                 "capability":"windows.registry",
@@ -263,12 +263,15 @@ class WindowsRegistryCapabilitySchemaTests(unittest.TestCase):
             {row["code"] for row in validate_assessment_capability_semantics(good)},
         )
 
-        bad=json.loads(json.dumps(good))
-        bad["assessment"]["states"]["value-state"]["state"]["datatype"]="string"
-        bad["assessment"]["states"]["value-state"]["state"]["value"]="1"
-        self.assertIn(
+        # The State datatype is the comparison type, not the collected
+        # REG_DWORD Item's wire type. OVAL tries a runtime cast and may return
+        # error if conversion fails; rejecting the authored State here is wrong.
+        string_comparison=json.loads(json.dumps(good))
+        string_comparison["assessment"]["states"]["value-state"]["state"]["datatype"]="string"
+        string_comparison["assessment"]["states"]["value-state"]["state"]["value"]="1"
+        self.assertNotIn(
             "windows.registry.value_type_datatype",
-            {row["code"] for row in validate_assessment_capability_semantics(bad)},
+            {row["code"] for row in validate_assessment_capability_semantics(string_comparison)},
         )
 
     def test_string_registry_type_allows_version_comparison(self):
