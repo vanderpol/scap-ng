@@ -64,33 +64,45 @@ assessment:
 
 The [0.3 Manual Assessment Result](0.3.0/results/manual-assessment-result.json) illustrates attribution and evidence **using synthetic result data**, not an actual assessment.
 
-## Assessment Results that explain the root cause
+## Assessment Results: collected Items and decisive comparisons
 
-**SCAP 1.4:** Detailed OVAL Results/System Characteristics can preserve the
-technical data, but finding the decisive Test, State, Item, and comparison often
-requires traversing several ID-based structures.
+**SCAP 1.4:** OVAL Results/System Characteristics retain collected system data, but readers often must join Tests, Objects, States and Items to understand which specific values failed.
 
-**SCAP-NG:** The detailed Assessment Result keeps technical truth separate from
-policy pass/fail and records the decisive comparison directly.
+**SCAP-NG:** An Assessment Result retains the **actual reported system Items**, their typed fields, provenance, and per-Item Test/State comparisons. It can stand alone without a Benchmark.
+
+For example, this **synthetic three-Item scan** checks whether a configuration directory and its two files are owned by UID `0`. One fails:
+
+| Collected file or directory | Type | Observed owner UID | Mode | Comparison |
+| --- | --- | ---: | --- | --- |
+| `/etc/example.d` | directory | 0 | `0755` | Pass |
+| `/etc/example.d/agent.conf` | file | **1001** | `0644` | **Fail** |
+| `/etc/example.d/network.conf` | file | 0 | `0640` | Pass |
+
+The result records each Item's `full_path`, file type, owner UID and username, group ID, mode, size in bytes, collection status and provenance. It then records the actual comparison for **each** Item. The failing one contains:
 
 ```json
 {
+  "item_ref": "config-agent-file",
   "outcome": "false",
-  "logical_complete": true,
-  "population_complete": true,
-  "evidence_complete": true,
-  "tests": [{
-    "id": "file-owner-is-root",
+  "state_results": [{
+    "state_ref": "owner-root",
     "outcome": "false",
-    "reason": {
-      "code": "value_mismatch",
-      "message": "The collected file owner did not match the required owner."
-    }
+    "entity_results": [{
+      "entity": "owner_uid",
+      "operation": "equals",
+      "comparison_results": [{
+        "outcome": "false",
+        "item_value": {"datatype": "integer", "value": 1001, "status": "exists"},
+        "expected_value": {"datatype": "integer", "value": 0, "status": "exists"}
+      }]
+    }]
   }]
 }
 ```
 
-Full example: [0.3 automated Assessment Result](0.3.0/results/assessment-result.json).
+[**Open the complete three-Item Assessment Result**](0.3.0/results/assessment-result-multi-file.json) to inspect its `items`, `tests[].per_item_results`, `objects`, `field_uses`, completeness, and failure-evidence accounting. Every collected Item in this example is retained; this is **not** a five-Item sample from a larger population. Only fields authorized by the Assessment's reporting selection should be emitted; redacted or uncollected fields must not be invented.
+
+By contrast, the [Benchmark's Rule Result](README.md#readable-benchmark-and-rule-results) only needs the readable finding and decisive values—not this full technical graph. A [simpler, single-file Assessment Result](0.3.0/results/assessment-result.json) is also available. Both fixtures are synthetic, not observations from a live scanner.
 
 ## Applicability Assessment (technical example)
 
