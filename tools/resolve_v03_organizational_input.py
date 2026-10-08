@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import copy
 import datetime as dt
+import math
 
 
 class InputResolutionError(ValueError):
@@ -37,7 +38,7 @@ def _valid_type(value,datatype):
     if datatype=="integer":
         return type(value) is int
     if datatype in ("float","number"):
-        return type(value) in (int,float) and not isinstance(value,bool)
+        return type(value) in (int,float) and math.isfinite(value)
     if datatype in ("string","version","ipv4","ipv6","path"):
         return type(value) is str
     return False
@@ -174,7 +175,9 @@ def bind_assessment_inputs(rule,selector,assessment,policy_context):
         param_id=assignment if isinstance(assignment,str) else (
             assignment or {}).get("parameter")
         if not param_id:
-            raise InputResolutionError("unbound_assessment_input",name)
+            if contract.get("required"):
+                raise InputResolutionError("unbound_assessment_input",name)
+            continue
         if param_id not in values:
             if contract.get("required"):
                 missing.append({"input":name,"parameter":param_id,

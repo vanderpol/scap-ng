@@ -77,6 +77,22 @@ class ResolutionTests(unittest.TestCase):
         with self.assertRaisesRegex(InputResolutionError,"invalid_time"):
             resolve_input_sets(b,[s],run_start="2026-10-08T11:00:00")
 
+    def test_optional_unbound_input_is_not_fabricated(self):
+        b,s,r,a=fixtures()
+        a["inputs"]["optional-input"]={
+            "required":False,"datatype":"string","cardinality":"zero_or_one"}
+        context=resolve_input_sets(b,[s],run_start=self.RUN)
+        result=bind_assessment_inputs(r,"automated",a,context)
+        self.assertNotIn("optional-input",result["bindings"])
+        self.assertEqual(result["outcome"],"ready")
+
+    def test_non_finite_numeric_input_is_rejected(self):
+        b,s,r,a=fixtures()
+        b["parameters"][0]["datatype"]="float"
+        s["organizational_input"]["values"]["approved_fs"]=[float("nan")]
+        with self.assertRaisesRegex(InputResolutionError,"invalid_datatype"):
+            resolve_input_sets(b,[s],run_start=self.RUN)
+
     def test_unknown_choice_does_not_inject_bindings(self):
         b,s,r,a=fixtures()
         context=resolve_input_sets(b,[s],run_start=self.RUN)
