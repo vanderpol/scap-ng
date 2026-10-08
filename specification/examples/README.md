@@ -75,85 +75,6 @@ evaluate:
 
 The full Assessment preserves required metadata and its explicit execution root.
 
-
-### Local Objects versus shared Objects
-
-In the RHEL 9 example above, `object:` is **inside the Test**: that Object is
-private to that Test. This is the normal choice when the acquisition has one
-consumer. No separate Object ID or top-level registry entry is needed.
-
-If two Tests need **the same acquisition within one Assessment**, the author
-can instead declare a descriptive, named Object under `shared_objects:`
-and reference it from the consuming Tests. Unlike an inline Object, this
-explicitly preserves reusable identity. This short comparison is
-**illustrative syntax** (omitting fields for readability):
-
-```yaml
-# Private: owned by one Test
-tests:
-  file-owner-test:
-    capability: unix.file
-    object:
-      capability: unix.file
-      select: {filepath: /etc/ssh/sshd_config}
-
-# Shared: one named Object, available to multiple Tests in this Assessment
-shared_objects:
-  ssh-configuration-object:
-    capability: unix.file
-    select: {filepath: /etc/ssh/sshd_config}
-tests:
-  file-owner-test:
-    capability: unix.file
-    object: ssh-configuration-object
-  file-permissions-test:
-    capability: unix.file
-    object: ssh-configuration-object
-```
-
-These are two **alternative authoring shapes**, not one file to concatenate:
-normally choose a local Object, and promote it to `shared_objects` when
-the shared acquisition is intentional. Sharing an Object *within* an
-Assessment is distinct from consuming the **result of another Assessment**,
-shown next. The later [production-derived RHEL 9 example](#consumer-local-components-and-shared-objects)
-demonstrates local and shared acquisition in the same converted Assessment.
-
-### Referencing another Assessment file
-
-SCAP-NG also supports a separate form of reuse: an Assessment may statically
-declare a **dependency on another Assessment's result**, and use that result
-inside its own `evaluate` tree. Here is a **manufactured native illustration**,
-adapted from the existing [Assessment dependency fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml),
-not an automatically converted STIG example:
-
-```yaml
-assessment:
-  id: example.composed-assessment
-  dependencies:
-    platform-applicable:
-      assessment: ../applicability/example-platform.assessment.yaml
-      expected_id: example.platform-applicable
-      expected_version: 1
-      purpose: applicability
-  evaluate:
-    all:
-      - assessment: platform-applicable
-      - test: local-setting-correct
-```
-
-The `assessment:` path identifies the **external authored YAML file**;
-`expected_id` and `expected_version` protect against accidentally binding
-the wrong content; `platform-applicable` is the local alias referenced by
-`evaluate`. The other Assessment remains an independent unit with its own
-technical result and evidence. The compiler must resolve and validate
-dependencies, including rejecting cycles. The result is reused without
-copying the referenced Assessment's Tests or collected Items into this file.
-
-**Important distinction:** this is **Assessment-result reuse**, not
-cross-Assessment Object/Item collection sharing. The latter remains a
-separate, deferred design topic. For the normative contract, see
-[Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
-
 ## Manual Assessments
 
 **SCAP 1.4:** Manual STIG Check Text generally lives in XCCDF. **SCAP-NG:** The real procedure becomes a first-class Assessment with explicit recorded responses.
@@ -600,6 +521,88 @@ is the single source for the active build, provenance, and download instructions
 - [Automated Assessment Result](0.3.0/results/assessment-result.json)
 - [Bounded-evidence Assessment Result](0.3.0/results/assessment-result-bounded-evidence.json)
 - [Manual Assessment Result](0.3.0/results/manual-assessment-result.json)
+
+## Additional authoring details
+
+These optional examples explain when an Object should be shared and how a separate Assessment can be referenced. They are not needed for the introductory examples.
+
+### Local Objects versus shared Objects
+
+In the RHEL 9 example above, `object:` is **inside the Test**: that Object is
+private to that Test. This is the normal choice when the acquisition has one
+consumer. No separate Object ID or top-level registry entry is needed.
+
+If two Tests need **the same acquisition within one Assessment**, the author
+can instead declare a descriptive, named Object under `shared_objects:`
+and reference it from the consuming Tests. Unlike an inline Object, this
+explicitly preserves reusable identity. This short comparison is
+**illustrative syntax** (omitting fields for readability):
+
+```yaml
+# Private: owned by one Test
+tests:
+  file-owner-test:
+    capability: unix.file
+    object:
+      capability: unix.file
+      select: {filepath: /etc/ssh/sshd_config}
+
+# Shared: one named Object, available to multiple Tests in this Assessment
+shared_objects:
+  ssh-configuration-object:
+    capability: unix.file
+    select: {filepath: /etc/ssh/sshd_config}
+tests:
+  file-owner-test:
+    capability: unix.file
+    object: ssh-configuration-object
+  file-permissions-test:
+    capability: unix.file
+    object: ssh-configuration-object
+```
+
+These are two **alternative authoring shapes**, not one file to concatenate:
+normally choose a local Object, and promote it to `shared_objects` when
+the shared acquisition is intentional. Sharing an Object *within* an
+Assessment is distinct from consuming the **result of another Assessment**,
+shown next. The later [production-derived RHEL 9 example](#consumer-local-components-and-shared-objects)
+demonstrates local and shared acquisition in the same converted Assessment.
+
+### Referencing another Assessment file
+
+SCAP-NG also supports a separate form of reuse: an Assessment may statically
+declare a **dependency on another Assessment's result**, and use that result
+inside its own `evaluate` tree. Here is a **manufactured native illustration**,
+adapted from the existing [Assessment dependency fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml),
+not an automatically converted STIG example:
+
+```yaml
+assessment:
+  id: example.composed-assessment
+  dependencies:
+    platform-applicable:
+      assessment: ../applicability/example-platform.assessment.yaml
+      expected_id: example.platform-applicable
+      expected_version: 1
+      purpose: applicability
+  evaluate:
+    all:
+      - assessment: platform-applicable
+      - test: local-setting-correct
+```
+
+The `assessment:` path identifies the **external authored YAML file**;
+`expected_id` and `expected_version` protect against accidentally binding
+the wrong content; `platform-applicable` is the local alias referenced by
+`evaluate`. The other Assessment remains an independent unit with its own
+technical result and evidence. The compiler must resolve and validate
+dependencies, including rejecting cycles. The result is reused without
+copying the referenced Assessment's Tests or collected Items into this file.
+
+**Important distinction:** this is **Assessment-result reuse**, not
+cross-Assessment Object/Item collection sharing. The latter remains a
+separate, deferred design topic. For the normative contract, see
+[Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
 
 ## Detailed reference and evidence
 
