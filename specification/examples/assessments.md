@@ -106,7 +106,13 @@ Our [three-Item synthetic Assessment Result](0.3.0/results/assessment-result-mul
 | `/etc/example.d/agent.conf` | **1001** | 0 | **`false`** |
 | `/etc/example.d/network.conf` | 0 | 0 | `true` |
 
-When an Assessment contains ten Tests, each Test can report the system data relevant to its own outcome, even where Tests inspected the same observation for different purposes.
+This fixture also checks the **same `agent.conf` file a second time**, against a *different* requirement:
+
+- **Owner Test:** UID **1001** was found; UID **0** was required.
+- **Permissions Test:** mode **`0644`** was found; mode **`0600`** was required.
+
+Both Tests include the reported file attributes beside their own comparison. The repeated file data is intentional: each Test asks a different question about that file. The scanner may reuse its single collection operation.
+
 
 ### Normal and diagnostic reporting use the same content
 
