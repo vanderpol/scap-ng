@@ -87,6 +87,8 @@
 ## Results and evidence
 
 - Results separate policy/Rule context from distinct Assessment executions and their Test/Object/Variable/Item evidence.
+- Assessment Results are standalone, Test-centered technical reports: each retained per-Item observation and its typed system fields sits beside the Test's verdict and comparison, even if a shared observation is repeated under different Tests. Runtime collection caching is independent of result serialization.
+- The scanner application/run controls per-Test evidence retention; it may request a diagnostic override against the **same signed Benchmark and Assessment content**. The effective cap, source and override explanation are in Assessment Results, and reporting limits never alter evaluation truth, redaction or safety limits.
 - Execution identity, dependency scheduling, provenance, completeness, and outcome rationale are explicit.
 - Evidence caps or early termination may bound volume but must record completeness/truncation and must not change the normative verdict.
 - `reported_elements` is an explicit author-visible reporting projection and does not change technical truth; hidden capability-specific reporting defaults are not part of 0.3.
