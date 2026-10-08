@@ -492,23 +492,13 @@ def _validate_windows_registry_like_value_datatypes(test_id,test,states):
                         "message":"Registry type has no verified native value encoding; do not infer a datatype",
                     })
             continue
-        for state_id,payload in leaves:
-            if payload.get("field")!="value":
-                continue
-            value=payload.get("value")
-            if isinstance(value,dict) and set(value) in ({"variable"},{"input"}):
-                continue
-            datatype=payload.get("datatype")
-            if datatype not in allowed:
-                diagnostics.append({
-                    "test":test_id,
-                    "state":state_id,
-                    "code":f"{test.get('capability')}.value_type_datatype",
-                    "registry_type":registry_type,
-                    "datatype":datatype,
-                    "allowed_datatypes":sorted(allowed),
-                    "message":"registry value datatype is incompatible with exact asserted registry type",
-                })
+        # Do NOT require the authored State comparison datatype to equal
+        # the collected Registry Item datatype. OVAL 5.x §5.3.6.5 requires
+        # attempting to cast observed Item values to the explicit State
+        # datatype before comparing. REG_SZ "10" with an integer <= 10 State
+        # predicate is valid; a failed runtime cast yields error, not false.
+        # The generated State schema checks allowed authored datatypes, while
+        # collected-Item shape/datatype validation remains separate.
     # One mismatch per State/field even if both its local and test-wide ALL
     # conjunction lead to the same diagnostic.
     unique={}
