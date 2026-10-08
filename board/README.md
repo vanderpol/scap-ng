@@ -10,6 +10,10 @@ For the current project/design review, use:
 - [Draft specification](../specification/README.md)
 - [Real Benchmark and Rule policy examples](../specification/examples/README.md) and [technical Assessment examples](../specification/examples/assessments.md)
 
+## Open Board discussion (not a formal vote)
+
+[Assessment authoring vocabulary — three approaches, examples, and reaction voting](ASSESSMENT-VOCABULARY-DISCUSSION.md) is an **informal pre-0.3 discussion**, not a ratified schema change. [Vote or comment in the thread](https://github.com/vanderpol/scap-ng/issues/207).
+
 ## Published votes
 
 See [VOTES.md](VOTES.md) for the maintained proposal/vote index.

@@ -4,7 +4,7 @@
 
 **Finding:** A more natural `collect / where / expect` vocabulary is **feasible and worth testing**. A presentation/authoring adapter can preserve the current typed Test/Object/State/evaluate model; replacing that model with Ansible task execution or unqualified shorthand is substantially harder and **not recommended**. Prefer testing the smallest semantic-preserving vocabulary change first.
 
-The [single real Rule comparison](VERB-COMPARISON-SINGLE-ASSESSMENT.md) shows current `linux.partition` RHEL 9 SV-257851 alongside a speculative form. This page evaluates implementation cost and potential misunderstandings; it does not repeat that full example.
+The [Board's three-way same-Rule comparison](../../../board/ASSESSMENT-VOCABULARY-DISCUSSION.md) shows current `linux.partition` RHEL 9 SV-257851 alongside two speculative forms. This page evaluates implementation cost and potential misunderstandings; it does not repeat that full example.
 
 ## What existing production research proves — and what it does not
 

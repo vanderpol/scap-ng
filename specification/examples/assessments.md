@@ -391,7 +391,7 @@ The publisher refers to the stable Assessment ID; the build resolves it within a
 
 ### Research-only syntax comparisons (not 0.3 schemas)
 
-**[One simple Assessment, two vocabularies](../../research/assessment-simplification/ansible-authoring-09/VERB-COMPARISON-SINGLE-ASSESSMENT.md)** compares the **real RHEL 9 `linux.partition` Assessment** above with a short Ansible-inspired `check / collect / where / expect / require / report` sketch. The alternative is **not 0.3 schema-valid or executable**; it is solely a discussion about clearer verbs, with all existence/match semantics kept in view.
+**[Board discussion and informal vote: three Assessment vocabularies](../../board/ASSESSMENT-VOCABULARY-DISCUSSION.md)** compares the same real RHEL 9 automated Assessment in **current 0.3**, **Ansible-inspired**, and **inspection-oriented** notation. The alternatives are **not 0.3 schema-valid or executable**. [Vote or comment on the three options](https://github.com/vanderpol/scap-ng/issues/207) without changing the current specification.
 
 **Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. This example supports side-by-side comparison of original requirements and proposed authoring.
 
