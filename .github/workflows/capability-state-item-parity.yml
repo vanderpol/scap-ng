@@ -8,6 +8,7 @@ on:
       - schema/v0.3.0/capability-common.schema.json
       - third_party/scap-1.4-schemas/oval_5.12.3/**
       - tools/audit_capability_state_item_parity.py
+      - tools/audit_v03_polymorphic_datatypes.py
       - tools/validate_generated_capability_semantics.py
       - tools/test_registry_inline_datatype_semantics.py
       - tools/research_expand_registry_authoring.py
@@ -37,6 +38,8 @@ jobs:
           python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json || status=1
           python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json || status=1
           exit "$status"
+      - name: Inventory v0.3 polymorphic state field datatypes
+        run: python tools/audit_v03_polymorphic_datatypes.py --json > v03-polymorphic-fields.json
       - name: Generate and meta-validate every reviewed capability schema
         run: |
           PYTHONPATH=tools python - <<'PY'
@@ -76,6 +79,7 @@ jobs:
           path: |
             capability-state-item-parity.json
             capability-state-item-parity-v03.json
+            v03-polymorphic-fields.json
             generated-capability-schema-validation.json
       - name: Enforce parity
         if: steps.audit.outcome != 'success'
