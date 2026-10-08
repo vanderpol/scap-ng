@@ -77,6 +77,23 @@ class InlineRegistryTypeTests(unittest.TestCase):
         self.assertIn("windows.registry.conflicting_registry_types",
                       [e.get("code") for e in diagnostics])
 
+    def test_unmodelled_registry_type_and_value_is_explicit_error(self):
+        for kind in ("none","resource_list","full_resource_descriptor",
+                     "resource_requirements_list"):
+            with self.subTest(kind=kind):
+                f=fixture(kind=kind,value="opaque",datatype="string")
+                codes={entry.get("code") for entry in
+                       validate_assessment_capability_semantics(f)}
+                self.assertIn("windows.registry.unsupported_type_value_encoding",codes)
+
+    def test_unmodelled_registry_type_alone_is_still_comparable(self):
+        f=fixture(kind="none")
+        state=f["assessment"]["tests"]["registry-type-value-test"]["states"][0]["state"]
+        state["all"]=[state["all"][0]]
+        codes={entry.get("code") for entry in
+               validate_assessment_capability_semantics(f)}
+        self.assertNotIn("windows.registry.unsupported_type_value_encoding",codes)
+
     def test_disjunction_does_not_infer_type(self):
         f=fixture(value="1",datatype="string")
         f["assessment"]["tests"]["registry-type-value-test"]["states"][0]["state"]["any"]=(
