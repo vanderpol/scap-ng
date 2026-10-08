@@ -431,9 +431,15 @@ SHOULD produce `required_item_missing` unless the more specific
 
 ## 9. Concrete evidence
 
-When failure is established by a concrete violating item, at least one concrete
-failing example SHALL be retained unless collection/evaluation failed before
-one could be captured.
+When failure is established by a concrete violating Item, and the
+effective scanner/run evidence-retention and disclosure constraints permit
+reporting an Item, at least one concrete failing example SHALL be retained
+unless collection/evaluation failed before one could be captured. If an
+effective zero-Item limit, redaction or an independent safety restriction
+prevents that witness from being reported, the Test outcome, observed/actual
+mismatch counts, reason, evidence-retention provenance and omission/truncation
+indicators SHALL remain truthful. Such restrictions SHALL NOT change the
+technical Test outcome or turn missing evidence into a fabricated Item.
 
 Evidence SHOULD identify what failed and why.
 

@@ -81,6 +81,26 @@ class AssessmentEvidenceIntegrityTests(unittest.TestCase):
         doc["assessment_result"]["evidence_retention"]["maximum_items"] = 2
         self.assertIn("test.exceeds_retention_limit", codes(doc))
 
+    def test_explicit_zero_retention_preserves_fail_truth_and_truncation(self):
+        doc = load("assessment-result.json")
+        a = doc["assessment_result"]
+        test = a["tests"][0]
+        a["evidence_retention"]["maximum_items"] = 0
+        a["evidence_summary"]["maximum"] = 0
+        a["evidence_summary"]["returned"] = 0
+        a["evidence_summary"]["truncated_population"] = True
+        a["evidence_complete"] = False
+        test["per_item_results"] = []
+        test["item_refs"] = []
+        test["item_summary"]["returned_items"] = 0
+        test["item_summary"]["truncated_evidence"] = True
+        a["field_uses"] = []
+        self.assertEqual(test["outcome"], "false")
+        self.assertEqual(test["item_summary"]["observed_mismatches"], 1)
+        self.assertEqual(validate_assessment_result_semantics(doc), [])
+        test["item_summary"]["truncated_evidence"] = False
+        self.assertIn("test.omitted_failures_not_marked", codes(doc))
+
     def test_omitted_failures_must_be_reported_honestly(self):
         doc = load("assessment-result-bounded-evidence.json")
         doc["assessment_result"]["tests"][0]["item_summary"]["truncated_evidence"] = False
