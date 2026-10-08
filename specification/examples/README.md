@@ -10,6 +10,8 @@ the complete review build are linked when more detail is useful.
 
 **Current 0.3 verification:** The [six-benchmark regression](https://github.com/vanderpol/scap-ng/actions/runs/37809832500) completed source conversion, 0.3 schema and Assessment-semantic validation, package-graph validation, exact normalization and compilation. Its downloadable `scap-ng-board-representative-review` artifact contains two Linux benchmarks, two Windows benchmarks, Windows Server DNS and Apache 2.4 UNIX Server. See [source-linked gate measurements](../../research/iterations/003/evidence/validation-gates-2026-10-08/README.md). The separately tracked [65-source 0.3 checkpoint](https://github.com/vanderpol/scap-ng/issues/202) remains a distinct release gate; scanner-runtime equivalence is not established by these static checks.
 
+**Measured reuse (six-benchmark reference):** The verified [normalizer report from run 37809832500](https://github.com/vanderpol/scap-ng/actions/runs/37809832500) records **3,007 referenced Assessment instances → 2,433 unique definitions** after exact semantic normalization: **574 duplicate definitions avoided (19.09%)**, over **1,567 Rules** in six benchmarks. This is a reduction in *distinct repository Assessment definitions*, not a claim of fewer Rules, faster runtime scans, or 19.09% smaller standalone bundles. Source: `representative-board-conversion-evidence` artifact, `normalizer-report.json`.
+
 **Source-first example policy:** Prefer a real published DISA STIG Rule for every
 feature, with Rule ID, benchmark/version, original check text or automation,
 native assessment, and a concrete explanation of the improvement. Distinguish
