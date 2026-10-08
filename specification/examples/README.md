@@ -67,6 +67,12 @@ rule:
 
 The full source retains additional Rule fields, including references, applicability, choice bindings, and empty-but-explicit supported policy sections. The **fix** is represented under `remediation.guidance`; it is not discarded during conversion.
 
+## A second policy example — Windows Server 2025
+
+The actual converted **Windows Server 2025 SV-278001** Rule has the title *“Windows Server 2025 default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.”* Its medium-severity policy discussion explains that unauthorized Registry permission changes can compromise system security and stability. The Rule also retains the lengthy DISA remediation guidance, including distinct defaults for domain controllers and other servers.
+
+The **Rule owns the requirement and fix**; its [automated Assessment](assessments.md#explicit-evaluation-logic) separately represents the Boolean technical checks. Its existing `all/any/not` structure must not be advertised as an automatically converted `if/then/else` branch, because unknown-value outcomes may differ.
+
 ## How the Rule selects an Assessment
 
 This actual Rule offers `default`, `automated`, and `manual` choices. The automated choice refers to a reusable Assessment checking the `/home` mount, while the manual choice preserves the STIG check procedure.
@@ -107,7 +113,7 @@ This excerpt shows the first three of **417 disabled Rules** from that Profile. 
 
 An ordinary Rule may apply only when a package or system feature is present. The converted RHEL 9 `applicability.yaml` includes an explicit condition `benchmark.rhel_9.condition.gnome-shell-package`, linked to an Assessment that checks installation. SCAP-NG uses technical checks for applicability rather than treating CPE text as a magical scanner predicate.
 
-Details: [real applicability Assessment example](assessments.md#explicit-applicability).
+Details: [real applicability Assessment example](assessments.md#applicability-assessment-technical-example).
 
 ## Readable Benchmark and Rule results
 
