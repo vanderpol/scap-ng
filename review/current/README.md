@@ -32,6 +32,10 @@ and identifies SCAP-NG source commit `d266e2fbf6e384e66dd3d8e0d1109e03be07b6e8`.
 Direct artifact URLs are intentionally not used here because they are not
 reliable navigation links for all GitHub sessions.
 
+Final full-corpus modernization census:
+[workflow run 37708757220](https://github.com/vanderpol/scap-ng/actions/runs/37708757220)
+— **65 source packages, 61 generated, 4 known SQL-extension blockers, 0 unexpected blockers**.
+
 ## Explicitly deferred beyond 0.3
 
 See the concise [deferred/out-of-scope list](../../specification/deferred-after-0.3.md). Deferred research is not part of the normative 0.3 review package.
