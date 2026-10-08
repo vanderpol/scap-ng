@@ -6,7 +6,6 @@ about a live target scan.
 
 - [Scan Result](scan-result.json) — run/target index and references to normalized
   Benchmark and Assessment Results.
-- [Benchmark and Assessment Organizational Input provenance](benchmark-result-organizational-input.json) — synthetic illustration of one authorized value: complete canonical Benchmark Result provenance, concise Rule Result value/reference, and [Assessment consumed-input reference](assessment-result-organizational-input.json). Verified for schema and cross-reference consistency, **not** target scanner execution.
 - [Benchmark Result](benchmark-result.json) — policy-facing counters and
   **embedded Rule Results**. Its automated Rule contains a typed owner-UID
   comparison; the manual Rule has an explanatory message and Assessment
