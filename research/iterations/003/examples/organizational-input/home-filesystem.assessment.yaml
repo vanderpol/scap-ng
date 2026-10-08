@@ -1,0 +1,43 @@
+assessment:
+  id: shared.home-filesystem-approved
+  version: 1
+  assessment_title: The /home filesystem uses an organization-approved type
+  mode: automated
+  class: compliance
+  purpose: assessment
+
+  inputs:
+    approved-filesystem-types-input:
+      datatype: string
+      cardinality: one_or_more
+      required: true
+      description: Authorized filesystem types for the /home mount.
+
+  tests:
+    home-filesystem-test:
+      test_title: The /home mount uses an approved filesystem type
+      capability: linux.partition
+      object:
+        capability: linux.partition
+        select:
+          mount_point:
+            value: /home
+            operation: equals
+            datatype: string
+      states:
+        - capability: linux.partition
+          state:
+            field: fs_type
+            operation: equals
+            datatype: string
+            variable_match: one_or_more
+            match: one_or_more
+            existence: one_or_more
+            value:
+              input: approved-filesystem-types-input
+      reported_elements: all
+      existence: one_or_more
+      match: all
+
+  evaluate:
+    test: home-filesystem-test
