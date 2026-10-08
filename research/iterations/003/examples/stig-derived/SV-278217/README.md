@@ -75,3 +75,7 @@ The [v0.3 windows.registry mapping](../../../../../schema/v0.3.0/capability-mapp
 `REG_MULTI_SZ` element-by-element native array fidelity needs separate research; this Rule itself mandates DWORD and does not require introducing any new scanner capability.
 
 **Acceptance gate:** Can a compiler reconstruct an explicit, faithful `type=dword AND value=integer 1` State with exact existence/cardinality, without deriving a value from a coercion or a hidden default? Compare results of the canonical and proposed source against the same fixtures.
+
+## Board vocabulary comparison (no spec changes)
+
+[Compare OVAL-familiar and Ansible-inspired terminology for this exact Rule](VOCABULARY-COMPARISON.md). Both samples keep the same structure, values, selectors, result semantics and quantifiers; only selected property names differ. Neither sample is schema-valid 0.3 source or an Ansible playbook.
