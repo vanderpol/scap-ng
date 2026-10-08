@@ -168,18 +168,45 @@ jobs:
               raise SystemExit(f"unexpected representative-set status totals: generated={generated} blocked={blocked}")
           print(json.dumps({"packages":6,"generated":generated,"blocked":blocked},indent=2))
           PY
+      - name: Render canonical 0.3 candidate authoring
+        run: |
+          PYTHONPATH=scap-ng/tools python - <<'PY'
+          import subprocess, sys
+          from pathlib import Path
+
+          source_root=Path("work/representative")
+          output_root=Path("work/candidate-source")
+          evidence_root=Path("work/render-evidence")
+          for source in sorted(p for p in source_root.iterdir() if p.is_dir()):
+              target=output_root/source.name
+              evidence=evidence_root/source.name
+              cmd=[
+                  sys.executable,
+                  "scap-ng/tools/render_0_3_human_review_candidate.py",
+                  str(source),
+                  "--output-root",str(target),
+                  "--evidence-dir",str(evidence),
+                  "--label",source.name,
+              ]
+              subprocess.run(cmd,check=True)
+          PY
       - name: Validate active v0.3.0 schema
         run: |
-          python scap-ng/tools/validate_native_json_schemas.py work/representative             --schema-dir scap-ng/schema/v0.3.0             --allow-unpromoted-conversion-vocabulary             --report work/schema-validation.json
+          python scap-ng/tools/validate_native_json_schemas.py work/candidate-source \
+            --schema-dir scap-ng/schema/v0.3.0 \
+            --allow-unpromoted-conversion-vocabulary \
+            --report work/schema-validation.json
       - name: Validate native Assessment semantics
         run: |
-          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/representative             --report work/semantic-validation.json
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/candidate-source \
+            --report work/semantic-validation.json
       - name: Validate package graph
         run: |
-          python scap-ng/tools/validate_native_package_graph.py work/representative             --report work/package-graph.json
+          python scap-ng/tools/validate_native_package_graph.py work/candidate-source \
+            --report work/package-graph.json
       - name: Normalize exact duplicate Assessments for Board-readable source
         run: |
-          python scap-ng/tools/scap_ng_repo_normalizer.py work/representative \
+          python scap-ng/tools/scap_ng_repo_normalizer.py work/candidate-source \
             --rewrite \
             --output-root work/board-source \
             --report work/normalizer-report.json \
