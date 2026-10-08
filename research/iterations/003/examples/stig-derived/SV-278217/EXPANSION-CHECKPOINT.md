@@ -24,3 +24,11 @@ An isolated Python prototype verified seven positive/negative tests. **The proof
 3. Wire expansion into the normalizer/compiler (never into runtime scanner), create goldens for Registry DWORD / string / absent / unreadable, and match original canonical results.
 4. Move logical identity resolution (issue #199) into the same compilation pass.
 5. Keep SV-278029 as the flagship integration test and leave proposed NTP parsing unresolved until proven from existing capabilities.
+
+## October 8 follow-up: first schema-gated standalone compiler entry point
+
+- [Research expansion module/CLI](../../../../../tools/research_expand_registry_authoring.py) now maps Registry `hive` to its actual native scalar enum and uses exact current 0.3 comparison/quantifier vocabulary; it emits Test `test_title: null` rather than omitting the required property.
+- [Runnable authored SV-278217 fixture](readable-authoring.prototype.yaml) and [unit tests](../../../../../tools/test_research_expand_registry_authoring.py) now cover exact fixture expansion and an actual `validate_native_json_schemas.document_errors` schema/semantic gate.
+- To use in a repository checkout: `python tools/research_expand_registry_authoring.py research/iterations/003/examples/stig-derived/SV-278217/readable-authoring.prototype.yaml --output /tmp/sv-278217.canonical.json --validate-v03`.
+- **Validation has NOT been run after these new commits.** Github content writes succeeded, but this session cannot directly execute the checked-out GitHub tree. Do not mark schema equivalence or CI pass as verified until the test runner executes, and do not integrate this research-only compiler into production packaging yet.
+- Further gate: prove complete source schema validity, canonical semantics and negative result-equivalence cases; then integrate as an explicit pre-compilation normalization stage rather than scanner-side interpretation.
