@@ -338,13 +338,28 @@ required input produces `not_evaluated`, rather than inventing a pass/fail.
 
 ### Who creates the Organizational Input file?
 
-**Users should fill in a generated template, not author YAML from scratch.**
-The content publisher/build process is the preferred source of a distributable
-template because it already knows the Benchmark's organization-resolved
-Parameters, their types/cardinalities/constraints, and which Assessment inputs
-consume them. A scanner should also be able to generate an equivalent template
-on demand, or render a form from the same contract. Templates are **not**
-permission to overwrite publisher-defined State values.
+**Two distinct template-generation use cases should be kept separate:**
+
+1. **Publisher-generated templates (primary, current design):** When a
+   Benchmark explicitly delegates a Parameter to an organization, the content
+   author/build pipeline can publish a ready-to-fill template with the
+   Benchmark. Its allowed fields come from the publisher's Parameter and
+   Assessment-input contracts. Users should not have to write YAML from
+   scratch.
+2. **Scanner-generated templates (potential future Tailoring capability):**
+   If the OVAL Board decides Tailoring may use Organizational Input to vary
+   otherwise fixed expected-state values, a scanner could inspect a *chosen*
+   Rule/Assessment and generate a tailored input template for its eligible
+   State fields—even where the publisher did not predeclare Organizational
+   Input. This is more powerful than merely regenerating a publisher template,
+   and **is not authorized by the current 0.3 design**. It would require an
+   explicit policy-deviation contract, value-type/quantifier restrictions,
+   approval and provenance, and results identifying the changed policy.
+
+Both paths should ultimately produce understandable, machine-validated
+inputs, but the second would change the effective security requirement and
+cannot masquerade as an unchanged publisher STIG evaluation. Generation must
+never automatically authorize or apply an override.
 
 A generated template for the fictional time-source Parameter might begin as
 follows (illustrative **template**, deliberately not a completed or valid Input
