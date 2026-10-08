@@ -43,6 +43,15 @@ jobs:
           status=0
           python tools/audit_capability_state_item_parity.py --json > capability-state-item-parity.json || status=1
           python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json || status=1
+          python - <<'PY'
+          import json
+          for filename in ("capability-state-item-parity.json", "capability-state-item-parity-v03.json"):
+              report=json.load(open(filename, encoding="utf-8"))
+              print(filename, "checked=",report.get("checked"),"failures=",report.get("failures"))
+              for entry in report.get("results", []):
+                  if not entry.get("ok"):
+                      print("UNRESOLVED:", entry.get("capability"),entry.get("errors"))
+          PY
           exit "$status"
       - name: Inventory v0.3 polymorphic state field datatypes
         id: polymorphic
