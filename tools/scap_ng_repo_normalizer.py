@@ -142,7 +142,7 @@ def neutralize_shared_title(value: str, benchmark_labels: set[str]) -> str:
     linux_family = all(("linux" in x) or x.startswith("rhel") for x in labels)
 
     if windows_family:
-        text = re.sub(r"^\s*WN\d+(?:-[A-Z]{2})?-\d+\s*[-:]?\s*", "", text, flags=re.I)
+        text = re.sub(r"^\s*WN\d+-(?:[A-Z]{2}|\d{2})-\d+\s*[-:]?\s*", "", text, flags=re.I)
         text = re.sub(r"\bWindows\s+Server\s+20\d{2}\b", "Windows", text, flags=re.I)
         text = re.sub(r"\bWindows\s+(?:10|11)\b", "Windows", text, flags=re.I)
 
