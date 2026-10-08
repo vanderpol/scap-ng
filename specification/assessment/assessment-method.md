@@ -611,6 +611,36 @@ for example, OVAL Boolean lexical values `true`, `false`, `1`, and `0`
 remain valid migration inputs where the source schema permits them, while native
 SCAP-NG Boolean literals are the JSON/YAML Boolean values `true` and `false`.
 
+### 0.3 State comparison datatype versus collected Item datatype
+
+For OVAL-derived Assessments, **the datatype declared on an authored State
+predicate is the datatype used for comparison, not necessarily the native
+datatype of the collected Item field**. These are separate contracts:
+
+- The capability's collected-Item field schema identifies the observed value's
+  native representation and preserves that representation in evidence.
+- The authored State's explicit `datatype` governs the comparison. The
+  evaluator attempts the corresponding OVAL-compatible conversion of the
+  collected value before applying the authored comparison operation.
+- An unsupported or unsuccessful required cast SHALL produce an evaluation
+  error under the applicable OVAL result-propagation rules. The evaluator SHALL
+  NOT silently reinterpret the authored datatype, treat an uncastable value as
+  an ordinary mismatch, or weaken a comparison to string equality.
+
+This does **not** permit an authored integer State literal to be expressed as
+the string `"10"`; native authored literals remain correctly typed. For
+example, real Windows 11 SV-253447 and Windows Server 2025 SV-278181 may
+collect Registry `REG_SZ` data yet compare the numeric cached-logon threshold
+using an integer State. The collected Item retains the Registry string type
+and contents; the State expresses the integer comparison. Such source content
+SHALL NOT be rejected merely because the two datatypes differ.
+
+A schema-valid predicate does not prove cast execution or scanner behavior.
+Known-result evaluator tests SHALL cover successful casts, invalid lexical
+casts, collected-value absence, and relevant error propagation before
+claiming runtime equivalence. Evidence for the source/schema correction:
+[0.3 fidelity CI](https://github.com/vanderpol/scap-ng/actions/runs/37809832383).
+
 ## Structured record values
 
 The Assessment language SHALL support **record** values as first-class
