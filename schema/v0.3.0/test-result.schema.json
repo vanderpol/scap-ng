@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.3.0/test-result.schema.json",
   "x-scap-ng-version": "0.3.0",
-  "x-last-modified": "2026-10-06",
+  "x-last-modified": "2026-10-08",
   "title": "SCAP-NG Test Result draft v0.3.0 strawman",
   "description": "Detailed result for one authored Test. Preserves existence, per-State, per-Item, and final Test aggregation layers.",
   "type": "object",
@@ -92,7 +92,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "Item identities involved in execution/collection; this list is not proof that every Item is retained as a per_item_result when evidence was capped."
     },
     "per_item_results": {
       "type": "array",
@@ -101,7 +102,8 @@
         "required": [
           "item_ref",
           "outcome",
-          "state_results"
+          "state_results",
+          "item"
         ],
         "properties": {
           "item_ref": {
@@ -116,10 +118,15 @@
             "items": {
               "$ref": "state-result.schema.json"
             }
+          },
+          "item": {
+            "$ref": "collected-item.schema.json",
+            "description": "Reported system Item with typed attributes, embedded beside this Test's verdict and State comparisons. The item.id SHALL equal item_ref. This is the Test-local evidence, not a second independently evaluated observation."
           }
         },
         "additionalProperties": false
-      }
+      },
+      "description": "Retained per-Item Test comparisons with collected system values inline; may be bounded by the scanner's effective evidence-retention policy. Actual evaluated/mismatching counts belong in item_summary, not this array's length."
     },
     "reason": {
       "type": [
@@ -133,6 +140,46 @@
         "object",
         "null"
       ]
+    },
+    "item_summary": {
+      "type": "object",
+      "description": "Per-Test evaluation and evidence counts. The total mismatch count may be unknown when collection stops early; returned_items counts retained per_item_results, not Items evaluated.",
+      "required": [
+        "evaluated_items",
+        "observed_mismatches",
+        "actual_mismatches",
+        "returned_items",
+        "truncated_evidence"
+      ],
+      "properties": {
+        "evaluated_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_mismatches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_mismatches": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "returned_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated_evidence": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
