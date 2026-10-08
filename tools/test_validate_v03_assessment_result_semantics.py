@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "specification" / "examples" / "0.3.0" / "results"
 AUTOMATED = (
     "assessment-result.json",
+    "assessment-result-pass-omitted.json",
+    "assessment-result-pass-witness.json",
     "assessment-result-multi-file.json",
     "assessment-result-bounded-evidence.json",
     "assessment-result-diagnostic-override.json",
@@ -30,6 +32,34 @@ class AssessmentEvidenceIntegrityTests(unittest.TestCase):
         for filename in AUTOMATED:
             with self.subTest(filename=filename):
                 self.assertEqual(validate_assessment_result_semantics(load(filename)), [])
+
+    def test_passing_items_may_be_omitted_without_reporting_truncation(self):
+        a = load("assessment-result-pass-omitted.json")["assessment_result"]
+        t = a["tests"][0]
+        self.assertEqual(a["outcome"], "true")
+        self.assertEqual(t["outcome"], "true")
+        self.assertEqual(t["item_summary"]["evaluated_items"], 10000)
+        self.assertEqual(t["item_summary"]["observed_mismatches"], 0)
+        self.assertEqual(t["item_summary"]["returned_items"], 0)
+        self.assertEqual(t["per_item_results"], [])
+        self.assertFalse(t["item_summary"]["truncated_evidence"])
+        self.assertTrue(a["population_complete"])
+        self.assertTrue(a["evidence_complete"])
+        self.assertEqual(validate_assessment_result_semantics({"assessment_result": a}), [])
+
+    def test_passing_positive_witness_is_retained_when_decisive(self):
+        a = load("assessment-result-pass-witness.json")["assessment_result"]
+        t = a["tests"][0]
+        self.assertEqual(a["outcome"], "true")
+        self.assertEqual(t["item_summary"]["returned_items"], 1)
+        self.assertEqual(t["item_summary"]["observed_mismatches"], 0)
+        self.assertFalse(t["item_summary"]["truncated_evidence"])
+        witness = t["per_item_results"][0]
+        self.assertEqual(witness["outcome"], "true")
+        self.assertEqual(witness["item"]["fields"]["owner_uid"]["value"], 0)
+        self.assertEqual(witness["state_results"][0]["entity_results"][0]
+                         ["comparison_results"][0]["outcome"], "true")
+        self.assertEqual(validate_assessment_result_semantics({"assessment_result": a}), [])
 
     def test_missing_item_summary_rejected(self):
         doc = load()

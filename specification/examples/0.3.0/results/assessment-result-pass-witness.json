@@ -1,0 +1,176 @@
+{
+  "assessment_result": {
+    "result_schema_version": "0.3.0",
+    "execution_id": "example-pass-witness-1",
+    "assessment": {
+      "id": "example.required-file-owned-by-root",
+      "version": 1
+    },
+    "purpose": "assessment",
+    "class": "compliance",
+    "mode": "automated",
+    "outcome": "true",
+    "logical_complete": true,
+    "population_complete": true,
+    "evidence_complete": true,
+    "tests": [
+      {
+        "id": "file-owner-is-root",
+        "outcome": "true",
+        "check_existence": "at_least_one_exists",
+        "existence_outcome": "true",
+        "check": "all",
+        "state_operator": "AND",
+        "object_refs": [
+          "config-file"
+        ],
+        "state_refs": [
+          "owner-root"
+        ],
+        "item_refs": [
+          "config-file-1"
+        ],
+        "per_item_results": [
+          {
+            "item_ref": "config-file-1",
+            "outcome": "true",
+            "state_results": [
+              {
+                "state_ref": "owner-root",
+                "outcome": "true",
+                "operator": "AND",
+                "entity_results": [
+                  {
+                    "entity": "owner_uid",
+                    "outcome": "true",
+                    "operation": "equals",
+                    "item_values": [
+                      {
+                        "datatype": "integer",
+                        "value": 0,
+                        "status": "exists"
+                      }
+                    ],
+                    "comparison_results": [
+                      {
+                        "outcome": "true",
+                        "item_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        },
+                        "expected_value": {
+                          "datatype": "integer",
+                          "value": 0,
+                          "status": "exists"
+                        }
+                      }
+                    ],
+                    "reason": "Observed owner UID 0 equals required UID 0."
+                  }
+                ]
+              }
+            ],
+            "item": {
+              "id": "config-file-1",
+              "capability": "unix.file",
+              "status": "exists",
+              "fields": {
+                "full_path": {
+                  "datatype": "string",
+                  "value": "/etc/example.conf",
+                  "status": "exists"
+                },
+                "owner_uid": {
+                  "datatype": "integer",
+                  "value": 0,
+                  "status": "exists"
+                },
+                "owner_user_name": {
+                  "datatype": "string",
+                  "value": "root",
+                  "status": "exists"
+                }
+              },
+              "provenance": {
+                "target_ref": "target-1",
+                "source_execution_ref": "collection-file-owner-1"
+              }
+            }
+          }
+        ],
+        "reason": "Required /etc/example.conf exists and its owner UID is 0; the retained passing Item proves the condition.",
+        "item_summary": {
+          "evaluated_items": 1,
+          "observed_mismatches": 0,
+          "actual_mismatches": 0,
+          "returned_items": 1,
+          "truncated_evidence": false
+        }
+      }
+    ],
+    "objects": [
+      {
+        "id": "config-file",
+        "capability": "unix.file",
+        "status": "complete",
+        "item_refs": [
+          "config-file-1"
+        ],
+        "logical_complete": true,
+        "population_complete": true,
+        "stop_reason": null
+      }
+    ],
+    "variables": [],
+    "diagnostics": [],
+    "evidence_summary": {
+      "observed_failures": 0,
+      "actual_failures": 0,
+      "maximum": 50,
+      "returned": 0,
+      "truncated_population": false,
+      "stop_reason": "complete"
+    },
+    "target_ref": "target-1",
+    "expression_execution": {
+      "assessment": "example.required-file-owned-by-root",
+      "invocation_ref": "example-pass-witness-1",
+      "outcome": "true",
+      "executed_tests": [
+        "file-owner-is-root"
+      ],
+      "trace": [
+        {
+          "path": "example.required-file-owned-by-root/evaluate",
+          "kind": "test",
+          "outcome": "true",
+          "test": "file-owner-is-root",
+          "assessment": "example.required-file-owned-by-root",
+          "reused": false,
+          "owner_invocation_ref": "example-pass-witness-1"
+        }
+      ],
+      "diagnostics": []
+    },
+    "field_uses": [
+      {
+        "test_ref": "file-owner-is-root",
+        "item_ref": "config-file-1",
+        "used_elements": [
+          "owner_uid"
+        ],
+        "required_elements": [
+          "full_path"
+        ],
+        "relationship": "direct"
+      }
+    ],
+    "dependent_assessments": [],
+    "evidence_retention": {
+      "scope": "per_test",
+      "maximum_items": 50,
+      "source": "scanner_configuration"
+    }
+  }
+}

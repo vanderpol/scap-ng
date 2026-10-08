@@ -21,6 +21,8 @@ CASES = {
     "scan-result.json": "scan-result.schema.json",
     "benchmark-result.json": "benchmark-result.schema.json",
     "assessment-result.json": "assessment-result.schema.json",
+    "assessment-result-pass-omitted.json": "assessment-result.schema.json",
+    "assessment-result-pass-witness.json": "assessment-result.schema.json",
     "assessment-result-multi-file.json": "assessment-result.schema.json",
     "assessment-result-diagnostic-override.json": "assessment-result.schema.json",
     "assessment-result-bounded-evidence.json": "assessment-result.schema.json",
