@@ -45,10 +45,24 @@ jobs:
           python tools/audit_capability_state_item_parity.py --mapping-dir schema/v0.3.0/capability-mappings/supported --json > capability-state-item-parity-v03.json || status=1
           exit "$status"
       - name: Inventory v0.3 polymorphic state field datatypes
-        run: python tools/audit_v03_polymorphic_datatypes.py --json > v03-polymorphic-fields.json
+        id: polymorphic
+        continue-on-error: true
+        run: |
+          python tools/audit_v03_polymorphic_datatypes.py --json > v03-polymorphic-fields.json || {
+            python -c 'import json; x=json.load(open("v03-polymorphic-fields.json")); print("Polymorphic audit errors:", json.dumps(x.get("structural_errors",[])[:20],indent=2))'
+            exit 1
+          }
       - name: Inventory repeated OVAL Item fields in v0.3
-        run: python tools/audit_v03_item_cardinality.py --json > v03-item-cardinality.json
+        id: cardinality
+        continue-on-error: true
+        run: |
+          python tools/audit_v03_item_cardinality.py --json > v03-item-cardinality.json || {
+            python -c 'import json; x=json.load(open("v03-item-cardinality.json")); print("Cardinality audit errors:", json.dumps(x.get("failures",[])[:20],indent=2))'
+            exit 1
+          }
       - name: Generate and meta-validate every reviewed capability schema
+        id: schema_generation
+        continue-on-error: true
         run: |
           PYTHONPATH=tools python - <<'PY'
           import json
@@ -76,6 +90,7 @@ jobs:
               raise SystemExit(1)
           PY
       - name: Regression test inline Registry type semantics and authored expansion
+        id: regression
         if: always()
         run: |
           PYTHONPATH=tools python -m unittest -v tools/test_registry_inline_datatype_semantics.py tools/test_registry_type_coverage.py tools/test_v03_registry_collected_item.py tools/test_nested_state_field_semantics.py tools/test_audit_v03_item_cardinality.py tools/test_research_expand_registry_authoring.py
@@ -123,12 +138,23 @@ jobs:
             v03-item-cardinality.json
             generated-capability-schema-validation.json
             sv-278217.canonical.json
-      - name: Enforce parity
-        if: steps.audit.outcome != 'success'
+      - name: Enforce all fidelity gates
+        if: always()
+        env:
+          PARITY_OUTCOME: ${{ steps.audit.outcome }}
+          POLYMORPHIC_OUTCOME: ${{ steps.polymorphic.outcome }}
+          CARDINALITY_OUTCOME: ${{ steps.cardinality.outcome }}
+          SCHEMA_OUTCOME: ${{ steps.schema_generation.outcome }}
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
-          cat capability-state-item-parity.json
-          cat capability-state-item-parity-v03.json
-          exit 1
+          status=0
+          for outcome in "$PARITY_OUTCOME" "$POLYMORPHIC_OUTCOME" "$CARDINALITY_OUTCOME" "$SCHEMA_OUTCOME" "$REGRESSION_OUTCOME"; do
+            if [ "$outcome" != "success" ]; then
+              echo "::error::Fidelity gate outcome: $outcome"
+              status=1
+            fi
+          done
+          exit "$status"
 
   announce-audit-run:
     name: Announce fidelity audit run
