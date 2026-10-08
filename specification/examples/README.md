@@ -358,8 +358,8 @@ This is central to [O1 — preserve meaning through migration](../objectives.md)
 
 # Accepted 0.3 authoring modernizations
 
-These are part of the 0.3 requirement set. The final Board package will include
-schema-valid examples for each accepted form.
+These are part of the 0.3 requirement set. The current owner-review package
+includes schema-valid production-derived coverage for each accepted form.
 
 ## Consumer-local components and shared Objects
 
@@ -509,9 +509,13 @@ where useful. It does not add another dedicated sharing construct.
 
 The current generated review set contains RHEL 9, Oracle Linux 9, Windows 11,
 Windows Server 2025, Windows Server DNS, and Apache 2.4 UNIX Server, with
-faithful and modernized authoring trees.
+faithful and modernized authoring trees. All six benchmark jobs plus package
+assembly pass in the linked run. The package REVIEW-GUIDE maps every accepted
+0.3 modernization to real converted content or a clearly labeled
+production-derived native-authoring example when automatic conversion must
+remain fail-closed.
 
-[Open the current successful workflow run](https://github.com/vanderpol/scap-ng/actions/runs/37662165669)
+[Open the current successful workflow run](https://github.com/vanderpol/scap-ng/actions/runs/37705450998)
 and download `scap-ng-0.3-human-review-candidate` from its **Artifacts** section.
 
 Direct Actions artifact URLs are intentionally not used because they are not
