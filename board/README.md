@@ -19,7 +19,11 @@ records. Do not silently rewrite a proposition after voting begins.
 
 ## 0.2.0 preserved review material
 
-The 0.2.0 sample/review corpus remains under
-[review-content/0.2.0/](review-content/0.2.0/) for traceability. Current
-prerelease examples are indexed from the specification and current review area;
-older examples are not current merely because they still validate.
+The historical 0.2.0 schemas are preserved under
+[../schema/v0.2.0/](../schema/v0.2.0/). They are the durable evidence of
+that design checkpoint; **rebuilding its converter output or Board-pilot
+samples is not a 0.3 release requirement**.
+
+Older [0.2 review material](review-content/0.2.0/) may remain for historical
+context only. It is not a maintained validation baseline. Current examples
+and acceptance criteria are in the specification and current review area.

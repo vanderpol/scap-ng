@@ -1,6 +1,6 @@
 # SCAP-NG draft specification
 
-**Status:** pre-alpha working draft. SCAP-NG 0.3.0 is the active development version; 0.2.0 is the frozen earlier review baseline. This is not a released standard.
+**Status:** pre-alpha working draft. SCAP-NG 0.3.0 is the active development version; historical [0.2.0 schemas](../schema/v0.2.0/) are retained as an archived design checkpoint, not a content-reproduction release gate. This is not a released standard.
 
 These pages define the current SCAP-NG contract. Research and design-history records are non-normative; unresolved proposals remain outside the normative text until decided.
 

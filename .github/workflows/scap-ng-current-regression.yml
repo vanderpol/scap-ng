@@ -1,5 +1,6 @@
 name: Current-design regression contracts
-# Current 0.3 development plus frozen 0.2 compatibility contracts.
+# Active 0.3 contracts. Historical 0.2 schema remains in Git, but
+# Board-pilot regeneration is not a release gate.
 on:
   pull_request:
     paths:
@@ -96,32 +97,8 @@ jobs:
           sparse-checkout: oval-schemas
       - name: Verify new-test inventory and source schema compilation
         run: python tools/audit_oval_new_tests.py --upstream-repo work/oval60 --check
-      - name: Checkout frozen SCAP-NG 0.2 Board-pilot baseline
-        uses: actions/checkout@v4
-        with:
-          repository: vanderpol/scap-ng
-          ref: 6d001e40365a2bab58d79303b815d1fc06bebd26
-          path: work/frozen-v02
-      - name: Checkout pinned Self-Assertion source for the bounded Board pilot
-        uses: actions/checkout@v4
-        with:
-          repository: OVAL-Community/SCAP-Self-Assertion
-          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
-          path: work/self-assertion
-          sparse-checkout: SCAP_1.4/OVAL_Test_Content
-      - name: Reproduce frozen 0.2 Board conversions from the recorded pilot baseline
-        run: |
-          (
-            cd work/frozen-v02
-            PYTHONPATH=tools python tools/convert_board_pilot_v02.py --source-root ../self-assertion --check
-            PYTHONPATH=tools python tools/test_board_conversion_v02.py
-            PYTHONPATH=tools python tools/validate_native_json_schemas.py board/review-content/0.2.0/mechanical --schema-dir schema/v0.2.0
-          )
       - name: Current source graph and actual corpus CLI
         run: |
-          python tools/test_board_samples_v02.py --report work/board-pilot-validation.json
-          python tools/validate_native_json_schemas.py board/review-content/0.2.0/content --schema-dir schema/v0.2.0
-          python tools/check_current_authoring_contract.py board/review-content/0.2.0/content
           python tools/check_assessment_reference.py
           python tools/test_esx_host_capabilities_v02.py
           python tools/test_esx_identity_software_v02.py
@@ -167,11 +144,11 @@ jobs:
           python tools/test_generate_windows_ntuser_rights_capabilities.py
           python tools/test_generate_windows_wuaupdatesearcher_capability.py
           python tools/test_validate_generated_capability_semantics.py
-          python tools/test_schema_v02_promotion.py
           python tools/test_generate_textfilecontent54_capability_schema.py
           python tools/test_schema_v03_independence.py
           python tools/test_component_naming_v03.py
           python tools/test_v03_vocabulary_contract.py
+          python tools/test_v03_value_match_contract.py
       - name: Variables, defaults, State entities and explicit semantics
         run: |
           python tools/test_ng_existence_semantics.py
@@ -198,14 +175,11 @@ jobs:
           python tools/test_current_authoring_contract.py
           python tools/test_full_review_contract.py
           python tools/test_tailoring_example.py
-      - name: Validate 0.2.0 promotion invariants
-        run: python tools/test_schema_v02_promotion.py
-
-      - name: Generate reviewed capability schema slice
+       - name: Generate current 0.3 capability schema slice
         run: |
           mkdir -p work/generated-capability-schemas
           python tools/generate_capability_schema.py \
-            --mapping schema/v0.2.0/capability-mappings/supported/unix.file.json \
+            --mapping schema/v0.3.0/capability-mappings/supported/unix.file.json \
             --output work/generated-capability-schemas/unix.file.schema.json
           python -m json.tool work/generated-capability-schemas/unix.file.schema.json > /dev/null
 
@@ -221,13 +195,7 @@ jobs:
           name: conditional-known-results-${{ matrix.os }}
           path: work/conditional-results.json
 
-      - name: Upload Board pilot validation receipt
-        uses: actions/upload-artifact@v4
-        with:
-          name: board-pilot-validation-${{ matrix.os }}
-          path: work/board-pilot-validation.json
-
-      - name: Repository normalization and content compiler
+       - name: Repository normalization and content compiler
         run: |
           python tools/test_scap_ng_repo_normalizer.py
           python tools/test_scap_ng_content_compiler.py

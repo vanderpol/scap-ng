@@ -27,7 +27,6 @@ from validate_native_json_schemas import schema_store
 
 ROOT = Path(__file__).resolve().parents[1]
 V03 = ROOT / "schema" / "v0.3.0"
-V02 = ROOT / "schema" / "v0.2.0"
 VALUES = {
     "all": "all",
     "one_or_more": "at least one",
@@ -121,7 +120,7 @@ class ValueMatchContract(unittest.TestCase):
         del state["state"]["value_match"]
         self.assertTrue(list(validator.iter_errors(state)))
 
-    def test_versioned_conversion_preserves_frozen_02(self):
+    def test_current_03_converter_emits_value_match(self):
         source={"assessment":{"objects":{"file-selector":{
             "capability":"unix.file",
             "select":{"full_path":{
@@ -130,15 +129,12 @@ class ValueMatchContract(unittest.TestCase):
                 "variable_check":"at least one"
             }}
         }},"states":{},"tests":{}}}
-        for version, key in (("0.2.0", "variable_match"),
-                             ("0.3.0", "value_match")):
-            mapping=json.loads((ROOT / "schema" / ("v"+version) /
-                                "capability-mappings/supported/unix.file.json").read_text())
-            converted=apply_capability_mapping(source,mapping)
-            selector=converted["assessment"]["objects"]["file-selector"]["select"]["full_path"]
-            self.assertEqual(selector[key], "any" if version == "0.2.0" else "one_or_more")
-            self.assertNotIn("value_match" if key=="variable_match" else "variable_match",
-                             selector)
+        mapping=json.loads(
+            (V03 / "capability-mappings/supported/unix.file.json").read_text())
+        converted=apply_capability_mapping(source,mapping)
+        selector=converted["assessment"]["objects"]["file-selector"]["select"]["full_path"]
+        self.assertEqual(selector["value_match"], "one_or_more")
+        self.assertNotIn("variable_match", selector)
 
     def test_oval_var_check_six_state_truth_table_parity(self):
         statuses=sorted(RESULTS)
