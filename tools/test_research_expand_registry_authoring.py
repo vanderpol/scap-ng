@@ -18,6 +18,8 @@ class RegistryAuthoringExpansionTests(unittest.TestCase):
   x=expand_registry_test(TEST)
   self.assertEqual(x["states"][0]["state"]["all"][0]["value"], "dword")
   self.assertEqual(x["states"][0]["state"]["all"][1], {"field":"value", "value":1, "operation":"equals", "datatype":"integer", "match":"all", "existence":"one_or_more"})
+  self.assertEqual(x["object"]["select"]["hive"], "local_machine")
+  self.assertIsNone(x["test_title"])
   self.assertEqual(x["object"]["select"]["key"]["value"], r"SYSTEM\CurrentControlSet\Control\Lsa")
  def test_refuse_string_one(self):
   t=copy.deepcopy(TEST); t["states"][0]["expect"]["value"]={"equals":"1"}
