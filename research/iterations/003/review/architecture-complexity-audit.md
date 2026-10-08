@@ -34,6 +34,18 @@ Classify each candidate **keep / simplify / consolidate / remove / research**. C
 - `research/iterations/003/review/native-schema-validation-triage.md`: historical generator/schema/content drift.
 - `tools/measure_post_modernization_residual_patterns.py`, `tools/test_research_inline_private_components.py`: audit/rewrite research already implemented; **not executed during this pass**.
 
+## Second pass: capability contract and authoring overhead
+
+**Confirmed implementation constraint:** `tools/validate_generated_capability_semantics.py` currently rejects Test → Object and Test → State mismatches **for both referenced and inline uses** (`test.object_capability`, `test.inline_object_capability`, `test.state_capability`, `test.inline_state_capability`). It also checks parent Object vs nested Set Object and filter State capabilities. Thus the hypothetical "inline Object with a different compatible capability" is **not currently supported**, notwithstanding generic prose about independently typed nodes. There is a stronger simplification argument for eliminating identical inline declarations **if** each containment parent is explicitly typed and resolved deterministically.
+
+**Important exception:** An inline Object used in Variable-local or nested Object/Set contexts does not necessarily have a Test as lexical parent. A safe rule cannot simply say "all inline Objects inherit from Test"; it must identify the nearest semantically typed parent, require explicit capability when none exists, and reject conflicts. A referenced/shared Object remains explicit and cannot be silently retyped. Filter-local State might inherit from its containing Object rather than a Test. Exact rules still require tests.
+
+**Potential gap in validator structure:** `validate_native_semantics.py` is an entrypoint that delegates to `validate_assessment_capability_semantics`. Its advertised validation scope is within one Assessment and its local graph, so **do not assume** it validates Benchmark → Rule → Assessment Parameter wiring or a completed Organizational Input Set merely because this command passes. The full compilation/policy resolver must be checked separately.
+
+**Confirmed authoring overhead:** `schema/v0.3.0/rule.schema.json` requires `organizational_input_requirements` on **every Rule**, including those with none, and its `uses` entries require repeated Test/State/State-slot references. This is potentially derivable from the selected Assessment's declared input consumers and the Rule's binding, which would reduce duplication and prevent drift. Whether it can be entirely omitted or generated as a manifest/index is an open policy and implementation decision.
+
+**No schema or validator changes made.** These are implementation-backed findings, not corpus statistics or conformance proof.
+
 ## Work remaining before a design freeze / Board release
 
 1. Build a reproducible, pinned baseline from fresh 0.3 conversion and normalization, then run JSON Schema and semantic validators. Count files, failures and provenance classifications.
