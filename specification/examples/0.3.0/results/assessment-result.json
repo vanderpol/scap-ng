@@ -21,9 +21,15 @@
         "existence_outcome": "true",
         "check": "all",
         "state_operator": "AND",
-        "object_refs": ["config-file"],
-        "state_refs": ["owner-root"],
-        "item_refs": ["config-file-1"],
+        "object_refs": [
+          "config-file"
+        ],
+        "state_refs": [
+          "owner-root"
+        ],
+        "item_refs": [
+          "config-file-1"
+        ],
         "per_item_results": [
           {
             "item_ref": "config-file-1",
@@ -64,12 +70,45 @@
                   }
                 ]
               }
-            ]
+            ],
+            "item": {
+              "id": "config-file-1",
+              "capability": "unix.file",
+              "status": "exists",
+              "fields": {
+                "full_path": {
+                  "datatype": "string",
+                  "value": "/etc/example.conf",
+                  "status": "exists"
+                },
+                "owner_uid": {
+                  "datatype": "integer",
+                  "value": 1001,
+                  "status": "exists"
+                },
+                "owner_user_name": {
+                  "datatype": "string",
+                  "value": "example-user",
+                  "status": "exists"
+                }
+              },
+              "provenance": {
+                "target_ref": "target-1",
+                "source_execution_ref": "collection-file-owner-1"
+              }
+            }
           }
         ],
         "reason": {
           "code": "value_mismatch",
           "message": "The collected file owner did not match the required owner."
+        },
+        "item_summary": {
+          "evaluated_items": 1,
+          "observed_mismatches": 1,
+          "actual_mismatches": 1,
+          "returned_items": 1,
+          "truncated_evidence": false
         }
       }
     ],
@@ -78,38 +117,12 @@
         "id": "config-file",
         "capability": "unix.file",
         "status": "complete",
-        "item_refs": ["config-file-1"],
+        "item_refs": [
+          "config-file-1"
+        ],
         "logical_complete": true,
         "population_complete": true,
         "stop_reason": null
-      }
-    ],
-    "items": [
-      {
-        "id": "config-file-1",
-        "capability": "unix.file",
-        "status": "exists",
-        "fields": {
-          "full_path": {
-            "datatype": "string",
-            "value": "/etc/example.conf",
-            "status": "exists"
-          },
-          "owner_uid": {
-            "datatype": "integer",
-            "value": 1001,
-            "status": "exists"
-          },
-          "owner_user_name": {
-            "datatype": "string",
-            "value": "example-user",
-            "status": "exists"
-          }
-        },
-        "provenance": {
-          "target_ref": "target-1",
-          "source_execution_ref": "collection-file-owner-1"
-        }
       }
     ],
     "variables": [],
@@ -127,7 +140,9 @@
       "assessment": "example.file-owner",
       "invocation_ref": "example-file-owner-1",
       "outcome": "false",
-      "executed_tests": ["file-owner-is-root"],
+      "executed_tests": [
+        "file-owner-is-root"
+      ],
       "trace": [
         {
           "path": "example.file-owner/evaluate",
@@ -145,11 +160,20 @@
       {
         "test_ref": "file-owner-is-root",
         "item_ref": "config-file-1",
-        "used_elements": ["owner_uid"],
-        "required_elements": ["full_path"],
+        "used_elements": [
+          "owner_uid"
+        ],
+        "required_elements": [
+          "full_path"
+        ],
         "relationship": "direct"
       }
     ],
-    "dependent_assessments": []
+    "dependent_assessments": [],
+    "evidence_retention": {
+      "scope": "per_test",
+      "maximum_items": 50,
+      "source": "scanner_configuration"
+    }
   }
 }
