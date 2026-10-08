@@ -112,6 +112,8 @@ semantic fidelity are both required.
 - [Manual review notes](manual-review/) — examples where a command is not
   sufficient to decide compliance.
 
+**[Current feasibility and terminology findings](VOCABULARY-FEASIBILITY-2026-10-08.md)** — evidence and implementation-cost comparison of authoring-only aliases versus changes to canonical 0.3/renderer/assessment semantics. Includes a newer six-benchmark corpus cross-check and an explicit warning about the earlier renderer's suppressed defaults. This remains **non-normative research**.
+
 ### Current provisional counts
 
 The 418 default-automated Rules currently classify by observed source features
