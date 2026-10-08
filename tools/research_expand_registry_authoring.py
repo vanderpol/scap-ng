@@ -77,7 +77,7 @@ def expand_registry_test(test):
         "test_title": None,
         "capability": "windows.registry",
         "object": {"capability": "windows.registry", "select": obj},
-        "states": [{"capability": "windows.registry", "state": {"all": [
+        "states": [{"state_title": None, "capability": "windows.registry", "state": {"all": [
             dict(field="type", **kind, match=expect["match"], existence=expect["existence"]),
             dict(field="value", **val, match=expect["match"], existence=expect["existence"]),
         ]}}],
