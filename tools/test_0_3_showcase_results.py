@@ -68,6 +68,30 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
                     self.fail(f"{example_name} failed {schema_name}:\n{details}")
 
 
+    def test_benchmark_embeds_typed_rule_finding_without_execution_graph(self):
+        schema = json.loads((SCHEMA_DIR / "benchmark-result.schema.json").read_text())
+        validator = Draft202012Validator(schema, resolver=RefResolver.from_schema(schema, store=self.store))
+        doc = json.loads((EXAMPLE_DIR / "benchmark-result.json").read_text())
+        rules = doc["benchmark_result"]["rule_results"]
+        self.assertEqual(len(rules), 2)
+        finding = rules[0]["findings"][0]
+        self.assertEqual(finding["observed"]["value"], 1001)
+        self.assertEqual(finding["expected"]["value"], 0)
+        self.assertEqual(finding["subject"]["identifier"], "/etc/example.conf")
+        self.assertEqual(finding["instance_id"], rules[0]["instances"][0]["id"])
+        self.assertEqual(rules[1]["findings"], [], "Manual decisions do not invent Items")
+        for field in ("tests", "items", "observed_state", "expected_state"):
+            self.assertNotIn(field, rules[0])
+        missing = copy.deepcopy(doc)
+        del missing["benchmark_result"]["rule_results"][0]["findings"]
+        self.assertTrue(list(validator.iter_errors(missing)))
+        fabricated = copy.deepcopy(doc)
+        fabricated["benchmark_result"]["rule_results"][0]["findings"][0]["item"] = {"id": "bogus"}
+        self.assertTrue(list(validator.iter_errors(fabricated)))
+        redacted_leak = copy.deepcopy(doc)
+        redacted_leak["benchmark_result"]["rule_results"][0]["findings"][0]["observed"]["redacted"] = True
+        self.assertTrue(list(validator.iter_errors(redacted_leak)))
+
     def test_assessment_intro_contains_real_inline_rule_and_local_object(self):
         example_page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
             encoding="utf-8"

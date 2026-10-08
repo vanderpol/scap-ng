@@ -2,16 +2,17 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.3.0/rule-result.schema.json",
   "x-scap-ng-version": "0.3.0",
-  "x-last-modified": "2026-10-06",
+  "x-last-modified": "2026-10-08",
   "title": "SCAP-NG Rule Result draft v0.3.0 strawman",
-  "description": "Compact policy-facing result for one effectively selected Rule. Detailed Assessment execution data remains in referenced Assessment Results.",
+  "description": "Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment Results own the underlying technical execution.",
   "type": "object",
   "required": [
     "rule_id",
     "outcome",
     "assessment",
     "message",
-    "instances"
+    "instances",
+    "findings"
   ],
   "properties": {
     "rule_id": {
@@ -309,7 +310,224 @@
         "conditions"
       ],
       "additionalProperties": false
+    },
+    "findings": {
+      "type": "array",
+      "description": "Bounded decisive Assessment-derived typed facts. Empty when none can safely be reported; no copied execution graph.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/comparison_finding"
+          },
+          {
+            "$ref": "#/$defs/missing_finding"
+          }
+        ]
+      }
+    },
+    "finding_counts": {
+      "type": "object",
+      "description": "Optional collection summary: evaluated population and actual failures are distinct from returned evidence. Only aggregate independent instance populations when justified.",
+      "required": [
+        "evaluated_items",
+        "observed_violations",
+        "actual_violations",
+        "population_complete",
+        "reported_items",
+        "sample_truncated"
+      ],
+      "properties": {
+        "evaluated_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_violations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_violations": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "reported_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample_truncated": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "population_complete": {
+                "const": false
+              }
+            },
+            "required": [
+              "population_complete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "actual_violations": {
+                "const": "unknown"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "subject": {
+      "type": "object",
+      "required": [
+        "kind",
+        "identifier"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparison_finding": {
+      "type": "object",
+      "required": [
+        "kind",
+        "instance_id",
+        "subject",
+        "field",
+        "operation",
+        "expected",
+        "observed",
+        "outcome"
+      ],
+      "properties": {
+        "kind": {
+          "const": "comparison"
+        },
+        "instance_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "$ref": "result-types.schema.json#/$defs/typed_value"
+        },
+        "observed": {
+          "$ref": "result-types.schema.json#/$defs/typed_value"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "unknown",
+            "error",
+            "not_evaluated",
+            "not_applicable"
+          ]
+        },
+        "test_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "missing_finding": {
+      "type": "object",
+      "description": "Missing required resource or inconclusive collection; no fictional Item.",
+      "required": [
+        "kind",
+        "instance_id",
+        "subject",
+        "predicate",
+        "expected_existence",
+        "observed_existence",
+        "outcome"
+      ],
+      "properties": {
+        "kind": {
+          "const": "missing"
+        },
+        "instance_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "predicate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_existence": {
+          "enum": [
+            "exists",
+            "does_not_exist"
+          ]
+        },
+        "observed_existence": {
+          "enum": [
+            "exists",
+            "does_not_exist",
+            "not_collected",
+            "error"
+          ]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "unknown",
+            "error",
+            "not_evaluated",
+            "not_applicable"
+          ]
+        },
+        "test_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }

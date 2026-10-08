@@ -50,7 +50,9 @@
           "code": "value_mismatch",
           "message": "The collected file owner did not match the required owner."
         },
-        "evidence_refs": ["config-file-1"],
+        "evidence_refs": [
+          "config-file-1"
+        ],
         "instances": [
           {
             "id": "instance-1",
@@ -58,7 +60,9 @@
             "assessment_result_ref": "example-file-owner-1",
             "assessment_invocation_id": "example-file-owner-1",
             "message": "The collected file was not owned by root.",
-            "evidence_refs": ["config-file-1"]
+            "evidence_refs": [
+              "config-file-1"
+            ]
           }
         ],
         "weight": 10,
@@ -67,7 +71,32 @@
         "applicability": {
           "outcome": "applicable",
           "conditions": []
-        }
+        },
+        "findings": [
+          {
+            "kind": "comparison",
+            "instance_id": "instance-1",
+            "subject": {
+              "kind": "file",
+              "identifier": "/etc/example.conf"
+            },
+            "field": "owner_uid",
+            "operation": "equals",
+            "expected": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            },
+            "observed": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 1001
+            },
+            "outcome": "fail",
+            "test_ref": "file-owner-is-root",
+            "item_ref": "config-file-1"
+          }
+        ]
       },
       {
         "rule_id": "rule-home-nosuid",
@@ -81,7 +110,9 @@
         },
         "message": "The assessor found /home mounted without nosuid.",
         "reason": "manual_assessment_failed",
-        "evidence_refs": ["evidence-home-mount-1"],
+        "evidence_refs": [
+          "evidence-home-mount-1"
+        ],
         "instances": [
           {
             "id": "instance-1",
@@ -89,7 +120,9 @@
             "assessment_result_ref": "example-manual-home-nosuid-1",
             "assessment_invocation_id": "example-manual-home-nosuid-1",
             "message": "Manual review determined the requirement was not satisfied.",
-            "evidence_refs": ["evidence-home-mount-1"]
+            "evidence_refs": [
+              "evidence-home-mount-1"
+            ]
           }
         ],
         "weight": 10,
@@ -98,7 +131,8 @@
         "applicability": {
           "outcome": "applicable",
           "conditions": []
-        }
+        },
+        "findings": []
       }
     ]
   }
