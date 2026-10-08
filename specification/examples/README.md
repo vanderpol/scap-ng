@@ -77,7 +77,7 @@ The **Rule owns the requirement and fix**; its [automated Assessment](assessment
 
 **RHEL 9 SV-257851** offers an automated check for `/home` mount options and a manual check procedure. The Rule retains the requirement; the chosen Assessment contains the actual Test.
 
-**See the [complete worked Rule → Assessment example](assessments.md#automated-assessments)**, with both the real Rule's `assessment_choices` and the inline `object`, `states`, and `evaluate` YAML. Those examples are deliberately kept together on the Assessment page so a reader can follow the relationship without jumping back and forth.
+**See the [complete worked Rule → Assessment example](assessments.md#start-here-the-rule-and-its-automated-assessment)**, with both the real Rule's `assessment_choices` and the inline `object`, `states`, and `evaluate` YAML. Those examples are deliberately kept together on the Assessment page so a reader can follow the relationship without jumping back and forth.
 
 The **agreed 0.3 authoring contract** uses stable Assessment IDs instead of relative file paths. The remaining compiler/converter migration is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199); the linked walkthrough clearly labels its ID-based sample as the intended format.
 
@@ -103,7 +103,7 @@ This excerpt shows the first three of **417 disabled Rules** from that Profile. 
 
 An ordinary Rule may apply only when a package or system feature is present. The converted RHEL 9 `applicability.yaml` includes an explicit condition `benchmark.rhel_9.condition.gnome-shell-package`, linked to an Assessment that checks installation. SCAP-NG uses technical checks for applicability rather than treating CPE text as a magical scanner predicate.
 
-Details: [applicability Assessment example](assessments.md#applicability-assessment-technical-example).
+Details: [applicability Assessment example](assessments.md#applicability-first-check-whether-a-rule-applies).
 
 ## Readable Benchmark and Rule results
 
@@ -135,7 +135,7 @@ The current [0.3 Benchmark Result fixture](0.3.0/results/benchmark-result.json) 
 }
 ```
 
-The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#assessment-results-actual-system-data-beside-every-test).
+The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For the decisive Test/State/Item comparisons, see [Assessment Results that explain the root cause](assessments.md#after-scanning-assessment-results-that-explain-why).
 
 ### How Scan, Benchmark, and Assessment Results fit together
 
@@ -172,6 +172,6 @@ This material is not needed to understand the policy examples.
 
 ### Cross-file reference implementation status
 
-The [worked RHEL 9 example](assessments.md#the-rule-points-to-an-assessment) shows the agreed **logical-ID** authoring notation. At this pre-alpha checkpoint, the current compiler still resolves legacy source-path references; migration to native logical-ID lookup is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
+The [worked RHEL 9 example](assessments.md#1-the-rule-chooses-how-to-check-the-requirement) shows the agreed **logical-ID** authoring notation. At this pre-alpha checkpoint, the current compiler still resolves legacy source-path references; migration to native logical-ID lookup is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
-For measured assessment reductions, the exact `for_each:` search index, source provenance and broader census, see the [Assessment page's detailed evidence](assessments.md#detailed-reference-and-evidence). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.
+For measured authoring reductions, source provenance and the broader census, see the [Assessment page's optional evidence](assessments.md#evidence-and-further-reading-optional). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.
