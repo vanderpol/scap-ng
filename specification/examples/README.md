@@ -8,39 +8,6 @@ the complete review build are linked when more detail is useful.
 > post-0.3 research are labeled separately. An example does not become normative
 > merely because it validates or appears on this page.
 
-## 0.3 at a glance
-
-SCAP-NG 0.3 is now backed by both focused conformance tests and production-scale
-migration evidence:
-
-- **6/6 representative benchmarks pass** schema and semantic validation: RHEL 9,
-  Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and
-  Apache 2.4 UNIX.
-- The final **65-package NIWC census converts 61 packages**, with the remaining
-  **4 blocked only by the already-known unsupported SQL extension** and **0
-  unexpected blockers**.
-- Proven automatic modernization found **55 real `for_each` rewrites** and folded
-  **509 compile-time constant Variables** while keeping runtime/dataflow Variables
-  explicit.
-- Across 6,916 Rule Assessments, the modernized authoring view reduces top-level
-  Object entries by **95.68%**, State entries by **100%**, Variables by **59.69%**,
-  and named component references by **94.42%**.
-
-**How these numbers were measured:** the final census used the pinned current
-NIWC SCAP 1.4 corpus (65 packages; 61 convertible; 6,916 Rule Assessments). For
-each generated Assessment, it compared the fidelity-first SCAP-NG conversion
-with the same content after only accepted, exact/reversible 0.3 authoring
-transformations. The percentages above count **top-level named graph
-structures/references**, not source XML bytes and not scanner runtime. For
-perspective, normalized serialized output decreased by only **3.13% in bytes**
-and **5.20% in lines**—the much larger reductions are specifically the
-indirection an author or reviewer must navigate.
-
-See the [0.3 modernization review guide](../../review/current/REVIEW-GUIDE.md)
-for real before/after STIG examples and the
-[current review page](../../review/current/README.md) for the validated build,
-pinned corpus revision, and full census evidence.
-
 The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
 ## Benchmark → Rule → Assessment
@@ -548,6 +515,59 @@ is the single source for the active build, provenance, and download instructions
 The frozen 0.2 Board-review examples remain available for historical comparison
 under [board/review-content/0.2.0](../../board/review-content/0.2.0/README.md).
 They are not presented as current 0.3 examples.
+
+## 0.3 migration results — the broader picture
+
+The examples above are a **six-benchmark human-review set**, selected to make the
+new authoring model understandable across Linux, Windows, and services. They are
+not the whole migration experiment.
+
+**Where the 65 benchmarks came from.** NIWC Atlantic publishes a public
+[SCAP 1.4 content library](https://github.com/niwc-atlantic/scap-content-library).
+For a reproducible baseline, this project pinned its `Current/` directory to
+[revision `8c8e5dff`](https://github.com/niwc-atlantic/scap-content-library/tree/8c8e5dff860af6b1290ee9273a282db24278f8d5/Current).
+That snapshot contains **65 individual signed benchmark ZIPs** for operating
+systems and applications, plus **one consolidated bundle**. The bundle is not a
+66th distinct benchmark. These are existing production SCAP 1.4 artifacts,
+not 65 examples written specifically for SCAP-NG. We used them to see whether
+the new design works beyond hand-picked demonstrations.
+
+**What we did.** We ran conversion and modernization across that frozen
+source set, compared fidelity-first generated Assessments with the same
+Assessments after supported, semantics-preserving 0.3 authoring simplifications,
+and separately validated six representative benchmark trees for human review.
+The figures below describe **conversion and authoring structure**, not scans
+of live machines or a claim that all SCAP 1.4 constructs are supported.
+
+| Measure | Observed result |
+| --- | --- |
+| Individual SCAP 1.4 benchmark packages examined | **65** |
+| Packages converted | **61** |
+| Known blockers | **4**, all from the unsupported SQL extension; **0 unexpected** |
+| Representative benchmark trees passing schema and semantic validation | **6 of 6** |
+| Rule Assessments in the measured modernization set | **6,916** |
+| Confirmed automatic `for_each` rewrites | **55** |
+| Compile-time constant Variables folded | **509** |
+| Fewer top-level named Objects / States | **95.68% / 100%** |
+| Fewer top-level Variables / named component references | **59.69% / 94.42%** |
+| Reduction in normalized serialized bytes / lines | **3.13% / 5.20%** |
+
+**How to read the reductions.** The dramatic percentages refer to the
+*top-level named component graph* that an author must navigate: many Objects
+and States moved next to their consuming Test rather than disappearing as
+actual collection or comparison behavior. They are **not** a 95% reduction
+in file size, scanner work, or runtime, and do not mean all real-world
+assessment complexity disappeared. The much smaller byte/line changes
+provide an important cross-check on that distinction. The converter deliberately
+retains complex structures when simpler syntax would alter OVAL results.
+
+For the actual before/after STIG cases, see the
+[modernization review guide](../../review/current/REVIEW-GUIDE.md).
+The [current review page](../../review/current/README.md) maintains the
+validated build, detailed census evidence, and links to the downloadable
+artifact. The [corpus manifest](../../tests/corpus-manifest.yaml) records
+the exact source snapshot and separates real production migration evidence
+from synthetic conformance fixtures.
 
 ## Version rule
 
