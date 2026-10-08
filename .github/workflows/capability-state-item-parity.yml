@@ -10,6 +10,7 @@ on:
       - tools/audit_capability_state_item_parity.py
       - tools/audit_v03_polymorphic_datatypes.py
       - tools/audit_v03_item_cardinality.py
+      - tools/audit_v03_deprecated_mappings.py
       - tools/validate_generated_capability_semantics.py
       - tools/test_registry_inline_datatype_semantics.py
       - tools/test_registry_type_coverage.py
@@ -69,6 +70,14 @@ jobs:
             python -c 'import json; x=json.load(open("v03-item-cardinality.json")); print("Cardinality audit errors:", json.dumps(x.get("failures",[])[:20],indent=2))'
             exit 1
           }
+      - name: Reject deprecated OVAL mapping entities
+        id: deprecated
+        continue-on-error: true
+        run: |
+          python tools/audit_v03_deprecated_mappings.py --json > v03-deprecated-mappings.json || {
+            python -c 'import json; x=json.load(open("v03-deprecated-mappings.json")); print("Deprecated mapping errors:", json.dumps(x.get("violations",[])[:20],indent=2))'
+            exit 1
+          }
       - name: Generate and meta-validate every reviewed capability schema
         id: schema_generation
         continue-on-error: true
@@ -115,6 +124,7 @@ jobs:
               "v03_parity":"capability-state-item-parity-v03.json",
               "v03_polymorphic":"v03-polymorphic-fields.json",
               "v03_cardinality":"v03-item-cardinality.json",
+              "v03_deprecated":"v03-deprecated-mappings.json",
               "capability_schemas":"generated-capability-schema-validation.json",
           }
           rows=[]
@@ -124,8 +134,8 @@ jobs:
                   rows.append(f"| {label} | MISSING | - |")
                   continue
               report=json.loads(path.read_text(encoding="utf-8"))
-              count=report.get("checked",report.get("mapping_count",report.get("checked_source_items","-")))
-              failures=report.get("failures",report.get("structural_errors",[]))
+              count=report.get("checked",report.get("mapping_count",report.get("checked_source_items",report.get("mappings","-"))))
+              failures=report.get("failures",report.get("structural_errors",report.get("violations",[])))
               failure_count=failures if isinstance(failures,int) else len(failures)
               status="PASS" if failure_count==0 else f"FAIL: {failure_count}"
               rows.append(f"| {label} | {status} | {count} |")
@@ -145,6 +155,7 @@ jobs:
             capability-state-item-parity-v03.json
             v03-polymorphic-fields.json
             v03-item-cardinality.json
+            v03-deprecated-mappings.json
             generated-capability-schema-validation.json
             sv-278217.canonical.json
       - name: Enforce all fidelity gates
@@ -153,11 +164,12 @@ jobs:
           PARITY_OUTCOME: ${{ steps.audit.outcome }}
           POLYMORPHIC_OUTCOME: ${{ steps.polymorphic.outcome }}
           CARDINALITY_OUTCOME: ${{ steps.cardinality.outcome }}
+          DEPRECATED_OUTCOME: ${{ steps.deprecated.outcome }}
           SCHEMA_OUTCOME: ${{ steps.schema_generation.outcome }}
           REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
           status=0
-          for outcome in "$PARITY_OUTCOME" "$POLYMORPHIC_OUTCOME" "$CARDINALITY_OUTCOME" "$SCHEMA_OUTCOME" "$REGRESSION_OUTCOME"; do
+          for outcome in "$PARITY_OUTCOME" "$POLYMORPHIC_OUTCOME" "$CARDINALITY_OUTCOME" "$DEPRECATED_OUTCOME" "$SCHEMA_OUTCOME" "$REGRESSION_OUTCOME"; do
             if [ "$outcome" != "success" ]; then
               echo "::error::Fidelity gate outcome: $outcome"
               status=1
