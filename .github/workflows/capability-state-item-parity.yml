@@ -130,6 +130,30 @@ jobs:
           cat capability-state-item-parity-v03.json
           exit 1
 
+  announce-audit-run:
+    name: Announce fidelity audit run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Expose run link before the parity tests finish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "<!-- scap-ng-v03-fidelity-ci-run -->"
+            echo "### Latest automated SCAP-NG 0.3 datatype fidelity run"
+            echo ""
+            echo "- Result: **running**"
+            echo "- Run: ${RUN_URL}"
+            echo "- Source SHA: \`${SOURCE_SHA}\`"
+          } > "${RUNNER_TEMP}/scap-ng-fidelity-ci-comment.md"
+          gh issue comment 201 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/scap-ng-fidelity-ci-comment.md"
+
   publish-audit-run:
     name: Publish audit run link
     needs: [parity]
