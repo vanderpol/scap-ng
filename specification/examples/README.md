@@ -422,8 +422,8 @@ Assessment input name.
 | Rule `inputs.required-time-sources-input.parameter` | `approved_time_sources` | Same Benchmark Parameter |
 | Rule `inputs` mapping key | `required-time-sources-input` | Assessment `inputs.required-time-sources-input` |
 | State `value.input` | `required-time-sources-input` | The same declared Assessment input, referenced directly |
-| Test `states` entry | `state-source-approved` | State using the supplied value |
-| Root `evaluate.test` | `test-time-sources` | Test performing the comparison |
+| Test `states` entry | `approved-time-source-state` | State using the supplied value |
+| Root `evaluate.test` | `time-sources-test` | Test performing the comparison |
 
 The Assessment Request separately selects **which Input Set** applies:
 `organizational_input.id: example.production-site` and
@@ -438,9 +438,9 @@ values.approved_time_sources = [ntp1.example.test, ntp2.example.test]
     -> Benchmark Parameter approved_time_sources
     -> Rule maps approved_time_sources to required-time-sources-input
     -> Assessment input required-time-sources-input
-    -> State state-source-approved: hostname compared directly to required-time-sources-input
-    -> Test test-time-sources
-    -> evaluate: test-time-sources
+    -> State approved-time-source-state: hostname compared directly to required-time-sources-input
+    -> Test time-sources-test
+    -> evaluate: time-sources-test
 ```
 
 **1. Publisher's Benchmark** declares *what* the organization must supply,
@@ -477,13 +477,13 @@ organizational_input_requirements:
     - input: approved_time_sources
       required: true
       uses:
-        - test: test-time-sources
-          state: state-source-approved
+        - test: time-sources-test
+          state: approved-time-source-state
           state_slot: hostname
 ```
 
 This is the precise destination: the `hostname` expected-State field used
-by `test-time-sources`. The scanner can identify the consumer before
+by `time-sources-test`. The scanner can identify the consumer before
 execution, validate that the Rule's declaration agrees with the Assessment,
 and report missing/invalid input against that exact location. The supplied
 list does **not** apply globally to every Test or State in the Benchmark.
@@ -502,7 +502,7 @@ inputs:
     cardinality: one_or_more
     required: true
 states:
-  state-source-approved:
+  approved-time-source-state:
     capability: linux.chrony
     state:
       field: hostname
