@@ -64,45 +64,65 @@ assessment:
 
 The [0.3 Manual Assessment Result](0.3.0/results/manual-assessment-result.json) illustrates attribution and evidence **using synthetic result data**, not an actual assessment.
 
-## Assessment Results: collected Items and decisive comparisons
+## Assessment Results: actual system data beside every Test
 
-**SCAP 1.4:** OVAL Results/System Characteristics retain collected system data, but readers often must join Tests, Objects, States and Items to understand which specific values failed.
+**OVAL / SCAP 1.4:** A Definition's outcome, the Test verdicts, and collected System Characteristics live in separate structures. Understanding a failure requires joining Tests, Objects, States and Items.
 
-**SCAP-NG:** An Assessment Result retains the **actual reported system Items**, their typed fields, provenance, and per-Item Test/State comparisons. It can stand alone without a Benchmark.
+**SCAP-NG:** One Assessment execution produces a self-contained Assessment Result. Each Test has its **technical outcome**, reported system Items and expected-versus-observed comparisons **together**. This works for standalone Assessment scans as well as for Benchmark-linked results.
 
-For example, this **synthetic three-Item scan** checks whether a configuration directory and its two files are owned by UID `0`. One fails:
+### One failed file ownership Test
 
-| Collected file or directory | Type | Observed owner UID | Mode | Comparison |
-| --- | --- | ---: | --- | --- |
-| `/etc/example.d` | directory | 0 | `0755` | Pass |
-| `/etc/example.d/agent.conf` | file | **1001** | `0644` | **Fail** |
-| `/etc/example.d/network.conf` | file | 0 | `0640` | Pass |
-
-The result records each Item's `full_path`, file type, owner UID and username, group ID, mode, size in bytes, collection status and provenance. It then records the actual comparison for **each** Item. The failing one contains:
+The [single-file synthetic Assessment Result](0.3.0/results/assessment-result.json) includes this Test-local observation (other fields and comparisons omitted here):
 
 ```json
 {
-  "item_ref": "config-agent-file",
+  "id": "file-owner-is-root",
   "outcome": "false",
-  "state_results": [{
-    "state_ref": "owner-root",
-    "outcome": "false",
-    "entity_results": [{
-      "entity": "owner_uid",
-      "operation": "equals",
-      "comparison_results": [{
-        "outcome": "false",
-        "item_value": {"datatype": "integer", "value": 1001, "status": "exists"},
-        "expected_value": {"datatype": "integer", "value": 0, "status": "exists"}
-      }]
-    }]
+  "per_item_results": [{
+    "item_ref": "config-file-1",
+    "item": {
+      "id": "config-file-1",
+      "capability": "unix.file",
+      "status": "exists",
+      "fields": {
+        "full_path": {"datatype": "string", "value": "/etc/example.conf", "status": "exists"},
+        "owner_uid": {"datatype": "integer", "value": 1001, "status": "exists"}
+      }
+    },
+    "outcome": "false"
   }]
 }
 ```
 
-[**Open the complete three-Item Assessment Result**](0.3.0/results/assessment-result-multi-file.json) to inspect its `items`, `tests[].per_item_results`, `objects`, `field_uses`, completeness, and failure-evidence accounting. Every collected Item in this example is retained; this is **not** a five-Item sample from a larger population. Only fields authorized by the Assessment's reporting selection should be emitted; redacted or uncollected fields must not be invented.
+The complete result also shows the decisive comparison: **UID 1001 found; UID 0 required**, along with the owner's name, collection provenance and other authorized attributes.
 
-By contrast, the [Benchmark's Rule Result](README.md#readable-benchmark-and-rule-results) only needs the readable finding and decisive values—not this full technical graph. A [simpler, single-file Assessment Result](0.3.0/results/assessment-result.json) is also available. Both fixtures are synthetic, not observations from a live scanner.
+### Three files, one failed comparison
+
+Our [three-Item synthetic Assessment Result](0.3.0/results/assessment-result-multi-file.json) retains each Item's path, type, owner, group, mode, size and provenance directly beside the per-Item Test verdict:
+
+| File or directory | UID found | UID required | Technical outcome |
+| --- | ---: | ---: | --- |
+| `/etc/example.d` | 0 | 0 | `true` |
+| `/etc/example.d/agent.conf` | **1001** | 0 | **`false`** |
+| `/etc/example.d/network.conf` | 0 | 0 | `true` |
+
+When an Assessment contains ten Tests, each Test can report the system data relevant to its own outcome, even where Tests inspected the same observation for different purposes.
+
+### Normal and diagnostic reporting use the same content
+
+The **scanner application**, not a separate Benchmark or Assessment file, selects the evidence-retention limit. A diagnostic run may override it, without modifying the authored checks or verdict.
+
+| | Normal scan | Diagnostic run |
+| --- | --- | --- |
+| Per-Test maximum reported Items | 2 | 50 |
+| Failing Items observed | 20 | 20 |
+| Detailed Items retained | 2 | 20 |
+| Assessment outcome | `false` | `false` |
+| Entire population evaluated? | No | No |
+
+Compare the [normal bounded-evidence fixture](0.3.0/results/assessment-result-bounded-evidence.json) with the [diagnostic override fixture](0.3.0/results/assessment-result-diagnostic-override.json). These are **synthetic examples**, not real scanner runs. Their `evidence_retention` object records the effective per-Test maximum and whether it came from scanner configuration or an operator override, including the override reason. **50 is an example setting, not a hidden default.**
+
+An evidence cap limits retained examples, **not what the Test evaluates**. If actual collection stops early, the result separately reports incomplete population and an unknown final mismatch total. Raising the reporting limit does not bypass scanner resource safeguards or author-controlled `reported_elements` and redaction. The [Benchmark Result](README.md#readable-benchmark-and-rule-results) needs only the concise decisive finding; the Assessment Result preserves the detailed technical evidence.
 
 ## Applicability Assessment (technical example)
 
