@@ -4,11 +4,12 @@ This is the single active human-review entry point.
 
 ## Start here — one review path
 
-1. **Start with the basics:** [Benchmark → Rule → Assessment examples](../../specification/examples/README.md#benchmark--rule--assessment). Read the first few examples before browsing advanced features.
-2. **Compare before and after:** [0.3 modernization review guide](REVIEW-GUIDE.md), including explicit boundaries for conversions that remain fail-closed.
-3. **Inspect all six actual benchmark trees:** open [the latest verified end-to-end six-anchor build](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) and download the **`scap-ng-board-representative-review`** artifact under *Artifacts*. Its `authoring/` tree includes two Linux, two Windows, DNS and Apache STIGs; the build also produced normalized and compiled packages.
+1. **Start with the policy:** [real Benchmark and Rule examples](../../specification/examples/README.md), with actual STIG titles, discussion, identifiers, fixes and publisher Profiles.
+2. **Then inspect the checks:** [automated and manual Assessment examples](../../specification/examples/assessments.md), including readable results and 0.3 modernizations.
+3. **Compare before and after:** [0.3 modernization review guide](REVIEW-GUIDE.md), including boundaries for conversions that remain fail-closed.
+4. **Inspect all six actual benchmark trees:** open [the latest verified end-to-end six-anchor build](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) and download the **`scap-ng-board-representative-review`** artifact under *Artifacts*. Its `authoring/` tree includes two Linux, two Windows, DNS and Apache STIGs; the build also produced normalized and compiled packages.
 
-For specific searches in that ZIP (including `for_each:`, `shared_objects:`, Set/Filter and typed arrays), see the [exact-key feature index](../../specification/examples/README.md#finding-features-inside-the-six-benchmark-review-zip).
+For specific searches in that ZIP (including `for_each:`, `shared_objects:`, Set/Filter and typed arrays), see the [exact-key feature index](../../specification/examples/assessments.md#finding-features-inside-the-six-benchmark-review-zip).
 
 **Evidence status (October 8, 2026):** The six-benchmark build linked above passed conversion, native 0.3 schema/semantic validation, graph validation, normalization and compilation. The separate [65-source active-0.3 release gate](https://github.com/vanderpol/scap-ng/issues/202) has not yet been certified green. Four `independent.sqlext` packages are acknowledged blockers; pending compilation/runtime-equivalence issues are not resolved by a successful six-anchor build. 0.3 remains a **pre-alpha review candidate**, and OVAL Board release awaits owner acceptance.
 
