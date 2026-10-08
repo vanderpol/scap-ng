@@ -8,6 +8,12 @@ Source: DISA Microsoft Windows Server 2025 STIG, **WN25-00-000440 / V-278029**, 
 
 **What this example proves:** the *human readability of a proposed native representation* of a real, conditional STIG check. **What it does not prove:** a working Windows collector, exact OVAL/SCAP 1.4 equivalence, semantic conformance, completed Organizational Input implementation, or actual Windows target evaluation.
 
+
+## Concrete 0.3 comparison (new)
+
+- [Closest current 0.3 authoring shape](current-0.3-shape.research.yaml) — actual `tests`, inline `object`/`states`, and nested `if/then/else` using currently supported mapping names; **research-only and not semantically validated**.
+- [Why the 0.3-shaped version is not yet equivalent](0.3-gap-analysis.md) — typed NtpServer parsing, PDC role proof, unsupported unknown-return path, scoped Organizational Input, and conditional six-state behavior.
+
 ## What the real Rule asks
 
 - A domain-joined server **other than the domain controller holding the PDC Emulator role** must have Windows Time NTP Client `Type=NT5DS`.
