@@ -395,18 +395,33 @@ def validate_windows_policy_state_ranges(test_id,test,states):
     return diagnostics
 
 
+def _all_state_leaves(payload):
+    """Visit every authored predicate, regardless of its Boolean placement."""
+    if not isinstance(payload,dict):
+        return
+    if isinstance(payload.get("field"),str):
+        yield payload
+    for operator in ("all","any","one","odd"):
+        children=payload.get(operator)
+        if isinstance(children,list):
+            for child in children:
+                yield from _all_state_leaves(child)
+    if isinstance(payload.get("not"),dict):
+        yield from _all_state_leaves(payload["not"])
+
+
 def _literal_state_values(states, state_ids, field):
     for state_id in state_ids or []:
         state=states.get(state_id)
         if not isinstance(state,dict):
             continue
-        payload=state.get("state") or {}
-        if payload.get("field") != field:
-            continue
-        value=payload.get("value")
-        if isinstance(value,dict) and set(value)=={"variable"}:
-            continue
-        yield state_id,payload
+        for payload in _all_state_leaves(state.get("state")):
+            if payload.get("field") != field:
+                continue
+            value=payload.get("value")
+            if isinstance(value,dict) and set(value) in ({"variable"},{"input"}):
+                continue
+            yield state_id,payload
 
 
 def _conjunctive_state_leaves(payload):
