@@ -62,6 +62,12 @@ def validate_input_contracts(benchmark,rules,assessments):
             declared_inputs=assessment.get("inputs") or {}
             bindings=choice.get("inputs") or {}
             references=_declared_consumers(assessment)
+            if not references:
+                # Legacy computed-Variable inputs and manual inputs have their
+                # own resolution contract. This checker is specifically for
+                # the new direct expected-State input form; never infer consumers
+                # merely because an Assessment declares an Input.
+                continue
             seen={(test,state,slot,name) for test,state,slot,name in references}
             for test,state,slot,name in references:
                 if not slot or name not in declared_inputs:

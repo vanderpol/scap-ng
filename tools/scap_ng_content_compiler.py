@@ -34,6 +34,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import pkcs7
 from cryptography.x509.oid import NameOID
 
+from validate_v03_input_contracts import validate_input_contracts
+
 
 def canonical_json(value: Any) -> bytes:
     return json.dumps(
@@ -547,6 +549,16 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
     validate_draft_expression_assessments(
         {aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()},
         allow_unpromoted_conversion_vocabulary=allow_unpromoted_conversion_vocabulary,
+    )
+
+    # Native 0.3 direct State inputs are policy bindings, not runtime
+    # collection selectors. Verify that every published Rule location and
+    # Parameter declaration agrees before packaging immutable references.
+    validate_input_contracts(
+        compiled_benchmark["benchmark"],
+        {rid: json.loads(members[object_index[rid]["path"]])["rule"]
+         for rid in compiled_rule_ids},
+        {aid: doc["assessment"] for aid, (_, doc) in assessment_docs.items()},
     )
 
     for aid, (source_path, doc) in sorted(assessment_docs.items()):
