@@ -6,9 +6,60 @@ For policy context, see the [Benchmark and Rule examples](README.md). This page 
 
 ## Automated Assessments
 
-**SCAP 1.4:** An OVAL check commonly requires following separate Test, Object, and State IDs. **SCAP-NG:** A private Object and State may live directly with their Test, making the check easier to read.
+**SCAP 1.4:** A Rule points to an OVAL Definition; following its Tests, Objects and States usually means jumping among separate IDs. **SCAP-NG:** The Rule still says *what is required*, but its Assessment shows *how to check it*, with private Objects and States directly beside their Test.
 
-Start with the [real RHEL 9 `nosuid` Assessment](README.md#the-automated-assessment--the-actual-check) immediately after the Benchmark → Rule → Assessment linkage. This page continues with manual Assessments, technical results, and more advanced examples rather than repeating the same introductory YAML.
+### 1. The Rule points to an Assessment
+
+Here is **real converted RHEL 9 STIG Rule SV-257851**. Its requirement is that the `/home` filesystem use the `nosuid` mount option. These `assessment_choices` are the actual current source-path form (the rest of the Rule is omitted):
+
+```yaml
+rule:
+  id: SV-257851
+  assessment_choices:
+    default:
+      assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
+    automated:
+      assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257851.manual.yaml
+```
+
+The automated choice leads to the technical check; the manual choice leads to a human procedure. The `default` and `automated` selections can share one Assessment. The compiler resolves these relative source paths when packaging content. Logical-ID references are [planned but not yet supported in authoring](https://github.com/vanderpol/scap-ng/issues/199).
+
+### 2. The actual Assessment, with a local Object and State
+
+This excerpt is from the same **real converted RHEL 9 check**, not invented syntax. It contains the selected filesystem, required mount option and evaluation root together in one Assessment file; only surrounding metadata is omitted.
+
+```yaml
+tests:
+  home-mounted-nosuid-option-test:
+    capability: linux.partition
+    object:
+      capability: linux.partition
+      select:
+        mount_point:
+          value: .*\\/home
+          operation: pattern_match
+          datatype: string
+    states:
+      - capability: linux.partition
+        state:
+          field: mount_options
+          value: nosuid
+          operation: equals
+          datatype: string
+          match: one_or_more
+          existence: one_or_more
+    reported_elements: all
+    existence: one_or_more
+    match: all
+evaluate:
+  test: home-mounted-nosuid-option-test
+```
+
+Read the check from top to bottom: the **Test** checks the mount options; its local **Object** selects the `/home` filesystem; its local **State** expects `nosuid`; and **`evaluate`** identifies the Test that supplies the Assessment's technical outcome.
+
+In SCAP 1.4, readers would usually follow Test, Object and State references through separate OVAL structures. Here those private parts are together, making the check easier to author and review. The actual Rule's policy title, severity and fix remain on the [Benchmark and Rule page](README.md#rhel-9-rule--the-requirement).
 
 ## Manual Assessments
 
