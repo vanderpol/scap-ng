@@ -75,7 +75,7 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         main_page = (ROOT / "specification" / "examples" / "README.md").read_text(
             encoding="utf-8"
         )
-        intro = example_page.split("## Manual Assessments", 1)[0]
+        intro = example_page.split("## The alternative: a manual Assessment", 1)[0]
         blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", intro)
         self.assertEqual(len(blocks), 2, "Start with Rule linkage and the real Assessment YAML")
         rule = yaml.safe_load(blocks[0])["rule"]
@@ -95,22 +95,22 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
             self.assertNotIn("/", reference, "Authors use IDs, not file paths")
             self.assertNotIn("\\", reference, "Authors use IDs, not file paths")
             self.assertFalse(reference.endswith(".yaml"))
-        self.assertIn("not yet the current converter's output", intro)
+        self.assertIn("Compiler support for resolving these IDs is still pending", intro)
         test = assessment["tests"]["home-mounted-nosuid-option-test"]
         self.assertEqual(test["object"]["capability"], "linux.partition")
         self.assertIn("mount_point", test["object"]["select"])
         self.assertEqual(test["states"][0]["state"]["field"], "mount_options")
         self.assertEqual(test["states"][0]["state"]["value"], "nosuid")
         self.assertEqual(assessment["evaluate"]["test"], "home-mounted-nosuid-option-test")
-        self.assertIn("assessments.md#automated-assessments", main_page)
+        self.assertIn("assessments.md#start-here-the-rule-and-its-automated-assessment", main_page)
 
     def test_applicability_example_uses_logical_assessment_id(self):
         example_page = (
             ROOT / "specification" / "examples" / "assessments.md"
         ).read_text(encoding="utf-8")
         applicability = example_page.split(
-            "## Applicability Assessment (technical example)", 1
-        )[1].split("## Authoring improvements", 1)[0]
+            "## Applicability: first check whether a rule applies", 1
+        )[1].split("## Practical authoring improvements", 1)[0]
         blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", applicability)
         self.assertEqual(len(blocks), 1)
         entry = yaml.safe_load(blocks[0])["applicability"]
@@ -118,6 +118,26 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         self.assertEqual(ref, "condition.gnome-shell-package")
         self.assertNotIn("/", ref)
         self.assertFalse(ref.endswith(".yaml"))
+
+    def test_assessment_page_reads_simple_to_advanced(self):
+        page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
+            encoding="utf-8"
+        )
+        headings = [
+            "## Start here: the Rule and its automated Assessment",
+            "## The alternative: a manual Assessment",
+            "## After scanning: Assessment Results that explain why",
+            "## Applicability: first check whether a rule applies",
+            "## Practical authoring improvements",
+            "## Advanced or not-yet-automated features",
+            "## Evidence and further reading (optional)",
+        ]
+        positions = [page.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        self.assertEqual(page.count("### Organizational Input"), 1)
+        self.assertNotIn('"maximum": 20', page, "Example must match current cap")
+        self.assertNotIn('"stop_reason": "evidence_maximum_reached"', page)
+        self.assertNotIn("## Additional authoring details", page)
 
     def test_inline_collected_items_and_comparisons(self):
         for name in (
