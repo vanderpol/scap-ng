@@ -1,6 +1,7 @@
 # Proposed SCAP-NG 0.3 authoring surface — NOT a current schema-valid Assessment.
 # Intent is to make real SV-278029 comprehensible to a Windows administrator.
 # Requires logical-reference resolution (#199), selector/State syntax (#200),
+# a formally defined generic pure transformation contract (not a new capability),
 # PDC Emulator detection, parsed NTP peers and explicit branch-result semantics.
 assessment:
   id: example.sv-278029-windows-time
@@ -73,17 +74,26 @@ assessment:
       match: all
 
     approved-ntp-peers-test:
-      # A typed windows.time.peers collector is PROPOSED, not yet supported.
-      # Reading raw registry NtpServer and checking equals would be incorrect:
-      # it may contain multiple peers, commas, flags, and whitespace.
-      capability: windows.time.peers
-      # No "source" selector: the capability uniquely defines what is collected.
-      # A future collector contract must specify the source, parser, and evidence.
+      # Existing windows.registry capability collects the raw NtpServer value.
+      # The normalization/iteration below is PROPOSED authoring syntax, NOT
+      # a validated 0.3 transformation or a new scanner capability.
+      capability: windows.registry
       object:
-        collect: {}
+        select:
+          hive:
+            equals: local_machine
+          key:
+            equals: 'SYSTEM\CurrentControlSet\Services\W32Time\Parameters'
+          name:
+            equals: NtpServer
+      transform:
+        # Defined, deterministic pure processing of collected evidence.
+        # Parse whitespace-separated peer tokens and their comma flags.
+        # Preserve raw evidence and return error/unknown on malformed input.
+        parse: windows-ntpserver-peers
+        field: value
       states:
         - expect:
-            # Explicitly require EVERY configured parsed peer to be authorized.
             every_peer:
               in:
                 input: authorized-time-sources-input
