@@ -81,22 +81,28 @@ jobs:
 
           native = root / "active-directory-forest-native"
           repo = Path(".")
-          checks = [
-              (native / "benchmark.yaml", repo / "schema/v0.2.0/benchmark.schema.json"),
-          ]
-          checks += [
-              (path, repo / "schema/v0.2.0/rule.schema.json")
-              for path in sorted((native / "rules").glob("*.rule.yaml"))
-          ]
-          checks += [
-              (path, repo / "schema/v0.2.0/manual-assessment.schema.json")
-              for path in sorted((native / "assessments/manual").glob("*.assessment.yaml"))
-          ]
-          for doc_path, schema_path in checks:
-              doc = yaml.safe_load(doc_path.read_text(encoding="utf-8"))
-              schema = json.loads(schema_path.read_text(encoding="utf-8"))
-              errors = sorted(Draft202012Validator(schema).iter_errors(doc), key=lambda e: list(e.path))
-              assert not errors, (doc_path, [e.message for e in errors[:10]])
+          # Legacy-import comparison remains available against the 0.2 draft;
+          # additionally validate the exact same converted documents against
+          # the active 0.3 native Benchmark/Rule/Manual Assessment contracts.
+          # This is structural validation, not logical-ID compiler migration.
+          for version in ("0.2.0", "0.3.0"):
+              schema_dir = repo / "schema" / f"v{version}"
+              checks = [
+                  (native / "benchmark.yaml", schema_dir / "benchmark.schema.json"),
+              ]
+              checks += [
+                  (path, schema_dir / "rule.schema.json")
+                  for path in sorted((native / "rules").glob("*.rule.yaml"))
+              ]
+              checks += [
+                  (path, schema_dir / "manual-assessment.schema.json")
+                  for path in sorted((native / "assessments/manual").glob("*.assessment.yaml"))
+              ]
+              for doc_path, schema_path in checks:
+                  doc = yaml.safe_load(doc_path.read_text(encoding="utf-8"))
+                  schema = json.loads(schema_path.read_text(encoding="utf-8"))
+                  errors = sorted(Draft202012Validator(schema).iter_errors(doc), key=lambda e: list(e.path))
+                  assert not errors, (version, doc_path, [e.message for e in errors[:10]])
 
           html = (root / "active-directory-forest-audit.html").read_text(encoding="utf-8")
           assert "Active Directory Forest" in html
