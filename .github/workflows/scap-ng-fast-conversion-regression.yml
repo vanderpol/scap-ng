@@ -194,7 +194,6 @@ jobs:
         run: |
           python scap-ng/tools/validate_native_json_schemas.py work/candidate-source \
             --schema-dir scap-ng/schema/v0.3.0 \
-            --allow-unpromoted-conversion-vocabulary \
             --report work/schema-validation.json
       - name: Validate native Assessment semantics
         run: |
@@ -217,7 +216,6 @@ jobs:
         run: |
           python scap-ng/tools/validate_native_json_schemas.py work/board-source \
             --schema-dir scap-ng/schema/v0.3.0 \
-            --allow-unpromoted-conversion-vocabulary \
             --report work/board-schema-validation.json
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/board-source \
             --report work/board-semantic-validation.json
@@ -229,8 +227,7 @@ jobs:
             --output-dir work/board-packages \
             --metrics work/compiler-metrics.json \
             --source-revision ${{ env.NIWC_REVISION }} \
-            --scap-ng-revision ${{ github.event.pull_request.head.sha || github.sha }} \
-            --allow-unpromoted-conversion-vocabulary
+            --scap-ng-revision ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Stage compact Board review artifact
         run: |
           python - <<'PY'
