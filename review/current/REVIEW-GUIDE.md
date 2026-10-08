@@ -8,6 +8,13 @@ authoring example.
 When reading this file inside the generated review package, paths below are
 relative to the package root.
 
+**Provenance rule for Board examples:** Start with actual DISA STIG checks.
+For each modernization, record the source Rule ID and legacy mechanism,
+native representation, change achieved, and how semantic correctness was
+verified. Native examples derived from real checks must remain identified
+as *authored research*, not converter output. Hypothetical policy fixtures
+are not evidence of newly automating a manual STIG Rule.
+
 ## Modernization coverage
 
 | 0.3 decision | Production example | Review status |
