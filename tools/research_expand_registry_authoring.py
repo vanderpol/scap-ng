@@ -85,3 +85,45 @@ def expand_registry_test(test):
         "existence": test["existence"], "match": test["match"]
     }
     return copy.deepcopy(result)
+
+
+def expand_registry_assessment(document):
+    """Expand research-only, single-Registry-Test Assessment without changing policy."""
+    if not isinstance(document, dict) or set(document) != {"assessment"}:
+        raise AuthoringError("expected one assessment document")
+    assessment = document["assessment"]
+    if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
+        raise AuthoringError("automated assessment required")
+    if not isinstance(assessment.get("tests"), dict) or len(assessment["tests"]) != 1:
+        raise AuthoringError("exactly one test required by this limited prototype")
+    result = copy.deepcopy(document)
+    test_id, test = next(iter(assessment["tests"].items()))
+    result["assessment"]["tests"][test_id] = expand_registry_test(test)
+    return result
+
+
+def main():
+    import argparse
+    import json
+    from pathlib import Path
+    import yaml
+
+    parser = argparse.ArgumentParser(description="Experimental single-test Registry shorthand expansion")
+    parser.add_argument("source", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--validate-v03", action="store_true")
+    args = parser.parse_args()
+    source = yaml.safe_load(args.source.read_text(encoding="utf-8"))
+    expanded = expand_registry_assessment(source)
+    if args.validate_v03:
+        from validate_native_json_schemas import build_validators, document_errors
+        root = Path(__file__).resolve().parents[1]
+        validator = build_validators(root / "schema/v0.3.0")["assessment.schema.json"]
+        errors = list(document_errors(validator, expanded))
+        if errors:
+            raise AuthoringError("0.3 schema/semantic validation failed: " + " | ".join(str(e) for e in errors))
+    args.output.write_text(json.dumps(expanded, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()
