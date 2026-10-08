@@ -1,6 +1,7 @@
 # Research: closest current 0.3.0 authored shape.
 # NOT validated/tested, NOT a lossless conversion or compliant publisher policy.
 # The final not_applicable arm is a diagnostic placeholder, not a settled STIG disposition.
+# The existing domain-joined dependency is OLD-format source and the PDC dependency is UNSATISFIED.
 assessment:
   id: example.sv-278029-windows-time
   version: 1
@@ -15,34 +16,22 @@ assessment:
       required: true
       description: Publisher-delegated approved DoW time source identifiers.
 
-  tests:
-    domain-member-not-pdc-test:
-      test_title: System is domain joined and is not the PDC Emulator
-      capability: windows.wmi.query
-      object:
-        capability: windows.wmi.query
-        collect:
-          namespace: root\\cimv2
-          query: SELECT DomainRole FROM Win32_ComputerSystem
-      states:
-        - capability: windows.wmi.query
-          state:
-            field: result
-            record:
-              match: all
-              existence: one_or_more
-              fields:
-                domainrole:
-                  value: [1, 3, 4]
-                  operation: equals
-                  datatype: integer
-                  variable_match: one_or_more
-                  match: one_or_more
-                  existence: one_or_more
-      reported_elements: all
-      existence: one_or_more
-      match: all
+  # An existing legacy applicability Assessment can be upgraded and reused.
+  # A dedicated PDC Emulator holder Assessment is a RESEARCH DEPENDENCY:
+  # it is not implemented and cannot be treated as resolved.
+  dependencies:
+    domain-joined:
+      assessment: ../../../../../../research/assessment-simplification/samples/ms_windows_server_2025/assessments/applicability/niwc.ms_windows_server_2025.condition.windows-domain-member-server-or-domain-controller.assessment.yaml
+      expected_id: niwc.ms_windows_server_2025.condition.windows-domain-member-server-or-domain-controller.assessment
+      expected_version: 1
+      purpose: applicability
+    local-pdc-emulator:
+      assessment: RESEARCH-ONLY-NOT-IMPLEMENTED/pdc-emulator-holder.assessment.yaml
+      expected_id: research.windows.local-pdc-emulator-holder
+      expected_version: 1
+      purpose: applicability
 
+  tests:
     time-type-nt5ds-test:
       test_title: Time configuration uses NT5DS
       capability: windows.registry
@@ -111,7 +100,10 @@ assessment:
       match: all
 
   evaluate:
-    if: {test: domain-member-not-pdc-test}
+    if:
+      all:
+        - assessment: domain-joined
+        - not: {assessment: local-pdc-emulator}
     then: {test: time-type-nt5ds-test}
     else:
       if: {test: time-type-ntp-test}
