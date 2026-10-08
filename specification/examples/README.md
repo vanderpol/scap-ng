@@ -8,6 +8,17 @@ the complete review build are linked when more detail is useful.
 > post-0.3 research are labeled separately. An example does not become normative
 > merely because it validates or appears on this page.
 
+**Source-first example policy:** Prefer a real published DISA STIG Rule for every
+feature, with Rule ID, benchmark/version, original check text or automation,
+native assessment, and a concrete explanation of the improvement. Distinguish
+(a) faithfully converted automated checks, (b) formerly manual checks with
+*demonstrated and validated* new automation, and (c) real checks extended by
+explicit publisher-delegated organizational values. Never imply a synthetic
+requirement was part of a STIG. A fictional fixture may explain an unproven
+feature, but it must be marked research-only and does not count as proof of
+modernization. If no defensible real case exists, leave the feature out of the
+Board showcase rather than inventing a result.
+
 The excerpts below are from the **validated 0.3.0 candidate** produced by [workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654), source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`. Download the `scap-ng-0.3-human-review-candidate` artifact and follow the exact paths shown. Excerpts omit surrounding fields and are **not standalone Assessments**. **Converted** means the converter emitted the file; **native example** means authored content, not an automatic rewrite; **fixture** means invented test data, not a live scan.
 
 ## Benchmark → Rule → Assessment
