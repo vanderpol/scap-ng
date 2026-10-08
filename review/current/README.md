@@ -2,40 +2,21 @@
 
 This is the single active human-review entry point.
 
-## Read first
+## Start here — one review path
 
-1. [Core objectives](../../specification/objectives.md)
-2. [0.3 modernization review guide](REVIEW-GUIDE.md)
-3. [SCAP-NG feature tour and 0.3 source/result examples](../../specification/examples/README.md)
-4. [Draft specification](../../specification/README.md)
-5. [Objective-to-issue traceability](../../OBJECTIVES.md)
+1. **Understand the changes:** [90-second 0.3 feature showcase](../../specification/examples/README.md#90-second-03-showcase). Each accepted modernization links to a specific real STIG source example.
+2. **Compare before and after:** [0.3 modernization review guide](REVIEW-GUIDE.md), including explicit boundaries for conversions that remain fail-closed.
+3. **Inspect all six actual benchmark trees:** open [the latest verified end-to-end six-anchor build](https://github.com/vanderpol/scap-ng/actions/runs/37813594321) and download the **`scap-ng-board-representative-review`** artifact under *Artifacts*. Its `authoring/` tree includes two Linux, two Windows, DNS and Apache STIGs; the build also produced normalized and compiled packages.
 
-## Current development review
+For specific searches in that ZIP (including `for_each:`, `shared_objects:`, Set/Filter and typed arrays), see the [exact-key feature index](../../specification/examples/README.md#finding-features-inside-the-six-benchmark-review-zip).
 
-SCAP-NG 0.3.0 is active pre-alpha work. The current six-benchmark candidate is
-schema/semantic clean and assembled for owner review; Board publication remains
-pending human acceptance.
+**Evidence status (October 8, 2026):** The six-benchmark build linked above passed conversion, native 0.3 schema/semantic validation, graph validation, normalization and compilation. The separate [65-source active-0.3 release gate](https://github.com/vanderpol/scap-ng/issues/202) has not yet been certified green. Four `independent.sqlext` packages are acknowledged blockers; pending compilation/runtime-equivalence issues are not resolved by a successful six-anchor build. 0.3 remains a **pre-alpha review candidate**, and OVAL Board release awaits owner acceptance.
 
-- [0.3.0 schema](../../schema/v0.3.0/README.md)
-- [0.3.0 agenda / semantic-promotion tracker](https://github.com/vanderpol/scap-ng/issues/174)
-- [Open 0.3.0 issues](https://github.com/vanderpol/scap-ng/milestone/2)
+**Results examples:** [0.3 Scan, Benchmark and Assessment Result fixtures](../../specification/examples/0.3.0/results/README.md) are clearly labeled **synthetic**; they explain summary, provenance, bounded evidence and manual attribution but are not real scanner output.
 
-Representative full-benchmark candidate artifacts are produced by the
-[0.3 candidate human-review workflow](https://github.com/vanderpol/scap-ng/actions/workflows/0.3-candidate-human-review.yml).
+The earlier [deterministic human-review snapshot](https://github.com/vanderpol/scap-ng/actions/runs/37755622654) remains available for historical comparison with source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`; it is **not** the latest regression build. The full-corpus modernization research measurements are kept separate from the active [full-corpus release checkpoint](https://github.com/vanderpol/scap-ng/actions/workflows/scap-ng-full-current-v03-release.yml).
 
-Current successful **6/6** six-benchmark owner-review candidate:
-[workflow run 37755622654](https://github.com/vanderpol/scap-ng/actions/runs/37755622654).
-
-Open the run's **Artifacts** section and download
-`scap-ng-0.3-human-review-candidate`. The deterministic inner review ZIP has
-SHA-256 `fb887034148eebf31d9518f7a95f2d6fcd35f4a0317a5f4979d8cd924f14eece`
-and identifies SCAP-NG source commit `138c1d2f7695f1c1fe73ceb4f49de16e509dcfde`.
-Direct artifact URLs are intentionally not used here because they are not
-reliable navigation links for all GitHub sessions.
-
-Final full-corpus modernization census:
-[workflow run 37708757220](https://github.com/vanderpol/scap-ng/actions/runs/37708757220)
-— **65 source packages, 61 generated, 4 known SQL-extension blockers, 0 unexpected blockers**.
+For further detail, use the [0.3 schema](../../schema/v0.3.0/README.md), [core objectives](../../specification/objectives.md), [current draft specification](../../specification/README.md) and [0.3 Board release issue](https://github.com/vanderpol/scap-ng/issues/191). The showcase and review guide above are the primary reader-facing entry points.
 
 ## Explicitly deferred beyond 0.3
 
