@@ -75,56 +75,11 @@ The **Rule owns the requirement and fix**; its [automated Assessment](assessment
 
 ## How the Rule selects an Assessment
 
-The RHEL 9 Rule offers `default`, `automated`, and `manual` choices. The automated choice refers to a reusable Assessment checking the `/home` mount, while the manual choice preserves the STIG check procedure.
+**RHEL 9 SV-257851** offers an automated check for `/home` mount options and a manual check procedure. The Rule retains the requirement; the chosen Assessment contains the actual Test.
 
-**Planned logical-ID syntax (not yet implemented):** references use stable IDs, so moving files does not require updating relative paths. For example:
+**See the [complete worked Rule → Assessment example](assessments.md#automated-assessments)**, with both the real Rule's `assessment_choices` and the inline `object`, `states`, and `evaluate` YAML. Those examples are deliberately kept together on the Assessment page so a reader can follow the relationship without jumping back and forth.
 
-```yaml
-rule:
-  id: SV-257851
-  assessment_choices:
-    automated:
-      assessment: rhel9.sv-257851.automated
-    manual:
-      assessment: rhel9.sv-257851.manual
-```
-
-The compiler must discover IDs in a declared scope, reject missing or ambiguous references, and package immutable resolved identities. **Implementation is not yet complete** ([#199](https://github.com/vanderpol/scap-ng/issues/199)); the real transitional source-path form is documented [below](#cross-file-reference-implementation-status).
-
-## The automated Assessment — the actual check
-
-Following the Rule's automated choice leads to a **real converted RHEL 9 Assessment** checking that the `/home` mount includes the `nosuid` option. Here is the core check (metadata and other fields omitted):
-
-```yaml
-tests:
-  home-mounted-nosuid-option-test:
-    capability: linux.partition
-    object:
-      capability: linux.partition
-      select:
-        mount_point:
-          value: .*\\/home
-          operation: pattern_match
-          datatype: string
-    states:
-      - capability: linux.partition
-        state:
-          field: mount_options
-          value: nosuid
-          operation: equals
-          datatype: string
-          match: one_or_more
-          existence: one_or_more
-    reported_elements: all
-    existence: one_or_more
-    match: all
-evaluate:
-  test: home-mounted-nosuid-option-test
-```
-
-Reading this top to bottom: **`test`** names the check, its local **`object`** selects the `/home` filesystem, the local **`state`** says which mount option is required, and **`evaluate`** selects the Test whose technical outcome is returned. There is no need to jump to separate Object and State files just to understand this simple check.
-
-This excerpt is from the real converted RHEL 9 `SV-257851` automated Assessment, not a new proposed syntax. For standalone automated/manual Assessments, the Test-centered **result format**, and modern features, continue to the [Assessment examples](assessments.md).
+Source authoring still uses relative paths, resolved at packaging. The planned logical-ID form is tracked separately in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
 ## Publisher Profiles
 
@@ -217,18 +172,6 @@ This material is not needed to understand the policy examples.
 
 ### Cross-file reference implementation status
 
-**Current converter output (SV-257851):**
-
-```yaml
-assessment_choices:
-  default:
-    assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
-  automated:
-    assessment: ../../shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml
-  manual:
-    assessment: ../assessments/manual/SV-257851.manual.yaml
-```
-
-The compiler currently resolves these source paths to Assessment IDs inside compiled packages. Logical-ID references in source are planned across Benchmark, Rule, Assessment, and dependency links, but are not yet supported ([#199](https://github.com/vanderpol/scap-ng/issues/199)).
+The [worked RHEL 9 example](assessments.md#the-rule-points-to-an-assessment) shows the converter's actual path-based Assessment references. The compiler resolves them to Assessment IDs inside compiled packages; future source-level logical-ID references remain under [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
 For measured assessment reductions, the exact `for_each:` search index, source provenance and broader census, see the [Assessment page's detailed evidence](assessments.md#detailed-reference-and-evidence). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.
