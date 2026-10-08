@@ -20,6 +20,8 @@ EXAMPLE_DIR = ROOT / "specification" / "examples" / "0.3.0" / "results"
 CASES = {
     "scan-result.json": "scan-result.schema.json",
     "benchmark-result.json": "benchmark-result.schema.json",
+    "benchmark-result-organizational-input.json": "benchmark-result.schema.json",
+    "assessment-result-organizational-input.json": "assessment-result.schema.json",
     "assessment-result.json": "assessment-result.schema.json",
     "assessment-result-pass-omitted.json": "assessment-result.schema.json",
     "assessment-result-pass-witness.json": "assessment-result.schema.json",

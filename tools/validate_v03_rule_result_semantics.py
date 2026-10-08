@@ -60,3 +60,56 @@ def validate_rule_result_semantics(rule: dict) -> list[dict]:
         if observed > retained and not counts["sample_truncated"]:
             report("counts.omission_not_marked", "finding_counts.sample_truncated")
     return errors
+
+
+def validate_benchmark_organizational_input_links(document: dict) -> list[dict]:
+    """Verify Rule-level summaries against authoritative Benchmark registry.
+
+    Run after JSON Schema validation. The input's actual use by a specific
+    Assessment invocation is validated separately when Assessment Results
+    are available; this guards the published Benchmark/Rule result boundary.
+    """
+    root = document.get("benchmark_result", {})
+    if not isinstance(root, dict):
+        return [{"code": "benchmark.invalid", "path": "benchmark_result"}]
+    registry = (root.get("effective_policy") or {}).get("organizational_inputs") or {}
+    errors = []
+    for rule_index, rule in enumerate(root.get("rule_results") or []):
+        if not isinstance(rule, dict):
+            continue
+        seen = set()
+        for input_index, entry in enumerate(rule.get("organizational_inputs") or []):
+            path = f"rule_results[{rule_index}].organizational_inputs[{input_index}]"
+            if not isinstance(entry, dict):
+                errors.append({"code":"organizational_input.invalid", "path":path})
+                continue
+            ref = entry.get("organizational_input_ref")
+            if ref in seen:
+                errors.append({"code":"organizational_input.duplicate_ref",
+                               "path":path+".organizational_input_ref"})
+            seen.add(ref)
+            canonical = registry.get(ref)
+            if canonical is None:
+                errors.append({"code":"organizational_input.unknown_ref",
+                               "path":path+".organizational_input_ref"})
+                continue
+            if entry.get("parameter") != canonical.get("parameter"):
+                errors.append({"code":"organizational_input.parameter_mismatch",
+                               "path":path+".parameter"})
+            typed = entry.get("effective_value") or {}
+            if canonical.get("redacted") is True:
+                if typed.get("redacted") is not True or "value" in typed:
+                    errors.append({"code":"organizational_input.redacted_registry_leak",
+                                   "path":path+".effective_value"})
+            elif "value" in canonical and "value" in typed:
+                if typed["value"] != canonical["value"]:
+                    errors.append({"code":"organizational_input.value_mismatch",
+                                   "path":path+".effective_value.value"})
+            authority = entry.get("authority_summary") or {}
+            canonical_provenance = canonical.get("provenance") or {}
+            for key in ("organization", "authorization_reference"):
+                if key in authority and key in canonical_provenance:
+                    if authority[key] != canonical_provenance[key]:
+                        errors.append({"code":"organizational_input.authority_mismatch",
+                                       "path":path+".authority_summary."+key})
+    return errors

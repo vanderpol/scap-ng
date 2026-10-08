@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, RefResolver
-from validate_v03_rule_result_semantics import validate_rule_result_semantics
+from validate_v03_rule_result_semantics import validate_rule_result_semantics, validate_benchmark_organizational_input_links
 
 ROOT = Path(__file__).resolve().parents[1]
 S = ROOT / "schema" / "v0.3.0"
@@ -37,6 +37,66 @@ class RuleFindingSemanticsTests(unittest.TestCase):
         for rule in rules:
             self.assertEqual(validate_rule_result_semantics(rule), [])
         self.assertEqual(rules[1]["findings"], [])
+
+    def org_doc(self):
+        return json.loads((E / "benchmark-result-organizational-input.json").read_text())
+
+    def test_organizational_input_provenance_is_normalized_with_rule_visibility(self):
+        doc = self.org_doc()
+        self.assertEqual(list(self.validator.iter_errors(doc)), [])
+        b = doc["benchmark_result"]
+        rule = b["rule_results"][0]
+        entry = rule["organizational_inputs"][0]
+        ref = entry["organizational_input_ref"]
+        self.assertEqual(ref, "example-site-owner-policy")
+        source = b["effective_policy"]["organizational_inputs"][ref]
+        self.assertEqual(source["parameter"], entry["parameter"])
+        self.assertEqual(source["value"], entry["effective_value"]["value"])
+        self.assertEqual(source["provenance"]["authorization_reference"],
+                         entry["authority_summary"]["authorization_reference"])
+        assessment = json.loads((E / "assessment-result-organizational-input.json").read_text())
+        consumed = assessment["assessment_result"]["consumed_organizational_inputs"][0]
+        self.assertEqual(consumed["organizational_input_ref"], ref)
+        self.assertEqual(consumed["value"], source["value"])
+        self.assertEqual(validate_benchmark_organizational_input_links(doc), [])
+
+    def test_rule_organizational_input_must_reference_valid_canonical_value(self):
+        doc = self.org_doc()
+        rule = doc["benchmark_result"]["rule_results"][0]
+        value = rule["organizational_inputs"][0]
+        value["organizational_input_ref"] = "not-a-real-ref"
+        self.assertIn("organizational_input.unknown_ref",
+                      {e["code"] for e in validate_benchmark_organizational_input_links(doc)})
+        value["organizational_input_ref"] = "example-site-owner-policy"
+        value["effective_value"]["value"] = 23
+        self.assertIn("organizational_input.value_mismatch",
+                      {e["code"] for e in validate_benchmark_organizational_input_links(doc)})
+        value["effective_value"]["value"] = 0
+        rule["organizational_inputs"].append(copy.deepcopy(value))
+        self.assertIn("organizational_input.duplicate_ref",
+                      {e["code"] for e in validate_benchmark_organizational_input_links(doc)})
+
+    def test_rule_cannot_expose_canonical_redacted_input(self):
+        doc = self.org_doc()
+        registry = doc["benchmark_result"]["effective_policy"]["organizational_inputs"]["example-site-owner-policy"]
+        registry["redacted"] = True
+        registry.pop("value")
+        self.assertIn("organizational_input.redacted_registry_leak",
+                      {e["code"] for e in validate_benchmark_organizational_input_links(doc)})
+        item = doc["benchmark_result"]["rule_results"][0]["organizational_inputs"][0]["effective_value"]
+        item.pop("value")
+        item["redacted"] = True
+        self.assertEqual(list(self.validator.iter_errors(doc)), [])
+        self.assertEqual(validate_benchmark_organizational_input_links(doc), [])
+
+    def test_organizational_rule_entry_requires_ref_and_typed_value(self):
+        doc = self.org_doc()
+        entry = doc["benchmark_result"]["rule_results"][0]["organizational_inputs"][0]
+        entry.pop("organizational_input_ref")
+        self.assertTrue(list(self.validator.iter_errors(doc)))
+        entry["organizational_input_ref"] = "example-site-owner-policy"
+        entry["effective_value"] = {"status": "exists", "value": 0}
+        self.assertTrue(list(self.validator.iter_errors(doc)))
 
     def test_finding_matches_authoritative_assessment_witness(self):
         rule = self.doc()["benchmark_result"]["rule_results"][0]

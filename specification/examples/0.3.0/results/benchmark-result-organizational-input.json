@@ -1,0 +1,177 @@
+{
+  "benchmark_result": {
+    "result_schema_version": "0.3.0",
+    "run_id": "example-run-1",
+    "started_at": "2026-10-07T16:00:00Z",
+    "completed_at": "2026-10-07T16:05:00Z",
+    "benchmark": {
+      "id": "example.rhel9",
+      "version": "0.3-review",
+      "package_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "target_ref": "target-1",
+    "effective_policy": {
+      "profile": "stig",
+      "tailoring": null,
+      "selected_rules": [
+        "rule-file-owner",
+        "rule-home-nosuid"
+      ],
+      "disabled_rules": [],
+      "check_selectors": {
+        "rule-file-owner": "automated",
+        "rule-home-nosuid": "manual"
+      },
+      "parameters": {
+        "approved_owner_uid": 0
+      },
+      "organizational_inputs": {
+        "example-site-owner-policy": {
+          "parameter": "approved_owner_uid",
+          "value": 0,
+          "source": "organizational_input",
+          "input_set": {
+            "id": "example.production-site",
+            "version": 1
+          },
+          "provenance": {
+            "organization": "Example Organization",
+            "supplied_by": "Example Security Engineer",
+            "supplied_at": "2026-10-08T10:00:00Z",
+            "authorized_by": "Example Security Manager",
+            "authorized_at": "2026-10-08T10:05:00Z",
+            "authorization_reference": "EXAMPLE-POLICY-2026",
+            "authorization_status": "approved",
+            "source_system": "Example site policy service"
+          },
+          "redacted": false
+        }
+      }
+    },
+    "summary": {
+      "total": 2,
+      "pass": 0,
+      "fail": 2,
+      "not_applicable": 0,
+      "not_evaluated": 0,
+      "error": 0,
+      "unknown": 0
+    },
+    "rule_results": [
+      {
+        "rule_id": "rule-file-owner",
+        "title": "The configuration file must be owned by root.",
+        "severity": "medium",
+        "outcome": "fail",
+        "assessment": {
+          "id": "example.file-owner",
+          "version": 1,
+          "mode": "automated"
+        },
+        "message": "Observed UID 1001; expected UID 0.",
+        "reason": {
+          "code": "value_mismatch",
+          "message": "The collected file owner did not match the required owner."
+        },
+        "evidence_refs": [
+          "config-file-1"
+        ],
+        "instances": [
+          {
+            "id": "instance-1",
+            "outcome": "fail",
+            "assessment_result_ref": "example-file-owner-1",
+            "assessment_invocation_id": "example-file-owner-1",
+            "message": "The collected file was not owned by root.",
+            "evidence_refs": [
+              "config-file-1"
+            ]
+          }
+        ],
+        "weight": 10,
+        "check_selector": "automated",
+        "parameters": {},
+        "applicability": {
+          "outcome": "applicable",
+          "conditions": []
+        },
+        "findings": [
+          {
+            "kind": "comparison",
+            "instance_id": "instance-1",
+            "subject": {
+              "kind": "file",
+              "identifier": "/etc/example.conf"
+            },
+            "field": "owner_uid",
+            "operation": "equals",
+            "expected": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            },
+            "observed": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 1001
+            },
+            "outcome": "fail",
+            "test_ref": "file-owner-is-root",
+            "item_ref": "config-file-1"
+          }
+        ],
+        "organizational_inputs": [
+          {
+            "organizational_input_ref": "example-site-owner-policy",
+            "parameter": "approved_owner_uid",
+            "effective_value": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            },
+            "authority_summary": {
+              "organization": "Example Organization",
+              "authorization_reference": "EXAMPLE-POLICY-2026"
+            }
+          }
+        ]
+      },
+      {
+        "rule_id": "rule-home-nosuid",
+        "title": "The /home file system must be mounted with nosuid.",
+        "severity": "medium",
+        "outcome": "fail",
+        "assessment": {
+          "id": "example.home-nosuid.manual",
+          "version": 1,
+          "mode": "manual"
+        },
+        "message": "The assessor found /home mounted without nosuid.",
+        "reason": "manual_assessment_failed",
+        "evidence_refs": [
+          "evidence-home-mount-1"
+        ],
+        "instances": [
+          {
+            "id": "instance-1",
+            "outcome": "fail",
+            "assessment_result_ref": "example-manual-home-nosuid-1",
+            "assessment_invocation_id": "example-manual-home-nosuid-1",
+            "message": "Manual review determined the requirement was not satisfied.",
+            "evidence_refs": [
+              "evidence-home-mount-1"
+            ]
+          }
+        ],
+        "weight": 10,
+        "check_selector": "manual",
+        "parameters": {},
+        "applicability": {
+          "outcome": "applicable",
+          "conditions": []
+        },
+        "findings": []
+      }
+    ]
+  }
+}

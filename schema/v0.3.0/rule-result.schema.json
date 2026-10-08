@@ -241,6 +241,50 @@
       "type": "object",
       "description": "Effective publisher/Profile/Tailoring Parameters materially relevant to this Rule result."
     },
+    "organizational_inputs": {
+      "type": "array",
+      "description": "Effective organization-supplied expected-state values actually used by this Rule, each linked to exactly one authoritative Benchmark Result organizational-input registry entry. Empty/absent only when the Rule did not consume Organizational Input. Never duplicates the complete authority or contact record.",
+      "items": {
+        "type": "object",
+        "required": [
+          "organizational_input_ref",
+          "parameter",
+          "effective_value"
+        ],
+        "properties": {
+          "organizational_input_ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Exact key in benchmark_result.effective_policy.organizational_inputs; not an Input Set filename."
+          },
+          "parameter": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Benchmark Parameter ID resolved by the Rule's selected Assessment."
+          },
+          "effective_value": {
+            "$ref": "result-types.schema.json#/$defs/typed_value",
+            "description": "Typed resolved value shown to a Rule reader. Redaction SHALL be at least as restrictive as the canonical registry."
+          },
+          "authority_summary": {
+            "type": "object",
+            "description": "Optional small reviewer-facing context; complete provenance lives in the Benchmark Result registry.",
+            "properties": {
+              "organization": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authorization_reference": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "applicability": {
       "type": [
         "object",
