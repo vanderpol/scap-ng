@@ -8,7 +8,7 @@ For the current project/design review, use:
 
 - [Current review](../review/current/README.md)
 - [Draft specification](../specification/README.md)
-- [Source and result examples](../specification/examples/README.md)
+- [Real Benchmark and Rule policy examples](../specification/examples/README.md) and [technical Assessment examples](../specification/examples/assessments.md)
 
 ## Published votes
 
