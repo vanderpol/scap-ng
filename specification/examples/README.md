@@ -252,43 +252,35 @@ This is the actual converted tree, not a fabricated `evaluate` example.
 
 ## Conditional evaluation
 
-**SCAP 1.4:** Environment-sensitive checks can use nested guard Tests, which are hard to recognize as role-dependent requirements. **SCAP-NG:** Native content supports explicit `if/then/else`, but source OVAL Boolean graphs cannot generally be converted into procedural branches without changing six-state outcomes.
+**SCAP 1.4:** Platform-dependent requirements often hide behind nested Boolean
+criteria and guard Tests. **SCAP-NG:** `evaluate: if/then/else` is available
+for explicitly authored branch semantics (inherited from 0.2), **but a converter
+must not silently rewrite a source Boolean graph**.
 
-**Converted Windows Server 2025 SV-278001** checks `HKEY_LOCAL_MACHINE\\SYSTEM` registry permissions differently for domain controllers and other servers. The 0.3 candidate **correctly preserves** the source's guarded Boolean expression. From `benchmarks/windows-server-2025/candidate-authoring/assessments/automated/SV-278001.automated.yaml`:
+**Real Windows Server 2025 SV-278001:** Domain controllers and other servers
+have different Registry-permission requirements. The converted 0.3 Assessment
+preserves the source `evaluate: all/any/not` expression; see
+[SV-278001 in the actual review bundle](../../review/current/REVIEW-GUIDE.md#7-explicit-evaluate-where-composition-is-real).
 
-```yaml
-evaluate:
-  all:
-    - test: default-permissions-hkey-local-machine-security-registry-key-maintained-test
-    - test: default-non-domain-controller-permissions-hkey-local-machine-software-registry-test
-    - any:
-        - all:
-            - test: system-windows-domain-controller-test
-            - test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
-        - all:
-            - not:
-                test: system-windows-domain-controller-test
-            - test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
-```
-
-A **native authoring alternative derived from this same real STIG Rule** could put the role choice at the point of decision:
+Conceptually a publisher might author:
 
 ```yaml
 evaluate:
-  all:
-    - test: default-permissions-hkey-local-machine-security-registry-key-maintained-test
-    - test: default-non-domain-controller-permissions-hkey-local-machine-software-registry-test
-    - if:
-        test: system-windows-domain-controller-test
-      then:
-        test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
-      else:
-        test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
+  if:
+    test: system-windows-domain-controller-test
+  then:
+    test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
+  else:
+    test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
 ```
 
-This is **source-derived native syntax, not generated candidate output**: a publisher choosing it must accept the defined conditional behavior for non-Boolean role results. The source-equivalent converter does not silently make that policy choice. For example, if the role Test is `unknown` and *both* permission Tests are `false`, the original Boolean expression is `false` but the conditional branch cannot be selected and returns `unknown`.
-
-For an *authored* `if/then/else` form, use the [conditional conformance suite](../../tests/conditional-0.2.0/README.md), explicitly labeled as a fixture. It is **not** the output for SV-278001. [Production conditional research](../../research/assessment-simplification/conditional-10/README.md) demonstrates why the rewrite is unsafe for error, unknown, not-evaluated, and not-applicable outcomes. The conditional syntax itself predates 0.3.
+**This excerpt is not the converted result or a complete equivalent Assessment.**
+If the role Test is `unknown` and *both* permission Tests are `false`, the
+source Boolean graph can resolve `false`, while the conditional cannot select a
+branch and yields `unknown`. An author may intentionally choose conditional
+behavior; a lossless converter cannot guess that choice. See the
+[existing conformance fixtures](../../tests/conditional-0.2.0/README.md)
+and [source-pattern research](../../research/assessment-simplification/conditional-10/README.md).
 
 ## Manual Assessments
 
@@ -333,133 +325,44 @@ The referenced file tests the real `gnome-shell` package using `linux.rpminfo` o
 
 ## Organizational Input
 
-**SCAP 1.4:** Site-specific expected values often require XCCDF Values,
-Tailoring and OVAL external Variables. **SCAP-NG:** A Benchmark declares a
-typed organization-resolved Parameter; a Rule maps it to an Assessment input;
-the Assessment consumes the value directly. The Input Set is supplied and
-authorized independently, without changing publisher Test logic.
+**SCAP 1.4:** Site-specific expected values often require a chain of XCCDF
+Value → Tailoring → external OVAL Variable. **SCAP-NG:** The publisher declares
+a typed Benchmark Parameter, the Rule binds it to an Assessment Input, and an
+approved Organizational Input Set supplies the value **without changing the
+published Test logic**.
 
-**Worked example (fictional policy, real supported capability):** The publisher
-requires the filesystem mounted at `/home` to have an organization-approved
-type. The organization approves `ext4` and `xfs`. Unlike an earlier example
-built around an unimplemented `linux.chrony` collector, this uses the supported
-`linux.partition` mapping, which exposes `mount_point` as a selector and
-`fs_type` as a State field. **This is still an integration research fixture:
-direct input resolution and evaluator behavior have not been proved
-end-to-end.** The fictional rule is not a DISA requirement. **Provenance clarification:** this is a newly authored, hypothetical policy requirement built on a supported OVAL-derived collection capability. It is **not** a converted DISA rule, not a known formerly manual STIG check, and not evidence of a manual-to-automated conversion. No legacy Rule ID or SCAP 1.4 source definition is claimed.
-
-The explicit linkage is:
-
-| Owner | Authored identity | Meaning |
-| --- | --- | --- |
-| Input Set | `values.approved_filesystem_types` | Organization-approved `[ext4, xfs]` |
-| Benchmark | `parameters[].id: approved_filesystem_types` | Publisher-delegated type/constraints |
-| Rule | `inputs.approved-filesystem-types-input.parameter` | Bind Parameter to Assessment contract |
-| Assessment | `inputs.approved-filesystem-types-input` | Named typed input |
-| State in Test | `value.input: approved-filesystem-types-input` | Compare collected `fs_type` against approved values |
-
-**Benchmark Parameter fragment:**
+**Integration research fixture, not a DISA STIG Rule:** The publisher delegates
+the allowed filesystem types for `/home` to the organization. The site supplies
+`[ext4, xfs]`, and a `linux.partition` Assessment evaluates the collected
+`fs_type` against that input:
 
 ```yaml
-parameters:
-  - id: approved_filesystem_types
-    resolution: organization
-    datatype: string
-    cardinality: one_or_more
-    required: true
-    constraints:
-      min_items: 1
-      unique_items: true
+states:
+  - capability: linux.partition
+    state:
+      field: fs_type
+      value:
+        input: approved-filesystem-types-input
+      operation: equals
+      datatype: string
+      variable_match: one_or_more
+      match: one_or_more
+      existence: one_or_more
 ```
 
-**Rule binding (fragment):**
+The Benchmark parameter, Rule binding, Assessment input contract, completed
+Input Set, request and resolution context are shown together in the
+[worked source files](../../research/iterations/003/examples/organizational-input/README.md).
+**Status:** illustrative fragments and a research Assessment—not a complete
+compiler/evaluator-verified 0.3 package. The direct input-resolution contract
+still requires end-to-end proof; these are *fictional approved values*, not a
+publisher-approved change to a real STIG requirement.
 
-```yaml
-assessment_choices:
-  automated:
-    assessment: home-filesystem.assessment.yaml
-    inputs:
-      approved-filesystem-types-input:
-        parameter: approved_filesystem_types
-```
-
-**Assessment Test (fragment):**
-
-```yaml
-inputs:
-  approved-filesystem-types-input:
-    datatype: string
-    cardinality: one_or_more
-    required: true
-tests:
-  home-filesystem-test:
-    capability: linux.partition
-    object:
-      capability: linux.partition
-      select:
-        mount_point:
-          value: /home
-          operation: equals
-          datatype: string
-    states:
-      - capability: linux.partition
-        state:
-          field: fs_type
-          operation: equals
-          datatype: string
-          variable_match: one_or_more
-          match: one_or_more
-          existence: one_or_more
-          value:
-            input: approved-filesystem-types-input
-    reported_elements: all
-    existence: one_or_more
-    match: all
-evaluate:
-  test: home-filesystem-test
-```
-
-The State consumes an input **without a pass-through Variable**. The
-`variable_match` quantifier makes the expected-value aggregation explicit;
-`match: all` on the Test applies to collected partitions. The shorter
-`operation: in` expression is [under research](../../research/iterations/003/design/membership-comparison-research.md),
-not valid 0.3 syntax.
-
-**Completed Organization Input Set:** The separate
-[example Input Set](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml)
-records `approved_filesystem_types: [ext4, xfs]`, source/authority,
-organization, supplier, timestamps, approver and authorization status. These
-values are fictional. The
-[Assessment Request](../../research/iterations/003/examples/organizational-input/assessment-request.yaml)
-explicitly selects that Input Set; descriptive scope metadata never selects a
-target implicitly. Missing required input produces `not_evaluated`, not an
-invented pass/fail.
-
-**Why is the binding in the Rule?** The Assessment remains reusable and does
-not hard-code the Benchmark's policy Parameter ID. Different Rules may bind
-different authorized policy Parameters to its same technical input. The
-additional Rule-level `organizational_input_requirements` discovery map may
-ultimately be generated at compilation instead of authored twice; this is
-still an architecture-audit question, not an accepted change.
-
-### Who provides templates?
-
-For **publisher-delegated Organizational Input**, the preferred path is for
-the content author/build process to generate a ready-to-fill, typed Input Set
-template at publication. The scanner should be able to present or validate
-it; people should not author complex YAML from scratch.
-
-If the OVAL Board later permits Tailoring of otherwise fixed expected-State
-values, a scanner could generate an input template for an eligible
-Rule/Assessment on demand. That is **a different, future capability**, requiring
-policy-deviation identity, approval, precise State-slot bindings and semantics.
-It is not an authority to overwrite published requirements in 0.3. See
-[issue #196](https://github.com/vanderpol/scap-ng/issues/196).
-
-The [worked files](../../research/iterations/003/examples/organizational-input/README.md)
-illustrate the Benchmark Parameter, Rule fragment, Assessment, Input Set,
-request and resolved context. **The integrated fixture remains research-only
-until schema, compiler and evaluator conformance are demonstrated.**
+**Template ownership:** The publisher/build should provide a typed Input Set
+template for declared organization-resolved Parameters; the scanner may help
+populate and validate it. Arbitrary scanner-created Tailoring of fixed policy
+values is a different, deferred capability ([#196](https://github.com/vanderpol/scap-ng/issues/196)).
+Missing required input must not produce a fabricated pass.
 
 ## Profiles and Tailoring
 
