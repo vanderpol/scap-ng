@@ -778,20 +778,30 @@ Rule, and Assessment layers, but one Assessment Result SHALL remain
 self-contained for the logical evaluation data needed to understand that
 Assessment invocation.
 
-Within an Assessment Result, Test Results, Object collection results, collected
-Items, Variable Results, State Results, and Entity Results MAY be represented as
-normalized arrays keyed by stable result-local identities and referenced from
-one another. Implementations SHALL NOT require a consumer to retrieve a
-different Assessment Result merely to resolve the logical Test/Object/Item/
-Variable graph for the current invocation.
+Within an Assessment Result, **retained per-Item system observations SHALL
+appear directly alongside the Test result and per-Item State/Entity comparisons
+that explain them**. An Item has a stable identity, typed reported fields,
+collection status and provenance; a Test-local Item reference SHALL identify
+that same embedded Item. This Test-centered presentation intentionally repeats
+reported observations if they explain different Test outcomes, rather than
+recreating OVAL Results/System Characteristics silos. The underlying runtime
+collection MAY be cached/reused without changing how results are serialized.
 
-Collected Items that materially participate in the Assessment's logical result
-or decisive explanation SHALL be represented in that Assessment Result. Large
-auxiliary evidence such as complete command output, packet captures, screenshots,
-or other bulky artifacts MAY be stored as separate integrity-bound result-package
-members referenced by stable identity and digest. Moving such auxiliary evidence
-out of line SHALL NOT remove the typed observations needed to interpret the
-Assessment result.
+Object/collection execution records, Variables, expression execution and
+other information needed for conformance or diagnostics remain at Assessment
+scope. Additional collected Items unrelated to a reported Test MAY be retained
+at Assessment scope; they do not replace the Test-local evidence needed for
+understanding an ordinary Test failure. A Test's retained per-Item records
+may represent only a bounded subset of the Items evaluated; evaluated counts,
+failure counts and completeness SHALL be distinguished from returned examples.
+Implementations SHALL NOT require a consumer to retrieve another Assessment
+Result merely to resolve the logical Test/Item/Variable explanation.
+
+Large auxiliary evidence such as complete command output, packet captures,
+screenshots or other bulky artifacts MAY be stored as separate integrity-bound
+result-package members referenced by stable identity and digest. Moving these
+out of line SHALL NOT remove the typed decisive observations needed to
+interpret the Assessment result.
 
 A separate duplicate "debug tree" is not mandatory when the preserved
 Test/Item/State/Entity graph already provides enough structured information to
@@ -837,6 +847,25 @@ Claims about schema validity, semantic validity, known-result evaluation,
 collection/acquisition, live-target execution, and migration equivalence SHALL
 follow the distinct evidence layers defined in
 [Conformance and Validation](../core/conformance.md#4a-conformance-evidence-layers).
+
+## Application-controlled Assessment evidence retention
+
+The same authored Assessment and signed Benchmark content SHALL work for normal
+and diagnostic scanner runs. The scanner's effective reporting policy, not a
+different content version, determines how many Item examples are retained.
+Automated Assessment Results SHALL identify the effective per-Test Item maximum
+(an integer, or `null` when no Item-count cap is requested) and the source of
+that setting. Operator overrides SHALL include an explanation and SHALL NOT
+change authored evaluation semantics or the technical outcome.
+
+A Test's retained `per_item_results` are **evidence**, not a complete list of
+everything the scanner evaluated when retention is capped. Reported evaluated
+counts, mismatching counts, returned examples and completeness SHALL distinguish
+what is known from what remains unknown. An evidence override SHALL NOT bypass
+content-controlled redaction or scanner safety limits, including execution time,
+memory and output volume. Independently authorized early termination may affect
+population completeness, but an evidence maximum alone SHALL NOT be interpreted
+as an acceptance threshold or a logical-evaluation cutoff.
 
 ## 17. Failure counts and evidence maximums
 
