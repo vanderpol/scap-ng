@@ -32,3 +32,7 @@ An isolated Python prototype verified seven positive/negative tests. **The proof
 - To use in a repository checkout: `python tools/research_expand_registry_authoring.py research/iterations/003/examples/stig-derived/SV-278217/readable-authoring.prototype.yaml --output /tmp/sv-278217.canonical.json --validate-v03`.
 - **Validation has NOT been run after these new commits.** Github content writes succeeded, but this session cannot directly execute the checked-out GitHub tree. Do not mark schema equivalence or CI pass as verified until the test runner executes, and do not integrate this research-only compiler into production packaging yet.
 - Further gate: prove complete source schema validity, canonical semantics and negative result-equivalence cases; then integrate as an explicit pre-compilation normalization stage rather than scanner-side interpretation.
+
+## Schema review correction — October 8
+
+A direct review of `tools/generate_capability_schema.py` found a concrete omission in the research expander: generated v0.3 capability State validation currently requires `state_title`, even on inline States. The original research expander had omitted it. Updated `tools/research_expand_registry_authoring.py` to emit explicit `state_title: null` (per schema), and added a unit assertion. This does **not** imply that the State title requirement is the ideal authoring design or that the full validation suite passes; any later decision to drop title metadata from consumer-local States requires coordinated schema/compiler tests. CI outcome remains unverified.
