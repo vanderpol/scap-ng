@@ -240,6 +240,92 @@ Input Set supplies its approved value. An Assessment Request **must explicitly
 bind** the Input Set—`intended_scope` alone never selects targets. Missing
 required input produces `not_evaluated`, rather than inventing a pass/fail.
 
+### How that value reaches a real check
+
+The Input Set is only one part of the workflow. In the same **fictional
+time-server example**, the publisher declares a required Parameter, the Rule
+binds it to the Assessment, and the Assessment compares collected system data
+against the supplied policy value. These are **illustrative authoring fragments**
+from the worked fixture, not a claim that this fictional benchmark was
+converted from a published STIG.
+
+**1. Publisher's Benchmark** declares *what* the organization must supply,
+without inventing its server names:
+
+```yaml
+parameters:
+  - id: approved_time_sources
+    resolution: organization
+    datatype: string
+    cardinality: one_or_more
+    required: true
+    description: Hostnames of organization-approved time sources.
+```
+
+**2. The Rule** connects that policy Parameter to the Assessment's named input:
+
+```yaml
+assessment_choices:
+  automated:
+    assessment: time-source.assessment.yaml
+    inputs:
+      required_time_sources:
+        parameter: approved_time_sources
+```
+
+**3. The Assessment** declares `required_time_sources` as an input and uses
+that expected value when checking the time-source hostnames collected from the
+target. The original worked fixture expresses that connection as:
+
+```yaml
+inputs:
+  required_time_sources:
+    datatype: string
+    cardinality: one_or_more
+    required: true
+variables:
+  approved-sources:
+    datatype: string
+    input: required_time_sources
+states:
+  state-source-approved:
+    capability: linux.chrony
+    state:
+      field: hostname
+      operation: pattern_match
+      value:
+        variable: approved-sources
+```
+
+**4. The Assessment Request** explicitly selects the approved Input Set:
+
+```yaml
+assessment_request:
+  id: example-production-scan
+  benchmark:
+    id: example.linux.security-policy
+    version: V1R1
+  organizational_input:
+    id: example.production-site
+    version: 1
+    source: site.organizational-input.yaml
+```
+
+**5. At execution**, the processor validates and freezes the approved values
+(`ntp1.example.test` and `ntp2.example.test`) and evaluates the target's
+configured time servers against them. The Input Set supplies **expected
+policy data**, never commands, collector selection, or a changed Test. If the
+required input is missing, the dependent Assessment is `not_evaluated`
+with reason `missing_organizational_input`—not a guessed pass or fail.
+
+The [full Assessment fixture](../../research/iterations/003/examples/organizational-input/time-source.assessment.yaml),
+[Rule binding](../../research/iterations/003/examples/organizational-input/rule-fragment.yaml),
+[Benchmark Parameter](../../research/iterations/003/examples/organizational-input/benchmark-parameter.yaml),
+[Assessment Request](../../research/iterations/003/examples/organizational-input/assessment-request.yaml),
+and [resolved policy example](../../research/iterations/003/examples/organizational-input/resolved-context.yaml)
+show the complete connection. Their design-fixture status is distinct from
+the validated converted STIG examples above.
+
 See the [complete example file](../../research/iterations/003/examples/organizational-input/site.organizational-input.yaml),
 [worked integration example](../../research/iterations/003/examples/organizational-input/README.md),
 and [0.3 JSON Schema](../../schema/v0.3.0/organizational-input.schema.json).
