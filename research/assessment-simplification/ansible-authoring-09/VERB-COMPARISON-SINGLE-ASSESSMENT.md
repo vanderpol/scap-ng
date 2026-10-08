@@ -37,7 +37,7 @@ evaluate:
 
 The **Test** uses `linux.partition`; its **Object** selects the mount point by regex; its **State** compares reported mount-option values; `evaluate` chooses this named Test. Nothing here is a proposed new language.
 
-## Ansible-inspired phrasing — deliberately invalid YAML for SCAP-NG
+## Ansible-inspired phrasing — not SCAP-NG schema-valid
 
 ```yaml
 check:
