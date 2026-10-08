@@ -1,0 +1,476 @@
+name: Full NIWC Current SCAP-NG 0.3 release checkpoint
+# Separate 0.3 release candidate; historical 0.2 freeze workflow remains untouched.
+
+# Run only for intentional 0.3 Board/release checkpoints.
+
+on:
+  # Exhaustive 65-package source accounting / 61 supported 0.3 candidates.
+  # NEVER use this as a routine development or pre-merge test.
+  # Run it only when intentionally producing a durable content deliverable,
+  # release/freeze candidate, or OVAL Board review checkpoint.
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/full-niwc-v03-build-trigger
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-niwc-current-v03-release
+  cancel-in-progress: true
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  generate:
+    name: Generate fresh native batch ${{ matrix.batch }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Generate source-only batch
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: |
+          python - <<'PY'
+          import json, os, re, shutil, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("scap-ng/tools").resolve()))
+          from generate_niwc_current_review import native_artifact_base
+          batch=int(os.environ["BATCH"])
+          revision=os.environ["NIWC_REVISION"]
+          files=sorted(p for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip") if "Consolidated" not in p.name)
+          if len(files)!=65:
+              raise SystemExit(f"Expected 65 pinned individual NIWC packages, found {len(files)}")
+          selected=[p for i,p in enumerate(files) if i % 4 == batch]
+          base=Path("work/result"); generated=base/"generated"; status_dir=base/"status"; logs=base/"logs"
+          generated.mkdir(parents=True,exist_ok=True); status_dir.mkdir(parents=True,exist_ok=True); logs.mkdir(parents=True,exist_ok=True)
+          for source in selected:
+              artifact=source.name
+              key=native_artifact_base(source.stem)
+              out=generated/key; split=Path("work")/f"split-{key}"; log_path=logs/f"{key}.log"
+              shutil.rmtree(out,ignore_errors=True); shutil.rmtree(split,ignore_errors=True)
+              command=[sys.executable,"scap-ng/tools/generate_niwc_current_review.py",str(source),
+                       "--output",str(out),"--split-root",str(split),
+                       "--source-revision",revision,"--source-repository-path",f"Current/{artifact}",
+                       "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+                       "--summary",str(out/"source-generation.json")]
+              proc=subprocess.run(command,capture_output=True,text=True)
+              log_path.write_text(proc.stdout+"\n"+proc.stderr,encoding="utf-8")
+              status={"artifact":artifact,"key":key,"status":"generated" if proc.returncode==0 else "blocked",
+                      "returncode":proc.returncode,"log_tail":"\n".join((proc.stdout+"\n"+proc.stderr).splitlines()[-80:])}
+              (status_dir/f"{key}.json").write_text(json.dumps(status,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+              shutil.rmtree(split,ignore_errors=True)
+              print(json.dumps({k:v for k,v in status.items() if k!="log_tail"}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-current-batch-${{ matrix.batch }}
+          path: work/result
+          if-no-files-found: error
+          compression-level: 6
+
+  normalize_compile:
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: scap-ng
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 cryptography jsonschema==4.25.1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-current-batch-*
+          path: downloads
+          merge-multiple: false
+      - name: Assemble only same-run generated trees
+        run: |
+          python - <<'PY'
+          import json,shutil
+          from pathlib import Path
+          out=Path("work/fresh-current"); out.mkdir(parents=True,exist_ok=True); statuses=[]
+          for status_path in sorted(Path("downloads").rglob("status/*.json")):
+              status=json.loads(status_path.read_text()); statuses.append(status)
+              if status["status"]!="generated": continue
+              source=status_path.parent.parent/"generated"/status["key"]
+              if not (source/"benchmark.yaml").exists(): raise SystemExit(f"Generated status without Benchmark tree: {source}")
+              target=out/status["key"]
+              if target.exists(): raise SystemExit(f"Duplicate generated key: {status['key']}")
+              shutil.copytree(source,target)
+          if len(statuses)!=65: raise SystemExit(f"Expected 65 package status records, got {len(statuses)}")
+          expected_blockers={
+              "U_MS_SQL_Server_2016_Database_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2016_Instance_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV14-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Database_V1R2_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+              "U_MS_SQL_Server_2022_Instance_V1R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip":"nonstandard source capability independent.sqlext",
+          }
+          blocked_packages=[x for x in statuses if x["status"]!="generated"]
+          unexpected=[]
+          for row in blocked_packages:
+              marker=expected_blockers.get(row["artifact"])
+              if not marker or marker not in row.get("log_tail",""):
+                  unexpected.append(row)
+          for artifact in expected_blockers:
+              row=next((x for x in statuses if x["artifact"]==artifact),None)
+              if row is None or row["status"]=="generated":
+                  unexpected.append({
+                      "artifact":artifact,
+                      "status":"missing" if row is None else row["status"],
+                      "reason":"expected sqlext blocker disappeared; review before changing baseline",
+                  })
+          summary={"source_policy":"fresh_same_run_only","niwc_revision":"8c8e5dff860af6b1290ee9273a282db24278f8d5",
+                   "packages":len(statuses),"generated":sum(x["status"]=="generated" for x in statuses),
+                   "blocked":len(blocked_packages),
+                   "known_blocked":sum(x["artifact"] in expected_blockers for x in blocked_packages),
+                   "unexpected_blocked":len(unexpected),
+                   "expected_blockers":expected_blockers,
+                   "blocked_packages":blocked_packages}
+          Path("work/evidence").mkdir(parents=True,exist_ok=True)
+          Path("work/evidence/generation-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({k:v for k,v in summary.items() if k not in {"blocked_packages","expected_blockers"}},indent=2))
+          if summary["packages"] != 65 or summary["generated"] != 61 or summary["known_blocked"] != 4 or unexpected:
+              raise SystemExit(
+                  "Full review artifact requires all 65 packages accounted for with "
+                  "61 generated, exactly four known independent.sqlext blockers, and zero unexpected blockers; "
+                  f"got packages={summary['packages']} generated={summary['generated']} "
+                  f"known_blocked={summary['known_blocked']} unexpected={len(unexpected)}"
+              )
+          PY
+      - name: Preserve conversion output for review
+        run: |
+          python - <<'PY'
+          import shutil
+          from pathlib import Path
+
+          review = Path("work/evidence/conversion-output")
+          (review / "logs").mkdir(parents=True, exist_ok=True)
+          (review / "status").mkdir(parents=True, exist_ok=True)
+          (review / "source-generation").mkdir(parents=True, exist_ok=True)
+
+          for p in sorted(Path("downloads").rglob("logs/*.log")):
+              target = review / "logs" / p.name
+              if target.exists():
+                  raise SystemExit(f"Duplicate conversion log name: {p.name}")
+              shutil.copy2(p, target)
+
+          for p in sorted(Path("downloads").rglob("status/*.json")):
+              target = review / "status" / p.name
+              if target.exists():
+                  raise SystemExit(f"Duplicate conversion status name: {p.name}")
+              shutil.copy2(p, target)
+
+          for p in sorted(Path("work/fresh-current").glob("*/source-generation.json")):
+              target = review / "source-generation" / f"{p.parent.name}.source-generation.json"
+              shutil.copy2(p, target)
+
+          print(f"conversion_logs={len(list((review/'logs').glob('*.log')))}")
+          print(f"conversion_status={len(list((review/'status').glob('*.json')))}")
+          print(f"source_generation_summaries={len(list((review/'source-generation').glob('*.json')))}")
+          PY
+      - name: Refuse historical generated input
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path("work/fresh-current")
+          forbidden=("iterations/001","iterations/002","canonical-benchmark.json")
+          for p in root.rglob("*"):
+              if any(x in p.as_posix() for x in forbidden): raise SystemExit(f"Historical generated input detected: {p}")
+          summaries=list(root.rglob("source-generation.json"))
+          if not summaries: raise SystemExit("No fresh source-generation provenance found")
+          for p in summaries:
+              if '"generated_fresh": true' not in p.read_text(): raise SystemExit(f"Fresh-generation provenance missing: {p}")
+          print(f"fresh_generation_records={len(summaries)}")
+          PY
+      - name: Render verified 0.3 candidate authoring for 61 supported benchmarks
+        timeout-minutes: 90
+        run: |
+          PYTHONPATH=scap-ng/tools python - <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          sources=sorted(p for p in Path("work/fresh-current").iterdir() if p.is_dir())
+          if len(sources)!=61:
+              raise SystemExit(f"Expected 61 supported pinned native benchmarks, got {len(sources)}")
+          output=Path("work/candidate-current")
+          evidence=Path("work/evidence/v03-render")
+          status=[]
+          for index,source in enumerate(sources,1):
+              cmd=[
+                  sys.executable,"scap-ng/tools/render_0_3_human_review_candidate.py",
+                  str(source),"--output-root",str(output/source.name),
+                  "--evidence-dir",str(evidence/source.name),
+                  "--label",source.name,
+              ]
+              proc=subprocess.run(cmd,capture_output=True,text=True)
+              row={"benchmark":source.name,"index":index,
+                   "returncode":proc.returncode,"log_tail":(proc.stdout+"\n"+proc.stderr)[-2500:]}
+              status.append(row)
+              print(json.dumps({"benchmark":source.name,"index":index,
+                                "returncode":proc.returncode}),flush=True)
+              if proc.returncode:
+                  (evidence/"render-status.json").parent.mkdir(parents=True,exist_ok=True)
+                  (evidence/"render-status.json").write_text(
+                      json.dumps(status,indent=2,sort_keys=True)+"\n")
+                  raise SystemExit(f"0.3 candidate rendering failed: {source.name}: {row['log_tail']}")
+          (evidence/"render-status.json").write_text(json.dumps(status,indent=2,sort_keys=True)+"\n")
+          if len(list(output.iterdir()))!=61:
+              raise SystemExit("0.3 candidate benchmark count mismatch")
+          PY
+      - name: Census fresh native corpus for schema stabilization
+        run: |
+          python scap-ng/tools/native_schema_census.py work/candidate-current \
+            --output work/evidence/native-schema-census.json
+      - name: Validate fresh converter corpus against v0.3.0 active authoring gate
+        timeout-minutes: 45
+        run: |
+          python scap-ng/tools/validate_native_json_schemas.py work/candidate-current \
+            --schema-dir scap-ng/schema/v0.3.0 \
+            --allow-unpromoted-conversion-vocabulary \
+            --report work/evidence/schema-validation-before-normalization.json
+      - name: Validate fresh native Assessment graph semantics
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/candidate-current \
+            --report work/evidence/semantic-validation-before-normalization.json
+      - name: Validate fresh native package graph semantics
+        timeout-minutes: 20
+        run: |
+          python scap-ng/tools/validate_native_package_graph.py work/candidate-current \
+            --report work/evidence/package-graph-before-normalization.json
+
+      - name: Normalize exact duplicates and report near overlaps
+        run: |
+          # Draft-stability gate: exact semantic normalization only.
+          # Advisory near-duplicate/rule-similarity analysis is intentionally
+          # separate because it does not affect exact merge decisions and is
+          # substantially more expensive across the full corpus.
+          python scap-ng/tools/scap_ng_repo_normalizer.py work/candidate-current \
+            --rewrite \
+            --output-root work/normalized-current \
+            --report work/evidence/normalizer-report.json \
+            --advisory none
+      - name: Validate normalized converter corpus against v0.3.0 active authoring gate
+        timeout-minutes: 45
+        run: |
+          python scap-ng/tools/validate_native_json_schemas.py work/normalized-current \
+            --schema-dir scap-ng/schema/v0.3.0 \
+            --allow-unpromoted-conversion-vocabulary \
+            --report work/evidence/schema-validation-after-normalization.json
+      - name: Validate normalized native Assessment graph semantics
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_native_semantics.py work/normalized-current \
+            --report work/evidence/semantic-validation-after-normalization.json
+      - name: Validate normalized native package graph semantics
+        timeout-minutes: 20
+        run: |
+          python scap-ng/tools/validate_native_package_graph.py work/normalized-current \
+            --report work/evidence/package-graph-after-normalization.json
+
+      - name: Compile unnormalized corpus baseline
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/candidate-current             --output-dir work/packages-before --metrics work/evidence/compiler-before.json             --allow-unpromoted-conversion-vocabulary             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Compile normalized corpus
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-after --metrics work/evidence/compiler-after.json             --allow-unpromoted-conversion-vocabulary             --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Compile normalized corpus with self-signed CMS test certificate
+        run: |
+          python scap-ng/tools/scap_ng_content_compiler.py work/normalized-current             --output-dir work/packages-signed-test --metrics work/evidence/compiler-signed-test.json             --allow-unpromoted-conversion-vocabulary             --sign-self-signed-test-cert --source-revision "$NIWC_REVISION" --scap-ng-revision "$GITHUB_SHA"
+      - name: Build compact evidence report
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ev=Path("work/evidence")
+          generation=json.loads((ev/"generation-summary.json").read_text())
+          normalizer=json.loads((ev/"normalizer-report.json").read_text())
+          schema_before=json.loads((ev/"schema-validation-before-normalization.json").read_text())
+          schema_after=json.loads((ev/"schema-validation-after-normalization.json").read_text())
+          semantic_before=json.loads((ev/"semantic-validation-before-normalization.json").read_text())
+          semantic_after=json.loads((ev/"semantic-validation-after-normalization.json").read_text())
+          package_before=json.loads((ev/"package-graph-before-normalization.json").read_text())
+          package_after=json.loads((ev/"package-graph-after-normalization.json").read_text())
+          before=json.loads((ev/"compiler-before.json").read_text())
+          after=json.loads((ev/"compiler-after.json").read_text())
+          signed=json.loads((ev/"compiler-signed-test.json").read_text())
+          delta=before["total_bytes"]-after["total_bytes"]
+          pct=round(100.0*delta/before["total_bytes"],2) if before["total_bytes"] else 0.0
+          summary={"niwc_revision":generation["niwc_revision"],"source_packages":generation["packages"],
+                   "generated_native_benchmarks":generation["generated"],"blocked_source_packages":generation["blocked"],
+              "known_blocked_source_packages":generation.get("known_blocked",0),
+              "unexpected_blocked_source_packages":generation.get("unexpected_blocked",0),
+                   **normalizer["summary"],
+                   "schema_documents_before":schema_before["documents_checked"],
+                   "schema_invalid_before":schema_before["invalid"],
+                   "schema_documents_after":schema_after["documents_checked"],
+                   "schema_invalid_after":schema_after["invalid"],
+                   "semantic_assessments_before":semantic_before["assessment_documents_checked"],
+                   "semantic_invalid_before":semantic_before["invalid"],
+                   "semantic_assessments_after":semantic_after["assessment_documents_checked"],
+                   "semantic_invalid_after":semantic_after["invalid"],
+                   "package_graph_packages_before":package_before["packages_checked"],
+                   "package_graph_invalid_before":package_before["invalid"],
+                   "package_graph_packages_after":package_after["packages_checked"],
+                   "package_graph_invalid_after":package_after["invalid"],
+                   "compiled_bundles_before":before["bundles"],"compiled_bytes_before":before["total_bytes"],
+                   "compiled_bundles_after":after["bundles"],"compiled_bytes_after":after["total_bytes"],
+                   "compiled_byte_delta":delta,"compiled_byte_reduction_pct":pct,
+                   "signed_test_bundles":signed["signed_bundles"],"signing_trust":signed["signing_trust"]}
+          (ev/"experiment-summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          lines=["# Full pinned NIWC Current 0.3 authoring/normalization/compiler checkpoint","",
+                 "All 0.3 authoring candidates in this run were freshly rendered from pinned NIWC SCAP 1.4 Current ZIPs (61 supported; 4 explicitly blocked by deprecated independent.sqlext).",
+                 "No iteration-001/002 or pre-existing generated SCAP-NG tree was used as input.","",
+                 "## Generation",f"- Pinned NIWC revision: {summary['niwc_revision']}",
+                 f"- Source packages accounted for: **{summary['source_packages']}**",
+                 f"- Native Benchmarks generated: **{summary['generated_native_benchmarks']}**",
+                 f"- Source/conversion blockers: **{summary['blocked_source_packages']}**","",
+                 "## Validation",
+                 f"- Schema documents before normalization: **{summary['schema_documents_before']}** / invalid **{summary['schema_invalid_before']}**",
+                 f"- Schema documents after normalization: **{summary['schema_documents_after']}** / invalid **{summary['schema_invalid_after']}**",
+                 f"- Assessment semantics before normalization: **{summary['semantic_assessments_before']}** / invalid **{summary['semantic_invalid_before']}**",
+                 f"- Assessment semantics after normalization: **{summary['semantic_assessments_after']}** / invalid **{summary['semantic_invalid_after']}**",
+                 f"- Package graphs before normalization: **{summary['package_graph_packages_before']}** / invalid **{summary['package_graph_invalid_before']}**",
+                 f"- Package graphs after normalization: **{summary['package_graph_packages_after']}** / invalid **{summary['package_graph_invalid_after']}**","",
+                 "## Exact normalization",f"- Referenced Assessment definitions before: **{summary['referenced_assessment_instances_before']}**",
+                 f"- Definitions after proven exact normalization: **{summary['assessment_definitions_after_exact_normalization']}**",
+                 f"- Duplicate definitions avoided: **{summary['duplicate_assessment_definitions_avoided']}**",
+                 f"- Definition reduction: **{summary['exact_definition_reduction_pct']}%**","",
+                 "## Manual-review candidates",f"- Near-duplicate Assessment groups: **{summary['near_duplicate_review_groups']}**",
+                 f"- Near-duplicate Rule candidates reported: **{summary['near_duplicate_rule_candidates_reported']}**","",
+                 "## Compiler experiment",f"- Unsigned bundles before: **{summary['compiled_bundles_before']}** / {summary['compiled_bytes_before']} bytes",
+                 f"- Unsigned bundles after: **{summary['compiled_bundles_after']}** / {summary['compiled_bytes_after']} bytes",
+                 f"- Aggregate standalone-bundle change: **{summary['compiled_byte_delta']} bytes ({summary['compiled_byte_reduction_pct']}%)**",
+                 f"- Self-signed CMS experimental bundles: **{summary['signed_test_bundles']}**",
+                 f"- Signature trust: {summary['signing_trust']}","",
+                 "Standalone benchmark bundles remain self-contained, so cross-benchmark repository sharing does not necessarily reduce total independently distributed bundle size.",
+                 "Repository-definition reduction is the primary normalization metric.",""]
+          (ev/"README.md").write_text("\n".join(lines),encoding="utf-8")
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+      - name: Stage complete NIWC Current review artifact
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+
+          root=Path("work/niwc-current-review")
+          shutil.rmtree(root,ignore_errors=True)
+          root.mkdir(parents=True,exist_ok=True)
+
+          mappings=[
+              (Path("work/candidate-current"), root/"source"),
+              (Path("work/normalized-current"), root/"normalized"),
+              (Path("work/packages-after"), root/"packages"),
+              (Path("work/evidence"), root/"evidence"),
+          ]
+          for source,target in mappings:
+              if source.exists():
+                  shutil.copytree(source,target)
+
+          generation=json.loads(Path("work/evidence/generation-summary.json").read_text())
+          summary={
+              "artifact":"niwc-current-full-review",
+              "scap_ng_revision":"${{ github.event.pull_request.head.sha || github.sha }}",
+              "niwc_revision":"${{ env.NIWC_REVISION }}",
+              "source_packages_expected":65,
+              "source_packages_accounted_for":generation["packages"],
+              "generated_native_benchmarks":generation["generated"],
+              "blocked_source_packages":generation["blocked"],
+              "layout":{
+                  "source":"Fresh current-design SCAP-NG source trees generated from pinned NIWC Current packages.",
+                  "normalized":"Exact-semantics normalized source trees with shared Assessments.",
+                  "packages":"Compiled readable .scapng bundles.",
+                  "evidence":"Generation status, blockers, validation, normalization, compiler and provenance reports.",
+              },
+          }
+          (root/"REVIEW.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          (root/"README.md").write_text(
+              "# NIWC Current full SCAP-NG review build\n\n"
+              "This artifact is generated fresh from all 65 pinned NIWC Current SCAP 1.4 packages.\n"
+              "Publication is gated on all 65 source packages being accounted for, with 61 native Benchmark trees, exactly four expected independent.sqlext publisher-extension blockers, and zero unexpected blockers.\n\n"
+              "## Layout\n\n"
+              "- source/ — fresh generated native SCAP-NG authoring trees\n"
+              "- normalized/ — exact-semantics normalized authoring trees\n"
+              "- packages/ — compiled readable .scapng bundles\n"
+              "- evidence/ — validation, blocker, provenance, normalization and compiler reports\n\n"
+              "SCAP-NG source commit: ${{ github.event.pull_request.head.sha || github.sha }}\n\n"
+              "Pinned NIWC source revision: ${{ env.NIWC_REVISION }}\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: niwc-current-full-review
+          path: work/niwc-current-review
+          if-no-files-found: error
+          compression-level: 6
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-niwc-current-v03-release
+          path: |
+            work/candidate-current
+            work/normalized-current
+            work/packages-before
+            work/packages-after
+            work/packages-signed-test
+            work/evidence
+          if-no-files-found: error
+          compression-level: 6
+
+  announce-release-run:
+    name: Announce 0.3 corpus release run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Record full checkpoint run for Issue 202
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          gh issue comment 202 --body "Full SCAP-NG 0.3 corpus checkpoint started: ${RUN_URL} at \`${SOURCE_SHA}\`. 65 source packages; 61 expected supported; four expected deprecated sqlext blockers."
+
+  report-release-run:
+    name: Report 0.3 corpus release verdict
+    needs: [generate, normalize_compile]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Post definitive full checkpoint verdict
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GENERATION: ${{ needs.generate.result }}
+          COMPILE: ${{ needs.normalize_compile.result }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          gh issue comment 202 --body "Full SCAP-NG 0.3 corpus checkpoint: generation **${GENERATION}**, schema/semantics/normalization/compilation **${COMPILE}**. Run: ${RUN_URL}; source: \`${SOURCE_SHA}\`. This does not certify scanner-runtime equivalence."
