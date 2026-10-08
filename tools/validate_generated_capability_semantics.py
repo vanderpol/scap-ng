@@ -409,31 +409,50 @@ def _literal_state_values(states, state_ids, field):
         yield state_id,payload
 
 
+def _conjunctive_state_leaves(payload):
+    """Flatten only guaranteed ALL conjunctions; never assume ANY/ONE/ODD."""
+    if not isinstance(payload,dict):
+        return []
+    if "field" in payload:
+        return [payload]
+    if set(payload)=={"all"} and isinstance(payload["all"],list):
+        leaves=[]
+        for child in payload["all"]:
+            leaves.extend(_conjunctive_state_leaves(child))
+        return leaves
+    return []
+
+
 def _validate_windows_registry_like_value_datatypes(test_id,test,states):
     if test.get("capability") not in {"windows.registry","windows.ntuser"}:
         return []
-    referenced=[
-        states.get(state_id)
-        for state_id in (test.get("states") or [])
-        if isinstance(states.get(state_id),dict)
-    ]
-    exact_types=[]
-    for state in referenced:
-        payload=state.get("state") or {}
-        if (
-            payload.get("field")=="type"
-            and payload.get("operation") in EXACT_EQUALITY_OPERATIONS
-            and isinstance(payload.get("value"),str)
-        ):
-            exact_types.append(payload["value"])
-    if len(set(exact_types)) != 1:
+    leaves=[]
+    for state_id in test.get("states") or []:
+        state=states.get(state_id)
+        if isinstance(state,dict):
+            leaves.extend((state_id,leaf) for leaf in _conjunctive_state_leaves(state.get("state")))
+    exact_types={
+        payload["value"]
+        for _,payload in leaves
+        if payload.get("field")=="type"
+        and payload.get("operation") in EXACT_EQUALITY_OPERATIONS
+        and isinstance(payload.get("value"),str)
+    }
+    # An ambiguous disjunction or conflicting type assertion must never be
+    # simplified to an inferred Registry type by this type-compatibility rule.
+    if len(exact_types)!=1:
         return []
-    registry_type=exact_types[0]
+    registry_type=next(iter(exact_types))
     allowed=REGISTRY_TYPE_VALUE_DATATYPES.get(registry_type)
     if not allowed:
         return []
     diagnostics=[]
-    for state_id,payload in _literal_state_values(states,test.get("states"),"value"):
+    for state_id,payload in leaves:
+        if payload.get("field")!="value":
+            continue
+        value=payload.get("value")
+        if isinstance(value,dict) and set(value) in ({"variable"},{"input"}):
+            continue
         datatype=payload.get("datatype")
         if datatype not in allowed:
             diagnostics.append({
