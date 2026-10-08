@@ -316,7 +316,7 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
 
     def resolve_source_assessment(from_path, reference, *, expected_version=None, expected_purpose=None):
         nonlocal logical_index
-        legacy_path = ("/" in reference or "\\\\" in reference
+        legacy_path = ("/" in reference or "\\" in reference
                        or reference.endswith((".yaml", ".yml")))
         if legacy_path:
             target, doc = resolve_assessment(source_root, from_path, reference)
@@ -448,6 +448,8 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
         )
         compiled_benchmark["benchmark"]["applicability_catalog"] = app_id
 
+    compiled_rule_ids = set()
+    rule_paths_to_ids = {}
     for rule_path in sorted((benchmark_dir / "rules").glob("*.yaml")):
         doc = load_yaml(rule_path)
         rule = doc.get("rule")
@@ -465,6 +467,10 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
             remember_assessment(aid, target, assessment_doc)
             choice["assessment"] = aid
         rid = rule["id"]
+        if rid in compiled_rule_ids:
+            raise ValueError(f"{rule_path}: duplicate Rule logical identity {rid}")
+        compiled_rule_ids.add(rid)
+        rule_paths_to_ids[_lexical_abs(rule_path)] = rid
         add_object(
             rid,
             "rule",
@@ -472,6 +478,29 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
             compiled,
             rule_path,
         )
+
+    # The publisher's Benchmark may still list Rules by legacy source path.
+    # Package identity is always logical; fail closed on unknown or duplicate links.
+    rule_references = compiled_benchmark["benchmark"].get("rules", [])
+    resolved_rule_ids = []
+    for reference in rule_references:
+        if not isinstance(reference, str):
+            raise ValueError(f"{benchmark_path}: Rule reference must be a string")
+        if "/" in reference or "\\" in reference or reference.endswith((".yaml", ".yml")):
+            target = _lexical_abs(benchmark_path.parent / reference)
+            if not target.resolve().is_relative_to(source_root.resolve()):
+                raise ValueError(f"{benchmark_path}: Rule reference escapes source root: {reference}")
+            identity = rule_paths_to_ids.get(target)
+            if identity is None:
+                raise ValueError(f"{benchmark_path}: unresolved Rule source reference: {reference}")
+        else:
+            identity = reference
+            if identity not in compiled_rule_ids:
+                raise ValueError(f"{benchmark_path}: unresolved Rule identity: {identity}")
+        if identity in resolved_rule_ids:
+            raise ValueError(f"{benchmark_path}: duplicate Rule reference: {identity}")
+        resolved_rule_ids.append(identity)
+    compiled_benchmark["benchmark"]["rules"] = resolved_rule_ids
 
     # Resolve every declared edge, including unused/unselected branches, before
     # packaging. A dependency is an immutable manifest object, never a source path.

@@ -162,6 +162,24 @@ class ContentCompilerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unresolved Assessment identity"):
                 compile_benchmark(root, bench)
 
+    def test_benchmark_rule_paths_become_logical_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "corpus"
+            bench = root / "example"
+            dump(bench / "benchmark.yaml", {"benchmark": {
+                "id": "example", "version": {"value": "1"},
+                "rules": ["rules/R1.rule.yaml"], "profiles": []}})
+            dump(bench / "rules" / "R1.rule.yaml", {"rule": {
+                "id": "R1", "assessment_choices": {}, "default_assessment_choice": None}})
+            _, members, index = compile_benchmark(root, bench)
+            compiled = json.loads(members[index["example"]["path"]])["benchmark"]
+            self.assertEqual(compiled["rules"], ["R1"])
+            record = {"benchmark": {"id": "example", "version": {"value": "1"},
+                                    "rules": ["rules/missing.yaml"], "profiles": []}}
+            dump(bench / "benchmark.yaml", record)
+            with self.assertRaisesRegex(ValueError, "unresolved Rule source reference"):
+                compile_benchmark(root, bench)
+
     def test_runtime_manifest_omits_authoring_source_paths_and_verifies_graph(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"corpus"
