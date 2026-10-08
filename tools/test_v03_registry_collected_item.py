@@ -20,6 +20,15 @@ def scalar(value,datatype="string"):
 
 
 class RegistryCollectedItemTests(unittest.TestCase):
+    def test_multisz_array_is_canonical_schema_valid(self):
+        from pathlib import Path
+        from validate_native_json_schemas import schema_store, validator
+        root=Path(__file__).resolve().parents[1]
+        schemas=root / "schema/v0.3.0"
+        v=validator(schemas,"collected-item.schema.json",schema_store(schemas))
+        instance=item("multi_string",[scalar("a"),scalar("b")])
+        self.assertEqual([],list(v.iter_errors(instance)))
+
     def test_multisz_array_retains_elements(self):
         self.assertEqual([],diagnostics(item("multi_string",[scalar("a"),scalar("b")])))
     def test_multisz_flat_string_rejected(self):
