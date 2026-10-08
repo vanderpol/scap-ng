@@ -92,7 +92,7 @@ policy pass/fail and records the decisive comparison directly.
 
 Full example: [0.3 automated Assessment Result](0.3.0/results/assessment-result.json).
 
-## Explicit applicability
+## Applicability Assessment (technical example)
 
 **SCAP 1.4:** Applicability can be scattered among CPE, XCCDF, and OVAL. **SCAP-NG:** Applicability refers to explicit technical Assessments.
 
@@ -446,21 +446,18 @@ Assessment is distinct from consuming the **result of another Assessment**,
 shown next. The later [production-derived RHEL 9 example](#consumer-local-components-and-shared-objects)
 demonstrates local and shared acquisition in the same converted Assessment.
 
-### Referencing another Assessment file
+### Referencing another Assessment
 
-SCAP-NG also supports a separate form of reuse: an Assessment may statically
-declare a **dependency on another Assessment's result**, and use that result
-inside its own `evaluate` tree. Here is a **manufactured native illustration**,
-adapted from the existing [Assessment dependency fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml),
-not an automatically converted STIG example:
+An Assessment can depend on another Assessment's result and combine it in its own `evaluate` expression. That is **result reuse**, distinct from sharing collected Objects or Items across Assessments.
+
+**Agreed logical-ID authoring target (illustrative; not yet compiler-supported):**
 
 ```yaml
 assessment:
   id: example.composed-assessment
   dependencies:
     platform-applicable:
-      assessment: ../applicability/example-platform.assessment.yaml
-      expected_id: example.platform-applicable
+      assessment: example.platform-applicable
       expected_version: 1
       purpose: applicability
   evaluate:
@@ -469,18 +466,9 @@ assessment:
       - test: local-setting-correct
 ```
 
-The `assessment:` path identifies the **external authored YAML file**;
-`expected_id` and `expected_version` protect against accidentally binding
-the wrong content; `platform-applicable` is the local alias referenced by
-`evaluate`. The other Assessment remains an independent unit with its own
-technical result and evidence. The compiler must resolve and validate
-dependencies, including rejecting cycles. The result is reused without
-copying the referenced Assessment's Tests or collected Items into this file.
+The publisher refers to the stable Assessment ID; the build resolves it within a declared source/import scope, checks the type and version, rejects cycles, and packages the dependency. The alias `platform-applicable` remains local to the requesting Assessment.
 
-**Important distinction:** this is **Assessment-result reuse**, not
-cross-Assessment Object/Item collection sharing. The latter remains a
-separate, deferred design topic. For the normative contract, see
-[Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
+**Current implementation differs:** the existing [research fixture](../../research/iterations/003/examples/assessment-result-dependency/composed.assessment.yaml) uses a relative file path and a duplicate `expected_id`. Both the compiler and schema must be migrated before the logical-ID version is a valid 0.3 file; this is tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199). Do not treat the target syntax as executable current content. For the current dependency contract, see [Assessment-result dependencies](../assessment/assessment-method.md#assessment-result-dependencies).
 
 ## Detailed reference and evidence
 
