@@ -136,7 +136,7 @@ class ValueMatchContract(unittest.TestCase):
                                 "capability-mappings/supported/unix.file.json").read_text())
             converted=apply_capability_mapping(source,mapping)
             selector=converted["assessment"]["objects"]["file-selector"]["select"]["full_path"]
-            self.assertEqual(selector[key], "one_or_more")
+            self.assertEqual(selector[key], "any" if version == "0.2.0" else "one_or_more")
             self.assertNotIn("value_match" if key=="variable_match" else "variable_match",
                              selector)
 
