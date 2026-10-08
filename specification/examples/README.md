@@ -8,7 +8,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 **SCAP 1.4:** Benchmark and Rule material is largely combined in one XCCDF document, with checks elsewhere. **SCAP-NG:** A Benchmark references independent Rules; each Rule retains readable policy prose and chooses an Assessment. There is **no extra Policy file** between Rule and Assessment.
 
-## A real Benchmark — RHEL 9
+## RHEL 9 Benchmark
 
 From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37813594321), excerpted without changing the shown fields:
 
@@ -36,9 +36,9 @@ benchmark:
     # ... 442 more Rule IDs in this Benchmark
 ```
 
-The real converted Benchmark has **445 Rules**. It also carries description, product applicability, references, scoring, and publisher Profiles; the excerpt omits those fields for readability. Its `groups: []` is genuinely empty: the converter has **not invented group assignments**. Meaningful groups can be authored, but must not be presented as converted source when they are absent.
+The converted Benchmark contains **445 Rules**, along with description, applicability, references, scoring, and publisher Profiles. Its `groups: []` indicates that no groups are defined in this converted source.
 
-## A real Rule — the human-readable requirement
+## RHEL 9 Rule — the requirement
 
 **RHEL 9 SV-257851** requires the `nosuid` mount option for the `/home` filesystem. A Rule preserves the STIG title, discussion, identifiers, severity, and fix **without burying the requirement inside test logic**.
 
@@ -67,17 +67,17 @@ rule:
 
 The full source retains additional Rule fields, including references, applicability, choice bindings, and empty-but-explicit supported policy sections. The **fix** is represented under `remediation.guidance`; it is not discarded during conversion.
 
-## A second policy example — Windows Server 2025
+## Windows Server 2025 Rule
 
 The actual converted **Windows Server 2025 SV-278001** Rule has the title *“Windows Server 2025 default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.”* Its medium-severity policy discussion explains that unauthorized Registry permission changes can compromise system security and stability. The Rule also retains the lengthy DISA remediation guidance, including distinct defaults for domain controllers and other servers.
 
-The **Rule owns the requirement and fix**; its [automated Assessment](assessments.md#explicit-evaluation-logic) separately represents the Boolean technical checks. Its existing `all/any/not` structure must not be advertised as an automatically converted `if/then/else` branch, because unknown-value outcomes may differ.
+The **Rule owns the requirement and fix**; its [automated Assessment](assessments.md#explicit-evaluation-logic) separately represents the Boolean technical checks. The converted Assessment retains `all/any/not` evaluation; changing it to `if/then/else` could change outcomes when values are unknown.
 
 ## How the Rule selects an Assessment
 
-This actual Rule offers `default`, `automated`, and `manual` choices. The automated choice refers to a reusable Assessment checking the `/home` mount, while the manual choice preserves the STIG check procedure.
+The RHEL 9 Rule offers `default`, `automated`, and `manual` choices. The automated choice refers to a reusable Assessment checking the `/home` mount, while the manual choice preserves the STIG check procedure.
 
-**Agreed 0.3 authoring target:** references will use stable **logical IDs**, so authors can rearrange files without updating `../` paths. The following is **illustrative target syntax, not the converter's current output**:
+**Planned logical-ID syntax (not yet implemented):** references use stable IDs, so moving files does not require updating relative paths. For example:
 
 ```yaml
 rule:
@@ -91,9 +91,9 @@ rule:
 
 The compiler must discover IDs in a declared scope, reject missing or ambiguous references, and package immutable resolved identities. **Implementation is not yet complete** ([#199](https://github.com/vanderpol/scap-ng/issues/199)); the real transitional source-path form is documented [below](#cross-file-reference-implementation-status).
 
-## Publisher Profiles — use real selections
+## Publisher Profiles
 
-The RHEL 9 Benchmark defines **11 publisher Profiles**. For example, its actual `CAT_I_Only` Profile is:
+The RHEL 9 Benchmark defines **11 publisher Profiles**. The `CAT_I_Only` Profile includes:
 
 ```yaml
 profiles:
@@ -113,7 +113,7 @@ This excerpt shows the first three of **417 disabled Rules** from that Profile. 
 
 An ordinary Rule may apply only when a package or system feature is present. The converted RHEL 9 `applicability.yaml` includes an explicit condition `benchmark.rhel_9.condition.gnome-shell-package`, linked to an Assessment that checks installation. SCAP-NG uses technical checks for applicability rather than treating CPE text as a magical scanner predicate.
 
-Details: [real applicability Assessment example](assessments.md#applicability-assessment-technical-example).
+Details: [applicability Assessment example](assessments.md#applicability-assessment-technical-example).
 
 ## Readable Benchmark and Rule results
 
@@ -133,7 +133,7 @@ This material is not needed to understand the policy examples.
 
 ### Cross-file reference implementation status
 
-**Transitional converter output (real SV-257851):**
+**Current converter output (SV-257851):**
 
 ```yaml
 assessment_choices:
@@ -145,6 +145,6 @@ assessment_choices:
     assessment: ../assessments/manual/SV-257851.manual.yaml
 ```
 
-The existing compiler resolves these authoring **paths** into Assessment IDs inside the compiled package. It does **not yet** accept the logical IDs shown in the earlier *target* example. The approved direction applies uniformly to Benchmark-to-Rule, Rule-to-Assessment, dependencies, and other inter-file authored links; follow [#199](https://github.com/vanderpol/scap-ng/issues/199) for implementation, relocation, and ambiguity tests.
+The compiler currently resolves these source paths to Assessment IDs inside compiled packages. Logical-ID references in source are planned across Benchmark, Rule, Assessment, and dependency links, but are not yet supported ([#199](https://github.com/vanderpol/scap-ng/issues/199)).
 
 For measured assessment reductions, the exact `for_each:` search index, source provenance and broader census, see the [Assessment page's detailed evidence](assessments.md#detailed-reference-and-evidence). Historical 0.2 examples remain [archived here](../../board/review-content/0.2.0/README.md), not as current 0.3 authoring examples.
