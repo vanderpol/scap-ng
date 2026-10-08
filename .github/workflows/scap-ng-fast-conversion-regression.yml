@@ -328,8 +328,8 @@ jobs:
           gh issue comment 202 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/six-run.md"
 
   publish-six-run:
-    name: Report representative conversion verdict
-    needs: [convert]
+    name: Report representative conversion and validation verdict
+    needs: [convert, validate]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -341,18 +341,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          RESULT: ${{ needs.convert.result }}
+          CONVERSION_RESULT: ${{ needs.convert.result }}
+          VALIDATION_RESULT: ${{ needs.validate.result }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
           {
             echo "<!-- scap-ng-six-anchor-run -->"
             echo "### Latest six-anchor 0.3 conversion regression"
             echo ""
-            echo "- Result: **${RESULT}**"
+            echo "- Source conversion (six-matrix): **${CONVERSION_RESULT}**"
+            echo "- Schema/semantics/normalization/compilation: **${VALIDATION_RESULT}**"
             echo "- Run: ${RUN_URL}"
             echo "- Source SHA: \`${SOURCE_SHA}\`"
             echo "- Inspect each matrix job and downloadable evidence at the run link."
             echo ""
-            echo "Passing conversion is not proof of scanner/runtime equivalence."
+            echo "A green conversion matrix alone is not a green release gate. Neither static gate proves scanner/runtime equivalence."
           } > "${RUNNER_TEMP}/six-run.md"
           gh issue comment 202 --edit-last --create-if-none --body-file "${RUNNER_TEMP}/six-run.md"
