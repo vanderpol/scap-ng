@@ -58,6 +58,6 @@ assessment:
 
 SCAP 1.4 conversion SHALL preserve source identity in migration evidence while emitting native names that follow this convention.
 
-A 0.3 normalizer MAY convert older native presentation forms such as `test-example` and historical `state-example` to `example-test` and `example-state` when every reference can be rewritten deterministically and collision-free.
+A 0.3 normalizer MAY convert older Test IDs such as `test-example` to `example-test` when references can be rewritten deterministically and collision-free. Historical State IDs SHALL be retained only in migration provenance, not renamed into new native State IDs.
 
 The frozen 0.2 review content is not renamed by this convention.
