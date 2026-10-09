@@ -60,7 +60,8 @@ jobs:
               if(!d.body.includes(marker)||d.number!==number){core.warning('WRONG_ORIGIN '+number);continue;}
               const hasVoting=d.reactions.totalCount>0||d.comments.nodes.some(c=>c.reactions.totalCount>0||c.replies.totalCount>0);
               const originalMarkers=number===211?['scap-ng-vote-option: ','scap-ng-complete-comparison-20261009']:['scap-ng-canonical-vote: '];
-              const unexpected=d.comments.totalCount!==d.comments.nodes.length||d.comments.nodes.some(c=>!originalMarkers.some(m=>c.body.includes(m))||c.author?.login!=='github-actions[bot]');
+              core.info('OLD_COMMENT_CLASS_'+number+' '+JSON.stringify(d.comments.nodes.map(c=>({author:c.author?.login,option:c.body.includes('scap-ng-vote-option: '),newOption:c.body.includes('scap-ng-canonical-vote: '),details:c.body.includes('scap-ng-complete-comparison-20261009'),reactions:c.reactions.totalCount,replies:c.replies.totalCount}))));
+              const unexpected=d.comments.totalCount!==d.comments.nodes.length||d.comments.nodes.some(c=>!originalMarkers.some(m=>c.body.includes(m))||!['github-actions[bot]','github-actions'].includes(c.author?.login));
               core.info('RETIREMENT_ENGAGEMENT_'+number+' '+JSON.stringify({voteReactions:hasVoting,unexpectedComments:unexpected,commentCount:d.comments.totalCount,topReactions:d.reactions.totalCount}));
               if(hasVoting||unexpected){core.warning('NOT_DELETING_ENGAGED_DISCUSSION_'+number+' '+d.url);continue;}
               try {
