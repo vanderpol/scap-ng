@@ -24,9 +24,34 @@ See the [full objectives](specification/objectives.md) and
 - **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
 - **Current review:** [review/current/README.md](review/current/README.md)
 - **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
-- **0.2.0 frozen schema:** [schema/v0.2.0/](schema/v0.2.0/)
+- **Six complete STIG conversions (ZIP):** [Download the 0.3 review bundle](https://github.com/vanderpol/scap-ng/actions/runs/37849528026/artifacts/11580544848) · [individual ZIPs](#full-stig-conversion-downloads)
 - **Open issues / 0.3 work:** [GitHub issues](https://github.com/vanderpol/scap-ng/issues)
 - **Governance and published votes:** [board/README.md](board/README.md)
+
+
+## Full STIG conversion downloads
+
+The [six-STIG review bundle (ZIP)](https://github.com/vanderpol/scap-ng/actions/runs/37849528026/artifacts/11580544848)
+contains the **complete converted 0.3 authoring trees** and **six compiled
+`.scapng` packages**. Individual full-conversion ZIPs are also available:
+
+- [Red Hat Enterprise Linux 9](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11580818580)
+- [Oracle Linux 9](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581187923)
+- [Windows 11](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11580608540)
+- [Windows Server 2025](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11582000947)
+- [Windows Server DNS](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581811893)
+- [Apache HTTP Server 2.4 (UNIX)](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581482203)
+
+These are **SCAP-NG preview conversions** of DISA STIG-based NIWC-enhanced
+SCAP 1.4 content, **not official DISA-issued SCAP-NG benchmarks**.
+The individual ZIPs contain full faithful and simplified candidate authoring
+sources; the combined ZIP includes compiled packages. Both builds
+[passed their GitHub Actions workflows](https://github.com/vanderpol/scap-ng/actions/runs/37849528026),
+but successful conversion/compilation does not establish live-scanner fidelity.
+GitHub Actions artifact downloads may require sign-in and expire; the
+[review workflows](https://github.com/vanderpol/scap-ng/actions)
+can regenerate them.
+
 
 ## Architecture
 
