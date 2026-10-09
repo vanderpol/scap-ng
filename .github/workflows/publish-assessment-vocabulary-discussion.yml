@@ -78,9 +78,15 @@ jobs:
               // and never rewrite or replace existing vote comments/reactions.
               if (discussion.body !== body) {
                 const edit = 'mutation($discussionId:ID!,$body:String!){updateDiscussion(input:{discussionId:$discussionId,body:$body}){discussion{id url body}}}';
-                const updated = await github.graphql(edit,{discussionId:discussion.id,body});
-                if(updated.updateDiscussion.discussion.body !== body) throw new Error('Opening post did not match source after update.');
-                core.info('UPDATED_CANONICAL_DISCUSSION '+updated.updateDiscussion.discussion.url);
+                try {
+                  const updated = await github.graphql(edit,{discussionId:discussion.id,body});
+                  if(updated.updateDiscussion.discussion.body !== body) throw new Error('Opening post did not match source after update.');
+                  core.info('UPDATED_CANONICAL_DISCUSSION '+updated.updateDiscussion.discussion.url);
+                } catch(err) {
+                  const msg = String(err.message||err);
+                  if(!/Resource not accessible by integration|FORBIDDEN|forbidden/i.test(msg)) throw err;
+                  core.warning('GitHub Actions bot cannot edit its existing Discussion opening post. Will append one complete source-backed examples comment under the SAME Discussion. No new Discussion or voting options are created.');
+                }
               } else {
                 core.info('CANONICAL_DISCUSSION_ALREADY_CURRENT '+discussion.url);
               }
@@ -102,9 +108,30 @@ jobs:
               const added = await github.graphql(mutation,{discussionId:discussion.id,body:comment});
               core.info('CREATED_VOTE_'+option.key+' '+added.addDiscussionComment.comment.url);
             }
-            // Confirm that the final Discussion body and each existing option still match.
+            // Some GitHub Actions integrations can create but cannot edit a Discussion.
+            // In that case put the full source + all three YAML examples *inside this
+            // same Discussion* in one idempotent comment; never duplicate the vote.
+            const detailedMarker = 'scap-ng-complete-comparison-20261009';
+            const view = await github.graphql(commentQuery,{id:discussion.id});
+            const detailed = view.node.comments.nodes.filter(c=>c.body?.includes(detailedMarker));
+            if(detailed.length>1) throw new Error('Multiple complete-comparison comments; reconcile manually.');
+            if (discussion.body !== body && !detailed.length) {
+              const text = '<!-- '+detailedMarker+' -->\\n\\n'+body;
+              const mutation = 'mutation($discussionId:ID!,$body:String!){addDiscussionComment(input:{discussionId:$discussionId,body:$body}){comment{id url}}}';
+              const result = await github.graphql(mutation,{discussionId:discussion.id,body:text});
+              core.info('PUBLISHED_FULL_EXAMPLES_IN_DISCUSSION '+result.addDiscussionComment.comment.url);
+            } else if (detailed.length) {
+              core.info('FULL_EXAMPLES_ALREADY_IN_DISCUSSION '+detailed[0].url);
+            }
+            // Confirm that the final Discussion and four voting comments are intact.
             const verified = await github.graphql('query($id:ID!){node(id:$id){...on Discussion{body comments(first:100){nodes{body url}}}}}',{id:discussion.id});
-            if(verified.node.body !== body) throw new Error('Discussion body verification failed.');
+            if(verified.node.body !== body &&
+                !verified.node.comments.nodes.some(c => c.body?.includes(detailedMarker) &&
+                  c.body.includes('## A — Current SCAP-NG 0.3') &&
+                  c.body.includes('## B — Ansible-inspired') &&
+                  c.body.includes('## C — Inspection-oriented'))) {
+              throw new Error('Complete comparison missing from both opening post and comments.');
+            }
             for(const option of options) {
               const match = verified.node.comments.nodes.filter(c=>c.body.includes('scap-ng-vote-option: '+option.key+'-20261009'));
               if(match.length!==1) throw new Error('Discussion lost or duplicated vote '+option.key);
