@@ -1,0 +1,95 @@
+name: Read-only Board Discussions overlap audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/audit-board-discussions.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inventory Discussions and comments using GitHub GraphQL
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner, name = context.repo.repo;
+            let after = null, pages = 0;
+            const discussions = [];
+            while (pages < 12) {
+              const result = await github.graphql(`
+                query($owner: String!, $name: String!, $after: String) {
+                  repository(owner: $owner, name: $name) {
+                    discussions(first: 35, after: $after,
+                      orderBy: {field: UPDATED_AT, direction: DESC}) {
+                      nodes {
+                        number title url body createdAt updatedAt
+                        category { name }
+                        comments(first: 30) {
+                          totalCount
+                          nodes { body createdAt author { login } }
+                          pageInfo { hasNextPage }
+                        }
+                      }
+                      pageInfo { hasNextPage endCursor }
+                    }
+                  }
+                }`, {owner, name, after});
+              const connection = result.repository.discussions;
+              discussions.push(...connection.nodes);
+              pages++;
+              if (!connection.pageInfo.hasNextPage) break;
+              after = connection.pageInfo.endCursor;
+            }
+            const words = /ansible|assessments? authoring|authoring language|authoring vocabulary|canonical execution|alternate presentation|yaml vs json|local(ized)? (object|state)|embedded (state|filter)|inspection[- ]oriented/i;
+            const topicHits = discussions.map(d => {
+              const comments = d.comments.nodes || [];
+              const text = [d.title, d.body, ...comments.map(c => c.body)].join('\n');
+              const snippets = [];
+              for(const term of ['ansible', 'authoring', 'vocabulary', 'canonical execution', 'embedded', 'inspection']) {
+                let i = text.toLowerCase().indexOf(term);
+                if(i >= 0) snippets.push(text.slice(Math.max(0,i - 110),Math.min(text.length,i + 260)).replace(/\s+/g,' '));
+              }
+              return {
+                number:d.number,title:d.title,url:d.url,category:d.category?.name,
+                updatedAt:d.updatedAt,totalComments:d.comments.totalCount,
+                commentsTruncated:d.comments.pageInfo.hasNextPage,
+                hasAnsible:/ansible/i.test(text), matches:words.test(text),
+                snippets:snippets.slice(0,4), body:d.body,
+                comments: comments.map(c=>({body:c.body,author:c.author?.login,createdAt:c.createdAt}))
+              };
+            });
+            fs.mkdirSync('work', {recursive: true});
+            fs.writeFileSync('work/board-discussion-audit.json', JSON.stringify({
+              generatedAt:new Date().toISOString(), count:discussions.length, pages,
+              discussions: topicHits
+            },null,2));
+            core.info('AUDIT_TOTAL '+ discussions.length + ' discussions across '+pages+' pages');
+            core.info('AUDIT_ANSIBLE_BEGIN');
+            for (const d of topicHits.filter(d=>d.hasAnsible)) {
+              core.info(JSON.stringify({number:d.number,title:d.title,url:d.url,category:d.category,
+                updatedAt:d.updatedAt,totalComments:d.totalComments,
+                commentsTruncated:d.commentsTruncated,snippets:d.snippets}).slice(0,1900));
+            }
+            core.info('AUDIT_ANSIBLE_END');
+            core.info('AUDIT_TOPIC_BEGIN');
+            for (const d of topicHits.filter(d=>d.matches && !d.hasAnsible)) {
+              core.info(JSON.stringify({number:d.number,title:d.title,url:d.url,category:d.category,
+                updatedAt:d.updatedAt,totalComments:d.totalComments,
+                commentsTruncated:d.commentsTruncated,snippets:d.snippets}).slice(0,950));
+            }
+            core.info('AUDIT_TOPIC_END');
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: read-only-board-discussion-inventory
+          path: work/board-discussion-audit.json
+          if-no-files-found: warn
