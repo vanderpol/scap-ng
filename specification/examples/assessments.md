@@ -410,9 +410,9 @@ The examples above show how to read and write an Assessment; you don't need the 
 
 ### Where to find real source files
 
-The [0.3 six-benchmark review package](https://github.com/vanderpol/scap-ng/actions/runs/37849528026) contains real converted Linux, Windows, DNS and Apache authoring sources. The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real converted Rule and Assessment source paths. Search the downloadable `authoring/` tree for **`for_each:`** (not `foreach`), `shared_objects:`, `evaluate:`, or `assessment_choices:`.
+The [durable six-STIG source ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-six-stig-source-preview.zip) contains the current converted Linux, Windows, DNS and Apache **candidate authoring** alongside each benchmark's **faithful conversion**, with the embedded Filter/State-predicate updates. The [six individual ZIPs](https://github.com/vanderpol/scap-ng#full-stig-conversion-downloads), [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/SHA256SUMS.txt), and [review guide](../../review/current/REVIEW-GUIDE.md) are also available.
 
-In this pinned six-benchmark artifact there are **8 `for_each:` occurrences across 7 Assessments** and **79 `shared_objects:` occurrences**; these numbers describe a single build, not an entire standard or runtime scan. The checked `reported_elements:` entries in that bundle are all `all`—the bundle does **not** demonstrate selective redaction, native conditionals, Organizational Input binding, cross-Assessment result reuse, or *live* scanner output. See the [fixture catalog](0.3.0/results/README.md) for expressly synthetic results.
+Within the combined archive, search `scap-ng-0.3-human-review/benchmarks/<name>/candidate-authoring/` for **`for_each:`**, **`shared_objects:`**, **`filters:`**, **`evaluate:`**, and **`assessment_choices:`**. This is a readability/source conversion preview, **not** a live scanner result, an approved 0.3 release, or proof of six-state runtime equivalence. See the [separate synthetic fixture catalog](0.3.0/results/README.md) for example results; use the ZIP's `SCORECARD.md` for measurements from the corresponding exact build.
 
 ### What the production conversion measurements actually mean
 
