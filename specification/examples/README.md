@@ -10,7 +10,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 ## RHEL 9 Benchmark
 
-From `authoring/rhel_9/benchmark.yaml` in the [validated six-benchmark ZIP](https://github.com/vanderpol/scap-ng/actions/runs/37849528026), excerpted without changing the shown fields:
+From `rhel9/candidate-authoring/benchmark.yaml` in the [direct RHEL 9 native authoring preview ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-rhel9-source-preview.zip) (current 0.3 examples; surrounding fields are abbreviated):
 
 ```yaml
 benchmark:
@@ -42,7 +42,7 @@ The converted Benchmark contains **445 Rules**, along with description, applicab
 
 **RHEL 9 SV-257851** requires the `nosuid` mount option for the `/home` filesystem. A Rule preserves the STIG title, discussion, identifiers, severity, and fix **without burying the requirement inside test logic**.
 
-From `authoring/rhel_9/rules/SV-257851.rule.yaml` in the same ZIP (the discussion below is abridged; all shown values originate in the actual Rule):
+From `rhel9/candidate-authoring/rules/SV-257851.rule.yaml` in the same ZIP (the discussion below is abridged; all shown values originate in the actual Rule):
 
 ```yaml
 rule:
@@ -168,7 +168,7 @@ Two optional presentations are rendered **from the native SCAP-NG content**, not
 - **HTML review:** browse Rule titles, severity, discussion, check procedure, and fix text.
 - **Excel audit checklist:** the same policy and check text, with controlled results, evidence/notes, evaluator, and review-date fields.
 
-[Download the verified Active Directory Forest pilot artifact](https://github.com/vanderpol/scap-ng/actions/runs/37821933656/artifacts/11570215522) from the [successful validation run](https://github.com/vanderpol/scap-ng/actions/runs/37821933656). It contains native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. The [workflow](https://github.com/vanderpol/scap-ng/actions/workflows/stig-manual-audit-outputs.yml) regenerates these files from its pinned DISA manual when the artifact expires.
+The original Active Directory Forest pilot generated native YAML, `active-directory-forest-audit.html`, and `active-directory-forest-audit.xlsx`. Its GitHub Actions download was **temporary and is no longer advertised as a working attachment**. The [manual STIG conversion contract](../../specification/migration/scap-1.4-migration.md) and [pilot implementation issue #157](https://github.com/vanderpol/scap-ng/issues/157) remain available; no durable manual-pilot ZIP has been published yet.
 
 That historical pilot passed conversion, optional-output checks, and native-document validation. The compiler now accepts logical Assessment IDs even though this pilot's converter still emits transitional paths ([#199](https://github.com/vanderpol/scap-ng/issues/199)). This example shows manual auditing; the RHEL 9 walkthrough shows automated checks.
 
@@ -176,7 +176,7 @@ That historical pilot passed conversion, optional-output checks, and native-docu
 
 Read the [Assessment examples](assessments.md) to see how that Rule is evaluated, including automated and manual checks, `for_each`, static values, direct Variable evaluation, conditional branches, Organization Input and bounded evidence. The [0.3 result fixture catalog](0.3.0/results/README.md) separately shows Scan, Benchmark, Automated Assessment and Manual Assessment results.
 
-The six-benchmark set passed conversion, schema/semantics, normalization and compilation in [run 37849528026](https://github.com/vanderpol/scap-ng/actions/runs/37849528026). The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
+The [six fresh benchmark authoring conversions](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-six-stig-source-preview.zip) passed conversion, native schema/semantics validation and current embedded-Filter checks in [run 37930622386](https://github.com/vanderpol/scap-ng/actions/runs/37930622386). These ZIPs contain source authoring and comparison trees, not compiled scanner packages. The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
 
 ## Technical reference (optional)
 
