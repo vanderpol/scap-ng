@@ -440,3 +440,77 @@ jobs:
             work/scap-ng-0.3-board-review.zip.sha256
           if-no-files-found: error
           compression-level: 6
+
+
+  publish_preview:
+    name: Publish durable six-STIG pre-alpha source preview ZIPs
+    needs: [precheck, render, assemble]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: scap-ng-0.3-human-review-candidate
+          path: downloaded
+
+      - name: Verify embedded-Filter conversion and build six individual source ZIPs
+        run: |
+          python scap-ng/tools/build_six_stig_release_assets.py \
+            --input-root downloaded \
+            --output publish \
+            --source-sha "${{ github.sha }}" \
+            --niwc-revision "${{ env.NIWC_REVISION }}"
+
+      - name: Publish source ZIPs as commit-pinned GitHub prerelease attachments
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          NIWC_REVISION: "${{ env.NIWC_REVISION }}"
+        run: |
+          set -euo pipefail
+          short_sha="$(printf '%s' "$SOURCE_SHA" | cut -c1-12)"
+          tag="v0.3.0-six-stig-preview-$short_sha"
+          {
+            echo '# Six native STIG conversions — SCAP-NG 0.3 pre-alpha authoring preview'
+            echo ''
+            echo '**Not an official SCAP-NG 0.3 release or OVAL Board review request.**'
+            echo ''
+            echo 'Each individual ZIP is a complete native source conversion, with candidate-authoring/ using embedded Test and Filter predicates, faithful-authoring/ for comparison, and a per-Benchmark scorecard.'
+            echo 'The combined ZIP contains all six conversion trees. No native scanner result is claimed. The ZIPs are not official DISA-issued SCAP-NG content.'
+            echo ''
+            echo "SCAP-NG source revision: $SOURCE_SHA"
+            echo "Pinned NIWC SCAP 1.4 source revision: $NIWC_REVISION"
+            echo "Validation/build: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo ''
+            echo 'Verify assets with the attached SHA256SUMS.txt and BUILD-MANIFEST.json.'
+          } > publish/RELEASE-NOTES.md
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Commit-pinned release $tag already exists: never overwrite a published review asset."
+            exit 1
+          fi
+          gh release create "$tag" \
+            --target "$SOURCE_SHA" \
+            --title "SCAP-NG 0.3 six STIG source preview ($short_sha)" \
+            --notes-file publish/RELEASE-NOTES.md \
+            --prerelease \
+            publish/scap-ng-0.3-*-source-preview.zip \
+            publish/BUILD-MANIFEST.json \
+            publish/SHA256SUMS.txt
+
+          gh release view "$tag" --json url,assets --jq '{url:.url,assets:[.assets[].name]}'
+          echo "DURABLE_REVIEW_RELEASE=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"
+          {
+            echo '## Durable six-STIG source previews'
+            echo "Source SHA: $SOURCE_SHA"
+            echo "Release: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"
+          } >> "$GITHUB_STEP_SUMMARY"
