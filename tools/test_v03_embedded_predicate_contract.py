@@ -116,6 +116,11 @@ class EmbeddedPredicateContract(unittest.TestCase):
         ]
         self.assertEqual(self.errors(doc), [])
 
+    def test_existence_only_test_may_have_empty_comparison_list(self):
+        doc = valid()
+        doc["assessment"]["tests"]["file-owner-test"]["states"] = []
+        self.assertEqual(self.errors(doc), [])
+
     def test_repeated_equal_predicates_preserve_cardinality(self):
         # A single legacy State can occur in multiple operand positions.
         # Deduplicating would change ONE/ODD semantics.
