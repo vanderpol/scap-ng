@@ -4,7 +4,7 @@
   "x-scap-ng-version": "0.3.0",
   "x-last-modified": "2026-10-08",
   "title": "SCAP-NG Test Result draft v0.3.0 strawman",
-  "description": "Detailed result for one authored Test. Preserves existence, per-State, per-Item, and final Test aggregation layers.",
+  "description": "Detailed technical result for one authored Test. Test-local predicate positions, not independently named State artifacts, determine comparison identities.",
   "type": "object",
   "required": [
     "id",
@@ -87,7 +87,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "Ordered identifiers of consumer-local Test predicates. Canonical 0.3 form is <test-id>.states[<zero-based-index>], including repeated identical predicates at separate positions. No separately named authored States are required."
     },
     "item_refs": {
       "type": "array",
@@ -118,7 +119,8 @@
             "type": "array",
             "items": {
               "$ref": "state-result.schema.json"
-            }
+            },
+            "description": "Each local comparison result identifies one lexical Test.states array position; it must resolve against this Test's ordered state_refs, not a source OVAL State ID."
           },
           "item": {
             "$ref": "collected-item.schema.json",
