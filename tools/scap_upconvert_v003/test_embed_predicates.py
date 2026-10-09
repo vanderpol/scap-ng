@@ -3,7 +3,7 @@
 import copy
 import unittest
 
-from tools.scap_upconvert_v003.embed_predicates import (
+from scap_upconvert_v003.embed_predicates import (
     embed_predicates, reexpand_predicates,
 )
 
