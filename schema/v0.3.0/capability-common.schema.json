@@ -234,15 +234,16 @@
       ]
     },
     "state_filter": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/inline_predicate"
+        }
+      ],
       "type": "object",
       "required": [
-        "state",
         "action"
       ],
       "properties": {
-        "state": {
-          "$ref": "#/$defs/state_use"
-        },
         "action": {
           "type": "string",
           "enum": [
@@ -251,14 +252,15 @@
           ]
         }
       },
-      "additionalProperties": false
+      "description": "Filter an observed Item population on its typed fields, before Set operations; never a named State reference."
     },
     "test_reference_set": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/state_use"
+        "$ref": "#/$defs/inline_predicate"
       },
-      "uniqueItems": true
+      "minItems": 1,
+      "description": "Test-local comparison expressions; no State IDs or redundant capability declarations."
     },
     "comparison_operation": {
       "type": "string",
@@ -931,6 +933,61 @@
         }
       },
       "additionalProperties": false
+    },
+    "inline_predicate": {
+      "type": "object",
+      "description": "Consumer-local typed comparison. The effective capability is inherited from its consuming Test or Object; capability-specific field/expression validation occurs in generated capability schemas.",
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "capability"
+            ]
+          },
+          {
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "required": [
+              "state_title"
+            ]
+          },
+          {
+            "required": [
+              "filter_title"
+            ]
+          }
+        ]
+      },
+      "oneOf": [
+        {
+          "required": [
+            "field"
+          ]
+        },
+        {
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "required": [
+            "any"
+          ]
+        },
+        {
+          "required": [
+            "one"
+          ]
+        },
+        {
+          "required": [
+            "odd"
+          ]
+        }
+      ]
     }
   }
 }
