@@ -4,12 +4,12 @@
 
 **Question for the OVAL Board:** Given the same straightforward STIG requirement, which authoring vocabulary is easiest to read and least likely to be misunderstood? Should we revisit terminology **before finalizing 0.3**, or retain 0.3 and investigate for the next release?
 
-**[Participate in the discussion and vote on GitHub #207](https://github.com/vanderpol/scap-ng/issues/207)**. Add a **👍 to exactly one** option comment. D expressly invites proposals that do not fit A–C, including hybrid designs:
+**[Participate in the single GitHub Discussion and vote A/B/C/D](https://github.com/vanderpol/scap-ng/discussions/211)**. Add a **👍 to exactly one** option comment. D expressly invites proposals that do not fit A–C, including hybrid designs:
 
-- [Vote A — Current SCAP-NG / OVAL-aligned](https://github.com/vanderpol/scap-ng/issues/207#issuecomment-6071169165)
-- [Vote B — Ansible-inspired](https://github.com/vanderpol/scap-ng/issues/207#issuecomment-6071169545)
-- [Vote C — Inspection-oriented](https://github.com/vanderpol/scap-ng/issues/207#issuecomment-6071169947)
-- [Vote D — None of the above; different or hybrid approach needed](https://github.com/vanderpol/scap-ng/issues/207#issuecomment-6079265492)
+- [Vote A — Current SCAP-NG / OVAL-aligned](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834526)
+- [Vote B — Ansible-inspired](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834528)
+- [Vote C — Inspection-oriented](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834530)
+- [Vote D — None of the above; different or hybrid approach needed](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834531)
 
 **D is a substantive alternative, not an abstention:** use it when A–C do not capture an acceptable direction. A short explanation of the missing piece (terminology, structure, readability, semantics) will help make that vote actionable; members need not design the whole replacement before voting. If you are simply undecided, you can comment without voting.
 
@@ -143,7 +143,7 @@ This reads as *inspect partitions → select the mount → expect the option →
 
 ## What feedback would help?
 
-Please vote for the direction you actually support. In explaining an A–C vote, consider whether `inspect` or `collect` better conveys *obtain target facts*, whether `select` or `where` more clearly means *identify relevant resources*, and whether `items.satisfy` is clearer than `match`. **Use D** if a different vocabulary or hybrid would be preferable; please explain the needed improvement in the [discussion](https://github.com/vanderpol/scap-ng/issues/207). Do not vote A–C merely to avoid choosing D.
+Please vote for the direction you actually support. In explaining an A–C vote, consider whether `inspect` or `collect` better conveys *obtain target facts*, whether `select` or `where` more clearly means *identify relevant resources*, and whether `items.satisfy` is clearer than `match`. **Use D** if a different vocabulary or hybrid would be preferable; please explain the needed improvement in the [discussion](https://github.com/vanderpol/scap-ng/discussions/211). Do not vote A–C merely to avoid choosing D.
 
 There is a genuine timing decision: **if the Board strongly prefers different terms, should 0.3 wait for a defined, tested change, or should we freeze its current vocabulary and make the improvement in a future version?** A straw poll alone cannot settle that technical or release question.
 
