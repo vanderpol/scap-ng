@@ -177,10 +177,90 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                 errors.append(error)
             return errors
 
+        # 0.3 predicates have no independent capability or State ID. Validate
+        # each embedded expression against the generated schema for its actual
+        # Test or collected Item capability. General assessment JSON Schema
+        # checks only the shape; this pass checks allowable typed fields.
+        if declared_version == "0.3.0":
+            predicate_validators = {}
+
+            def validate_local_predicate(predicate, capability, path):
+                if not isinstance(capability, str):
+                    yield ValidationError("Cannot resolve predicate capability", path=deque(path))
+                    return
+                if capability not in predicate_validators:
+                    try:
+                        mapping = load_mapping(capability, declared_version)
+                        fragment = generate(mapping, root, schema_version=declared_version)
+                        if "state_expression" not in fragment.get("$defs", {}):
+                            predicate_validators[capability] = None
+                        else:
+                            fragment = dict(fragment, **{"$ref": "#/$defs/state_expression"})
+                            predicate_validators[capability] = Draft202012Validator(
+                                fragment, registry=registry
+                            )
+                    except (ValueError, KeyError) as exc:
+                        yield ValidationError(
+                            f"Cannot load predicate capability {capability}: {exc}",
+                            path=deque(path)
+                        )
+                        return
+                pred_validator = predicate_validators[capability]
+                if pred_validator is None:
+                    yield ValidationError(
+                        f"Capability {capability} has no State/predicate expression",
+                        path=deque(path)
+                    )
+                    return
+                for error in pred_validator.iter_errors(predicate):
+                    error.path.extendleft(reversed(path))
+                    yield error
+
+            object_registry = {
+                **(assessment.get("objects") or {}),
+                **(assessment.get("shared_objects") or {}),
+            }
+            for test_name, test in (assessment.get("tests") or {}).items():
+                if not isinstance(test, dict):
+                    continue
+                for i, predicate in enumerate(test.get("states") or []):
+                    yield from validate_local_predicate(
+                        predicate, test.get("capability"),
+                        ["assessment", "tests", test_name, "states", i]
+                    )
+
+            def filter_uses(value, path, capability=None):
+                if isinstance(value, list):
+                    for i, item in enumerate(value):
+                        yield from filter_uses(item, path + [i], capability)
+                elif isinstance(value, dict):
+                    current_cap = value.get("capability", capability)
+                    object_use = value.get("object")
+                    if "filters" in value:
+                        if isinstance(object_use, str):
+                            ref = object_registry.get(object_use)
+                            current_cap = ref.get("capability") if isinstance(ref, dict) else None
+                        elif isinstance(object_use, dict):
+                            current_cap = object_use.get("capability", current_cap)
+                        for i, flt in enumerate(value.get("filters") or []):
+                            if not isinstance(flt, dict):
+                                continue
+                            predicate = {k: v for k, v in flt.items() if k != "action"}
+                            yield predicate, current_cap, path + ["filters", i]
+                    for key, child in value.items():
+                        if key == "filters":
+                            continue
+                        if isinstance(child, (dict, list)):
+                            yield from filter_uses(child, path + [key], current_cap)
+
+            for predicate, cap, path in filter_uses(assessment, ["assessment"]):
+                yield from validate_local_predicate(predicate, cap, path)
+
         named_sections = [
-            ("states", "state"),
             ("tests", "test"),
         ]
+        if declared_version != "0.3.0":
+            named_sections.insert(0, ("states", "state"))
         if declared_version == "0.3.0":
             named_sections.insert(0, ("shared_objects", "object"))
         else:
