@@ -35,10 +35,9 @@ class V03DirectInputCompilationTests(unittest.TestCase):
                 "capability":"linux.partition",
                 "object":{"capability":"linux.partition","select":{
                     "mount_point":{"value":"/home","operation":"equals","datatype":"string"}}},
-                "states":[{"capability":"linux.partition","state":{
-                    "field":"fs_type","value":{"input":"approved-types-input"},
+                "states":[{"field":"fs_type","value":{"input":"approved-types-input"},
                     "operation":"equals","datatype":"string",
-                    "value_match":"one_or_more","match":"all","existence":"one_or_more"}}],
+                    "value_match":"one_or_more","match":"all","existence":"one_or_more"}],
                 "reported_elements":"all","existence":"one_or_more","match":"all"}},
             "evaluate":{"test":"home-type-test"},
         }}
