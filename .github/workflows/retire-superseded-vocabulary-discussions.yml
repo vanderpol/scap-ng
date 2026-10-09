@@ -1,0 +1,47 @@
+name: Retire superseded A-B-C-D vocabulary discussions safely
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/retire-superseded-vocabulary-discussions.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live #213 and retire 211/212 only if no participant engagement
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repoQuery='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){d211:discussion(number:211){id number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}}d212:discussion(number:212){id number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}}d213:discussion(number:213){id number url title body comments(first:100){totalCount nodes{body}}}}}}';
+            const data=await github.graphql(repoQuery,{...context.repo,name:context.repo.repo});
+            const {d211,d212,d213}=data.repository;
+            if(!d213||!d213.body.includes('scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-SHARED-20261009')) throw new Error('Replacement Discussion #213 is not the expected post.');
+            if((d213.body.split(String.fromCharCode(96,96,96)+'yaml').length-1)!==4)throw new Error('Replacement Discussion does not have four authored YAML blocks in its opening post.');
+            if(d213.comments.totalCount!==4)throw new Error('Replacement Discussion does not have precisely 4 votes.');
+            for(const k of ['A','B','C','D'])if(d213.comments.nodes.filter(x=>x.body.includes('scap-ng-canonical-vote: '+k+'-20261009')).length!==1)throw new Error('Missing vote '+k);
+            core.info('VERIFIED_REPLACEMENT https://github.com/vanderpol/scap-ng/discussions/213');
+            const targets=[[211,d211,'scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-20261009'],[212,d212,'scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-CLEAN-20261009']];
+            for(const [number,d,marker] of targets){
+              if(!d){core.info('ALREADY_DELETED '+number);continue;}
+              if(!d.body.includes(marker)||d.number!==number){core.warning('WRONG_ORIGIN '+number);continue;}
+              const hasVoting=d.reactions.totalCount>0||d.comments.nodes.some(c=>c.reactions.totalCount>0||c.replies.totalCount>0);
+              const originalMarkers=number===211?['scap-ng-vote-option: ','scap-ng-complete-comparison-20261009']:['scap-ng-canonical-vote: '];
+              const unexpected=d.comments.totalCount!==d.comments.nodes.length||d.comments.nodes.some(c=>!originalMarkers.some(m=>c.body.includes(m))||c.author?.login!=='github-actions[bot]');
+              core.info('RETIREMENT_ENGAGEMENT_'+number+' '+JSON.stringify({voteReactions:hasVoting,unexpectedComments:unexpected,commentCount:d.comments.totalCount,topReactions:d.reactions.totalCount}));
+              if(hasVoting||unexpected){core.warning('NOT_DELETING_ENGAGED_DISCUSSION_'+number+' '+d.url);continue;}
+              try {
+                const mutation='mutation($id:ID!){deleteDiscussion(input:{id:$id}){discussion{id}}}';
+                await github.graphql(mutation,{id:d.id});
+                core.info('DELETED_SUPERSEDED_DISCUSSION_'+number+' '+d.url);
+              }catch(err) {
+                core.warning('UNABLE_TO_DELETE_DISCUSSION_'+number+' '+String(err.message||err).split('\n')[0]);
+              }
+            }
+            await core.summary.addLink('Verified canonical Board vote #213','https://github.com/vanderpol/scap-ng/discussions/213').write();
