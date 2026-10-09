@@ -102,6 +102,21 @@ jobs:
                 comments:d.comments.map(c=>({author:c.author,body:c.body.slice(0,1500)}))}).slice(0,6900));
             }
             core.info('AUDIT_NONVOTE_END');
+            core.info('AUDIT_ISSUE_TRACEABILITY_BEGIN');
+            const noIssue = [];
+            for(const d of topicHits.filter(d=>/^\\[VOTE P\\d+\\]/.test(d.title))) {
+              const issueMatches = [...d.body.matchAll(/(?:github\\.com\\/[^\\s)]+\\/issues\\/(\\d+)|(?<![\\w])#(\\d+))/g)]
+                .map(m => Number(m[1] || m[2]));
+              const refs = [...new Set(issueMatches)].sort((a,b)=>a-b);
+              if(!refs.length)noIssue.push(d.number);
+              core.info(JSON.stringify({number:d.number,title:d.title,
+                issueRefs:refs,hasImplementationLinks:refs.length>0}));
+            }
+            core.info('AUDIT_ISSUE_TRACEABILITY_END');
+            core.info('AUDIT_ISSUE_TRACEABILITY_SUMMARY ' +JSON.stringify({
+              numberedProposals:topicHits.filter(d=>/^\\[VOTE P\\d+\\]/.test(d.title)).length,
+              noIssueCount:noIssue.length,noIssueDiscussionNumbers:noIssue
+            }));
             core.info('AUDIT_ALL_TITLES_BEGIN');
             for(const d of topicHits) {
               core.info(JSON.stringify({number:d.number,title:d.title,totalComments:d.totalComments}));
