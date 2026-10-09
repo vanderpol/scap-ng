@@ -51,11 +51,6 @@ def valid_assessment():
                     "datatype": "string",
                 }
             },
-            "states": {
-                "dnssec-enabled-state": {
-                    "capability": "independent.shellcommand",
-                }
-            },
             "inputs": {
                 "minimum-key-size-input": {
                     "datatype": "integer",
@@ -69,7 +64,7 @@ def valid_assessment():
                     "reported_elements": "all",
                     "capability": "independent.shellcommand",
                     "object": "forward-zones-object",
-                    "states": ["dnssec-enabled-state"],
+                    "states": [{"field": "stdout", "value": "enabled", "operation": "equals", "datatype": "string", "match": "all", "existence": "one_or_more"}],
                 }
             },
             "evaluate": {"test": "zone-signing-test"},
@@ -109,9 +104,9 @@ class ComponentNamingV03Tests(unittest.TestCase):
         doc["assessment"]["tests"]["zone-signing-test"]["object"] = "forward-zones"
         self.assertTrue(self.errors(doc))
 
-    def test_untyped_state_reference_is_rejected(self):
+    def test_all_state_references_are_rejected(self):
         doc = valid_assessment()
-        doc["assessment"]["tests"]["zone-signing-test"]["states"] = ["dnssec-enabled"]
+        doc["assessment"]["tests"]["zone-signing-test"]["states"] = ["dnssec-enabled-state"]
         self.assertTrue(self.errors(doc))
 
     def test_evaluate_requires_test_suffix(self):
