@@ -77,21 +77,6 @@
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$"
           }
         },
-        "states": {
-          "type": "object",
-          "description": "Optional named States retained only when independent/reusable predicate identity is meaningful. Private States are authored inline with their consumer.",
-          "additionalProperties": {
-            "allOf": [
-              {
-                "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/inline_state"
-              }
-            ]
-          },
-          "propertyNames": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-state$"
-          }
-        },
         "tests": {
           "type": "object",
           "description": "Named Tests. A capability defines its Test source shape: commonly an Object, but clean native capabilities MAY consume another first-class source such as a Variable directly.",
@@ -122,7 +107,7 @@
               "states": {
                 "type": "array",
                 "items": {
-                  "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/state_use"
+                  "$ref": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json#/$defs/inline_predicate"
                 },
                 "uniqueItems": true
               },
@@ -406,7 +391,8 @@
             }
           }
         }
-      ]
+      ],
+      "description": "Automated Assessments contain Test-local typed predicates and Object/Set-operand Filters with no named State registry. Shared Objects retain explicit acquisition identity."
     }
   },
   "additionalProperties": false
