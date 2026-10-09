@@ -777,10 +777,10 @@ def generate(mapping, repo_root, schema_version=None):
                 "then": {"required": ["filesystem"]},
             })
 
-    if version == "0.3.0":
-        # Predicates are consumer-local and have no independently declared State.
-        # Retain the generated typed state_expression for each Test/Filter use.
-        defs.pop("state", None)
+    # Retain the legacy State-wrapper fragment for converter round-trip and
+    # migration-regression fixtures. Native 0.3 Assessment validation never
+    # accepts this wrapper as authored State/Filter syntax; it validates only
+    # the generated state_expression at the consuming Test/Set location.
 
     generated = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
