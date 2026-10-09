@@ -1,0 +1,96 @@
+name: Publish single A-B-C-D Assessment vocabulary Discussion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - board/discussions/ASSESSMENT-VOCABULARY-ABCD.md
+      - .github/workflows/publish-assessment-vocabulary-discussion.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+concurrency:
+  group: publish-assessment-vocabulary-discussion
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create or verify one Discussion and four vote comments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner, name = context.repo.repo;
+            const title = '[FEEDBACK] Assessment authoring vocabulary: A / B / C / D';
+            const marker = 'scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-20261009';
+            const body = fs.readFileSync('board/discussions/ASSESSMENT-VOCABULARY-ABCD.md', 'utf8');
+            if (!body.includes(marker)) throw new Error('Required unique Discussion marker is missing.');
+            const options = [
+              {
+                key: 'A', heading: 'A — Keep current SCAP-NG 0.3 (OVAL-aligned)',
+                description: 'Prefer the working `tests`, `object`, `select`, Test-local `states`, `existence`/`match`, `evaluate`, and `reported_elements` vocabulary. Embedded predicates have no named reusable State or repeated predicate capability.'
+              },
+              {
+                key: 'B', heading: 'B — Ansible-inspired wording',
+                description: 'Prefer `check`, `collect`, `where`, `expect`, `require`, and `report`. Research-only; not Ansible playbook syntax and not yet schema-valid or equivalence-proven.'
+              },
+              {
+                key: 'C', heading: 'C — Inspection-oriented wording',
+                description: 'Prefer `check`, `inspect`, `select`, `expect`, explicit `items`/`field_values` and `evidence`. Research-only; not yet schema-valid or equivalence-proven.'
+              },
+              {
+                key: 'D', heading: 'D — None of the above / hybrid',
+                description: 'A different vocabulary or a hybrid of A, B and C would be clearer. Please add a brief reply explaining what should change; this is a substantive alternative, not an abstention.'
+              }
+            ];
+            const query = 'query($owner:String!,$name:String!,$after:String){ repository(owner:$owner,name:$name){ id discussionCategories(first:100){nodes{id name isAnswerable}} discussions(first:100,after:$after){nodes{id title url body}pageInfo{hasNextPage endCursor}} }}';
+            let after = null, repoInfo, all = [];
+            do {
+              const data = await github.graphql(query,{owner,name,after});
+              repoInfo = data.repository;
+              all.push(...repoInfo.discussions.nodes);
+              after = repoInfo.discussions.pageInfo.hasNextPage ? repoInfo.discussions.pageInfo.endCursor : null;
+            } while (after);
+            const matches = all.filter(d => d.body?.includes(marker) || d.title === title);
+            if (matches.length > 1) throw new Error('More than one matching Discussion: ' + matches.map(d=>d.url));
+            let discussion = matches[0];
+            if (!discussion) {
+              const cats = repoInfo.discussionCategories.nodes;
+              // A/B/C/D reaction comments work in General. Do not mislabel it a native poll.
+              const cat = cats.find(x=>x.name.toLowerCase()==='general' && !x.isAnswerable)
+                || cats.find(x=>/^(ideas|proposals)$/i.test(x.name) && !x.isAnswerable)
+                || cats.find(x=>!x.isAnswerable);
+              if (!cat) throw new Error('A non-answerable Discussion category is required.');
+              const mutation = 'mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){ createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{id url title}} }';
+              const result = await github.graphql(mutation,{repositoryId:repoInfo.id,categoryId:cat.id,title,body});
+              discussion = result.createDiscussion.discussion;
+              core.info('CREATED_CANONICAL_DISCUSSION '+discussion.url);
+            } else {
+              core.info('FOUND_CANONICAL_DISCUSSION '+discussion.url);
+              if(!discussion.body?.includes(marker))throw new Error('Same title with unexpected marker; review manually.');
+            }
+            const commentQuery = 'query($id:ID!){ node(id:$id){...on Discussion {comments(first:100){nodes{id body url}pageInfo{hasNextPage}}}}}';
+            for(const option of options) {
+              const c = await github.graphql(commentQuery,{id:discussion.id});
+              const connection = c.node.comments;
+              if(connection.pageInfo.hasNextPage) throw new Error('More than 100 replies; cannot safely deduplicate.');
+              const voteMarker = 'scap-ng-vote-option: '+option.key+'-20261009';
+              const existing = connection.nodes.filter(n=>n.body?.includes(voteMarker));
+              if(existing.length > 1) throw new Error('Duplicate vote comment '+option.key);
+              if(existing.length) {
+                core.info('FOUND_VOTE_'+option.key+' '+existing[0].url);
+                continue;
+              }
+              const comment = '<!-- '+voteMarker+' -->\n\n### Vote '+option.heading+'\n\n'+option.description+'\n\n**React 👍 to this comment to vote '+option.key+'. Please choose only one option.**';
+              const mutation = 'mutation($discussionId:ID!,$body:String!){addDiscussionComment(input:{discussionId:$discussionId,body:$body}){comment{id url}}}';
+              const added = await github.graphql(mutation,{discussionId:discussion.id,body:comment});
+              core.info('CREATED_VOTE_'+option.key+' '+added.addDiscussionComment.comment.url);
+            }
+            core.info('CANONICAL_VOTE_DISCUSSION '+discussion.url);
+            await core.summary.addHeading('Board vocabulary vote').addLink('Open single A/B/C/D Discussion', discussion.url).write();
