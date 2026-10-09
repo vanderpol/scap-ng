@@ -24,39 +24,34 @@ See the [full objectives](specification/objectives.md) and
 - **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
 - **Current review:** [review/current/README.md](review/current/README.md)
 - **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
-- **Six complete STIG conversions (ZIP):** [Download the 0.3 review bundle](https://github.com/vanderpol/scap-ng/actions/runs/37849528026/artifacts/11580544848) · [individual ZIPs](#full-stig-conversion-downloads)
+- **Six complete STIG conversions (ZIP):** [Direct six-STIG source ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-six-stig-source-preview.zip) · [individual ZIPs](#full-stig-conversion-downloads)
 - **Open issues / 0.3 work:** [GitHub issues](https://github.com/vanderpol/scap-ng/issues)
 - **Governance and published votes:** [board/README.md](board/README.md)
 
 
 ## Full STIG conversion downloads
 
-The [six-STIG review bundle (ZIP)](https://github.com/vanderpol/scap-ng/actions/runs/37849528026/artifacts/11580544848)
-contains the **complete converted 0.3 authoring trees** and **six compiled
-`.scapng` packages**. Individual full-conversion ZIPs are also available:
+**Current source-derived six-STIG preview (October 9, 2026).** These ZIPs are attached to a [durable GitHub prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-preview-99e8faf09771), **not** transient GitHub Actions artifacts. Select a benchmark for its complete `candidate-authoring/` and `faithful-authoring/` trees and `SCORECARD.md`.
 
-- [Red Hat Enterprise Linux 9](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11580818580)
-- [Oracle Linux 9](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581187923)
-- [Windows 11](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11580608540)
-- [Windows Server 2025](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11582000947)
-- [Windows Server DNS](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581811893)
-- [Apache HTTP Server 2.4 (UNIX)](https://github.com/vanderpol/scap-ng/actions/runs/37849528008/artifacts/11581482203)
+| Benchmark | Direct ZIP download |
+| --- | --- |
+| Red Hat Enterprise Linux 9 | [Download RHEL 9](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-rhel9-source-preview.zip) |
+| Oracle Linux 9 | [Download Oracle Linux 9](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-oracle-linux9-source-preview.zip) |
+| Windows 11 | [Download Windows 11](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-windows11-source-preview.zip) |
+| Windows Server 2025 | [Download Windows Server 2025](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-windows-server-2025-source-preview.zip) |
+| Windows Server DNS | [Download Windows Server DNS](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-windows-server-dns-source-preview.zip) |
+| Apache HTTP Server 2.4 (UNIX) | [Download Apache 2.4](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-apache-unix-server-source-preview.zip) |
 
-These are **SCAP-NG preview conversions** of DISA STIG-based NIWC-enhanced
-SCAP 1.4 content, **not official DISA-issued SCAP-NG benchmarks**.
-The individual ZIPs contain full faithful and simplified candidate authoring
-sources; the combined ZIP includes compiled packages. Both builds
-[passed their GitHub Actions workflows](https://github.com/vanderpol/scap-ng/actions/runs/37849528026),
-but successful conversion/compilation does not establish live-scanner fidelity.
-GitHub Actions artifact downloads may require sign-in and expire; the
-[review workflows](https://github.com/vanderpol/scap-ng/actions)
-can regenerate them.
+**All six in one:** [Download the combined six-STIG source ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-six-stig-source-preview.zip) · [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/SHA256SUMS.txt) · [source SHA and embedded-Filter counts](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/BUILD-MANIFEST.json).
 
+Built from SCAP-NG commit `99e8faf0977199f4cd099f12439801c213d56ac5` and pinned NIWC SCAP 1.4 source revision `8c8e5dff860af6b1290ee9273a282db24278f8d5`. The new native authoring uses direct embedded Test and Filter predicates; the older faithful conversion remains in each archive for comparison. [The six-source build and validation](https://github.com/vanderpol/scap-ng/actions/runs/37930622386) passed.
+
+**Status:** These are pre-alpha, source-only authoring/design previews of DISA STIG-based NIWC-enhanced SCAP 1.4 content. They are **not official DISA SCAP-NG benchmarks**, compiled `.scapng` scanner packages, observed scan results, verified runtime equivalence, or an invitation to review/freeze SCAP-NG 0.3.0. The [current review guide](review/current/REVIEW-GUIDE.md) explains what to inspect; the Board's current [A/B/C/D vocabulary Discussion](https://github.com/vanderpol/scap-ng/discussions/213) is separate from release acceptance.
 
 ## Architecture
 
 SCAP-NG uses **Benchmark → Rule → Assessment**. Native automated Assessments
-retain useful OVAL concepts such as Test, Object, State, Variable, and Item while
+retain useful OVAL concepts such as Test, Object, local typed State predicates, Variable, and Item while
 removing legacy serialization and packaging machinery where it is not
 semantically required. Distribution uses modular source compiled into a
 self-contained manifest-based package.
