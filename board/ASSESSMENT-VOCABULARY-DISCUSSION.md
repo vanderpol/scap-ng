@@ -1,7 +1,9 @@
-# SCAP-NG Assessment vocabulary — moved to Discussion #211
+# Assessment vocabulary examples and vote
 
-The **full comparison, terminology table, and all three YAML examples** now live in the [single A/B/C/D GitHub Discussion](https://github.com/vanderpol/scap-ng/discussions/211).
+The **canonical Board discussion** is now [A/B/C/D — SCAP-NG Assessment vocabulary with shared acquisition](https://github.com/vanderpol/scap-ng/discussions/213).
 
-**[Read the full side-by-side examples directly in Discussion #211](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834662)**, then vote by reacting 👍 to one of the four options in that same Discussion.
+That single Discussion contains the full comparison, real RHEL 9 STIG YAML excerpts, proposed `shared_collections` and `shared_inspections` analogs, the lossless-conversion constraints, and the four voting comments.
 
-This page is only a forwarding pointer for links in the original Discussion opening post and historical issues; it is **not a separate voting page**. The preserved Markdown source used to maintain the discussion is [board/discussions/ASSESSMENT-VOCABULARY-ABCD.md](discussions/ASSESSMENT-VOCABULARY-ABCD.md).
+**[Read and vote directly in Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213).**
+
+This file is a historical link-forwarding stub only; no ballot or examples are maintained here. The authored text backing the live Discussion is [board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md](discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md).
