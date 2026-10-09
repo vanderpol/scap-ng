@@ -32,6 +32,16 @@ conditions; there is no independent Filter comparison language or new truth
 function. A Filter's effective capability comes from the Object/Set operand
 whose collected Items it evaluates.
 
+**No Filter or State title is required or emitted in native authoring.**
+The predicate's consumer location, explicit action, field, operation and value
+are normally self-documenting. Do not copy historical `state_title`, source
+OVAL `comment`, or a new `filter_title` into executable inline predicate fields.
+Preserve historical State identifiers, titles and comments in the separate
+migration provenance ledger. Authors MAY use ordinary YAML comments to explain
+non-obvious purpose or subtle source semantics; comments SHALL NOT affect
+comparison, evaluation, schema validity, or result identity. In particular, a
+missing human title SHALL NOT cause generation of an artificial State ID.
+
 For example, an abbreviated illustration:
 
 ```yaml
