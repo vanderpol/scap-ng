@@ -7,12 +7,13 @@ approval from the example ZIP.
 
 **For a quick owner review, start at the
 [10-minute sample guide](REVIEW-GUIDE.md).**
-It points to the verified
-[six-benchmark candidate artifact](https://github.com/vanderpol/scap-ng/actions/runs/37915343548/artifacts/11609966698)
-containing complete authoring trees for RHEL 9, Oracle Linux 9, Windows 11,
-Windows Server 2025, Windows Server DNS, and Apache 2.4.
+It points to the [direct, durable six-STIG source preview ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-six-stig-source-preview.zip)
+containing complete converted authoring trees for RHEL 9, Oracle Linux 9, Windows 11,
+Windows Server 2025, Windows Server DNS, and Apache 2.4. Individual benchmark ZIPs,
+a [SHA-256 checksum file](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/SHA256SUMS.txt),
+and build provenance are [attached to the same prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-preview-99e8faf09771).
 
-The **candidate** uses `benchmarks/<name>/candidate-authoring/`; the
+The **combined candidate ZIP** uses `scap-ng-0.3-human-review/benchmarks/<name>/candidate-authoring/` (individual ZIPs start at `<name>/candidate-authoring/`); the
 corresponding `faithful-authoring/` is included for side-by-side inspection.
 It is an authoring/design example, **not** a scanner runtime result or a
 compiled package. The normative current syntax is defined in
