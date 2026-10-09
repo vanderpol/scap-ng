@@ -40,6 +40,11 @@ class RegistryAuthoringExpansionTests(unittest.TestCase):
     "evaluate": {"test": "restrict-anonymous-test"},
    }
   }
+  # Research expansion retains source wrapper metadata; native 0.3 migrates
+  # that metadata to a reversible non-executable ledger before validation.
+  from scap_upconvert_v003.embed_predicates import embed_predicates
+  assessment, evidence = embed_predicates(assessment)
+  self.assertIn("state_title", str(evidence))
   errors = list(document_errors(validators["assessment.schema.json"], assessment))
   self.assertEqual([], [str(e) for e in errors])
 
