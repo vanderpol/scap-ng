@@ -74,6 +74,16 @@ jobs:
             } else {
               core.info('FOUND_CANONICAL_DISCUSSION '+discussion.url);
               if(!discussion.body?.includes(marker))throw new Error('Same title with unexpected marker; review manually.');
+              // Update only the opening post, never delete/recreate the Discussion,
+              // and never rewrite or replace existing vote comments/reactions.
+              if (discussion.body !== body) {
+                const edit = 'mutation($discussionId:ID!,$body:String!){updateDiscussion(input:{discussionId:$discussionId,body:$body}){discussion{id url body}}}';
+                const updated = await github.graphql(edit,{discussionId:discussion.id,body});
+                if(updated.updateDiscussion.discussion.body !== body) throw new Error('Opening post did not match source after update.');
+                core.info('UPDATED_CANONICAL_DISCUSSION '+updated.updateDiscussion.discussion.url);
+              } else {
+                core.info('CANONICAL_DISCUSSION_ALREADY_CURRENT '+discussion.url);
+              }
             }
             const commentQuery = 'query($id:ID!){ node(id:$id){...on Discussion {comments(first:100){nodes{id body url}pageInfo{hasNextPage}}}}}';
             for(const option of options) {
@@ -91,6 +101,14 @@ jobs:
               const mutation = 'mutation($discussionId:ID!,$body:String!){addDiscussionComment(input:{discussionId:$discussionId,body:$body}){comment{id url}}}';
               const added = await github.graphql(mutation,{discussionId:discussion.id,body:comment});
               core.info('CREATED_VOTE_'+option.key+' '+added.addDiscussionComment.comment.url);
+            }
+            // Confirm that the final Discussion body and each existing option still match.
+            const verified = await github.graphql('query($id:ID!){node(id:$id){...on Discussion{body comments(first:100){nodes{body url}}}}}',{id:discussion.id});
+            if(verified.node.body !== body) throw new Error('Discussion body verification failed.');
+            for(const option of options) {
+              const match = verified.node.comments.nodes.filter(c=>c.body.includes('scap-ng-vote-option: '+option.key+'-20261009'));
+              if(match.length!==1) throw new Error('Discussion lost or duplicated vote '+option.key);
+              core.info('VERIFIED_VOTE_'+option.key+' '+match[0].url);
             }
             core.info('CANONICAL_VOTE_DISCUSSION '+discussion.url);
             await core.summary.addHeading('Board vocabulary vote').addLink('Open single A/B/C/D Discussion', discussion.url).write();
