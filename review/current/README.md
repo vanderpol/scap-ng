@@ -1,48 +1,35 @@
 # Current SCAP-NG 0.3 review
 
-**0.3.0 is pre-alpha, pending final release validation and owner acceptance.**
-This is the only current human-review entry point; historical research and
-0.2.0 review pages are not competing specifications.
+**Status:** pre-alpha. The six-STIG readability candidate has passed
+conversion and its native schema/semantic checks. Final 65-source and
+six-state runtime-conformance work continues; do **not** infer release
+approval from the example ZIP.
 
-## Read in this order
+**For a quick owner review, start at the
+[10-minute sample guide](REVIEW-GUIDE.md).**
+It points to the verified
+[six-benchmark candidate artifact](https://github.com/vanderpol/scap-ng/actions/runs/37915343548/artifacts/11609966698)
+containing complete authoring trees for RHEL 9, Oracle Linux 9, Windows 11,
+Windows Server 2025, Windows Server DNS, and Apache 2.4.
 
-1. [Benchmark → Rule examples](../../specification/examples/README.md):
-   actual STIG policy, identifiers, remediation, and publisher Profiles.
-2. [Automated and Manual Assessment examples](../../specification/examples/assessments.md):
-   concise Rule → Assessment checks, modernizations, and **synthetic** result
-   illustrations (not observed scanner results).
-3. [Modernization review guide](REVIEW-GUIDE.md): where each production
-   example lives and why unproven automatic rewrites remain fail-closed.
-4. [Verified six-benchmark artifact](https://github.com/vanderpol/scap-ng/actions/runs/37849528026):
-   download **`scap-ng-board-representative-review`** under *Artifacts*.
-   Browse `authoring/` (RHEL 9, Oracle Linux 9, Windows 11, Windows Server
-   2025, DNS, Apache), `packages/`, and `REVIEW.json`. The artifact was
-   built from SCAP-NG commit `9095a1983bbd60be2bdd65655fa40f5c428cb9f9`
-   and passed conversion, native 0.3 schema/semantic/graph checks,
-   normalization, and compilation.
+The **candidate** uses `benchmarks/<name>/candidate-authoring/`; the
+corresponding `faithful-authoring/` is included for side-by-side inspection.
+It is an authoring/design example, **not** a scanner runtime result or a
+compiled package. The normative current syntax is defined in
+[selection and filtering](../../specification/assessment/selection-and-filters.md).
 
-## Evidence boundary
+For a simpler in-browser view first, use the
+[Benchmark and Rule](../../specification/examples/README.md) and
+[Assessment examples](../../specification/examples/assessments.md) pages.
 
-- [The first active-0.3 full-corpus release run](https://github.com/vanderpol/scap-ng/actions/runs/37838382899)
-  **succeeded** at code commit `799d083119b3d0506e552616b22e62076db8337e`,
-  including signed test compilation. It accounts for 61 supported native
-  benchmark packages and four explicit nonstandard `independent.sqlext`
-  source blockers.
-- [The follow-up full-corpus run](https://github.com/vanderpol/scap-ng/actions/runs/37846666574)
-  validates later Organizational Input/result contracts at code commit
-  `38ac339e7818c662dabbf100b34584c3e5fd6eb1`.
-  Its outcome must be checked independently before calling 0.3 complete.
-  Later commits through `9095a198` change documentation and audit tooling,
-  not the content evaluation contract.
-- These runs establish source-conversion and build gates, **not** live scanner
-  or cross-vendor runtime equivalence. The
-  [0.3 release issue](https://github.com/vanderpol/scap-ng/issues/191) and
-  [full-corpus gate](https://github.com/vanderpol/scap-ng/issues/202) track
-  final acceptance.
+Technical release evidence: [embedded-filter migration #208](https://github.com/vanderpol/scap-ng/issues/208),
+[0.3 release gate #191](https://github.com/vanderpol/scap-ng/issues/191), and
+[full corpus correctness #202](https://github.com/vanderpol/scap-ng/issues/202).
+The earlier 65-source run [37914508160](https://github.com/vanderpol/scap-ng/actions/runs/37914508160)
+uncovered audit-policy regex schema validation gaps, now addressed in the
+converter regression suite. Latest-run results must be inspected independently
+before describing full-corpus conformance as established.
 
-For detailed language semantics use the [draft specification](../../specification/README.md)
-and [0.3 schema](../../schema/v0.3.0/README.md).
-[Deferred/out-of-scope topics](../../specification/deferred-after-0.3.md)
-are not normative 0.3. Published [Board votes](../../board/VOTES.md)
-and the preserved [0.2 schema](../../schema/v0.2.0/README.md)
-remain historical governance/evidence, not current authoring guidance.
+The [0.2 schema](../../schema/v0.2.0/README.md) remains the historical
+Board reference; deferred features are listed in
+[deferred-after-0.3](../../specification/deferred-after-0.3.md).

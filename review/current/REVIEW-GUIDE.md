@@ -1,63 +1,45 @@
-# SCAP-NG 0.3 modernization review guide
+# SCAP-NG 0.3 — quick sample review
 
-This is a short guide to the **verified six-benchmark review ZIP** linked from
-[Current review](README.md). Open the GitHub Actions run, download the
-`scap-ng-board-representative-review` artifact, and inspect its `authoring/`
-directory first. The same ZIP contains `packages/` (compiled output),
-`results/synthetic-fixtures/` (illustrations, **not** real scans), and
-`REVIEW.json` (the generated feature index).
+**Audience:** owner/Board readability review (about 10 minutes). This is *not* an
+independent proof of runtime equivalence or approval to freeze 0.3.0.
 
-**Important:** Paths below refer to the current six-benchmark ZIP, **not** an
-older research comparison package. The ZIP contains native/normalized
-0.3 authoring; it does not contain side-by-side faithful and modernized
-source trees. Detailed transformation evidence belongs to the research
-materials, not this compact Board artifact.
+**Sample:** [successful six-STIG candidate build](https://github.com/vanderpol/scap-ng/actions/runs/37915343548)
+→ **Artifacts** → `scap-ng-0.3-human-review-candidate`. Its nested
+`scap-ng-0.3-board-review.zip` contains the six complete
+`benchmarks/<name>/candidate-authoring/` trees, the original
+`faithful-authoring/` for comparison, and per-benchmark `SCORECARD.md`.
+**The archive has no compiled scanner packages or observed scan results.**
 
-## What to review
+## Read just these three real conversions
 
-| SCAP 1.4 mechanism | SCAP-NG 0.3 improvement | Where in the ZIP |
+| Time | Focus | Look inside the downloaded ZIP |
 | --- | --- | --- |
-| Separately identified OVAL Object/State for a private Test | Keep private Object and State beside the Test | `authoring/shared/assessments/home-is-mounted-with-the-nosuid-option.assessment.yaml` |
-| Shared acquisition across checks | Explicit named `shared_objects:` only when reuse is needed | `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml` |
-| Static Variable plus collection plumbing | Preserve typed literal collections directly | `authoring/ms_windows_11/assessments/automated/SV-253274.automated.yaml` |
-| ObjectComponent → Variable → selector iteration | Use `for_each:` to express a proven collection expansion | `authoring/shared/assessments/all-local-interactive-user-home-directories-are-0750-or-less.assessment.yaml` |
-| Separate Set and Filter component chains | Localize the structure but preserve its Set/Filter meaning | `authoring/ms_windows_11/assessments/applicability/condition.bluetooth-installation.yaml` |
-| OVAL criteria tree spanning multiple Tests | Retain explicit `evaluate:` for nontrivial Boolean composition | `authoring/ms_windows_server_2025/assessments/automated/SV-278001.automated.yaml` |
-| Monolithic XCCDF policy and selection | Distinct Benchmark, Rule, and Assessment documents | `authoring/rhel_9/benchmark.yaml` and `authoring/rhel_9/rules/` |
+| 3 min | **An ordinary Rule and its direct predicate** | `benchmarks/rhel9/candidate-authoring/` → find `home-is-mounted-with-the-nosuid-option.assessment.yaml`. Compare its local `states:` entries with the same name under `faithful-authoring/` |
+| 3 min | **An embedded Filter on observed Items** | `benchmarks/windows11/candidate-authoring/ms_windows_11/assessments/applicability/condition.bluetooth-installation.yaml`; compare to `faithful-authoring/`. Look for `filters:` and the absence of an artificial `state:`, capability, or State title inside each Filter |
+| 3 min | **Genuine multi-Test logic** | `benchmarks/windows-server-2025/candidate-authoring/ms_windows_server_2025/assessments/automated/SV-278001.automated.yaml`. Confirm the `evaluate:` tree still conveys an understandable requirement |
 
-Component names follow descriptive type-suffixed IDs. Computed Variables
-remain named when they carry runtime meaning; only provably static Variable
-plumbing is folded. Searches for `variable.value`, `for_each:`,
-`shared_objects:`, `set:`, and `evaluate:` should target native YAML
-rather than embedded shell/PowerShell text.
+If a named path has been deduplicated to `shared/` by the candidate renderer,
+search the ZIP for the Assessment basename rather than assuming a fixed directory.
 
-## Conversion boundary: DNS nested iteration
+## Four things to tell us
 
-Windows Server DNS **SV-259388** motivates correlated/nested `for_each`:
-the existing PowerShell obtains zones, enumerates hosts, resolves names,
-and checks RRSIG records. This is a **real production requirement** but
-the nested native rewrite is an **authored research example**, not an
-automatic conversion in the ZIP. The source converter keeps the
-PowerShell-based check rather than guessing equivalent behavior.
+Does an ordinary Test read naturally without chasing State references?
+Does `select` (what to acquire) versus `filters` (which observed Items to
+keep) make sense? Do comparisons still convey their typed requirements without
+repeated capability/title wrappers? Is anything now **harder** to understand
+than the faithful conversion?
 
-Similarly, Observations and a redesigned `evaluate` are **not** normative
-0.3 features. See the
-[deferred boundary](../../specification/deferred-after-0.3.md).
+**What does not need your review:** proving filter cardinality, regex matching,
+unknown/error propagation, OVAL source identity, 65-source conversion, or
+package signing. Those are engineering conformance gates in
+[issue #208](https://github.com/vanderpol/scap-ng/issues/208), not owner
+manual-verification work.
 
-## Evidence and review order
+For a short in-page introduction without downloading a ZIP, read the
+[Rule → Assessment walkthrough](../../specification/examples/assessments.md)
+and the [select/filter/state contract](../../specification/assessment/selection-and-filters.md).
 
-1. Read the [Benchmark/Rule example](../../specification/examples/README.md)
-   then the [Assessment example](../../specification/examples/assessments.md)
-   for a short Rule → Assessment walkthrough.
-2. Inspect the real `authoring/` paths above; confirm source identifiers,
-   typed comparisons, and which checks remain complex.
-3. Inspect `packages/` and the generated `REVIEW.json`. Use
-   `results/synthetic-fixtures/` only to understand the proposed reporting
-   contract, **not** as runtime-conformance evidence.
-4. Check the [0.3 release issue](https://github.com/vanderpol/scap-ng/issues/191)
-   and [65-source correctness gate](https://github.com/vanderpol/scap-ng/issues/202)
-   before interpreting this six-benchmark build as a complete release.
-
-SCAP-NG preserves unsupported/deprecated and unproven conversion cases as
-explicit blockers; schema-valid examples and successful compilation do not
-prove live scanner equivalence.
+**Release boundary:** The six-STIG artifact is suitable for a *readability*
+preview, but 0.3 freeze waits for a successful exact-head
+[65-source gate](https://github.com/vanderpol/scap-ng/actions/workflows/scap-ng-full-current-v03-release.yml)
+and differential six-state runtime checks.
