@@ -1,6 +1,6 @@
 # Published Board voting proposals
 
-**Current request for Board feedback:** [single A/B/C/D Assessment authoring vocabulary Discussion #212](https://github.com/vanderpol/scap-ng/discussions/212). Use its four 👍 voting comments; the P001–P058 table below is historical and should not be circulated as the current ballot.
+**Current request for Board feedback:** [single A/B/C/D Assessment authoring vocabulary Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213). Use its four 👍 voting comments; the P001–P058 table below is historical and should not be circulated as the current ballot.
 
 > **HISTORICAL POSTED INDEX — do not circulate as 58 current Board votes.** The 58 proposals were published before the 0.3-local predicate and other design refinements. A [complete audit](review/0.3-discussion-audit.md) found zero reactions/comments on the numbered proposals and no direct implementation-issue links. Some questions are now obsolete, while others deserve scoped independent review. No ratification is inferred.
 
