@@ -1,0 +1,93 @@
+name: Publish Board vocabulary vote with shared acquisition example
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md
+      - .github/workflows/publish-assessment-vocabulary-shared.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+concurrency:
+  group: publish-assessment-vocabulary-shared
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish complete opening post plus precisely four short vote comments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner, name = context.repo.repo;
+            const marker = 'scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-SHARED-20261009';
+            const title = '[BOARD FEEDBACK] SCAP-NG Assessment vocabulary A / B / C / D — shared acquisitions';
+            const body = fs.readFileSync('board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md','utf8');
+            const yamlFence=String.fromCharCode(96,96,96)+'yaml';
+            if (!body.includes(marker) || (body.split(yamlFence).length-1) !== 4) {
+              throw new Error('Source MUST contain unique marker and 4 YAML examples.');
+            }
+            const votes = [
+              ['A','Current SCAP-NG 0.3 / OVAL-aligned','Prefer current 0.3 tests, object, select, Test-local states, explicit existence/match, evaluate, and reported_elements.'],
+              ['B','Ansible-inspired','Prefer check, collect, where, expect, require, and report, with shared_collections for named reusable acquisitions (hypothetical, not Ansible playbook syntax).'],
+              ['C','Inspection-oriented','Prefer check, inspect, select, expect, items/field_values, and evidence, with shared_inspections for named reusable acquisitions (hypothetical syntax).'],
+              ['D','Different or hybrid design','None of A–C fits; prefer a different combination or vocabulary. Please explain if possible.']
+            ];
+            const query = 'query($owner:String!,$name:String!,$after:String){repository(owner:$owner,name:$name){id discussionCategories(first:100){nodes{id name isAnswerable}} discussions(first:100,after:$after){nodes{id url title body}pageInfo{hasNextPage endCursor}}}}';
+            let after=null, all=[], foundRepo;
+            do {
+              const data = await github.graphql(query,{owner,name,after});
+              foundRepo = data.repository;
+              all.push(...foundRepo.discussions.nodes);
+              after=foundRepo.discussions.pageInfo.hasNextPage ? foundRepo.discussions.pageInfo.endCursor : null;
+            } while(after);
+            const matches=all.filter(d=>d.body?.includes(marker)||d.title===title);
+            if(matches.length>1)throw new Error('Duplicate canonical Discussions: '+matches.map(d=>d.url));
+            let discussion=matches[0];
+            if(!discussion){
+              const cat=foundRepo.discussionCategories.nodes.find(c=>c.name.toLowerCase()==='general'&&!c.isAnswerable)
+                ||foundRepo.discussionCategories.nodes.find(c=>/^(ideas|proposals)$/i.test(c.name)&&!c.isAnswerable);
+              if(!cat)throw new Error('Need non-answerable General/Ideas/Proposals category.');
+              const mutation='mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{id url body}}}';
+              const created=await github.graphql(mutation,{repositoryId:foundRepo.id,categoryId:cat.id,title,body});
+              discussion=created.createDiscussion.discussion;
+              core.info('CREATED_NEW_CLEAN_DISCUSSION '+discussion.url);
+            } else {
+              core.info('FOUND_NEW_CLEAN_DISCUSSION '+discussion.url);
+            }
+            // Never repeat the #211 defect: exact opening post before any comments.
+            const read='query($id:ID!){node(id:$id){... on Discussion{url body comments(first:100){nodes{body url}pageInfo{hasNextPage}}}}}';
+            let current=(await github.graphql(read,{id:discussion.id})).node;
+            if(current.body!==body)throw new Error('Opening post differs from the full source; DO NOT publish a giant follow-up comment.');
+            if((current.body.split(yamlFence).length-1)!==4)throw new Error('Opening post must display all 4 YAML code samples.');
+            if(current.comments.pageInfo.hasNextPage)throw new Error('Cannot safely deduplicate over 100 comments.');
+            for(const [code,name,description] of votes){
+              const voteMarker='scap-ng-canonical-vote: '+code+'-20261009';
+              const existing=current.comments.nodes.filter(c=>c.body.includes(voteMarker));
+              if(existing.length>1)throw new Error('Duplicate vote '+code);
+              if(existing.length)continue;
+              const comment='<!-- '+voteMarker+' -->\n\n### '+code+' — '+name+'\n\n'+description+'\n\n**React 👍 to this comment to vote '+code+'. Please choose only one.**';
+              const mutation='mutation($discussionId:ID!,$body:String!){addDiscussionComment(input:{discussionId:$discussionId,body:$body}){comment{id url}}}';
+              const result=await github.graphql(mutation,{discussionId:discussion.id,body:comment});
+              core.info('NEW_VOTE_'+code+' '+result.addDiscussionComment.comment.url);
+              current=(await github.graphql(read,{id:discussion.id})).node;
+            }
+            current=(await github.graphql(read,{id:discussion.id})).node;
+            if(current.body!==body)throw new Error('Verification: opening post changed.');
+            if(current.comments.nodes.length!==4)throw new Error('Expected four and only four voting comments; found '+current.comments.nodes.length);
+            for(const [code] of votes){
+              const option=current.comments.nodes.filter(c=>c.body.includes('scap-ng-canonical-vote: '+code+'-20261009'));
+              if(option.length!==1)throw new Error('Missing/duplicate option '+code);
+              core.info('VERIFIED_NEW_VOTE_'+code+' '+option[0].url);
+            }
+            core.info('VERIFIED_CANONICAL_DISCUSSION '+current.url);
+            core.info('VERIFIED_OPENING_POST_YAML_BLOCKS 4');
+            core.info('VERIFIED_ONLY_FOUR_VOTING_COMMENTS 4');
+            await core.summary.addHeading('One clean Discussion').addLink('Board A/B/C/D vote — full content in opening post',current.url).write();
