@@ -36,7 +36,10 @@ def _declared_consumers(assessment):
                 state_id=f"{test_id}.states[{idx}]"
             else:
                 raise ValueError(f"{assessment.get('id')}: invalid State reference")
-            payload=item.get("state") if isinstance(item,dict) else None
+            # Native 0.3 embeds the typed predicate directly. Transitional
+            # 0.2 converter/research sources may still carry a State wrapper;
+            # validate their expected-value Input uses through the same path.
+            payload = (item.get("state") if "state" in item else item) if isinstance(item,dict) else None
             consumers.extend(_state_inputs(payload,test_id=test_id,state_id=state_id))
     return consumers
 
