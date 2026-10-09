@@ -130,6 +130,34 @@ class EmbeddedPredicateContract(unittest.TestCase):
         test["states_match"] = "one"
         self.assertEqual(self.errors(doc), [])
 
+    def test_audit_policy_enumerated_observation_allows_oval_regex(self):
+        # #208 / full 65-source corpus: exact OVAL pattern_match is
+        # independent of the enumeration of possible collected Item values.
+        for field, expression in (
+            ("group_membership", "AUDIT_(SUCCESS|SUCCESS_FAILURE)"),
+            ("removable_storage", "AUDIT_(FAILURE|SUCCESS_FAILURE)"),
+            ("computer_account_management", "AUDIT_(SUCCESS|SUCCESS_FAILURE)"),
+        ):
+            with self.subTest(field=field):
+                doc = valid()
+                test = doc["assessment"]["tests"]["file-owner-test"]
+                test["capability"] = "windows.auditeventpolicysubcategories"
+                test.pop("object")
+                test["states"] = [{
+                    "field": field, "value": expression,
+                    "operation": "pattern_match", "datatype": "string",
+                    "match": "all", "value_match": "all",
+                    "existence": "one_or_more",
+                }]
+                self.assertEqual(self.errors(doc), [])
+                # A regex is not a valid enumerated literal when equality is
+                # explicitly requested. Do not weaken that contract.
+                test["states"][0]["operation"] = "equals"
+                self.assertTrue(self.errors(doc))
+                # But an actual member of the enum still is a valid literal.
+                test["states"][0]["value"] = "AUDIT_SUCCESS"
+                self.assertEqual(self.errors(doc), [])
+
     def test_filter_action_explicit(self):
         for flt in (predicate(), {"action": "reject", **predicate()}):
             doc = valid()
