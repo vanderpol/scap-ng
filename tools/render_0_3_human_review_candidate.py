@@ -38,6 +38,7 @@ from research_static_literal_collections import (
 )
 from scap_upconvert_v003.foreach_modernization import modernize_foreach_v1
 from normalize_0_3_review_surface import normalize_tree
+from scap_upconvert_v003.embed_predicates import embed_predicates, reexpand_predicates
 
 
 def dump_yaml(value:Any)->str:
@@ -204,7 +205,34 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
     # and redundant benchmark-local naming for human review.
     surface_report=normalize_tree(output_root)
 
+    # #208: compile the 0.3 review surface to local predicates, retaining
+    # a non-executable, independently verifiable migration record. Do this
+    # after vocabulary normalization so the authored surface is the final form.
     evidence_dir.mkdir(parents=True,exist_ok=True)
+    embedded_summary={"assessments":0,"replaced_uses":0,"removed_named_states":0}
+    for assessment_path in sorted(output_root.rglob("*.yaml")):
+        doc=yaml.safe_load(assessment_path.read_text(encoding="utf-8"))
+        if not isinstance(doc,dict) or not isinstance(doc.get("assessment"),dict):
+            continue
+        if doc["assessment"].get("mode")!="automated":
+            continue
+        embedded,ledger=embed_predicates(doc)
+        if reexpand_predicates(embedded,ledger)!=doc:
+            raise ValueError(f"predicate re-expansion mismatch for {assessment_path}")
+        assessment_path.write_text(dump_yaml(embedded),encoding="utf-8")
+        embedded_summary["assessments"]+=1
+        embedded_summary["replaced_uses"]+=len(ledger["changes"])
+        embedded_summary["removed_named_states"]+=len(ledger["named_states"] or {})
+        if ledger["changes"] or ledger["named_states"]:
+            relative=assessment_path.relative_to(output_root)
+            ledger_path=evidence_dir/"embedded-predicate-ledgers"/relative.with_suffix(".ledger.json")
+            ledger_path.parent.mkdir(parents=True,exist_ok=True)
+            ledger_path.write_text(json.dumps(ledger,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+    (evidence_dir/"embedded-predicate-summary.json").write_text(
+        json.dumps(embedded_summary,indent=2,sort_keys=True)+"\n",
+        encoding="utf-8"
+    )
+
     (evidence_dir/"review-surface-normalization.json").write_text(
         json.dumps(surface_report,indent=2,sort_keys=True)+"\n",
         encoding="utf-8",
@@ -223,6 +251,7 @@ def render(source_root:Path,output_root:Path,evidence_dir:Path,label:str)->dict:
             "static_literal_folding_atomic_fail_closed":True,
             "review_surface_is_presentation_only":True,
         },
+        "embedded_predicate_migration":embedded_summary,
         "review_surface_normalization":{
             "renamed_assessment_files":len(surface_report.get("renames") or []),
             "assessment_ids_shortened":len(surface_report.get("assessment_id_map") or {}),
