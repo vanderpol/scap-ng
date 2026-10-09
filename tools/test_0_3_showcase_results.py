@@ -127,8 +127,8 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         test = assessment["tests"]["home-mounted-nosuid-option-test"]
         self.assertEqual(test["object"]["capability"], "linux.partition")
         self.assertIn("mount_point", test["object"]["select"])
-        self.assertEqual(test["states"][0]["state"]["field"], "mount_options")
-        self.assertEqual(test["states"][0]["state"]["value"], "nosuid")
+        self.assertEqual(test["states"][0]["field"], "mount_options")
+        self.assertEqual(test["states"][0]["value"], "nosuid")
         self.assertEqual(assessment["evaluate"]["test"], "home-mounted-nosuid-option-test")
         self.assertIn("assessments.md#start-here-the-rule-and-its-automated-assessment", main_page)
 
