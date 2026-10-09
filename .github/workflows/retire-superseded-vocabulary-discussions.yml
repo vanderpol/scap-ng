@@ -19,7 +19,34 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const repoQuery='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){d211:discussion(number:211){id number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}}d212:discussion(number:212){id number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}}d213:discussion(number:213){id number url title body comments(first:100){totalCount nodes{body}}}}}}';
+            const repoQuery=`
+              query($owner: String!, $name: String!) {
+                repository(owner: $owner, name: $name) {
+                  d211: discussion(number: 211) {
+                    id number url title body
+                    reactions(first: 1) { totalCount }
+                    comments(first: 100) { totalCount nodes {
+                      body author { login }
+                      reactions(first: 1) { totalCount }
+                      replies(first: 1) { totalCount }
+                    }}
+                  }
+                  d212: discussion(number: 212) {
+                    id number url title body
+                    reactions(first: 1) { totalCount }
+                    comments(first: 100) { totalCount nodes {
+                      body author { login }
+                      reactions(first: 1) { totalCount }
+                      replies(first: 1) { totalCount }
+                    }}
+                  }
+                  d213: discussion(number: 213) {
+                    id number url title body
+                    comments(first: 100) { totalCount nodes { body } }
+                  }
+                }
+              }
+            `;
             const data=await github.graphql(repoQuery,{...context.repo,name:context.repo.repo});
             const {d211,d212,d213}=data.repository;
             if(!d213||!d213.body.includes('scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-SHARED-20261009')) throw new Error('Replacement Discussion #213 is not the expected post.');
