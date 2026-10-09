@@ -1190,6 +1190,7 @@ def validate_assessment_capability_semantics(document):
     variables=assessment.get("variables") or {}
     states=assessment.get("states") or {}
     tests=assessment.get("tests") or {}
+    is_v03=(assessment.get("specification") or {}).get("version")=="0.3.0"
 
     for object_id,obj in objects.items():
         _validate_object_payload(object_id,obj,objects,states,diagnostics)
@@ -1266,15 +1267,24 @@ def validate_assessment_capability_semantics(document):
                     })
             elif isinstance(state_use,dict):
                 synthetic=f"__inline_state_{index}"
-                effective_states[synthetic]=state_use
                 effective_state_ids.append(synthetic)
-                if state_use.get("capability") != test.get("capability"):
-                    diagnostics.append({
-                        "test":test_id,
-                        "code":"test.inline_state_capability",
-                        "state_index":index,
-                        "message":"Test and inline State capabilities must match",
-                    })
+                if is_v03:
+                    # Existing capability-specific semantic rules consume a
+                    # resolved State table. Present the local predicate through
+                    # an internal adapter; source remains wrapper-free.
+                    effective_states[synthetic]={
+                        "capability":test.get("capability"),
+                        "state":state_use,
+                    }
+                else:
+                    effective_states[synthetic]=state_use
+                    if state_use.get("capability") != test.get("capability"):
+                        diagnostics.append({
+                            "test":test_id,
+                            "code":"test.inline_state_capability",
+                            "state_index":index,
+                            "message":"Test and inline State capabilities must match",
+                        })
 
         effective_test["states"]=effective_state_ids
         diagnostics.extend(
