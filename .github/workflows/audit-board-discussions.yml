@@ -87,6 +87,18 @@ jobs:
                 commentsTruncated:d.commentsTruncated,snippets:d.snippets}).slice(0,950));
             }
             core.info('AUDIT_TOPIC_END');
+            core.info('AUDIT_NONVOTE_BEGIN');
+            for(const d of topicHits.filter(d=>!/^\\[VOTE P\\d+\\]/.test(d.title))) {
+              core.info(JSON.stringify({number:d.number,title:d.title,url:d.url,category:d.category,
+                totalComments:d.totalComments,updatedAt:d.updatedAt,body:d.body.slice(0,4800),
+                comments:d.comments.map(c=>({author:c.author,body:c.body.slice(0,1500)}))}).slice(0,6900));
+            }
+            core.info('AUDIT_NONVOTE_END');
+            core.info('AUDIT_ALL_TITLES_BEGIN');
+            for(const d of topicHits) {
+              core.info(JSON.stringify({number:d.number,title:d.title,totalComments:d.totalComments}));
+            }
+            core.info('AUDIT_ALL_TITLES_END');
       - uses: actions/upload-artifact@v4
         if: always()
         with:
