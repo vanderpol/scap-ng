@@ -87,8 +87,9 @@ Tooling SHOULD generate reverse usage indexes when useful.
 
 ## Source presentation order
 
-Assessment source SHOULD present metadata first, followed by `objects`, `variables`, `states`, `tests`, and
-`evaluate`, omitting sections that are absent.
+Assessment source SHOULD present metadata first, followed by `shared_objects` (only when acquisition reuse requires naming), `variables`, `tests`, and `evaluate`, omitting sections that are absent.
+In 0.3 there is **no named State section**: Test expectations are embedded in their consuming Test, and collection Filters contain their typed comparison directly on the Set operand.
+See [selection, filtering and local predicates](selection-and-filters.md) for the single maintained semantic contract.
 This recommendation supports consistent reading and review.
 
 Mapping key order SHALL NOT affect Assessment semantics or reference resolution.
