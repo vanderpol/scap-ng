@@ -2,7 +2,7 @@
 
 **Audience:** project owner and repository visitors seeking a roughly 10-minute readability preview. **This is not a formal request for OVAL Board review, 0.3 release approval, or runtime-conformance certification.**
 
-**Download:** [direct six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/scap-ng-0.3-six-stig-source-preview.zip) · [six individual ZIPs in the repository README](https://github.com/vanderpol/scap-ng#full-stig-conversion-downloads) · [checksum file](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-99e8faf09771/SHA256SUMS.txt).
+**Download:** [direct six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-six-stig-source-preview.zip) · [six individual ZIPs in the repository README](https://github.com/vanderpol/scap-ng#full-stig-conversion-downloads) · [checksum file](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/SHA256SUMS.txt).
 
 These are durable **GitHub Release attachments**, not expiring Actions artifacts. The combined ZIP contains the complete `scap-ng-0.3-human-review/benchmarks/<name>/candidate-authoring/` trees, matching `faithful-authoring/` trees, and per-benchmark `SCORECARD.md` files. It **does not** contain compiled scanner packages or observed scan results.
 
