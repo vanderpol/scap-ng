@@ -9,7 +9,7 @@ A **Rule** says *what is required*; an **Assessment** says *how to check it*. Fo
 
 ## Start here: the Rule and its automated Assessment
 
-**SCAP 1.4:** A Rule points to an OVAL Definition; following its Tests, Objects and States usually means jumping among separate IDs. **SCAP-NG:** The Rule still says *what is required*, but its Assessment shows *how to check it*, with private Objects and States directly beside their Test.
+**SCAP 1.4:** A Rule points to an OVAL Definition; following its Tests, Objects and States usually means jumping among separate IDs. **SCAP-NG:** The Rule still says *what is required*, but its Assessment shows *how to check it*, with local Objects and direct typed comparisons rather than separately named States.
 
 ### 1. The Rule chooses how to check the requirement
 
@@ -29,7 +29,7 @@ rule:
 
 The Rule and requirement are real. The **compiler now resolves these logical IDs** to Assessment source files and packages them automatically. Existing SCAP 1.4 converter output still uses transitional relative paths; migrating generated content and verifying all cross-file reference types remains tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
-### 2. The automated check keeps its Object and State nearby
+### 2. The automated check embeds its expectation
 
 This is a **real converted RHEL 9 Assessment** (only surrounding metadata is omitted).
 
@@ -45,14 +45,12 @@ tests:
           operation: pattern_match
           datatype: string
     states:
-      - capability: linux.partition
-        state:
-          field: mount_options
-          value: nosuid
-          operation: equals
-          datatype: string
-          match: one_or_more
-          existence: one_or_more
+      - field: mount_options
+        value: nosuid
+        operation: equals
+        datatype: string
+        match: one_or_more
+        existence: one_or_more
     reported_elements: all
     existence: one_or_more
     match: all
@@ -60,7 +58,7 @@ evaluate:
   test: home-mounted-nosuid-option-test
 ```
 
-Read the check from top to bottom: the **Test** checks the mount options; its local **Object** selects the `/home` filesystem; its local **State** expects `nosuid`; and **`evaluate`** identifies the Test that supplies the Assessment's technical outcome.
+Read the check from top to bottom: the **Test** checks the mount options; its local **Object** selects the `/home` filesystem; its local **comparison** expects `nosuid`; and **`evaluate`** identifies the Test that supplies the Assessment's technical outcome.
 
 Unlike SCAP 1.4's separately referenced Test/Object/State records, this check can be understood in one place. The Rule's title, severity and fix remain in the [policy example](README.md#rhel-9-rule--the-requirement).
 
@@ -249,13 +247,11 @@ tests:
     capability: variable.value
     variable: count-passwd-entries-variable
     states:
-      - capability: variable.value
-        state:
-          field: value
-          value:
-            variable: count-unique-uids-variable
-          operation: equals
-          datatype: integer
+      - field: value
+        value:
+          variable: count-unique-uids-variable
+        operation: equals
+        datatype: integer
 ```
 
 This is an excerpt; the full converted example also includes explicit quantifiers and reporting fields.
@@ -270,7 +266,20 @@ This is an excerpt; the full converted example also includes explicit quantifier
 
 **SCAP 1.4:** Separate Objects may be necessary even for one check's local Set. **SCAP-NG 0.3:** **Oracle Linux 9 SV-271608**, verifying MFA certificate status checking, puts the two SSSD configuration-file acquisitions inside the Test's Object while **retaining their `union` operator**. The underlying files are `/etc/sssd/sssd.conf` and `/etc/sssd/conf.d/*.conf`. See its [source-linked review](../../review/current/REVIEW-GUIDE.md#what-to-review).
 
-The same principle applies to Filters: locality is a presentation improvement, not a reason to alter set membership or filter action.
+**Embedded Filter** (abbreviated `unix.file` illustration, not a claim of a new production conversion):
+
+```yaml
+filters:
+  - action: exclude
+    field: owner_uid
+    value: 0
+    operation: equals
+    datatype: integer
+    match: all
+    existence: one_or_more
+```
+
+A Filter tests **observed collected Items**, not collection selector inputs. The Filter keeps its include/exclude behavior but no longer needs a named State, `state:` wrapper, capability, or title. Its source State identity/comment is retained in migration provenance. See the [short normative explanation](../assessment/selection-and-filters.md).
 
 ### Explicit evaluation logic
 
@@ -341,16 +350,14 @@ the allowed filesystem types for `/home` to the organization. The site supplies
 
 ```yaml
 states:
-  - capability: linux.partition
-    state:
-      field: fs_type
-      value:
-        input: approved-filesystem-types-input
-      operation: equals
-      datatype: string
-      value_match: one_or_more
-      match: one_or_more
-      existence: one_or_more
+  - field: fs_type
+    value:
+      input: approved-filesystem-types-input
+    operation: equals
+    datatype: string
+    value_match: one_or_more
+    match: one_or_more
+    existence: one_or_more
 ```
 
 The Benchmark parameter, Rule binding, Assessment input contract, completed
