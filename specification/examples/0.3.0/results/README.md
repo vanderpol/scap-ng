@@ -21,6 +21,8 @@ about a live target scan.
 - [Manual Assessment Result](manual-assessment-result.json) — human technical
   determination with assessor identity, time, comments, and evidence references.
 
+All retained per-Item comparison results refer to the **Test-local predicate position** (for example, `file-owner-is-root.states[0]`), not a separately authored State ID. These lexical references remain stable within the immutable packaged Assessment. Original OVAL State IDs and comments, where applicable, remain in migration provenance rather than ordinary executable content or result references.
+
 The examples use `result_schema_version: 0.3.0`. They should be regenerated or
 revalidated at each 0.3 prerelease checkpoint as required by the repository
 release process.
