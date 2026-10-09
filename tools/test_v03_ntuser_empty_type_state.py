@@ -32,9 +32,19 @@ class NTUserEmptyTypeStateTests(unittest.TestCase):
     def test_empty_string_allowed_for_state_type_comparison(self):
         predicates=list(type_predicate_properties(self.schema["$defs"]["state"]))
         self.assertTrue(predicates)
-        self.assertTrue(any("" in variant.get("enum",[])
-                            for predicate in predicates
-                            for variant in predicate.get("value",{}).get("oneOf",[])))
+        # Native 0.3 distinguishes an enum-backed literal comparison from
+        # a regex pattern_match. The literal enum is in the else-branch of
+        # the operation guard, not necessarily properties.value directly.
+        def enum_members(node):
+            if isinstance(node,dict):
+                if isinstance(node.get("enum"),list):
+                    yield from node["enum"]
+                for value in node.values():
+                    yield from enum_members(value)
+            elif isinstance(node,list):
+                for value in node:
+                    yield from enum_members(value)
+        self.assertIn("",list(enum_members(self.schema["$defs"]["state"])))
 
     def test_empty_sentinel_not_claimed_as_real_registry_type(self):
         from validate_generated_capability_semantics import REGISTRY_TYPE_VALUE_DATATYPES

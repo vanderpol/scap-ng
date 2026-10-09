@@ -94,15 +94,25 @@ class ValueMatchContract(unittest.TestCase):
             else:
                 self.assertEqual(object_errors,[])
 
-    def test_scalar_does_not_require_or_allow_multivalue_modifier(self):
+    def test_scalar_quantifier_preserves_explicit_oval_state_expectations(self):
         for kind, validator in self.validators.items():
             with self.subTest(kind=kind):
                 scalar = self.base(kind, "ext4", quantifier=None)
                 self.assertEqual(list(validator.iter_errors(scalar)), [])
-                for legacy in ("variable_match", "value_match"):
-                    noncanonical = copy.deepcopy(scalar)
-                    noncanonical[legacy] = "none"
-                    self.assertTrue(list(validator.iter_errors(noncanonical)))
+                legacy = copy.deepcopy(scalar)
+                legacy["variable_match"] = "none"
+                self.assertTrue(list(validator.iter_errors(legacy)))
+                explicit = copy.deepcopy(scalar)
+                explicit["value_match"] = "none"
+                if kind == "state_entity_base":
+                    # OVAL-authored States sometimes explicitly carry
+                    # value_match/var_check even with one expected value.
+                    # Preserve the author's aggregator over a singleton.
+                    self.assertEqual(list(validator.iter_errors(explicit)), [])
+                else:
+                    # No change to the collection selector or generic scalar
+                    # predicate contracts.
+                    self.assertTrue(list(validator.iter_errors(explicit)))
 
     def test_observed_match_and_existence_are_independent_scopes(self):
         v = self.validators["state_entity_base"]
