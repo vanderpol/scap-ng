@@ -10,16 +10,19 @@ For the current project/design review, use:
 - [Draft specification](../specification/README.md)
 - [Real Benchmark and Rule policy examples](../specification/examples/README.md) and [technical Assessment examples](../specification/examples/assessments.md)
 
-## Open Board discussion (not a formal vote)
+## Current 0.3 Board-decision review (not yet published as votes)
 
-[Assessment authoring vocabulary — three approaches, a fourth 'other' option, and reaction voting](ASSESSMENT-VOCABULARY-DISCUSSION.md) is an **informal pre-0.3 discussion**, not a ratified schema change. [Vote or comment in the thread](https://github.com/vanderpol/scap-ng/issues/207).
+- [Candidate decision register](review/0.3-vote-shortlist.md) — **18 independently reviewable areas**: 11 automated Assessment/OVAL-successor questions and seven broader SCAP-NG integration questions. This is an *internal candidate bank*, not a demand for 18 Board votes.
+- [Audit of 61 published Discussions](review/0.3-discussion-audit.md) — full P001–P058 dispositions, current-0.3 conflicts and participation evidence.
+- [Coordination issue #209](https://github.com/vanderpol/scap-ng/issues/209) — decide which questions and which standards/governance audience warrant a first focused round.
 
-## Published votes
+The [Assessment vocabulary comparison](ASSESSMENT-VOCABULARY-DISCUSSION.md) remains an informal [A/B/C/D preference straw poll in issue #207](https://github.com/vanderpol/scap-ng/issues/207), pending a single canonical GitHub Discussion.
 
-See [VOTES.md](VOTES.md) for the maintained proposal/vote index.
+## Historical published proposals
 
-Published proposal records under [proposals/](proposals/) are immutable review
-records. Do not silently rewrite a proposition after voting begins.
+[VOTES.md](VOTES.md) retains links to the 58 previously published, **unvoted** yes/no proposal Discussions. They are **not** the current proposed 0.3 ballot set, and no ratification is implied. Original [proposal text](proposals/) is preserved.
+
+**Publication rule for each eventual new Discussion:** state one clearly scoped decision and genuine alternative, identify the 0.3 baseline, link directly to its coordinating **GitHub implementation issue and related issue(s)**, cite short source-backed/conformance evidence, distinguish Board feedback from implementation acceptance, and avoid unnecessary verbosity. A proposal whose issue links or compatibility claim is not verified stays in draft.
 
 ## 0.2.0 preserved review material
 
