@@ -37,6 +37,18 @@ For accepted 0.3 collection-iteration semantics, see
 automatic-modernization proof remains under
 [foreach-07](../../research/assessment-simplification/foreach-07/README.md).
 
+## Embedded predicates and Filters
+
+0.3 native Tests and Object/Set Filters use **local typed comparison
+expressions**, not named or separately reusable States. A Filter still narrows
+the observed Item population after acquisition, and before Set/Test evaluation.
+Only the consumer specifies the effective capability. Source OVAL State
+identifiers, titles and comments remain in non-executable migration evidence.
+
+See [selection and filtering](../../specification/assessment/selection-and-filters.md)
+and implementation/proof [#208](https://github.com/vanderpol/scap-ng/issues/208).
+The frozen 0.2.0 schemas are unaffected.
+
 ## Collection `for_each`
 
 0.3 supports typed collection expansion from a named `shared_objects` source,
