@@ -1268,15 +1268,16 @@ def validate_assessment_capability_semantics(document):
             elif isinstance(state_use,dict):
                 synthetic=f"__inline_state_{index}"
                 effective_state_ids.append(synthetic)
-                if is_v03:
-                    # Existing capability-specific semantic rules consume a
-                    # resolved State table. Present the local predicate through
-                    # an internal adapter; source remains wrapper-free.
+                if is_v03 and not ("state" in state_use and "capability" in state_use):
+                    # Native 0.3 predicates are already unwrapped.
                     effective_states[synthetic]={
                         "capability":test.get("capability"),
                         "state":state_use,
                     }
                 else:
+                    # Transitional converter/research fixtures still carry
+                    # source State wrappers. The canonical 0.3 schema rejects
+                    # them, but the semantic validator checks them faithfully.
                     effective_states[synthetic]=state_use
                     if state_use.get("capability") != test.get("capability"):
                         diagnostics.append({
