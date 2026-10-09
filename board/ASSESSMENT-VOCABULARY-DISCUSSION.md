@@ -15,6 +15,18 @@
 
 The poll is **nonbinding**. Choosing words is not a decision to adopt a second language or change existing Test outcomes. Formal standards approval, schema changes, and migration would be separate decisions.
 
+## Non-negotiable acceptance gate: lossless forward conversion from SCAP 1.4
+
+**All three candidates (A, B, and C) MUST support lossless, automated forward conversion from the supported SCAP 1.4/XCCDF and OVAL 5.12.3 source constructs.** This is an entry requirement, **not an optional benefit of A or a feature that members are voting to remove**. Any fourth/hybrid proposal must satisfy the same gate. Lossless means *equivalent technical and policy meaning*, not byte-for-byte identical XML or identical authoring layout.
+
+In particular, conversion SHALL preserve resource selection, collected-Item and Filter/Set membership (including ordering and include/exclude), capabilities, variable computations and bindings, typed values and all quantifiers, Boolean evaluation, applicability, policy/Rule/check selection, manual assessment intent, evidence/redaction requirements, and six technical outcomes (`true`, `false`, `unknown`, `error`, `not_evaluated`, `not_applicable`). No translator may silently change a check into a weaker or stronger assessment, replace a regex with a literal, or hide an unsupported construct.
+
+**Proof status is deliberately different from the requirement:** A has a source-derived 0.3 converter and active corpus/conformance testing; that is not a blanket claim that its final runtime equivalence gate is complete. B and C are **single-rule vocabulary sketches only**. They have **not** demonstrated complete SCAP 1.4 representational coverage or a working lossless converter. Before either could replace A, they would need versioned grammars, precise mapping of complex source constructs, converter implementation, and differential six-state/corpus validation. The short YAML excerpts are not intended to contain every feature by themselves.
+
+Deprecated or deliberately excluded input constructs (for example, legacy `independent.sqlext`) SHALL produce explicit source-specific conversion errors, not invented equivalents. This defined exclusion is not permission to drop supported semantics. **Backward conversion into SCAP 1.4 is not a requirement.**
+
+Please vote on which **authoring direction is clearest**, assuming it must ultimately satisfy these gates—not which small excerpt looks easiest because it omits complexity.
+
 ## Three vocabularies at a glance
 
 | What the author means | **A. Current SCAP-NG 0.3** | **B. Ansible-inspired** | **C. Inspection-oriented** |
@@ -127,7 +139,7 @@ This reads as *inspect partitions → select the mount → expect the option →
 - **Technical outcomes:** `true`, `false`, `error`, `unknown`, `not_evaluated` and `not_applicable` retain their meanings. A policy pass is not universally identical to an Assessment's technical `true`.
 - **Capabilities, collection, evidence:** 0.3 requires the Test's and independently typed inline Object's capabilities to agree; direct embedded comparisons inherit their effective capability and carry no redundant declaration. A hypothetical one-declaration private-component binding (as in B/C) must resolve capability deterministically, keep independently named/shared and nested components correctly typed, and fail on incompatible cross-capability use. Missing/incomplete Items, typed selectors and expectations, reporting/redaction rules, and evidence/provenance remain explicit. `evidence` must not silently become a collection limit or permission to omit required proof.
 - **More complicated Assessments:** Multi-Test `evaluate`, named Test results, Set/Filter/Variable algebra, correlated `for_each` Item populations, and Organizational Input must be representable without inventing Ansible-like procedural semantics.
-- **No hidden defaults:** A shorter authoring presentation would need a strict, versioned, lossless translation to the canonical typed model or an equally explicit canonical schema. The current two speculative excerpts **do not** meet that bar.
+- **No hidden defaults or loss of conversion coverage:** A shorter authoring presentation SHALL have a strict, versioned, lossless translation from the supported SCAP 1.4/XCCDF and OVAL 5.12.3 constructs, with typed semantics and explicit failures for excluded inputs. B and C do **not yet** have the grammar, converter, or differential conformance evidence needed to satisfy that requirement.
 
 ## What feedback would help?
 
