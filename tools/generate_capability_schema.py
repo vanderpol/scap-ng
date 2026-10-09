@@ -457,6 +457,7 @@ def generate(mapping, repo_root, schema_version=None):
                 "enum": sorted(set(meta["datatypes"])),
             },
         }
+        enum_guard = None
         if name in state_value_enums:
             variants = [
                 {"type": "string", "enum": list(state_value_enums[name])},
@@ -468,11 +469,34 @@ def generate(mapping, repo_root, schema_version=None):
                     "minItems": 1,
                     "items": {"type": "string", "enum": list(state_value_enums[name])},
                 })
-            props["value"] = {"oneOf": variants}
-        scalar_state_branches.append({
+                # Enumeration values describe the observed audit settings,
+                # not the language of expected regex patterns. Valid OVAL
+                # pattern_match States use expressions such as
+                # AUDIT_(SUCCESS|SUCCESS_FAILURE); rejecting them is lossy.
+                # Only widen expected values for the explicit pattern
+                # operator. Keep strict enum validation for literal equality.
+                regex_variants = [
+                    {"type": "string"},
+                    {"$ref": f"{common_capability_schema_id}#/$defs/variable_reference"},
+                    {"type": "array", "minItems": 1, "items": {"type": "string"}},
+                ]
+                enum_guard = {
+                    "if": {
+                        "properties": {"operation": {"const": "pattern_match"}},
+                        "required": ["operation"],
+                    },
+                    "then": {"properties": {"value": {"oneOf": regex_variants}}},
+                    "else": {"properties": {"value": {"oneOf": variants}}},
+                }
+            else:
+                props["value"] = {"oneOf": variants}
+        branch = {
             "properties": props,
             "required": ["field"],
-        })
+        }
+        if enum_guard is not None:
+            branch["allOf"] = [enum_guard]
+        scalar_state_branches.append(branch)
         if name in field_documentation:
             scalar_state_branches[-1]["description"] = field_documentation[name]
 
