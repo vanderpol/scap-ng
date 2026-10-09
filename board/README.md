@@ -16,7 +16,7 @@ For the current project/design review, use:
 - [Audit of 61 published Discussions](review/0.3-discussion-audit.md) — full P001–P058 dispositions, current-0.3 conflicts and participation evidence.
 - [Coordination issue #209](https://github.com/vanderpol/scap-ng/issues/209) — decide which questions and which standards/governance audience warrant a first focused round.
 
-**Now live:** [single A/B/C/D Assessment vocabulary vote — GitHub Discussion #211](https://github.com/vanderpol/scap-ng/discussions/211). The [side-by-side comparison and YAML examples inside the Discussion](https://github.com/vanderpol/scap-ng/discussions/211#discussioncomment-18834662) shows the same real RHEL 9 STIG in three vocabularies. This remains a nonbinding preference poll; source conversion and conformance are mandatory acceptance gates. The old [issue #207](https://github.com/vanderpol/scap-ng/issues/207) is preserved as the original discussion history, not a second voting location.
+**Now live:** [single A/B/C/D Assessment vocabulary vote — GitHub Discussion #212](https://github.com/vanderpol/scap-ng/discussions/212). The [side-by-side comparison and YAML examples inside the Discussion](https://github.com/vanderpol/scap-ng/discussions/212) shows the same real RHEL 9 STIG in three vocabularies. This remains a nonbinding preference poll; source conversion and conformance are mandatory acceptance gates. The old [issue #207](https://github.com/vanderpol/scap-ng/issues/207) is preserved as the original discussion history, not a second voting location.
 
 ## Historical published proposals
 
