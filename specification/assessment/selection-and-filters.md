@@ -123,7 +123,15 @@ first-class when acquisition identity or reuse matters.
 7. Source State identities, authorship/comments where present and the precise
    source-to-local-use mapping belong in separate migration provenance.
    Diagnostic/evidence references use unambiguous lexical paths or generated
-   stable identities, not required author-maintained State names.
+   stable identities, not required author-maintained State names. The 0.3
+   canonical Test Result identifies an authored comparison as
+   `<test-id>.states[<zero-based-index>]`; the corresponding per-Item comparison
+   uses that same location. A Filter diagnostic identifies its concrete
+   Object/Set-operand path and Filter index (for example,
+   `shared_objects.file-set-object.set.operands[0].filters[0]`). Compiled
+   identities MAY substitute immutable equivalent paths while preserving a
+   resolvable source map. Neither kind of path requires a title or ID in
+   the authored comparison.
 
 ## Lossless forward conversion
 
