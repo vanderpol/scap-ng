@@ -103,18 +103,20 @@ jobs:
             }
             core.info('AUDIT_NONVOTE_END');
             core.info('AUDIT_ISSUE_TRACEABILITY_BEGIN');
+            const numberedProposals = topicHits.filter(d => d.title.startsWith('[VOTE P'));
             const noIssue = [];
-            for(const d of topicHits.filter(d=>/^\\[VOTE P\\d+\\]/.test(d.title))) {
-              const issueMatches = [...d.body.matchAll(/(?:github\\.com\\/[^\\s)]+\\/issues\\/(\\d+)|(?<![\\w])#(\\d+))/g)]
-                .map(m => Number(m[1] || m[2]));
-              const refs = [...new Set(issueMatches)].sort((a,b)=>a-b);
-              if(!refs.length)noIssue.push(d.number);
+            for(const d of numberedProposals) {
+              const references = [];
+              for (const match of d.body.matchAll(/issues\/(\d+)/g)) references.push(Number(match[1]));
+              for (const match of d.body.matchAll(/(?<![a-zA-Z0-9])#(\d+)/g)) references.push(Number(match[1]));
+              const refs = [...new Set(references)].sort((a,b)=>a-b);
+              if(!refs.length) noIssue.push(d.number);
               core.info(JSON.stringify({number:d.number,title:d.title,
                 issueRefs:refs,hasImplementationLinks:refs.length>0}));
             }
             core.info('AUDIT_ISSUE_TRACEABILITY_END');
             core.info('AUDIT_ISSUE_TRACEABILITY_SUMMARY ' +JSON.stringify({
-              numberedProposals:topicHits.filter(d=>/^\\[VOTE P\\d+\\]/.test(d.title)).length,
+              numberedProposals:numberedProposals.length,
               noIssueCount:noIssue.length,noIssueDiscussionNumbers:noIssue
             }));
             core.info('AUDIT_ALL_TITLES_BEGIN');
