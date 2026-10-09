@@ -216,6 +216,33 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
                     error.path.extendleft(reversed(path))
                     yield error
 
+                # JSON Schema cannot express every cross-field native type
+                # dependency. Preserve the same explicit scalar/array datatype
+                # validation performed by the semantic pipeline, for both
+                # consumer-local Tests and observed-Item Filters.
+                from validate_generated_capability_semantics import (
+                    _native_literal_or_collection_matches_datatype,
+                )
+                pending = [(predicate, path)]
+                while pending:
+                    node, local_path = pending.pop()
+                    if not isinstance(node, dict):
+                        continue
+                    if "datatype" in node and "value" in node:
+                        value, datatype = node["value"], node["datatype"]
+                        if not isinstance(value, dict) and not _native_literal_or_collection_matches_datatype(
+                            value, datatype
+                        ):
+                            yield ValidationError(
+                                f"Predicate literal {value!r} does not match authored datatype {datatype!r}",
+                                validator="native_literal_datatype",
+                                path=deque(local_path + ["value"]),
+                            )
+                    for operator in ("all", "any", "one", "odd"):
+                        if isinstance(node.get(operator), list):
+                            for index, child in enumerate(node[operator]):
+                                pending.append((child, local_path + [operator, index]))
+
             object_registry = {
                 **(assessment.get("objects") or {}),
                 **(assessment.get("shared_objects") or {}),
