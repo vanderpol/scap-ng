@@ -33,6 +33,7 @@ jobs:
                       nodes {
                         number title url body createdAt updatedAt
                         category { name }
+                        reactionGroups { content users { totalCount } }
                         comments(first: 30) {
                           totalCount
                           nodes { body createdAt author { login } }
@@ -61,6 +62,7 @@ jobs:
               return {
                 number:d.number,title:d.title,url:d.url,category:d.category?.name,
                 updatedAt:d.updatedAt,totalComments:d.comments.totalCount,
+                reactions:d.reactionGroups?.map(g=>({content:g.content,count:g.users.totalCount})) ?? [],
                 commentsTruncated:d.comments.pageInfo.hasNextPage,
                 hasAnsible:/ansible/i.test(text), matches:words.test(text),
                 snippets:snippets.slice(0,4), body:d.body,
@@ -76,7 +78,7 @@ jobs:
             core.info('AUDIT_ANSIBLE_BEGIN');
             for (const d of topicHits.filter(d=>d.hasAnsible)) {
               core.info(JSON.stringify({number:d.number,title:d.title,url:d.url,category:d.category,
-                updatedAt:d.updatedAt,totalComments:d.totalComments,
+                updatedAt:d.updatedAt,totalComments:d.totalComments,reactions:d.reactions,
                 commentsTruncated:d.commentsTruncated,snippets:d.snippets}).slice(0,1900));
             }
             core.info('AUDIT_ANSIBLE_END');
@@ -87,10 +89,16 @@ jobs:
                 commentsTruncated:d.commentsTruncated,snippets:d.snippets}).slice(0,950));
             }
             core.info('AUDIT_TOPIC_END');
+            core.info('AUDIT_ENGAGEMENT '+JSON.stringify({discussions:topicHits.length,
+              comments:topicHits.reduce((n,d)=>n+d.totalComments,0),
+              reactions:topicHits.reduce((n,d)=>n+d.reactions.reduce((a,r)=>a+r.count,0),0),
+              active:topicHits.filter(d=>d.totalComments>0 || d.reactions.some(r=>r.count>0))
+                .map(d=>({number:d.number,title:d.title,comments:d.totalComments,
+                  reactions:d.reactions.filter(r=>r.count>0)}))}));
             core.info('AUDIT_NONVOTE_BEGIN');
             for(const d of topicHits.filter(d=>!/^\\[VOTE P\\d+\\]/.test(d.title))) {
               core.info(JSON.stringify({number:d.number,title:d.title,url:d.url,category:d.category,
-                totalComments:d.totalComments,updatedAt:d.updatedAt,body:d.body.slice(0,4800),
+                totalComments:d.totalComments,updatedAt:d.updatedAt,reactions:d.reactions,body:d.body.slice(0,4800),
                 comments:d.comments.map(c=>({author:c.author,body:c.body.slice(0,1500)}))}).slice(0,6900));
             }
             core.info('AUDIT_NONVOTE_END');
