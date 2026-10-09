@@ -1,6 +1,8 @@
 # Published Board voting proposals
 
-React to each opening post: 👍 Yes, 👎 No. No ratification is inferred here.
+> **HISTORICAL POSTED INDEX — do not circulate as 58 current Board votes.** The 58 proposals were published before the 0.3-local predicate and other design refinements. A [complete audit](review/0.3-discussion-audit.md) found zero reactions/comments on the numbered proposals and no direct implementation-issue links. Some questions are now obsolete, while others deserve scoped independent review. No ratification is inferred.
+
+For the current owner review, use the [18-area candidate decision register](review/0.3-vote-shortlist.md) and [tracking issue #209](https://github.com/vanderpol/scap-ng/issues/209). That register is **not** a recommendation to send 18 simultaneous polls. Until a smaller issue-linked ballot set is accepted, this table is retained only to preserve exact published Discussion URLs. Historical opening posts remain unmodified.
 
 | ID | Decision | GitHub Discussion |
 | --- | --- | --- |
