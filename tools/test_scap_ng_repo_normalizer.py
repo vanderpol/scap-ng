@@ -307,6 +307,97 @@ class RepoNormalizerTests(unittest.TestCase):
             self.assertNotIn("wn11",shared[0].name)
             self.assertNotIn("windows-11",shared[0].name)
 
+    def test_opt_in_grouped_layout_preserves_legacy_identity_and_references(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "source"
+            for name, rid in (("a", "R1"), ("b", "R2")):
+                self.benchmark(root, name, rid, "/home/example")
+                path = root / name / "assessments" / "automated" / f"{rid}.automated.assessment.yaml"
+                doc = yaml.safe_load(path.read_text())
+                doc["assessment"]["tests"]["test-file"]["test_title"] = (
+                    "All local interactive user home directories are 0750 or less"
+                )
+                dump(path, doc)
+            flat, grouped = Path(td) / "flat", Path(td) / "grouped"
+            old_argv = __import__("sys").argv
+            try:
+                for target, extra in ((flat, []), (grouped, ["--shared-layout", "os-subject"])):
+                    __import__("sys").argv = [
+                        "normalizer", str(root), "--rewrite", "--output-root", str(target),
+                        "--report", str(Path(td) / (target.name + ".json")),
+                        "--advisory", "none", *extra,
+                    ]
+                    self.assertEqual(normalizer.main(), 0)
+            finally:
+                __import__("sys").argv = old_argv
+            legacy = list((flat / "shared" / "assessments").glob("*.yaml"))
+            new = list((grouped / "shared" / "assessments" / "unix" / "files").glob("*.yaml"))
+            self.assertEqual(len(legacy), len(new))
+            self.assertEqual(len(new), 1)
+            self.assertEqual(new[0].name, "interactive-user-home-dirs-0750-less.assessment.yaml")
+            self.assertLess(len(new[0].name), len(legacy[0].name))
+            self.assertEqual(yaml.safe_load(legacy[0].read_text()), yaml.safe_load(new[0].read_text()))
+            for name, rid in (("a", "R1"), ("b", "R2")):
+                rule_dir = grouped / name / "rules"
+                rule = yaml.safe_load((rule_dir / f"{rid}.rule.yaml").read_text())["rule"]
+                ref = rule["assessment_choices"]["automated"]["assessment"]
+                self.assertIn("shared/assessments/unix/files/", ref)
+                self.assertEqual((rule_dir / ref).resolve(), new[0].resolve())
+            report = json.loads((Path(td) / "grouped.json").read_text())
+            self.assertEqual(report["shared_layout"], "os-subject")
+            self.assertEqual(report["repository_validation"]["unresolved_rule_references"], 0)
+            self.assertNotIn("shared_layout", json.loads((Path(td) / "flat.json").read_text()))
+            second = Path(td) / "again"
+            try:
+                __import__("sys").argv = [
+                    "normalizer", str(grouped), "--rewrite", "--output-root", str(second),
+                    "--report", str(Path(td) / "again.json"), "--advisory", "none",
+                    "--shared-layout", "os-subject",
+                ]
+                self.assertEqual(normalizer.main(), 0)
+            finally:
+                __import__("sys").argv = old_argv
+            self.assertEqual(
+                {p.relative_to(grouped): p.read_bytes() for p in grouped.rglob("*") if p.is_file()},
+                {p.relative_to(second): p.read_bytes() for p in second.rglob("*") if p.is_file()},
+            )
+
+    def test_os_subject_classification_is_conservative(self):
+        category = normalizer.shared_assessment_category
+        self.assertEqual(category({"tests": {"x": {"capability": "windows.registry"}}}), ("windows", "registry"))
+        self.assertEqual(category({"tests": {"x": {"capability": "linux.file"}, "y": {"capability": "unix.file"}}}), ("linux", "files"))
+        self.assertEqual(category({"tests": {"x": {"capability": "windows.registry"}, "y": {"capability": "unix.file"}}}), ("unclassified", "other"))
+        self.assertEqual(category({"mode": "manual"}), ("unclassified", "manual"))
+
+    def test_os_subject_collisions_use_deterministic_digest(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "source"
+            for name, rid, literal in (
+                ("a", "R1", "/etc/a"), ("b", "R2", "/etc/a"),
+                ("c", "R3", "/etc/b"), ("d", "R4", "/etc/b"),
+            ):
+                self.benchmark(root, name, rid, literal)
+            output, report_path = Path(td) / "normalized", Path(td) / "report.json"
+            old_argv = __import__("sys").argv
+            try:
+                __import__("sys").argv = [
+                    "normalizer", str(root), "--rewrite", "--output-root", str(output),
+                    "--report", str(report_path), "--advisory", "none",
+                    "--shared-layout", "os-subject",
+                ]
+                self.assertEqual(normalizer.main(), 0)
+            finally:
+                __import__("sys").argv = old_argv
+            shared = list((output / "shared" / "assessments" / "unix" / "files").glob("*.yaml"))
+            self.assertEqual(len(shared), 2)
+            for path in shared:
+                self.assertRegex(path.name, r"^file-[0-9a-f]{8}\.assessment\.yaml$")
+            report = json.loads(report_path.read_text())
+            self.assertEqual(report["repository_validation"]["assessment_identity_conflicts"], 0)
+            self.assertEqual({x["shared_assessment"] for x in report["exact_groups"]},
+                             {p.relative_to(output).as_posix() for p in shared})
+
+
     def test_default_mode_is_dry_run(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)/"source"

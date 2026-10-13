@@ -140,6 +140,7 @@ Useful options:
 - `--top-near N`: limit near-duplicate groups retained in the report.
 - `--max-rule-candidates N`: limit similar Rule candidates; `0` means all.
 - `--fingerprint-cache PATH`: persist fingerprints between runs.
+- `--shared-layout flat|os-subject`: default `flat` leaves existing 0.3 release output paths unchanged. Opt in to `os-subject` for `shared/assessments/<os-family>/<subject>/<short-name>.assessment.yaml`. Folders and filenames are tooling-only; logical IDs remain stable. Ambiguous capability families go under `unclassified/` for review. Do not switch published bundle generation until conversion, compilation and reference checks pass.
 
 **Safety:** exact semantic duplicates may be promoted automatically. Near duplicates are advisory only. The tool refuses to rewrite the source tree in place.
 

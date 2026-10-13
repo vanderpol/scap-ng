@@ -74,8 +74,12 @@ manual procedures part of the OVAL successor.
 ## 2. Rule binding
 
 A Rule SHALL expose named Assessment selections and identify its default
-selection when appropriate. Authored selections SHALL resolve through explicit
-Assessment YAML paths relative to the referring Rule.
+selection when appropriate. Native 0.3 authored selections SHALL use Assessment logical IDs, independent
+of source filenames or directory placement. The compiler indexes eligible
+Benchmark/shared content and generates the package manifest; authors do not
+maintain a manual Assessment index. Transitional converted source MAY use
+relative Assessment YAML paths, which the compiler validates and resolves
+before packaging. See [package and integrity](../package/package-and-integrity.md).
 
 The authoritative binding chain is Benchmark → Rule → selected Assessment.
 There is no separate Policy object or file in the current working design.

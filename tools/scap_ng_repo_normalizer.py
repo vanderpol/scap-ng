@@ -192,6 +192,93 @@ def shared_assessment_base_name(assessment: dict, benchmark_labels: set[str] | N
 
     return "shared-assessment"
 
+# Source layout is a repository preference, never Assessment semantics.
+# This stays opt-in while published 0.3 conversion artifacts are in review.
+SHARED_LAYOUT_STOPWORDS = {
+    "a", "all", "an", "and", "are", "be", "configured", "for", "has",
+    "have", "is", "local", "must", "of", "or", "should", "that", "the",
+    "to", "with",
+}
+SHARED_LAYOUT_SHORT_WORDS = {
+    "directories": "dirs", "directory": "dir", "permissions": "perms",
+}
+
+
+def concise_shared_filename(assessment: dict, benchmark_labels: set[str]) -> str:
+    """Short source filename; never used as logical Assessment identity."""
+    base = shared_assessment_base_name(assessment, benchmark_labels)
+    words = [
+        SHARED_LAYOUT_SHORT_WORDS.get(word, word)
+        for word in base.split("-")
+        if word not in SHARED_LAYOUT_STOPWORDS
+    ]
+    if not words:
+        words = base.split("-")
+    if len(words) > 6:
+        words = words[:3] + words[-3:]
+    while len("-".join(words)) > 48 and len(words) > 2:
+        words.pop(len(words) // 2)  # preserve first purpose and final qualifier
+    return "-".join(words)[:48].rstrip("-") or "shared-assessment"
+
+
+def shared_assessment_category(assessment: dict) -> tuple[str, str]:
+    """Group by capability, not by source STIG; unclear scope stays unclassified.
+
+    Category labels are navigational, not runtime applicability assertions.
+    """
+    capabilities: set[str] = set()
+
+    def visit(value: Any) -> None:
+        if isinstance(value, dict):
+            cap = value.get("capability")
+            if isinstance(cap, str):
+                capabilities.add(cap.lower())
+            for nested in value.values():
+                visit(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                visit(nested)
+
+    visit(assessment)
+    families: set[str] = set()
+    subjects: set[str] = set()
+    for cap in capabilities:
+        prefix, _, item = cap.partition(".")
+        if prefix in {"linux", "windows", "macos", "unix", "solaris"}:
+            families.add(prefix)
+        if "registry" in item:
+            subjects.add("registry")
+        elif any(x in item for x in ("file", "directory", "symlink", "fstab", "inode")):
+            subjects.add("files")
+        elif any(x in item for x in ("password", "shadow", "user", "account", "group", "pam", "login")):
+            subjects.add("accounts")
+        elif any(x in item for x in ("service", "systemd", "process", "runlevel")):
+            subjects.add("services")
+        elif "audit" in item:
+            subjects.add("audit")
+        elif any(x in item for x in ("network", "interface", "dns", "route", "socket", "firewall")):
+            subjects.add("network")
+        elif any(x in item for x in ("sysctl", "kernel", "selinux")):
+            subjects.add("security")
+        else:
+            subjects.add("other")
+
+    if families == {"linux", "unix"}:
+        family = "linux"
+    elif families == {"macos", "unix"}:
+        family = "macos"
+    elif families == {"solaris", "unix"}:
+        family = "solaris"
+    elif len(families) == 1:
+        family = next(iter(families))
+    else:
+        family = "unclassified"
+    subject = next(iter(subjects)) if len(subjects) == 1 else "other"
+    if not capabilities and assessment.get("mode") == "manual":
+        subject = "manual"
+    return family, subject
+
+
 def rule_refs(rule_path: Path) -> list[tuple[str, Path]]:
     doc = load_yaml(rule_path)
     rule = doc.get("rule") or {}
@@ -633,6 +720,10 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int | None = None) ->
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus_root", type=Path)
+    ap.add_argument(
+        "--shared-layout", choices=("flat", "os-subject"), default="flat",
+        help="Opt-in OS/subject folders and shorter names; flat is the release default.",
+    )
     ap.add_argument("--rewrite", action="store_true",
                     help="Write a normalized repository copy. Default is dry-run/report-only.")
     ap.add_argument("--output-root", type=Path,
@@ -755,6 +846,22 @@ def main() -> int:
         group_base_names[fingerprint] = base
         base_fingerprints[base].add(fingerprint)
 
+    # Resolve case-insensitive collisions before any writes or rewrites.
+    layout_names: dict[str, tuple[Path, str]] = {}
+    layout_collisions: dict[str, set[str]] = defaultdict(set)
+    if args.shared_layout == "os-subject":
+        for group in duplicate_groups:
+            fingerprint = group[0]["exact"]
+            assessment = load_yaml(group[0]["path"]).get("assessment") or {}
+            labels = {
+                str(c["benchmark"])
+                for row in group for c in row["consumers"] if c.get("benchmark")
+            }
+            folder = shared_rel_dir.joinpath(*shared_assessment_category(assessment))
+            short_name = concise_shared_filename(assessment, labels)
+            layout_names[fingerprint] = (folder, short_name)
+            layout_collisions[(folder / short_name).as_posix().casefold()].add(fingerprint)
+
     for group in sorted(
         duplicate_groups,
         key=lambda g: (-len(g), g[0]["exact"]),
@@ -772,7 +879,16 @@ def main() -> int:
         mode = assessment.get("mode")
         # Preserve the document-kind suffix because schema selection is intentionally filename-based.
         suffix = ".manual.assessment.yaml" if mode == "manual" else ".assessment.yaml"
-        shared_rel_path = shared_rel_dir / f"{shared_name}{suffix}"
+        if args.shared_layout == "os-subject":
+            folder, short_name = layout_names[fingerprint]
+            key = (folder / short_name).as_posix().casefold()
+            filename = (
+                f"{short_name}-{fingerprint[:8]}"
+                if len(layout_collisions[key]) > 1 else short_name
+            )
+            shared_rel_path = folder / f"{filename}{suffix}"
+        else:
+            shared_rel_path = shared_rel_dir / f"{shared_name}{suffix}"
         shared_path = (output / shared_rel_path) if output is not None else None
 
         assessment["id"] = shared_id
@@ -1037,6 +1153,13 @@ def main() -> int:
             "advisory_similarity_changes_exact_merge_decisions": False,
         },
     }
+
+    if args.shared_layout == "os-subject":
+        report["shared_layout"] = "os-subject"
+        report["unclassified_shared_assessments"] = sum(
+            row["shared_assessment"].startswith("shared/assessments/unclassified/")
+            for row in exact_report
+        )
 
     if args.fingerprint_cache is not None:
         args.fingerprint_cache.parent.mkdir(parents=True, exist_ok=True)
