@@ -1,0 +1,89 @@
+name: Promote verified shared Assessment layout (#216)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/promote-validated-shared-layout.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish content from verified six-STIG run
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download completed verified candidate (no regeneration)
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: 38420025845
+          github-token: ${{ github.token }}
+          name: issue-214-shared-layout-review
+          path: work
+      - name: Prove source revision, evidence, archive checksum and corrected folders
+        run: |
+          python - <<'PY'
+          import json, zipfile
+          from pathlib import Path
+          report=json.loads(Path("work/LAYOUT-COMPARISON.json").read_text())
+          expected="29591bda05abb0006971268fca3e1b98b7d0f3f7"
+          assert report["scap_ng_revision"] == expected, report["scap_ng_revision"]
+          assert report["benchmarks"] == 6 and report["shared_assessments"] == 550
+          assert report["assessment_payloads_and_logical_ids_identical"]
+          assert report["rule_and_applicability_logical_bindings_identical"]
+          assert report["exact_semantic_groups_unchanged"]
+          assert len(report["verified_compiled_bundles"]) == 6
+          categories=report["os_family_subject_counts"]
+          assert sum(categories.values())==550, categories
+          assert set(x.split("/")[0] for x in categories) <= {"linux","windows","unix","macos","solaris","common"}, categories
+          assert "unclassified" not in json.dumps(categories)
+          with zipfile.ZipFile("work/scap-ng-0.3-shared-layout-preview.zip") as zf:
+              assert zf.testzip() is None
+              names=zf.namelist()
+              assert not any("/unclassified/" in name for name in names)
+              assert not any("/linux/" in name and name.split("/")[-1].startswith("linux-") for name in names)
+              assert len([x for x in names if x.endswith(".assessment.yaml") and "/shared/assessments/" in x])==550
+          print("Validated source SHA",expected)
+          print("Category counts",categories)
+          PY
+          cd work
+          sha256sum -c SHA256SUMS.txt
+      - name: Publish isolated prerelease without modifying root README
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="v0.3.0-shared-layout-preview-29591bda05ab"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Immutable prerelease exists; refusing overwrite."
+            exit 1
+          fi
+          cat > work/RELEASE-NOTES.md <<'EOF'
+          Corrected issue #216 six-STIG authoring source layout preview.
+          550 verified, schema-validated shared Assessments; no previously
+          ambiguous DoD folder label. Generic independent collectors are
+          placed using verified benchmark consumers. Existing IDs and content
+          are unchanged; compiled package shared content is namespaced at
+          assessments/shared/<family>/<subject>/.
+          Six compiled packages passed manifest verification in the pinned
+          producing workflow run 38420025845. This prerelease provides
+          source only; separate authoring and compiled downloads are published
+          after this immutable preview has been confirmed.
+          Root README and all historical release attachments unchanged.
+          EOF
+          gh release create "$tag" \
+            --target 29591bda05abb0006971268fca3e1b98b7d0f3f7 \
+            --title "SCAP-NG 0.3 corrected shared Assessment layout" \
+            --notes-file work/RELEASE-NOTES.md \
+            --prerelease \
+            work/scap-ng-0.3-shared-layout-preview.zip \
+            work/LAYOUT-COMPARISON.json \
+            work/SHA256SUMS.txt
+          echo "PUBLISHED_LAYOUT_PREVIEW=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"
