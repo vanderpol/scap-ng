@@ -300,6 +300,10 @@ def shared_assessment_category(
     }
     if family == "common" and len(consumer_families) == 1 and None not in consumer_families:
         family = next(iter(consumer_families))
+    # The unix.* OVAL family includes Linux. If all verified consumers are
+    # Linux benchmarks, use their familiar OS category for source navigation.
+    elif family == "unix" and consumer_families == {"linux"}:
+        family = "linux"
     # If explicit capabilities and consumers disagree, keep the category
     # conservative, retaining evidence for human review rather than assuming.
     elif families and consumer_families and None not in consumer_families:

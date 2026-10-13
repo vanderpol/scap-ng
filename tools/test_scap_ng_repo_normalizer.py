@@ -375,6 +375,11 @@ class RepoNormalizerTests(unittest.TestCase):
                    "tests": {"x": {"capability": "independent.textfilecontent54"}}}
         self.assertEqual(category(generic), ("common", "files"))
         self.assertEqual(category(generic, {"rhel_9", "oracle_linux_9"}), ("linux", "files"))
+        self.assertEqual(
+            category({"tests": {"x": {"capability": "unix.file"}}},
+                     {"rhel_9", "oracle_linux_9"}),
+            ("linux", "files"),
+        )
         self.assertEqual(category(generic, {"ms_windows_11"}), ("windows", "files"))
         self.assertEqual(category(generic, {"rhel_9", "ms_windows_11"}), ("common", "files"))
         self.assertEqual(category(generic, {"rhel_9", "unknown-platform"}), ("common", "files"))
