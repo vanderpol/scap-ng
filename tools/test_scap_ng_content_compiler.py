@@ -35,6 +35,20 @@ class ContentCompilerTests(unittest.TestCase):
             readable_member_name(Path("bench/rules/SV-123.rule.yaml"),"SV-123","rule"),
             "rules/SV-123.rule.json",
         )
+        self.assertEqual(
+            readable_member_name(
+                Path("authoring/shared/assessments/linux/files/check.assessment.yaml"),
+                "ng.shared.check", "assessment",
+            ),
+            "assessments/shared/linux/files/check.assessment.json",
+        )
+        self.assertEqual(
+            readable_member_name(
+                Path("authoring/shared/assessments/common/manual/manual.manual.assessment.yaml"),
+                "ng.shared.manual", "assessment",
+            ),
+            "assessments/shared/common/manual/manual.manual.assessment.json",
+        )
 
         long_name="SV-" + ("1234567890" * 30) + ".automated.assessment.yaml"
         shortened=readable_member_name(

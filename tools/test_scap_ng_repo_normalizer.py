@@ -366,8 +366,24 @@ class RepoNormalizerTests(unittest.TestCase):
         category = normalizer.shared_assessment_category
         self.assertEqual(category({"tests": {"x": {"capability": "windows.registry"}}}), ("windows", "registry"))
         self.assertEqual(category({"tests": {"x": {"capability": "linux.file"}, "y": {"capability": "unix.file"}}}), ("linux", "files"))
-        self.assertEqual(category({"tests": {"x": {"capability": "windows.registry"}, "y": {"capability": "unix.file"}}}), ("unclassified", "other"))
-        self.assertEqual(category({"mode": "manual"}), ("unclassified", "manual"))
+        self.assertEqual(category({"tests": {"x": {"capability": "windows.registry"}, "y": {"capability": "unix.file"}}}), ("common", "other"))
+        self.assertEqual(category({"mode": "manual"}), ("common", "manual"))
+
+    def test_generic_capability_uses_verified_same_family_consumers(self):
+        category = normalizer.shared_assessment_category
+        generic = {"mode": "automated", "assessment_title": "Linux must audit opens",
+                   "tests": {"x": {"capability": "independent.textfilecontent54"}}}
+        self.assertEqual(category(generic), ("common", "files"))
+        self.assertEqual(category(generic, {"rhel_9", "oracle_linux_9"}), ("linux", "files"))
+        self.assertEqual(category(generic, {"ms_windows_11"}), ("windows", "files"))
+        self.assertEqual(category(generic, {"rhel_9", "ms_windows_11"}), ("common", "files"))
+        self.assertEqual(category(generic, {"rhel_9", "unknown-platform"}), ("common", "files"))
+        self.assertEqual(category({"mode": "manual"}, {"ms_windows_server_dns"}), ("windows", "manual"))
+        self.assertEqual(
+            category({"tests": {"x": {"capability": "independent.shellcommand"}}},
+                     {"rhel_9", "oracle_linux_9"}),
+            ("linux", "commands"),
+        )
 
     def test_os_subject_collisions_use_deterministic_digest(self):
         with tempfile.TemporaryDirectory() as td:

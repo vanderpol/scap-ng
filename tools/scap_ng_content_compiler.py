@@ -75,11 +75,14 @@ def readable_member_name(source_path: Path, logical_id: str, kind: str) -> str:
         member = f"rules/{base}{suffix}"
     elif kind == "assessment":
         rel_parts = None
-        # Preserve everything below the nearest authoring 'assessments' directory,
-        # including automated/manual/applicability categorization.
+        # Preserve local automated/manual/applicability groups. Source-backed
+        # shared Assessments are explicitly namespaced under assessments/shared/
+        # in the compiled ZIP (never mixed with local Assessment categories).
         for i in range(len(parts) - 1, -1, -1):
             if parts[i] == "assessments":
                 rel_parts = parts[i + 1 :]
+                if i > 0 and parts[i - 1] == "shared":
+                    rel_parts = ["shared", *rel_parts]
                 break
         if not rel_parts:
             rel_parts = [source_path.name]

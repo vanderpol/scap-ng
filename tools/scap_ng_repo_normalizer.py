@@ -221,10 +221,28 @@ def concise_shared_filename(assessment: dict, benchmark_labels: set[str]) -> str
     return "-".join(words)[:48].rstrip("-") or "shared-assessment"
 
 
-def shared_assessment_category(assessment: dict) -> tuple[str, str]:
-    """Group by capability, not by source STIG; unclear scope stays unclassified.
+# Benchmarks are evidence for how the published source is used, not a
+# statement that a generic capability is intrinsically OS-specific.
+PUBLISHED_BENCHMARK_FAMILIES = {
+    "rhel_9": "linux",
+    "oracle_linux_9": "linux",
+    "ms_windows_11": "windows",
+    "ms_windows_server_2025": "windows",
+    "ms_windows_server_dns": "windows",
+    "apache_server_2-4_unix_server": "unix",
+}
 
-    Category labels are navigational, not runtime applicability assertions.
+
+def shared_assessment_category(
+    assessment: dict, benchmark_labels: set[str] | None = None
+) -> tuple[str, str]:
+    """Group by explicit collector and verified same-family consumers.
+
+    Generic independent.* collectors work across OS families: they do not
+    imply Linux, Windows, or Unix. When all known consumers are from the same
+    supported platform family, use that as a source-navigation grouping only.
+    Do not infer scanner applicability from these folder names. Unknown/mixed
+    consumers use neutral 'common', not DoD classification terminology.
     """
     capabilities: set[str] = set()
 
@@ -256,6 +274,8 @@ def shared_assessment_category(assessment: dict) -> tuple[str, str]:
             subjects.add("services")
         elif "audit" in item:
             subjects.add("audit")
+        elif "shellcommand" in item:
+            subjects.add("commands")
         elif any(x in item for x in ("network", "interface", "dns", "route", "socket", "firewall")):
             subjects.add("network")
         elif any(x in item for x in ("sysctl", "kernel", "selinux")):
@@ -272,9 +292,22 @@ def shared_assessment_category(assessment: dict) -> tuple[str, str]:
     elif len(families) == 1:
         family = next(iter(families))
     else:
-        family = "unclassified"
+        family = "common"
+
+    consumer_families = {
+        PUBLISHED_BENCHMARK_FAMILIES.get(name)
+        for name in (benchmark_labels or set())
+    }
+    if family == "common" and len(consumer_families) == 1 and None not in consumer_families:
+        family = next(iter(consumer_families))
+    # If explicit capabilities and consumers disagree, keep the category
+    # conservative, retaining evidence for human review rather than assuming.
+    elif families and consumer_families and None not in consumer_families:
+        if any(consumer != family for consumer in consumer_families):
+            family = "common"
+
     subject = next(iter(subjects)) if len(subjects) == 1 else "other"
-    if not capabilities and assessment.get("mode") == "manual":
+    if assessment.get("mode") == "manual":
         subject = "manual"
     return family, subject
 
@@ -857,8 +890,14 @@ def main() -> int:
                 str(c["benchmark"])
                 for row in group for c in row["consumers"] if c.get("benchmark")
             }
-            folder = shared_rel_dir.joinpath(*shared_assessment_category(assessment))
+            family, subject = shared_assessment_category(assessment, labels)
+            folder = shared_rel_dir / family / subject
             short_name = concise_shared_filename(assessment, labels)
+            # The enclosing folder already conveys the verified platform family.
+            # Do not repeat it in the source filename.
+            prefix = family + "-"
+            if short_name.startswith(prefix) and len(short_name) > len(prefix):
+                short_name = short_name[len(prefix):]
             layout_names[fingerprint] = (folder, short_name)
             layout_collisions[(folder / short_name).as_posix().casefold()].add(fingerprint)
 
@@ -1156,8 +1195,8 @@ def main() -> int:
 
     if args.shared_layout == "os-subject":
         report["shared_layout"] = "os-subject"
-        report["unclassified_shared_assessments"] = sum(
-            row["shared_assessment"].startswith("shared/assessments/unclassified/")
+        report["common_shared_assessments"] = sum(
+            row["shared_assessment"].startswith("shared/assessments/common/")
             for row in exact_report
         )
 
