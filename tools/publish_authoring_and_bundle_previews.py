@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Issue #215: publish one clean authoring ZIP and one compiled bundle per STIG.
+"""Issue #215: publish one combined authoring ZIP and one compiled bundle per STIG.
 
 Only preverified grouped native source is accepted. Faithful converter evidence
 remains preserved in its original CI/release; it is intentionally not re-shipped.
@@ -103,8 +103,9 @@ def build(source: Path, output: Path, revision: str) -> None:
     if len(bundles) != len(BENCHMARKS):
         raise ValueError(f"Expected exactly six .scapng bundles, got {bundles}")
 
-    # Map shared logical identities to their exact source paths, avoiding
-    # unrelated Linux/Windows content in a benchmark-specific authoring ZIP.
+    # Map shared identities to exact source paths; verify that each benchmark
+    # independently compiles using only its required shared Assessments.
+    # These temporary per-benchmark trees are verification evidence, NOT downloads.
     shared_by_id = {}
     for path in sorted((source / "shared").rglob("*.assessment.yaml")):
         obj = yaml.safe_load(path.read_text(encoding="utf-8")).get("assessment") or {}
@@ -175,20 +176,6 @@ def build(source: Path, output: Path, revision: str) -> None:
                     f"missing={missing}, extra={extra}, mismatched={mismatched}"
                 )
 
-            (root / "README.md").write_text(
-                f"# {title} — SCAP-NG 0.3 authoring source\n\n"
-                f"Open \`authoring/{key}/benchmark.yaml\` to start.\n"
-                "All Rules, Assessments and required shared Assessments are under \`authoring/\`.\n"
-                "This is the **modernized native authoring form**, not a faithful\n"
-                "SCAP 1.4 migration dump. No competing candidate source is included.\n"
-                "The compiled scanning-content download is a separate \`.scapng\` file.\n"
-                "Pre-alpha research demonstration, not DISA-approved content or\n"
-                "a production-authorized scanner package.\n",
-                encoding="utf-8",
-            )
-            authoring_asset = f"scap-ng-0.3-{short}-authoring.zip"
-            write_archive(output / authoring_asset, root)
-            check_archive(output / authoring_asset, [f"authoring/{key}/benchmark.yaml"])
 
         bundle_asset = f"scap-ng-0.3-{short}.scapng"
         shutil.copy2(original, output / bundle_asset)
@@ -196,7 +183,6 @@ def build(source: Path, output: Path, revision: str) -> None:
             raise ValueError(f"Compiled bundle changed during packaging: {key}")
         releases[key] = {
             "label": title,
-            "authoring_file": authoring_asset,
             "scanning_file": bundle_asset,
             "benchmark_id": manifest["benchmark_id"],
             "shared_assessments_included": len(selected_shared),
@@ -204,7 +190,7 @@ def build(source: Path, output: Path, revision: str) -> None:
             "compiled_bundle_signed": bool(manifest.get("signature", {}).get("format")),
         }
 
-    # One convenient combined source ZIP, still without faithful/candidate trees.
+    # Exactly one public source ZIP for all six STIGs, without parallel trees.
     combined = "scap-ng-0.3-six-stig-authoring.zip"
     with tempfile.TemporaryDirectory(prefix="ng-authoring-all-") as temp:
         root = Path(temp)
@@ -226,7 +212,7 @@ def build(source: Path, output: Path, revision: str) -> None:
     shutil.rmtree(compiled)
     metrics.unlink()
     manifest = {
-        "format": "scap-ng-six-stig-two-product-preview-0.1",
+        "format": "scap-ng-six-stig-two-product-preview-0.2",
         "status": "pre-alpha, not runtime scanner conformance or publisher trust",
         "source_release": SOURCE_TAG,
         "source_revision": SOURCE_REVISION,
@@ -242,8 +228,8 @@ def build(source: Path, output: Path, revision: str) -> None:
     (output / "SHA256SUMS.txt").write_text(
         "".join(f"{sha256(p)}  {p.name}\n" for p in files), encoding="utf-8",
     )
-    if len([x for x in output.glob("*-authoring.zip")]) != 7:
-        raise ValueError("Missing six authoring ZIPs or combined authoring ZIP")
+    if sorted(x.name for x in output.glob("*.zip")) != [combined]:
+        raise ValueError("Expected exactly one combined authoring ZIP")
     if len(list(output.glob("*.scapng"))) != 6:
         raise ValueError("Missing six scanning bundles")
     print(json.dumps(manifest, indent=2, sort_keys=True))
