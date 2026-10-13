@@ -32,7 +32,17 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           mkdir -p work/input
-          gh release download v0.3.0-shared-layout-preview-722251735685 \
+          # A separate six-STIG validation job produces this immutable input.
+          # Never consume or publish a preview until that upstream release exists.
+          tag="v0.3.0-shared-layout-preview-29591bda05ab"
+          for attempt in $(seq 1 120); do
+            if gh release view "$tag" >/dev/null 2>&1; then
+              break
+            fi
+            sleep 10
+          done
+          gh release view "$tag" >/dev/null
+          gh release download "$tag" \
             --pattern 'scap-ng-0.3-shared-layout-preview.zip' --dir work/input
           unzip -q work/input/scap-ng-0.3-shared-layout-preview.zip -d work/source
           test -d work/source/shared-layout-preview/authoring

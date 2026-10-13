@@ -33,8 +33,8 @@ BENCHMARKS = {
     "apache_server_2-4_unix_server": ("apache-unix-server", "Apache HTTP Server 2.4 (UNIX)"),
 }
 
-SOURCE_TAG = "v0.3.0-shared-layout-preview-722251735685"
-SOURCE_REVISION = "722251735685db11e2ae8c9c3ba68e89a29d723b"
+SOURCE_TAG = "v0.3.0-shared-layout-preview-29591bda05ab"
+SOURCE_REVISION = "29591bda05abb0006971268fca3e1b98b7d0f3f7"
 NIWC_REVISION = "8c8e5dff860af6b1290ee9273a282db24278f8d5"
 
 
@@ -81,6 +81,13 @@ def build(source: Path, output: Path, revision: str) -> None:
     if actual != set(BENCHMARKS):
         raise ValueError(f"Incorrect six-benchmark set: {actual}")
     output.mkdir(parents=True, exist_ok=True)
+    # Fail closed on the old DoD-ambiguous folder and duplicated OS prefix.
+    for path in (source / "shared" / "assessments").rglob("*.assessment.yaml"):
+        rel = path.relative_to(source / "shared" / "assessments")
+        if "unclassified" in rel.parts:
+            raise ValueError(f"Deprecated shared folder in source: {rel}")
+        if rel.parts[0] == "linux" and path.name.startswith("linux-"):
+            raise ValueError(f"Redundant Linux filename prefix: {rel}")
     validation = validate_normalized_repository(source)
     if validation["unresolved_rule_references"] or validation["assessment_identity_conflicts"]:
         raise ValueError(f"Invalid source references: {validation}")
@@ -115,6 +122,14 @@ def build(source: Path, output: Path, revision: str) -> None:
         with zipfile.ZipFile(original) as zf:
             manifest = json.loads(zf.read("META-INF/manifest.json"))
         manifest_objects = manifest["objects"]
+        for identity, record in manifest_objects.items():
+            member = record["path"]
+            if "unclassified" in member.split("/"):
+                raise ValueError(f"Deprecated classification in {key}: {member}")
+            if (identity.startswith("ng.shared.")
+                    and record["type"] == "assessment"
+                    and not member.startswith("assessments/shared/")):
+                raise ValueError(f"Shared Assessment outside shared package directory: {member}")
         if manifest["benchmark_id"] != f"benchmark.{key}":
             raise ValueError(f"Compiled Benchmark ID changed for {key}")
 
