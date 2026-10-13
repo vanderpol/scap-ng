@@ -21,8 +21,9 @@ import yaml
 
 
 KEYS = {
-    "rhel9", "oracle-linux9", "windows11", "windows-server-2025",
-    "apache-unix-server", "windows-server-dns",
+    "rhel_9", "oracle_linux_9", "ms_windows_11",
+    "ms_windows_server_2025", "apache_server_2-4_unix_server",
+    "ms_windows_server_dns",
 }
 
 
