@@ -53,6 +53,26 @@ jobs:
           families=collections.Counter(c.split(".")[0] for z in odd for c in z["capabilities"])
           linuxnames=[z for z in odd if z["path"].split("/")[-1].startswith("linux-")]
           payload={"total":len(out),"buckets":dict(buckets),"suspect_files":len([z for z in odd if z["path"].startswith("unclassified/files/")]),"suspect_total":len(odd),"suspect_linux_names":len(linuxnames),"suspect_capability_families":dict(families),"suspect_capabilities":dict(counters),"sample":odd[:35],"linux_samples":linuxnames[:25]}
+          consumers=collections.defaultdict(set)
+          for rule_path in Path("work/source/authoring").rglob("*.rule.yaml"):
+              doc=yaml.safe_load(rule_path.read_text()) or {}
+              rule=doc.get("rule") or {}
+              benchmark=rule_path.parent.parent.name
+              for choice in (rule.get("assessment_choices") or {}).values():
+                  if not isinstance(choice,dict) or not isinstance(choice.get("assessment"),str):continue
+                  target=(rule_path.parent / choice["assessment"]).resolve()
+                  if target.is_relative_to(root.resolve()):
+                      consumers[target.relative_to(root.resolve()).as_posix()].add(benchmark)
+          grouped=collections.defaultdict(collections.Counter)
+          missing=[]
+          for x in odd:
+              uses=sorted(consumers.get(x["path"],set()))
+              if not uses:missing.append(x["path"])
+              key="+".join(uses) if uses else "(no-rule-consumers)"
+              grouped[x["path"].split("/")[1]][key]+=1
+          payload["suspect_consumer_groups"]={k:dict(v) for k,v in grouped.items()}
+          payload["suspect_missing_consumers"] = missing[:25]
+          payload["sample_with_consumers"] = [{**x,"consumers":sorted(consumers.get(x["path"],set()))} for x in odd[:45]]
           print(json.dumps(payload,indent=2))
           Path("work/classification-audit.json").write_text(json.dumps(payload,indent=2)+"\n")
           PY
