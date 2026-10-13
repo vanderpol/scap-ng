@@ -1,0 +1,111 @@
+name: Publish verified six-STIG authoring and scanning downloads (#216)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-verified-six-stig-downloads.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish previously verified artifact without rebuilding
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download already-green six-STIG ZIPs and compiled packages
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: 38422154466
+          name: six-stig-separate-authoring-scanning-preview
+          github-token: ${{ github.token }}
+          path: publish
+      - name: Validate source provenance, checksums and release contents
+        run: |
+          cd publish
+          sha256sum --check SHA256SUMS.txt
+          python - <<'PY'
+          import json, zipfile
+          from pathlib import Path
+          root=Path(".")
+          manifest=json.loads(Path("DOWNLOADS.json").read_text())
+          assert manifest["source_revision"] == "29591bda05abb0006971268fca3e1b98b7d0f3f7"
+          assert manifest["build_revision"] == "32e423c38c1a126b4a4cc9213dcc663efd689984"
+          assert len(manifest["benchmarks"])==6
+          assert len(list(root.glob("*.scapng")))==6
+          assert len(list(root.glob("*-authoring.zip")))==7
+          for key,row in manifest["benchmarks"].items():
+              assert (root/row["authoring_file"]).is_file(), key
+              assert (root/row["scanning_file"]).is_file(), key
+              assert row["compiled_bundle_signed"] is False, key
+          for path in sorted(root.glob("*.zip")):
+              with zipfile.ZipFile(path) as zf:
+                  assert zf.testzip() is None, path
+                  paths=zf.namelist()
+                  assert not any("/unclassified/" in n for n in paths), path
+                  assert not any("candidate-authoring/" in n or "faithful-authoring/" in n for n in paths), path
+                  assert not any("/shared/assessments/linux/linux-" in n for n in paths), path
+          for path in sorted(root.glob("*.scapng")):
+              with zipfile.ZipFile(path) as zf:
+                  assert zf.testzip() is None, path
+                  manifest=json.loads(zf.read("META-INF/manifest.json"))
+                  for ident,row in manifest["objects"].items():
+                      if row["type"]=="assessment" and ident.startswith("ng.shared."):
+                          assert row["path"].startswith("assessments/shared/"), (path,ident,row["path"])
+                      assert "/unclassified/" not in row["path"]
+          print("Validated six distinct unsigned scanner packages and seven clean authoring archives")
+          PY
+      - name: Publish durable prerelease using default-branch target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # GitHub's release API requires additional workflow-write permission
+          # when target_commitish is an older commit whose workflow files
+          # differ from default branch. GITHUB_TOKEN cannot get that scope.
+          # Tag *current default branch*; pin validated build/input SHA in
+          # DOWNLOADS.json and release notes (never rebuild/relabel content).
+          tag="v0.3.0-verified-authoring-and-bundles-38422154466"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Refusing to overwrite existing durable release: $tag"
+            exit 1
+          fi
+          cat > publish/RELEASE-NOTES.md <<'EOF'
+          # SCAP-NG 0.3 — corrected six-STIG authoring and compiled bundles
+
+          **Download types:** six per-STIG modernized authoring ZIPs, six
+          separate compiled .scapng bundles, and one combined authoring ZIP.
+          Checksums and provenance are in SHA256SUMS.txt and DOWNLOADS.json.
+
+          This is content validated in workflow run 38422154466, originally
+          from SCAP-NG authoring source 29591bda05abb0006971268fca3e1b98b7d0f3f7,
+          built by 32e423c38c1a126b4a4cc9213dcc663efd689984,
+          NIWC source 8c8e5dff860af6b1290ee9273a282db24278f8d5.
+          The release tag targets the default branch at *publication* as
+          required by GitHub workflow-auth restrictions; that tag target does
+          not supersede the content build revisions above.
+
+          Shared Assessments use OS-family/subject paths in authoring and
+          assessments/shared/<family>/<subject>/ in compiled package ZIPs.
+          No legacy 'faithful'/'candidate' duplicate authoring trees.
+          Original release assets and the root README are unchanged.
+
+          These bundles are **unsigned pre-alpha scanner-format examples**,
+          not DISA-issued or publisher-trusted compliance content; compilation
+          and integrity verification do not demonstrate scanner conformance.
+          EOF
+          gh release create "$tag" \
+            --target main \
+            --title "SCAP-NG 0.3 — corrected authoring and scanning content" \
+            --notes-file publish/RELEASE-NOTES.md \
+            --prerelease \
+            publish/*.zip publish/*.scapng \
+            publish/DOWNLOADS.json publish/SHA256SUMS.txt
+          gh release view "$tag" --json url,assets,tagName --jq '{url:.url,tag:.tagName,assets:[.assets[].name]}'
