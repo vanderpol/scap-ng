@@ -1,0 +1,63 @@
+name: Shared Assessment classification audit (issue 216)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/shared-assessment-classification-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Retrieve immutable six-STIG modernized authoring input
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-authoring-and-bundles-911e19576114 \
+            --pattern 'scap-ng-0.3-six-stig-authoring.zip' --dir work
+          unzip -q work/scap-ng-0.3-six-stig-authoring.zip -d work/source
+      - name: Explain family buckets by actual Test capability and source
+        run: |
+          python - <<'PY'
+          import json, collections
+          from pathlib import Path
+          import yaml
+          root=Path("work/source/authoring/shared/assessments")
+          out=[]
+          for path in sorted(root.rglob("*.assessment.yaml")):
+              doc=yaml.safe_load(path.read_text())["assessment"]
+              caps=[]
+              def walk(v):
+                  if isinstance(v,dict):
+                      if isinstance(v.get("capability"),str): caps.append(v["capability"])
+                      for x in v.values():walk(x)
+                  elif isinstance(v,list):
+                      for x in v:walk(x)
+              walk(doc)
+              out.append({"path":path.relative_to(root).as_posix(),"id":doc.get("id"),"title":doc.get("assessment_title"),"capabilities":sorted(set(caps)),"mode":doc.get("mode")})
+          buckets=collections.Counter("/".join(z["path"].split("/")[:2]) for z in out)
+          odd=[z for z in out if z["path"].startswith("unclassified/")]
+          counters=collections.Counter(c for z in odd for c in z["capabilities"])
+          families=collections.Counter(c.split(".")[0] for z in odd for c in z["capabilities"])
+          linuxnames=[z for z in odd if z["path"].split("/")[-1].startswith("linux-")]
+          payload={"total":len(out),"buckets":dict(buckets),"suspect_files":len([z for z in odd if z["path"].startswith("unclassified/files/")]),"suspect_total":len(odd),"suspect_linux_names":len(linuxnames),"suspect_capability_families":dict(families),"suspect_capabilities":dict(counters),"sample":odd[:35],"linux_samples":linuxnames[:25]}
+          print(json.dumps(payload,indent=2))
+          Path("work/classification-audit.json").write_text(json.dumps(payload,indent=2)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-assessment-classification-audit
+          path: work/classification-audit.json
+          retention-days: 90
