@@ -64,7 +64,7 @@ def classify(v, original):
     n = v["consumer_count"]
     contexts = v["consumer_contexts"]
     if n == 0:
-        return "retain_unreferenced_audit"
+        return "audit_unreferenced_provenance"
     if n > 1:
         return "retain_shared"
     if contexts.get("variable"):
@@ -96,7 +96,7 @@ def variable_rows(doc):
     for row in analyzed["rows"]:
         v = vars[row["variable_id"]]
         row = {**row, "category": classify(row, v)}
-        row["disposition"] = "candidate_research" if row["category"].startswith("candidate_") else "retain"
+        row["disposition"] = "candidate_research" if row["category"].startswith("candidate_") else ("audit" if row["category"].startswith("audit_") else "retain")
         yield row
 
 def fetch_oval(split, key, rid):
@@ -298,13 +298,13 @@ def run(args):
              f"Measured [the released six-STIG authoring archive](https://github.com/vanderpol/scap-ng/releases/tag/{RELEASE})",
              f"against pinned NIWC source revision `{PIN}`.", "",
              "### Six STIG variable classifications", "",
-             "| STIG | Variable uses | Candidate research | Retain |",
-             "|---|---:|---:|---:|"]
+             "| STIG | Variable uses | Candidate research | Retain named | Unreferenced audit |",
+             "|---|---:|---:|---:|---:|"]
     for key, title in BENCHMARKS.items():
         c = summary[key]
-        lines.append(f"| {title} | {c.get('variables',0)} | {c.get('candidate_research',0)} | {c.get('retain',0)} |")
+        lines.append(f"| {title} | {c.get('variables',0)} | {c.get('candidate_research',0)} | {c.get('retain',0)} | {c.get('audit',0)} |")
     lines += ["",
-              f"Total benchmark-variable uses: **{len(rows)}** (candidates: **{sum(r['disposition']=='candidate_research' for r in rows)}**, retain: **{sum(r['disposition']=='retain' for r in rows)}**).",
+              f"Total benchmark-variable uses: **{len(rows)}** (candidates: **{sum(r['disposition']=='candidate_research' for r in rows)}**, retain: **{sum(r['disposition']=='retain' for r in rows)}**, unreferenced audit: **{sum(r['disposition']=='audit' for r in rows)}**).",
               f"Unique Variable definitions across all six (deduplicate shared Assessments): **{len(unique)}**.",
               "",
               "Breakdown by reason is in `STATS.json`; every classified occurrence is in `ALL-VARIABLES.csv`.",
