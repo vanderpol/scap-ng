@@ -147,6 +147,8 @@ The current [0.3 Benchmark Result fixture](0.3.0/results/benchmark-result.json) 
 }
 ```
 
+The `datatype` fields in this JSON finding are **intentional**: this is a Result, recording the expected comparison type and observed collected-value type. Removing redundant scalar datatypes from **authored 0.3 Assessment YAML** does **not** remove typed evidence from Results or canonical scanner packages. For example, `owner_uid` is an integer comparison even when a collector on another platform reports a text-encoded numeric value; casting and errors remain explicit.
+
 The typed observed-versus-expected finding is **already inside the Benchmark Result**; readers need not open any additional file to see the essential cause. The full fixture also shows the Rule title, severity, check selection, applicability, execution instances, and references to supporting Assessment Results. For complete Test/State/Item execution detail, see [Assessment Results that explain the root cause](assessments.md#after-scanning-assessment-results-that-explain-why).
 
 ### How Scan, Benchmark, and Assessment Results fit together
