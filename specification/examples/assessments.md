@@ -173,6 +173,46 @@ The Assessment checks whether `gnome-shell` is installed using `linux.rpminfo` o
 
 SCAP-NG keeps familiar OVAL concepts (Test, Object, State, Variable, Item) but puts them where readers need them. Each short example is source-derived; see the [modernization review guide](../../review/current/REVIEW-GUIDE.md) for full before/after files.
 
+### Datatype simplification: less code, unchanged comparison meaning
+
+**SCAP 1.4:** Each OVAL State entity declares a datatype and comparison
+operation. **SCAP-NG 0.3:** An ordinary numeric, Boolean or string comparison
+can use its native YAML value type. Only a genuinely specialized comparison
+needs a descriptive typed operator.
+
+For example, the real Apache STIG Rule **SV-214273** compares an Apache
+version. The same expected value now reads:
+
+```yaml
+# Existing fully typed 0.3 form (also still accepted)
+value: '2.4'
+operation: greater_than_or_equal
+datatype: version
+```
+
+```yaml
+# New concise 0.3 authoring form
+value: '2.4'
+operation: version_greater_than_or_equal
+```
+
+**What changes?** Only the source syntax. The 0.3 compiler reconstructs the
+original explicit `datatype: version` and `operation: greater_than_or_equal`
+before capability validation and bundle creation. Regular comparisons such
+as `value: 10` / `operation: greater_than_or_equal` omit datatype entirely.
+Unresolved Variable/Input contracts, arrays and ambiguous comparisons
+remain explicitly typed. There is no author-facing `compare_as` field.
+
+In the six-STIG authoring corpus, **4,532 of 5,267 datatype declarations
+(86.0%)** were structurally eligible for this conservative source-only
+simplification; **735 remain explicit**. These are authored occurrence
+counts, not unique STIG Rules or runtime benchmarks. [Implementation and
+conformance tracker #200](https://github.com/vanderpol/scap-ng/issues/200).
+The ongoing release gate compares all six compiled bundles byte-for-byte
+between the old and new source forms; this must pass before describing a
+published package as compiler-equivalent. Full OVAL 5.12.3 runtime
+equivalence remains a separate independent validation requirement.
+
 ### Consumer-local components and shared Objects
 
 **SCAP 1.4:** Even private Objects/States live in separate registries. **SCAP-NG 0.3:** Keep the private parts with the Test, while preserving named acquisitions when they are genuinely referenced.
