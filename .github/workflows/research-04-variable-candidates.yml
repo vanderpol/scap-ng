@@ -88,7 +88,7 @@ jobs:
           assert stats['benchmark_usage_count']>0
           assert stats['unique_variable_definitions']>0
           assert sum(v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())==stats['benchmark_usage_count']
-          assert all(v.get('candidate_research',0)+v.get('retain',0)==v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())
+          assert all(v.get('candidate_research',0)+v.get('retain',0)+v.get('audit',0)==v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())
           assert stats['examples'] and len(stats['examples'])<=18
           for item in stats['examples']:
               folder=root/item['folder']
@@ -111,6 +111,7 @@ jobs:
           print('VARIABLE_USE_COUNTS=',stats['benchmark_usage_count'])
           print('CANDIDATE_COUNTS=',sum(v.get('candidate_research',0) for v in stats['six_benchmark_use_counts'].values()))
           print('RETAIN_COUNTS=',sum(v.get('retain',0) for v in stats['six_benchmark_use_counts'].values()))
+          print('UNREFERENCED_AUDIT_COUNTS=',sum(v.get('audit',0) for v in stats['six_benchmark_use_counts'].values()))
           print('ZIP_SHA256=',hashlib.sha256(z.read_bytes()).hexdigest())
           PY
       - uses: actions/upload-artifact@v4
