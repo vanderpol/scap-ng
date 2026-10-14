@@ -53,6 +53,14 @@ proposals are not listed as delivered features.
   references by logical ID at compilation; transitional source-path support
   remains for imported content. [#199](https://github.com/vanderpol/scap-ng/issues/199)
 - Removed redundant `assessment_choices.default` from native 0.3 Rules; the required `default_assessment_choice` now names the actual publisher check, preserving Tailoring selection and manual-only checks. Frozen 0.2.0 is unchanged. [#217](https://github.com/vanderpol/scap-ng/issues/217)
+- Added owner-approved 0.3 concise datatype authoring: native scalar literals
+  omit redundant comparison types; specialized OVAL comparisons use explicit
+  typed operators such as `version_greater_than_or_equal`, never `compare_as`.
+  The compiler reconstructs canonical typed predicates before existing
+  capability/schema validation and scanner bundle emission; variable/input
+  contracts stay typed. Historical 0.2 is unchanged. Source-only six-STIG
+  parity and separate OVAL runtime conformance remain explicit checkpoints.
+  [#200](https://github.com/vanderpol/scap-ng/issues/200)
 - Added typed compact Rule Result findings and Test-centered bounded
   Assessment evidence without claiming actual scanner results.
   [#203](https://github.com/vanderpol/scap-ng/issues/203) [#205](https://github.com/vanderpol/scap-ng/issues/205)
