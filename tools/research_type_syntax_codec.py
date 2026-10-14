@@ -91,7 +91,7 @@ def _validate_typed_comparison(node, path):
             f"{path}: float literal cannot be {inferred}; "
             "special float representation unresolved"
         )
-    if datatype in SPECIAL_TYPES and inferred != "string":
+    if datatype in SPECIAL_TYPES - {"float"} and inferred != "string":
         raise TypeSyntaxError(f"{path}: {datatype} requires a string scalar")
     if datatype == "record":
         raise TypeSyntaxError(f"{path}: record must be a typed structure")
