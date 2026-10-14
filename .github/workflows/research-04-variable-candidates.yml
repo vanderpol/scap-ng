@@ -9,6 +9,9 @@ on:
       - tools/research_04_variable_census.py
       - tools/validate_research_04_pairs.py
       - tools/test_validate_research_04_pairs.py
+      - tools/research_04_self_contained_inline.py
+      - tools/test_research_04_self_contained_inline.py
+      - tools/enrich_research_04.py
 
 permissions:
   contents: write
@@ -44,6 +47,7 @@ jobs:
       - name: Test research presentation-round-trip rejection rules
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_validate_research_04_pairs.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_self_contained_inline.py -v
       - name: Download exact six-STIG 0.3 authoring baseline
         env:
           GH_TOKEN: ${{ github.token }}
@@ -82,6 +86,10 @@ jobs:
             --split-root work/split \
             --output work/research/scap-ng-0.4-variable-research \
             --max-examples 18
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/enrich_research_04.py \
+            --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
+            --study work/research/scap-ng-0.4-variable-research \
+            --split-root work/split
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_research_04_pairs.py \
             work/research/scap-ng-0.4-variable-research \
             > work/research/scap-ng-0.4-variable-research/VERIFICATION.json
@@ -97,12 +105,21 @@ jobs:
           assert stats['unique_variable_definitions']>0
           assert sum(v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())==stats['benchmark_usage_count']
           assert all(v.get('candidate_research',0)+v.get('retain',0)+v.get('audit',0)==v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())
-          assert stats['examples'] and len(stats['examples'])<=18
+          assert stats['examples'] and len(stats['examples'])==20
+          syntactic=json.loads((root/'SELF-CONTAINED-STATS.json').read_text())
+          assert syntactic['structural_proofs']>0
+          assert syntactic['proofs_by_type'].get('object',0)>0
+          assert syntactic['proofs_by_type'].get('variable',0)>0
+          assert syntactic['object_source_examples']==2
+          assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
           assert verification['source_pairs']==len(stats['examples'])
           assert verification['presentation_round_trips_with_original_witness']>0
           assert verification['runtime_semantic_equivalence_proven'] is False
-          assert verification['self_contained_compiler_lowering_proven'] is False
+          assert verification['self_contained_compiler_lowering_proven'] is True
+          assert verification['self_contained_lowering_is_structural_only'] is True
+          assert verification['independently_lowerable_examples']>=2
+          assert verification['independently_lowerable_object_examples']==2
           for item in stats['examples']:
               folder=root/item['folder']
               assert (folder/'original-1.4.oval.xml').is_file()
@@ -122,6 +139,8 @@ jobs:
               assert archive.testzip() is None
           print('PAIRED_OVAL_CASES_VERIFIED=',len(stats['examples']))
           print('RESEARCH_SKETCH_ROUND_TRIPS=',verification['presentation_round_trips_with_original_witness'])
+          print('INDEPENDENT_STRUCTURAL_PROOFS=',syntactic['structural_proofs'])
+          print('INDEPENDENT_LOWERING_EXAMPLES=',verification['independently_lowerable_examples'])
           print('VARIABLE_USE_COUNTS=',stats['benchmark_usage_count'])
           print('CANDIDATE_COUNTS=',sum(v.get('candidate_research',0) for v in stats['six_benchmark_use_counts'].values()))
           print('RETAIN_COUNTS=',sum(v.get('retain',0) for v in stats['six_benchmark_use_counts'].values()))
@@ -175,7 +194,8 @@ jobs:
             echo "Full category counts: STATS.json; every Variable: ALL-VARIABLES.csv."
             echo "Named Object nesting candidates: NAMED-OBJECTS.csv."
             echo "All examples include original-1.4.oval.xml next to current-0.3.assessment.yaml."
-            echo "VERIFICATION.json reports presentation-only round trips using the original 0.3 file as witness; no runtime parity or independent compiler lowering has been proven."
+            echo "VERIFICATION.json distinguishes older witness-based sketches from self-contained independently lowerable private declarations."
+            echo "SELF-CONTAINED-STATS.json reports corpus proofs, refusals, per-STIG chain counts and YAML nesting/size effects; OVAL/scanner runtime parity is NOT claimed."
             echo
             echo "This is a research classification, NOT validation of the proposed 0.4 syntax or execution equivalence."
           } > work/issue-summary.md
