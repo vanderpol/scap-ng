@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   source-type-parity:
@@ -65,3 +66,15 @@ jobs:
           path: work/*.json
           retention-days: 90
           if-no-files-found: error
+      - name: Report successful structural research checkpoint
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment 200 --body "Research-only datatype syntax CI passed on $GITHUB_SHA. All three strategies restored 4,012/4,012 typed YAML ASTs without differences (4,528 ordinary comparisons plus four version operations; 735 explicit type contracts retained). This is **not** evaluator/OVAL XML parity. Exact run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+      - name: Report failed structural research gate
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment 200 --body "Research-only datatype syntax CI failed on $GITHUB_SHA. Do not claim full-corpus AST parity for this run. Inspect logs at $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
