@@ -1,7 +1,11 @@
-name: Verify manual paste of Discussion 213 (read-only)
+name: Audit canonical Discussion 213 terminology (read-only)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-assessment-vocabulary-shared.yml
 
 permissions:
   contents: read
@@ -31,4 +35,29 @@ jobs:
             }
             core.info('VOTE_COMMENTS_PRESERVED '+d.comments.totalCount);
             core.info('COMMENT_REACTIONS '+d.comments.nodes.reduce((n,c)=>n+c.reactions.totalCount,0));
+            const post=d.body;
+            const cStart=post.indexOf('## C — Inspection-oriented');
+            const next=post.indexOf('\n---',cStart);
+            if(cStart<0)throw Error('Missing Option C');
+            const cText=post.slice(cStart,next>=0?next:undefined);
+            const code=cText.match(/```yaml\n([\s\S]*?)\n```/);
+            if(!code)throw Error('No Option C fenced YAML');
+            const yaml=code[1];
+            const columnChecks={
+              item_match: /\n    items:\n      existence: one_or_more\n      match: all(?:\n|$)/.test(yaml),
+              field_match: /\n        field_values:\n          existence: one_or_more\n          match: one_or_more(?:\n|$)/.test(yaml),
+              no_satisfy_token: !/\bsatisfy\s*:/.test(yaml),
+              b_named_checks: /## B — Ansible-inspired/.test(post) && /checks:\n  home-mounted-nosuid-option-check:/.test(post),
+              b_explicit_evaluate: /evaluate:\n  any:\n    - all:/.test(post),
+              shared_acquisition_preserved: /## Named shared acquisition/.test(post),
+            };
+            core.info('DISCUSSION_213_C_YAML_BEGIN\n'+yaml+'\nDISCUSSION_213_C_YAML_END');
+            core.info('DISCUSSION_213_INSPECTION_AUDIT '+JSON.stringify(columnChecks));
+            const glossary=post.split('\n').filter(x=>x.startsWith('| ') && (x.includes('Require Items')||x.includes('Require field instances')||x.includes('Choose / combine technical')));
+            core.info('DISCUSSION_213_VOCABULARY_TABLE '+JSON.stringify(glossary));
+            const stale=post.split('\n').filter(x=>/\bsatisfy\b|items\.satisfy|field_values\.satisfy/i.test(x));
+            core.info('DISCUSSION_213_REMAINING_SATISFY_REFERENCES '+JSON.stringify(stale));
+            if(!columnChecks.item_match||!columnChecks.field_match||!columnChecks.no_satisfy_token)
+              core.warning('Option C changed incompletely: inspect item and field-value match keys');
+            if(stale.length)core.warning('The prose or table still refers to satisfy; consider consistent documentation update');
             core.info('REPLIES '+d.comments.nodes.reduce((n,c)=>n+c.replies.totalCount,0));
