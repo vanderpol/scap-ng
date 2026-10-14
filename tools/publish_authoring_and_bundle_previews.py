@@ -21,6 +21,7 @@ import yaml
 
 from scap_ng_content_compiler import compile_benchmark, verify_bundle
 from scap_ng_repo_normalizer import validate_normalized_repository
+from curate_native_authoring_zip import ENGINEERING_SIDECARS, native_yaml
 
 
 # Public names are presentation aliases, not Assessment, Benchmark, or Rule IDs.
@@ -53,6 +54,12 @@ def write_archive(output: Path, root: Path, *, top: str | None = None) -> None:
             if path.name == "CANDIDATE-STATUS.md":
                 continue
             rel = path.relative_to(root)
+            # Native source only. Engineering evidence is retained by CI, not
+            # duplicated in a Board-facing content authoring download.
+            if rel.as_posix() != "README.md" and not native_yaml(rel.as_posix()):
+                if rel.parts[0] == "authoring" and rel.name in ENGINEERING_SIDECARS:
+                    continue
+                raise ValueError(f"Unexpected non-native authoring file: {rel}")
             arcname = (Path(top) / rel).as_posix() if top else rel.as_posix()
             if any(part in {"faithful-authoring", "candidate-authoring"} for part in rel.parts):
                 raise ValueError(f"Research-stage tree must not be distributed: {rel}")
@@ -69,6 +76,9 @@ def check_archive(output: Path, expected: list[str] | None = None) -> None:
         names = zf.namelist()
         if any("faithful-authoring" in n or "candidate-authoring" in n or "CANDIDATE-STATUS" in n for n in names):
             raise ValueError(f"Legacy review-stage names leaked: {output}")
+        invalid = [n for n in names if n != "README.md" and not native_yaml(n)]
+        if invalid:
+            raise ValueError(f"Non-native authoring files leaked into {output}: {invalid[:12]}")
         for name in expected or []:
             if name not in names:
                 raise ValueError(f"Missing {name} in {output}")
