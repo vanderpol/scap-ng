@@ -56,11 +56,13 @@ def module_from_assessment(doc):
     a=doc["assessment"]
     objects=a.get("objects") or {}
     variables=a.get("variables") or {}
-    if not all(n in objects for n in CORE_OBJECTS):
-        raise ValueError("Missing complete Apache source Object graph")
+    # Published 0.3 has localized former top-level Objects beneath their
+    # consuming Tests/Objects. Do not recreate the obsolete 0.2 layout.
+    # Import only *actually named* source Objects and the surviving Variable
+    # chain; preserve all local Objects in each consuming Assessment.
     if not all(n in variables for n in CORE_VARIABLES):
-        raise ValueError("Missing complete Apache source Variable graph")
-    selected_objects={n:deepcopy(objects[n]) for n in CORE_OBJECTS}
+        raise ValueError("Missing complete Apache Variable derivation chain")
+    selected_objects={n:deepcopy(objects[n]) for n in CORE_OBJECTS if n in objects}
     selected_variables={n:deepcopy(variables[n]) for n in CORE_VARIABLES}
     for n,payload in selected_objects.items():
         for ref,loc in extract_refs(payload,"objects"):
@@ -76,6 +78,23 @@ def module_from_assessment(doc):
         for ref,loc in extract_refs(payload,"objects"):
             if ref in objects and ref not in selected_objects:
                 raise ValueError(f"Graph not source-closed: Variable {n} -> {ref}")
+    # These are REQUIRED source bindings in the importing Assessment, not
+    # automatically shared runtime collections. Their declarations remain
+    # assessment-local, and the expanded 0.3 graph is exactly preserved.
+    required_objects=sorted({
+        ref for payload in selected_variables.values()
+        for ref,loc in extract_refs(payload,"objects")
+        if ref not in selected_objects
+    })
+    required_variables=sorted({
+        ref for payload in selected_variables.values()
+        for ref,loc in extract_refs(payload,"variables")
+        if ref not in selected_variables
+    })
+    # Nonlocal Variable graph references are not justified by the proof.
+    if required_variables:
+        raise ValueError("External Variable input dependencies need typed binders: "
+                         + repr(required_variables))
     exports={}
     for source,alias in EXPORTS.items():
         v=selected_variables[source]
@@ -86,6 +105,7 @@ def module_from_assessment(doc):
         "id":MODULE_ID, "version":MODULE_VERSION,
         "objects":selected_objects,
         "variables":selected_variables,
+        "requires":{"objects":required_objects},
         "exports":exports,
     }}
 
@@ -94,8 +114,16 @@ def validated_module(module):
     if not isinstance(module,dict) or set(module)!={"source_module"}:
         raise ValueError("Invalid source module root")
     source=module["source_module"]
-    if not isinstance(source,dict) or set(source)!={"id","version","objects","variables","exports"}:
+    if (not isinstance(source,dict) or set(source) not in (
+          {"id","version","objects","variables","exports"},
+          {"id","version","objects","variables","requires","exports"})):
         raise ValueError("Unexpected source module fields")
+    requires=source.get("requires",{"objects":[]})
+    if (not isinstance(requires,dict) or set(requires)!={"objects"} or
+        not isinstance(requires["objects"],list) or
+        any(not isinstance(x,str) or not x for x in requires["objects"]) or
+        len(set(requires["objects"]))!=len(requires["objects"])):
+        raise ValueError("Invalid required source Object bindings")
     if source["id"]!=MODULE_ID or source["version"]!=MODULE_VERSION:
         raise ValueError("Source module identity/version mismatch")
     objs=source["objects"]; vars=source["variables"]
@@ -239,7 +267,7 @@ def run(zip_path, study):
             })
         print("APACHE_CURRENT_RELEASE_LAYOUT="+json.dumps(
             sorted(counts,key=lambda x:-x["variables"])[:4],sort_keys=True))
-        raise ValueError("Legacy 4-Object+11-Variable publisher graph does not exist in the published 0.3 layout; inspect current 0.3 inventory")
+        raise ValueError("No repeated Apache Variable module safely extracted from the current released 0.3 layout")
     groups={}
     for path,doc,module in candidates:
         groups.setdefault(sha(module),[]).append((path,doc,module))
@@ -276,6 +304,7 @@ def run(zip_path, study):
         "source_bundle_sha256":sha(module),
         "module_objects":len(module["source_module"]["objects"]),
         "module_variables":len(module["source_module"]["variables"]),
+        "required_assessment_local_object_sources":module["source_module"].get("requires",{}).get("objects",[]),
         "public_exports":module["source_module"]["exports"],
         "identical_graph_candidates":len(chosen),
         "safe_exact_roundtrip_consumers":len(extracted),
