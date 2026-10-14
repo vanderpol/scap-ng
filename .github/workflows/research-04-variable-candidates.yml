@@ -19,6 +19,7 @@ on:
       - tools/test_research_04_apache_source_import.py
       - tools/research_04_variable_debug_trace.py
       - tools/test_research_04_variable_debug_trace.py
+      - research/assessment-simplification/variable-readability-04/BOARD-DESIGN-OPTIONS.md
 
 permissions:
   contents: write
@@ -112,6 +113,8 @@ jobs:
             --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_board_preview.py \
             --study work/research/scap-ng-0.4-variable-research
+          cp scap-ng/research/assessment-simplification/variable-readability-04/BOARD-DESIGN-OPTIONS.md \
+            work/research/scap-ng-0.4-variable-research/BOARD-DESIGN-OPTIONS.md
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_research_04_pairs.py \
             work/research/scap-ng-0.4-variable-research \
             > work/research/scap-ng-0.4-variable-research/VERIFICATION.json
@@ -139,6 +142,7 @@ jobs:
           assert patterns['apache_exact_named_payload_duplicate_groups']>0
           assert patterns['apache_complete_closed_graph_duplicate_groups']>=0
           assert (root/'BOARD-RESEARCH-PREVIEW.md').is_file()
+          assert (root/'BOARD-DESIGN-OPTIONS.md').is_file()
           source_import=json.loads((root/'BUILD-TIME-IMPORT/RESULTS.json').read_text())
           assert source_import['safe_exact_roundtrip_consumers']>=3
           assert source_import['runtime_semantics_modified'] is False
