@@ -1,0 +1,67 @@
+name: Datatype authoring reversible prototype (#200)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/research_type_syntax_codec.py
+      - tools/test_research_type_syntax_codec.py
+      - .github/workflows/research-datatype-authoring-prototype.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-type-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Independently authored datatype expectations and rejection cases
+        run: python -m unittest discover -s tools -p test_research_type_syntax_codec.py -v
+      - name: Download exact pinned six-STIG native authoring ZIP
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          gh release download v0.3.0-six-stig-default-choice-af635ecf0255 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern scap-ng-0.3-six-stig-authoring.zip \
+            --dir work
+          echo '8dfbcf35d2fe61a370e6929d9a6399952e95150b0c37d7eaf7eef9e2a89cff3e  work/scap-ng-0.3-six-stig-authoring.zip' | sha256sum --check
+      - name: Compare three authoring syntax strategies against complete native typed AST
+        run: |
+          set -euo pipefail
+          for strategy in hybrid typed-operators compare-as; do
+            python tools/research_type_syntax_codec.py \
+              work/scap-ng-0.3-six-stig-authoring.zip \
+              --strategy "$strategy" --report "work/$strategy.json"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for strategy in ('hybrid','typed-operators','compare-as'):
+              report=json.loads(Path(f'work/{strategy}.json').read_text())
+              assert report['roundtrip_mismatches']==0,report
+              assert report['documents_by_kind']=={
+                  'assessment':2433,'rule':1567,'benchmark':6,'applicability':6
+              }, report
+              c=report['counts']
+              assert c['inferred_scalar']==4528,c
+              assert c['retained_noncomparison_type']==623,c
+              assert c['retained_dynamic_or_collection_type']==112,c
+              assert c.get('typed_operator',0)+c.get('explicit_compare_as',0)==4,c
+          print('PASS: all 4,012 document ASTs recovered under three strategies')
+          PY
+      - name: Preserve research evidence; no publication or schema mutation
+        uses: actions/upload-artifact@v4
+        with:
+          name: datatype-syntax-structural-parity
+          path: work/*.json
+          retention-days: 90
+          if-no-files-found: error
