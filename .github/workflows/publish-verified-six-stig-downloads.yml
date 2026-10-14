@@ -31,6 +31,12 @@ jobs:
         run: |
           cd publish
           sha256sum --check SHA256SUMS.txt
+          # Repackage the already-verified source without changing one YAML byte.
+          # Original audit/evidence sidecars stay in pinned Actions run 38422154466.
+          python ../tools/curate_native_authoring_zip.py \
+            scap-ng-0.3-six-stig-authoring.zip \
+            scap-ng-0.3-six-stig-authoring.clean.zip --expected-yaml 4012
+          mv scap-ng-0.3-six-stig-authoring.clean.zip scap-ng-0.3-six-stig-authoring.zip
           python - <<'PY'
           import hashlib
           import json
@@ -77,6 +83,9 @@ jobs:
               assert all("authoring/" + key + "/benchmark.yaml" in names for key in expected_benchmarks)
               assert any(p.startswith("authoring/shared/assessments/linux/") for p in names)
               assert any(p.startswith("authoring/shared/assessments/windows/") for p in names)
+              assert len([n for n in names if n.endswith(".yaml")]) == 4012
+              assert set(n for n in names if not n.endswith(".yaml")) == {"README.md"}
+              assert not any("evidence" in n or "provenance.json" in n or "source-generation.json" in n for n in names)
 
           for p in sorted(root.glob("*.scapng")):
               with zipfile.ZipFile(p) as zf:
@@ -95,7 +104,7 @@ jobs:
           manifest.pop("source_release", None)  # That intermediate preview was not published.
           manifest["source_validation_run"] = 38420025845
           manifest["compilation_validation_run"] = 38422154466
-          manifest["format"] = "scap-ng-six-stig-one-authoring-six-bundles-preview-0.1"
+          manifest["format"] = "scap-ng-six-stig-one-clean-authoring-six-bundles-preview-0.2"
           manifest["distribution"] = {
               "authoring_zip_count": 1,
               "compiled_scanning_bundle_count": 6,
@@ -119,22 +128,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          tag="v0.3.0-six-stig-authoring-plus-scanning-38422154466"
+          tag="v0.3.0-six-stig-clean-authoring-38422154466"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "::error::Refusing to overwrite existing release $tag"
             exit 1
           fi
           cat > publish/RELEASE-NOTES.md <<'EOF'
-          # SCAP-NG 0.3: one authoring ZIP + six compiled STIG packages
+          # SCAP-NG 0.3: clean native authoring ZIP + six compiled STIG packages
 
           **Authoring:** one combined ZIP containing six modernized native
           authoring trees, their reusable shared Assessments, and documentation.
+          No converter evidence, source-generation, grouping provenance or Rule
+          audit JSON sidecars are included. Native YAML is unchanged.
 
           **Scanning:** six independent compiled .scapng packages, one for each
           RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025,
           Windows Server DNS, and Apache HTTP Server 2.4 (UNIX).
 
-          Only those seven content files are attached. DOWNLOADS.json and
+          Original 48 audit/evidence sidecars remain available in the pinned
+          engineering build artifact, not the authoring distribution.
+          Only seven content files are attached. DOWNLOADS.json and
           SHA256SUMS.txt provide provenance and checksums.
 
           Validated SCAP-NG authoring source:
@@ -155,7 +168,7 @@ jobs:
           EOF
           gh release create "$tag" \
             --target main \
-            --title "SCAP-NG 0.3 — one authoring ZIP + six compiled STIG bundles" \
+            --title "SCAP-NG 0.3 — native-only authoring ZIP + six compiled STIG bundles" \
             --notes-file publish/RELEASE-NOTES.md \
             --prerelease \
             publish/scap-ng-0.3-six-stig-authoring.zip \
