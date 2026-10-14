@@ -173,5 +173,82 @@ class CodecTests(unittest.TestCase):
                     )
 
 
+class ActualOVALMappingBoundaryTests(unittest.TestCase):
+    """Exercise the repository's actual OVAL -> typed 0.3 predicate translator.
+
+    Inputs are small OVAL-like entity XML fragments. This is not a test
+    of full datastream parsing, Schematron, or host scan evaluation.
+    """
+
+    def source_predicate(self, xml):
+        import xml.etree.ElementTree as ET
+        from scap_upconvert_v003.native_capability_mapping import (
+            _native_scalar_predicate,
+        )
+        entity = ET.fromstring(xml)
+        payload = dict(entity.attrib)
+        payload["value"] = entity.text or ""
+        return _native_scalar_predicate(payload, {"specification_version": "0.3.0"})
+
+    def test_source_lexical_type_and_operation_restore(self):
+        cases = [
+            (
+                '<entity datatype="int" operation="greater than or equal">0010</entity>',
+                {"value": 10, "datatype": "integer", "operation": "greater_than_or_equal",
+                 "match": "all", "existence": "one_or_more"},
+            ),
+            (
+                '<entity datatype="boolean" operation="equals">1</entity>',
+                {"value": True, "datatype": "boolean", "operation": "equals",
+                 "match": "all", "existence": "one_or_more"},
+            ),
+            (
+                '<entity datatype="string" operation="equals">01</entity>',
+                {"value": "01", "datatype": "string", "operation": "equals",
+                 "match": "all", "existence": "one_or_more"},
+            ),
+            (
+                '<entity datatype="version" operation="greater than or equal">2.9</entity>',
+                {"value": "2.9", "datatype": "version",
+                 "operation": "greater_than_or_equal",
+                 "match": "all", "existence": "one_or_more"},
+            ),
+            (
+                '<entity datatype="evr_string" operation="less than">1:2.0-1</entity>',
+                {"value": "1:2.0-1", "datatype": "rpm_evr",
+                 "operation": "less_than", "match": "all",
+                 "existence": "one_or_more"},
+            ),
+            (
+                '<entity datatype="ipv4_address" operation="subset of">192.0.2.0/24</entity>',
+                {"value": "192.0.2.0/24", "datatype": "ipv4",
+                 "operation": "subset_of", "match": "all",
+                 "existence": "one_or_more"},
+            ),
+        ]
+        for xml, expected in cases:
+            with self.subTest(xml=xml):
+                actual = self.source_predicate(xml)
+                self.assertEqual(actual, expected)
+                for strategy in STRATEGIES:
+                    authored = to_authoring(actual, strategy)
+                    self.assertEqual(to_canonical(authored), expected)
+
+    def test_source_float_special_is_real_migration_representation_gap(self):
+        # OVAL common datatype supports INF; legacy mapping currently creates
+        # a nonfinite Python float. JSON-canonical SCAP-NG cannot store that
+        # value as an ordinary number. Never claim a silent conversion.
+        for lexical in ("INF", "-INF", "NaN"):
+            with self.subTest(lexical=lexical):
+                source = self.source_predicate(
+                    f'<entity datatype="float" operation="equals">{lexical}</entity>'
+                )
+                self.assertEqual(source["datatype"], "float")
+                with self.assertRaisesRegex(
+                    TypeSyntaxError, "special float representation unresolved"
+                ):
+                    to_authoring(source)
+
+
 if __name__ == "__main__":
     unittest.main()
