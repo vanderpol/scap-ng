@@ -16,6 +16,8 @@ from typing import Any
 
 import yaml
 
+from research_04_self_contained_inline import lower_inline
+
 
 def exact_variable_refs(value: Any, variable: str, path=()):
     if isinstance(value, dict):
@@ -88,15 +90,26 @@ def validate_pairs(root: Path) -> dict:
     stats = json.loads((root / "STATS.json").read_text(encoding="utf-8"))
     successes = 0
     retained = 0
+    independent = 0
+    object_examples = 0
     for row in stats["examples"]:
         folder = root / row["folder"]
         current_file = folder / "current-0.3.assessment.yaml"
         original_file = folder / "original-1.4.oval.xml"
         sketch_file = folder / "proposed-0.4.RESEARCH.yaml"
+        independent_file = folder / "proposed-0.4.SELF-CONTAINED.RESEARCH.yaml"
         if not (current_file.is_file() and original_file.is_file()):
             raise ValueError(f"missing source pair: {folder}")
         if hashlib.sha256(original_file.read_bytes()).hexdigest() != row["oval_sha256"]:
             raise ValueError(f"OVAL source checksum mismatch: {folder}")
+        if independent_file.exists():
+            current_doc = yaml.safe_load(current_file.read_text(encoding="utf-8"))
+            proposed_doc = yaml.safe_load(independent_file.read_text(encoding="utf-8"))
+            if lower_inline(proposed_doc) != current_doc:
+                raise ValueError(f"self-contained lowering mismatch: {folder}")
+            independent += 1
+            if row["category"] == "candidate_nested_foreach_source":
+                object_examples += 1
         if row["proposed_sketch"]:
             if not sketch_file.is_file():
                 raise ValueError(f"missing proposed sketch: {folder}")
@@ -112,8 +125,11 @@ def validate_pairs(root: Path) -> dict:
         "source_pairs": len(stats["examples"]),
         "presentation_round_trips_with_original_witness": successes,
         "no_rewrite_examples": retained,
+        "independently_lowerable_examples": independent,
+        "independently_lowerable_object_examples": object_examples,
         "runtime_semantic_equivalence_proven": False,
-        "self_contained_compiler_lowering_proven": False,
+        "self_contained_compiler_lowering_proven": independent > 0,
+        "self_contained_lowering_is_structural_only": True,
     }
 
 
