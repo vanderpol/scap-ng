@@ -208,3 +208,15 @@ Authoritative operation semantics are described in the
 Capability-specific constraints remain a separate required verification
 beyond common datatype support. See the next-stage expected-result and
 runtime test plan earlier in this report.
+
+## Known-result comparison checkpoint — 2026-10-14
+
+The next focused gate now has [13 expected-result OVAL comparison fixtures](../../../tests/datatype-operator-evaluation-0.3/expected-cases.json) and a deliberately narrow [reference-check runner](../../../tools/test_research_type_evaluation_fixtures.py). The expected statuses were authored separately from the runner and derived from the [OVAL 5.12.3 EntityAttributeGroup comparison contract](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html).
+
+Fixtures cover string leading-zero and Boolean-looking literals; success and failure when collected strings are interpreted as integers; integer ordering; native Booleans; dotted-numeric version equality and ordering; IPv4/IPv6 subset tests; same-address different-prefix inequality; and required error results on unequal prefix lengths in relational operations.
+
+Each fixture checks the canonical typed comparison against its preassigned expected status, converts it to the owner-preferred typed-operator syntax without compare_as, reconstructs the same canonical predicate and verifies the same expected status on that reconstructed expression.
+
+**Scope limitation:** This is not an independent OVAL scanner, not a general-purpose OVAL evaluator, and not evidence of complete runtime parity. The reference interpreter is deliberately limited to these documented cases. It does not test RPM/Debian comparator behavior, floating-point IEEE-32 semantics, arbitrary version separators, records, variable cardinality, target Item collection or the full six-state result domain. The existing OVAL six-state truth-table regressions are separate. The remaining gate is independent OVAL evaluator differential testing, ideally against the published Self-Assertion corpus with identical collected Items, plus pinned XSD/Schematron conformance.
+
+The focused checks run in [research datatype authoring CI](../../../.github/workflows/research-datatype-authoring-prototype.yml). No native specification, actual release, or compiled .scapng content changes are introduced.
