@@ -4,6 +4,8 @@
 
 **OVAL Board feedback — informal, nonbinding preference vote.**
 
+**October 14, 2026 owner-approved 0.3 readability improvement:** Ordinary scalar comparison datatypes can be inferred from YAML, and exceptional OVAL comparisons use descriptive typed operators. These six redundant `datatype: string` entries have been removed from A, B and C equally. This does not indicate Board ratification or prove the experimental B/C grammars are fully convertible.
+
 The same **real RHEL 9 STIG rule SV-257851** (`/home` must be mounted with `nosuid`) is shown below in three authoring styles. Which is easiest to read and maintain—including when acquisition is reused across checks?
 
 **How to vote:** After reviewing the comparison, the three complete check excerpts, and shared-acquisition example, add **👍 to exactly one of the four voting comments directly beneath this opening post**:
@@ -21,14 +23,14 @@ D is a substantive alternative (not abstention). A brief explanation is welcome;
 
 | What the author means | **A. Current SCAP-NG 0.3** | **B. Ansible-inspired** | **C. Inspection-oriented** |
 | --- | --- | --- | --- |
-| Independently evaluated unit | `test` / `tests` | `check` | `check` / `checks` |
+| Independently evaluated unit | `test` / `tests` | `check` / `checks` | `check` / `checks` |
 | Get system Items | `object` + `capability` | `collect` | `inspect` |
 | Identify which resources | `select` | `where` | `select` |
 | State what values are acceptable | Test-local `states` with direct typed comparisons (no `state:` wrapper) | `expect` | `expect` |
 | Compare field to value | `operation: equals`, `value` | `equals` | `equals` |
 | Require Items to exist / satisfy | Test `existence`, `match` | `require.collected_items`, `require.matching_items` | `items.existence`, `items.satisfy` |
 | Require field instances to exist / satisfy | State `existence`, `match` | `expect.*.existence`, `expect.*.match` | `field_values.existence`, `field_values.satisfy` |
-| Choose / combine technical results | `evaluate` / `test` | implicit one-`check` root in this sketch | explicit `evaluate` / `check` |
+| Choose / combine technical results | `evaluate` / `test` | explicit `evaluate` / `check` *(proposed)* | explicit `evaluate` / `check` |
 | Specify visible result fields | `reported_elements` | `report.elements` | `evidence.fields` |
 | Declare capability / preserve type identity | Test and inline Object; embedded comparisons inherit it | one `collect` declaration (proposed) | one typed `check` declaration (proposed) |
 | Named reusable acquisition section | `shared_objects` | `shared_collections` *(proposed)* | `shared_inspections` *(proposed)* |
@@ -55,12 +57,10 @@ tests:
         mount_point:
           value: .*\\/home
           operation: pattern_match
-          datatype: string
     states:
       - field: mount_options
         value: nosuid
         operation: equals
-        datatype: string
         match: one_or_more
         existence: one_or_more
     reported_elements: all
@@ -73,27 +73,45 @@ evaluate:
 ## B — Ansible-inspired (research-only syntax)
 
 ```yaml
-check:
-  id: home-mounted-nosuid-option-test
-  collect: linux.partition
-  where:
-    mount_point:
-      matches_regex: '.*\\/home'
-      datatype: string
-  expect:
-    mount_options:
-      equals: nosuid
-      datatype: string
-      existence: one_or_more
-      match: one_or_more
-  require:
-    collected_items: one_or_more
-    matching_items: all
-  report:
-    elements: all
+checks:
+  home-mounted-nosuid-option-check:
+    collect: linux.partition
+    where:
+      mount_point:
+        matches_regex: '.*\\/home'
+    expect:
+      mount_options:
+        equals: nosuid
+        existence: one_or_more
+        match: one_or_more
+    require:
+      collected_items: one_or_more
+      matching_items: all
+    report:
+      elements: all
+evaluate:
+  check: home-mounted-nosuid-option-check
 ```
 
-This reads as *collect partitions → where the mount point matches → expect `nosuid` → require matching Items → report fields*. It also proposes a single capability declaration and an implicit single-check evaluation root. Neither shorthand is supported by the 0.3 schema; a production translator would need to materialize and validate both deterministically. This is **not Ansible playbook syntax**.
+This reads as *collect partitions → where the mount point matches → expect `nosuid` → require matching Items → report fields → evaluate the named Check*. The `checks:` map and explicit `evaluate:` root are **proposed** B syntax; the original one-`check` shortcut could not express multi-check OVAL criteria losslessly. Like A/C, B must preserve the six-state OVAL result model rather than assume sequential tasks are an implicit AND. The single-capability shorthand and this Check vocabulary are not supported by the actual 0.3 schema. This is **not Ansible playbook syntax**.
+
+**More than one check in B:** The following is a separate schematic Assessment illustrating **(A AND B) OR C**. It is not an alternate evaluation of STIG SV-257851; each named Check would have its own complete `collect` / `where` / `expect` / `require` / `report` definition.
+
+```yaml
+checks:
+  requirement-a-check:  # full Check definition omitted
+  requirement-b-check:  # full Check definition omitted
+  alternate-c-check:    # full Check definition omitted
+
+evaluate:
+  any:
+    - all:
+        - check: requirement-a-check
+        - check: requirement-b-check
+    - check: alternate-c-check
+```
+
+The nested `all`/`any` tree must preserve source OVAL criteria semantics, including `true`, `false`, `error`, `unknown`, `not_evaluated`, and `not_applicable`; it is **not** equivalent to Ansible `when`, task ordering, or `block`/`rescue`. An independent conversion/evaluation proof would be required before B could replace A.
 
 ## C — Inspection-oriented (research-only syntax)
 
@@ -105,11 +123,9 @@ checks:
       select:
         mount_point:
           matches_regex: '.*\\/home'
-          datatype: string
     expect:
       - field: mount_options
         equals: nosuid
-        datatype: string
         field_values:
           existence: one_or_more
           satisfy: one_or_more
@@ -151,11 +167,13 @@ shared_collections:
   users-collection:
     capability: unix.password
     # typed selection omitted
-check:
-  id: user-policy-check
-  collect:
-    ref: users-collection
-  # expectations and requirements omitted
+checks:
+  user-policy-check:
+    collect:
+      ref: users-collection
+    # expectations and requirements omitted
+evaluate:
+  check: user-policy-check
 
 ---
 # C — Research-only proposal (separate Assessment excerpt)
