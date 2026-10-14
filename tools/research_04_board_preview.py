@@ -138,6 +138,8 @@ def make(study):
         "",
         "## Board engagement",
         "",
+        "Read `BOARD-DESIGN-OPTIONS.md` in this same ZIP for the scoped import syntax, exact lowering guardrails, debugging design and suggested questions.",
+        "",
         "This is suitable as an **informational research preview** after the owner reviews",
         "its examples; it is **not** a specification ratification request.",
         "For discussion, ask whether the Board prefers (1) source-only compiler imports",
