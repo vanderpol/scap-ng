@@ -49,6 +49,38 @@ See [selection and filtering](../../specification/assessment/selection-and-filte
 and implementation/proof [#208](https://github.com/vanderpol/scap-ng/issues/208).
 The frozen 0.2.0 schemas are unaffected.
 
+## Compact comparison datatypes in 0.3 authoring
+
+The owner-approved 0.3 **source** format permits ordinary scalar expected
+values to convey their effective datatype through native YAML/JSON value type,
+without repeating `datatype: string`, `datatype: integer`, etc. The rarer
+specialized OVAL comparisons use a typed operator, e.g.
+`operation: version_greater_than_or_equal` or
+`operation: rpm_evr_greater_than`. The authoring field `compare_as`
+is **not** supported.
+
+Before validating a capability or producing a `.scapng` bundle, the
+tooling expands the source expression to the existing canonical explicit
+`datatype` and base `operation`. The canonical representation retains
+exact OVAL 5.12.3 semantics; no scanner guesses comparison types from
+collected Items. Variables/Inputs, dynamic values and literal arrays retain
+explicit datatypes when inference is ambiguous. The legacy fully typed
+0.3 form remains valid; frozen 0.2 is unchanged.
+
+The shared primitives schema describes both accepted authoring forms.
+The **authoring-aware validation entrypoint** is
+`python tools/validate_native_json_schemas.py`, which expands source
+before performing existing capability-specific checks. The authoritative
+compiler performs the same expansion before packaging. Direct JSON Schema
+inspection of a compact source field is not a substitute for these
+semantic and capability checks.
+
+See [Assessment method](../../specification/assessment/assessment-method.md),
+[the real STIG example](../../specification/examples/assessments.md),
+and the [compiler parity gate #200](https://github.com/vanderpol/scap-ng/issues/200).
+This is an owner-accepted pre-alpha showcase, not Board ratification or
+independent scanner evaluation conformance.
+
 ## Collection `for_each`
 
 0.3 supports typed collection expansion from a named `shared_objects` source,
