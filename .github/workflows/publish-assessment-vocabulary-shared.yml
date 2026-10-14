@@ -1,69 +1,34 @@
-name: Synchronize canonical A/B/C/D Discussion 213 opening post
+name: Verify manual paste of Discussion 213 (read-only)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md
-      - .github/workflows/publish-assessment-vocabulary-shared.yml
   workflow_dispatch:
 
 permissions:
   contents: read
-  discussions: write
-
-concurrency:
-  group: sync-vocabulary-discussion-213
-  cancel-in-progress: false
+  discussions: read
 
 jobs:
-  update-existing:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Safely update only Discussion 213 opening body
+      - name: Check opening-post parity and preserve vote evidence
         uses: actions/github-script@v7
         with:
           script: |
             const fs=require('fs');
-            const cp=require('child_process');
-            const file='board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md';
+            const source=fs.readFileSync('board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md','utf8');
             const marker='scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-SHARED-20261009';
-            const body=fs.readFileSync(file,'utf8');
-            const fence=String.fromCharCode(96,96,96)+'yaml';
-            if(!body.includes(marker) || body.split(fence).length-1!==5)
-              throw Error('Canonical source must retain its provenance and FIVE YAML examples');
-            const query='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){discussion(number:213){id number url title body comments(first:100){totalCount pageInfo{hasNextPage} nodes{id body reactions(first:1){totalCount} replies(first:1){totalCount}}}}}}';
-            const get=async()=>(await github.graphql(query,{owner:context.repo.owner,name:context.repo.repo})).repository.discussion;
-            const before=await get();
-            if(!before||before.number!==213||!before.body.includes(marker))
-              throw Error('Refusing to create/replace Discussion 213: wrong provenance or absent');
-            if(before.comments.pageInfo.hasNextPage||before.comments.totalCount!==before.comments.nodes.length)
-              throw Error('Paginated comments require separate manual preservation audit');
-            for(const option of ['A','B','C','D']){
-              const matching=before.comments.nodes.filter(c=>c.body.includes('scap-ng-canonical-vote: '+option+'-20261009'));
-              if(matching.length!==1)throw Error('Expected one preserved voting comment '+option);
+            const result=await github.graphql('query($owner:String!,$name:String!){repository(owner:$owner,name:$name){discussion(number:213){url body number comments(first:100){totalCount pageInfo{hasNextPage} nodes{body reactions(first:1){totalCount} replies(first:1){totalCount}}}}}}',{owner:context.repo.owner,name:context.repo.repo});
+            const d=result.repository.discussion;
+            if(!d||!d.body.includes(marker)||!source.includes(marker))throw Error('Unexpected Discussion #213 identity');
+            if(d.comments.pageInfo.hasNextPage||d.comments.nodes.length!==d.comments.totalCount)throw Error('Cannot assess all comments');
+            for(const key of ['A','B','C','D'])if(d.comments.nodes.filter(x=>x.body.includes('scap-ng-canonical-vote: '+key+'-20261009')).length!==1)throw Error('Missing/duplicate voting comment '+key);
+            if(d.body===source){
+              core.info('VERIFIED_DISCUSSION_213_MATCHES_SOURCE '+d.url);
+            }else{
+              core.warning('Discussion #213 is not yet updated. Copy the complete source from https://github.com/vanderpol/scap-ng/issues/220 into the opening-post Edit control. This workflow is READ ONLY; no vote comments or existing engagement are changed.');
             }
-            if(before.body===body){
-              core.info('DISCUSSION_213_ALREADY_SYNCHRONIZED '+before.url);
-              return;
-            }
-            // Only overwrite the exact prior source version, preventing any
-            // separately made moderator edits from being silently reverted.
-            const previous=cp.execFileSync('git',['show','HEAD^:'+file],{encoding:'utf8'});
-            if(before.body!==previous)throw Error('Discussion 213 differs from previous repository source; refusing to overwrite human edits');
-            const edit='mutation($discussionId:ID!,$body:String!){updateDiscussion(input:{discussionId:$discussionId,body:$body}){discussion{id number url body}}}';
-            const response=await github.graphql(edit,{discussionId:before.id,body});
-            const updated=response.updateDiscussion?.discussion;
-            if(!updated||updated.number!==213||updated.body!==body)throw Error('Opening-post update not confirmed');
-            const after=await get();
-            if(after.body!==body||after.id!==before.id||after.title!==before.title)
-              throw Error('Post-update title/body/identity verification failed');
-            if(JSON.stringify(after.comments)!==JSON.stringify(before.comments))
-              throw Error('Discussion voting comments or their reactions/replies changed unexpectedly');
-            core.info('UPDATED_ONLY_DISCUSSION_213_OPENING_POST '+after.url);
-            core.info('PRESERVED_ALL_'+after.comments.totalCount+'_COMMENTS_AND_REACTIONS');
-            await core.summary.addHeading('Discussion #213 updated in place')
-              .addLink('Open canonical A/B/C/D discussion',after.url).write();
+            core.info('VOTE_COMMENTS_PRESERVED '+d.comments.totalCount);
+            core.info('COMMENT_REACTIONS '+d.comments.nodes.reduce((n,c)=>n+c.reactions.totalCount,0));
+            core.info('REPLIES '+d.comments.nodes.reduce((n,c)=>n+c.replies.totalCount,0));
