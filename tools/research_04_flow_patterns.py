@@ -94,6 +94,49 @@ def analyze_assessment(doc):
         ))
     return rows
 
+def resolved_graph_fingerprint(variable_id, assessment):
+    """Closed authoring dependency fingerprint; refuse missing references/cycles.
+
+    This checks equality of stored derivation and collector shape. It does NOT
+    imply target-dependent collection/evidence can be safely cached or shared.
+    """
+    registry=assessment.get("variables") or {}
+    objects={**(assessment.get("objects") or {}), **(assessment.get("shared_objects") or {})}
+    missing=set()
+    def walk(node, var_stack=(), obj_stack=()):
+        if isinstance(node,list):
+            return [walk(x,var_stack,obj_stack) for x in node]
+        if isinstance(node,dict):
+            if set(node)=={"variable"} and isinstance(node["variable"],str):
+                name=node["variable"]
+                if name in var_stack:
+                    missing.add("variable-cycle:"+name)
+                    return {"variable_cycle":name}
+                if name not in registry:
+                    missing.add("variable-missing:"+name)
+                    return {"variable_missing":name}
+                return {"resolved_variable":walk(
+                    clean(registry[name]),var_stack+(name,),obj_stack)}
+            # Object references are alternate serializations in the accepted
+            # 0.3 Assessment language; preserve the marker and source identity.
+            if set(node)=={"object"} and isinstance(node["object"],str):
+                name=node["object"]
+                if name in obj_stack:
+                    missing.add("object-cycle:"+name)
+                    return {"object_cycle":name}
+                if name not in objects:
+                    missing.add("object-missing:"+name)
+                    return {"object_missing":name}
+                return {"resolved_object":walk(
+                    clean(objects[name]),var_stack,obj_stack+(name,))}
+            return {k:walk(v,var_stack,obj_stack) for k,v in node.items()
+                    if k not in NONSEMANTIC}
+        return node
+    if variable_id not in registry:
+        raise ValueError("unknown Variable")
+    closure=walk(clean(registry[variable_id]),(variable_id,),())
+    return fingerprint(closure),sorted(missing)
+
 def friendly(text):
     return str(text).replace("|","\\|").replace("\n"," ").replace("`","'")
 
@@ -152,6 +195,8 @@ def run(source_zip, study):
     expression_groups=defaultdict(list)
     chain_graph_counts=Counter()
     named_chain_consumers=Counter()
+    closure_occurrences=defaultdict(list)
+    incomplete_closure=Counter()
     for path in paths:
         a=docs[path]["assessment"]
         graph=analyze_assessment(docs[path])
@@ -159,6 +204,11 @@ def run(source_zip, study):
         chain_graph_counts.update({path:len([r for r in graph if any(
             item.startswith("variables/") for item in r["consumer_paths"])])})
         for row in graph:
+            closure, missing=resolved_graph_fingerprint(row["name"],a)
+            if missing:
+                incomplete_closure.update(missing)
+            else:
+                closure_occurrences[closure].append((path,row["name"]))
             occurrence[(row["name"], row["exact_payload_fingerprint"])].append(path)
             expression_groups[row["expression_fingerprint"]].append((path,row["name"]))
             for p in row["consumer_paths"]:
@@ -172,6 +222,11 @@ def run(source_zip, study):
         sample=[dict(assessment=p,variable=n) for p,n in v[:3]])
         for k,v in expression_groups.items() if len({p for p,n in v})>=2]
     repeated_expr.sort(key=lambda x:(-x["different_assessments"],-x["occurrences"]))
+    closed_groups=[dict(fingerprint=k, occurrences=len(v),
+        assessments=len({path for path,name in v}),
+        sample=[dict(assessment=path,variable=name) for path,name in v[:3]])
+        for k,v in closure_occurrences.items() if len({path for path,name in v})>=2]
+    closed_groups.sort(key=lambda g:(-g["assessments"],-g["occurrences"]))
     # A candidate for reuse is an identical named/expression definition across
     # assessment boundaries, NOT proof that it can be made a runtime provider.
     report={
@@ -182,6 +237,10 @@ def run(source_zip, study):
         "apache_exact_named_payload_duplicate_occurrences":sum(x["assessments"] for x in repeated_named),
         "apache_expression_duplicate_groups":len(repeated_expr),
         "apache_expression_duplicate_occurrences":sum(x["occurrences"] for x in repeated_expr),
+        "apache_complete_closed_graph_duplicate_groups":len(closed_groups),
+        "apache_complete_closed_graph_duplicate_occurrences":sum(g["occurrences"] for g in closed_groups),
+        "apache_incomplete_closed_graph_reasons":dict(incomplete_closure),
+        "largest_complete_closed_graph_groups":closed_groups[:18],
         "largest_named_duplicate_groups":repeated_named[:24],
         "largest_expression_duplicate_groups":repeated_expr[:20],
         "apache_chain_consumer_nodes":len(named_chain_consumers),
