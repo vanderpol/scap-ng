@@ -4,6 +4,8 @@
 
 Named internal Assessment components use meaningful lowercase kebab-case IDs ending in the component type.
 
+The example uses the accepted 0.3 concise comparison form: the Boolean literal `true` unambiguously determines the comparison type, so the local State does not repeat `datatype: boolean`. The compiler restores that type in canonical content. Component ID naming and datatype inference are independent rules.
+
 | Component | Required form | Example |
 | --- | --- | --- |
 | Object | `<meaningful-name>-object` | `forward-zones-object` |
@@ -33,7 +35,6 @@ assessment:
         - field: dnssec_enabled
           operation: equals
           value: true
-          datatype: boolean
           match: all
           existence: one_or_more
 
