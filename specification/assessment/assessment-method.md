@@ -616,6 +616,56 @@ for example, OVAL Boolean lexical values `true`, `false`, `1`, and `0`
 remain valid migration inputs where the source schema permits them, while native
 SCAP-NG Boolean literals are the JSON/YAML Boolean values `true` and `false`.
 
+### 0.3 concise typed comparison authoring (owner-approved pre-alpha)
+
+For automated Assessment specification **0.3.0**, the source author MAY omit
+`datatype` only when a **single scalar literal** unambiguously specifies the
+comparison datatype through its native JSON/YAML kind and the capability field
+contract. The authoring compiler SHALL make the effective datatype explicit
+before running the canonical generated capability schemas, applying the
+comparison, or emitting any `.scapng` bundle.
+
+For rare valid OVAL datatypes not determined by the scalar literal, the
+author SHALL use a self-describing typed comparison operation such as
+`version_equals`, `version_greater_than_or_equal`,
+`rpm_evr_greater_than`, `debian_evr_less_than`, or
+`ipv4_subset_of`. The authoring grammar SHALL NOT use `compare_as`.
+The typed operator corresponds to the **exact** OVAL 5.12.3 datatype
+and base operation; the compiler SHALL NOT change the evaluation algorithm.
+
+```yaml
+# Native 0.3 source syntax
+value: 10
+operation: greater_than_or_equal
+
+value: '2.4'
+operation: version_greater_than_or_equal
+
+# Canonical compiled equivalent for the second comparison
+value: '2.4'
+datatype: version
+operation: greater_than_or_equal
+```
+
+Uncertain or multi-valued datatypes—including Variable references, Organizational
+Input bindings, literal arrays, records, and Variable/Input declarations—SHALL
+retain their explicit type contract until an independently proven lossless
+inference method exists. A source `value: '1'` remains a string; it SHALL
+NOT be treated as the integer `1`. Conflicting type/operation combinations,
+missing type on dynamic references, and invalid capability field datatypes
+SHALL fail validation. Legacy explicit-typed 0.3 authoring remains accepted
+for faithful SCAP 1.4 migration and interoperability. Version 0.2.0 is frozen
+and unchanged.
+
+The current 0.3 common authoring schema recognizes this syntax; canonical
+validation still resolves the effective explicit datatype and operation
+before generated capability and semantic checks. The source/compiled
+semantic preservation gate is tracked in [#200](https://github.com/vanderpol/scap-ng/issues/200).
+This owner-approved Board-facing design is **not** an OVAL Board-ratified
+language or independent full evaluator/host scanner conformance proof.
+OVAL 5.12.3 special float values are independently tracked in
+[#218](https://github.com/vanderpol/scap-ng/issues/218).
+
 ### 0.3 State comparison datatype versus collected Item datatype
 
 For OVAL-derived Assessments, **the datatype declared on an authored State
@@ -624,7 +674,7 @@ datatype of the collected Item field**. These are separate contracts:
 
 - The capability's collected-Item field schema identifies the observed value's
   native representation and preserves that representation in evidence.
-- The authored State's explicit `datatype` governs the comparison. The
+- The authored State's effective comparison datatype (explicit in canonical compiled content, whether inferred or typed in source) governs the comparison. The
   evaluator attempts the corresponding OVAL-compatible conversion of the
   collected value before applying the authored comparison operation.
 - An unsupported or unsuccessful required cast SHALL produce an evaluation
