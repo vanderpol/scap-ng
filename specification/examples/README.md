@@ -10,7 +10,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 ## RHEL 9 Benchmark
 
-From `authoring/rhel_9/benchmark.yaml` in the [combined six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) (current 0.3 examples; surrounding fields are abbreviated):
+From `authoring/rhel_9/benchmark.yaml` in the [combined six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) (current 0.3 examples; surrounding fields are abbreviated):
 
 ```yaml
 benchmark:
@@ -176,7 +176,7 @@ That historical pilot passed conversion, optional-output checks, and native-docu
 
 Read the [Assessment examples](assessments.md) to see how that Rule is evaluated, including automated and manual checks, `for_each`, static values, direct Variable evaluation, conditional branches, Organization Input and bounded evidence. The [0.3 result fixture catalog](0.3.0/results/README.md) separately shows Scan, Benchmark, Automated Assessment and Manual Assessment results.
 
-The [six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) and six separately compiled scanner bundles passed source-schema, semantic graph, fresh-compilation and byte-for-byte canonical bundle comparison in the [typed-authoring release gate](https://github.com/vanderpol/scap-ng/issues/200). The old faithful/candidate side-by-side artifacts are historical evidence, not current authoring downloads. The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
+The [six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) and six separately compiled scanner bundles passed source-schema, semantic graph, fresh-compilation and byte-for-byte canonical bundle comparison in the [typed-authoring release gate](https://github.com/vanderpol/scap-ng/issues/200). The old faithful/candidate side-by-side artifacts are historical evidence, not current authoring downloads. The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
 
 ## Technical reference (optional)
 
