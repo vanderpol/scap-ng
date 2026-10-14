@@ -4,6 +4,15 @@
 collections are part of the 0.3 authoring model; automatic conversion remains
 bounded to exact, reversible static-Variable cases.
 
+**Datatype simplification note (0.3, #200):** The array examples below
+intentionally **retain** explicit `datatype: string`. The accepted compact
+authoring inference applies to a single unambiguous scalar literal, not to
+literal arrays, Variable references, or Organizational Inputs. The original
+OVAL type, value quantifiers and cardinality SHALL remain explicit until a
+separately proven lossless representation is implemented. Real single-scalar
+examples and the special version operators are in the
+[current Assessment showcase](../../specification/examples/assessments.md).
+
 Tracked by [#169](https://github.com/vanderpol/scap-ng/issues/169) and
 [#188](https://github.com/vanderpol/scap-ng/issues/188).
 
