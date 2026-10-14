@@ -365,6 +365,16 @@ def compile_benchmark(source_root: Path, benchmark_dir: Path, *, allow_unpromote
         return target, doc
 
     def remember_assessment(aid, source_path, doc):
+        # Compile only the canonical typed Assessment, never a source-only
+        # inferred operation. The existing validator then enforces exact
+        # capability/datatype restrictions and emits fully typed JSON.
+        from native_v03_authoring_codec import canonicalize_assessment_document
+        try:
+            doc = canonicalize_assessment_document(doc)
+        except ValueError as exc:
+            raise ValueError(
+                f"{source_path}: invalid native 0.3 typed authoring: {exc}"
+            ) from exc
         previous = assessment_docs.get(aid)
         if previous is not None and previous[0] != source_path:
             raise ValueError(f"duplicate Assessment identity {aid}: {previous[0]} vs {source_path}")
