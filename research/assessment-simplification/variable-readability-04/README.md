@@ -4,7 +4,7 @@
 
 This project is evaluating readability of OVAL-derived multi-stage calculations in the **six published 0.3 sample STIGs**, using the original standalone OVAL Rule closures beside the unchanged 0.3 Assessments.
 
-**[Download the complete current evidence ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-variable-research-59cdd89d87e6/scap-ng-0.4-variable-research.zip)** (includes `BOARD-RESEARCH-PREVIEW.md`, 20 OVAL+NG case directories, per-example Variable-flow views, `STATS.json`, `APACHE-DATAFLOW-PATTERNS.json`, and all-instance CSV classifications). [Tracking issue #223](https://github.com/vanderpol/scap-ng/issues/223).
+**[Download the complete current evidence ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-variable-research-3ccb830866b2/scap-ng-0.4-variable-research.zip)** (includes `BOARD-RESEARCH-PREVIEW.md`, 20 OVAL+NG case directories, per-example Variable-flow views, `STATS.json`, `APACHE-DATAFLOW-PATTERNS.json`, and all-instance CSV classifications). [Tracking issue #223](https://github.com/vanderpol/scap-ng/issues/223).
 
 ## What the corpus actually says
 
