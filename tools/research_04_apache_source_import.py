@@ -179,6 +179,8 @@ def source_authoring(doc,module):
     if not hits:
         raise ValueError("Unused source graph cannot improve authoring")
     for section,names in selected.items():
+        if not names:
+            continue
         for name in names:
             del a[section][name]
         if not a[section]:
@@ -223,6 +225,8 @@ def lower_source(authoring,module):
     if not hits:
         raise ValueError("Source import unused by consumer")
     for section in ("objects","variables"):
+        if not source[section]:
+            continue
         registry=a.setdefault(section,{})
         if set(registry)&selected[section]:
             raise ValueError("Compiler namespace collision in "+section)
