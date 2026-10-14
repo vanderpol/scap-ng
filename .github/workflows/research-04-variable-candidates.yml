@@ -105,7 +105,8 @@ jobs:
             --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_apache_source_import.py \
             --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
-            --study work/research/scap-ng-0.4-variable-research
+            --study work/research/scap-ng-0.4-variable-research \
+            --split-root work/split
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_variable_debug_trace.py \
             --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
             --study work/research/scap-ng-0.4-variable-research
@@ -142,6 +143,11 @@ jobs:
           assert source_import['safe_exact_roundtrip_consumers']>=3
           assert source_import['runtime_semantics_modified'] is False
           assert source_import['source_bundle_sha256']
+          assert source_import['paired_original_oval_import_samples']==3
+          assert source_import['duplicate_declarations_eliminated_from_authoring']>0
+          import pathlib
+          import_samples=list((root/'BUILD-TIME-IMPORT'/'consumer-samples').glob('*/original-1.4.oval.xml'))
+          assert len(import_samples)==source_import['paired_original_oval_import_samples']
           traces=json.loads((root/'VARIABLE-DEBUG-STATS.json').read_text())
           assert traces['paired_diagnostic_plans']>0
           assert traces['runtime_trace_data_observed'] is False
