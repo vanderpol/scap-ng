@@ -208,8 +208,9 @@ def analyze_chain(assessment):
         fanout[name] = usage
     successors = Counter(dst for src, dst in edges)
     private_chained = {
-        src for src, dst in edges if fanout[dst] == 1 and
-        isinstance(vars_.get(dst), dict) and vars_[dst].get("kind") == "local"
+        producer for consumer, producer in edges if fanout[producer] == 1 and
+        isinstance(vars_.get(producer), dict) and
+        vars_[producer].get("kind") == "local"
     }
     return {
         "variables": len(vars_),
