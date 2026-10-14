@@ -13,6 +13,7 @@ on:
       - tools/test_research_04_self_contained_inline.py
       - tools/enrich_research_04.py
       - tools/research_04_flow_patterns.py
+      - tools/research_04_board_preview.py
 
 permissions:
   contents: write
@@ -94,6 +95,8 @@ jobs:
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_flow_patterns.py \
             --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
             --study work/research/scap-ng-0.4-variable-research
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_board_preview.py \
+            --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_research_04_pairs.py \
             work/research/scap-ng-0.4-variable-research \
             > work/research/scap-ng-0.4-variable-research/VERIFICATION.json
@@ -119,6 +122,7 @@ jobs:
           assert patterns['apache_assessments_with_variable_dataflow']>0
           assert patterns['apache_variable_occurrences']>0
           assert patterns['apache_exact_named_payload_duplicate_groups']>0
+          assert (root/'BOARD-RESEARCH-PREVIEW.md').is_file()
           assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
           assert verification['source_pairs']==len(stats['examples'])
@@ -205,6 +209,7 @@ jobs:
             echo "VERIFICATION.json distinguishes older witness-based sketches from self-contained independently lowerable private declarations."
             echo "SELF-CONTAINED-STATS.json reports corpus proofs, refusals, per-STIG chain counts and YAML nesting/size effects; OVAL/scanner runtime parity is NOT claimed."
             echo "APACHE-DATAFLOW-PATTERNS.json counts duplicated Apache Variable graphs; paired examples include human-readable VARIABLE-FLOW.md diagrams."
+            echo "BOARD-RESEARCH-PREVIEW.md is an information-only evidence packet, not a ratification request."
             echo
             echo "This is a research classification, NOT validation of the proposed 0.4 syntax or execution equivalence."
           } > work/issue-summary.md
