@@ -20,8 +20,9 @@ def fixture():
         },
         "shared_objects": {
             "user-object": {"capability": "unix.password", "select": {}},
+            "foreach-user-object": {"capability": "unix.password", "select": {}},
             "directory-object": {"capability": "unix.file",
-                "for_each": {"item": "user", "in": "user-object"},
+                "for_each": {"item": "user", "in": "foreach-user-object"},
                 "select": {"directory": {"from": "user.home_dir"}}},
         },
         "tests": {
@@ -41,8 +42,8 @@ class ResearchInlineTest(unittest.TestCase):
 
     def test_inline_foreach_source_independently_reconstructs(self):
         doc=fixture()
-        inline, info=inline_object(doc, "user-object")
-        self.assertNotIn("user-object", inline["assessment"]["shared_objects"])
+        inline, info=inline_object(doc, "foreach-user-object")
+        self.assertNotIn("foreach-user-object", inline["assessment"]["shared_objects"])
         self.assertEqual(lower_inline(inline), doc)
 
     def test_reject_reused_variable(self):
@@ -66,9 +67,9 @@ class ResearchInlineTest(unittest.TestCase):
 
     def test_reject_reused_object(self):
         doc=fixture()
-        doc["assessment"]["tests"]["reuser"]={"object":"user-object"}
+        doc["assessment"]["tests"]["reuser"]={"object":"foreach-user-object"}
         with self.assertRaisesRegex(ValueError, "exactly one"):
-            inline_object(doc, "user-object")
+            inline_object(doc, "foreach-user-object")
 
     def test_reject_tampered_type(self):
         doc=fixture()
