@@ -10,6 +10,22 @@ The published 0.3 Apache corpus retained a common **11-Variable** derivation in 
 
 The experiment has no new runtime semantics; structural compilation is not proof of OVAL/scanner execution equivalence when future changes introduce different operators.
 
+## Two complementary but independent reuse questions
+
+Apache highlights **three** problems, and one design need not solve all of them:
+
+- **Authoring maintenance:** when a common discovery algorithm has a bug, fixing 15 independently maintained copies is error-prone. Build-time source reuse permits one correction, with each consumer rebuilding and validating against the updated, explicitly pinned source. The research prototype demonstrates independent expansion of 15/15 consumers, but does not establish a general version-upgrade workflow.
+- **Runtime efficiency:** executing equivalent system discovery commands 15 times may waste substantial time. A scanner could collect once *per compatible target and evaluation context*, retain the Items and their status/provenance, then supply those same observations to 15 separate checks. The source-only proof **does not** measure real command executions or prove safe runtime deduplication.
+- **Diagnosability:** independent of either reuse mechanism, explain which collection or transformation failed and which assessments depend on it. A shared acquisition failure must not be transformed into an invented pass or an incomplete result presented as complete.
+
+The options are **orthogonal**: source-only reuse, runtime-only collection deduplication, **both**, or neither. Do not assume the Board must choose exactly one. Runtime sharing can be implemented either through an explicit testless typed Observation/knowledge provider, or through a scanner optimization that transparently deduplicates safely equivalent collections in separately compiled Assessments. These paths have different interoperability implications.
+
+A runtime equivalence key must consider at least: target/session/snapshot, collector capability/version, normalized command and parameters, environment/working directory, privilege/security context, organizational input binding, requested evidence, and time/freshness requirements. The implementation must handle simultaneous consumers with one in-flight collection; independent consumers must receive the original status, completeness, errors, value cardinality, lineage and redaction constraints. Do not equate matching YAML text with safe command reuse. A target's configuration may change between checks, and some commands have side effects or context-sensitive output.
+
+**What has been proven:** 15/15 exact canonical build-time expansions and 154 duplicate declarations removed from experimental authoring.
+
+**Not yet proven:** actual number of duplicate process executions, time savings, safe runtime sharing, target-scoped cache invalidation, and equivalence of error/evidence behavior. Quantify these separately before estimating performance benefits.
+
 ## Proposal A — visible derived-value flow
 
 Generate a non-executable reader/debugger view from the canonical graph: input Objects → intermediate Variables and operations → typed outputs → consuming Test/State. Keep the actual YAML and standalone OVAL available beside the view.
@@ -65,9 +81,10 @@ Do not obscure chained calculations when multiple value streams combine, regex c
 
 ## Board questions (feedback, not a vote)
 
-1. Should reusable source-only modules be standardized as optional authoring syntax, or left to publisher/editor build tooling that emits canonical Assessments?
-2. Is a generated Variable dependency view sufficient, or should a portable **optional diagnostic trace** with per-stage status, counts, provenance and redaction be standardized?
-3. Which real OVAL examples best demonstrate where staged Variable calculations remain necessarily explicit?
+1. Should source-only modules be standardized as optional authoring syntax, or left to publisher/editor tooling that emits canonical Assessments?
+2. Should reusable runtime observations be explicit testless providers in the specification, a scanner optimization over independently authored Objects, or both?
+3. Is a generated Variable dependency view sufficient, or should a portable **optional diagnostic trace** with per-stage status, counts, provenance and redaction be standardized?
+4. Which real OVAL examples demonstrate when repeated collection is safe to share versus when evaluation context or freshness requires independent acquisition?
 
 ## Evidence and next acceptance gates
 
