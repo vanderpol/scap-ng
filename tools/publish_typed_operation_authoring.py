@@ -78,8 +78,15 @@ def prepare_zip(input_zip: Path, output_zip: Path, *, expected_assessments=2433)
                 continue
             statistics["assessment_yaml"] += 1
             version = ((original["assessment"].get("specification") or {}).get("version"))
-            if version != "0.3.0":
-                raise ValueError(f"Unexpected non-0.3 Assessment: {name}")
+            mode = original["assessment"].get("mode")
+            if mode == "manual":
+                # Manual Assessments have no automated evaluation engine or
+                # specification declaration. Their source must stay unchanged.
+                created[name] = raw
+                statistics["manual_assessments_byte_identical"] += 1
+                continue
+            if mode != "automated" or version != "0.3.0":
+                raise ValueError(f"Unexpected automated Assessment version/mode: {name}")
             compact = to_authoring(original, strategy="typed-operators", stats=statistics)
             assert canonicalize_assessment_document(compact) == original, name
             if compact == original:
