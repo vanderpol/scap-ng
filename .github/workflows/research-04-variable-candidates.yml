@@ -115,12 +115,14 @@ jobs:
           print('ZIP_SHA256=',hashlib.sha256(z.read_bytes()).hexdigest())
           PY
       - uses: actions/upload-artifact@v4
+        id: research_artifact
         with:
           name: scap-ng-0.4-variable-research-and-source-oval
           path: work/scap-ng-0.4-variable-research.zip
           if-no-files-found: error
           compression-level: 6
       - name: Publish durable, clearly research-only prerelease
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -138,6 +140,7 @@ jobs:
           echo "Research: https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
       - name: Put results on the research issue
         if: success()
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -146,11 +149,17 @@ jobs:
           {
             echo "### Verified six-STIG 0.4 variable research"
             echo
-            echo "Immutable [research ZIP with co-located standalone OVAL sources](https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag)."
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "Immutable [research ZIP with co-located standalone OVAL sources](https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag)."
+            else
+              echo "Validated [research ZIP in the workflow artifact](${{ steps.research_artifact.outputs.artifact-url }})."
+              echo "Note: release publication lacked permission; the Actions artifact is the verified output."
+            fi
             echo
             sed -n '/### Six STIG variable classifications/,/### Side-by-side/p' work/research/scap-ng-0.4-variable-research/README.md | sed '$d'
             echo
             echo "Full category counts: STATS.json; every Variable: ALL-VARIABLES.csv."
+            echo "Named Object nesting candidates: NAMED-OBJECTS.csv."
             echo "All examples include original-1.4.oval.xml next to current-0.3.assessment.yaml."
             echo
             echo "This is a research classification, NOT validation of the proposed 0.4 syntax or execution equivalence."
