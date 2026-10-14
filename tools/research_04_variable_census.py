@@ -99,6 +99,47 @@ def variable_rows(doc):
         row["disposition"] = "candidate_research" if row["category"].startswith("candidate_") else ("audit" if row["category"].startswith("audit_") else "retain")
         yield row
 
+def object_references(value, object_id, path=()):
+    """Direct named Object references, including foreach source bindings."""
+    if isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from object_references(child, object_id, path + (str(index),))
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            if key == "object" and child == object_id:
+                yield path + (key,)
+            elif key == "in" and child == object_id and path and path[-1] == "for_each":
+                yield path + (key,)
+            else:
+                yield from object_references(child, object_id, path + (key,))
+
+def named_object_rows(doc):
+    assessment = doc["assessment"]
+    registry = {}
+    for section in ("objects", "shared_objects"):
+        for oid, payload in (assessment.get(section) or {}).items():
+            if oid in registry:
+                raise ValueError(f"Duplicate named Object: {oid}")
+            registry[oid] = (section, payload)
+    for oid, (section, payload) in sorted(registry.items()):
+        refs = list(object_references(assessment, oid))
+        if not refs:
+            category = "audit_unreferenced_named_object"
+        elif len(refs) > 1:
+            category = "retain_shared_named_object"
+        elif refs[0][0] == "variables":
+            category = "candidate_variable_private_source_nesting"
+        elif "for_each" in refs[0]:
+            category = "candidate_nested_foreach_source"
+        elif refs[0][0] in {"objects", "shared_objects"}:
+            category = "candidate_nested_object_dependency"
+        elif refs[0][0] == "tests":
+            category = "already_test_locality_0_3"
+        else:
+            category = "retain_other_named_object"
+        yield dict(object_id=oid, section=section, category=category,
+                   consumer_count=len(refs), consumer_paths=[".".join(path) for path in refs])
+
 def fetch_oval(split, key, rid):
     manifest = json.loads((split / key / "manifest.json").read_text())
     matches = [row for row in manifest["rules"]
@@ -160,6 +201,7 @@ def run(args):
                     raise ValueError(f"Ambiguous/missing {key} {rule['id']} -> {aid}: {matches}")
                 reachable[key][matches[0]].add(rule["id"])
     rows = []
+    object_rows = []
     summary = {}
     for key in BENCHMARKS:
         c = Counter()
@@ -176,10 +218,17 @@ def run(args):
                 c[item["category"]] += 1
                 c[item["disposition"]] += 1
                 c["variables"] += 1
+            for item in named_object_rows(all_docs[rel]):
+                item.update(benchmark=key, source_path=rel, assessment_id=a["id"], rule_ids=sorted(rids))
+                object_rows.append(item)
+                c["named_objects"] += 1
+                c[item["category"]] += 1
         summary[key] = dict(c)
     unique = {(r["source_path"], r["variable_id"]): r for r in rows}
     unique_counts = dict(Counter(r["category"] for r in unique.values()))
     use_counts = dict(Counter(r["category"] for r in rows))
+    unique_objects = {(r["source_path"], r["object_id"]): r for r in object_rows}
+    object_counts = dict(Counter(r["category"] for r in object_rows))
     report = {
         "status": "research_only_candidates_not_proven",
         "source_release": RELEASE,
@@ -189,6 +238,9 @@ def run(args):
         "unique_variable_definitions": len(unique),
         "unique_category_counts": unique_counts,
         "benchmark_usage_count": len(rows),
+        "named_object_benchmark_uses": len(object_rows),
+        "named_object_unique_definitions": len(unique_objects),
+        "named_object_category_counts": object_counts,
         "notes": [
             "A reused shared assessment contributes to each benchmark using it, but counts only once in unique definitions.",
             "A candidate is a research hypothesis, not proof of safe conversion.",
@@ -202,6 +254,15 @@ def run(args):
         writer = csv.writer(stream)
         writer.writerow(fields)
         for item in sorted(rows, key=lambda r:(r["benchmark"],r["source_path"],r["variable_id"])):
+            writer.writerow([json.dumps(item.get(f), sort_keys=True) if isinstance(item.get(f),(dict,list))
+                             else item.get(f) for f in fields])
+
+    with (out / "NAMED-OBJECTS.csv").open("w", newline="") as stream:
+        fields = ["benchmark", "source_path", "assessment_id", "rule_ids",
+                  "object_id", "section", "consumer_count", "consumer_paths", "category"]
+        writer = csv.writer(stream)
+        writer.writerow(fields)
+        for item in sorted(object_rows, key=lambda r:(r["benchmark"],r["source_path"],r["object_id"])):
             writer.writerow([json.dumps(item.get(f), sort_keys=True) if isinstance(item.get(f),(dict,list))
                              else item.get(f) for f in fields])
 
@@ -307,7 +368,9 @@ def run(args):
               f"Total benchmark-variable uses: **{len(rows)}** (candidates: **{sum(r['disposition']=='candidate_research' for r in rows)}**, retain: **{sum(r['disposition']=='retain' for r in rows)}**, unreferenced audit: **{sum(r['disposition']=='audit' for r in rows)}**).",
               f"Unique Variable definitions across all six (deduplicate shared Assessments): **{len(unique)}**.",
               "",
-              "Breakdown by reason is in `STATS.json`; every classified occurrence is in `ALL-VARIABLES.csv`.",
+              "Breakdown by reason is in `STATS.json`; every classified Variable is in `ALL-VARIABLES.csv`.",
+              f"Named Objects: **{len(object_rows)} benchmark uses**, **{len(unique_objects)} unique definitions**, including **{sum(v for k,v in object_counts.items() if k.startswith('candidate_'))} private-source nesting research candidates**.",
+              "See `NAMED-OBJECTS.csv` for the direct references and disposition of each named Object.",
               "A candidate is not a promise of equivalence or a proposal to remove every surviving Variable.",
               "", "### Side-by-side original and proposed examples", "",
               "| Rule | Pattern | Directory |", "|---|---|---|"]
@@ -321,7 +384,8 @@ def run(args):
     shutil.rmtree(work)
     print("CENSUS_STATS_BEGIN")
     print(json.dumps({"by_benchmark": summary, "unique_variables": len(unique),
-                      "variable_uses": len(rows), "examples": cases}, sort_keys=True))
+                      "variable_uses": len(rows), "named_object_uses": len(object_rows),
+                      "named_object_categories": object_counts, "examples": cases}, sort_keys=True))
     print("CENSUS_STATS_END")
 
 def main():
