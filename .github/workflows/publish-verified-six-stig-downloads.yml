@@ -21,6 +21,7 @@ jobs:
     permissions:
       actions: read
       contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
       - name: Validate native-only authoring ZIP packaging contract
@@ -196,3 +197,7 @@ jobs:
             publish/*.scapng \
             publish/DOWNLOADS.json publish/SHA256SUMS.txt
           gh release view "$tag" --json url,assets,tagName --jq '{url:.url,tag:.tagName,assets:[.assets[].name]}'
+          # Persist a verifiable publication URL for reviewers and connected
+          # GitHub clients that cannot enumerate Actions workflow runs.
+          url="$(gh release view "$tag" --json url --jq .url)"
+          gh issue comment 199 --body "Published six-STIG logical-ID authoring ZIP and six unchanged compiled bundles: $url . Native ZIP SHA-256: 8cd4ee92112c154f821362eb42a1927bd51b8be0abe7e923e7930053611b563a. This is an experimental prerelease, not a completed schema ratification."
