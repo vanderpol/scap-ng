@@ -44,7 +44,7 @@ def make(study):
         "",
         "### What exact compilation shows",
         "",
-        f"- **{p['structural_proofs']}/{p['candidate_attempts']}** self-contained research forms independently lower to **bytewise-equivalent parsed 0.3 content** (before reserialization); this is **only a syntax/dataflow identity check**.",
+        f"- **{p['structural_proofs']}/{p['candidate_attempts']}** self-contained research forms independently lower to the **same parsed 0.3 Assessment structure**; this is **only a syntax/dataflow identity check**.",
         f"- **{p['metric_deltas']['cases_with_more_lines']}** of those forms increase YAML lines; **{p['metric_deltas']['cases_with_deeper_nesting']}** increase nesting depth.",
         f"- Combined delta over **separate** one-component-at-a-time proofs: **{p['metric_deltas']['sum_lines']:+d} YAML lines**, **{p['metric_deltas']['sum_bytes']:+d} bytes**. These deltas must NOT be extrapolated to a single simultaneous rewrite of every file.",
         "- Simply embedding full Objects or Variables is technically possible but often **harder to read**; fewer names is not the same as less complexity.",
