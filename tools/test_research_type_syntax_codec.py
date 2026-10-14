@@ -65,9 +65,15 @@ class CodecTests(unittest.TestCase):
 
     def test_float_expected_with_integer_literal_is_not_integer(self):
         source = {"value": 1, "operation": "equals", "datatype": "float"}
-        compact = {"value": 1, "operation": "equals", "compare_as": "float"}
+        # Ordinary scalar inference would incorrectly choose integer, so the
+        # user-preferred syntax carries the needed distinction in the operator.
+        compact = {"value": 1, "operation": "float_equals"}
         self.assertEqual(to_authoring(source), compact)
         self.assertEqual(to_canonical(compact), source)
+        # Retained only to compare the rejected research alternative.
+        old_alternative = {"value": 1, "operation": "equals", "compare_as": "float"}
+        self.assertEqual(to_authoring(source, "compare-as"), old_alternative)
+        self.assertEqual(to_canonical(old_alternative), source)
 
     def test_special_datatype_families_remain_distinct(self):
         examples = [
