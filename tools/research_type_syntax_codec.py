@@ -49,7 +49,10 @@ TYPE_OPERATIONS = {
     "ios_version": ORDERED,
     "record": frozenset({"equals"}),
 }
-SPECIAL_TYPES = DATATYPES - {"string", "boolean", "integer", "float", "record"}
+SPECIAL_TYPES = DATATYPES - {"string", "boolean", "integer", "record"}
+# Float normally infers from YAML float. A source float with a native integer
+# literal (e.g. value: 1) still needs explicit float comparison semantics.
+# Type-only operators cover this without an author-facing compare_as field.
 STRATEGIES = frozenset({"hybrid", "typed-operators", "compare-as"})
 
 
@@ -105,7 +108,7 @@ def _walk(value, transform, path="$", stats=None):
     return transform(node, path, stats)
 
 
-def to_authoring(canonical, strategy="hybrid", *, stats=None):
+def to_authoring(canonical, strategy="typed-operators", *, stats=None):
     """Full typed v0.3 AST -> candidate compact authoring AST."""
     if strategy not in STRATEGIES:
         raise ValueError(f"unknown strategy {strategy!r}")
@@ -233,7 +236,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("zip", type=Path)
     parser.add_argument("--strategy", choices=sorted(STRATEGIES),
-                        default="hybrid")
+                        default="typed-operators")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     report = census_zip(args.zip, args.strategy)
