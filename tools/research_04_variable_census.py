@@ -317,27 +317,9 @@ def run(args):
         shutil.copyfile(root / item["source_path"], folder / "current-0.3.assessment.yaml")
         oval, provenance = fetch_oval(args.split_root, key, rid)
         shutil.copyfile(oval, folder / "original-1.4.oval.xml")
-        doc = copy.deepcopy(all_docs[item["source_path"]])
-        variables = doc["assessment"].get("variables") or {}
-        target = variables.get(item["variable_id"])
-        uses = list(exact_variable_refs({k:v for k,v in doc["assessment"].items() if k != "variables"}, item["variable_id"]))
+        # Do not ship the old incomplete, witness-dependent inline sketch.
+        # Enrichment supplies an independent-lowering research proposal instead.
         proposal = False
-        if item["disposition"] == "candidate_research" and len(uses) == 1 and target:
-            path = uses[0]
-            parent = doc["assessment"]
-            for p in path[:-1]:
-                parent = parent[int(p)] if isinstance(parent, list) else parent[p]
-            last = int(path[-1]) if isinstance(parent, list) else path[-1]
-            if parent[last] == {"variable": item["variable_id"]}:
-                parent[last] = {"expression": copy.deepcopy(target.get("expression")),
-                                "research_inline_source_variable": item["variable_id"]}
-                variables.pop(item["variable_id"])
-                if not variables:
-                    doc["assessment"].pop("variables", None)
-                (folder / "proposed-0.4.RESEARCH.yaml").write_text(
-                    "# NOT a valid 0.3 or approved 0.4 file; this is speculative authoring sugar.\n"
-                    + yaml.safe_dump(doc, sort_keys=False))
-                proposal = True
         (folder / "README.md").write_text(
             f"# {rid} — {item['category']}\n\n"
             + f"Benchmark: {BENCHMARKS[key]}\n\n"
@@ -346,9 +328,9 @@ def run(args):
             + f"Associated Rule IDs: {', '.join(rids)}\n\n"
             + "- `original-1.4.oval.xml`: complete standalone OVAL dependency closure generated from pinned NIWC SCAP 1.4.\n"
             + "- `current-0.3.assessment.yaml`: exact released authoring Assessment.\n"
-            + ("- `proposed-0.4.RESEARCH.yaml`: complete but **non-normative** hypothetical inline form.\n" if proposal else
-               "- No proposed rewrite: this is a deliberate retained/complex counterexample.\n")
-            + "\nThis inline sketch omits the original Variable metadata and cannot be independently lowered into a lossless scanner graph. Any presentation re-expansion proof explicitly uses the complete current-0.3 file as a witness. No OVAL/runtime equivalence claim is made.\n")
+            + ("- A self-contained research rewrite will be provided by the independent-lowering step if this candidate passes.\n" if item["disposition"] == "candidate_research" else
+               "- No rewrite: retained/complex/provenance-audit counterexample.\n")
+            + "\nOnly complete-metadata, independently lowerable experimental rewrites are distributed. No OVAL/scanner runtime equivalence is claimed.\n")
         cases.append(dict(benchmark=key, rule_id=rid, category=item["category"],
                           folder=folder.relative_to(out).as_posix(), proposed_sketch=proposal,
                           oval_sha256=provenance["sha256"]))
@@ -377,8 +359,8 @@ def run(args):
     for c in cases:
         lines.append(f"| {BENCHMARKS[c['benchmark']]} {c['rule_id']} | {c['category']} | [{c['folder']}]({c['folder']}/README.md) |")
     lines += ["", "Every directory contains **original-1.4.oval.xml** directly beside **current-0.3.assessment.yaml**.",
-              "The optional `proposed-0.4.RESEARCH.yaml` is deliberately not a schema-valid 0.3 Assessment. It omits the source Variable's metadata and therefore is not a self-contained, reversible 0.4 compiler input.",
-              "VERIFICATION.json tests structural presentation round trips against the paired current-0.3 file as an explicit witness; this does not establish 0.4 lowering or OVAL/runtime semantic equivalence.",
+              "Only `proposed-0.4.SELF-CONTAINED.RESEARCH.yaml` examples are distributed when independently lowerable to the exact parsed 0.3 Assessment. Older incomplete sketches are not shipped.",
+              "VERIFICATION.json verifies all complete experimental examples lower independently into the exact original parsed 0.3 graph. This does not establish OVAL/scanner runtime semantic equivalence.",
               "Source OVAL includes each Rule's full referenced Definitions/Tests/Objects/States/Variables.",
               "For shared native Assessments the original OVAL is the representative Rule closure, not a claim of one-to-one file identity.", ""]
     (out / "README.md").write_text("\n".join(lines))
