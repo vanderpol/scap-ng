@@ -9,7 +9,7 @@ A **Rule** says *what is required*; an **Assessment** says *how to check it*. Fo
 
 ## Start here: the Rule and its automated Assessment
 
-**SCAP 1.4:** A Rule points to an OVAL Definition; following its Tests, Objects and States usually means jumping among separate IDs. **SCAP-NG:** The Rule still says *what is required*, but its Assessment shows *how to check it*, with local Objects and direct typed comparisons rather than separately named States.
+**SCAP 1.4:** A Rule points to an OVAL Definition; following its Tests, Objects and States usually means jumping among separate IDs. **SCAP-NG 0.3:** The Rule still says *what is required*, but its Assessment shows *how to check it*, with local Objects and direct comparisons rather than separately named States. Ordinary string, Boolean and integer comparisons omit redundant `datatype`; specialized comparisons use typed operators.
 
 ### 1. The Rule chooses how to check the requirement
 
@@ -44,12 +44,10 @@ tests:
         mount_point:
           value: .*\\/home
           operation: pattern_match
-          datatype: string
     states:
       - field: mount_options
         value: nosuid
         operation: equals
-        datatype: string
         match: one_or_more
         existence: one_or_more
     reported_elements: all
@@ -59,7 +57,7 @@ evaluate:
   test: home-mounted-nosuid-option-test
 ```
 
-Read the check from top to bottom: the **Test** checks the mount options; its local **Object** selects the `/home` filesystem; its local **comparison** expects `nosuid`; and **`evaluate`** identifies the Test that supplies the Assessment's technical outcome.
+Read the check from top to bottom: the **Test** checks the mount options; its local **Object** selects the `/home` filesystem; its local **comparison** expects `nosuid`; and **`evaluate`** identifies the Test that supplies the Assessment's technical outcome. Both literal expectations are strings, so their redundant `datatype: string` declarations are omitted in the actual 0.3 authoring ZIP; the compiler restores explicit comparison types when creating the canonical Assessment.
 
 Unlike SCAP 1.4's separately referenced Test/Object/State records, this check can be understood in one place. The Rule's title, severity and fix remain in the [policy example](README.md#rhel-9-rule--the-requirement).
 
@@ -175,13 +173,10 @@ SCAP-NG keeps familiar OVAL concepts (Test, Object, State, Variable, Item) but p
 
 ### Datatype simplification: less code, unchanged comparison meaning
 
-**SCAP 1.4:** Each OVAL State entity declares a datatype and comparison
-operation. **SCAP-NG 0.3:** An ordinary numeric, Boolean or string comparison
-can use its native YAML value type. Only a genuinely specialized comparison
-needs a descriptive typed operator.
+**SCAP 1.4:** An OVAL entity carries an explicit comparison datatype and operation. **SCAP-NG 0.3:** An ordinary string, integer, Boolean or unambiguous finite floating-point literal can convey its datatype through its YAML value type. Specialized comparison algorithms instead use descriptive typed operators. This is an **authoring simplification**: comparison types remain explicit in the compiled Assessment.
 
 For example, the real Apache STIG Rule **SV-214273** compares an Apache
-version. The same expected value now reads:
+version. Its expected `2.4` is a **version**, not an ordinary string. The two equivalent source forms read:
 
 ```yaml
 # Existing fully typed 0.3 form (also still accepted)
@@ -196,22 +191,18 @@ value: '2.4'
 operation: version_greater_than_or_equal
 ```
 
-**What changes?** Only the source syntax. The 0.3 compiler reconstructs the
-original explicit `datatype: version` and `operation: greater_than_or_equal`
-before capability validation and bundle creation. Regular comparisons such
-as `value: 10` / `operation: greater_than_or_equal` omit datatype entirely.
-Unresolved Variable/Input contracts, arrays and ambiguous comparisons
-remain explicitly typed. There is no author-facing `compare_as` field.
+**What changes?** Only the source syntax. The 0.3 compiler reconstructs the original explicit `datatype: version` and `operation: greater_than_or_equal` before capability validation and bundle creation. Using plain `operation: greater_than_or_equal` with the quoted value `'2.4'` **without** an explicit type would instead infer a **string** comparison, changing its meaning. Do not make that substitution.
+
+The distinction also applies to **equality**, not only ordering: a source `version_equals` check comparing `1.0` with `1.0.0` can succeed under OVAL version rules, while `equals` on the two strings does not. This is an illustrative comparison-semantics boundary, not a claim that the cited Apache STIG contains that equality Test. Other specialized operators include `rpm_evr_greater_than`, `debian_evr_less_than`, and `ipv4_subset_of`; they are part of the proposed 0.3 authoring vocabulary but still require independent scanner conformance testing for their respective algorithms.
+
+Ordinary comparisons such as `value: 10` / `operation: greater_than_or_equal` omit `datatype` entirely. A plain YAML `value: '10'` remains a **string**, not integer 10. There is no author-facing `compare_as` field. **Typed Variable references, Organizational Inputs, literal arrays and records remain explicitly typed** wherever inference would be ambiguous. Technical Results/System Characteristics also retain their separate **collected-field datatype** for evidence and casting; removing authored comparison boilerplate does not remove result typing.
 
 In the six-STIG authoring corpus, **4,532 of 5,267 datatype declarations
 (86.0%)** were structurally eligible for this conservative source-only
 simplification; **735 remain explicit**. These are authored occurrence
 counts, not unique STIG Rules or runtime benchmarks. [Implementation and
 conformance tracker #200](https://github.com/vanderpol/scap-ng/issues/200).
-The ongoing release gate compares all six compiled bundles byte-for-byte
-between the old and new source forms; this must pass before describing a
-published package as compiler-equivalent. Full OVAL 5.12.3 runtime
-equivalence remains a separate independent validation requirement.
+The [published six-STIG typed-operator release](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f) **passed byte-for-byte compiled bundle equivalence for all six STIGs** using the old and new source forms. That proves the simplification did not change the packaged canonical comparison data in this sample; full OVAL 5.12.3 evaluator/collector runtime equivalence remains a separate independent validation requirement ([#200](https://github.com/vanderpol/scap-ng/issues/200)). Source representations for OVAL `INF`, `-INF` and `NaN` remain a separately tracked gap ([#218](https://github.com/vanderpol/scap-ng/issues/218)).
 
 ### Consumer-local components and shared Objects
 
@@ -240,7 +231,7 @@ The [review guide](../../review/current/REVIEW-GUIDE.md) identifies real current
 
 ### Static values without Variable plumbing
 
-**SCAP 1.4:** Static multi-value constants often require separate Variables. **SCAP-NG 0.3:** Inline exact compile-time literals while retaining datatype and source quantifiers.
+**SCAP 1.4:** Static multi-value constants often require separate Variables. **SCAP-NG 0.3:** Inline exact compile-time literals while retaining the **explicit type for multi-valued/array expectations** and preserving the source quantifiers. Unlike a single scalar literal, an array is not yet eligible for type inference.
 
 **Real converted RHEL 9 SV-257923:** library directories are listed directly in a `unix.file` selector:
 
@@ -295,7 +286,7 @@ tests:
         datatype: integer
 ```
 
-This is an excerpt; the full converted example also includes explicit quantifiers and reporting fields.
+This is an excerpt; the full converted example also includes explicit quantifiers and reporting fields. **Keep `datatype: integer` here:** `value` is a *Variable reference*, not a literal integer from which the comparison type can be uniquely inferred. Removing it would weaken the source's typed Variable binding and fails the conservative 0.3 authoring rules.
 
 ### Predictable named component IDs
 
@@ -315,12 +306,11 @@ filters:
     field: owner_uid
     value: 0
     operation: equals
-    datatype: integer
     match: all
     existence: one_or_more
 ```
 
-A Filter tests **observed collected Items**, not collection selector inputs. The Filter keeps its include/exclude behavior but no longer needs a named State, `state:` wrapper, capability, or title. Its source State identity/comment is retained in migration provenance. See the [short normative explanation](../assessment/selection-and-filters.md).
+A Filter tests **observed collected Items**, not collection selector inputs. The expected `value: 0` is a native integer, so the authoring Filter can omit redundant `datatype: integer`. The compiler restores the typed integer comparison before capability validation. The Filter keeps its include/exclude behavior but no longer needs a named State, `state:` wrapper, capability, or title. Its source State identity/comment is retained in migration provenance. See the [short normative explanation](../assessment/selection-and-filters.md).
 
 ### Explicit evaluation logic
 
@@ -401,6 +391,8 @@ states:
     existence: one_or_more
 ```
 
+**Keep `datatype: string` in this illustration:** `value.input` supplies a dynamic typed reference, not an inline scalar string. The input's declaration, policy binding, and any source quantifiers must continue to determine the effective comparison type explicitly.
+
 The Benchmark parameter, Rule binding, Assessment input contract, completed
 Input Set, request and resolution context are shown together in the
 [worked source files](../../research/iterations/003/examples/organizational-input/README.md).
@@ -417,7 +409,7 @@ Missing required input must not produce a fabricated pass.
 
 An Assessment can depend on another Assessment's result and combine it in its own `evaluate` expression. That is **result reuse**, distinct from sharing collected Objects or Items across Assessments.
 
-**Agreed logical-ID authoring target (illustrative; not yet compiler-supported):**
+**Illustrative logical-ID authoring pattern (dependency compilation implemented; not a complete standalone Assessment):**
 
 ```yaml
 assessment:
@@ -439,7 +431,7 @@ The publisher refers to the stable Assessment ID; the build resolves it within a
 
 ### Research-only syntax comparisons (not 0.3 schemas)
 
-**[Board Discussion #213: full comparison and three YAML samples](https://github.com/vanderpol/scap-ng/discussions/213)** compares the same real RHEL 9 Assessment using **current 0.3**, **Ansible-inspired**, and **inspection-oriented** notation. B/C remain research-only and are not 0.3 schema-valid or executable. [Vote A/B/C/D in the same Discussion](https://github.com/vanderpol/scap-ng/discussions/213); this is nonbinding feedback, not an accepted schema change.
+**[Canonical Board Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213)** now includes the datatype-cleaned A/B/C examples, shared-acquisition terminology, and **named Ansible-inspired checks with explicit `evaluate: all`/`any`** for nested multi-check logic. B/C remain research-only and are not 0.3 schema-valid or executable; simplifying their prose does not prove SCAP 1.4 conversion fidelity. [Vote A/B/C/D there](https://github.com/vanderpol/scap-ng/discussions/213); this is nonbinding feedback, not a Board-ratified format. The superseded Discussion #219 was deleted.
 
 **Flagship integration example: [Windows Server 2025 SV-278029 — time synchronization](../../research/iterations/003/examples/stig-derived/SV-278029/README.md).** Combines reusable domain/PDC applicability, conditional evaluation, existing Registry collection, approved organizational time sources, and explainable results. [Readable proposed authoring](../../research/iterations/003/examples/stig-derived/SV-278029/readable-authoring.proposal.yaml) is **research-only, not schema-valid or executable**; PDC resolution, NTP token parsing and missing-input semantics remain open. This example supports side-by-side comparison of original requirements and proposed authoring.
 
@@ -451,7 +443,7 @@ The examples above show how to read and write an Assessment; you don't need the 
 
 ### Where to find real source files
 
-Use the [SCAP-NG prereleases](https://github.com/vanderpol/scap-ng/releases) to download the six-STIG native authoring ZIP and separate compiled scanning bundles. Each immutable release identifies its input revisions and checksums; confirm the release you select includes the latest [nonredundant Assessment default-choice update (#217)](https://github.com/vanderpol/scap-ng/issues/217).
+Use the [verified 0.3 typed-operator prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f) for **one six-STIG native authoring ZIP and six separate compiled scanner bundles**. The release incorporates both the [nonredundant default Assessment choice (#217)](https://github.com/vanderpol/scap-ng/issues/217) and the [datatype/operator simplification (#200)](https://github.com/vanderpol/scap-ng/issues/200), with pinned inputs and SHA-256 checksums.
 
 Native authoring files are under `authoring/<benchmark>/` and reusable Assessments under `authoring/shared/assessments/`. Rule and applicability links use stable logical Assessment identities rather than paths. The authoring source contains no parallel faithful/candidate trees or conversion evidence sidecars. These are pre-alpha source and package demonstrations, **not** proof of live scanner conformance, publisher trust or OVAL Board ratification. See the [synthetic result fixtures](0.3.0/results/README.md) for example result payloads.
 
