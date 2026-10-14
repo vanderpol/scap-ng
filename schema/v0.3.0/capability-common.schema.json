@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.3.0/capability-common.schema.json",
   "x-scap-ng-version": "0.3.0",
-  "x-last-modified": "2026-10-08",
+  "x-last-modified": "2026-10-14",
   "title": "SCAP-NG shared capability schema primitives v0.3.0",
-  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern.",
+  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern. Owner-accepted 0.3 compact source can omit an inferred literal comparison datatype or use a self-describing typed operation; published compiled Assessments retain fully explicit canonical datatypes. compare_as is not supported.",
   "$defs": {
     "variable_reference": {
       "type": "object",
@@ -45,8 +45,7 @@
       "type": "object",
       "required": [
         "value",
-        "operation",
-        "datatype"
+        "operation"
       ],
       "properties": {
         "value": {
@@ -135,6 +134,9 @@
               "variable_match"
             ]
           }
+        },
+        {
+          "$ref": "#/$defs/authoring_type_resolution"
         }
       ]
     },
@@ -143,7 +145,6 @@
       "required": [
         "value",
         "operation",
-        "datatype",
         "match",
         "existence"
       ],
@@ -206,6 +207,9 @@
               "variable_match"
             ]
           }
+        },
+        {
+          "$ref": "#/$defs/authoring_type_resolution"
         }
       ],
       "description": "One typed comparison over an observed field. value_match governs the expected-value population (including an explicitly specified single literal); a singleton literal is treated as a one-member population. A variable, Input or literal array requires value_match. Per observed-Item match and existence are separate."
@@ -253,7 +257,61 @@
         "bitwise_or",
         "pattern_match",
         "subset_of",
-        "superset_of"
+        "superset_of",
+        "float_equals",
+        "float_not_equal",
+        "float_greater_than",
+        "float_greater_than_or_equal",
+        "float_less_than",
+        "float_less_than_or_equal",
+        "binary_equals",
+        "binary_not_equal",
+        "version_equals",
+        "version_not_equal",
+        "version_greater_than",
+        "version_greater_than_or_equal",
+        "version_less_than",
+        "version_less_than_or_equal",
+        "ipv4_equals",
+        "ipv4_not_equal",
+        "ipv4_greater_than",
+        "ipv4_greater_than_or_equal",
+        "ipv4_less_than",
+        "ipv4_less_than_or_equal",
+        "ipv4_subset_of",
+        "ipv4_superset_of",
+        "ipv6_equals",
+        "ipv6_not_equal",
+        "ipv6_greater_than",
+        "ipv6_greater_than_or_equal",
+        "ipv6_less_than",
+        "ipv6_less_than_or_equal",
+        "ipv6_subset_of",
+        "ipv6_superset_of",
+        "rpm_evr_equals",
+        "rpm_evr_not_equal",
+        "rpm_evr_greater_than",
+        "rpm_evr_greater_than_or_equal",
+        "rpm_evr_less_than",
+        "rpm_evr_less_than_or_equal",
+        "debian_evr_equals",
+        "debian_evr_not_equal",
+        "debian_evr_greater_than",
+        "debian_evr_greater_than_or_equal",
+        "debian_evr_less_than",
+        "debian_evr_less_than_or_equal",
+        "fileset_revision_equals",
+        "fileset_revision_not_equal",
+        "fileset_revision_greater_than",
+        "fileset_revision_greater_than_or_equal",
+        "fileset_revision_less_than",
+        "fileset_revision_less_than_or_equal",
+        "ios_version_equals",
+        "ios_version_not_equal",
+        "ios_version_greater_than",
+        "ios_version_greater_than_or_equal",
+        "ios_version_less_than",
+        "ios_version_less_than_or_equal"
       ]
     },
     "match_quantifier": {
@@ -527,7 +585,6 @@
       "required": [
         "value",
         "operation",
-        "datatype",
         "match",
         "existence"
       ],
@@ -623,6 +680,9 @@
               "variable_match"
             ]
           }
+        },
+        {
+          "$ref": "#/$defs/authoring_type_resolution"
         }
       ],
       "additionalProperties": false
@@ -930,6 +990,309 @@
           ]
         }
       ]
+    },
+    "authoring_type_resolution": {
+      "description": "0.3 authoring permits omission of datatype ONLY when a literal and operation unambiguously establish comparison type. Direct Variable/Input/list comparisons retain datatype; compiler expands this union to the exact typed canonical OVAL predicate before capability checks and bundle emission. Typed operation plus datatype is prohibited.",
+      "if": {
+        "required": [
+          "datatype"
+        ]
+      },
+      "then": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "equals",
+              "not_equal",
+              "case_insensitive_equals",
+              "case_insensitive_not_equal",
+              "greater_than",
+              "greater_than_or_equal",
+              "less_than",
+              "less_than_or_equal",
+              "bitwise_and",
+              "bitwise_or",
+              "pattern_match",
+              "subset_of",
+              "superset_of"
+            ]
+          }
+        }
+      },
+      "else": {
+        "anyOf": [
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "case_insensitive_equals",
+                  "case_insensitive_not_equal",
+                  "pattern_match"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal"
+                ]
+              },
+              "value": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal",
+                  "bitwise_and",
+                  "bitwise_or"
+                ]
+              },
+              "value": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "float_equals",
+                  "float_not_equal",
+                  "float_greater_than",
+                  "float_greater_than_or_equal",
+                  "float_less_than",
+                  "float_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "binary_equals",
+                  "binary_not_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "version_equals",
+                  "version_not_equal",
+                  "version_greater_than",
+                  "version_greater_than_or_equal",
+                  "version_less_than",
+                  "version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv4_equals",
+                  "ipv4_not_equal",
+                  "ipv4_greater_than",
+                  "ipv4_greater_than_or_equal",
+                  "ipv4_less_than",
+                  "ipv4_less_than_or_equal",
+                  "ipv4_subset_of",
+                  "ipv4_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv6_equals",
+                  "ipv6_not_equal",
+                  "ipv6_greater_than",
+                  "ipv6_greater_than_or_equal",
+                  "ipv6_less_than",
+                  "ipv6_less_than_or_equal",
+                  "ipv6_subset_of",
+                  "ipv6_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "rpm_evr_equals",
+                  "rpm_evr_not_equal",
+                  "rpm_evr_greater_than",
+                  "rpm_evr_greater_than_or_equal",
+                  "rpm_evr_less_than",
+                  "rpm_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "debian_evr_equals",
+                  "debian_evr_not_equal",
+                  "debian_evr_greater_than",
+                  "debian_evr_greater_than_or_equal",
+                  "debian_evr_less_than",
+                  "debian_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "fileset_revision_equals",
+                  "fileset_revision_not_equal",
+                  "fileset_revision_greater_than",
+                  "fileset_revision_greater_than_or_equal",
+                  "fileset_revision_less_than",
+                  "fileset_revision_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ios_version_equals",
+                  "ios_version_not_equal",
+                  "ios_version_greater_than",
+                  "ios_version_greater_than_or_equal",
+                  "ios_version_less_than",
+                  "ios_version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          }
+        ]
+      }
     }
   }
 }
