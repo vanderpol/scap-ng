@@ -6,6 +6,7 @@ not evaluate a Variable or invent runtime observations, status or test truth.
 """
 from __future__ import annotations
 from collections import Counter, defaultdict
+import csv
 from pathlib import Path
 import argparse
 import hashlib
@@ -51,12 +52,14 @@ def build_plan(document, *, source_path=""):
             reverse[dep].append(n["name"])
     out=[]
     hazards=Counter()
+    depths={}
     for idx,name in enumerate(order,1):
         n=lookup[name]
         ops=n["operations"]
         inputs=n["dependencies"]
         source=n["source_objects"]
         reasons=[]
+        depths[name]=1+max((depths.get(dep,0) for dep in inputs),default=0)
         if ops.get("concat") and len(inputs)+len(source)>1:
             reasons.append("concat_multiple_dynamic_sources__check_cardinality_and_product")
         if ops.get("regex_capture"):
@@ -72,6 +75,7 @@ def build_plan(document, *, source_path=""):
         out.append({
             "sequence":idx,
             "variable_id":name,
+            "upstream_dependency_depth":depths[name],
             "datatype":n["datatype"],
             "kind":n["kind"],
             "operations":ops,
@@ -92,6 +96,7 @@ def build_plan(document, *, source_path=""):
         "source_path":source_path,
         "source_structure_sha256":hashlib.sha256(serialized.encode()).hexdigest(),
         "stage_count":len(out),
+        "longest_variable_chain":max(depths.values(),default=0),
         "stage_order_proven_acyclic":True,
         "unresolved_variable_refs":sorted(missing),
         "potential_debug_hazard_counts":dict(hazards),
@@ -101,7 +106,18 @@ def build_plan(document, *, source_path=""):
 def run(zip_path,study):
     stats=json.loads((study/"STATS.json").read_text())
     summary=Counter()
+    depth_by_benchmark=defaultdict(list)
+    variable_assessments=Counter()
     with zipfile.ZipFile(zip_path) as z:
+        scoped=set()
+        with (study/"ALL-VARIABLES.csv").open(newline="",encoding="utf-8") as fd:
+            for row in csv.DictReader(fd):
+                scoped.add((row["benchmark"],row["source_path"]))
+        for benchmark,path in sorted(scoped):
+            doc=yaml.safe_load(z.read("authoring/"+path))
+            plan=build_plan(doc,source_path=path)
+            depth_by_benchmark[benchmark].append(plan["longest_variable_chain"])
+            variable_assessments[benchmark]+=1
         for case in stats["examples"]:
             folder=study/case["folder"]
             doc=yaml.safe_load((folder/"current-0.3.assessment.yaml").read_text(encoding="utf8"))
@@ -123,6 +139,13 @@ def run(zip_path,study):
         "paired_stage_occurrences":summary["paired_stages"],
         "apache_paired_stage_occurrences":summary["apache_paired_stages"],
         "unresolved_references":summary["unresolved_refs"],
+        "full_release_dependency_chains_by_benchmark":{
+            key:{
+                "assessments_with_variables":len(values),
+                "max_dependency_chain":max(values,default=0),
+                "median_dependency_chain":sorted(values)[len(values)//2],
+                "assessments_with_chain_depth_4_or_more":sum(v>=4 for v in values),
+            } for key,values in depth_by_benchmark.items()},
         "debug_hazard_occurrences":{k.removeprefix("hazard_"):v for k,v in summary.items()
                                    if k.startswith("hazard_")},
         "runtime_trace_data_observed":False,
