@@ -4,7 +4,7 @@
 
 **OVAL Board feedback — informal, nonbinding preference vote.**
 
-**October 14, 2026 owner-approved 0.3 authoring update:** Ordinary scalar comparisons no longer require repeated `datatype: string`; specialized comparisons use self-describing operators. For a fair authoring-vocabulary comparison, all three examples now omit datatype only where the exact scalar/capability makes inference lossless. B/C still lack full conversion/evaluator proof. The live GitHub Discussion #213 opening post may not yet reflect these repo-source changes.
+**October 14, 2026 owner-approved 0.3 authoring update:** Ordinary scalar comparisons no longer require repeated `datatype: string`; specialized comparisons use self-describing operators. For a fair authoring-vocabulary comparison, all three examples now omit datatype only where the exact scalar/capability makes inference lossless. B/C still lack full conversion/evaluator proof. **This file is a historical draft**. The canonical [Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213) has since been updated by the owner, including explicit named `checks` and `evaluate: all`/`any` in option B. The maintained complete opening-post source is [`ASSESSMENT-VOCABULARY-ABCD-SHARED.md`](ASSESSMENT-VOCABULARY-ABCD-SHARED.md). Do not reuse this earlier one-check Option B example.
 
 The same **real RHEL 9 STIG rule SV-257851** (`/home` must be mounted with `nosuid`) is shown below in three authoring styles. Which is easiest to read and maintain?
 
