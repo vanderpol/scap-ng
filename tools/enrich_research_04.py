@@ -100,10 +100,13 @@ def run(zip_path, out, split_root):
             folder = out / entry["folder"]
             source = yaml.safe_load((folder / "current-0.3.assessment.yaml").read_text(encoding="utf-8"))
             if entry["category"].startswith("candidate_"):
-                match = re.search(r"Variable: \\x60([^\\x60]+)\\x60", (folder / "README.md").read_text())
-                if match:
+                variable_line = next(
+                    (line for line in (folder / "README.md").read_text().splitlines()
+                     if line.startswith("Variable: ")), "")
+                quoted_parts = variable_line.split(chr(96))
+                if len(quoted_parts) >= 3:
                     try:
-                        changed, info = inline_variable(source, match.group(1))
+                        changed, info = inline_variable(source, quoted_parts[1])
                         if lower_inline(changed) != source:
                             raise ValueError("roundtrip unequal")
                         dump_inline(folder / "proposed-0.4.SELF-CONTAINED.RESEARCH.yaml", changed)
