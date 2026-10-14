@@ -39,6 +39,25 @@ FAVORITES = {
     "apache_server_2-4_unix_server": ["SV-214228", "SV-214268"],
 }
 
+def dynamic_sources(expression):
+    """Distinct runtime data producers in an expression (not mere function calls)."""
+    found = set()
+    def walk(node):
+        if isinstance(node, list):
+            for child in node:
+                walk(child)
+        elif isinstance(node, dict):
+            if isinstance(node.get("variable"), str):
+                found.add(("variable", node["variable"]))
+            if isinstance(node.get("object"), str):
+                found.add(("object", node["object"]))
+            if "object_values" in node:
+                found.add(("object_values", repr(node["object_values"])))
+            for child in node.values():
+                walk(child)
+    walk(expression)
+    return found
+
 def classify(v, original):
     if original.get("kind") == "external":
         return "retain_external_input"
@@ -59,9 +78,11 @@ def classify(v, original):
         funcs = v["function_counts"]
         if v["kind"] == "direct_object_projection":
             return "candidate_projection"
+        sources = dynamic_sources(expr)
         if funcs.get("concat") == 1 and len(funcs) <= 2:
-            return "candidate_unary_concat_review"
-        if len(funcs) <= 2:
+            return ("candidate_unary_concat_review" if len(sources) == 1
+                    else "retain_multi_source_concat")
+        if len(funcs) <= 2 and len(sources) == 1:
             return "candidate_other_unary_review"
         return "retain_complex_object_input"
     if contexts.get("state") == 1:
@@ -184,28 +205,47 @@ def run(args):
             writer.writerow([json.dumps(item.get(f), sort_keys=True) if isinstance(item.get(f),(dict,list))
                              else item.get(f) for f in fields])
 
-    # Portfolio: at least one per available benchmark, then category diversity,
-    # then additional examples from real Rules (avoid duplicate source files).
+    # Portfolio: in every STIG include one candidate and one retained example;
+    # then add categories not yet represented, balancing benchmark coverage.
     chosen = []
     used = set()
+    by_benchmark_selected = Counter()
+    category_benchmark_selected = Counter()
     def rank(row):
         return (not any(r in FAVORITES[row["benchmark"]] for r in row["rule_ids"]),
                 row["consumer_count"], row["source_path"])
     ordered = sorted(rows, key=rank)
+    def take(row):
+        chosen.append(row)
+        used.add(row["source_path"])
+        by_benchmark_selected[row["benchmark"]] += 1
+        category_benchmark_selected[(row["benchmark"],row["category"])] += 1
     for key in BENCHMARKS:
-        for r in ordered:
-            if r["benchmark"] == key and r["source_path"] not in used:
-                chosen.append(r); used.add(r["source_path"]); break
+        for disposition in ("candidate_research", "retain"):
+            options = [r for r in ordered if r["benchmark"] == key and
+                       r["disposition"] == disposition and r["source_path"] not in used]
+            if options:
+                take(options[0])
     for category in sorted({r["category"] for r in rows}):
         if len(chosen) >= args.max_examples: break
         if any(r["category"] == category for r in chosen): continue
-        for r in ordered:
-            if r["category"] == category and r["source_path"] not in used:
-                chosen.append(r); used.add(r["source_path"]); break
-    for r in ordered:
-        if len(chosen) >= args.max_examples: break
-        if r["source_path"] not in used and (r["disposition"] == "candidate_research" or len(chosen)<9):
-            chosen.append(r); used.add(r["source_path"])
+        options = [r for r in rows if r["category"] == category and r["source_path"] not in used]
+        options.sort(key=lambda r:(by_benchmark_selected[r["benchmark"]], rank(r)))
+        if options and by_benchmark_selected[options[0]["benchmark"]] < 4:
+            take(options[0])
+    # Fill remaining spots with diverse examples, avoiding four near-identical
+    # Apache concat samples when other platforms or mechanisms are available.
+    while len(chosen) < args.max_examples:
+        options = [r for r in rows if r["source_path"] not in used and
+                   by_benchmark_selected[r["benchmark"]] < 4]
+        if not options:
+            break
+        options.sort(key=lambda r:(
+            by_benchmark_selected[r["benchmark"]],
+            category_benchmark_selected[(r["benchmark"],r["category"])],
+            sum(x["category"] == r["category"] for x in chosen),
+            rank(r)))
+        take(options[0])
     cases = []
     for item in chosen:
         key = item["benchmark"]
