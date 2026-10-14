@@ -1,0 +1,124 @@
+name: Publish no-redundant-default six-STIG bundle (#217)
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-six-stig-no-default-choice.yml
+      - tools/drop_redundant_default.py
+      - tools/test_drop_redundant_default.py
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-six-stig-default-choice-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  validate-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 cryptography jsonschema==4.25.1
+      - name: Run focused selector tests
+        run: python -m unittest discover -s tools -p test_drop_redundant_default.py -v
+      - name: Fetch pinned validated six-STIG material
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: 38422154466
+          github-token: ${{ github.token }}
+          name: six-stig-separate-authoring-scanning-preview
+          path: work/input
+      - name: Recreate byte-verified logical authoring and drop duplicate defaults
+        run: |
+          set -euo pipefail
+          (cd work/input && sha256sum --check SHA256SUMS.txt)
+          python tools/curate_native_authoring_zip.py work/input/scap-ng-0.3-six-stig-authoring.zip work/clean.zip --expected-yaml 4012
+          python tools/publish_logical_authoring.py work/clean.zip work/logical.zip
+          mkdir -p work/release
+          python tools/drop_redundant_default.py work/logical.zip work/release/scap-ng-0.3-six-stig-authoring.zip --expected-rules 1567
+          echo "8dfbcf35d2fe61a370e6929d9a6399952e95150b0c37d7eaf7eef9e2a89cff3e  work/release/scap-ng-0.3-six-stig-authoring.zip" | sha256sum --check
+          unzip -q work/release/scap-ng-0.3-six-stig-authoring.zip -d work/source
+      - name: Validate and compile six packages from matching authoring
+        run: |
+          set -euo pipefail
+          mkdir -p work/reports
+          python tools/validate_native_json_schemas.py work/source/authoring --schema-dir schema/v0.3.0 --report work/reports/schema.json
+          python tools/validate_native_package_graph.py work/source/authoring --report work/reports/graph.json
+          python tools/scap_ng_content_compiler.py work/source/authoring --output-dir work/release --metrics work/reports/compiled.json --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 --scap-ng-revision "$GITHUB_SHA"
+          PYTHONPATH=tools python - <<'PY'
+          import yaml
+          from pathlib import Path
+          from scap_ng_content_compiler import verify_bundle
+          rules=list(Path('work/source/authoring').rglob('*.rule.yaml'))
+          assert len(rules)==1567
+          modes={'automated':0,'manual':0}
+          for p in rules:
+              r=yaml.safe_load(p.read_bytes())['rule']
+              assert 'default' not in r['assessment_choices'],p
+              s=r['default_assessment_choice']
+              assert s in r['assessment_choices'],p
+              modes[s]+=1
+          assert modes=={'automated':1391,'manual':176},modes
+          packages=list(Path('work/release').glob('*.scapng'))
+          assert len(packages)==6,packages
+          for p in packages: verify_bundle(p)
+          print('Validated selection and six compiled packages:',modes)
+          PY
+      - name: Write release manifest, hashes and check them
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          root=Path('work/release')
+          files=sorted(p for p in root.iterdir() if p.is_file())
+          assert sum(p.suffix=='.zip' for p in files)==1
+          assert sum(p.suffix=='.scapng' for p in files)==6
+          obj={'format':'scap-ng-0.3-no-redundant-default-choice',
+               'owner_issue':217,'board_ratified':False,
+               'original_validation_run':38422154466,
+               'current_revision':'${{ github.sha }}',
+               'rule_count':1567,'aliases_removed':1567,
+               'defaults':{'automated':1391,'manual':176},
+               'sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in files}}
+          (root/'DOWNLOADS.json').write_text(json.dumps(obj,indent=2,sort_keys=True)+'\n')
+          files=sorted(p for p in root.iterdir() if p.is_file())
+          (root/'SHA256SUMS.txt').write_text(''.join(
+              hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\n' for p in files))
+          PY
+          (cd work/release && sha256sum --check SHA256SUMS.txt)
+      - name: Publish new immutable prerelease and report URL
+        env:
+          ${{ github.token }}: ${{ github.token }}
+          ${{ github.repository }}: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="v0.3.0-six-stig-default-choice-$(echo "$GITHUB_SHA" | cut -c1-12)"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Refuse to overwrite release $tag"; exit 1
+          fi
+          cat > work/RELEASE-NOTES.md <<'EOF'
+          # SCAP-NG 0.3 — explicit Assessment default without redundant alias
+
+          Owner-approved in issue #217. The six-STIG native authoring ZIP has
+          1,567 fewer redundant choice entries (1,391 automated defaults and
+          176 manual defaults). Authors and Tailoring select named Assessment
+          choices; default_assessment_choice explicitly sets the publisher choice.
+          All Assessment definitions remain unchanged. This release contains
+          six freshly compiled and validated .scapng packages matching the ZIP.
+          Previous releases and the root README remain unchanged.
+
+          Pre-alpha, unsigned, not Board-ratified, DISA-issued or production
+          scanner-conformance evidence. Pinned engineering evidence is separate.
+          EOF
+          gh release create "$tag" --target "$GITHUB_SHA" --prerelease --title "SCAP-NG 0.3 — simplified Assessment defaults (six STIGs)" --notes-file work/RELEASE-NOTES.md work/release/scap-ng-0.3-six-stig-authoring.zip work/release/*.scapng work/release/DOWNLOADS.json work/release/SHA256SUMS.txt
+          url="$(gh release view "$tag" --json url --jq .url)"
+          gh issue comment 217 --body "Published six-STIG authoring default-choice cleanup: $url . Source SHA-256: 8dfbcf35d2fe61a370e6929d9a6399952e95150b0c37d7eaf7eef9e2a89cff3e. Six matching .scapng packages validated; pre-alpha, not Board-ratified."
+          echo "RELEASE_URL=$url"
