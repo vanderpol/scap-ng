@@ -37,10 +37,11 @@ jobs:
             core.info('COMMENT_REACTIONS '+d.comments.nodes.reduce((n,c)=>n+c.reactions.totalCount,0));
             const post=d.body;
             const cStart=post.indexOf('## C — Inspection-oriented');
-            const next=post.indexOf('\n---',cStart);
+            const next=post.indexOf('\n## ',cStart+4);
             if(cStart<0)throw Error('Missing Option C');
             const cText=post.slice(cStart,next>=0?next:undefined);
-            const code=cText.match(/```yaml\n([\s\S]*?)\n```/);
+            core.info('DISCUSSION_213_OPTION_C_SECTION_START '+JSON.stringify(cText.slice(0,2200)));
+            const code=cText.match(/```(?:yaml)?[^\n]*\n([\s\S]*?)```/);
             if(!code)throw Error('No Option C fenced YAML');
             const yaml=code[1];
             const columnChecks={
