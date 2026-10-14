@@ -12,6 +12,7 @@ on:
       - tools/research_04_self_contained_inline.py
       - tools/test_research_04_self_contained_inline.py
       - tools/enrich_research_04.py
+      - tools/research_04_flow_patterns.py
 
 permissions:
   contents: write
@@ -90,6 +91,9 @@ jobs:
             --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
             --study work/research/scap-ng-0.4-variable-research \
             --split-root work/split
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_flow_patterns.py \
+            --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
+            --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_research_04_pairs.py \
             work/research/scap-ng-0.4-variable-research \
             > work/research/scap-ng-0.4-variable-research/VERIFICATION.json
@@ -111,6 +115,10 @@ jobs:
           assert syntactic['proofs_by_type'].get('object',0)>0
           assert syntactic['proofs_by_type'].get('variable',0)>0
           assert syntactic['object_source_examples']==2
+          patterns=json.loads((root/'APACHE-DATAFLOW-PATTERNS.json').read_text())
+          assert patterns['apache_assessments_with_variable_dataflow']>0
+          assert patterns['apache_variable_occurrences']>0
+          assert patterns['apache_exact_named_payload_duplicate_groups']>0
           assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
           assert verification['source_pairs']==len(stats['examples'])
@@ -196,6 +204,7 @@ jobs:
             echo "All examples include original-1.4.oval.xml next to current-0.3.assessment.yaml."
             echo "VERIFICATION.json distinguishes older witness-based sketches from self-contained independently lowerable private declarations."
             echo "SELF-CONTAINED-STATS.json reports corpus proofs, refusals, per-STIG chain counts and YAML nesting/size effects; OVAL/scanner runtime parity is NOT claimed."
+            echo "APACHE-DATAFLOW-PATTERNS.json counts duplicated Apache Variable graphs; paired examples include human-readable VARIABLE-FLOW.md diagrams."
             echo
             echo "This is a research classification, NOT validation of the proposed 0.4 syntax or execution equivalence."
           } > work/issue-summary.md
