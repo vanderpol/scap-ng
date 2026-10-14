@@ -129,8 +129,33 @@ def resolved_graph_fingerprint(variable_id, assessment):
                     return {"object_missing":name}
                 return {"resolved_object":walk(
                     clean(objects[name]),var_stack,obj_stack+(name,))}
-            return {k:walk(v,var_stack,obj_stack) for k,v in node.items()
-                    if k not in NONSEMANTIC}
+            resolved={}
+            for k,v in node.items():
+                if k in NONSEMANTIC:
+                    continue
+                if k=="object" and isinstance(v,str):
+                    if v in obj_stack:
+                        missing.add("object-cycle:"+v)
+                        resolved[k]={"object_cycle":v}
+                    elif v not in objects:
+                        missing.add("object-missing:"+v)
+                        resolved[k]={"object_missing":v}
+                    else:
+                        resolved[k]={"resolved_object":walk(
+                            clean(objects[v]),var_stack,obj_stack+(v,))}
+                elif k=="in" and isinstance(v,str) and "item" in node:
+                    if v in obj_stack:
+                        missing.add("object-cycle:"+v)
+                        resolved[k]={"object_cycle":v}
+                    elif v not in objects:
+                        missing.add("object-missing:"+v)
+                        resolved[k]={"object_missing":v}
+                    else:
+                        resolved[k]={"resolved_object":walk(
+                            clean(objects[v]),var_stack,obj_stack+(v,))}
+                else:
+                    resolved[k]=walk(v,var_stack,obj_stack)
+            return resolved
         return node
     if variable_id not in registry:
         raise ValueError("unknown Variable")
