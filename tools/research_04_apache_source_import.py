@@ -16,11 +16,14 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+import re
+import shutil
 import zipfile
 
 import yaml
 
 from prove_apache_observation import CORE_OBJECTS, CORE_VARIABLES, EXPORTS
+from research_04_variable_census import fetch_oval
 
 MODULE_ID = "research.apache.httpd.discovery.source"
 MODULE_VERSION = 1
@@ -158,10 +161,28 @@ def external_references(doc, selected_names):
     return hits
 
 
+def required_source_bindings(assessment, module_source):
+    """The module is parameterized by an existing Assessment-local source Object.
+
+    No implicit source or silently invented collection is permitted. Runtime
+    collection identity remains owned by the consuming Assessment.
+    """
+    sources={
+        **(assessment.get("objects") or {}),
+        **(assessment.get("shared_objects") or {}),
+    }
+    required=module_source.get("requires",{}).get("objects",[])
+    missing=[name for name in required if name not in sources]
+    if missing:
+        raise ValueError("Unresolved required source Object bindings: "+repr(missing))
+    return {name:sha(sources[name]) for name in required}
+
+
 def source_authoring(doc,module):
     """Extract module definitions, retaining output refs by original names."""
     source=validated_module(module)
     a=deepcopy(doc["assessment"])
+    required_source_bindings(a,source)
     if "imports" in a:
         raise ValueError("Assessment already has imports")
     regs={"objects":source["objects"],"variables":source["variables"]}
@@ -217,6 +238,7 @@ def lower_source(authoring,module):
     if binding!=required:
         raise ValueError("Import source identity/digest/export contract mismatch")
     del a["imports"]
+    required_source_bindings(a,source)
     selected={section:set(source[section]) for section in ("objects","variables")}
     hits=external_references({"assessment":a},selected)
     declared_exports={item["name"] for item in source["exports"].values()}
@@ -246,7 +268,7 @@ def collect(zip_path):
         return documents
 
 
-def run(zip_path, study):
+def run(zip_path, study, split_root):
     docs=collect(zip_path)
     candidates=[]
     for path,doc in docs.items():
@@ -297,11 +319,29 @@ def run(zip_path, study):
     consumers.mkdir(parents=True,exist_ok=True)
     for path,original,candidate,refs in extracted[:3]:
         stem=Path(path).stem
-        (consumers/(stem+".import.RESEARCH.yaml")).write_text(
-            "# Experimental authoring-only source import; compiler expands before scanning.\n"
-            +yaml.safe_dump(candidate,sort_keys=False),encoding="utf-8")
-        (consumers/(stem+".expanded-0.3.yaml")).write_text(
+        case=consumers/stem
+        case.mkdir(parents=True,exist_ok=True)
+        (case/"current-0.3.assessment.yaml").write_text(
+            yaml.safe_dump(original,sort_keys=False),encoding="utf-8")
+        (case/"proposed-0.4.import.RESEARCH.yaml").write_text(
+            "# Research-only authoring module; compiled output has no imports.\n"
+            + yaml.safe_dump(candidate,sort_keys=False),encoding="utf-8")
+        (case/"expanded-0.3.assessment.yaml").write_text(
             yaml.safe_dump(lower_source(candidate,module),sort_keys=False),encoding="utf-8")
+        rule_id=re.search(r"SV-[0-9]+",stem)
+        if not rule_id:
+            raise ValueError("Could not pair import example with original OVAL: "+stem)
+        oval, provenance=fetch_oval(
+            split_root,"apache_server_2-4_unix_server",rule_id.group(0))
+        if hashlib.sha256(oval.read_bytes()).hexdigest()!=provenance["sha256"]:
+            raise ValueError("Standalone OVAL provenance digest mismatch")
+        shutil.copyfile(oval,case/"original-1.4.oval.xml")
+        (case/"README.md").write_text(
+            "# "+rule_id.group(0)+" — build-time shared derivation\n\n"
+            "View original-1.4.oval.xml beside current-0.3.assessment.yaml, "
+            "proposed-0.4.import.RESEARCH.yaml and expanded-0.3.assessment.yaml. "
+            "All original 0.3 structures are preserved by compiler lowering. "
+            "No scanner/runtime pooling is introduced.\n",encoding="utf-8")
     report={
         "research_only":True,
         "runtime_semantics_modified":False,
@@ -316,6 +356,9 @@ def run(zip_path, study):
         "export_consumer_references":sum(len(hits) for _,_,_,hits in extracted),
         "original_named_definitions_across_consumers":len(extracted)*(
              len(module["source_module"]["objects"])+len(module["source_module"]["variables"])),
+        "duplicate_declarations_eliminated_from_authoring":(len(extracted)-1)*(
+             len(module["source_module"]["objects"])+len(module["source_module"]["variables"])),
+        "paired_original_oval_import_samples":min(3,len(extracted)),
         "authoring_definitions_with_import_module":len(module["source_module"]["objects"])+len(module["source_module"]["variables"]),
         "consumer_source_references_included":sorted(p for p,_,_,_ in extracted),
         "note":"Exact parsed 0.3 authoring expansion. No scanner runtime work-sharing or OVAL execution claim.",
@@ -337,8 +380,9 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--authoring-zip",type=Path,required=True)
     p.add_argument("--study",type=Path,required=True)
+    p.add_argument("--split-root",type=Path,required=True)
     a=p.parse_args()
-    print(json.dumps(run(a.authoring_zip,a.study),indent=2,sort_keys=True))
+    print(json.dumps(run(a.authoring_zip,a.study,a.split_root),indent=2,sort_keys=True))
 
 if __name__=="__main__":
     main()
