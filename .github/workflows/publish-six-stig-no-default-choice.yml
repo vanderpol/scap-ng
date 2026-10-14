@@ -122,3 +122,10 @@ jobs:
           url="$(gh release view "$tag" --json url --jq .url)"
           gh issue comment 217 --body "Published six-STIG authoring default-choice cleanup: $url . Source SHA-256: 8dfbcf35d2fe61a370e6929d9a6399952e95150b0c37d7eaf7eef9e2a89cff3e. Six matching .scapng packages validated; pre-alpha, not Board-ratified."
           echo "RELEASE_URL=$url"
+      - name: Report failed validation gate without publishing
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh issue comment 217 --body "Six-STIG default-choice workflow did NOT publish a release; one or more verification gates failed. Inspect exact run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID . Original source and all previous releases are unchanged."
