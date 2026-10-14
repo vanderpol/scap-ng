@@ -575,8 +575,9 @@ def main(argv=None):
                         raise ValueError('Cannot bind distinct source default without collision: '+rid)
                     choices[default]=source_default
             else:
-                default='automated' if 'automated' in choices else (
-                    'manual' if 'manual' in choices else next(iter(choices),None))
+                # If source provided no unselected check, preserve existing
+                # authored selector ordering rather than inventing a new default.
+                default=next(iter(choices),None)
             if default is None: raise ValueError('Rule has no Assessment: '+rid)
             if 'default' in choices or default not in choices:
                 raise ValueError('Invalid normalized Assessment choices for '+rid)
