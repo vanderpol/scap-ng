@@ -10,7 +10,7 @@ This page illustrates real converted **Red Hat Enterprise Linux 9 STIG** content
 
 ## RHEL 9 Benchmark
 
-From `rhel9/candidate-authoring/benchmark.yaml` in the [direct RHEL 9 native authoring preview ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-rhel9-source-preview.zip) (current 0.3 examples; surrounding fields are abbreviated):
+From `authoring/rhel_9/benchmark.yaml` in the [combined six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) (current 0.3 examples; surrounding fields are abbreviated):
 
 ```yaml
 benchmark:
@@ -42,7 +42,7 @@ The converted Benchmark contains **445 Rules**, along with description, applicab
 
 **RHEL 9 SV-257851** requires the `nosuid` mount option for the `/home` filesystem. A Rule preserves the STIG title, discussion, identifiers, severity, and fix **without burying the requirement inside test logic**.
 
-From `rhel9/candidate-authoring/rules/SV-257851.rule.yaml` in the same ZIP (the discussion below is abridged; all shown values originate in the actual Rule):
+From `authoring/rhel_9/rules/SV-257851.rule.yaml` in the same ZIP (the discussion below is abridged; all shown values originate in the actual Rule):
 
 ```yaml
 rule:
@@ -176,7 +176,7 @@ That historical pilot passed conversion, optional-output checks, and native-docu
 
 Read the [Assessment examples](assessments.md) to see how that Rule is evaluated, including automated and manual checks, `for_each`, static values, direct Variable evaluation, conditional branches, Organization Input and bounded evidence. The [0.3 result fixture catalog](0.3.0/results/README.md) separately shows Scan, Benchmark, Automated Assessment and Manual Assessment results.
 
-The [six fresh benchmark authoring conversions](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-six-stig-source-preview.zip) passed conversion, native schema/semantics validation and current embedded-Filter checks in [run 37931389745](https://github.com/vanderpol/scap-ng/actions/runs/37931389745). These ZIPs contain source authoring and comparison trees, not compiled scanner packages. The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
+The [six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) and six separately compiled scanner bundles passed source-schema, semantic graph, fresh-compilation and byte-for-byte canonical bundle comparison in the [typed-authoring release gate](https://github.com/vanderpol/scap-ng/issues/200). The old faithful/candidate side-by-side artifacts are historical evidence, not current authoring downloads. The first [active-0.3 full-corpus gate](https://github.com/vanderpol/scap-ng/actions/runs/37838382899) also passed; the [follow-up gate](https://github.com/vanderpol/scap-ng/actions/runs/37846666574) checks later required input/result changes. Neither static validation nor synthetic results establish scanner-runtime equivalence.
 
 ## Technical reference (optional)
 
