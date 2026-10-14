@@ -6,6 +6,8 @@ on:
     paths:
       - tools/research_type_syntax_codec.py
       - tools/test_research_type_syntax_codec.py
+      - tools/test_research_type_evaluation_fixtures.py
+      - tests/datatype-operator-evaluation-0.3/**
       - .github/workflows/research-datatype-authoring-prototype.yml
   workflow_dispatch:
 
@@ -24,6 +26,8 @@ jobs:
       - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Independently authored datatype expectations and rejection cases
         run: python -m unittest discover -s tools -p test_research_type_syntax_codec.py -v
+      - name: Known-result limited OVAL comparison and typed-operator behavior
+        run: python -m unittest discover -s tools -p test_research_type_evaluation_fixtures.py -v
       - name: Download exact pinned six-STIG native authoring ZIP
         env:
           GH_TOKEN: ${{ github.token }}
@@ -71,7 +75,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue comment 200 --body "Research-only datatype syntax CI passed on $GITHUB_SHA. All three strategies restored 4,012/4,012 typed YAML ASTs without differences (4,528 ordinary comparisons plus four version operations; 735 explicit type contracts retained). This is **not** evaluator/OVAL XML parity. Exact run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gh issue comment 200 --body "Research-only datatype syntax and spec-anchored limited expected-result fixtures passed on $GITHUB_SHA. All three strategies restored 4,012/4,012 typed YAML ASTs without differences (4,528 ordinary comparisons plus four version operations; 735 explicit type contracts retained). This is **not** evaluator/OVAL XML parity. Exact run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - name: Report failed structural research gate
         if: failure()
         env:
