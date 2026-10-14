@@ -512,7 +512,7 @@ def main(argv=None):
                 )
                 if not manual_ref:
                     raise ValueError('Blocked applicability requires source manual fallback for '+rid)
-                choices={'default':{'assessment':'../'+manual_ref},'manual':{'assessment':'../'+manual_ref}}
+                choices={'manual':{'assessment':'../'+manual_ref}}
                 blocked_rows=[blocked_applicability[x] for x in blocked_refs]
                 reasons=sorted({row.get('classification') or row.get('reason') for row in blocked_rows})
                 result['applicability_manual_fallback']={
@@ -549,8 +549,37 @@ def main(argv=None):
                                 'context':'applicability',
                             })
                     result['source_defect_manual_fallback_assessment']=manual_ref
-            default='default' if 'default' in choices else next(iter(choices),None)
+            # A source XCCDF check without an explicit selector is not an
+            # additional authored Assessment method. Bind the publisher default
+            # to its existing named method; never duplicate it under 'default'.
+            source_default=choices.pop('default',None)
+            if source_default is not None:
+                identical=[name for name,binding in choices.items()
+                           if binding==source_default]
+                if identical:
+                    default=next((name for name in ('automated','manual')
+                                  if name in identical),identical[0])
+                else:
+                    # Some legacy sources may have a unique unselected check.
+                    # Preserve its distinct method under a descriptive name
+                    # rather than silently substituting another Assessment.
+                    assessment_ref=source_default['assessment'].replace('\\','/')
+                    if '/manual/' in assessment_ref:
+                        label='manual'
+                    elif '/automated/' in assessment_ref:
+                        label='automated'
+                    else:
+                        raise ValueError('Cannot identify source-default Assessment mode: '+rid)
+                    default=label if label not in choices else 'publisher-'+label
+                    if default in choices:
+                        raise ValueError('Cannot bind distinct source default without collision: '+rid)
+                    choices[default]=source_default
+            else:
+                default='automated' if 'automated' in choices else (
+                    'manual' if 'manual' in choices else next(iter(choices),None))
             if default is None: raise ValueError('Rule has no Assessment: '+rid)
+            if 'default' in choices or default not in choices:
+                raise ValueError('Invalid normalized Assessment choices for '+rid)
             content=source.rule_content(element)
             extensions={key:content.pop(key,None) for key in ('documentable','false_positives','false_negatives','mitigations','potential_impacts','responsibility')}
             for key in ('requires','conflicts'):
