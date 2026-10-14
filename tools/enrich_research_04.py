@@ -206,7 +206,7 @@ def run(zip_path, out, split_root):
             f"in {summary['metric_deltas']['cases_with_deeper_nesting']} cases.\n")
         stream.write(
             "- Full metrics: SELF-CONTAINED-PROOFS.csv and SELF-CONTAINED-STATS.json.\n"
-            "- Unlike the older inline sketches, files named "
+            "- Only files named "
             "proposed-0.4.SELF-CONTAINED.RESEARCH.yaml carry complete local definitions "
             "and independently lower exactly into the released 0.3 source.\n"
             "- Original standalone OVAL files accompany the two new Object examples "
