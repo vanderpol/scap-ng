@@ -4,6 +4,8 @@
 
 **OVAL Board feedback — informal, nonbinding preference vote.**
 
+**October 14, 2026 owner-approved 0.3 authoring update:** Ordinary scalar comparisons no longer require repeated `datatype: string`; specialized comparisons use self-describing operators. For a fair authoring-vocabulary comparison, all three examples now omit datatype only where the exact scalar/capability makes inference lossless. B/C still lack full conversion/evaluator proof. The live GitHub Discussion #213 opening post may not yet reflect these repo-source changes.
+
 The same **real RHEL 9 STIG rule SV-257851** (`/home` must be mounted with `nosuid`) is shown below in three authoring styles. Which is easiest to read and maintain?
 
 **How to vote:** After reviewing the three YAML examples, add **👍 to exactly one of the four voting comments directly beneath this opening post**:
@@ -52,12 +54,10 @@ tests:
         mount_point:
           value: .*\\/home
           operation: pattern_match
-          datatype: string
     states:
       - field: mount_options
         value: nosuid
         operation: equals
-        datatype: string
         match: one_or_more
         existence: one_or_more
     reported_elements: all
@@ -76,11 +76,9 @@ check:
   where:
     mount_point:
       matches_regex: '.*\\/home'
-      datatype: string
   expect:
     mount_options:
       equals: nosuid
-      datatype: string
       existence: one_or_more
       match: one_or_more
   require:
@@ -102,11 +100,9 @@ checks:
       select:
         mount_point:
           matches_regex: '.*\\/home'
-          datatype: string
     expect:
       - field: mount_options
         equals: nosuid
-        datatype: string
         field_values:
           existence: one_or_more
           satisfy: one_or_more
