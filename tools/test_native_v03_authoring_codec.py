@@ -68,6 +68,33 @@ class NativeV03TypedAuthoringTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     canonicalize_assessment_document(wrap({"value":value,"operation":operation}))
 
+    def test_current_v03_json_schema_accepts_compact_typed_comparisons(self):
+        import json
+        from pathlib import Path
+        from jsonschema import Draft202012Validator
+        source = Path(__file__).resolve().parents[1] / "schema/v0.3.0/capability-common.schema.json"
+        definitions = json.loads(source.read_text())["$defs"]
+        for section in ("object_entity_base", "state_entity_base", "scalar_value_predicate"):
+            validator = Draft202012Validator({
+                "$defs": definitions, "$ref": "#/$defs/" + section
+            })
+            base = {"value": "1.2", "operation": "version_equals"}
+            if section != "object_entity_base":
+                base.update(match="all", existence="one_or_more")
+            self.assertEqual(list(validator.iter_errors(base)), [], section)
+            self.assertEqual(list(validator.iter_errors({
+                **base, "operation": "equals", "datatype": "version"
+            })), [], section)
+            self.assertTrue(list(validator.iter_errors({
+                **base, "datatype": "version"
+            })), "typed source with datatype should be rejected")
+            self.assertTrue(list(validator.iter_errors({
+                **base, "value": {"variable": "some-variable"}, "operation": "equals"
+            })), "bare dynamic reference cannot silently infer datatype")
+            self.assertTrue(list(validator.iter_errors({
+                **base, "value": 8, "operation": "version_equals"
+            })), "version typed op requires string literal")
+
     def test_canonical_03_backward_compatible_and_02_unmodified(self):
         original=wrap({"value":"1.2","datatype":"version","operation":"equals"})
         self.assertEqual(canonicalize_assessment_document(original),original)
