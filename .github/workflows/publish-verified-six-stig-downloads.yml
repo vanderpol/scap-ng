@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - .github/workflows/publish-verified-six-stig-downloads.yml
+      - tools/curate_native_authoring_zip.py
+      - tools/test_curate_native_authoring_zip.py
+      - tools/publish_authoring_and_bundle_previews.py
   workflow_dispatch:
 
 permissions:
@@ -19,6 +22,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Validate native-only authoring ZIP packaging contract
+        run: python tools/test_curate_native_authoring_zip.py
       - name: Download pinned, already-validated release inputs
         uses: actions/download-artifact@v4
         with:
@@ -128,7 +133,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          tag="v0.3.0-six-stig-clean-authoring-38422154466"
+          tag="v0.3.0-six-stig-clean-authoring-${GITHUB_SHA:0:12}"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "::error::Refusing to overwrite existing release $tag"
             exit 1
