@@ -86,6 +86,58 @@ The **compiler**, not the eventual scanner, SHALL resolve all authored sugar to 
 
 **No native 0.3 schema, converter, compiler, benchmark or release asset is changed by this research.**
 
+## Authoring vocabulary decision direction — 2026-10-14
+
+**Owner preference: typed operations, no authored `compare_as`.** In this
+small set of exceptional comparisons, the single explicit name is more
+readable than an extra type modifier. This is an accepted **authoring direction
+for continued research**, not yet a ratified or implemented normative schema
+change; the OVAL evaluation-equivalence gate is still open.
+
+Examples (read as **the collected Item compared against the authored value**):
+
+```yaml
+# Ordinary expected value: datatype inferred at compile time
+value: 10
+operation: greater_than_or_equal
+
+# Exceptional version ordering: the datatype is part of the operation
+value: '2.4'
+operation: version_greater_than_or_equal
+
+# RPM and Debian package versions have different ordering rules
+value: '1:2.0-1'
+operation: rpm_evr_greater_than
+
+# IP prefix comparison with OVAL-specific error semantics
+value: '192.0.2.0/24'
+operation: ipv4_subset_of
+
+# Rare non-inferable case: source comparison is float, literal is integer
+value: 1
+operation: float_equals
+```
+
+**An operation is one combined token; there is no separate authored
+`compare_as` property.** Implementors MAY generate the complete legal
+typed-operation table from the pinned common datatype/operation matrix
+instead of maintaining dozens of manually handwritten handlers. That internal
+operator enum size is not an author-facing complexity cost: almost all
+authored comparisons use simple ordinary operations.
+
+Ordinary scalar comparisons can omit redundant datatype only when their
+effective source type is **uniquely determined** from valid YAML scalar tags
+and the applicable capability field contract. Typed Variable/Input declarations
+and ambiguous, dynamic, record or array values stay explicitly typed unless
+separately proven lossless. Canonical compiler output continues to declare
+the precise comparison datatype and legacy-compatible base operation.
+
+The `compare-as` and `hybrid` modes are retained in the **research codec**
+only as historical comparative controls. The default research prototype now
+uses the `typed-operators` mode. Future conformance tests need validate
+specialized **equality as well as ordering**, including nonfinite-float
+representation tracked in [#218](https://github.com/vanderpol/scap-ng/issues/218).
+
 ## Mandatory verification before any normative change
 
 - Golden corpus: all non-deprecated OVAL 5.12.3 datatype/operator legal pairs and deliberately illegal pairs, extracted from *pinned* XSD/Schematron rather than guessed. Include all 13 native datatype categories, fixed capability field types, Object selectors, States, nested record fields, Variables, external Organizational Inputs and literal Components.
