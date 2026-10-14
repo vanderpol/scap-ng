@@ -224,7 +224,22 @@ def run(zip_path, study):
             continue
         candidates.append((path,doc,module))
     if not candidates:
-        raise ValueError("No full legacy Apache 4-Object+11-Variable source graphs in immutable 0.3 authoring; do not claim compatibility")
+        counts=[]
+        for path,doc in docs.items():
+            a=doc["assessment"]
+            counts.append({
+                "path":path,
+                "objects":len(a.get("objects") or {}),
+                "shared_objects":len(a.get("shared_objects") or {}),
+                "variables":len(a.get("variables") or {}),
+                "core_objects_found":[name for name in CORE_OBJECTS if name in (a.get("objects") or {})],
+                "core_variables_found":[name for name in CORE_VARIABLES if name in (a.get("variables") or {})],
+                "sample_variable_names":list((a.get("variables") or {}))[:14],
+                "sample_object_names":list((a.get("objects") or {}))[:8],
+            })
+        print("APACHE_CURRENT_RELEASE_LAYOUT="+json.dumps(
+            sorted(counts,key=lambda x:-x["variables"])[:4],sort_keys=True))
+        raise ValueError("Legacy 4-Object+11-Variable publisher graph does not exist in the published 0.3 layout; inspect current 0.3 inventory")
     groups={}
     for path,doc,module in candidates:
         groups.setdefault(sha(module),[]).append((path,doc,module))
