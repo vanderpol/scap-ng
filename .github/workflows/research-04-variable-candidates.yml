@@ -1,0 +1,157 @@
+name: 0.4 Variable and nested-Object research (#223)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-variable-candidates.yml
+      - tools/research_04_variable_census.py
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: variable-research-04
+  cancel-in-progress: false
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+  AUTHORING_TAG: v0.3.0-six-stig-typed-operators-5796d016b12f
+
+jobs:
+  census:
+    name: Six-STIG source-paired variable census
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1 jsonschema
+      - name: Download exact six-STIG 0.3 authoring baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/input
+          gh release download "$AUTHORING_TAG" --pattern scap-ng-0.3-six-stig-authoring.zip --dir work/input
+          test -s work/input/scap-ng-0.3-six-stig-authoring.zip
+          sha256sum work/input/scap-ng-0.3-six-stig-authoring.zip
+      - name: Split pinned NIWC originals into standalone OVAL closures
+        run: |
+          set -euo pipefail
+          declare -A zipfiles=(
+            [rhel_9]="U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
+            [oracle_linux_9]="U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip"
+            [ms_windows_11]="U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip"
+            [ms_windows_server_2025]="U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip"
+            [ms_windows_server_dns]="U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip"
+            [apache_server_2-4_unix_server]="U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip"
+          )
+          for key in rhel_9 oracle_linux_9 ms_windows_11 ms_windows_server_2025 ms_windows_server_dns apache_server_2-4_unix_server; do
+            file="niwc/Current/${zipfiles[$key]}"
+            test -s "$file"
+            python scap-ng/tools/scap14_rule_splitter.py "$file" \
+              --output-dir "work/split/$key" \
+              --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+              --source-revision "$NIWC_REVISION" \
+              --source-repository-path "Current/${zipfiles[$key]}" \
+              --benchmark-key "$key" \
+              --fail-on-unresolved
+          done
+      - name: Measure released authoring and build OVAL-paired research cases
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_variable_census.py \
+            --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
+            --split-root work/split \
+            --output work/research/scap-ng-0.4-variable-research \
+            --max-examples 18
+      - name: Verify every exported case and produce portable research ZIP
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile, yaml
+          root=Path('work/research/scap-ng-0.4-variable-research')
+          stats=json.loads((root/'STATS.json').read_text())
+          assert len(stats['six_benchmark_use_counts'])==6
+          assert stats['benchmark_usage_count']>0
+          assert stats['unique_variable_definitions']>0
+          assert sum(v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())==stats['benchmark_usage_count']
+          assert all(v.get('candidate_research',0)+v.get('retain',0)==v.get('variables',0) for v in stats['six_benchmark_use_counts'].values())
+          assert stats['examples'] and len(stats['examples'])<=18
+          for item in stats['examples']:
+              folder=root/item['folder']
+              assert (folder/'original-1.4.oval.xml').is_file()
+              assert (folder/'current-0.3.assessment.yaml').is_file()
+              assert hashlib.sha256((folder/'original-1.4.oval.xml').read_bytes()).hexdigest()==item['oval_sha256']
+              assert '<oval_definitions' in (folder/'original-1.4.oval.xml').read_text() or 'oval_definitions' in (folder/'original-1.4.oval.xml').read_text()
+              yaml.safe_load((folder/'current-0.3.assessment.yaml').read_text())
+              if item['proposed_sketch']:
+                  yaml.safe_load((folder/'proposed-0.4.RESEARCH.yaml').read_text())
+          z=Path('work/scap-ng-0.4-variable-research.zip')
+          with zipfile.ZipFile(z,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
+              for p in sorted(root.rglob('*')):
+                  if p.is_file():
+                      arc=(Path('scap-ng-0.4-variable-research')/p.relative_to(root)).as_posix()
+                      archive.write(p,arc)
+          with zipfile.ZipFile(z) as archive:
+              assert archive.testzip() is None
+          print('PAIRED_OVAL_CASES_VERIFIED=',len(stats['examples']))
+          print('VARIABLE_USE_COUNTS=',stats['benchmark_usage_count'])
+          print('CANDIDATE_COUNTS=',sum(v.get('candidate_research',0) for v in stats['six_benchmark_use_counts'].values()))
+          print('RETAIN_COUNTS=',sum(v.get('retain',0) for v in stats['six_benchmark_use_counts'].values()))
+          print('ZIP_SHA256=',hashlib.sha256(z.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-0.4-variable-research-and-source-oval
+          path: work/scap-ng-0.4-variable-research.zip
+          if-no-files-found: error
+          compression-level: 6
+      - name: Publish durable, clearly research-only prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="v0.4.0-variable-research-${GITHUB_SHA:0:12}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Immutable research prerelease already exists: $tag"
+            exit 1
+          fi
+          gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
+            --title "SCAP-NG 0.4 Variable authoring research (${GITHUB_SHA:0:12})" \
+            --notes "RESEARCH ONLY for issue #223; not normative 0.3 or adopted 0.4 syntax. Includes a six-STIG variable census, retained-variable statistics, and standalone OVAL originals beside current 0.3 and hypothetical 0.4 Assessment examples." \
+            work/scap-ng-0.4-variable-research.zip
+          echo "Research: https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag" >> "$GITHUB_STEP_SUMMARY"
+      - name: Put results on the research issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="v0.4.0-variable-research-${GITHUB_SHA:0:12}"
+          {
+            echo "### Verified six-STIG 0.4 variable research"
+            echo
+            echo "Immutable [research ZIP with co-located standalone OVAL sources](https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag)."
+            echo
+            sed -n '/### Six STIG variable classifications/,/### Side-by-side/p' work/research/scap-ng-0.4-variable-research/README.md | sed '$d'
+            echo
+            echo "Full category counts: STATS.json; every Variable: ALL-VARIABLES.csv."
+            echo "All examples include original-1.4.oval.xml next to current-0.3.assessment.yaml."
+            echo
+            echo "This is a research classification, NOT validation of the proposed 0.4 syntax or execution equivalence."
+          } > work/issue-summary.md
+          gh issue comment 223 --body-file work/issue-summary.md
