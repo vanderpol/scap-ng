@@ -40,6 +40,36 @@ class SourceGraphImportTests(unittest.TestCase):
         self.assertEqual(author["assessment"]["imports"]["apache_discovery"]["sha256"],sha(mod))
         self.assertNotIn("imports",lower_source(author,mod)["assessment"])
 
+    def test_one_bug_fix_updates_all_15_builds_without_copy_editing(self):
+        """One source change, 15 affected builds; unchanged pins must fail closed."""
+        mod, base=fixture()
+        consumers=[]
+        for i in range(15):
+            original=deepcopy(base)
+            original["assessment"]["id"]=f"SV-{i+1:06d}"
+            original["assessment"]["tests"]["target-test"]["title"]=f"Different rule {i+1}"
+            author,_=source_authoring(original,mod)
+            consumers.append((original,author))
+
+        corrected=deepcopy(mod)
+        corrected["source_module"]["variables"]["intermediate"]["expression"]={
+            "literal":"/corrected"
+        }
+        self.assertNotEqual(sha(corrected),sha(mod))
+        for original,author in consumers:
+            # Publishing a changed shared graph cannot silently change consumers.
+            with self.assertRaisesRegex(ValueError,"digest"):
+                lower_source(author,corrected)
+            # Research prototype pins per Assessment. A future common lockfile
+            # could centrally manage this pin, but must remain fail-closed.
+            author["assessment"]["imports"]["apache_discovery"]["sha256"]=sha(corrected)
+            expanded=lower_source(author,corrected)
+            self.assertEqual(
+                expanded["assessment"]["variables"]["intermediate"]["expression"],
+                {"literal":"/corrected"})
+            self.assertEqual(expanded["assessment"]["tests"],original["assessment"]["tests"])
+            self.assertEqual(expanded["assessment"]["id"],original["assessment"]["id"])
+
     def test_module_type_tamper_refused(self):
         mod,doc=fixture()
         mod["source_module"]["exports"]["config"]["datatype"]="boolean"
