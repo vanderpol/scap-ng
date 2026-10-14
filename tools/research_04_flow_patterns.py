@@ -131,7 +131,7 @@ def graph_markdown(assessment, rid, key):
 
 def run(source_zip, study):
     with zipfile.ZipFile(source_zip) as z:
-        names=[n for n in z.namelist() if n.endswith(".assessment.yaml") and n.startswith("authoring/")]
+        names=[n for n in z.namelist() if n.endswith(".yaml") and n.startswith("authoring/")]
         docs={}
         for name in names:
             obj=yaml.safe_load(z.read(name))
