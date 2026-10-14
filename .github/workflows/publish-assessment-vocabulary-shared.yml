@@ -2,10 +2,6 @@ name: Audit canonical Discussion 213 terminology (read-only)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/publish-assessment-vocabulary-shared.yml
 
 permissions:
   contents: read
@@ -21,21 +17,21 @@ jobs:
         with:
           script: |
             const fs=require('fs');
-            const source=fs.readFileSync('board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md','utf8');
+            const source=fs.readFileSync('board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md','utf8').replace(/\r\n/g,'\n');
             const marker='scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-SHARED-20261009';
             const result=await github.graphql('query($owner:String!,$name:String!){repository(owner:$owner,name:$name){discussion(number:213){url body number comments(first:100){totalCount pageInfo{hasNextPage} nodes{body reactions(first:1){totalCount} replies(first:1){totalCount}}}}}}',{owner:context.repo.owner,name:context.repo.repo});
             const d=result.repository.discussion;
             if(!d||!d.body.includes(marker)||!source.includes(marker))throw Error('Unexpected Discussion #213 identity');
             if(d.comments.pageInfo.hasNextPage||d.comments.nodes.length!==d.comments.totalCount)throw Error('Cannot assess all comments');
             for(const key of ['A','B','C','D'])if(d.comments.nodes.filter(x=>x.body.includes('scap-ng-canonical-vote: '+key+'-20261009')).length!==1)throw Error('Missing/duplicate voting comment '+key);
-            if(d.body===source){
+            if(d.body.replace(/\r\n/g,'\n')===source){
               core.info('VERIFIED_DISCUSSION_213_MATCHES_SOURCE '+d.url);
             }else{
-              core.warning('Discussion #213 is not yet updated. Copy the complete source from https://github.com/vanderpol/scap-ng/issues/220 into the opening-post Edit control. This workflow is READ ONLY; no vote comments or existing engagement are changed.');
+              core.warning('Discussion #213 differs from repository reference text. Review differences deliberately; this audit never edits posts, replies or reactions.');
             }
             core.info('VOTE_COMMENTS_PRESERVED '+d.comments.totalCount);
             core.info('COMMENT_REACTIONS '+d.comments.nodes.reduce((n,c)=>n+c.reactions.totalCount,0));
-            const post=d.body;
+            const post=d.body.replace(/\r\n/g,'\n');
             const cStart=post.indexOf('## C — Inspection-oriented');
             const next=post.indexOf('\n## ',cStart+4);
             if(cStart<0)throw Error('Missing Option C');
@@ -56,7 +52,7 @@ jobs:
             core.info('DISCUSSION_213_INSPECTION_AUDIT '+JSON.stringify(columnChecks));
             const glossary=post.split('\n').filter(x=>x.startsWith('| ') && (x.includes('Require Items')||x.includes('Require field instances')||x.includes('Choose / combine technical')));
             core.info('DISCUSSION_213_VOCABULARY_TABLE '+JSON.stringify(glossary));
-            const stale=post.split('\n').filter(x=>/\bsatisfy\b|items\.satisfy|field_values\.satisfy/i.test(x));
+            const stale=post.split('\n').filter(x=>/items\.satisfy|field_values\.satisfy/i.test(x));
             core.info('DISCUSSION_213_REMAINING_SATISFY_REFERENCES '+JSON.stringify(stale));
             if(!columnChecks.item_match||!columnChecks.field_match||!columnChecks.no_satisfy_token)
               core.warning('Option C changed incompletely: inspect item and field-value match keys');
