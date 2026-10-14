@@ -52,6 +52,7 @@ proposals are not listed as delivered features.
 - Resolved native Rule, Assessment, dependency and applicability authoring
   references by logical ID at compilation; transitional source-path support
   remains for imported content. [#199](https://github.com/vanderpol/scap-ng/issues/199)
+- Removed redundant `assessment_choices.default` from native 0.3 Rules; the required `default_assessment_choice` now names the actual publisher check, preserving Tailoring selection and manual-only checks. Frozen 0.2.0 is unchanged. [#217](https://github.com/vanderpol/scap-ng/issues/217)
 - Added typed compact Rule Result findings and Test-centered bounded
   Assessment evidence without claiming actual scanner results.
   [#203](https://github.com/vanderpol/scap-ng/issues/203) [#205](https://github.com/vanderpol/scap-ng/issues/205)
