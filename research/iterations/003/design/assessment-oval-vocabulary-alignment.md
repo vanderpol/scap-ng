@@ -1,6 +1,6 @@
 # Assessment vocabulary alignment with OVAL
 
-**Status:** pre-alpha design decision for iteration 003
+**Status: historical iteration-003 vocabulary snapshot, not current normative 0.3 source syntax.** It preserves earlier named-State forms and explicit scalar datatypes to document the design evolution. The accepted 0.3 format instead uses [direct inline State predicates and optional scalar datatype inference](../../../specification/assessment/assessment-method.md); specialized comparisons, including versions, use typed operators. See the [current examples](../../../specification/examples/assessments.md) and [canonical Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213). Historical examples below are intentionally not rewritten into executable 0.3.
 
 This document records the SCAP-NG Assessment vocabulary to use before deeper
 capability-schema generation.
