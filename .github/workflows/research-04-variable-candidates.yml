@@ -14,6 +14,7 @@ on:
       - tools/enrich_research_04.py
       - tools/research_04_flow_patterns.py
       - tools/research_04_board_preview.py
+      - tools/test_research_04_flow_patterns.py
 
 permissions:
   contents: write
@@ -50,6 +51,7 @@ jobs:
         run: |
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_validate_research_04_pairs.py -v
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_self_contained_inline.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_flow_patterns.py -v
       - name: Download exact six-STIG 0.3 authoring baseline
         env:
           GH_TOKEN: ${{ github.token }}
@@ -122,6 +124,7 @@ jobs:
           assert patterns['apache_assessments_with_variable_dataflow']>0
           assert patterns['apache_variable_occurrences']>0
           assert patterns['apache_exact_named_payload_duplicate_groups']>0
+          assert patterns['apache_complete_closed_graph_duplicate_groups']>=0
           assert (root/'BOARD-RESEARCH-PREVIEW.md').is_file()
           assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
