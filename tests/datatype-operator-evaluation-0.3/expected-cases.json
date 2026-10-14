@@ -1,0 +1,201 @@
+{
+  "description": "Independent human-assigned expected results for a strictly limited slice of OVAL 5.12.3; not the full Self-Assertion corpus, and not runtime scanner conformance.",
+  "authority": "https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html",
+  "cases": [
+    {
+      "id": "string-preserve-leading-zero",
+      "type": "string",
+      "observed": {
+        "datatype": "string",
+        "value": "1"
+      },
+      "comparison": {
+        "value": "01",
+        "operation": "equals",
+        "datatype": "string"
+      },
+      "expected": "false",
+      "basis": "OVAL 5.12.3 EntityAttributeGroup; lexical string equality"
+    },
+    {
+      "id": "string-true-capitalization",
+      "type": "string",
+      "observed": {
+        "datatype": "string",
+        "value": "True"
+      },
+      "comparison": {
+        "value": "True",
+        "operation": "equals",
+        "datatype": "string"
+      },
+      "expected": "true",
+      "basis": "String value True is not automatically coerced to Boolean"
+    },
+    {
+      "id": "integer-cast-collected-text",
+      "type": "integer",
+      "observed": {
+        "datatype": "string",
+        "value": "01"
+      },
+      "comparison": {
+        "value": 1,
+        "operation": "equals",
+        "datatype": "integer"
+      },
+      "expected": "true",
+      "basis": "OVAL State comparison datatype controls cast; string 01 parses as integer 1"
+    },
+    {
+      "id": "integer-cast-error",
+      "type": "integer",
+      "observed": {
+        "datatype": "string",
+        "value": "abc"
+      },
+      "comparison": {
+        "value": 1,
+        "operation": "equals",
+        "datatype": "integer"
+      },
+      "expected": "error",
+      "basis": "OVAL EntityAttributeGroup requires error when observed value cannot cast to integer"
+    },
+    {
+      "id": "integer-ordered-false",
+      "type": "integer",
+      "observed": {
+        "datatype": "integer",
+        "value": 8
+      },
+      "comparison": {
+        "value": 10,
+        "operation": "greater_than",
+        "datatype": "integer"
+      },
+      "expected": "false",
+      "basis": "Observed 8 is not greater than expected 10"
+    },
+    {
+      "id": "boolean-true-equality",
+      "type": "boolean",
+      "observed": {
+        "datatype": "boolean",
+        "value": true
+      },
+      "comparison": {
+        "value": true,
+        "operation": "equals",
+        "datatype": "boolean"
+      },
+      "expected": "true",
+      "basis": "Native Boolean true, not string True"
+    },
+    {
+      "id": "version-zero-padding",
+      "type": "version",
+      "observed": {
+        "datatype": "version",
+        "value": "1.0.0"
+      },
+      "comparison": {
+        "value": "1.0",
+        "operation": "equals",
+        "datatype": "version"
+      },
+      "expected": "true",
+      "basis": "OVAL version components pad missing trailing zero"
+    },
+    {
+      "id": "version-numeric-order",
+      "type": "version",
+      "observed": {
+        "datatype": "version",
+        "value": "2.10"
+      },
+      "comparison": {
+        "value": "2.9",
+        "operation": "greater_than",
+        "datatype": "version"
+      },
+      "expected": "true",
+      "basis": "Version comparison uses numeric component order rather than lexical order"
+    },
+    {
+      "id": "ipv4-subset",
+      "type": "ipv4",
+      "observed": {
+        "datatype": "ipv4",
+        "value": "192.0.2.128/25"
+      },
+      "comparison": {
+        "value": "192.0.2.0/24",
+        "operation": "subset_of",
+        "datatype": "ipv4"
+      },
+      "expected": "true",
+      "basis": "Address range of observed /25 is contained in expected /24"
+    },
+    {
+      "id": "ipv4-prefix-error",
+      "type": "ipv4",
+      "observed": {
+        "datatype": "ipv4",
+        "value": "192.0.2.0/25"
+      },
+      "comparison": {
+        "value": "192.0.2.0/24",
+        "operation": "greater_than",
+        "datatype": "ipv4"
+      },
+      "expected": "error",
+      "basis": "OVAL ipv4 relational comparisons with unequal prefix lengths MUST report error"
+    },
+    {
+      "id": "ipv4-prefix-not-equal",
+      "type": "ipv4",
+      "observed": {
+        "datatype": "ipv4",
+        "value": "192.0.2.0/25"
+      },
+      "comparison": {
+        "value": "192.0.2.0/24",
+        "operation": "equals",
+        "datatype": "ipv4"
+      },
+      "expected": "false",
+      "basis": "OVAL ipv4 equality compares address and prefix"
+    },
+    {
+      "id": "ipv6-subset",
+      "type": "ipv6",
+      "observed": {
+        "datatype": "ipv6",
+        "value": "2001:db8:1::/48"
+      },
+      "comparison": {
+        "value": "2001:db8::/32",
+        "operation": "subset_of",
+        "datatype": "ipv6"
+      },
+      "expected": "true",
+      "basis": "IPv6 address set containment"
+    },
+    {
+      "id": "ipv6-prefix-error",
+      "type": "ipv6",
+      "observed": {
+        "datatype": "ipv6",
+        "value": "2001:db8::/48"
+      },
+      "comparison": {
+        "value": "2001:db8::/32",
+        "operation": "less_than",
+        "datatype": "ipv6"
+      },
+      "expected": "error",
+      "basis": "IPv6 ordered comparison with unequal prefix lengths requires error"
+    }
+  ]
+}
