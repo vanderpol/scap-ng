@@ -15,6 +15,8 @@ on:
       - tools/research_04_flow_patterns.py
       - tools/research_04_board_preview.py
       - tools/test_research_04_flow_patterns.py
+      - tools/research_04_apache_source_import.py
+      - tools/test_research_04_apache_source_import.py
 
 permissions:
   contents: write
@@ -52,6 +54,7 @@ jobs:
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_validate_research_04_pairs.py -v
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_self_contained_inline.py -v
           PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_flow_patterns.py -v
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_apache_source_import.py -v
       - name: Download exact six-STIG 0.3 authoring baseline
         env:
           GH_TOKEN: ${{ github.token }}
@@ -97,6 +100,9 @@ jobs:
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_flow_patterns.py \
             --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
             --study work/research/scap-ng-0.4-variable-research
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_apache_source_import.py \
+            --authoring-zip work/input/scap-ng-0.3-six-stig-authoring.zip \
+            --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_board_preview.py \
             --study work/research/scap-ng-0.4-variable-research
           PYTHONPATH=scap-ng/tools python scap-ng/tools/validate_research_04_pairs.py \
@@ -126,6 +132,10 @@ jobs:
           assert patterns['apache_exact_named_payload_duplicate_groups']>0
           assert patterns['apache_complete_closed_graph_duplicate_groups']>=0
           assert (root/'BOARD-RESEARCH-PREVIEW.md').is_file()
+          source_import=json.loads((root/'BUILD-TIME-IMPORT/RESULTS.json').read_text())
+          assert source_import['safe_exact_roundtrip_consumers']>=3
+          assert source_import['runtime_semantics_modified'] is False
+          assert source_import['source_bundle_sha256']
           assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
           assert verification['source_pairs']==len(stats['examples'])
@@ -155,6 +165,7 @@ jobs:
           print('PAIRED_OVAL_CASES_VERIFIED=',len(stats['examples']))
           print('OLD_INCOMPLETE_SKETCHES_SHIPPED=',verification['presentation_round_trips_with_original_witness'])
           print('INDEPENDENT_STRUCTURAL_PROOFS=',syntactic['structural_proofs'])
+          print('SAFE_APACHE_SOURCE_IMPORTS=',source_import['safe_exact_roundtrip_consumers'])
           print('INDEPENDENT_LOWERING_EXAMPLES=',verification['independently_lowerable_examples'])
           print('VARIABLE_USE_COUNTS=',stats['benchmark_usage_count'])
           print('CANDIDATE_COUNTS=',sum(v.get('candidate_research',0) for v in stats['six_benchmark_use_counts'].values()))
