@@ -161,7 +161,9 @@ def lower_inline(doc):
                         raise ValueError("Unsupported private Object registry")
                     ref_name = "object"
                 declarations.append((section, id_, deepcopy(entry["definition"])))
-                return {ref_name: id_}
+                # Collection for_each.in refers to its source Object by a
+                # scalar name, unlike an ordinary Object reference mapping.
+                return {ref_name: id_} if is_var else id_
             return {k: expand(v) for k, v in node.items()}
         if isinstance(node, list):
             return [expand(v) for v in node]
