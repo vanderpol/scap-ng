@@ -28,15 +28,17 @@ Among 22 Apache automated Assessments containing 282 Variable occurrences:
 
 - **20 repeated named-Variable definition groups** cover **248 occurrences**.
 - A stricter transitive fingerprint that includes referenced Variables **and** source Object definitions finds **24 complete repeated graph groups** spanning **238 occurrences**. There were **no missing dependencies** in this closure census.
-- Earlier research separately proved one precise **15-assessment, 4-Object + 11-Variable** shared Apache discovery graph with two typed outputs and exact flattening.
+- The actual released 0.3 authoring has already localized the older shared Objects. A new source-only import prototype therefore reuses the surviving **11-Variable graph**, leaving source collection Objects Assessment-local.
+- **15 of 15** Apache Assessments imported that graph and independently expanded to exactly their original parsed 0.3 content. That removes **154 duplicate Variable declarations** from experimental source authoring while retaining two typed public outputs and all existing runtime semantics.
+- Debugging complexity is measurable: **18 of 22** Apache Assessments containing Variables have dependency chains at least four stages deep; maximum and median longest chain per Assessment are **nine stages**. The other five STIGs have maximum Variable dependency depth of two or less.
 - Common authoring graph shape does **not** by itself prove two evaluations can safely share runtime Items or derived values; target context, error status, completeness and lineage remain requirements.
 
 The biggest readability problem is therefore often **seeing and reusing the same dataflow graph across Assessments**, not simply eliminating one-off names.
 
 ## Recommendations, in order
 
-1. **Explain existing graphs first (no new standard feature).** Generate a concise, collapsible dependency view showing collected inputs → transformation stages → typed outputs → consuming Objects/States/Tests, with the complete unabridged graph and standalone OVAL available on demand. The evidence ZIP includes `VARIABLE-FLOW.md` beside applicable examples.
-2. **Investigate build-time reuse of typed derived-data graphs.** An author imports a verified source-only library of Objects/Variables and selects named typed outputs; the compiler expands it into each consuming Assessment's unchanged 0.3 graph. That can remove cloned authoring without imposing new cross-Assessment runtime statuses, scheduling or caching. Require acyclic imports, explicit namespaces/exports and exact round-trip proof.
+1. **Explain and diagnose existing graphs first.** Generate a concise dependency view showing collected inputs → Variable stages → typed outputs → consuming checks. Produce an optional diagnostic trace with per-stage status, input/output counts, bounded redacted samples, completeness and source Item lineage. The archive now includes `VARIABLE-FLOW.md` and `VARIABLE-DEBUG-PLAN.yaml`; the latter is an authoring-time plan, **not** scanner evidence.
+2. **Generalize the proven build-time Apache reuse.** A source-only import of the surviving 11-Variable graph compiles back to all 15 original 0.3 Assessments. Formalize source identity, hash, explicit exported values, local Object dependencies, namespace/collision checks and cycle rejection. This does not introduce cross-Assessment runtime status, scheduling or caching.
 3. **Treat runtime shared producers as a separate decision.** A scanner-side Observation/provider may later collect once and reuse evidence, but only after proving target binding, collection identity, status/completeness, provenance, redaction and result behavior. **Authoring reuse does not grant runtime reuse.**
 4. **Prototype ordered derived-value stages as an *authoring view*, not a replacement evaluator.** A left-to-right pipeline or SQL-like named stages may communicate intent better than scattered Variable references, but it needs exact lowering into current typed Variable operations without altering multiple values, error handling, correlation or Cartesian products.
 5. **Allow bounded private inlining only where it actually reads better.** The experimental exact-lowering proof works, but widespread full-definition nesting adds lines and depth. Do not generalize from "possible" to "desirable".
@@ -53,6 +55,8 @@ For a short review of *different* semantic situations, start with these director
 - **Windows Server DNS SV-259374:** derived path
 
 Every sample retains the full source `original-1.4.oval.xml` next to the unmodified `current-0.3.assessment.yaml` and any experimental alternatives. Research syntax is visibly identified as **not adopted**.
+
+For a concise technical choice set, read [Board design options](BOARD-DESIGN-OPTIONS.md). The archive's `BUILD-TIME-IMPORT/consumer-samples/` places each source-only imported example beside its original standalone OVAL definition, unmodified 0.3 Assessment, and compiler-expanded output.
 
 ## Gate before proposing 0.4 normative text
 
