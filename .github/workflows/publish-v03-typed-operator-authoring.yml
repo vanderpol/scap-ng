@@ -1,0 +1,180 @@
+name: Publish six-STIG typed-operator authoring and parity (#200)
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-v03-typed-operator-authoring.yml
+      - tools/native_v03_authoring_codec.py
+      - tools/test_native_v03_authoring_codec.py
+      - tools/publish_typed_operation_authoring.py
+      - tools/scap_ng_content_compiler.py
+      - tools/validate_native_json_schemas.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-typed-operation-0.3-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  parity-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install explicit validation dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 ruamel.yaml==0.18.16 jsonschema==4.25.1 cryptography
+      - name: Focused accepted authoring and research regression
+        run: |
+          python -m unittest discover -s tools -p test_native_v03_authoring_codec.py -v
+          python -m unittest discover -s tools -p test_research_type_syntax_codec.py -v
+          python -m unittest discover -s tools -p test_research_type_evaluation_fixtures.py -v
+      - name: Download immutable owner-reviewed six-STIG baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/original
+          gh release download v0.3.0-six-stig-default-choice-af635ecf0255 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work/original
+          echo '8dfbcf35d2fe61a370e6929d9a6399952e95150b0c37d7eaf7eef9e2a89cff3e  work/original/scap-ng-0.3-six-stig-authoring.zip' | sha256sum --check
+      - name: Generate source-only compact authoring ZIP and verify all source semantics
+        run: |
+          set -euo pipefail
+          mkdir -p work/release work/reports
+          python tools/publish_typed_operation_authoring.py \
+            work/original/scap-ng-0.3-six-stig-authoring.zip \
+            work/release/scap-ng-0.3-six-stig-authoring.zip \
+            --report work/reports/authoring-transform.json
+          unzip -q work/original/scap-ng-0.3-six-stig-authoring.zip -d work/baseline
+          unzip -q work/release/scap-ng-0.3-six-stig-authoring.zip -d work/compact
+          python - <<'PY'
+          import json, pathlib
+          r=json.loads(pathlib.Path('work/reports/authoring-transform.json').read_text())
+          assert r['counts']['inferred_scalar']==4528,r
+          assert r['counts']['typed_operator']==4,r
+          assert r['counts']['assessment_yaml']==2433,r
+          assert r['documents']==4013,r
+          print('Source ZIP validated:',r['counts'])
+          PY
+      - name: Compare schema and native graph validation of original and compact source
+        run: |
+          set -euo pipefail
+          for source in baseline compact; do
+            python tools/validate_native_json_schemas.py work/$source/authoring \
+              --schema-dir schema/v0.3.0 --report work/reports/$source-schema.json
+            python tools/validate_native_package_graph.py work/$source/authoring \
+              --report work/reports/$source-graph.json
+          done
+      - name: Compile identical scanner bundles independently from both authoring versions
+        run: |
+          set -euo pipefail
+          mkdir -p work/baseline-bundles work/compact-bundles
+          for source in baseline compact; do
+            python tools/scap_ng_content_compiler.py \
+              work/$source/authoring \
+              --output-dir work/$source-bundles \
+              --metrics work/reports/$source-compiler.json \
+              --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+              --scap-ng-revision "$GITHUB_SHA"
+          done
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from scap_ng_content_compiler import verify_bundle
+          root=Path('work')
+          originals={p.name:p for p in (root/'baseline-bundles').glob('*.scapng')}
+          rewritten={p.name:p for p in (root/'compact-bundles').glob('*.scapng')}
+          assert len(originals)==len(rewritten)==6, (originals,rewritten)
+          for name in sorted(originals):
+              assert name in rewritten
+              old_hash=hashlib.sha256(originals[name].read_bytes()).hexdigest()
+              new_hash=hashlib.sha256(rewritten[name].read_bytes()).hexdigest()
+              assert old_hash==new_hash,(name,old_hash,new_hash)
+              verify_bundle(rewritten[name])
+              print('Byte-for-byte scanner bundle parity verified:',name,old_hash)
+          PY
+          cp work/compact-bundles/*.scapng work/release/
+      - name: Manifest with SHA256 verification
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('work/release')
+          files=sorted(p for p in root.iterdir() if p.is_file())
+          assert len(files)==7 and len([p for p in files if p.suffix=='.scapng'])==6
+          transform=json.loads(Path('work/reports/authoring-transform.json').read_text())
+          data={
+             'format':'scap-ng-0.3-owner-accepted-typed-operator-authoring',
+             'board_ratified':False,
+             'owner_issue':200,
+             'baseline_release':'v0.3.0-six-stig-default-choice-af635ecf0255',
+             'legacy_niwc_source_revision':'8c8e5dff860af6b1290ee9273a282db24278f8d5',
+             'scap_ng_build_revision':'${{ github.sha }}',
+             'assessment_count':2433,
+             'comparison_datatypes_elided':4532,
+             'canonical_bundle_sha256_equal_to_baseline':True,
+             'transformation_report':transform,
+             'files':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in files},
+          }
+          (root/'DOWNLOADS.json').write_text(json.dumps(data,sort_keys=True,indent=2)+'\n')
+          files=sorted(p for p in root.iterdir() if p.is_file())
+          (root/'SHA256SUMS.txt').write_text(''.join(
+            hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\n' for p in files))
+          PY
+          (cd work/release && sha256sum --check SHA256SUMS.txt)
+      - name: Publish isolated pre-alpha release with one authoring ZIP and six bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="v0.3.0-six-stig-typed-operators-$(echo "$GITHUB_SHA" | cut -c1-12)"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Refusing to overwrite historical immutable release"
+            exit 1
+          fi
+          cat > work/release-notes.md <<'EOF'
+          # SCAP-NG 0.3 — concise typed-operator authoring preview
+
+          Owner-approved review direction in issue #200, **not an OVAL Board vote**.
+          Standard scalar comparisons infer type from native YAML; specialized
+          comparisons use a self-describing operation such as
+          version_greater_than_or_equal or rpm_evr_greater_than. No compare_as field.
+
+          The one native six-STIG source authoring ZIP replaces 4,532 redundant
+          datatype fields in scalar comparisons. The six accompanying unsigned
+          .scapng bundles were separately compiled from both old and revised
+          sources and verified byte-for-byte identical. All 2,433 Assessment ASTs
+          reconstruct exactly and schema/graph gates pass.
+
+          Dynamic Variables, arrays and ambiguous contracts retain explicit
+          datatypes. This proves canonical equivalence, **not** independent runtime
+          OVAL 5.12.3 evaluator/scanner conformance. OVAL nonfinite float
+          representation (#218) remains a tracked source-fidelity gap.
+          This pre-alpha release is not DISA-issued or production scanner-certified.
+          EOF
+          gh release create "$tag" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "SCAP-NG 0.3 — typed-operator authoring (six STIGs)" \
+            --notes-file work/release-notes.md \
+            work/release/scap-ng-0.3-six-stig-authoring.zip \
+            work/release/*.scapng work/release/DOWNLOADS.json work/release/SHA256SUMS.txt
+          url="$(gh release view "$tag" --json url --jq .url)"
+          gh issue comment 200 --body "Published owner-accepted 0.3 compact datatype authoring preview after six source schema/graph checks and byte-identical compiled bundle verification: $url ; current SHA $GITHUB_SHA. This is pre-alpha, not independent OVAL runtime conformance or Board ratification."
+          echo "RELEASE_URL=$url"
+      - name: Report failed safety gate without publishing
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh issue comment 200 --body "Typed-operator 0.3 authoring publication did NOT pass every required safety gate. Inspect run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Previous published six-STIG release unchanged."
