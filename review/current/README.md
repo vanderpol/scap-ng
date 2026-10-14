@@ -4,7 +4,7 @@
 
 ## Start with one real download
 
-[**Download the six-STIG native authoring ZIP**](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [GitHub Release including all six compiled `.scapng` bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f) · [SHA-256 manifest](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/SHA256SUMS.txt).
+[**Download the six-STIG native authoring ZIP**](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [GitHub Release including all six compiled `.scapng` bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f).
 
 The authoring archive contains exactly **one normalized set** of RHEL 9,
 Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS and
