@@ -59,7 +59,6 @@ tests:
                 field: owner_uid
                 value: 0
                 operation: equals
-                datatype: integer
                 match: all
                 existence: one_or_more
     existence: none
@@ -80,10 +79,11 @@ states:
   - field: owner_uid
     value: 0
     operation: equals
-    datatype: integer
     match: all
     existence: one_or_more
 ```
+
+In both examples, the expected `value: 0` is an unambiguous integer literal, so native 0.3 source omits `datatype: integer`. At compilation, both comparisons expand back to the same explicit integer datatype and `equals` operation as the original OVAL-compatible predicate. A Variable reference or a literal array would still require an explicit datatype; the collected Item field retains its own independent type.
 
 The Test retains the sole Test capability declaration. A Filter attached to a
 shared Object takes its capability from that Object; a same-capability Set
@@ -103,7 +103,7 @@ first-class when acquisition identity or reuse matters.
    `union`, `intersection`, or `difference`. Preserve action order and
    existing multiplicity/Item-identity semantics; do not arbitrarily
    rearrange filters or move them across Set operators.
-3. Predicate field, datatype, operation, value or typed value source, observed
+3. Predicate field, **effective comparison datatype** (inferred only when safe or explicit as required), operation, value or typed value source, observed
    `match`, field `existence`, expected `value_match`, redaction,
    record/list fields, and nested logical expression are preserved exactly.
    Native logical grouping SHALL not introduce implicit AND/OR semantics.
