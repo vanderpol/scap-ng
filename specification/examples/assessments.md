@@ -193,7 +193,15 @@ operation: version_greater_than_or_equal
 
 **What changes?** Only the source syntax. The 0.3 compiler reconstructs the original explicit `datatype: version` and `operation: greater_than_or_equal` before capability validation and bundle creation. Using plain `operation: greater_than_or_equal` with the quoted value `'2.4'` **without** an explicit type would instead infer a **string** comparison, changing its meaning. Do not make that substitution.
 
-The distinction also applies to **equality**, not only ordering: a source `version_equals` check comparing `1.0` with `1.0.0` can succeed under OVAL version rules, while `equals` on the two strings does not. This is an illustrative comparison-semantics boundary, not a claim that the cited Apache STIG contains that equality Test. Other specialized operators include `rpm_evr_greater_than`, `debian_evr_less_than`, and `ipv4_subset_of`; they are part of the proposed 0.3 authoring vocabulary but still require independent scanner conformance testing for their respective algorithms.
+The distinction also applies to **equality**, not only ordering:
+
+```yaml
+# Illustrative version equality: source semantic type is preserved
+value: '1.0'
+operation: version_equals
+```
+
+A source `version_equals` check comparing `1.0` with `1.0.0` can succeed under OVAL version rules, while `equals` on the two strings does not. This is an illustrative comparison-semantics boundary, not a claim that the cited Apache STIG contains that equality Test. Other specialized operators include `rpm_evr_greater_than`, `debian_evr_less_than`, and `ipv4_subset_of`; they are part of the proposed 0.3 authoring vocabulary but still require independent scanner conformance testing for their respective algorithms.
 
 Ordinary comparisons such as `value: 10` / `operation: greater_than_or_equal` omit `datatype` entirely. A plain YAML `value: '10'` remains a **string**, not integer 10. There is no author-facing `compare_as` field. **Typed Variable references, Organizational Inputs, literal arrays and records remain explicitly typed** wherever inference would be ambiguous. Technical Results/System Characteristics also retain their separate **collected-field datatype** for evidence and casting; removing authored comparison boilerplate does not remove result typing.
 
