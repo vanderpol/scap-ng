@@ -100,3 +100,59 @@ The **compiler**, not the eventual scanner, SHALL resolve all authored sugar to 
 - [OVAL 5.12.3 System Characteristics item types and casting](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-system-characteristics-schema.html).
 - [OVAL 5.12.3 Definitions, Variables and expression semantics](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html).
 - [Current SCAP-NG conversion crosswalk](../../../tools/scap_upconvert_v003/native_capability_mapping.py), [OVAL typed-variable conformance matrix](oval-variable-coverage.md), [OVAL 5.12.3 → NG](../../../specification/migration/oval-5.12.3-to-ng.md), and [SCAP-NG native capability predicates](../../../schema/v0.3.0/capability-common.schema.json).
+
+
+## Reversible syntax prototype — 2026-10-14
+
+**Correction to the initial inventory:** of the 4,774 ordinary-looking
+typed scalars, 246 are typed values without a comparison operation. They
+may be Variable or other noncomparison declarations; removing those types
+without a separate proof risks changing source semantics. The first
+prototype retains those 246 and all other noncomparison declarations.
+
+- **[Research-only reversible codec](../../../tools/research_type_syntax_codec.py)**
+- **[Focused expectations and negative tests](../../../tools/test_research_type_syntax_codec.py)**
+- **[Six-STIG CI and attached reports](../../../.github/workflows/research-datatype-authoring-prototype.yml)**
+
+### Implemented experimental choices
+
+| Strategy | Ordinary YAML scalar | Version | RPM / IP / other specialized types |
+| --- | --- | --- | --- |
+| hybrid | infer native scalar value type | version_equals | compare_as: rpm_evr |
+| typed-operators | infer native scalar value type | version_equals | rpm_evr_equals |
+| compare-as | infer native scalar value type | compare_as: version | compare_as: rpm_evr |
+
+The codec never decides comparison type from values collected by a scanner.
+Every representation converts back to the same explicit canonical
+typed comparisons. All options and their names are **research only**.
+
+### Conservatively proved structural results
+
+All three strategies reconstruct the canonical typed AST for the
+identical pinned six-STIG ZIP (4,012 YAML documents) with **zero mismatches**.
+
+- 4,528 ordinary typed scalar comparisons inferred unambiguously from
+  the parsed YAML scalar type;
+- four version comparisons expressed by specialized operation or
+  optional comparison-type modifier;
+- 623 noncomparison datatype declarations left explicit (377 without
+  values plus 246 with values and no comparison);
+- 112 dynamic-reference or array-valued declarations left explicit;
+- 4,532/5,267 = **86.0%** of authored datatype declarations removed
+  in this conservative research prototype, not the broader 90.7%
+  theoretical figure.
+
+The suite checks legal type/operator combinations across all 13 native
+datatype families, explicit string versus integer/Boolean values,
+integer-literal float comparisons, dynamically referenced values,
+array/record constraints, unknown operations, and invalid comparison
+types. This is **AST structural preservation**, not proven OVAL
+expected-result equivalence, migration XML round-trip, or live scanner
+evaluation. The current OVAL nonfinite float gap is explicitly
+rejected and must be solved before claiming universal SCAP 1.4 losslessness.
+
+Authoritative operation semantics are described in the
+[OVAL 5.12.3 Core Common schema](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-common-schema.html).
+Capability-specific constraints remain a separate required verification
+beyond common datatype support. See the next-stage expected-result and
+runtime test plan earlier in this report.
