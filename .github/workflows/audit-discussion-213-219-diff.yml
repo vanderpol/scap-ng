@@ -1,0 +1,98 @@
+name: Read-only diff of Discussions 213 and 219
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/audit-discussion-213-219-diff.yml
+permissions:
+  contents: read
+  discussions: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch two live discussion posts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');
+            const query='query($owner:String!,$name:String!) { repository(owner:$owner,name:$name) { a:discussion(number:213) {number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}} b:discussion(number:219) {number url title body reactions(first:1){totalCount} comments(first:100){totalCount nodes{body author{login} reactions(first:1){totalCount} replies(first:1){totalCount}}}} }}';
+            const data=await github.graphql(query,{owner:context.repo.owner,name:context.repo.repo});
+            const {a,b}=data.repository;
+            if(!a||!b)throw Error('Discussion #213 or #219 missing');
+            if(a.comments.nodes.length!==a.comments.totalCount || b.comments.nodes.length!==b.comments.totalCount)throw Error('Comments are paged');
+            fs.mkdirSync('diff-evidence',{recursive:true});
+            fs.writeFileSync('diff-evidence/213.md',a.body,'utf8');
+            fs.writeFileSync('diff-evidence/219.md',b.body,'utf8');
+            fs.writeFileSync('diff-evidence/metadata.json',JSON.stringify({a:{...a,body:undefined},b:{...b,body:undefined}},null,2));
+      - name: Separate YAML/code example differences from all prose and voting differences
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from difflib import unified_diff
+          from itertools import zip_longest
+          import json,re
+          p=Path('diff-evidence')
+          d213=(p/'213.md').read_text()
+          d219=(p/'219.md').read_text()
+          meta=json.loads((p/'metadata.json').read_text())
+          a,b=meta['a'],meta['b']
+          def split_fences(s):
+              prose=[];blocks=[];code=[];fence=None
+              for ln in s.splitlines(keepends=True):
+                  if re.match(r'^\s*(?:'+re.escape(chr(96)*3)+r'|~~~)',ln):
+                      if fence is None:
+                          fence=True;code=[ln]
+                          prose.append('<<CODE-'+str(len(blocks)+1)+'>>\n')
+                      else:
+                          code.append(ln);blocks.append(''.join(code));code=[];fence=None
+                  elif fence:
+                      code.append(ln)
+                  else:
+                      prose.append(ln)
+              if fence:
+                  raise ValueError('Unbalanced fenced code')
+              return ''.join(prose),blocks
+          prose213,blocks213=split_fences(d213)
+          prose219,blocks219=split_fences(d219)
+          def diff(x,y,aa,bb):
+              return ''.join(unified_diff(x.splitlines(True),y.splitlines(True),fromfile=aa,tofile=bb))
+          prose_diff=diff(prose213,prose219,'213-prose','219-prose')
+          code_diff=[(i,diff(x,y,'213-block-'+str(i),'219-block-'+str(i))) for i,(x,y) in enumerate(zip_longest(blocks213,blocks219,fillvalue=''),1)]
+          code_diff=[(i,d) for i,d in code_diff if d]
+          ca=a['comments']['nodes'];cb=b['comments']['nodes']
+          comments_diff=diff(json.dumps(ca,indent=2),json.dumps(cb,indent=2),'213-comments','219-comments')
+          def markers(cs):
+              return sorted(set(re.findall(r'scap-ng-canonical-vote:\s*([A-D])-\d+', '\n'.join(x['body'] for x in cs))))
+          checks={
+            'title_equal':a['title']==b['title'],
+            'body_equal':d213==d219,
+            'prose_outside_fences_equal':prose213==prose219,
+            'number_of_code_fences':[len(blocks213),len(blocks219)],
+            'changed_code_fences':[i for i,_ in code_diff],
+            'vote_markers_213':markers(ca),
+            'vote_markers_219':markers(cb),
+            'comment_count_213':a['comments']['totalCount'],
+            'comment_count_219':b['comments']['totalCount'],
+            'comments_identical':ca==cb,
+            'post_reactions':[a['reactions']['totalCount'],b['reactions']['totalCount']],
+            'comment_reactions':[sum(x['reactions']['totalCount'] for x in ca),sum(x['reactions']['totalCount'] for x in cb)],
+            'comment_replies':[sum(x['replies']['totalCount'] for x in ca),sum(x['replies']['totalCount'] for x in cb)]
+          }
+          report='\n'.join(['SOURCE 213: '+a['url'], 'SOURCE 219: '+b['url'],json.dumps(checks,indent=2),'', '--- DIFFERENCES OUTSIDE FENCED EXAMPLES ---',prose_diff or '[NONE]', '--- CHANGED FENCED EXAMPLES ---']+[str(i)+'\n'+d for i,d in code_diff]+['--- COMMENT DIFFERENCES ---',comments_diff or '[NONE]','--- COMPLETE BODY DIFF ---',diff(d213,d219,'213-complete','219-complete') or '[NONE]'])
+          (p/'comparison.txt').write_text(report)
+          print('DISCUSSION COMPARISON FLAGS:\n'+json.dumps(checks,indent=2))
+          print('--- PROSE DIFF ---\n'+(prose_diff[:23000] or '[NONE]'))
+          for i,d in code_diff:
+              print('--- CODE BLOCK '+str(i)+' ---\n'+d[:7500])
+          print('--- COMMENT DIFF ---\n'+(comments_diff[:13000] or '[NONE]'))
+          print('FULL EVIDENCE IN ATTACHED ARTIFACT')
+          PY
+      - name: Archive complete original posts and comparison
+        uses: actions/upload-artifact@v4
+        with:
+          name: discussion-213-vs-219-full-audit
+          path: diff-evidence/
+          retention-days: 30
