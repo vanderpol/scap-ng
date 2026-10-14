@@ -28,8 +28,8 @@ D is a substantive alternative (not abstention). A brief explanation is welcome;
 | Identify which resources | `select` | `where` | `select` |
 | State what values are acceptable | Test-local `states` with direct typed comparisons (no `state:` wrapper) | `expect` | `expect` |
 | Compare field to value | `operation: equals`, `value` | `equals` | `equals` |
-| Require Items to exist / satisfy | Test `existence`, `match` | `require.collected_items`, `require.matching_items` | `items.existence`, `items.satisfy` |
-| Require field instances to exist / satisfy | State `existence`, `match` | `expect.*.existence`, `expect.*.match` | `field_values.existence`, `field_values.satisfy` |
+| Require Items to exist / satisfy | Test `existence`, `match` | `require.collected_items`, `require.matching_items` | `items.existence`, `items.match` |
+| Require field instances to exist / satisfy | State `existence`, `match` | `expect.*.existence`, `expect.*.match` | `field_values.existence`, `field_values.match` |
 | Choose / combine technical results | `evaluate` / `test` | explicit `evaluate` / `check` *(proposed)* | explicit `evaluate` / `check` |
 | Specify visible result fields | `reported_elements` | `report.elements` | `evidence.fields` |
 | Declare capability / preserve type identity | Test and inline Object; embedded comparisons inherit it | one `collect` declaration (proposed) | one typed `check` declaration (proposed) |
@@ -128,10 +128,10 @@ checks:
         equals: nosuid
         field_values:
           existence: one_or_more
-          satisfy: one_or_more
+          match: one_or_more
     items:
       existence: one_or_more
-      satisfy: all
+      match: all
     evidence:
       fields: all
 
@@ -215,7 +215,7 @@ Please choose the clearest **authoring direction**, assuming it must ultimately 
 
 ## What feedback would help after your vote?
 
-Please vote for the direction you actually support. In explaining an A–C vote, consider whether `inspect` or `collect` better conveys *obtain target facts*, whether `select` or `where` more clearly means *identify relevant resources*, and whether `items.satisfy` is clearer than `match`. **Use D** if a different vocabulary or hybrid would be preferable; please explain the needed improvement in the comments below. Do not vote A–C merely to avoid choosing D.
+Please vote for the direction you actually support. In explaining an A–C vote, consider whether `inspect` or `collect` better conveys *obtain target facts*, whether `select` or `where` more clearly means *identify relevant resources*, and whether the nested `items.match` and `field_values.match` terminology is clearer than the alternative B vocabulary. **Use D** if a different vocabulary or hybrid would be preferable; please explain the needed improvement in the comments below. Do not vote A–C merely to avoid choosing D.
 
 There is a genuine timing decision: **if the Board strongly prefers different terms, should 0.3 wait for a defined, tested change, or should we freeze its current vocabulary and make the improvement in a future version?** A straw poll alone cannot settle that technical or release question.
 
