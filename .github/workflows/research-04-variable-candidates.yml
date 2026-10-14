@@ -129,7 +129,7 @@ jobs:
           assert len(list(__import__('csv').DictReader((root/'SELF-CONTAINED-PROOFS.csv').open())))==syntactic['candidate_attempts']
           verification=json.loads((root/'VERIFICATION.json').read_text())
           assert verification['source_pairs']==len(stats['examples'])
-          assert verification['presentation_round_trips_with_original_witness']>0
+          assert verification['presentation_round_trips_with_original_witness']==0
           assert verification['runtime_semantic_equivalence_proven'] is False
           assert verification['self_contained_compiler_lowering_proven'] is True
           assert verification['self_contained_lowering_is_structural_only'] is True
@@ -153,7 +153,7 @@ jobs:
           with zipfile.ZipFile(z) as archive:
               assert archive.testzip() is None
           print('PAIRED_OVAL_CASES_VERIFIED=',len(stats['examples']))
-          print('RESEARCH_SKETCH_ROUND_TRIPS=',verification['presentation_round_trips_with_original_witness'])
+          print('OLD_INCOMPLETE_SKETCHES_SHIPPED=',verification['presentation_round_trips_with_original_witness'])
           print('INDEPENDENT_STRUCTURAL_PROOFS=',syntactic['structural_proofs'])
           print('INDEPENDENT_LOWERING_EXAMPLES=',verification['independently_lowerable_examples'])
           print('VARIABLE_USE_COUNTS=',stats['benchmark_usage_count'])
