@@ -17,6 +17,8 @@ def make(study):
     s=json.loads((study/"STATS.json").read_text())
     p=json.loads((study/"SELF-CONTAINED-STATS.json").read_text())
     a=json.loads((study/"APACHE-DATAFLOW-PATTERNS.json").read_text())
+    source=json.loads((study/"BUILD-TIME-IMPORT/RESULTS.json").read_text())
+    debugging=json.loads((study/"VARIABLE-DEBUG-STATS.json").read_text())
     candidates=sum(x.get("candidate_research",0) for x in s["six_benchmark_use_counts"].values())
     retain=sum(x.get("retain",0) for x in s["six_benchmark_use_counts"].values())
     audit=sum(x.get("audit",0) for x in s["six_benchmark_use_counts"].values())
@@ -56,14 +58,29 @@ def make(study):
         f"- A stricter transitive comparison that includes referenced Variables **and source Objects** identifies **{a['apache_complete_closed_graph_duplicate_groups']}** repeated, complete dependency-graph groups across **{a['apache_complete_closed_graph_duplicate_occurrences']}** Variable occurrences; unresolved authoring dependencies: **{sum(a['apache_incomplete_closed_graph_reasons'].values())}**.",
 
         f"- **{a['apache_expression_duplicate_groups']}** repeated expression signatures spanning Assessments. Identical graphs suggest a reuse opportunity, **not** a proven shared runtime acquisition plan.",
-        "- Earlier Apache Observation research separately proved **15 consumers** sharing an exact **4-Object + 11-Variable** discovery subgraph with two public outputs. Its runtime status/provenance contract is still deferred.",
+        "- Earlier legacy-layout Apache research found a four-Object/11-Variable graph. The **published 0.3 release localizes the source Objects**; do not revive that old layout in a proposed standard.",
+        "",
+        "### New build-time compilation proof using published 0.3 content",
+        "",
+        f"- **{source['safe_exact_roundtrip_consumers']} of {source['identical_graph_candidates']}** Apache Assessment consumers independently expand a single **{source['module_variables']}-Variable source module** back to exactly the same parsed 0.3 assessment; **{len(source['refusals'])} rejected**.",
+        f"- This replaces **{source['original_named_definitions_across_consumers']}** duplicated declarations with **{source['authoring_definitions_with_import_module']}** shared declarations plus explicit imports—a research reduction of **{source['duplicate_declarations_eliminated_from_authoring']}** duplicate Variable declarations.",
+        f"- Public typed outputs: **{', '.join(source['public_exports'])}**. Required Object sources remain local to each Assessment: **{', '.join(source['required_assessment_local_object_sources']) or 'none'}**.",
+        "- Every sample in `BUILD-TIME-IMPORT/consumer-samples/` includes the complete original standalone OVAL XML, released 0.3 YAML, research import, and expanded 0.3 YAML.",
+        "- **Compiler-only sharing does not share scan results or collected Items**, and it adds no runtime status/evidence mechanism.",
+        "",
+        "### Make complex Variable chains diagnosable",
+        "",
+        f"- The study generated **{debugging['paired_diagnostic_plans']}** static diagnostic stage plans covering **{debugging['paired_stage_occurrences']}** stage occurrences; no scanner was run.",
+        "- Each plan records the ordered Variable DAG, operations, inputs, consumer checks, datatypes, and risky multi-source or regex transformations.",
+        "- A future scanner MAY offer optional, bounded **per-stage debugging**: input/output counts, status/completeness/error, source lineage and redacted samples. Keep ordinary assessment results small.",
+        "- Trace details must **never** change scan truth, infer completion from a sample, or leak sensitive values.",
         "",
         "## Approaches worth comparing (not all need a language change)",
         "",
         "| Approach | Benefit | Risk / implementation cost | Working priority |",
         "|---|---|---|---|",
-        "| **Generated dependency map** from existing content | Authors see input → calculation → consumers; zero schema impact | Explain only; no source reduction | **First** |",
-        "| **Build-time shared graph import** | Author discovery once; compiler expands the exact existing 0.3 graph per Assessment | Add explicit typed exports, acyclic namespaces, provenance and compiler validation; **no new runtime behavior** | **High priority to prototype** |",
+        "| **Generated dependency map + optional Variable trace** | Explain input → stage → consumer; surface first incomplete/error stage | Scan-time diagnostics need privacy, result contract and capped evidence | **First; separate normative trace later** |",
+        "| **Build-time shared graph import** | Proven on 15 Apache 0.3 Assessments; exact compiler expansion and typed outputs | Need general namespace/import-cycle/schema contract and independent content-validation gating | **Best scoped 0.4 candidate** |",
         "| **Shared runtime producer / Observation** | Scanner may collect once and reuse typed evidence across Rules | Requires new artifact identity, scheduling, target scope, status/completeness, provenance and caching contract | **Separate future decision** |",
         "| **Small named transformation stages** | A linear left-to-right path may read more naturally than many independent Variables | Must preserve multi-value/cardinality and six-state status; no implicit map/flatten/cartesian | **Prototype only** |",
         "| **Bounded inline expressions** | Reduce boilerplate for single-source, single-consumer expressions | Full-metadata nesting currently adds YAML; readability unknown | **Selective** |",
@@ -112,8 +129,9 @@ def make(study):
         "",
         "**Do not add universal Object nesting or a generic pipeline evaluator to 0.4 now.**",
         "First use generated, inspectable **value/dataflow views**.",
-        "Next prototype a **source-only import** of reusable typed Objects/Variables that",
-        "the compiler expands into each consuming Assessment's canonical 0.3 graph.",
+        "A concrete Apache source-only import now compiles **15/15** Assessments",
+        "back to the exact same parsed 0.3 content; develop its general namespace,",
+        "dependency, typing, validation and import-cycle contract before normative use.",
         "Do not infer that shared authoring implies shared runtime collection or results.",
         "Explore a compact pipeline syntax only if representative real chains become",
         "meaningfully easier to read and lower exactly. Keep explicit Variables valid.",
@@ -121,7 +139,11 @@ def make(study):
         "## Board engagement",
         "",
         "This is suitable as an **informational research preview** after the owner reviews",
-        "its examples; it is **not** a specification ratification request. A later",
+        "its examples; it is **not** a specification ratification request.",
+        "For discussion, ask whether the Board prefers (1) source-only compiler imports",
+        "to remain non-normative authoring tooling, or (2) a shared normative authoring",
+        "contract with exact lowering; and what debug stage evidence is worth standardizing.",
+        "A later",
         "proposal should contain a single precise grammar alternative, its lossless",
         "lowering rules, adversarial test fixtures and quantified benefits.",
         "",
