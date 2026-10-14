@@ -46,6 +46,18 @@ def build_plan(document, *, source_path=""):
         order.append(name)
     for name in lookup:
         visit(name)
+    def check_undefined_refs(node):
+        if isinstance(node,list):
+            for item in node:
+                check_undefined_refs(item)
+        elif isinstance(node,dict):
+            for key,value in node.items():
+                if key=="variable" and isinstance(value,str) and value not in lookup:
+                    missing.add(value)
+                else:
+                    check_undefined_refs(value)
+    for payload in (a.get("variables") or {}).values():
+        check_undefined_refs(payload)
     reverse=defaultdict(list)
     for n in nodes:
         for dep in n["dependencies"]:
