@@ -89,6 +89,20 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
     Reject both exact and conflicting duplicates, preserving distinct answers
     that intentionally share an outcome. Invalid shapes remain schema errors.
     """
+    # Native 0.3 supports concise, human-authored scalar comparisons and
+    # rare typed operators. Expand them to the same fully typed canonical AST
+    # BEFORE running unchanged JSON Schema and capability-specific validators.
+    # Source-level `compare_as` is intentionally rejected. Earlier specs
+    # and already-canonical 0.3 remain untouched.
+    from native_v03_authoring_codec import canonicalize_assessment_document
+    try:
+        doc = canonicalize_assessment_document(doc)
+    except ValueError as exc:
+        yield ValidationError(
+            f"Invalid SCAP-NG 0.3 typed authoring comparison: {exc}",
+            validator="native_authoring_datatype",
+        )
+        return
     yield from v.iter_errors(doc)
     # New versioned capability contracts are checked even in skipped branches.
     assessment = doc.get("assessment")
