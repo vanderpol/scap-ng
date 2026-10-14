@@ -24,22 +24,22 @@ See the [full objectives](specification/objectives.md) and
 - **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
 - **Current review:** [review/current/README.md](review/current/README.md)
 - **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
-- **Six complete STIGs:** [One native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) · [six compiled scanning bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-017183acc8f5)
+- **Six complete STIGs:** [One native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [six compiled scanning bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
 - **Open issues / 0.3 work:** [GitHub issues](https://github.com/vanderpol/scap-ng/issues)
 - **Governance and published votes:** [board/README.md](board/README.md)
 
 
 ## Six-STIG authoring and scanning downloads
 
-The [current owner-reviewed **SCAP-NG 0.3 six-STIG prerelease**](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-017183acc8f5)
+The [current owner-reviewed **SCAP-NG 0.3 six-STIG prerelease**](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
 contains **one native authoring ZIP** (all six STIGs and shared Assessments),
 plus **six separately compiled `.scapng` packages**—one each for RHEL 9,
 Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and
 Apache HTTP Server 2.4 (UNIX).
 
-**[Download the complete native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip)**
-· [open the six compiled bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-017183acc8f5)
-· [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/SHA256SUMS.txt).
+**[Download the complete native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip)**
+· [open the six compiled bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
+· [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/SHA256SUMS.txt).
 
 The native Rules select Assessments by logical ID, use a single explicit
 publisher default, and avoid redundant datatype declarations for ordinary
