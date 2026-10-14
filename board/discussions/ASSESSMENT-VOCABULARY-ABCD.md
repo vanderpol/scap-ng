@@ -1,5 +1,7 @@
 <!-- scap-ng-discussion-id: ASSESSMENT-VOCABULARY-ABCD-20261009 -->
 
+> **Historical vocabulary draft — not the current 0.3 format or live voting text.** Discussion [#213](https://github.com/vanderpol/scap-ng/discussions/213) is the maintained Board discussion, with the revised A/B/C examples, cleaned-up datatype declarations, and Option B named `checks` plus explicit `evaluate` for AND/OR. See [current source](ASSESSMENT-VOCABULARY-ABCD-SHARED.md). This document is retained only for historical design comparison.
+
 # Assessment authoring: A / B / C / D
 
 **OVAL Board / content-author input — informal, nonbinding preference poll.** Given the **same real RHEL 9 STIG requirement (SV-257851: `/home` mounted with `nosuid`)**, which authoring vocabulary is clearest to write, read and review?
