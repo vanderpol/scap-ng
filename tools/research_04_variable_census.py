@@ -344,11 +344,11 @@ def run(args):
             + f"Variable: `{item['variable_id']}` ({item['consumer_count']} consumer references)\n\n"
             + f"Released assessment source: `{item['source_path']}`\n\n"
             + f"Associated Rule IDs: {', '.join(rids)}\n\n"
-            + "- `original-1.4.oval.xml`: verbatim standalone OVAL closure generated from pinned NIWC SCAP 1.4.\n"
+            + "- `original-1.4.oval.xml`: complete standalone OVAL dependency closure generated from pinned NIWC SCAP 1.4.\n"
             + "- `current-0.3.assessment.yaml`: exact released authoring Assessment.\n"
             + ("- `proposed-0.4.RESEARCH.yaml`: complete but **non-normative** hypothetical inline form.\n" if proposal else
                "- No proposed rewrite: this is a deliberate retained/complex counterexample.\n")
-            + "\nNo runtime semantic or OVAL equivalence claim is made by this research sketch.\n")
+            + "\nThis inline sketch omits the original Variable metadata and cannot be independently lowered into a lossless scanner graph. Any presentation re-expansion proof explicitly uses the complete current-0.3 file as a witness. No OVAL/runtime equivalence claim is made.\n")
         cases.append(dict(benchmark=key, rule_id=rid, category=item["category"],
                           folder=folder.relative_to(out).as_posix(), proposed_sketch=proposal,
                           oval_sha256=provenance["sha256"]))
@@ -377,7 +377,8 @@ def run(args):
     for c in cases:
         lines.append(f"| {BENCHMARKS[c['benchmark']]} {c['rule_id']} | {c['category']} | [{c['folder']}]({c['folder']}/README.md) |")
     lines += ["", "Every directory contains **original-1.4.oval.xml** directly beside **current-0.3.assessment.yaml**.",
-              "The optional `proposed-0.4.RESEARCH.yaml` is deliberately not a schema-valid 0.3 Assessment.",
+              "The optional `proposed-0.4.RESEARCH.yaml` is deliberately not a schema-valid 0.3 Assessment. It omits the source Variable's metadata and therefore is not a self-contained, reversible 0.4 compiler input.",
+              "VERIFICATION.json tests structural presentation round trips against the paired current-0.3 file as an explicit witness; this does not establish 0.4 lowering or OVAL/runtime semantic equivalence.",
               "Source OVAL includes each Rule's full referenced Definitions/Tests/Objects/States/Variables.",
               "For shared native Assessments the original OVAL is the representative Rule closure, not a claim of one-to-one file identity.", ""]
     (out / "README.md").write_text("\n".join(lines))
