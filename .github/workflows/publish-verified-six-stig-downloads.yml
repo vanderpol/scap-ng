@@ -1,4 +1,4 @@
-name: Publish one authoring ZIP and six scanner bundles (#215)
+name: Publish logical-ID six-STIG authoring and scanning bundles (#199, #215)
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/publish-verified-six-stig-downloads.yml
       - tools/curate_native_authoring_zip.py
+      - tools/publish_logical_authoring.py
       - tools/test_curate_native_authoring_zip.py
       - tools/publish_authoring_and_bundle_previews.py
   workflow_dispatch:
@@ -24,6 +25,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate native-only authoring ZIP packaging contract
         run: python tools/test_curate_native_authoring_zip.py
+      - name: Install authoring YAML validation dependency
+        run: python -m pip install 'PyYAML>=6,<7'
       - name: Download pinned, already-validated release inputs
         uses: actions/download-artifact@v4
         with:
@@ -41,7 +44,13 @@ jobs:
           python ../tools/curate_native_authoring_zip.py \
             scap-ng-0.3-six-stig-authoring.zip \
             scap-ng-0.3-six-stig-authoring.clean.zip --expected-yaml 4012
-          mv scap-ng-0.3-six-stig-authoring.clean.zip scap-ng-0.3-six-stig-authoring.zip
+          # Published reviewer source uses logical IDs; all 2,433 Assessment
+          # documents remain byte-for-byte identical to the pinned source.
+          python ../tools/publish_logical_authoring.py \
+            scap-ng-0.3-six-stig-authoring.clean.zip \
+            scap-ng-0.3-six-stig-authoring.logical.zip
+          mv scap-ng-0.3-six-stig-authoring.logical.zip scap-ng-0.3-six-stig-authoring.zip
+          rm scap-ng-0.3-six-stig-authoring.clean.zip
           python - <<'PY'
           import hashlib
           import json
@@ -91,6 +100,10 @@ jobs:
               assert len([n for n in names if n.endswith(".yaml")]) == 4012
               assert set(n for n in names if not n.endswith(".yaml")) == {"README.md"}
               assert not any("evidence" in n or "provenance.json" in n or "source-generation.json" in n for n in names)
+              assert not any("../" in zf.read(n).decode("utf-8") for n in names if n.endswith(".rule.yaml"))
+              assert not any("assessment: assessments/" in zf.read(n).decode("utf-8") for n in names if n.endswith("/applicability.yaml"))
+              assert all("applicability_catalog: applicability.yaml" not in zf.read("authoring/" + key + "/benchmark.yaml").decode("utf-8") for key in expected_benchmarks)
+              assert hashlib.sha256((root / authoring).read_bytes()).hexdigest() == "8cd4ee92112c154f821362eb42a1927bd51b8be0abe7e923e7930053611b563a"
 
           for p in sorted(root.glob("*.scapng")):
               with zipfile.ZipFile(p) as zf:
@@ -109,7 +122,7 @@ jobs:
           manifest.pop("source_release", None)  # That intermediate preview was not published.
           manifest["source_validation_run"] = 38420025845
           manifest["compilation_validation_run"] = 38422154466
-          manifest["format"] = "scap-ng-six-stig-one-clean-authoring-six-bundles-preview-0.2"
+          manifest["format"] = "scap-ng-six-stig-logical-id-authoring-six-bundles-preview-0.3"
           manifest["distribution"] = {
               "authoring_zip_count": 1,
               "compiled_scanning_bundle_count": 6,
@@ -133,18 +146,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          tag="v0.3.0-six-stig-clean-authoring-${GITHUB_SHA:0:12}"
+          tag="v0.3.0-six-stig-logical-ids-${GITHUB_SHA:0:12}"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "::error::Refusing to overwrite existing release $tag"
             exit 1
           fi
           cat > publish/RELEASE-NOTES.md <<'EOF'
-          # SCAP-NG 0.3: clean native authoring ZIP + six compiled STIG packages
+          # SCAP-NG 0.3: logical-ID native authoring ZIP + six compiled STIG packages
 
           **Authoring:** one combined ZIP containing six modernized native
           authoring trees, their reusable shared Assessments, and documentation.
           No converter evidence, source-generation, grouping provenance or Rule
-          audit JSON sidecars are included. Native YAML is unchanged.
+          audit JSON sidecars are included. Rule references use Assessment logical
+          IDs instead of ../ filesystem traversal; 2,433 Assessment files are
+          unchanged, and duplicate IDs are rejected during packaging validation.
+          The prior released compiled bundles are unchanged.
 
           **Scanning:** six independent compiled .scapng packages, one for each
           RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025,
@@ -173,7 +189,7 @@ jobs:
           EOF
           gh release create "$tag" \
             --target main \
-            --title "SCAP-NG 0.3 — native-only authoring ZIP + six compiled STIG bundles" \
+            --title "SCAP-NG 0.3 — logical-ID authoring ZIP + six compiled STIG bundles" \
             --notes-file publish/RELEASE-NOTES.md \
             --prerelease \
             publish/scap-ng-0.3-six-stig-authoring.zip \
