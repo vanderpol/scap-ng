@@ -2,7 +2,7 @@
 
 **Audience:** project owner and OVAL Board visitors. These are pre-alpha examples, not a request to ratify 0.3 or a claim of scanner runtime conformance.
 
-**Download:** [one six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/scap-ng-0.3-six-stig-authoring.zip) · [release with six compiled scanner bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-017183acc8f5) · [checksum file](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-017183acc8f5/SHA256SUMS.txt).
+**Download:** [one six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [release with six compiled scanner bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f) · [checksum file](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/SHA256SUMS.txt).
 
 Open the ZIP; all native source paths begin with `authoring/`.
 
