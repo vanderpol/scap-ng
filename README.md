@@ -38,8 +38,7 @@ Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and
 Apache HTTP Server 2.4 (UNIX).
 
 **[Download the complete native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip)**
-· [open the six compiled bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
-· [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/SHA256SUMS.txt).
+· [open the six compiled bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f).
 
 The native Rules select Assessments by logical ID, use a single explicit
 publisher default, and avoid redundant datatype declarations for ordinary
