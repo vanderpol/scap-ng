@@ -8,6 +8,7 @@
 
 - Compliance/vulnerability content uses **Benchmark → Rule → Assessment**. There is no separate Policy object/file.
 - A Rule owns requirement/policy metadata, applicability references, named Assessment choices/selectors, and the default choice.
+- **Owner-approved 2026-10-14 (#217):** The publisher default is the `default_assessment_choice` selector pointing to an existing, named Assessment choice (typically `automated` or `manual`). A duplicate `assessment_choices.default` entry is prohibited in 0.3 native authoring. Tailoring may select a publisher-declared alternate and cannot introduce arbitrary methods. For unusual source formats with distinct unselected checks, conversion SHALL preserve a uniquely named choice rather than silently changing its Assessment.
 - An Assessment owns the automated or manual evaluation method.
 - Rule policy disposition (including current `role` handling for informational use) is separate from Assessment technical truth.
 
