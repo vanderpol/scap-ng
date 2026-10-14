@@ -647,6 +647,15 @@ datatype: version
 operation: greater_than_or_equal
 ```
 
+**Version equality is special too.** A version-typed comparison between
+`1.0` and `1.0.0` uses OVAL's numeric-component rules; ordinary string
+equality between those source spellings does not. Use
+`operation: version_equals` rather than dropping an original
+`datatype: version` and leaving `operation: equals`. Similarly,
+`rpm_evr_*`, `debian_evr_*`, and `ipv4_*` must preserve their
+specialized algorithms and any required error states. No valid source
+comparison may silently become an ordinary lexical string comparison.
+
 Uncertain or multi-valued datatypes—including Variable references, Organizational
 Input bindings, literal arrays, records, and Variable/Input declarations—SHALL
 retain their explicit type contract until an independently proven lossless
@@ -668,9 +677,11 @@ OVAL 5.12.3 special float values are independently tracked in
 
 ### 0.3 State comparison datatype versus collected Item datatype
 
-For OVAL-derived Assessments, **the datatype declared on an authored State
-predicate is the datatype used for comparison, not necessarily the native
-datatype of the collected Item field**. These are separate contracts:
+For OVAL-derived Assessments, **the effective State comparison datatype
+(whether explicit in source or inferred from a safe literal/typed operator)
+governs comparison**, and is not necessarily the datatype of the collected
+Item field. In compiled content that effective datatype is always explicit.
+These are separate contracts:
 
 - The capability's collected-Item field schema identifies the observed value's
   native representation and preserves that representation in evidence.
