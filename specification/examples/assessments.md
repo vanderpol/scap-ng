@@ -411,9 +411,9 @@ The examples above show how to read and write an Assessment; you don't need the 
 
 ### Where to find real source files
 
-The [durable six-STIG source ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-six-stig-source-preview.zip) contains the current converted Linux, Windows, DNS and Apache **candidate authoring** alongside each benchmark's **faithful conversion**, with the embedded Filter/State-predicate updates. The [six individual ZIPs](https://github.com/vanderpol/scap-ng#full-stig-conversion-downloads), [SHA-256 checksums](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/SHA256SUMS.txt), and [review guide](../../review/current/REVIEW-GUIDE.md) are also available.
+Use the [SCAP-NG prereleases](https://github.com/vanderpol/scap-ng/releases) to download the six-STIG native authoring ZIP and separate compiled scanning bundles. Each immutable release identifies its input revisions and checksums; confirm the release you select includes the latest [nonredundant Assessment default-choice update (#217)](https://github.com/vanderpol/scap-ng/issues/217).
 
-Within the combined archive, search `scap-ng-0.3-human-review/benchmarks/<name>/candidate-authoring/` for **`for_each:`**, **`shared_objects:`**, **`filters:`**, **`evaluate:`**, and **`assessment_choices:`**. This is a readability/source conversion preview, **not** a live scanner result, an approved 0.3 release, or proof of six-state runtime equivalence. See the [separate synthetic fixture catalog](0.3.0/results/README.md) for example results; use the ZIP's `SCORECARD.md` for measurements from the corresponding exact build.
+Native authoring files are under `authoring/<benchmark>/` and reusable Assessments under `authoring/shared/assessments/`. Rule and applicability links use stable logical Assessment identities rather than paths. The authoring source contains no parallel faithful/candidate trees or conversion evidence sidecars. These are pre-alpha source and package demonstrations, **not** proof of live scanner conformance, publisher trust or OVAL Board ratification. See the [synthetic result fixtures](0.3.0/results/README.md) for example result payloads.
 
 ### What the production conversion measurements actually mean
 
