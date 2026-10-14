@@ -52,7 +52,9 @@ def make(study):
         "### Apache is the most revealing case",
         "",
         f"- **{a['apache_assessments_with_variable_dataflow']}** Apache automated Assessments with Variable graphs and **{a['apache_variable_occurrences']}** Variable uses.",
-        f"- **{a['apache_exact_named_payload_duplicate_groups']}** repeated exact-named-definition groups with **{a['apache_exact_named_payload_duplicate_occurrences']}** total occurrences (groups may overlap across assessed Rules).",
+        f"- **{a['apache_exact_named_payload_duplicate_groups']}** exact-named-definition repeat groups span **{a['apache_exact_named_payload_duplicate_occurrences']}** Variable occurrences.",
+        f"- A stricter transitive comparison that includes referenced Variables **and source Objects** identifies **{a['apache_complete_closed_graph_duplicate_groups']}** repeated, complete dependency-graph groups across **{a['apache_complete_closed_graph_duplicate_occurrences']}** Variable occurrences; unresolved authoring dependencies: **{sum(a['apache_incomplete_closed_graph_reasons'].values())}**.",
+
         f"- **{a['apache_expression_duplicate_groups']}** repeated expression signatures spanning Assessments. Identical graphs suggest a reuse opportunity, **not** a proven shared runtime acquisition plan.",
         "- Earlier Apache Observation research separately proved **15 consumers** sharing an exact **4-Object + 11-Variable** discovery subgraph with two public outputs. Its runtime status/provenance contract is still deferred.",
         "",
