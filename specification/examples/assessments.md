@@ -19,13 +19,14 @@ The **real RHEL 9 STIG Rule SV-257851** requires the `/home` filesystem to use t
 rule:
   id: SV-257851
   assessment_choices:
-    default:
-      assessment: home-is-mounted-with-the-nosuid-option
     automated:
       assessment: home-is-mounted-with-the-nosuid-option
     manual:
       assessment: SV-257851.manual
+  default_assessment_choice: automated
 ```
+
+`default_assessment_choice` explicitly selects the publisher default; external Tailoring can choose the listed `manual` option. There is no redundant `default` Assessment entry. [#217](https://github.com/vanderpol/scap-ng/issues/217)
 
 The Rule and requirement are real. The **compiler now resolves these logical IDs** to Assessment source files and packages them automatically. Existing SCAP 1.4 converter output still uses transitional relative paths; migrating generated content and verifying all cross-file reference types remains tracked in [#199](https://github.com/vanderpol/scap-ng/issues/199).
 
