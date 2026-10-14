@@ -11,7 +11,7 @@ from drop_redundant_default import rewrite_rule, curate
 
 def rule(default="automated", distinct=False):
     automated="check.auto"
-    legacy="check.manual" if distinct else ("check.auto" if default=="automated" else "check.manual")
+    legacy="check.unique" if distinct else ("check.auto" if default=="automated" else "check.manual")
     choices=f"""  assessment_choices:
     default:
       assessment: {legacy}
