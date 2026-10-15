@@ -94,6 +94,35 @@ class SingleGrammarTests(unittest.TestCase):
         doc["assessment"]["tests"]["demo"]["states"][1]["all"][0]["operation"]="not_pattern_match"
         with self.assertRaisesRegex(ValueError,"Nonstandard comparison operator"):
             make_single(doc)
+    def test_object_set_filter_actions_with_native_predicate_and_missing(self):
+        doc=self.sample()
+        test=doc["assessment"]["tests"]["demo"]
+        test["object"]={
+            "capability":"unix.file",
+            "set":{"operator":"union","operands":[
+                {"object":{"capability":"unix.file",
+                           "select":{"directory":{"operation":"equals","value":"/bin"}}},
+                 "filters":[
+                    {"action":"exclude","field":"mode",
+                     "operation":"greater_than","value":493,
+                     "existence":"one_or_more","match":"all"},
+                    {"action":"include","all":[
+                        {"field":"owner_uid","operation":"equals","value":0,
+                         "existence":"one_or_more","match":"all"},
+                        {"field":"group_uid","operation":"equals","value":0,
+                         "existence":"one_or_more","match":"all"}]},
+                 ]}
+            ]}
+        }
+        short,counts,notes=make_single(doc)
+        filters=short["assessment"]["tests"]["demo"]["object"]["set"]["operands"][0]["filters"]
+        self.assertEqual(counts["object_set_filter_verbs"],2)
+        self.assertEqual(filters[0]["exclude"]["mode"]["greater_than"],493)
+        self.assertEqual(filters[0]["exclude"]["mode"]["require"],
+                         "at_least_one_exists_and_all_match")
+        self.assertEqual(filters[1]["include"]["all"][0]["owner_uid"]["equals"],0)
+        self.assertEqual(lower_single(short),normalize_inert_source_checks(doc,notes))
+
     def test_every_native_operator_is_covered_by_one_key(self):
         native,compact=operator_enum()
         self.assertEqual(len(native),len(compact))
