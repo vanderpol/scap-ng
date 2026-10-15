@@ -6,6 +6,7 @@ on:
     paths:
       - tools/generate_capability_schema_v04.py
       - tools/test_generate_capability_schema_v04.py
+      - tools/test_generate_capability_schema_v04_corpus.py
       - .github/workflows/generate-v04-capabilities.yml
       - schema/v0.4.0/capability-mappings/**
       - schema/v0.4.0/assessment-language.schema.json
@@ -29,3 +30,12 @@ jobs:
       - name: Generate/validate Linux and Windows native 0.4 capability contracts
         run: |
           PYTHONPATH=tools python tools/test_generate_capability_schema_v04.py -v
+      - name: Generate all 100 reviewed native 0.4 capability schemas
+        run: |
+          PYTHONPATH=tools python tools/test_generate_capability_schema_v04_corpus.py --output work/all-100-v04-generator-census.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: draft-v04-100-capability-census
+          path: work/all-100-v04-generator-census.json
+          if-no-files-found: warn
