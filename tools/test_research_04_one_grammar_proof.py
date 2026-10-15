@@ -129,14 +129,15 @@ class SingleGrammarTests(unittest.TestCase):
         test["object"]={"capability":"windows.cmdlet",
             "collect":{"select":{"fields":{"property":{
                 "value":"Enabled","operation":"equals",
-                "existence":"one_or_more","match":"all"}}}}}
+                "match":"all"}}}}}
         short,counts,notes=make_single(doc)
         inner=short["assessment"]["tests"]["demo"]["object"]["collect"]["select"]["fields"]["property"]
-        self.assertEqual(inner["require"],"at_least_one_exists_and_all_match")
+        self.assertEqual(inner["selection_match"],"all")
         self.assertEqual(inner["equals"],"Enabled")
+        self.assertNotIn("require",inner)
         self.assertNotIn("existence",inner)
         self.assertNotIn("operation",inner)
-        self.assertEqual(counts["other_typed_field_require"],1)
+        self.assertEqual(counts["collector_selection_match_only"],1)
         self.assertEqual(lower_single(short),normalize_inert_source_checks(doc,notes))
 
     def test_every_native_operator_is_covered_by_one_key(self):
