@@ -140,6 +140,6 @@ def main():
         if args.report:
             args.report.parent.mkdir(parents=True,exist_ok=True)
             args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
-        if counts["assessment_failures"]:
+        if counts.get("assessment_failures",0):
             raise SystemExit(f"{counts['assessment_failures']} fixture Assessments fail candidate fragment; resolve before schema promotion")
 if __name__=="__main__":main()
