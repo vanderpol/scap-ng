@@ -1,0 +1,31 @@
+name: 0.4 native capability schema generation draft
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/generate_capability_schema_v04.py
+      - tools/test_generate_capability_schema_v04.py
+      - .github/workflows/generate-v04-capabilities.yml
+      - schema/v0.4.0/capability-mappings/**
+      - schema/v0.4.0/assessment-language.schema.json
+      - schema/v0.4.0/capability-common.schema.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install draft JSON Schema validator
+        run: python -m pip install --disable-pip-version-check jsonschema
+      - name: Generate/validate Linux and Windows native 0.4 capability contracts
+        run: |
+          PYTHONPATH=tools python tools/test_generate_capability_schema_v04.py -v
