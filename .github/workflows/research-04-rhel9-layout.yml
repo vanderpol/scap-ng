@@ -41,4 +41,15 @@ jobs:
               y=yaml.safe_load(z.read(x)); print('RULE SAMPLE',x,str(y)[:1600])
             for x in auto[:2]:
               y=yaml.safe_load(z.read(x)); print('AUTOMATED SAMPLE',x,str(y)[:2400])
+            shared=[x for x in sorted(z.namelist()) if x.startswith('authoring/shared/') and x.endswith('.yaml')]
+            print('SHARED TOTAL',len(shared),'SHARED TOP',shared[:18])
+            choices=[]
+            for x in rules:
+              v=yaml.safe_load(z.read(x))['rule']
+              choices.append((v['id'],v.get('assessment_choices') or {}))
+            from collections import Counter
+            print('CHOICE SUMMARY',dict(Counter(('auto' if 'automated' in c else 'no_auto')+'_'+('manual' if 'manual' in c else 'no_manual') for rid,c in choices)))
+            print('AUTO IDS FIRST',[(rid,c['automated']['assessment']) for rid,c in choices if 'automated' in c][:24])
+            for x in shared[:4]:
+              y=yaml.safe_load(z.read(x));print('SHARED FILE SAMPLE',x,str(y)[:700])
           PY
