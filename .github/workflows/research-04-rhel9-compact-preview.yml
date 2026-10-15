@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   preview:
@@ -53,6 +53,22 @@ jobs:
             work/rhel9-compact-04-metrics.json
           if-no-files-found: error
           retention-days: 90
+      - name: Publish a single stable research prerelease download
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="v0.4.0-rhel9-compact-authoring-research"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --target "$GITHUB_SHA" --prerelease \
+              --title "RESEARCH ONLY: RHEL 9 compact Assessment authoring (0.4)" \
+              --notes "NOT A STANDARD OR SCANNING RELEASE. Full original RHEL 9 Benchmark, 445 Rule files, all manual tailoring choices and only RHEL 9-referenced shared automated Assessments. Source-only experimental compact grammar; every automated Assessment structurally lowers to its immutable published 0.3 counterpart. Rule classifications and original versus compact examples are included in the ZIP. No compiled bundle is supplied or implied. Source: v0.3.0-six-stig-typed-operators-5796d016b12f. See issue #227."
+          fi
+          gh release upload "$tag" \
+            work/rhel9-compact-04-research-authoring.zip \
+            work/rhel9-compact-04-metrics.json \
+            --clobber
       - name: Summary
         run: |
           python - <<'PY'
