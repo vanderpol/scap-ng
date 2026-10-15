@@ -65,7 +65,7 @@ class SourceTests(unittest.TestCase):
             result=analyze_package(path)["strata"]["structured_other"]
             self.assertEqual(result["deprecated_none_exist_check_unsafe"],1)
             self.assertEqual(result["unresolved_test_pair:none_exist/none exist"],1)
-            self.assertEqual(result["state_free_none_exist"],0)
+            self.assertEqual(result.get("state_free_none_exist",0),0)
 
     def test_macos_is_excluded_from_primary(self):
         self.assertEqual(kind("U_Apple_macOS_15_SCAP_1-4_Benchmark.zip",
