@@ -2,6 +2,15 @@
 
 **For technical discussion on October 16, 2026.** This is a **pre-alpha authoring-language candidate**, not a final standard, OVAL Board decision, or executable scanner bundle. The current 0.3 release is not changed.
 
+## Suggested 20-minute meeting flow
+
+- **3 minutes — motivation:** one Assessment grammar, inline native fields and verbs, explicit cardinality with less repetition. Existing SCAP 1.4 is a forward-conversion source, not an authoring dependency.
+- **7 minutes — examine three Windows 11 files:** `SV-253254` (two matching State alternatives and one shared field requirement), `SV-253274` (shell-command `stderr_line` absence override), `SV-253495` (five user-right single-field Tests plus two WMI nested-record Tests). Include one RHEL 9 file for contrast.
+- **7 minutes — request semantic criticism:** user-right `some_match`, nested record/field quantifiers, absent versus error/unknown/incomplete collection, and preservation of evaluation semantics.
+- **3 minutes — capture next actions:** which semantics require normative tests, counterexamples or source-backed migration proof? No request to approve 0.4 or attest scanner equivalence at this meeting.
+
+**Status to say aloud:** The revision 2 packet is a verified *pre-alpha technical proposal*. The research overlay validates this language, and source reconstructions pass, but the frozen/current normative v0.4 schema has **not** adopted scoped State requirements or renamed Test `collected_items_require`. No SCAP-NG scanner or 0.4 compiled bundles exist yet; no runtime parity is claimed. The JSON files mirror the YAML content but retain YAML-looking reference paths, so independent JSON compilation is a separate future gate. The legacy 0.3 converter CI regressions tracked in #226 are **not** evidence of a new 0.4 Assessment-language failure.
+
 ## What to review first (about five minutes)
 
 The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r2) contains two complete corresponding authoring ZIPs: one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
