@@ -89,7 +89,7 @@ def audit(zip_path,benchmarks=BENCHMARKS):
                  if p.startswith("authoring/") and "/rules/" in p}
         for benchmark in benchmarks:
             oldprefix=corpus.SOURCE_PREFIX
-            corpus.SOURCE_PREFIX="authoring/"+benchmark_dir(folders,benchmark)+"/"
+            corpus.SOURCE_PREFIX="authoring/"+resolve_benchmark_dir(folders,benchmark)+"/"
             try:
                 docs,_=corpus.archive_contents(z)
             finally:
