@@ -1,4 +1,4 @@
-name: 0.4 full corpus tally diagnostics
+name: 0.4 full corpus source OVAL evidence diagnostics
 
 on:
   workflow_dispatch:
@@ -17,25 +17,31 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: full-corpus-shorthand-04-report
-          run-id: 38716331301
+          name: full-65-source-oval-cardinality
+          run-id: 38717495282
           github-token: ${{ github.token }}
           path: work
-      - name: Inspect the underlying 0.3 research vocabulary safely
+      - name: Report source warnings and explicit/default frequency
         run: |
           python - <<'PY'
           from pathlib import Path
           import json
-          r=json.loads(Path("work/full-corpus-shorthand-04.json").read_text())
-          print("BENCHMARKS",r["benchmarks_total"],r["benchmarks_generated"],
-                r["benchmarks_expected_sql_blockers"])
-          print("TOTALS",r["totals"])
-          for scope in ("primary_structured","shell_command","macos_atypical"):
-              m=r["categories"].get(scope,{})
-              print("=== GROUP",scope)
-              for prefix in ("items_pair:","field_pair:","capability:",
-                             "selector_macro:","state_macro:"):
-                  entries=sorted(((key,v) for key,v in m.items() if key.startswith(prefix)),
-                                 key=lambda row:(-row[1],row[0]))
-                  print(prefix,entries[:15])
+          r=json.loads(Path("work/full-65-source-oval-cardinality.json").read_text())
+          print("BENCHMARKS",r["package_count"])
+          for scope in ("primary_structured","shell_command","macos_atypical","unsupported_sqlext"):
+              m=r["strata"].get(scope,{})
+              keys=("tests","states","state_field_entities",
+                    "item_common_all_match","field_common_all_match",
+                    "state_free_none_exist","existence_origin:schema_default",
+                    "existence_origin:source","entity_check_origin:schema_default",
+                    "entity_check_origin:source",
+                    "entity_existence_origin:schema_default")
+              print("=== GROUP",scope,{k:m.get(k,0) for k in keys})
+          for p in r["per_package"]:
+              pairs={k: v for group in p["strata"].values() for k,v in group.items()
+                     if k.startswith("unresolved_test_pair:")}
+              if p["warnings"] or pairs or p["source_oval_documents"]==0:
+                  print("SPECIAL",p["source"],"docs",p["source_oval_documents"],
+                        "warning_count",p["total_warnings"],"warnings",p["warnings"],
+                        "unresolved",pairs)
           PY
