@@ -214,6 +214,19 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         "Draft structural generation only; source enumeration and cross-field "
         "semantics require additional validation before 0.4 freeze."
     )
+    # Resolver scope changes when traversing external 0.4 language schemas.
+    # Use fully qualified references for generated native recursion, so local
+    # State expressions cannot accidentally resolve against an external schema.
+    def qualify_local_refs(node):
+        if isinstance(node, dict):
+            for key, val in node.items():
+                if key == "$ref" and isinstance(val, str) and val.startswith("#/$defs/"):
+                    node[key] = result["$id"] + val
+                else:
+                    qualify_local_refs(val)
+        elif isinstance(node,list):
+            for entry in node:qualify_local_refs(entry)
+    qualify_local_refs(result)
     return result
 
 
