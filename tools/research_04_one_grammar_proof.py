@@ -238,6 +238,23 @@ def normalize_inert_source_checks(original,notes):
         test["match"]="all"
     return out
 
+def check_no_parallel_comparison_or_cardinality_grammar(tree,location="assessment"):
+    """Fail closed if a proposed compact Assessment still embeds legacy pairs.
+
+    A Set's operator (union/difference) is not a comparison operator/value,
+    and cannot be conflated with an observed State/selector comparison.
+    """
+    if isinstance(tree,list):
+        for i,item in enumerate(tree):
+            check_no_parallel_comparison_or_cardinality_grammar(item,f"{location}[{i}]")
+    elif isinstance(tree,dict):
+        if "existence" in tree or "match" in tree:
+            raise ValueError(f"Parallel longhand quantifier in unified source at {location}")
+        if "operation" in tree and "value" in tree:
+            raise ValueError(f"Parallel longhand comparator in unified source at {location}")
+        for key,item in tree.items():
+            check_no_parallel_comparison_or_cardinality_grammar(item,f"{location}.{key}")
+
 def benchmark_dir(names,target):
     selectors={"rhel_9":lambda n:"rhel" in n and "9" in n,
                "windows_11":lambda n:"windows" in n and "11" in n and "server" not in n,
@@ -274,6 +291,7 @@ def audit(source):
                 if not isinstance(doc,dict) or (doc.get("assessment") or {}).get("mode")!="automated":
                     continue
                 short,counts,notes=make_single(doc)
+                check_no_parallel_comparison_or_cardinality_grammar(short)
                 recovered=lower_single(short)
                 expected=normalize_inert_source_checks(doc,notes)
                 if recovered!=expected:
