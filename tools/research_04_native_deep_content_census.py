@@ -103,6 +103,12 @@ def audit(zip_path):
                                     "instance_path":list(map(str,err.absolute_path)),
                                     "schema_path":list(map(str,err.absolute_schema_path)),
                                     "message":err.message[:750],
+                                    "suberrors":[{
+                                        "path":list(map(str,child.path)),
+                                        "message":child.message[:320],
+                                    } for child in err.context[:6]],
+                                    "require":test.get("require"),
+                                    "object_excerpt":str(test.get("object"))[:1000],
                                 })
                 if all_valid:counts["assessments_all_native_tests_pass"]+=1
             reports[benchmark]={
@@ -136,6 +142,13 @@ def main():
     for b,r in result["benchmarks"].items():
         print("DEEP_NATIVE_04",b,json.dumps(r["counts"],sort_keys=True),flush=True)
         print("DEEP_NATIVE_04_ERRORS",b,json.dumps(r["top_error_kinds"][:15]),flush=True)
+        shown=set()
+        for example in r["failure_samples"]:
+            group=(example["capability"],str(example["instance_path"]))
+            if group in shown:continue
+            shown.add(group)
+            if len(shown)>9:break
+            print("DEEP_NATIVE_04_SAMPLE",b,json.dumps(example,sort_keys=True),flush=True)
         bad+=r["counts"].get("native_test_fail",0)+r["counts"].get("unsupported_capability_test",0)
     if bad and args.strict:raise SystemExit(f"{bad} unresolved deep native Test validation failures")
 
