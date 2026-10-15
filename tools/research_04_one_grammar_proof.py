@@ -308,6 +308,7 @@ def make_single(original):
             notes=notes,label=f"tests.{tid}")
         counts["test_require"]+=1
     out=encode_filter_tree(out,notes,counts)
+    out=encode_auxiliary_pairs(out,notes,counts)
     ops,normalized_ops=operator_enum()
     out=encode_operations(out,counts,ops)
     return out,counts,notes
