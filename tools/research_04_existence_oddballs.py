@@ -59,7 +59,7 @@ def audit(zip_path):
                             "assessment_provenance":a.get("provenance"),
                         })
     return {"source_zip":str(zip_path.name),
-            "pairs":{"/".join(map(str,k)):v for k,v in sorted(pairs.items())},
+            "pairs":{"/".join(map(str,k)):v for k,v in sorted(pairs.items(), key=lambda row: tuple(str(x) for x in row[0]))},
             "suspects":suspects,
             "suspect_count":len(suspects)}
 
