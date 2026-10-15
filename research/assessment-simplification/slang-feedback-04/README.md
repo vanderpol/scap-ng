@@ -1,6 +1,6 @@
 # Research: Slang feedback and a smaller improvement to Assessment authoring
 
-**0.4 exploratory study.** Does not modify the frozen 0.3 grammar, Discussion #213, or any Board votes. This is one constrained *presentation* experiment, **not** a replacement OVAL evaluator.
+**0.4 exploratory study.** [Tracked by issue #224](https://github.com/vanderpol/scap-ng/issues/224) · [12/12 focused prototype tests passed](https://github.com/vanderpol/scap-ng/actions/runs/38662660201). Does not modify the frozen 0.3 grammar, Discussion #213, or any Board votes. This is one constrained *presentation* experiment, **not** a replacement OVAL evaluator.
 
 ## What the live Discussion actually shows (14 October 2026)
 
@@ -50,7 +50,7 @@ evaluate:
   check: home-mounted-nosuid-option
 ```
 
-The proposed `resource` is the capability type. A schema supplies *allowed field names and operator types*, **not** default semantic quantifiers. `select` describes collection, `expect` holds field comparisons and field-value cardinality, and `require.items` expresses Item cardinality and matching. `evaluate` remains explicit for complex AND/OR/XOR trees.
+The proposed `resource` is the capability type (avoiding the YAML 1.1 parser ambiguity of an unquoted `on` key). A schema supplies *allowed field names and operator types*, **not** default semantic quantifiers. `select` describes collection, `expect` holds field comparisons and field-value cardinality, and `require.items` expresses Item cardinality and matching. `evaluate` remains explicit for complex AND/OR/XOR trees.
 
 This short form has a narrow, mechanical lowering:
 
