@@ -46,7 +46,7 @@ Both record and record-field requirement scopes are preserved.
 | Server 2025 | **259 / 259** | 268 |
 | **Total** | **921 / 921** | **942** |
 
-**930/942** Assessment files reproduced the *exact original parsed 0.3 source*. The remaining **12** contained State-free Tests whose original `match` choice is never consulted in the pinned OVAL reference result model. Normalizing that inert setting has model-level proof but **not live scanner parity**, so this distinction is explicit in the report. [Complete compiler proof](https://github.com/vanderpol/scap-ng/actions/runs/38737558392).
+**930/942** Assessment files reproduced the *exact original parsed 0.3 source*. The remaining **12** contained State-free Tests whose original `match` choice is never consulted in the pinned OVAL reference result model. Their normalization has a separate reference-model proof and audit trail; it is **not** an exact-source conversion. No scanner exists yet, so scanner parity is a later implementation-validation task, **not a prerequisite to selecting the pre-alpha grammar**. [Complete compiler proof](https://github.com/vanderpol/scap-ng/actions/runs/38737558392).
 
 **Complex features were not bypassed.** The strict single-grammar CI also converted **154** Object Set filter entries (RHEL9 62, Win11 43, Server2025 49) to `include:/exclude:` actions over field-name predicates. Windows WMI/cmdlet collectors have **59** separate `selection_match:` properties (31 Win11, 28 Server2025) without a corresponding existence field; these are **not** incorrectly turned into `require`. All round-tripped source-exactly. `value_match:` for static arrays remains a third independent cardinality domain.
 
@@ -59,12 +59,12 @@ The [OVAL six-valued truth-table test](https://github.com/vanderpol/scap-ng/acti
 - `none_exist` **cannot** be replaced by `none_match` (a present Item may fail a comparison).
 - `none_match` is aggregate-equivalent to `all_match` on a **truly complemented predicate** over nonempty results, but there is **no automatic safe inverse of regex, WMI and all native operators**, and error/unknown must remain intact.
 - Missing fields in Windows record comparisons may yield **error**; flattening records would not be equivalent.
-- One RHEL 9 source Test combines `none_exist` with a State. The proposed grammar **preserves the State and exact source semantics**; whether the State is removable remains a separate vendor-evaluator research question.
+- One RHEL 9 source Test combines `none_exist` with a State. The proposed grammar **preserves the State and exact source semantics**. Removing that State would be an optional, separate semantic rewrite requiring a formal truth-table proof; no vendor scanner is needed to retain the original form.
 
 ## What needs a standards decision
 
 The proof shows **representation is feasible**. It does *not* show the first set of natural-language labels is optimal. The prototype covers all 20 possible original `existence × match` pairs with one `require` enum, including rare cases, but a 20-phrase glossary is not automatically easy to learn. The Board should pick a concise, truthful naming scheme and a single *complete* JSON Schema, with autocomplete and strict rejection of illegal combinations.
 
-**Recommendation:** Standardize **one grammar**, not two; retain native typed checks for unusual/negative cases instead of making them manual/shell. Approve the language only after schema validation, full 65-source conversion, and scanner differential tests for zero/error/unknown/incomplete outcomes.
+**Pre-alpha recommendation:** Advance **one grammar**, not two; retain native typed checks for unusual/negative cases instead of making them manual/shell. Before a 0.4 specification decision, require a strict, capability-aware JSON Schema; lossless conversion or explicitly justified model-equivalent normalization; full representative Linux/Windows coverage and the broader source corpus; and executable reference-model tests of zero/error/unknown/not-evaluated/not-applicable/incomplete outcomes. **Do not gate the syntax on a scanner that does not exist.** Reserve vendor/implementation conformance and differential scans for a later scanner milestone.
 
 [Full vocabulary/design research](HUMAN-VERBIAGE-PROPOSAL.md) · [Tracking issue #227](https://github.com/vanderpol/scap-ng/issues/227)
