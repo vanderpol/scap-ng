@@ -15,6 +15,7 @@ from pathlib import Path
 from oval_result_truth_tables import (
     TRUE,FALSE,ERROR,UNKNOWN,NOT_EVALUATED,NOT_APPLICABLE,
     aggregate_check,aggregate_existence,evaluate_collected_object_test,
+    evaluate_record_field,
 )
 OUTCOMES=(TRUE,FALSE,ERROR,UNKNOWN,NOT_EVALUATED,NOT_APPLICABLE)
 INVERT={TRUE:FALSE,FALSE:TRUE,ERROR:ERROR,UNKNOWN:UNKNOWN,
@@ -55,6 +56,56 @@ def prove_contextual_duality():
                         )
     return cases
 
+def prove_single_item_check_equivalence():
+    """With exactly one collected Item, all and only-one matching coincide.
+
+    More generally, one-exists gates two Items before State matching matters.
+    Check incomplete/error flags so no unproven Boolean-only shortcut leaks.
+    """
+    examined=0
+    for flag in ("complete","incomplete"):
+        for n in (1,2,3):
+            for row in product(OUTCOMES,repeat=n):
+                opts=dict(flag=flag,existence="only_one_exists",exists=n,
+                          has_state=True,item_results=row)
+                before=evaluate_collected_object_test(check="all",**opts)
+                after=evaluate_collected_object_test(check="only one",**opts)
+                examined+=1
+                if before!=after:
+                    raise AssertionError(
+                        f"one/all and one/one differ under {opts}: {before} {after}"
+                    )
+    for flag in ("error","not collected","not applicable","does not exist"):
+        a=evaluate_collected_object_test(flag,existence="only_one_exists",
+                                         check="all",has_state=True)
+        b=evaluate_collected_object_test(flag,existence="only_one_exists",
+                                         check="only one",has_state=True)
+        examined+=1
+        if a!=b:
+            raise AssertionError(f"Top-level flag mismatch {flag}: {a} {b}")
+    return examined
+
+
+def prove_state_free_irrelevant_check():
+    """State-free Test match aggregation is unreachable in reference model."""
+    examined=0
+    for exists in range(4):
+        for existence in EXISTENCE.values():
+            for flag in ("complete","incomplete","does not exist",
+                         "error","not collected","not applicable"):
+                a=evaluate_collected_object_test(flag,existence=existence,
+                    check="all",has_state=False,exists=exists)
+                for check in ("all","at least one","only one","none satisfy"):
+                    b=evaluate_collected_object_test(flag,existence=existence,
+                        check=check,has_state=False,exists=exists)
+                    examined+=1
+                    if a!=b:
+                        raise AssertionError(
+                            f"State-free check affected outcome: {existence} {flag} {exists} {check}"
+                        )
+    return examined
+
+
 def counterexamples():
     # "exactly one exists" cannot be reduced to at least one exists and
     # exactly one satisfying State (the latter accepts extra nonmatching Items).
@@ -77,6 +128,9 @@ def counterexamples():
     example_wrong_boolean=TRUE
     if example_with_error==example_wrong_boolean:
         raise AssertionError("Error propagation counterexample lost")
+    missing_record_field=evaluate_record_field("productstate",(),entity_check="all")
+    if missing_record_field!=ERROR:
+        raise AssertionError("Record field absence must remain ERROR, not be treated as none_exist")
     # Plain comparison operator negation is NOT guaranteed to be a dual:
     # pattern_match regex has no standard 0.3 not_pattern_match inverse.
     return {
@@ -97,6 +151,13 @@ def counterexamples():
             "incorrect_boolean_all_not":example_wrong_boolean,
             "source_equivalent":False,
         },
+        "record_missing_nested_subfield_is_not_absence_success":{
+            "case":"Expected structured record field has zero observed values",
+            "original_record_field_result":missing_record_field,
+            "incorrect_flattened_absence_result":"true",
+            "source_equivalent":False,
+            "proof_needed":"Preserve record field presence/error behavior and nested record quantifier levels",
+        },
         "zero_observed_items_with_state":{
             "case":"collected_object complete, existence none, zero Items, State present",
             "reference_test_with_state":"undefined by reference helper: aggregation requires nonempty State results",
@@ -113,6 +174,8 @@ def main():
         "source":"SCAP-NG pinned OVAL 5.12.3 truth-table helpers",
         "nonempty_aggregation_case_count":prove_check_duality(),
         "nonempty_test_context_case_count":prove_contextual_duality(),
+        "exact_one_existing_item_all_vs_one_matching_case_count":prove_single_item_check_equivalence(),
+        "state_free_matching_irrelevance_case_count":prove_state_free_irrelevant_check(),
         "counterexamples":counterexamples(),
         "limitations":[
             "Pure result-level duality proves no native comparator inversion: no implicit regex inversion, datatype coercion, or record negation.",
