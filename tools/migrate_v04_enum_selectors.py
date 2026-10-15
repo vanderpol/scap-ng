@@ -14,20 +14,31 @@ collection inputs are left unchanged for their respective source rules.
 from copy import deepcopy
 
 
-def _certified_constant_enum(document, variable_id, allowed):
+def _certified_constant_enum(document, variable_id, allowed, capability, field):
     """Constrain the research rewrite to one fully known, unique enum domain.
 
     This is a structural source proof, not a claim that 0.4 live scanner or
     OVAL object var_check semantics have been independently verified.
     """
-    if not isinstance(variable_id,str) or not isinstance(allowed,list) or not allowed:
+    # Verified original OVAL XML: Windows 11 obj:25329001 and
+    # Windows Server 2025 obj:27803001. Both omit var_check, whose
+    # documented OVAL 5.12.3 effective value is all. Restrict the
+    # exceptional rewrite to this precise known source lineage; other
+    # Variables need their own source proof, not a guessed quantifier.
+    if (capability,field,variable_id)!=(
+        "windows.userright","userright",
+        "this-constant-variable-represents-all-user-rights-variable"
+    ):
+        return None
+    if not isinstance(allowed,list) or len(allowed)!=45:
         return None
     assessment=document.get("assessment",document)
     variables=assessment.get("variables",{}) if isinstance(assessment,dict) else {}
     variable=variables.get(variable_id) if isinstance(variables,dict) else None
     if not isinstance(variable,dict):
         return None
-    if variable.get("kind")!="constant" or variable.get("datatype")!="string":
+    if (variable.get("kind")!="constant" or variable.get("datatype")!="string"
+        or variable.get("title")!="This constant_variable represents all user rights"):
         return None
     expression=variable.get("expression")
     if not isinstance(expression,dict) or set(expression)!={"literal"}:
@@ -75,7 +86,9 @@ def migrate(document, supported_mappings):
                     # This source has an explicit, named, constant Variable.
                     # Do NOT rewrite arbitrary variable references or infer
                     # value_match from an unexamined dynamic value population.
-                    values=_certified_constant_enum(out,val["variable"],allowed)
+                    values=_certified_constant_enum(
+                        out,val["variable"],allowed,curcap,field
+                    )
                     if values is not None:
                         # Source OVAL omits var_check, whose documented
                         # OVAL 5.12.3 effective value is ALL. Do NOT silently

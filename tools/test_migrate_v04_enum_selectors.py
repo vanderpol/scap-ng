@@ -47,14 +47,14 @@ class NativeEnumSelectorMigration(unittest.TestCase):
 
     def test_constant_full_enum_variable_is_expanded_with_exact_inverse(self):
         old={"assessment":{
-            "variables":{"all-rights-variable":{
+            "variables":{"this-constant-variable-represents-all-user-rights-variable":{
                 "kind":"constant","datatype":"string",
                 "expression":{"literal":["SE_NETWORK_LOGON_NAME"]},
-                "title":"All reviewed rights in fixture"}},
+                "title":"This constant_variable represents all user rights"}},
             "tests":{"one-test":{
                 "capability":"windows.userright",
                 "object":{"capability":"windows.userright",
-                          "select":{"userright":{"variable":"all-rights-variable"}}}
+                          "select":{"userright":{"variable":"this-constant-variable-represents-all-user-rights-variable"}}}
             }}
         }}
         new,notes=migrate(old,MAP)
@@ -93,6 +93,9 @@ class NativeEnumSelectorMigration(unittest.TestCase):
              "expression":{"literal":["SE_NETWORK_LOGON_NAME","SE_NETWORK_LOGON_NAME"]}},
             {"kind":"constant","datatype":"string",
              "expression":{"variable":"indirect-variable"}},
+            {"kind":"constant","datatype":"string",
+             "title":"An unrelated same-shaped source",
+             "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}},
         ):
             with self.subTest(variant=variant):
                 old={"assessment":{
@@ -100,12 +103,28 @@ class NativeEnumSelectorMigration(unittest.TestCase):
                     "tests":{"one-test":{
                         "capability":"windows.userright",
                         "object":{"capability":"windows.userright",
-                            "select":{"userright":{"variable":"all-rights-variable"}}}
+                            "select":{"userright":{"variable":"this-constant-variable-represents-all-user-rights-variable"}}}
                     }}
                 }}
                 converted,notes=migrate(old,MAP)
                 self.assertEqual(notes,[])
                 self.assertEqual(converted,old)
+
+    def test_unverified_constant_variable_id_not_rewritten(self):
+        old={"assessment":{
+            "variables":{"different-variable":{
+                "kind":"constant","datatype":"string",
+                "title":"This constant_variable represents all user rights",
+                "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}}},
+            "tests":{"test":{
+                "capability":"windows.userright",
+                "object":{"capability":"windows.userright",
+                          "select":{"userright":{"variable":"different-variable"}}},
+            }},
+        }}
+        output,notes=migrate(old,MAP)
+        self.assertEqual(notes,[])
+        self.assertEqual(output,old)
 
 if __name__=="__main__":
     unittest.main()
