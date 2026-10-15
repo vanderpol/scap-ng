@@ -22,7 +22,7 @@ SELECTOR = Draft202012Validator(
 
 
 def assessment_with_directory(predicate):
-    doc = fixture()
+    doc = fixture(requirement="at_least_one_exists")
     doc["assessment"]["tests"]["demo-test"]["object"] = {
         "capability": "unix.file",
         "select": {"directory": predicate},
@@ -123,7 +123,7 @@ class V04ObjectSelectorTests(unittest.TestCase):
         # Native collectors can have capability-specific sources other than
         # select (e.g. Variable/cmdlet). This test does not validate them;
         # separate generated capability schemas must close those alternatives.
-        doc = fixture()
+        doc = fixture(requirement="at_least_one_exists")
         doc["assessment"]["tests"]["demo-test"]["object"] = {"capability": "unix.file"}
         self.assertFalse(errors(doc))
 
