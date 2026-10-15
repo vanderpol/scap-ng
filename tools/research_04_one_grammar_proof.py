@@ -51,7 +51,7 @@ def from_source_pair(node, *, scope, with_states, notes, label):
     exist=out.get("existence")
     match=out.get("match")
     if exist is None or match is None:
-        raise ValueError(f"Missing explicit existence/match at {label}: {exist}/{match}")
+        raise ValueError(f"Missing explicit existence/match at {label}: {exist}/{match}; source={repr(out)[:1200]}")
     if exist not in EXISTS or match not in MATCHES:
         raise ValueError(f"Unrecognized source pair at {label}: {exist}/{match}")
     if "require" in out:
