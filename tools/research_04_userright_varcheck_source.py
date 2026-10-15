@@ -17,7 +17,30 @@ def local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
 
 
-def inspect_zip(path: Path, reviewed_enum: list[str]) -> dict:
+def source_attribute_defaults(xsd_path: Path) -> dict:
+    root=ET.parse(xsd_path).getroot()
+    def attributes(name):
+        return [n for n in root.iter()
+                if local(n.tag)=="attribute" and n.get("name")==name]
+    operations=[a for a in attributes("operation") if a.get("default")=="equals"]
+    checks=[a for a in attributes("var_check") if a.get("use")=="optional"]
+    docs=" ".join(" ".join(a.itertext()) for a in checks)
+    if not operations or not checks or (
+        "If var_ref is present but var_check is not" not in docs
+        or 'value "all"' not in docs
+    ):
+        raise ValueError("Missing authoritative OVAL 5.12.3 documented implicit attributes")
+    if any(a.get("default") is not None for a in checks):
+        raise ValueError("var_check unexpectedly has an XSD attribute default")
+    return {
+        "var_check":"all",
+        "operation":"equals",
+        "var_check_provenance":"documented implicit (not an XSD default attribute)",
+        "schema_path":str(xsd_path),
+    }
+
+
+def inspect_zip(path: Path, reviewed_enum: list[str], source_defaults: dict) -> dict:
     expected=set(reviewed_enum)
     findings=[]
     scanned=0
@@ -68,7 +91,13 @@ def inspect_zip(path: Path, reviewed_enum: list[str]) -> dict:
                             "literal_unique":True,
                             "exactly_matches_reviewed_enum":True,
                             "source_var_check":entity.get("var_check"),
+                            "effective_var_check":entity.get("var_check") or source_defaults["var_check"],
+                            "var_check_provenance":(
+                                "explicit" if entity.get("var_check")
+                                else source_defaults["var_check_provenance"]
+                            ),
                             "source_operation":entity.get("operation"),
+                            "effective_operation":entity.get("operation") or source_defaults["operation"],
                             "source_datatype":entity.get("datatype"),
                             "variable_datatype":variable.get("datatype"),
                         })
@@ -85,6 +114,7 @@ def inspect_zip(path: Path, reviewed_enum: list[str]) -> dict:
 def main() -> None:
     parser=argparse.ArgumentParser()
     parser.add_argument("--mapping",type=Path,required=True)
+    parser.add_argument("--xsd",type=Path,required=True)
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("archives",nargs="+",type=Path)
     args=parser.parse_args()
@@ -92,11 +122,13 @@ def main() -> None:
     assert mapping["specification_version"]=="0.4.0"
     enum=mapping["native"]["selector_value_enums"]["userright"]
     assert len(enum)==len(set(enum)) and len(enum)>1
-    rows=[inspect_zip(p,enum) for p in args.archives]
+    defaults=source_attribute_defaults(args.xsd)
+    rows=[inspect_zip(p,enum,defaults) for p in args.archives]
     report={
         "status":"source evidence only; no scanner runtime claim",
         "mapping":mapping["capability"],
         "expected_enum_members":len(enum),
+        "source_defaults":defaults,
         "archives":rows,
     }
     args.output.parent.mkdir(parents=True,exist_ok=True)
@@ -108,7 +140,8 @@ def main() -> None:
     # 'all' to 'one'. Distinguish one/at-least-one from all and missing values.
     for row in rows:
         for match in row["matches"]:
-            if match["source_var_check"] not in {"only one","at least one"}:
+            if (match["effective_var_check"]!="all"
+                or match["effective_operation"]!="equals"):
                 raise SystemExit(
                     f"Need explicit OVAL var_check review: {row['artifact']}: "
                     f"{match['source_var_check']!r}"

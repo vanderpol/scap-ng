@@ -1,6 +1,7 @@
 from copy import deepcopy
 #!/usr/bin/env python3
 import unittest
+from oval_result_truth_tables import aggregate_check
 from migrate_v04_enum_selectors import migrate,restore
 
 MAP={
@@ -59,14 +60,24 @@ class NativeEnumSelectorMigration(unittest.TestCase):
         new,notes=migrate(old,MAP)
         selector=new["assessment"]["tests"]["one-test"]["object"]["select"]["userright"]
         self.assertEqual(selector,{"equals":["SE_NETWORK_LOGON_NAME"],
-                                   "datatype":"string","value_match":"one"})
+                                   "datatype":"string","value_match":"all"})
         self.assertEqual(len(notes),1)
-        self.assertEqual(notes[0]["classification"],"constant_full_enum_model_pending")
+        self.assertEqual(notes[0]["classification"],"constant_full_enum_implicit_all_source_exact")
         self.assertEqual(restore(new,notes),old)
         tampered=deepcopy(new)
-        tampered["assessment"]["tests"]["one-test"]["object"]["select"]["userright"]["value_match"]="all"
+        tampered["assessment"]["tests"]["one-test"]["object"]["select"]["userright"]["value_match"]="one"
         with self.assertRaisesRegex(ValueError,"source proof mismatch"):
             restore(tampered,notes)
+
+    def test_implicit_all_is_not_equivalent_to_one(self):
+        # In the original pinned OVAL objects, the entity var_check is
+        # omitted. OVAL 5.12.3 says its effective value is ALL.
+        # For a 45-value enum, the equality predicates cannot be
+        # arbitrarily rewritten with ONE or AT LEAST ONE.
+        row=["true","false","false"]
+        self.assertEqual(aggregate_check("all",row),"false")
+        self.assertEqual(aggregate_check("only one",row),"true")
+        self.assertEqual(aggregate_check("at least one",row),"true")
 
     def test_unverified_variable_definitions_are_not_silently_coerced(self):
         for variant in (

@@ -210,7 +210,7 @@ def audit(zip_path,benchmarks=BENCHMARKS):
             "limitations":[
                 "Generic 0.4 authoring lowering is previously source-exact or separately reference-model-equivalent; generated deep schemas must be audited independently.",
                 "No live SCAP-NG scanner is available or required in pre-alpha.",
-                "Certified constant-full-enum Variable selections are structurally reversible, but their OVAL object value-check and exceptional-state equivalence still need independently sourced proof; do not count them as scanner parity.",
+                "Pinned Windows 11 and Server 2025 source OVAL omit var_check on the full-enum constant userright selector. The OVAL 5.12.3 schema documents effective var_check=all; the 0.4 explicit array preserves ALL rather than guessing ONE. Scanner/runtime parity remains separate.",
                 "Unknown or unmapped native Test types remain explicitly counted, not replaced by shell commands/manual.",
             ]}
 

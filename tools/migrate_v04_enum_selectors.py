@@ -5,8 +5,9 @@ Reviewed OVAL mappings sometimes encode a selector field as a *literal enum
 value*, e.g. windows.registry select.hive: local_machine. The 0.4 single
 authored grammar instead uses select.hive: {equals: local_machine}.
 
-This function NEVER guesses a comparator: conversion is permitted ONLY for a
-scalar value explicitly listed in the capability's reviewed selector_value_enums.
+This function NEVER guesses a comparator: literal conversion is permitted ONLY
+when a value is in the reviewed selector_value_enums. The exceptional constant
+full-enum Windows selector uses OVAL's documented implicit var_check=all.
 The inverse transformation is structurally exact; typed dynamic/regex or
 collection inputs are left unchanged for their respective source rules.
 """
@@ -76,19 +77,22 @@ def migrate(document, supported_mappings):
                     # value_match from an unexamined dynamic value population.
                     values=_certified_constant_enum(out,val["variable"],allowed)
                     if values is not None:
-                        # Exactly one string from a unique enum domain can
-                        # equal any observed enum value. The check semantics
-                        # and exceptional collection states still require
-                        # their own OVAL reference-model proof before release.
+                        # Source OVAL omits var_check, whose documented
+                        # OVAL 5.12.3 effective value is ALL. Do NOT silently
+                        # substitute ONE, even if it seems more useful for
+                        # the author's likely intent. Keep a reversible
+                        # source identity record; scanner parity is separate.
                         new={"equals":list(values),"datatype":"string",
-                             "value_match":"one"}
+                             "value_match":"all"}
                         select[field]=new
                         changes.append({
                             "path":path+["select",field],
                             "source_value":deepcopy(val),
                             "target_value":deepcopy(new),
                             "capability":curcap,"field":field,
-                            "classification":"constant_full_enum_model_pending",
+                            "classification":"constant_full_enum_implicit_all_source_exact",
+                            "source_var_check":"all",
+                            "source_var_check_provenance":"OVAL 5.12.3 documented implicit default",
                             "literal_count":len(values),
                         })
         for key,val in node.items():

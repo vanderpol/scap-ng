@@ -20,6 +20,17 @@ The [version-local native 0.4 capability generator](../../tools/generate_capabil
 
 A separate [real-source deep validation census](https://github.com/vanderpol/scap-ng/actions/runs/38760164659) resolved the referenced automated/applicability Assessments from RHEL 9, Windows 11 and Windows Server 2025 and recorded **541 Test occurrence failures out of 1,407** against the newly generated native capability schemas. The audit ran successfully *as an audit*, but the deep content acceptance gate is **not yet passing**. Main clusters involve reviewed enum Object selectors, special fixed-result Test requirements, WMI/cmdlet collection/selection grammar and complex Set/foreach sources. Details and remedies are tracked in [#228](https://github.com/vanderpol/scap-ng/issues/228). Do not add legacy YAML alternatives or classify these as manual/shell-only solely to make the schemas pass.
 
+## Source provenance for constant Variables
+
+The original Windows 11 / Windows Server 2025 OVAL userright selectors
+reference a 45-value constant Variable. The source omits `var_check` and
+`operation`. Under OVAL 5.12.3, those mean **all** and **equals**,
+respectively. The 0.4 research migration therefore uses an explicit
+array with `value_match: all`, **not** `one` (which would change truth
+semantics). See [#228](https://github.com/vanderpol/scap-ng/issues/228)
+and the pinned-source verification workflow. This is a source-semantic
+conversion guard, not a scanner correctness claim.
+
 ## Promotion gates still open
 
 Generic inline/shared Object selector grammar has focused positive/negative tests ([passing CI](https://github.com/vanderpol/scap-ng/actions/runs/38757998163)); **capability-specific selector names and datatype/operation narrowing** remain open. WMI/cmdlet `selection_match`, list edge cases, strong cross-capability scope/type validation, generated v0.4 capability schemas, complete migration lowering and six-valued reference parity still need completion. 0.3 compilation/validation is **not** asserted to implement 0.4. Variable source-module imports and variable debug graphs are separate [research #223](https://github.com/vanderpol/scap-ng/issues/223), **not** adopted language features.
