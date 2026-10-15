@@ -39,6 +39,11 @@ ABSENCE="none_exist"
 # At field scope none/all means no observed entities of the named field,
 # NOT zero collected Items. Exact pair lowering, not Test-level no-State proof.
 FIELD_ABSENCE_ENABLED=False
+# Scoped human-language research aliases for Test existence: one / match: all.
+# With no State, there is nothing to compare; do not say 'matches'.
+EXACT_ONE_NATURAL_ENABLED=False
+EXACT_ONE_BARE="only_one_exists"
+EXACT_ONE_WITH_STATE="only_one_exists_and_matches"
 LOGICAL={"all","any","one","odd"}
 
 def pair_of(node):
@@ -55,6 +60,8 @@ def maybe_require(node, scope, counts, *, state_free=False):
         label=ABSENCE
     elif scope=="field" and FIELD_ABSENCE_ENABLED and pair==("none","all"):
         label=ABSENCE
+    elif scope=="test" and EXACT_ONE_NATURAL_ENABLED and pair==("one","all"):
+        label=EXACT_ONE_BARE if state_free else EXACT_ONE_WITH_STATE
     if label is not None:
         out=deepcopy(node)
         if "require" in out:
@@ -73,7 +80,15 @@ def expand_require(node, *, scope, state_free=False):
     label=node["require"]
     if "existence" in node or "match" in node:
         raise ValueError("Cannot mix shorthand and explicit quantifiers")
-    if label==ABSENCE:
+    if label in (EXACT_ONE_BARE, EXACT_ONE_WITH_STATE):
+        if not EXACT_ONE_NATURAL_ENABLED or scope!="test":
+            raise ValueError("Human-language exact-one aliases available only on Tests in research")
+        if label==EXACT_ONE_BARE and not state_free:
+            raise ValueError("only_one_exists requires a Test without States")
+        if label==EXACT_ONE_WITH_STATE and state_free:
+            raise ValueError("only_one_exists_and_matches requires at least one State")
+        pair={"existence":"one","match":"all"}
+    elif label==ABSENCE:
         if scope=="test":
             if not state_free:
                 raise ValueError("none_exist requires a Test without States")
