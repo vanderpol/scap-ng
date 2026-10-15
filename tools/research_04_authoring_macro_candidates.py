@@ -128,7 +128,7 @@ def audit(path):
                             if len(equality_examples)<7:
                                 equality_examples.append({"file":filename,"test":tid,
                                                            "field":state["field"],"value":state["value"]})
-            all_ops={"operations":Counter(),"predicate_shapes":Counter()}
+            all_ops={"operations":Counter(),"predicate_shapes":Counter(),"equality_count":0,"regex_count":0}
             record_predicates(a, all_ops)
             operations.update(all_ops["operations"])
     return {
