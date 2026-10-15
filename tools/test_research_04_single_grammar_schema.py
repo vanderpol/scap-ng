@@ -51,8 +51,17 @@ class OneGrammarSchemaTests(unittest.TestCase):
         a["owner_uid"]["datatype"]="integer"
         a["owner_uid"]["value_match"]="one"
         self.assertEqual(validate(wrap([a])),[])
-        # missing value_match still requires a separate semantic validation gate
-        # for source arrays; the 0.4 schema snapshot MUST enforce this, too.
+        no_quantifier=deepcopy(a)
+        del no_quantifier["owner_uid"]["value_match"]
+        self.assertTrue(validate(wrap([no_quantifier])))
+        no_expected_collection=deepcopy(a)
+        no_expected_collection["owner_uid"]["equals"]=0
+        self.assertTrue(validate(wrap([no_expected_collection])))
+        variable=field("owner_uid","equals",{"variable":"allowed-uids-variable"})
+        variable["owner_uid"]["datatype"]="integer"
+        self.assertTrue(validate(wrap([variable])))
+        variable["owner_uid"]["value_match"]="one"
+        self.assertEqual(validate(wrap([variable])),[])
 
     def test_record_field_and_record_scope(self):
         data={"value":{"record":{
