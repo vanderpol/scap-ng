@@ -123,6 +123,22 @@ class SingleGrammarTests(unittest.TestCase):
         self.assertEqual(filters[1]["include"]["all"][0]["owner_uid"]["equals"],0)
         self.assertEqual(lower_single(short),normalize_inert_source_checks(doc,notes))
 
+    def test_nested_windows_collector_field_requirement_not_a_second_dialect(self):
+        doc=self.sample()
+        test=doc["assessment"]["tests"]["demo"]
+        test["object"]={"capability":"windows.cmdlet",
+            "collect":{"select":{"fields":{"property":{
+                "value":"Enabled","operation":"equals",
+                "existence":"one_or_more","match":"all"}}}}}
+        short,counts,notes=make_single(doc)
+        inner=short["assessment"]["tests"]["demo"]["object"]["collect"]["select"]["fields"]["property"]
+        self.assertEqual(inner["require"],"at_least_one_exists_and_all_match")
+        self.assertEqual(inner["equals"],"Enabled")
+        self.assertNotIn("existence",inner)
+        self.assertNotIn("operation",inner)
+        self.assertEqual(counts["other_typed_field_require"],1)
+        self.assertEqual(lower_single(short),normalize_inert_source_checks(doc,notes))
+
     def test_every_native_operator_is_covered_by_one_key(self):
         native,compact=operator_enum()
         self.assertEqual(len(native),len(compact))
