@@ -2,6 +2,8 @@
 
 **Research only, not accepted syntax.** Canonical 0.3 and [Board Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213) are unchanged.
 
+**Corpus work completed:** [Measured 65-source findings](FINDINGS.md) · [source OVAL proof](https://github.com/vanderpol/scap-ng/actions/runs/38718081754) · [61-converted-package structural proof](https://github.com/vanderpol/scap-ng/actions/runs/38716331301). This includes a separate macOS and shell-command accounting stratum and an exact compiler/source-layer distinction.
+
 ## Question
 
 Should common authoring shorthand use a separately versioned, discoverable compact YAML grammar, or should an editor/template system generate the existing explicit canonical YAML? Do **not** add undocumented mixed-in shortcuts or hidden defaults to the canonical format.
