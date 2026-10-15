@@ -1,6 +1,6 @@
 # 0.4 research: one canonical authoring grammar, not two YAML languages
 
-**Research only. No 0.4 decision has been approved.** The project owner prefers one discoverable simplified YAML specification, with no hidden aliases. All current proofs lower exactly to the immutable 0.3 authoring source; scanner conformance for alternative test rewrites remains unproved.
+**Research only. No 0.4 decision has been approved.** The project owner prefers one discoverable simplified YAML specification, with no hidden aliases. Most tested conversions reconstruct the immutable 0.3 authoring source exactly; documented State-free normalizations are separately reference-model-equivalent. SCAP-NG is **pre-alpha and has no scanners**, so scanner conformance is deliberately a later implementation milestone rather than an authoring-language approval gate.
 
 ## What the real RHEL 9 content says about "only one"
 
