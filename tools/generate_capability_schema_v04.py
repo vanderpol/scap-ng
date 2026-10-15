@@ -200,7 +200,8 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         }],
         "additionalProperties":False,
     }
-    defs["object"]["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
+    if "object" in defs:
+        defs["object"]["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
 
     state_fields, records = _generated_state_fields(mapping,repo_root)
     entries = []
