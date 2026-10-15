@@ -18,6 +18,7 @@ concurrency:
 
 env:
   NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+  BASELINE_CONVERTER: be317e37a3b2f7abad6ae0eebfccc8cfda33dc90
 
 jobs:
   precheck:
@@ -44,8 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 95
     steps:
+      # Pin the converter to the known-passing 0.3 full-corpus checkpoint.
+      # Current main's default-selector audit is independently tracked in #226.
       - uses: actions/checkout@v4
         with:
+          path: scap-ng-research
+      - uses: actions/checkout@v4
+        with:
+          ref: be317e37a3b2f7abad6ae0eebfccc8cfda33dc90
           path: scap-ng
       - uses: actions/checkout@v4
         with:
@@ -60,7 +67,7 @@ jobs:
         env:
           BATCH: ${{ matrix.batch }}
         run: |
-          PYTHONPATH=scap-ng/tools python - <<'PY'
+          PYTHONPATH=scap-ng-research/tools:scap-ng/tools python - <<'PY'
           import json,os,shutil,subprocess,sys
           from pathlib import Path
           from generate_niwc_current_review import native_artifact_base
@@ -104,7 +111,7 @@ jobs:
                                     failure_tail="\n".join(logs.splitlines()[-85:]))
                   else:
                       measure_cmd=[
-                          sys.executable,"scap-ng/tools/research_04_full_macro_census.py",
+                          sys.executable,"scap-ng-research/tools/research_04_full_macro_census.py",
                           "measure",str(generated),
                           "--source-artifact",source.name,"--key",key,
                           "--output",str(report)
