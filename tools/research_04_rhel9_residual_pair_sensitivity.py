@@ -38,6 +38,12 @@ def source_sensitivity(path):
         preview.FIELD_ABSENCE_ENABLED=True
         third=preview.single_stage(docs,2)
         third_report=preview.make_report(docs,raw,third,third)
+        # Preserve explicit OVAL cardinality "only one exists" rather than
+        # trying to make exact-one collection equivalent to one-or-more.
+        preview.PAIR_ALIASES[("one","all")]="exactly_one_all_match"
+        preview.PAIR_INVERSE["exactly_one_all_match"]={"existence":"one","match":"all"}
+        fourth=preview.single_stage(docs,2)
+        fourth_report=preview.make_report(docs,raw,fourth,fourth)
     finally:
         preview.FIELD_ABSENCE_ENABLED=earlier_field_absence
         preview.PAIR_ALIASES.clear();preview.PAIR_ALIASES.update(previous)
@@ -76,6 +82,11 @@ def source_sensitivity(path):
         "initial":classify_metric(first_report),
         "after_two_new_exact_presets":classify_metric(second_report),
         "after_field_none_exist_alias":classify_metric(third_report),
+        "after_exactly_one_exists_alias":classify_metric(fourth_report),
+        "exactly_one_added_occurrences":(
+            fourth[2]["test_require:exactly_one_all_match"] -
+            third[2]["test_require:exactly_one_all_match"]
+        ),
         "field_none_exist_added_occurrences":(
             third[2]["field_require:none_exist"] - second[2]["field_require:none_exist"]
         ),
