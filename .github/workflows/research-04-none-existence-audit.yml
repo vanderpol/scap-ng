@@ -1,0 +1,41 @@
+name: 0.4 none-existence and match source audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-none-existence-audit.yml
+      - tools/research_04_existence_oddballs.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Download immutable 0.3 six-STIG authoring ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+          test -s work/scap-ng-0.3-six-stig-authoring.zip
+      - name: Inspect exact combinations and sample source provenance
+        run: |
+          python tools/research_04_existence_oddballs.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/none-existence-inspection.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: none-existence-inspection
+          path: work/none-existence-inspection.json
+          if-no-files-found: error
