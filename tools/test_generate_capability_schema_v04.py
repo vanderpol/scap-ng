@@ -36,8 +36,11 @@ def materialize(capability):
 
 def validate(schema,definition,value):
     resolver=RefResolver.from_schema(schema,store={**STORE,schema["$id"]:schema})
+    # Supply the generated schema as the actual validation root. Nested
+    # state_expression references are intentionally document-relative.
     v=Draft202012Validator(
-        {"$ref":schema["$id"]+f"#/$defs/{definition}"},resolver=resolver
+        {"$id":schema["$id"],"$defs":schema["$defs"],
+         "$ref":f"#/$defs/{definition}"},resolver=resolver
     )
     return list(v.iter_errors(value))
 
