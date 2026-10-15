@@ -1,0 +1,28 @@
+name: Research Slang-inspired authoring façade (read-only proof)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-slang-scoped-facade.yml
+      - tools/research_slang_scoped_facade.py
+      - tools/test_research_slang_scoped_facade.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install typed YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Prove explicit four-scope cardinality mapping or refuse
+        run: |
+          PYTHONPATH=tools python tools/test_research_slang_scoped_facade.py -v
+          PYTHONPATH=tools python tools/research_slang_scoped_facade.py
