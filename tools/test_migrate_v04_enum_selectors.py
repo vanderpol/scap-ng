@@ -90,9 +90,9 @@ class NativeEnumSelectorMigration(unittest.TestCase):
     def test_unverified_variable_definitions_are_not_silently_coerced(self):
         for variant in (
             {"kind":"external","datatype":"string",
-             "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}},
+             "expression":{"literal":RIGHTS}},
             {"kind":"constant","datatype":"integer",
-             "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}},
+             "expression":{"literal":RIGHTS}},
             {"kind":"constant","datatype":"string",
              "expression":{"literal":[]}},
             {"kind":"constant","datatype":"string",
@@ -103,7 +103,7 @@ class NativeEnumSelectorMigration(unittest.TestCase):
              "expression":{"variable":"indirect-variable"}},
             {"kind":"constant","datatype":"string",
              "title":"An unrelated same-shaped source",
-             "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}},
+             "expression":{"literal":RIGHTS}},
         ):
             with self.subTest(variant=variant):
                 variant={"title":"This constant_variable represents all user rights",**variant}
