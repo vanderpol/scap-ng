@@ -1,0 +1,40 @@
+name: 0.4 corpus failure diagnostics
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-corpus-diagnostics.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: shorthand-census-04-batch-*
+          run-id: 38715777388
+          github-token: ${{ github.token }}
+          path: downloads
+      - name: Summarize representative pinned conversions without hiding errors
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import collections,json
+          paths=sorted(Path("downloads").rglob("status/*.json"))
+          rows=[json.loads(p.read_text()) for p in paths]
+          print("STATUS_COUNT",len(rows))
+          print("STATUSES",dict(collections.Counter(r["status"] for r in rows)))
+          selected=("rhel_9","ms_windows_11","active_directory_domain",
+                    "apache_server_2-4_unix_server","ms_sql_server_2022_instance")
+          for row in rows:
+              if row["key"] in selected:
+                  print("=== SOURCE",row["source_artifact"])
+                  print("STATUS",row["status"])
+                  print("ERROR_TAIL",row.get("failure_tail","<none>")[-5000:])
+          PY
