@@ -60,7 +60,7 @@ class OneGrammarSchemaTests(unittest.TestCase):
             "fields":{"productstate":{
                 "bitwise_and":4096,
                 "require":"at_least_one_exists_and_all_match"
-            }}}}
+            }}}}}
         self.assertEqual(validate(wrap([data])),[])
 
     def test_state_free_presence_names(self):
