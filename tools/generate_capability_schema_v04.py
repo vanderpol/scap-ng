@@ -193,7 +193,10 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     test["properties"].pop("existence",None)
     test["properties"].pop("match",None)
     test["properties"]["require"] = {
-        "oneOf": [
+        # `none_exist` legitimately occurs in both the presence-only
+        # and State-bearing vocabularies. oneOf would reject that overlap;
+        # the central 0.4 Test schema independently enforces Test scope.
+        "anyOf": [
             {"$ref": LANG + "#/$defs/presence_requirement"},
             {"$ref": LANG + "#/$defs/paired_requirement"},
         ],
