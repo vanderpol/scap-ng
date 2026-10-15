@@ -193,5 +193,33 @@ class CapabilityV04Tests(unittest.TestCase):
         self.assertTrue(validate(schema,"test",legacy_object))
 
 
+    def test_reviewed_enum_object_selectors_do_not_accept_arbitrary_values(self):
+        schema=materialize("windows.userright")
+        def selected(value):
+            return test_object("windows.userright",{"userright":value})
+        self.assertFalse(validate(schema,"object",selected(
+            {"equals":"SE_NETWORK_LOGON_NAME"}
+        )))
+        self.assertFalse(validate(schema,"object",selected({
+            "equals":["SE_NETWORK_LOGON_NAME","SE_DENY_NETWORK_LOGON_NAME"],
+            "datatype":"string","value_match":"one",
+        })))
+        self.assertFalse(validate(schema,"object",selected({
+            "equals":{"variable":"enumerated-rights-variable"},
+            "datatype":"string","value_match":"one",
+        })))
+        for bad in (
+            {"equals":"FICTIONAL_RIGHT"},
+            {"equals":["SE_NETWORK_LOGON_NAME","FICTIONAL_RIGHT"],
+             "datatype":"string","value_match":"one"},
+            {"matches_regex":"SE_.*"},
+            {"not_equal":"SE_NETWORK_LOGON_NAME"},
+            {"variable":"enumerated-rights-variable"},
+            {"equals":{"variable":"enumerated-rights-variable"},
+             "datatype":"string"},
+        ):
+            with self.subTest(bad=bad):
+                self.assertTrue(validate(schema,"object",selected(bad)))
+
 if __name__=="__main__":
     unittest.main()

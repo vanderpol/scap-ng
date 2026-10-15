@@ -145,6 +145,27 @@ def generate(mapping: dict, repo_root: Path) -> dict:
                 ],
                 "description": f"0.4 native Object selector: {name} (type checked)",
             }
+            reviewed_enum=mapping["native"].get("selector_value_enums",{}).get(name)
+            if reviewed_enum:
+                # Reviewed enumerated Object selectors are equalities, not
+                # arbitrary string comparisons. The only scalar/array literal
+                # operands are the values in the capability's enum catalog.
+                # Dynamic Variables remain typed and require value_match; their
+                # resolved membership needs separate semantic validation.
+                # Do not add a second legacy bare-string selector dialect.
+                selector["allOf"].append({
+                    "type":"object",
+                    "required":["equals"],
+                    "propertyNames":{"enum":[
+                        "equals","datatype","value_match","redact_result"
+                    ]},
+                    "properties":{"equals":{"oneOf":[
+                        {"type":"string","enum":list(reviewed_enum)},
+                        {"type":"array","minItems":1,
+                         "items":{"type":"string","enum":list(reviewed_enum)}},
+                        {"$ref":COMMON+"#/$defs/variable_reference"},
+                    ]}},
+                })
             # Nullable native selector values, e.g. Windows registry name,
             # retain their original existence/absence meaning.
             if name in mapping["native"].get("nullable_selectors",["name"]):
