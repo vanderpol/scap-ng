@@ -6,6 +6,8 @@
 
 **NEW — full RHEL 9 authoring preview:** [RHEL9-PREVIEW.md](RHEL9-PREVIEW.md) · [download the research authoring ZIP](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-rhel9-compact-authoring-research). All **445** Rule files are included; **417 (93.7%)** default to automated, with manual tailoring alternatives for **all 445**. The experiment resolves shared Assessments by their Rule references, compacts **574/574** Field predicates and exactly re-expands **423/423** selected automated/applicability Assessment files. **269/417** automated Rules have all their `existence`/`match` pairs shortened by the three research presets; **148** retain other valid pairs explicitly. No new 0.4 grammar is approved.
 
+**Current 0.4 recommendation for review:** [**One proposed human-readable authoring grammar**](ONE-GRAMMAR-BOARD-PREVIEW.md), with [full vocabulary, real RHEL/Windows examples and proof limitations](HUMAN-VERBIAGE-PROPOSAL.md). [Strict 3-benchmark verification](https://github.com/vanderpol/scap-ng/actions/runs/38737558392) covers **921/921 default-automated Rules**, preserving Object Set filters, nested Windows records, expected-value arrays and collector-only `selection_match`. **930/942** Assessment YAMLs lower to identical parsed 0.3 originals; **12** have State-free match normalization supported by the reference-result model but awaiting live differential testing. **Not approved syntax.**
+
 ## Question
 
 Should common authoring shorthand use a separately versioned, discoverable compact YAML grammar, or should an editor/template system generate the existing explicit canonical YAML? Do **not** add undocumented mixed-in shortcuts or hidden defaults to the canonical format.
