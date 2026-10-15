@@ -2,20 +2,13 @@
 
 **Pre-alpha specification draft in progress — not approved, not a release.** The existing 0.3 specification, scanner bundle format and Board Discussion #213 remain unchanged.
 
-## Latest real 0.4 interim authoring preview (RHEL 9 and Windows 11)
+## Joval showcase — best starting point (October 15, 2026)
 
-**[Download the verified current-format RHEL 9 and Windows 11 authoring ZIPs](https://github.com/vanderpol/scap-ng/actions/runs/38798029627/artifacts/12002887248)**. The one GitHub Actions artifact contains **two distinct ZIPs**, plus a summary manifest. These use the *current single 0.4 grammar*, not the historical three-preset compact experiment.
+**[Original OVAL single → modern SCAP-NG 0.4 showcase](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)** gives ten source-backed examples as original OVAL XML, 0.4 YAML and corresponding JSON with provenance. [Joval meeting guide](JOVAL-TECHNICAL-PREVIEW.md) includes the real versus optional/proposed transformation distinction and the [conditional semantic questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md). The showcase's optional if/else illustration is **not** a proven automatic six-state OVAL normalization; tested collection `for_each` examples are separately identified.
 
-- **RHEL 9:** 423 automated/applicability Assessment documents, 658 native Tests, 445 original Rules; all 423 parsed Assessments round-trip source-exactly.
-- **Windows 11:** 251 automated/applicability Assessment documents, 364 native Tests, 257 original Rules; 245 source-exact and six separately established State-free normalizations. Its 219 reviewed enum-selector migrations retain source inverse proofs, including the original OVAL implicit `var_check: all` for the 45-element user-right Variable.
+## Current six-STIG YAML + JSON authoring review packet
 
-Both ZIPs include complete, human-readable automated Assessment YAML, required shared Assessments, source Rules and Benchmark, original manual alternatives, and `REVIEW-FIRST.md` and `provenance.json`. **All transformed Assessment files passed the complete 0.4 schema and native capability-specific Test validation**, plus inverse source checks ([passing generator CI](https://github.com/vanderpol/scap-ng/actions/runs/38798029627)).
-
-**Limits:** Pre-alpha *authoring-only* review material, **not** compiled `.scapng` scanner bundles or normative 0.4 approval. Rule/Benchmark/manual files are intentionally byte-for-byte from published 0.3 content for context; some retain 0.3 metadata. GitHub Actions research artifacts have a 90-day retention period. The earlier RHEL9 compact research release remains historical only.
-
-## Most current six-STIG YAML + JSON preview for reviewers
-
-**[Permanent pre-alpha discussion prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r2)** contains all six STIG authoring conversions in **both formats**, including the scoped field-requirement candidate (Test/group/field) and human `and`/`or` logic. [Joval meeting reading guide](JOVAL-TECHNICAL-PREVIEW.md). All 1,396 converted Assessments and 2,144 native Tests passed the candidate overlay, explicit scope inverse, full 0.4 base and native schema checks; JSON values mirror YAML. **Pre-alpha, not Board-approved or scanner-compiled.** The separate earlier RHEL9 preview remains historical.
+**[Permanent pre-alpha discussion prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r2)** contains all six STIG authoring conversions in **both formats**, including the scoped field-requirement candidate (Test/group/field) and human `and`/`or` logic. [Joval meeting reading guide](JOVAL-TECHNICAL-PREVIEW.md). All 1,396 converted Assessments and 2,144 native Tests passed the candidate overlay, explicit scope inverse, full 0.4 base and native schema checks; JSON values mirror YAML. **Pre-alpha, not Board-approved or scanner-compiled.** The revised Test-level name is `collected_items_require`; native field/record-level `require` remains distinct. The separate earlier RHEL9 preview remains historical.
 
 **Start with [0.4 scope and release gates](0.4-SCOPE-AND-RELEASE-GATES.md).** It explicitly includes actual field names in State predicates, a human-readable `require` vocabulary, operator-as-key comparisons, native typed arrays, and Windows record fields. One **authoring** grammar is the goal, not a second optional set of hidden YAML shortcuts.
 
@@ -42,3 +35,4 @@ Both ZIPs include complete, human-readable automated Assessment YAML, required s
 5. Request owner/Board review using a concise, real before/after example set, not the large research history.
 
 **No SCAP-NG scanner exists in pre-alpha.** Scanner differential and implementation conformance are *later milestones* and do not block authoring-language drafting or approval. The specification still requires independently testable collection/result semantics.
+
