@@ -88,6 +88,10 @@ def audit(zip_path):
                 if restore(authored,migrations)!=source:
                     raise ValueError(f"Enum-selector migration broke original source: {path}")
                 counts["enum_selector_occurrences_explicitly_migrated"]+=len(migrations)
+                for entry in migrations:
+                    counts["enum_migration_"+entry.get(
+                        "classification","unclassified"
+                    )]+=1
                 if migrations:counts["assessments_with_enum_migration"]+=1
                 counts["assessments"]+=1
                 if normalizations:counts["assessments_with_model_normalizations"]+=1
@@ -152,6 +156,7 @@ def audit(zip_path):
             "limitations":[
                 "Generic 0.4 authoring lowering is previously source-exact or separately reference-model-equivalent; generated deep schemas must be audited independently.",
                 "No live SCAP-NG scanner is available or required in pre-alpha.",
+                "Certified constant-full-enum Variable selections are structurally reversible, but their OVAL object value-check and exceptional-state equivalence still need independently sourced proof; do not count them as scanner parity.",
                 "Unknown or unmapped native Test types remain explicitly counted, not replaced by shell commands/manual.",
             ]}
 
