@@ -45,6 +45,28 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(m["entity_check_origin:schema_default"],1)
             self.assertEqual(r["distinct_source_test_identities"],2)
 
+    def test_deprecated_none_exist_only_when_absence_only(self):
+        source=OVAL.replace('check="only one"', 'check="none exist"')
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/"U_MS_IIS_10-0_Server_SCAP_1-4_Benchmark.zip"
+            with ZipFile(path,"w") as archive:
+                archive.writestr("oval.xml",source)
+            result=analyze_package(path)["strata"]["structured_other"]
+            self.assertEqual(result["deprecated_none_exist_check_normalized_state_free"],1)
+            self.assertEqual(result["items_pair:none/all"],1)
+            self.assertEqual(result["state_free_none_exist"],1)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/"U_MS_IIS_10-0_Site_SCAP_1-4_Benchmark.zip"
+            with ZipFile(path,"w") as archive:
+                archive.writestr("oval.xml",source.replace(
+                    '<w:object object_ref="object:one"/>',
+                    '<w:object object_ref="object:one"/><w:state state_ref="state:one"/>'))
+            result=analyze_package(path)["strata"]["structured_other"]
+            self.assertEqual(result["deprecated_none_exist_check_unsafe"],1)
+            self.assertEqual(result["unresolved_test_pair:none_exist/none exist"],1)
+            self.assertEqual(result["state_free_none_exist"],0)
+
     def test_macos_is_excluded_from_primary(self):
         self.assertEqual(kind("U_Apple_macOS_15_SCAP_1-4_Benchmark.zip",
                               "windows.registry"),"macos_atypical")
