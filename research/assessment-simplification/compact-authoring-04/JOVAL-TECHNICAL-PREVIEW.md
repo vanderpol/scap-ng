@@ -2,6 +2,14 @@
 
 **For technical discussion on October 16, 2026.** This is a **pre-alpha authoring-language candidate**, not a final standard, OVAL Board decision, or executable scanner bundle. The current 0.3 release is not changed.
 
+## Start with the original OVAL → NG 0.4 feature showcase
+
+**[Download the ten real OVAL-single/NG side-by-side comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)**. The 86 KB ZIP is a better starting point for the Joval meeting than the multi-megabyte six-STIG bundles. It contains actual archived OVAL single XML, the **correct** linked 0.4 authoring Assessment in **YAML and JSON**, and its Rule, grouped together by SV-ID. **[Open the concise showcase guide](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-oval-to-ng-showcase-20261015/SHOWCASE-START-HERE.md)** for real side-by-side static Variable and Set/filter examples and the validated, separately labeled conditional illustration.
+
+Feature highlights: **SV-257889** (OVAL ObjectComponent → separately proved opt-in collection `for_each`), **SV-278028** (filters), **SV-278001** (multi-valued constant Variable → literal arrays; role-sensitive `evaluate` and a separately labeled `if/then/else` native authoring illustration), **SV-278138** (exclude filters), **SV-258179** (shared Assessment and OVAL extend-definition), **SV-259345** (DNS runtime Variables), **SV-214228** (Apache regex capture). The current six-STIG converter intentionally leaves some source graphs faithful rather than enabling a potentially unsafe automatic modernization.
+
+**Evidence classification:** The full OVAL/NG pairs are source-backed and copied verbatim; the extra `for_each` fixture is an accepted 0.3 authoring/proof example rather than emitted by 0.4 r2; the `if/else` fragment is valid 0.4 grammar but **not** claimed to be six-state-equivalent to the archived OVAL Boolean expression. The result fixture is synthetic. These are essential distinctions for an evaluator-implementation discussion.
+
 ## Suggested 20-minute meeting flow
 
 - **3 minutes — motivation:** one Assessment grammar, inline native fields and verbs, explicit cardinality with less repetition. Existing SCAP 1.4 is a forward-conversion source, not an authoring dependency.
