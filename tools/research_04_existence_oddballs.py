@@ -80,10 +80,8 @@ def main():
             "pair":[x["existence"],x["match"]],"has_states":x.get("has_states"),
             "source_ids":x.get("source_ids"),
             "title":x.get("assessment_title")}))
-    print("SUSPECT_COUNTS",json.dumps(dict(Counter(
-        (x["scope"],x["existence"],x["match"]) for x in r["suspects"]).__iter__()),default=str)
-        if False else json.dumps({"/".join(map(str,k)):v for k,v in sorted(Counter(
-        (x["scope"],x["existence"],x["match"]) for x in r["suspects"]).items())}))
+    by_kind=Counter((x["scope"],x["existence"],x["match"]) for x in r["suspects"])
+    print("SUSPECT_COUNTS", json.dumps({"/".join(map(str,k)):v for k,v in sorted(by_kind.items())}))
     print("SUSPECT_TOTAL",r["suspect_count"])
 if __name__=="__main__":
     main()
