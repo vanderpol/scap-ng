@@ -534,7 +534,8 @@ def main():
         z.writestr("research/EXAMPLES.md",examples_markdown(docs,stage1[0],stage2[0],report))
     # Independently ensure copied human/Rule/Benchmark files and path set match exactly.
     with zipfile.ZipFile(args.output) as z:
-        assert len([x for x in z.namelist() if x.startswith(SOURCE_PREFIX)])==len(raw)
+        if {name for name in z.namelist() if name.startswith("authoring/")} != set(raw):
+            raise AssertionError("Preview omitted or added source authoring files")
         for name,source_bytes in raw.items():
             contents=z.read(name)
             if name in stage2[0]:
