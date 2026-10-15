@@ -1,0 +1,41 @@
+name: 0.4 independent authoring reference graph audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/test_v04_review_reference_graph.py
+      - .github/workflows/v04-review-reference-graph.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download immutable six-STIG r3 JSON authoring preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --pattern scap-ng-v0.4-joval-six-stig-json.zip --dir work
+      - name: Independent reference graph and adversarial fixture tests
+        run: |
+          python tools/test_v04_review_reference_graph.py \
+            --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --report work/REFERENCE-GRAPH-REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-r3-independent-reference-graph
+          path: work/REFERENCE-GRAPH-REPORT.json
+          if-no-files-found: warn
