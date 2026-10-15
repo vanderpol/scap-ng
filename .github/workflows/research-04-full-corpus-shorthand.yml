@@ -1,0 +1,180 @@
+name: 0.4 full 65-source shorthand research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-full-corpus-shorthand.yml
+      - tools/research_04_full_macro_census.py
+      - tools/test_research_04_full_macro_census.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-corpus-04-shorthand-research
+  cancel-in-progress: false
+
+env:
+  NIWC_REVISION: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+
+jobs:
+  precheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1
+      - name: Scope and macro reversal checks
+        run: |
+          PYTHONPATH=tools python tools/test_research_04_full_macro_census.py -v
+          PYTHONPATH=tools python tools/test_research_04_compiled_authoring_macros.py -v
+          PYTHONPATH=tools python tools/test_research_04_none_exist_alias.py -v
+
+  measure:
+    needs: precheck
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: ${{ env.NIWC_REVISION }}
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 lxml==6.1.1 jsonschema
+      - name: Convert each pinned benchmark and audit reversible shorthand
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: |
+          PYTHONPATH=scap-ng/tools python - <<'PY'
+          import json,os,shutil,subprocess,sys
+          from pathlib import Path
+          from generate_niwc_current_review import native_artifact_base
+
+          batch=int(os.environ["BATCH"])
+          revision=os.environ["NIWC_REVISION"]
+          artifacts=sorted(
+              p for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip")
+              if "Consolidated" not in p.name
+          )
+          if len(artifacts)!=65:
+              raise SystemExit(f"Expected 65 pinned sources, found {len(artifacts)}")
+
+          chosen=[p for index,p in enumerate(artifacts) if index % 4==batch]
+          print(f"PINNED_SOURCES={len(artifacts)} BATCH={batch} SELECTED={len(chosen)}",flush=True)
+          root=Path("work/results")
+          for dir_name in ("status","reports","logs"):
+              (root/dir_name).mkdir(parents=True,exist_ok=True)
+
+          for source in chosen:
+              key=native_artifact_base(source.stem)
+              generated=Path("work/generated")/key
+              split=Path("work")/f"split-{key}"
+              report=root/"reports"/f"{key}.json"
+              status={"source_artifact":source.name,"key":key,
+                      "status":"not_started"}
+              convert_cmd=[
+                  sys.executable,"scap-ng/tools/generate_niwc_current_review.py",
+                  str(source),"--output",str(generated),"--split-root",str(split),
+                  "--source-revision",revision,
+                  "--source-repository-path",f"Current/{source.name}",
+                  "--schema","scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd",
+                  "--summary",str(generated/"generation.json")
+              ]
+              try:
+                  p=subprocess.run(convert_cmd,capture_output=True,text=True)
+                  logs=p.stdout+"\n"+p.stderr
+                  (root/"logs"/f"{key}.log").write_text(logs,encoding="utf-8")
+                  if p.returncode!=0:
+                      status.update(status="blocked",returncode=p.returncode,
+                                    failure_tail="\n".join(logs.splitlines()[-85:]))
+                  else:
+                      measure_cmd=[
+                          sys.executable,"scap-ng/tools/research_04_full_macro_census.py",
+                          "measure",str(generated),
+                          "--source-artifact",source.name,"--key",key,
+                          "--output",str(report)
+                      ]
+                      m=subprocess.run(measure_cmd,capture_output=True,text=True)
+                      details=m.stdout+"\n"+m.stderr
+                      (root/"logs"/f"{key}.audit.log").write_text(details,encoding="utf-8")
+                      if m.returncode:
+                          status.update(status="audit_failed",returncode=m.returncode,
+                                        failure_tail="\n".join(details.splitlines()[-85:]))
+                      else:
+                          data=json.loads(report.read_text())
+                          status.update(status="generated",assessments=data["totals"]["assessments_exact_reverse"],
+                                        tests=data["totals"]["tests_examined"])
+              except Exception as exc:
+                  status.update(status="unexpected_exception",failure_tail=repr(exc))
+              finally:
+                  (root/"status"/f"{key}.json").write_text(
+                      json.dumps(status,indent=2,sort_keys=True)+"\n")
+                  shutil.rmtree(generated,ignore_errors=True)
+                  shutil.rmtree(split,ignore_errors=True)
+              print(json.dumps({k:v for k,v in status.items() if k!="failure_tail"}),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shorthand-census-04-batch-${{ matrix.batch }}
+          path: |
+            work/results/status
+            work/results/reports
+            work/results/logs
+          if-no-files-found: error
+          compression-level: 6
+
+  aggregate:
+    needs: measure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: shorthand-census-04-batch-*
+          path: downloads
+      - name: Verify 65-source manifest and aggregate primary/secondary strata
+        run: |
+          python scap-ng/tools/research_04_full_macro_census.py aggregate downloads \
+            --output work/full-corpus-shorthand-04.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-corpus-shorthand-04-report
+          path: work/full-corpus-shorthand-04.json
+          if-no-files-found: error
+      - name: Print review-friendly findings
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("work/full-corpus-shorthand-04.json").read_text())
+          for scope in ("primary_structured","shell_command","macos_atypical","all_included"):
+              metrics=report["categories"].get(scope,{})
+              print("STRATUM",scope,"TESTS",metrics.get("tests",0),
+                    "PAIRS",sum(v for k,v in metrics.items() if k.startswith("items_pair:")))
+              for name in (
+                  "items_alias_candidate:at_least_one_all_match",
+                  "field_alias_candidate:at_least_one_all_match",
+                  "state_free_absence_tests","sole_test_direct_evaluate",
+                  "private_same_capability","one_state_tests",
+                  "selector_macro:equals","state_macro:equals",
+                  "selector_macro:pattern_match","state_macro:pattern_match"
+              ):
+                  print(f"  {name}: {metrics.get(name,0)}")
+          PY
