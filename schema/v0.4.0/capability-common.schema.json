@@ -591,10 +591,33 @@
             "minLength": 1
           },
           "additionalProperties": {
-            "$ref": "#/$defs/object_entity_base",
-            "description": "Required comparison-as-key Object selector predicate; native capability schemas constrain actual field names."
+            "oneOf": [
+              {
+                "$ref": "#/$defs/object_entity_base"
+              },
+              {
+                "$ref": "#/$defs/foreach_selector_binding"
+              }
+            ],
+            "description": "One explicit operator-as-key or correlated foreach field binding; capability-specific schemas narrow field names, nullability, datatypes and lineage."
           },
-          "description": "Native Object selectors use the same single 0.4 comparison-as-key grammar as State predicates, but SHALL NOT use a State/Item require or Organizational Input."
+          "description": "Native Object selectors use the same single 0.4 comparison-as-key grammar as State predicates, but SHALL NOT use a State/Item require or Organizational Input.",
+          "properties": {
+            "name": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/object_entity_base"
+                },
+                {
+                  "type": "null",
+                  "description": "An explicitly absent name selector for directory, registry-key and other supported named-resource collectors; capability-native schema must authorize null."
+                },
+                {
+                  "$ref": "#/$defs/foreach_selector_binding"
+                }
+              ]
+            }
+          }
         }
       },
       "not": {

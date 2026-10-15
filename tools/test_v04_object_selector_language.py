@@ -138,6 +138,29 @@ class V04ObjectSelectorTests(unittest.TestCase):
             with self.subTest(broken=broken):
                 self.assertTrue(list(collector.iter_errors(broken)))
 
+    def test_nullable_named_selector_and_correlated_binding_have_explicit_shapes(self):
+        named=assessment_with_directory({"equals":"/etc/audit"})
+        obj=named["assessment"]["tests"]["demo-test"]["object"]
+        obj["select"]["name"]=None
+        self.assertFalse(errors(named))
+
+        foreach=assessment_with_directory({"from":"item.directory"})
+        obj=foreach["assessment"]["tests"]["demo-test"]["object"]
+        obj["for_each"]={"item":"item","in":"directories-object"}
+        obj["select"]["name"]={"matches_regex":".*"}
+        self.assertFalse(errors(foreach))
+
+        for bad in (
+            {"directory":None,"name":{"equals":"config"}},
+            {"directory":{"equals":"/etc"},"not_a_name":None},
+            {"directory":{"from":"not-a-lineage-binding"},"name":None},
+            {"directory":{"input":"unknown-input"},"name":None},
+        ):
+            with self.subTest(bad=bad):
+                doc=assessment_with_directory({"equals":"/etc"})
+                doc["assessment"]["tests"]["demo-test"]["object"]["select"]=bad
+                self.assertTrue(errors(doc))
+
     def test_native_object_without_select_remains_possible(self):
         # Native collectors can have capability-specific sources other than
         # select (e.g. Variable/cmdlet). This test does not validate them;
