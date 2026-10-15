@@ -153,11 +153,11 @@ def analyze_package(src:Path):
                             c["state_field_entities"]+=1
                             existence=entity.get("check_existence","at_least_one_exists")
                             match=entity.get("entity_check","all")
-                            if "check_existence" not in entity:
+                            if "check_existence" not in entity.attrib:
                                 c["entity_existence_origin:schema_default"]+=1
                             else:
                                 c["entity_existence_origin:source"]+=1
-                            if "entity_check" not in entity:
+                            if "entity_check" not in entity.attrib:
                                 c["entity_check_origin:schema_default"]+=1
                             else:
                                 c["entity_check_origin:source"]+=1
