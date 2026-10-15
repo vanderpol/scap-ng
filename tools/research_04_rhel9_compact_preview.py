@@ -35,6 +35,10 @@ PAIR_ALIASES={
 PAIR_INVERSE={value:{"existence":k[0],"match":k[1]}
               for k,value in PAIR_ALIASES.items()}
 ABSENCE="none_exist"
+# Research sensitivity toggle only. The published RHEL9 preview keeps this off.
+# At field scope none/all means no observed entities of the named field,
+# NOT zero collected Items. Exact pair lowering, not Test-level no-State proof.
+FIELD_ABSENCE_ENABLED=False
 LOGICAL={"all","any","one","odd"}
 
 def pair_of(node):
@@ -48,6 +52,8 @@ def maybe_require(node, scope, counts, *, state_free=False):
     counts[f"{scope}_scope_total"]+=1
     label=PAIR_ALIASES.get(pair)
     if scope=="test" and state_free and pair==("none","all"):
+        label=ABSENCE
+    elif scope=="field" and FIELD_ABSENCE_ENABLED and pair==("none","all"):
         label=ABSENCE
     if label is not None:
         out=deepcopy(node)
@@ -68,8 +74,14 @@ def expand_require(node, *, scope, state_free=False):
     if "existence" in node or "match" in node:
         raise ValueError("Cannot mix shorthand and explicit quantifiers")
     if label==ABSENCE:
-        if scope!="test" or not state_free:
-            raise ValueError("none_exist requires a Test without States")
+        if scope=="test":
+            if not state_free:
+                raise ValueError("none_exist requires a Test without States")
+        elif scope=="field":
+            if not FIELD_ABSENCE_ENABLED:
+                raise ValueError("none_exist at State-field scope not enabled in this research version")
+        else:
+            raise ValueError("none_exist requires an explicit Test or field scope")
         pair={"existence":"none","match":"all"}
     elif label in PAIR_INVERSE:
         pair=PAIR_INVERSE[label]
