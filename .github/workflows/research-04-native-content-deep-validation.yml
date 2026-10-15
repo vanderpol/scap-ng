@@ -6,6 +6,8 @@ on:
     paths:
       - tools/research_04_native_deep_content_census.py
       - tools/generate_capability_schema_v04.py
+      - tools/migrate_v04_enum_selectors.py
+      - tools/test_migrate_v04_enum_selectors.py
       - .github/workflows/research-04-native-content-deep-validation.yml
   workflow_dispatch:
 
@@ -30,6 +32,9 @@ jobs:
           mkdir -p work
           gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
             --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Prove enumeration literals lower only through reviewed source mappings
+        run: |
+          PYTHONPATH=tools python tools/test_migrate_v04_enum_selectors.py -v
       - name: Compare all selected real Test content with generated version-local native schemas
         run: |
           PYTHONPATH=tools python tools/research_04_native_deep_content_census.py \
