@@ -40,6 +40,38 @@ jobs:
             --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
             --output work/three-benchmark-shortcuts.json \
             --markdown work/three-benchmark-shortcuts.md
+      - name: Explain residual real Test/field semantics, source Rules and patterns
+        run: |
+          python - <<'PY'
+          import collections,json
+          from pathlib import Path
+          result=json.loads(Path("work/three-benchmark-shortcuts.json").read_text())
+          for name,benchmark in result["benchmarks"].items():
+              sources=benchmark["residual_source_assessments"]
+              patterns=collections.defaultdict(list)
+              for a in sources:
+                  for r in a["residuals"]:
+                      label=(r["location"] if r["location"]=="test" else "field",
+                             "/".join(r["pair"]),r["capability"])
+                      patterns[label].append({
+                          "rules":a["referenced_rule_ids"],
+                          "assessment_id":a["assessment_id"],
+                          "test":r["test"],
+                          "file":a["file"],
+                          "state_free":r.get("state_free"),
+                          "states_count":r.get("states_count"),
+                          "field":r.get("field"),
+                          "states_match":r.get("states_match"),
+                          "expression":str(r.get("state_predicate") or r.get("test_sample"))[:700],
+                          "evaluate":str(a.get("evaluate"))[:500],
+                      })
+              print("=== BENCHMARK",name,"REMAINING",sum(map(len,patterns.values())),
+                    "UNIQUE_ASSESSMENTS",len(sources))
+              for key,occurrences in sorted(patterns.items(),key=lambda kv:(kv[0][0],kv[0][1],kv[0][2])):
+                  print("PATTERN",str(key),"COUNT",len(occurrences))
+                  for example in occurrences[:12 if name=="rhel_9" else 4]:
+                      print("EXAMPLE",json.dumps(example,sort_keys=True,default=str))
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: rhel9-win11-server2025-quantifier-04
