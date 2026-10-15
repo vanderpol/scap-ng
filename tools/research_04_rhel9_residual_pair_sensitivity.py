@@ -24,6 +24,7 @@ def source_sensitivity(path):
     first_report=preview.make_report(docs,raw,first,first)
     previous=dict(preview.PAIR_ALIASES)
     inverse=dict(preview.PAIR_INVERSE)
+    earlier_field_absence=preview.FIELD_ABSENCE_ENABLED
     try:
         preview.PAIR_ALIASES.update(ADDITIONAL)
         preview.PAIR_INVERSE.update({
@@ -31,7 +32,14 @@ def source_sensitivity(path):
         })
         second=preview.single_stage(docs,2)
         second_report=preview.make_report(docs,raw,second,second)
+        # A third research-only scenario. Absence of State-field entities is
+        # NOT the same semantic scope as zero Items in a State-free Test.
+        # Both lower to the exact original none/all pair, however.
+        preview.FIELD_ABSENCE_ENABLED=True
+        third=preview.single_stage(docs,2)
+        third_report=preview.make_report(docs,raw,third,third)
     finally:
+        preview.FIELD_ABSENCE_ENABLED=earlier_field_absence
         preview.PAIR_ALIASES.clear();preview.PAIR_ALIASES.update(previous)
         preview.PAIR_INVERSE.clear();preview.PAIR_INVERSE.update(inverse)
     a=first_report["rules"]
@@ -67,12 +75,29 @@ def source_sensitivity(path):
         "added_presets":{str(k):v for k,v in ADDITIONAL.items()},
         "initial":classify_metric(first_report),
         "after_two_new_exact_presets":classify_metric(second_report),
+        "after_field_none_exist_alias":classify_metric(third_report),
+        "field_none_exist_added_occurrences":(
+            third[2]["field_require:none_exist"] - second[2]["field_require:none_exist"]
+        ),
+        "field_none_exist_relevant_assessments":sum(
+            1 for a in third[0].values()
+            if any(
+                isinstance(test,dict) and any(
+                    isinstance(entry,dict) and len(entry)==1 and
+                    isinstance(next(iter(entry.values())),dict) and
+                    next(iter(entry.values())).get("require")=="none_exist"
+                    for entry in (test.get("states") or [])
+                )
+                for test in (a["assessment"].get("tests") or {}).values()
+            )
+        ),
         "changed_rule_count":len(changed),
         "changed_rule_sample":changed[:24],
         "proof":"Both stages exactly round-trip each Assessment to original parsed 0.3; no runtime evaluator equivalence claimed.",
         "interpretation_limits":[
             "The extra two presets are a deliberately narrow sensitivity test, not approved new language features.",
             "all_exist_all_match and optional_all_match must be explicitly taught: they have distinct empty-collection outcomes.",
+            "Field-level none_exist is an exact none/all alias for missing entities of a collected Item. Test-level none_exist remains restricted to State-free zero-Item checks, and match:none is a different meaning.",
             "Full compact grammar still includes other complex Object/Set/Variable, operation and evaluation structures.",
             "Numbers count Rule-level selected Assessments, including resolved shared definitions, not a declaration of fully simplified grammar."
         ]
