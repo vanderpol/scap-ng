@@ -1,0 +1,25 @@
+# 0.4 conformance checkpoint — October 15, 2026
+
+**Status: NOT editor-semantics-ready / NOT normative.** This is a short evidence ledger for [semantic regression gate #229](https://github.com/vanderpol/scap-ng/issues/229), not a new specification decision. It distinguishes authored-content source fidelity, schema checks, reference closure, and executable scanner semantics.
+
+| Gate | Current independently identifiable result | Still needed |
+| --- | --- | --- |
+| Complete draft Assessment/100-capability schemas | **PASS for six anchors:** [CI 38814161354](https://github.com/vanderpol/scap-ng/actions/runs/38814161354), 1,396 complete automated/applicability Assessment documents and 2,144 native Tests | Owner review of final Test/group/field `require` grammar, more adversarial native-type/cardinality cases |
+| Source reconstruction | **1,384 source-exact** six-STIG Assessments, **12** separately classified State-free model-equivalent cases, according to [release gate #228](https://github.com/vanderpol/scap-ng/issues/228) | Independent executable six-valued proof for each changed semantic class; source reconstruction alone does not prove runtime outcomes |
+| Scoped field requirement candidate | [Research overlay and inverse validation](https://github.com/vanderpol/scap-ng/blob/main/tools/research_04_scoped_schema.py) pass representative six-STIG sources; 2,550 original field declarations → 1,444 under scoped candidate (1,106 fewer) | Formalize inheritance and conflict rules, exceptional nested-record and zero/unknown/incomplete result cases; ratify separately from base 0.4 |
+| Six-STIG packet Rule choice closure | r2 had **12 unique missing shared manual Assessment IDs** across **29** Rule choices. [Corrective code and focused tests #230](https://github.com/vanderpol/scap-ng/issues/230) produced a **green corrected 4,001-document-per-format archive**: 1,567 Rules, 2,958 choice links, 2,422 unique Assessment IDs, zero unresolved and zero duplicate IDs. | Publish immutable corrected preview r3 after the new gated job succeeds; do not overwrite r2. Include this closure check in future releases |
+| YAML vs JSON | Both authoring archives mirror parsed YAML ↔ JSON content; the corrected reference closure is checked at ID level | Full independent JSON compiler/reference resolver and signed package generation is **not yet proven**. Do not describe JSON equivalence as independent buildability |
+| Conditional vs source `OR(AND(G,P),AND(NOT G,Q))` | Existing pinned six-state study agrees in **135/216** generic three-input assignments and differs in **81/216**; native procedural conditional is only an authoring candidate | Decide unresolved-guard/branch/evidence contract; preserve faithful Boolean expressions during source migration unless an exact proof exists |
+| `for_each`, Set Filters, static/dynamic Variables, Windows record semantics | Source-backed showcase examples and bounded regression research exist; not all legacy graphs are automatically modernized | Targeted six-valued/collection-completeness oracle cases, same-parent relations, set order, zero-valued variables, and negative mutation tests |
+| Current-main 0.3 converter | [Regression #226](https://github.com/vanderpol/scap-ng/issues/226) still fails current-main source-default/assessment-choice audit; previous pinned source converter produced 61 supported packages, four SQL-extension blockers | Isolate source-compatible default selector contract; focused real-source regression tests; intentional full-65 release/Board checkpoint only |
+| Live scanning | **None** — SCAP-NG remains pre-alpha and no 0.4 scanner is available | Independent implementation and conformance suite later; not a prerequisite to drafting, but required before any interoperability or runtime certification claim |
+
+**Next focused sequence (no routine 65-package work):**
+
+1. Finish [#230](https://github.com/vanderpol/scap-ng/issues/230) r3 publish and link the immutable Rule-reference closure evidence.
+2. Expand [#229](https://github.com/vanderpol/scap-ng/issues/229) small fixture matrix for zero/one/many + absent/error/unknown/incomplete/NA, including nested Windows record cardinality and `states_match` vs `value_match`; compare to a reference oracle with independently pinned expected outcomes, not only serializer inverse.
+3. Compare source-backed `for_each` collection scope to Test-per-user scope, and distinguish opt-in safe rewrites from research-only examples.
+4. Reproduce and repair [#226](https://github.com/vanderpol/scap-ng/issues/226) current converter audit without suppressing mismatches; retain its own issue boundary.
+5. Review vocabulary and any semantic revisions with the project owner, then capture approval in an issue and run the focused + six-anchor release gates.
+
+**Editor dependency:** [SCAP-NG Editor schema contract](https://github.com/vanderpol/scap-ng-editor/blob/main/docs/SCHEMA-INPUT-CONTRACT.md) points to `schema/v0.4.0/` and the separate research overlay. Codex implementation is held until owner review of the relevant stable authoring contracts; this status table does not promote the candidate to a standard.
