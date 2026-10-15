@@ -13,7 +13,7 @@ import argparse,json,zipfile
 from pathlib import Path
 from research_04_three_benchmark_quantifier import BENCHMARKS
 import research_04_rhel9_compact_preview as legacy
-from research_04_field_key_authoring import fold_document,unfold_document
+from research_04_field_key_authoring import fold_document,unfold_document,fold_node,unfold_node
 from oval_result_truth_tables import evaluate_collected_object_test
 
 EXISTS={
@@ -150,6 +150,76 @@ def decode_states(states):
         out.append(deepcopy(entry))
     return out
 
+def encode_filter_tree(node,notes,counters,path="assessment"):
+    """Object Set filters use the SAME field predicate and require grammar.
+
+    Example:
+      - action: exclude
+        field: mode
+        operation: greater_than
+        value: 493
+        existence: one_or_more
+        match: all
+    becomes:
+      - exclude:
+          mode:
+            greater_than: 493
+            require: at_least_one_exists_and_all_match
+    No change to Set filter selection or error propagation.
+    """
+    if isinstance(node,list):
+        return [encode_filter_tree(item,notes,counters,f"{path}[{i}]")
+                for i,item in enumerate(node)]
+    if not isinstance(node,dict):
+        return deepcopy(node)
+    out={}
+    for key,value in node.items():
+        if key=="filters" and isinstance(value,list):
+            updated=[]
+            for i,entry in enumerate(value):
+                if not isinstance(entry,dict):
+                    raise ValueError(f"Filter at {path}[{i}] is not a mapping")
+                action=entry.get("action")
+                if action not in ("include","exclude"):
+                    raise ValueError(f"Filter missing explicit include/exclude at {path}[{i}]")
+                if "field" not in entry and not any(k in entry for k in LOGIC):
+                    raise ValueError(f"Filter without field or logical predicate at {path}[{i}]")
+                original_pred={k:deepcopy(v) for k,v in entry.items() if k!="action"}
+                folded=fold_node(original_pred,Counter())
+                single=encode_states([folded],notes=notes,
+                    path=f"{path}.filters[{i}]",counters=counters)[0]
+                updated.append({action:single})
+                counters["object_set_filter_verbs"]+=1
+            out[key]=updated
+        else:
+            out[key]=encode_filter_tree(value,notes,counters,f"{path}.{key}")
+    return out
+
+
+def decode_filter_tree(node):
+    if isinstance(node,list):
+        return [decode_filter_tree(item) for item in node]
+    if not isinstance(node,dict):
+        return deepcopy(node)
+    out={}
+    for key,value in node.items():
+        if key=="filters" and isinstance(value,list):
+            updated=[]
+            for entry in value:
+                if not isinstance(entry,dict) or len(entry)!=1:
+                    raise ValueError("Filter must be one include/exclude mapping")
+                action,expr=next(iter(entry.items()))
+                if action not in ("include","exclude"):
+                    raise ValueError("Unknown filter action")
+                original=unfold_node(decode_states([expr])[0])
+                if not isinstance(original,dict) or "action" in original:
+                    raise ValueError("Filter payload is not valid inline State")
+                updated.append({"action":action,**original})
+            out[key]=updated
+        else:
+            out[key]=decode_filter_tree(value)
+    return out
+
 def operator_enum():
     # Use pinned 0.3 authoritative operator vocabulary, not freehand aliases.
     schema=json.loads((Path(__file__).resolve().parents[1]/
@@ -205,6 +275,7 @@ def make_single(original):
         tests[tid]=from_source_pair(test,scope="test",with_states=has_states,
             notes=notes,label=f"tests.{tid}")
         counts["test_require"]+=1
+    out=encode_filter_tree(out,notes,counts)
     ops,normalized_ops=operator_enum()
     out=encode_operations(out,counts,ops)
     return out,counts,notes
@@ -212,6 +283,7 @@ def make_single(original):
 def lower_single(compact):
     _,normalized_ops=operator_enum()
     out=decode_operations(compact,normalized_ops)
+    out=decode_filter_tree(out)
     tests=out["assessment"].get("tests") or {}
     for tid,test in list(tests.items()):
         if not isinstance(test,dict):continue
@@ -319,6 +391,7 @@ def audit(source):
                 "assessments_exact_source":metrics["exact_source_assessments"],
                 "assessments_with_state_free_model_normalizations":metrics["model_normalized_assessments"],
                 "field_key_predicates":metrics["field_key"],
+                "object_set_filters_compacted":metrics["object_set_filter_verbs"],
                 "record_wrappers":metrics["record_wrapper"],
                 "record_field_requirements":metrics["record_field_require"],
                 "source_match_normalizations":notes_all,
