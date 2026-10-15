@@ -1,0 +1,41 @@
+name: 0.4 RHEL9 shorthand residual pair sensitivity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-rhel9-residual-pair-sensitivity.yml
+      - tools/research_04_rhel9_residual_pair_sensitivity.py
+      - tools/research_04_rhel9_compact_preview.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Get immutable source authoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Measure two additional exact pair presets and prove complete reversibility
+        run: |
+          python tools/research_04_rhel9_residual_pair_sensitivity.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/rhel9-preset-sensitivity.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-preset-sensitivity
+          path: work/rhel9-preset-sensitivity.json
+          if-no-files-found: error
