@@ -2,7 +2,7 @@
 
 **Proposal for design review only — not an approved 0.4 specification.** This is intended as **the single normative Assessment authoring representation**, *not* an optional compact language layered over a different published authoring language. Legacy SCAP 1.4 and NG 0.3 content would be migrated by a converter. The scanner-visible semantics, collection and results contracts must not change.
 
-**Source-backed proof:** [three-STIG one-grammar CI](https://github.com/vanderpol/scap-ng/actions/runs/38735417616) · [OVAL six-valued semantic checks](https://github.com/vanderpol/scap-ng/actions/runs/38734873333) · [prior Windows record source proof](https://github.com/vanderpol/scap-ng/actions/runs/38733493967).
+**Source-backed proof:** [three-STIG one-grammar CI](https://github.com/vanderpol/scap-ng/actions/runs/38737558392) · [OVAL six-valued semantic checks](https://github.com/vanderpol/scap-ng/actions/runs/38734873333) · [prior Windows record source proof](https://github.com/vanderpol/scap-ng/actions/runs/38733493967).
 
 ## The language direction
 
@@ -10,7 +10,8 @@
 2. **Every observation/requirement explicitly says what qualifies.** A required `require:` uses *one documented controlled-vocabulary string* at the Test, State-field, record, and nested record-field scope. One grammar, no alternative `existence:/match:` authoring form and no hidden defaults.
 3. **Comparison operators are keys everywhere.** `equals: 0`, `matches_regex: '...'`, `not_equal: 0`, `bitwise_and: 4096`, `version_greater_than: '...'`; all native 0.3 OVAL comparison operations remain expressible and typed, not just simple scalar equals/regex. Exactly one comparison operation per scalar predicate. Direct arrays, Variables and Inputs remain valid comparator operands and preserve the separate `value_match:`.
 4. **Records remain structured.** A record has its own `require`; `record.fields.<name>` has a separate `require` and comparator. Never flatten record fields into ordinary scalar States: absent record subfields can produce **error**, not absence-success.
-5. **Collection, evaluation, provenance and disclosure remain explicit.** This proposal does not remove `evaluate`, change object/set/filters, replace manual alternatives, simplify `reported_elements`, or alter native capabilities.
+5. **Object Set filters use the same named predicates.** `include`/`exclude` remain explicit actions, represented as filter verbs with nested field-key predicates; Object Set membership and error semantics are unchanged.
+6. **Collection, evaluation, provenance and disclosure remain explicit.** This proposal does not remove `evaluate`, change collection or filter results, replace manual alternatives, simplify `reported_elements`, or alter native capabilities. Collector parameter matching and expected-value matching are separate from Test/State `require`.
 
 ### Real examples, abbreviated only for presentation
 
@@ -84,6 +85,33 @@ select:
 
 `value_match: one` is a distinct **expected-value comparison quantifier**. It cannot be deduced from `require` on a Test or State. The compiler must enforce it on arrays and Variable/Input comparisons.
 
+### Object Set filters and WMI collector field selection
+
+**RHEL 9 recursive file collection** uses Set filters. The one-grammar representation retains the filter action instead of silently changing it:
+
+```yaml
+filters:
+  - exclude:
+      mode:
+        greater_than: 493
+        require: at_least_one_exists_and_all_match
+```
+
+(The values illustrate the structure; they are not a verbatim transcription of a particular Rule.) The source `action: exclude` and typed field predicate lower exactly back to the original. Real RHEL 9 contains **62** such filter entries; Windows 11 has **43**, and Server 2025 has **49**, all structurally reconstructed.
+
+**Windows WMI/cmdlet collection** also contains a different kind of matching requirement at `object.collect.select.fields` or `object.collect.parameters.fields`. For example, the real TPM source includes the collection property names `tpmpresent,tpmready,tpmenabled`. The source is `match: all` **without any `existence` field**. The candidate spelling is:
+
+```yaml
+collect:
+  select:
+    fields:
+      property:
+        equals: 'tpmpresent,tpmready,tpmenabled'
+        selection_match: all
+```
+
+`selection_match` is **not** a shorthand for Item/State `require`, and no existence setting is invented. All **31** Windows 11 and **28** Server 2025 occurrences of this collector-only match field lower back exactly. Keep `selection_match`, `value_match`, and `require` distinct in the full capability schema and glossary.
+
 ## Controlled English: initial requirement vocabulary
 
 The human-facing grammar uses precisely **one** `require` string. The full *research-only* matrix supports all **20** original `existence × match` pairs rather than inventing a second "longhand" dialect for edge cases. A JSON Schema must enumerate permitted names for each capability and position; no unspecified synonyms or defaults are accepted.
@@ -136,7 +164,9 @@ The one-grammar prototype compiled every existing automated Assessment reference
 | Automated/applicability Assessment files compiled | **423** | **251** | **268** |
 | Exact parsed 0.3 reconstruction | **423** | **245** | **262** |
 | Files containing only State-free, model-equivalent `match` normalization | **0** | **6** | **6** |
-| State field-name predicates transformed | **574** | **579** | **785** |
+| State and Object Set filter field-name predicates transformed | **636** | **623** | **883** |
+| Object Set filter actions preserved | **62** | **43** | **49** |
+| WMI/cmdlet collector `selection_match` (no existence pair) | **0** | **31** | **28** |
 | Nested record wrappers preserved | **0** | **36** | **59** |
 | Native comparison operations transformed | **2,387** | **1,061** | **1,300** |
 
