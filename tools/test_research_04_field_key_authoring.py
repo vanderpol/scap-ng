@@ -55,12 +55,16 @@ class FieldKeyTests(unittest.TestCase):
                 original=deepcopy(entry)
                 self.assertEqual(unfold_node(fold_node(entry,Counter())),original)
 
-    def test_reserved_field_needs_explicit_canonical_escape(self):
+    def test_field_name_collisions_are_unambiguous_by_payload_shape(self):
         for field in ("all","value","field","operation","reported_elements"):
             source={"field":field,"value":"y","operation":"equals"}
             shortened=fold_node(source,Counter())
-            self.assertEqual(shortened,source)
+            self.assertEqual(shortened,{field:{"value":"y","operation":"equals"}})
             self.assertEqual(unfold_node(shortened),source)
+        self.assertEqual(
+            unfold_node({"all":[{"value":{"value":"forbidden","operation":"equals"}}]}),
+            {"all":[{"field":"value","value":"forbidden","operation":"equals"}]}
+        )
 
     def test_bad_compact_forms_are_rejected(self):
         for candidate in (
@@ -68,15 +72,10 @@ class FieldKeyTests(unittest.TestCase):
             {"mount_options":{}},
             {"mount_options":{"field":"owner_uid","value":0}},
             {"mount_options":{"value":0},"owner_uid":{"value":100}},
-            {"all":{"mount_options":{"value":0}}},
+            {"all":"x"},  # logical all requires list; field all requires mapping
             {"field_name":None},
         ):
             with self.subTest(candidate=candidate):
-                if len(candidate)!=1 or next(iter(candidate)) not in ("field",):
-                    # Multiple-key mappings are unchanged as an existing syntax
-                    # shape, but must be rejected by a strict compact grammar.
-                    if len(candidate)!=1:
-                        continue
                 with self.assertRaises(ValueError):
                     unfold_node(candidate)
 
