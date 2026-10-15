@@ -68,7 +68,7 @@ def create(source_zip,out_dir):
                         doc,notes,migrations,metrics=migrate_assessment(doc,path,cache)
                         counts.update(metrics)
                         counts["assessments"]+=1
-                        counts["tests"]+=len(doc["assessment"].get("tests") or {})
+                        counts["native_tests"]+=len(doc["assessment"].get("tests") or {})
                         counts["source_exact"]+=int(not notes)
                         counts["source_model_equivalent"]+=int(bool(notes))
                         counts["enum_migrations"]+=len(migrations)
@@ -99,7 +99,7 @@ def create(source_zip,out_dir):
     totals=Counter()
     for vals in by_stig.values():
         for key,val in vals.items():totals[key]+=val
-    for key,expected in {"assessments":1396,"tests":2144,"fields":2550,"saved":1106,"source_model_equivalent":12}.items():
+    for key,expected in {"assessments":1396,"native_tests":2144,"fields":2550,"saved":1106,"source_model_equivalent":12}.items():
         if totals[key]!=expected:raise ValueError(f"Six-STIG {key}: {totals[key]} != {expected}")
     index=[
         "# SCAP-NG 0.4 pre-alpha: Joval meeting review",
@@ -132,9 +132,9 @@ def create(source_zip,out_dir):
             "windows_11":"Windows 11","windows_server_2025":"Windows Server 2025",
             "windows_server_dns":"Windows Server DNS","apache_2_4_unix":"Apache 2.4 UNIX"}
     for key,v in by_stig.items():
-        index.append(f"| {labels.get(key,key)} | {v['assessments']} | {v['tests']} | {v['saved']} |")
+        index.append(f"| {labels.get(key,key)} | {v['assessments']} | {v['native_tests']} | {v['saved']} |")
     index+= [
-        f"| **Total** | **{totals['assessments']}** | **{totals['tests']}** | **{totals['saved']}** |",
+        f"| **Total** | **{totals['assessments']}** | **{totals['native_tests']}** | **{totals['saved']}** |",
         "",
         "Suggested Windows 11 sample files to open: SV-253254.automated",
         "(Enterprise versus EnterpriseS; explicit group AND and State OR),",
