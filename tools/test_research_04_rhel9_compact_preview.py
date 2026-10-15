@@ -45,10 +45,15 @@ class CompactPreview(unittest.TestCase):
                                  "at_least_one_some_match")
                 self.assertEqual(t["states"][1]["all"][1]["owner_uid"]["existence"],"optional")
                 self.assertIn("match",t["states"][1]["all"][1]["owner_uid"])
+                # Array-valued comparisons remain fully explicit: unlike a
+                # scalar, they require datatype and independent value_match.
+                self.assertIn("operation",t["states"][0]["value"])
+                self.assertEqual(t["states"][0]["value"]["datatype"],"integer")
                 if stage==2:
-                    self.assertIn("equals",t["states"][0]["value"])
+                    # Only an eligible direct scalar may use equals:.
+                    self.assertIn("equals",t["states"][1]["all"][0]["owner_uid"])
                 else:
-                    self.assertIn("operation",t["states"][0]["value"])
+                    self.assertIn("operation",t["states"][1]["all"][0]["owner_uid"])
                 self.assertEqual(before,self.fixture())
 
     def test_none_exist_only_state_free_exact(self):
