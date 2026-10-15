@@ -1,0 +1,614 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.0/rule-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-08",
+  "title": "SCAP-NG Rule Result draft v0.4.0 strawman",
+  "description": "Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment Results own the underlying technical execution.",
+  "type": "object",
+  "required": [
+    "rule_id",
+    "outcome",
+    "assessment",
+    "message",
+    "instances",
+    "findings"
+  ],
+  "properties": {
+    "rule_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "severity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ],
+      "description": "Deterministic aggregate policy outcome derived from all Rule result instances."
+    },
+    "assessment": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "digest": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mode": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "automated",
+                "manual",
+                null
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Identity of the effective selected Assessment for this Rule. Execution details live only in referenced Assessment Results."
+    },
+    "message": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "unexpected_existence",
+                "required_item_missing",
+                "required_match_missing",
+                "value_mismatch",
+                "cardinality_mismatch",
+                "unsupported_organizational_input",
+                "missing_organizational_input",
+                "invalid_organizational_input",
+                "collection_error"
+              ]
+            },
+            "input": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional references to decisive evidence or Assessment-result evidence members; evidence is not embedded here."
+    },
+    "instances": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Explicit result instances contributing to this policy-facing Rule Result. Present even for the common single-invocation case.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "outcome",
+          "assessment_result_ref"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "error",
+              "unknown",
+              "not_evaluated",
+              "not_applicable"
+            ]
+          },
+          "assessment_result_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Manifest logical Assessment execution identity, never a guessed artifact filename."
+          },
+          "assessment_invocation_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_instance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "check_instance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "object",
+              "null"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "description": "One policy-facing invocation/check/target instance. It references, but does not duplicate, the detailed Assessment Result."
+      }
+    },
+    "weight": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Effective Rule weight used by the selected scoring model, when defined."
+    },
+    "check_selector": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Effective named Assessment/check selector chosen for this Rule."
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Effective publisher/Profile/Tailoring Parameters materially relevant to this Rule result."
+    },
+    "organizational_inputs": {
+      "type": "array",
+      "description": "Concise organization-defined expected policy values actually used by this Rule, each linked to the single authoritative Benchmark Result effective_policy.organizational_inputs assertion. Omit for Rules that consume no Organizational Input. Full supplier/authorization records remain at Benchmark scope; do not copy execution graphs.",
+      "items": {
+        "type": "object",
+        "required": [
+          "parameter",
+          "organizational_input_ref",
+          "redacted"
+        ],
+        "properties": {
+          "parameter": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Effective organization-resolved Benchmark Parameter."
+          },
+          "organizational_input_ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Exact key in benchmark_result.effective_policy.organizational_inputs, not a source filename."
+          },
+          "value": {
+            "description": "Effective expected policy value; the same typed JSON value as the authoritative assertion, unless disclosure is restricted."
+          },
+          "redacted": {
+            "type": "boolean",
+            "description": "Explicit policy-value redaction indicator; never combine true with value."
+          },
+          "provenance_summary": {
+            "type": "object",
+            "description": "Optional concise nonauthoritative authority summary from the referenced Benchmark assertion, not a second provenance truth.",
+            "properties": {
+              "organization": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authorization_reference": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effective_from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expires_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "redacted": {
+                  "const": true
+                }
+              },
+              "required": [
+                "redacted"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "value"
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "applicability": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Rule-level applicability disposition plus references to the applicability Assessment Results that produced it; detailed execution data is not embedded here.",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "applicable",
+            "not_applicable",
+            "unknown",
+            "error",
+            "not_evaluated"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "outcome"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "applicable",
+                  "not_applicable",
+                  "unknown",
+                  "error",
+                  "not_evaluated"
+                ]
+              },
+              "assessment_result_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "assessment_invocation_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "outcome",
+        "conditions"
+      ],
+      "additionalProperties": false
+    },
+    "findings": {
+      "type": "array",
+      "description": "Bounded decisive Assessment-derived typed facts. Empty when none can safely be reported; no copied execution graph.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/comparison_finding"
+          },
+          {
+            "$ref": "#/$defs/missing_finding"
+          }
+        ]
+      }
+    },
+    "finding_counts": {
+      "type": "object",
+      "description": "Optional collection summary: evaluated population and actual failures are distinct from returned evidence. Only aggregate independent instance populations when justified.",
+      "required": [
+        "evaluated_items",
+        "observed_violations",
+        "actual_violations",
+        "population_complete",
+        "reported_items",
+        "sample_truncated"
+      ],
+      "properties": {
+        "evaluated_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_violations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_violations": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "reported_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample_truncated": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "population_complete": {
+                "const": false
+              }
+            },
+            "required": [
+              "population_complete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "actual_violations": {
+                "const": "unknown"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "subject": {
+      "type": "object",
+      "required": [
+        "kind",
+        "identifier"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparison_finding": {
+      "type": "object",
+      "required": [
+        "kind",
+        "instance_id",
+        "subject",
+        "field",
+        "operation",
+        "expected",
+        "observed",
+        "outcome"
+      ],
+      "properties": {
+        "kind": {
+          "const": "comparison"
+        },
+        "instance_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "$ref": "result-types.schema.json#/$defs/typed_value"
+        },
+        "observed": {
+          "$ref": "result-types.schema.json#/$defs/typed_value"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "unknown",
+            "error",
+            "not_evaluated",
+            "not_applicable"
+          ]
+        },
+        "test_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "missing_finding": {
+      "type": "object",
+      "description": "Missing required resource or inconclusive collection; no fictional Item.",
+      "required": [
+        "kind",
+        "instance_id",
+        "subject",
+        "predicate",
+        "expected_existence",
+        "observed_existence",
+        "outcome"
+      ],
+      "properties": {
+        "kind": {
+          "const": "missing"
+        },
+        "instance_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "predicate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_existence": {
+          "enum": [
+            "exists",
+            "does_not_exist"
+          ]
+        },
+        "observed_existence": {
+          "enum": [
+            "exists",
+            "does_not_exist",
+            "not_collected",
+            "error"
+          ]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "unknown",
+            "error",
+            "not_evaluated",
+            "not_applicable"
+          ]
+        },
+        "test_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

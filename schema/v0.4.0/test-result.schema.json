@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.0/test-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-08",
+  "title": "SCAP-NG Test Result draft v0.4.0 strawman",
+  "description": "Detailed technical result for one authored Test. Test-local predicate positions, not independently named State artifacts, determine comparison identities.",
+  "type": "object",
+  "required": [
+    "id",
+    "outcome",
+    "object_refs",
+    "state_refs",
+    "item_refs",
+    "per_item_results",
+    "item_summary"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcome": {
+      "$ref": "result-types.schema.json#/$defs/technical_outcome"
+    },
+    "check_existence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "all_exist",
+        "any_exist",
+        "at_least_one_exists",
+        "none_exist",
+        "only_one_exists",
+        null
+      ]
+    },
+    "existence_outcome": {
+      "oneOf": [
+        {
+          "$ref": "result-types.schema.json#/$defs/technical_outcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "check": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "all",
+        "at_least_one",
+        "only_one",
+        "none_satisfy",
+        null
+      ]
+    },
+    "state_operator": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "AND",
+        "OR",
+        null
+      ]
+    },
+    "object_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ordered identifiers of consumer-local Test predicates. Canonical 0.3 form is <test-id>.states[<zero-based-index>], including repeated identical predicates at separate positions. No separately named authored States are required."
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Only the collected Item IDs retained under per_item_results or otherwise needed to explain the Test. This list is not an unbounded enumeration of every evaluated Item; the required item_summary provides evaluated, failing and retained counts when reporting is capped."
+    },
+    "per_item_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_ref",
+          "outcome",
+          "state_results",
+          "item"
+        ],
+        "properties": {
+          "item_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "outcome": {
+            "$ref": "result-types.schema.json#/$defs/technical_outcome"
+          },
+          "state_results": {
+            "type": "array",
+            "items": {
+              "$ref": "state-result.schema.json"
+            },
+            "description": "Each local comparison result identifies one lexical Test.states array position; it must resolve against this Test's ordered state_refs, not a source OVAL State ID."
+          },
+          "item": {
+            "$ref": "collected-item.schema.json",
+            "description": "Reported system Item with typed attributes, embedded beside this Test's verdict and State comparisons. The item.id SHALL equal item_ref. This is the Test-local evidence, not a second independently evaluated observation."
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Test-local reported system Items and their evaluated State/Entity comparisons, subject to scanner-controlled evidence retention. This array can be a sample; never infer counts or collection completeness from its length."
+    },
+    "reason": {
+      "type": [
+        "string",
+        "object",
+        "null"
+      ]
+    },
+    "decisive_expression": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "item_summary": {
+      "type": "object",
+      "description": "Required counts for every technical Test, including no-item, unknown and capped-evidence cases. Evaluated Items and mismatches describe execution; returned_items counts retained per_item_results; actual_mismatches is unknown if full relevant population was not evaluated. Consistency between these values, the assessment retention cap and retained Items SHALL be validated beyond JSON Schema.",
+      "required": [
+        "evaluated_items",
+        "observed_mismatches",
+        "actual_mismatches",
+        "returned_items",
+        "truncated_evidence"
+      ],
+      "properties": {
+        "evaluated_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_mismatches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_mismatches": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "returned_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated_evidence": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,1049 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-15",
+  "title": "SCAP-NG shared capability schema primitives v0.4.0",
+  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern. Owner-accepted 0.3 compact source can omit an inferred literal comparison datatype or use a self-describing typed operation; published compiled Assessments retain fully explicit canonical datatypes. compare_as is not supported.",
+  "$defs": {
+    "variable_reference": {
+      "type": "object",
+      "required": [
+        "variable"
+      ],
+      "properties": {
+        "variable": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "entity_value": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        {
+          "$ref": "#/$defs/literal_collection"
+        },
+        {
+          "$ref": "#/$defs/variable_reference"
+        },
+        {
+          "$ref": "#/$defs/input_reference"
+        }
+      ]
+    },
+    "object_entity_base": {
+      "type": "object",
+      "required": [
+        "value",
+        "operation"
+      ],
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean"
+              ]
+            },
+            {
+              "$ref": "#/$defs/literal_collection"
+            },
+            {
+              "$ref": "#/$defs/variable_reference"
+            }
+          ],
+          "description": "An Object selector selects collection targets and SHALL NOT consume Organizational Input; direct {input: ...} is permitted only for expected-State comparisons."
+        },
+        "operation": {
+          "$ref": "#/$defs/comparison_operation"
+        },
+        "datatype": {
+          "$ref": "#/$defs/native_datatype"
+        },
+        "value_match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "value_match"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variable_reference"
+                  },
+                  {
+                    "$ref": "#/$defs/literal_collection"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "required": [
+              "value_match"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "variable_match"
+            ]
+          }
+        },
+        {
+          "$ref": "#/$defs/authoring_type_resolution"
+        }
+      ]
+    },
+    "state_entity_base": {
+      "$ref": "assessment-language.schema.json#/$defs/scalar_field_predicate"
+    },
+    "state_filter": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "include"
+          ],
+          "properties": {
+            "include": {
+              "$ref": "assessment-language.schema.json#/$defs/state_entry"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "exclude"
+          ],
+          "properties": {
+            "exclude": {
+              "$ref": "assessment-language.schema.json#/$defs/state_entry"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "One field-key predicate with an explicit include/exclude Set filter action."
+    },
+    "test_reference_set": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/inline_predicate"
+      },
+      "description": "Test-local comparison expressions; no State IDs or redundant capability declarations."
+    },
+    "comparison_operation": {
+      "type": "string",
+      "enum": [
+        "equals",
+        "not_equal",
+        "case_insensitive_equals",
+        "case_insensitive_not_equal",
+        "greater_than",
+        "greater_than_or_equal",
+        "less_than",
+        "less_than_or_equal",
+        "bitwise_and",
+        "bitwise_or",
+        "pattern_match",
+        "subset_of",
+        "superset_of",
+        "float_equals",
+        "float_not_equal",
+        "float_greater_than",
+        "float_greater_than_or_equal",
+        "float_less_than",
+        "float_less_than_or_equal",
+        "binary_equals",
+        "binary_not_equal",
+        "version_equals",
+        "version_not_equal",
+        "version_greater_than",
+        "version_greater_than_or_equal",
+        "version_less_than",
+        "version_less_than_or_equal",
+        "ipv4_equals",
+        "ipv4_not_equal",
+        "ipv4_greater_than",
+        "ipv4_greater_than_or_equal",
+        "ipv4_less_than",
+        "ipv4_less_than_or_equal",
+        "ipv4_subset_of",
+        "ipv4_superset_of",
+        "ipv6_equals",
+        "ipv6_not_equal",
+        "ipv6_greater_than",
+        "ipv6_greater_than_or_equal",
+        "ipv6_less_than",
+        "ipv6_less_than_or_equal",
+        "ipv6_subset_of",
+        "ipv6_superset_of",
+        "rpm_evr_equals",
+        "rpm_evr_not_equal",
+        "rpm_evr_greater_than",
+        "rpm_evr_greater_than_or_equal",
+        "rpm_evr_less_than",
+        "rpm_evr_less_than_or_equal",
+        "debian_evr_equals",
+        "debian_evr_not_equal",
+        "debian_evr_greater_than",
+        "debian_evr_greater_than_or_equal",
+        "debian_evr_less_than",
+        "debian_evr_less_than_or_equal",
+        "fileset_revision_equals",
+        "fileset_revision_not_equal",
+        "fileset_revision_greater_than",
+        "fileset_revision_greater_than_or_equal",
+        "fileset_revision_less_than",
+        "fileset_revision_less_than_or_equal",
+        "ios_version_equals",
+        "ios_version_not_equal",
+        "ios_version_greater_than",
+        "ios_version_greater_than_or_equal",
+        "ios_version_less_than",
+        "ios_version_less_than_or_equal"
+      ]
+    },
+    "match_quantifier": {
+      "type": "string",
+      "enum": [
+        "all",
+        "one_or_more",
+        "one",
+        "none"
+      ]
+    },
+    "existence_requirement": {
+      "type": "string",
+      "enum": [
+        "all",
+        "one_or_more",
+        "none",
+        "one",
+        "optional"
+      ]
+    },
+    "logical_operator": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any",
+        "one",
+        "odd"
+      ]
+    },
+    "native_datatype": {
+      "type": "string",
+      "enum": [
+        "string",
+        "boolean",
+        "integer",
+        "float",
+        "binary",
+        "version",
+        "ipv4",
+        "ipv6",
+        "rpm_evr",
+        "debian_evr",
+        "fileset_revision",
+        "ios_version",
+        "record"
+      ]
+    },
+    "file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "symlinks",
+                "symlinks_and_directories"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Independent/Unix file traversal. Preserves the complete non-deprecated OVAL recurse vocabulary."
+    },
+    "file_selection": {
+      "type": "object",
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "directory": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "name": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "traversal": {
+          "$ref": "#/$defs/file_traversal"
+        },
+        "filesystem": {
+          "$ref": "#/$defs/filesystem_scope"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "full_path"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "directory"
+                ]
+              },
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "traversal"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "directory",
+            "name"
+          ],
+          "not": {
+            "required": [
+              "full_path"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "set_object_operand": {
+      "type": "object",
+      "required": [
+        "object",
+        "filters"
+      ],
+      "properties": {
+        "object": {
+          "$ref": "#/$defs/object_use"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state_filter"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_nested_operand": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "set": {
+          "$ref": "#/$defs/set_expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_operand": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/set_object_operand"
+        },
+        {
+          "$ref": "#/$defs/set_nested_operand"
+        }
+      ]
+    },
+    "set_expression": {
+      "type": "object",
+      "required": [
+        "operator",
+        "operands"
+      ],
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": [
+            "union",
+            "intersection",
+            "difference"
+          ]
+        },
+        "operands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/set_operand"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operator": {
+                "const": "difference"
+              }
+            },
+            "required": [
+              "operator"
+            ]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "maxItems": 2
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "description": "Set composition compatible with OVAL 5.12.3 set semantics. A single operand is valid for union, intersection, or difference and evaluates to that operand after its filters are applied; difference is limited to at most two operands."
+    },
+    "hierarchy_traversal": {
+      "type": "object",
+      "required": [
+        "max_depth"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "record_field_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/record_field_predicate"
+    },
+    "record_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record"
+    },
+    "scalar_value_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/scalar_field_predicate"
+    },
+    "structured_value_predicate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_value_predicate"
+        },
+        {
+          "type": "object",
+          "required": [
+            "record"
+          ],
+          "properties": {
+            "record": {
+              "$ref": "#/$defs/record_predicate"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "list"
+          ],
+          "properties": {
+            "list": {
+              "$ref": "#/$defs/list_predicate"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "list_predicate": {
+      "type": "object",
+      "required": [
+        "item",
+        "match",
+        "existence"
+      ],
+      "properties": {
+        "item": {
+          "$ref": "#/$defs/structured_value_predicate"
+        },
+        "match": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "existence": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "file_traversal_base": {
+      "type": "object",
+      "required": [
+        "max_depth",
+        "recurse"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Maximum downward recursion depth; null means no limit. OVAL -1 imports as null."
+        },
+        "recurse": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "description": "Shared non-deprecated downward file recursion structure. Traversal direction is fixed by this construct as downward; deprecated OVAL recurse_direction=up is not representable."
+    },
+    "windows_file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "junctions",
+                "junctions_and_directories"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Windows file traversal. Preserves the non-deprecated OVAL junction terminology rather than silently treating it as Unix symlink syntax."
+    },
+    "object_record_field": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        {
+          "type": "object",
+          "required": [
+            "match"
+          ],
+          "properties": {
+            "match": {
+              "$ref": "#/$defs/match_quantifier"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "One named field in an authored record-valued Object input. The field key supplies identity; match preserves OVAL field entity_check semantics."
+    },
+    "object_record": {
+      "type": "object",
+      "required": [
+        "fields"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/object_record_field"
+          }
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authored record-valued Object input. Record field names are structurally unique. Parent record datatype=record and operation=equals are fixed by the record construct and are therefore not authored as optional choices."
+    },
+    "filesystem_scope": {
+      "type": "string",
+      "enum": [
+        "all",
+        "local",
+        "same"
+      ],
+      "description": "Filesystem search scope independent of recursion. OVAL recurse_file_system all/local/defined maps to all/local/same and applies to exact full_path as well as directory/name selection."
+    },
+    "foreach_binding": {
+      "type": "object",
+      "required": [
+        "item",
+        "in"
+      ],
+      "properties": {
+        "item": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Lexical name for one Item produced by the source Object."
+        },
+        "in": {
+          "$ref": "#/$defs/object_reference"
+        }
+      },
+      "additionalProperties": false,
+      "description": "SCAP-NG 0.3 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit."
+    },
+    "foreach_selector_binding": {
+      "type": "object",
+      "required": [
+        "from"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Bind this target selector from one field of the current foreach Item, e.g. user.home_dir."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Bind this selector from one field of a visible foreach lineage alias, e.g. user.home_dir. In a chained foreach, aliases inherited from the source Object remain correlated and visible."
+    },
+    "object_reference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
+    },
+    "inline_object": {
+      "type": "object",
+      "required": [
+        "capability"
+      ],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "not": {
+        "required": [
+          "result"
+        ]
+      },
+      "additionalProperties": true,
+      "description": "Consumer-local Object. Capability-specific structure is validated against the corresponding generated capability schema and semantic rules."
+    },
+    "object_use": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/object_reference"
+        },
+        {
+          "$ref": "#/$defs/inline_object"
+        }
+      ]
+    },
+    "literal_collection": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean"
+        ]
+      },
+      "description": "Non-empty ordered literal collection. Duplicates are preserved; datatype validity and source-equivalent matching quantifier are validated separately."
+    },
+    "input_reference": {
+      "type": "object",
+      "required": [
+        "input"
+      ],
+      "properties": {
+        "input": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "inline_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/state_entry"
+    },
+    "authoring_type_resolution": {
+      "description": "0.3 authoring permits omission of datatype ONLY when a literal and operation unambiguously establish comparison type. Direct Variable/Input/list comparisons retain datatype; compiler expands this union to the exact typed canonical OVAL predicate before capability checks and bundle emission. Typed operation plus datatype is prohibited.",
+      "if": {
+        "required": [
+          "datatype"
+        ]
+      },
+      "then": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "equals",
+              "not_equal",
+              "case_insensitive_equals",
+              "case_insensitive_not_equal",
+              "greater_than",
+              "greater_than_or_equal",
+              "less_than",
+              "less_than_or_equal",
+              "bitwise_and",
+              "bitwise_or",
+              "pattern_match",
+              "subset_of",
+              "superset_of"
+            ]
+          }
+        }
+      },
+      "else": {
+        "anyOf": [
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "case_insensitive_equals",
+                  "case_insensitive_not_equal",
+                  "pattern_match"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal"
+                ]
+              },
+              "value": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal",
+                  "bitwise_and",
+                  "bitwise_or"
+                ]
+              },
+              "value": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "float_equals",
+                  "float_not_equal",
+                  "float_greater_than",
+                  "float_greater_than_or_equal",
+                  "float_less_than",
+                  "float_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "binary_equals",
+                  "binary_not_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "version_equals",
+                  "version_not_equal",
+                  "version_greater_than",
+                  "version_greater_than_or_equal",
+                  "version_less_than",
+                  "version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv4_equals",
+                  "ipv4_not_equal",
+                  "ipv4_greater_than",
+                  "ipv4_greater_than_or_equal",
+                  "ipv4_less_than",
+                  "ipv4_less_than_or_equal",
+                  "ipv4_subset_of",
+                  "ipv4_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv6_equals",
+                  "ipv6_not_equal",
+                  "ipv6_greater_than",
+                  "ipv6_greater_than_or_equal",
+                  "ipv6_less_than",
+                  "ipv6_less_than_or_equal",
+                  "ipv6_subset_of",
+                  "ipv6_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "rpm_evr_equals",
+                  "rpm_evr_not_equal",
+                  "rpm_evr_greater_than",
+                  "rpm_evr_greater_than_or_equal",
+                  "rpm_evr_less_than",
+                  "rpm_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "debian_evr_equals",
+                  "debian_evr_not_equal",
+                  "debian_evr_greater_than",
+                  "debian_evr_greater_than_or_equal",
+                  "debian_evr_less_than",
+                  "debian_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "fileset_revision_equals",
+                  "fileset_revision_not_equal",
+                  "fileset_revision_greater_than",
+                  "fileset_revision_greater_than_or_equal",
+                  "fileset_revision_less_than",
+                  "fileset_revision_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ios_version_equals",
+                  "ios_version_not_equal",
+                  "ios_version_greater_than",
+                  "ios_version_greater_than_or_equal",
+                  "ios_version_less_than",
+                  "ios_version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

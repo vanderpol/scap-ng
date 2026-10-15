@@ -1,0 +1,27 @@
+name: SCAP-NG 0.4 draft schema checks
+
+on:
+  push:
+    paths:
+      - 'schema/v0.4.0/**'
+      - 'tools/test_v04_schema_draft.py'
+      - '.github/workflows/schema-v04-draft.yml'
+  pull_request:
+    paths:
+      - 'schema/v0.4.0/**'
+      - 'tools/test_v04_schema_draft.py'
+      - '.github/workflows/schema-v04-draft.yml'
+  workflow_dispatch:
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install jsonschema
+      - name: Version-local metadata, schema, positive/negative fixtures
+        run: python tools/test_v04_schema_draft.py
