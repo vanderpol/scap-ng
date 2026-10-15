@@ -22,6 +22,24 @@ from research_04_one_grammar_proof import make_single,benchmark_dir
 from generate_capability_schema_v04 import generate
 from migrate_v04_enum_selectors import migrate,restore
 
+SIX_ANCHORS=(*BENCHMARKS,"oracle_linux_9","windows_server_dns","apache_2_4_unix")
+
+
+def resolve_resolve_benchmark_dir(folders,benchmark):
+    if benchmark in BENCHMARKS:
+        return benchmark_dir(folders,benchmark)
+    names={
+        "oracle_linux_9":lambda n:"oracle" in n.lower() and "9" in n,
+        "windows_server_dns":lambda n:"windows" in n.lower() and "dns" in n.lower(),
+        "apache_2_4_unix":lambda n:"apache" in n.lower(),
+    }
+    match=[n for n in folders if names[benchmark](n)]
+    if len(match)!=1:
+        raise ValueError(
+            f"Cannot uniquely locate {benchmark}: matched={match}; available={sorted(folders)}"
+        )
+    return match[0]
+
 ROOT=Path(__file__).resolve().parents[1]
 MAPPINGS=ROOT/"schema"/"v0.4.0"/"capability-mappings"/"supported"
 SUPPORTED={p.stem:p for p in MAPPINGS.glob("*.json")}
@@ -63,13 +81,13 @@ def _variable_refs(node):
             yield from _variable_refs(child)
 
 
-def audit(zip_path):
+def audit(zip_path,benchmarks=BENCHMARKS):
     reports={}
     cache={}
     with zipfile.ZipFile(zip_path) as z:
         folders={p.split("/")[1] for p in z.namelist()
                  if p.startswith("authoring/") and "/rules/" in p}
-        for benchmark in BENCHMARKS:
+        for benchmark in benchmarks:
             oldprefix=corpus.SOURCE_PREFIX
             corpus.SOURCE_PREFIX="authoring/"+benchmark_dir(folders,benchmark)+"/"
             try:
@@ -167,8 +185,10 @@ def main():
     p.add_argument("--output",type=Path,required=True)
     p.add_argument("--strict",action="store_true",
                    help="Fail on any generated native Test mismatch (release gate, not initial research)")
+    p.add_argument("--six-anchor",action="store_true",
+                   help="Audit all six published 0.3 anchors, not just the proven initial three")
     args=p.parse_args()
-    result=audit(args.source_zip)
+    result=audit(args.source_zip,SIX_ANCHORS if args.six_anchor else BENCHMARKS)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
     bad=0
