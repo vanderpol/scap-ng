@@ -46,7 +46,9 @@ Both record and record-field requirement scopes are preserved.
 | Server 2025 | **259 / 259** | 268 |
 | **Total** | **921 / 921** | **942** |
 
-**930/942** Assessment files reproduced the *exact original parsed 0.3 source*. The remaining **12** contained State-free Tests whose original `match` choice is never consulted in the pinned OVAL reference result model. Normalizing that inert setting has model-level proof but **not live scanner parity**, so this distinction is explicit in the report. [Complete compiler proof](https://github.com/vanderpol/scap-ng/actions/runs/38736151378).
+**930/942** Assessment files reproduced the *exact original parsed 0.3 source*. The remaining **12** contained State-free Tests whose original `match` choice is never consulted in the pinned OVAL reference result model. Normalizing that inert setting has model-level proof but **not live scanner parity**, so this distinction is explicit in the report. [Complete compiler proof](https://github.com/vanderpol/scap-ng/actions/runs/38737558392).
+
+**Complex features were not bypassed.** The strict single-grammar CI also converted **154** Object Set filter entries (RHEL9 62, Win11 43, Server2025 49) to `include:/exclude:` actions over field-name predicates. Windows WMI/cmdlet collectors have **59** separate `selection_match:` properties (31 Win11, 28 Server2025) without a corresponding existence field; these are **not** incorrectly turned into `require`. All round-tripped source-exactly. `value_match:` for static arrays remains a third independent cardinality domain.
 
 **No new shell-command or manual fallback was needed** for the syntax experiment. Existing shell-command content remains intact. Original Rules, manual alternatives, applicability, and static Object arrays continue to be supported.
 
