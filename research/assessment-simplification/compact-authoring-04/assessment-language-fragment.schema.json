@@ -1,0 +1,7521 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/0.4/assessment-language-fragment.schema.json",
+  "title": "SCAP-NG 0.4 single-language Assessment syntax – RESEARCH CANDIDATE",
+  "description": "Non-normative focused grammar for named State fields, natural Test/field/record requirement names and operator-as-key predicates. Does not replace full versioned 0.4 schema snapshot, resolve capabilities, validate Object Sets, or approve wording.",
+  "type": "object",
+  "required": [
+    "assessment"
+  ],
+  "properties": {
+    "assessment": {
+      "type": "object",
+      "required": [
+        "tests"
+      ],
+      "properties": {
+        "tests": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/test"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "not": {
+    "required": [
+      "authoring_format"
+    ]
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "paired_requirement": {
+      "type": "string",
+      "enum": [
+        "none_exist",
+        "none_exist_and_only_one_matches",
+        "none_exist_and_some_match",
+        "none_exist_and_none_match",
+        "only_one_exists_and_matches",
+        "only_one_exists_and_only_one_matches",
+        "only_one_exists_and_some_match",
+        "only_one_exists_and_none_match",
+        "at_least_one_exists_and_all_match",
+        "at_least_one_exists_and_only_one_matches",
+        "at_least_one_exists_and_some_match",
+        "at_least_one_exists_and_none_match",
+        "all_exist_and_all_match",
+        "all_exist_and_only_one_matches",
+        "all_exist_and_some_match",
+        "all_exist_and_none_match",
+        "may_be_absent_and_all_match",
+        "may_be_absent_and_only_one_matches",
+        "may_be_absent_and_some_match",
+        "may_be_absent_and_none_match"
+      ],
+      "description": "Test-with-States, State-field, record, or record-field existence+matching requirement; generated names are draft candidates."
+    },
+    "presence_requirement": {
+      "type": "string",
+      "enum": [
+        "none_exist",
+        "only_one_exists",
+        "at_least_one_exists",
+        "all_exist",
+        "may_be_absent"
+      ],
+      "description": "State-free Test: existence only; matching aggregator is inoperative."
+    },
+    "scalar_field_predicate": {
+      "type": "object",
+      "required": [
+        "require"
+      ],
+      "properties": {
+        "require": {
+          "$ref": "#/$defs/paired_requirement"
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value_match": {
+          "enum": [
+            "all",
+            "one",
+            "one_or_more",
+            "none"
+          ]
+        },
+        "redact_result": {
+          "const": true
+        },
+        "equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "case_insensitive_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "case_insensitive_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "bitwise_and": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "bitwise_or": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "matches_regex": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "required": [
+                "equals"
+              ]
+            },
+            {
+              "required": [
+                "not_equal"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_equals"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "greater_than"
+              ]
+            },
+            {
+              "required": [
+                "greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "less_than"
+              ]
+            },
+            {
+              "required": [
+                "less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_and"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_or"
+              ]
+            },
+            {
+              "required": [
+                "matches_regex"
+              ]
+            },
+            {
+              "required": [
+                "subset_of"
+              ]
+            },
+            {
+              "required": [
+                "superset_of"
+              ]
+            },
+            {
+              "required": [
+                "float_equals"
+              ]
+            },
+            {
+              "required": [
+                "float_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "binary_equals"
+              ]
+            },
+            {
+              "required": [
+                "binary_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_equals"
+              ]
+            },
+            {
+              "required": [
+                "version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_equals"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_equals"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than_or_equal"
+              ]
+            }
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "field"
+                ]
+              },
+              {
+                "required": [
+                  "existence"
+                ]
+              },
+              {
+                "required": [
+                  "match"
+                ]
+              },
+              {
+                "required": [
+                  "operation"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "record_field_predicate": {
+      "type": "object",
+      "required": [
+        "require"
+      ],
+      "properties": {
+        "require": {
+          "$ref": "#/$defs/paired_requirement"
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value_match": {
+          "enum": [
+            "all",
+            "one",
+            "one_or_more",
+            "none"
+          ]
+        },
+        "redact_result": {
+          "const": true
+        },
+        "equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "case_insensitive_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "case_insensitive_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "bitwise_and": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "bitwise_or": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "matches_regex": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "required": [
+                "equals"
+              ]
+            },
+            {
+              "required": [
+                "not_equal"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_equals"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "greater_than"
+              ]
+            },
+            {
+              "required": [
+                "greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "less_than"
+              ]
+            },
+            {
+              "required": [
+                "less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_and"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_or"
+              ]
+            },
+            {
+              "required": [
+                "matches_regex"
+              ]
+            },
+            {
+              "required": [
+                "subset_of"
+              ]
+            },
+            {
+              "required": [
+                "superset_of"
+              ]
+            },
+            {
+              "required": [
+                "float_equals"
+              ]
+            },
+            {
+              "required": [
+                "float_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "binary_equals"
+              ]
+            },
+            {
+              "required": [
+                "binary_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_equals"
+              ]
+            },
+            {
+              "required": [
+                "version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_equals"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_equals"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than_or_equal"
+              ]
+            }
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "field"
+                ]
+              },
+              {
+                "required": [
+                  "existence"
+                ]
+              },
+              {
+                "required": [
+                  "match"
+                ]
+              },
+              {
+                "required": [
+                  "operation"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "record_wrapper_predicate": {
+      "type": "object",
+      "required": [
+        "record"
+      ],
+      "properties": {
+        "record": {
+          "type": "object",
+          "required": [
+            "require",
+            "fields"
+          ],
+          "properties": {
+            "require": {
+              "$ref": "#/$defs/paired_requirement"
+            },
+            "fields": {
+              "type": "object",
+              "minProperties": 1,
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/record_field_predicate"
+              }
+            },
+            "redact_result": {
+              "const": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "state_entry": {
+      "oneOf": [
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/scalar_field_predicate"
+              },
+              {
+                "$ref": "#/$defs/record_wrapper_predicate"
+              }
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "one"
+          ],
+          "properties": {
+            "one": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "odd"
+          ],
+          "properties": {
+            "odd": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "test": {
+      "type": "object",
+      "required": [
+        "require"
+      ],
+      "properties": {
+        "require": {
+          "$ref": "#/$defs/paired_requirement"
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state_entry"
+          }
+        },
+        "states_match": {
+          "enum": [
+            "all",
+            "any",
+            "one",
+            "odd"
+          ]
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "existence"
+            ]
+          },
+          {
+            "required": [
+              "match"
+            ]
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "not": {
+              "required": [
+                "states"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "$ref": "#/$defs/presence_requirement"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "states": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "states"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "$ref": "#/$defs/presence_requirement"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "states": {
+                "type": "array",
+                "minItems": 2
+              }
+            },
+            "required": [
+              "states"
+            ]
+          },
+          "then": {
+            "required": [
+              "states_match"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
+    }
+  }
+}
