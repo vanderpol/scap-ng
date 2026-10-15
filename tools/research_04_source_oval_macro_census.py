@@ -157,6 +157,7 @@ def analyze_package(src:Path):
                         fingerprints.add(fp)
                         c=counts[kind(source_name,capability)]
                         c["states"]+=1
+                        per_state_field_names=Counter()
                         for entity in state:
                             if not isinstance(entity.tag,str):
                                 continue
@@ -166,6 +167,17 @@ def analyze_package(src:Path):
                             # nested within record-valued entities are different
                             # and not silently counted in this scope.
                             c["state_field_entities"]+=1
+                            entity_name=local(entity.tag)
+                            c[f"field_name:{entity_name}"]+=1
+                            per_state_field_names[entity_name]+=1
+                            if entity_name in {"value","field","operation","all","any","one","odd"}:
+                                c[f"field_name_collision:{entity_name}"]+=1
+                            if entity.get("var_ref") is not None:
+                                c["state_entity_variable_reference"]+=1
+                            if entity.get("datatype")=="record":
+                                c["record_valued_state_entities"]+=1
+                            if any(local(child.tag)=="field" for child in entity):
+                                c["nested_record_field_structures"]+=1
                             existence=entity.get("check_existence","at_least_one_exists")
                             match=entity.get("entity_check","all")
                             if "check_existence" not in entity.attrib:
@@ -183,6 +195,11 @@ def analyze_package(src:Path):
                             c[f"field_pair:{pair[0]}/{pair[1]}"]+=1
                             if pair==("one_or_more","all"):
                                 c["field_common_all_match"]+=1
+                        if any(count>1 for count in per_state_field_names.values()):
+                            c["states_with_repeated_field_names"]+=1
+                            c["repeated_field_instances_extra"]+=sum(
+                                count-1 for count in per_state_field_names.values() if count>1
+                            )
     return {
         "source":source_name,
         "source_oval_documents":source_docs,
