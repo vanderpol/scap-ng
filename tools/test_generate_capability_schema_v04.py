@@ -98,6 +98,31 @@ class CapabilityV04Tests(unittest.TestCase):
             with self.subTest(candidate=candidate):
                 self.assertTrue(validate(schema,"state_predicate",candidate))
 
+    def test_no_object_native_capability_still_has_state_and_match_requirement(self):
+        # windows.passwordpolicy has no Object source but *does* evaluate an
+        # observed State. It is not a fixed-result/presence-only capability.
+        schema=materialize("windows.passwordpolicy")
+        self.assertNotIn("object",schema["$defs"])
+        self.assertIn("state_predicate",schema["$defs"])
+        mapping=json.loads(
+            (VERSION/"capability-mappings"/"supported"/"windows.passwordpolicy.json")
+            .read_text(encoding="utf-8")
+        )
+        field_name=next(iter(mapping["native"]["state_field_map"].values()))
+        valid={
+            "test_title":"policy State check",
+            "reported_elements":"all",
+            "capability":"windows.passwordpolicy",
+            "states":[{field_name:{
+                "equals":14,"require":"at_least_one_exists_and_all_match"
+            }}],
+            "require":"at_least_one_exists_and_all_match",
+        }
+        self.assertFalse(validate(schema,"test",valid))
+        bad=deepcopy(valid)
+        bad["require"]="only_one_exists"
+        self.assertTrue(validate(schema,"test",bad))
+
     def test_registry_literal_value_field_keeps_its_name(self):
         schema=materialize("windows.registry")
         state={"value":{"equals":"4",
