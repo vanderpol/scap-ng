@@ -1,0 +1,63 @@
+name: 0.4 OVAL single to NG Joval showcase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/export_v04_oval_single_showcase.py
+      - .github/workflows/v04-oval-single-showcase.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  showcase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Retrieve immutable v0.4 r2 meeting examples
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/sources
+          gh release download v0.4.0-joval-meeting-preview-20261015-r2 \
+            --pattern 'scap-ng-v0.4-joval-six-stig-*.zip' --dir work/sources
+      - name: Resolve Rules, archived OVAL singles, and exact converted Assessments
+        run: |
+          python tools/export_v04_oval_single_showcase.py \
+            --yaml work/sources/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json work/sources/scap-ng-v0.4-joval-six-stig-json.zip \
+            --out work/showcase
+          sha256sum work/showcase/*.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v04-oval-single-to-ng-feature-showcase
+          path: work/showcase/*
+          retention-days: 90
+          if-no-files-found: error
+      - name: Permanent peer-review showcase prerelease
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: v0.4.0-joval-oval-to-ng-showcase-20261015
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::notice::Immutable showcase already published"
+            exit 0
+          fi
+          gh release create "$TAG" \
+            work/showcase/scap-ng-v04-oval-single-to-ng-showcase.zip \
+            work/showcase/SHOWCASE-START-HERE.md \
+            work/showcase/MANIFEST.json \
+            --target "$GITHUB_SHA" \
+            --title "SCAP-NG 0.4: original OVAL singles to NG feature showcase for Joval" \
+            --notes "Original archived OVAL single XML paired with the actual published 0.4 r2 YAML and JSON authoring Assessments and corresponding Rules. Includes separate, clearly marked source-backed for_each research, native if/else grammar proof, organizational input and synthetic results; NOT a blanket equivalent automatic transformation or executable scanner." \
+            --prerelease
