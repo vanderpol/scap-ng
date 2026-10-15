@@ -37,6 +37,10 @@ These are *Test occurrences or explicit macro sites*, not additive lines saved:
 
 The source-macro research verified exact parsed expansion per generated Assessment; it does **not** establish a new 0.4 standardized YAML grammar or differential scanner conformance.
 
+## Follow-up: name the State field directly, without `field:` wrappers
+
+[Full evidence and comparisons](FIELD-AS-KEY.md) · [tracked under #227](https://github.com/vanderpol/scap-ng/issues/227). Across the *actual* six-STIG 0.3 authoring ZIP, **922 of 922** State field predicates in **318** automated Assessment documents lowered from `- field: name` to `- name: { ... }` and reconstructed the identical parsed original. **119** of these are fields truly named `value`; using typed nested mappings resolves the collision without banning the field name. Full corpus OVAL includes **1,335/7,211** such fields. The user-facing recommendation may be to **replace** the `field:` wrapper in one canonical 0.4 grammar, rather than add a second hidden shorthand. But field/operation/value types must remain explicit and exact; a bare `name: scalar` lacks enough semantics.
+
 ## Prioritized proposals for design review
 
 1. **Named explicit Test/field quantifier pair:** `require: at_least_one_all_match`. Very frequent and can lower to the independent existing fields at the correct scope.
