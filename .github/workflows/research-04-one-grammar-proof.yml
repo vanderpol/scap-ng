@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/research-04-one-grammar-proof.yml
       - tools/research_04_one_grammar_proof.py
+      - tools/test_research_04_one_grammar_proof.py
   workflow_dispatch:
 
 permissions:
@@ -21,6 +22,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Reject conflicting or hidden shorthand and prove nested record semantics
+        run: PYTHONPATH=tools python tools/test_research_04_one_grammar_proof.py -v
       - name: Get released 0.3 source
         env:
           GH_TOKEN: ${{ github.token }}
