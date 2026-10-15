@@ -234,22 +234,36 @@ def encode_auxiliary_pairs(node,notes,counters,path="assessment"):
         return deepcopy(node)
     out={k:encode_auxiliary_pairs(v,notes,counters,f"{path}.{k}")
          for k,v in node.items()}
-    if "existence" in out or "match" in out:
+    if "existence" in out:
         out=from_source_pair(out,scope="collector_field",with_states=True,
                              notes=notes,label=path)
         counters["other_typed_field_require"]+=1
-        counters[f"other_typed_field_location:{path.split('.fields.')[0] if '.fields.' in path else path}"]+=1
+    elif "match" in out:
+        # WMI/cmdlet Object.collect.select.fields.property constrains *which
+        # collection properties are selected*. It has only source 'match':
+        # inventing an Item/State existence pair would be a hidden default.
+        # This distinct collector-only aggregation is not a Test require.
+        if ".object.collect.select.fields." not in path:
+            raise ValueError(f"Unclassified match-only field semantics: {path} {repr(out)[:600]}")
+        out["selection_match"]=out.pop("match")
+        counters["collector_selection_match_only"]+=1
     return out
 
 
-def decode_auxiliary_pairs(node):
+def decode_auxiliary_pairs(node,path="assessment"):
     if isinstance(node,list):
-        return [decode_auxiliary_pairs(v) for v in node]
+        return [decode_auxiliary_pairs(v,f"{path}[{i}]") for i,v in enumerate(node)]
     if not isinstance(node,dict):
         return deepcopy(node)
-    out={k:decode_auxiliary_pairs(v) for k,v in node.items()}
+    out={k:decode_auxiliary_pairs(v,f"{path}.{k}") for k,v in node.items()}
     if isinstance(out.get("require"),str) and out["require"] in PAIR_BY_NAME:
         out=back_to_source_pair(out,scope="collector_field",with_states=True)
+    if "selection_match" in out:
+        if ".object.collect.select.fields." not in path:
+            raise ValueError(f"selection_match in unsupported scope: {path}")
+        if "match" in out:
+            raise ValueError("Conflicting selection match names")
+        out["match"]=out.pop("selection_match")
     return out
 
 def operator_enum():
@@ -427,6 +441,7 @@ def audit(source):
                 "field_key_predicates":metrics["field_key"],
                 "object_set_filters_compacted":metrics["object_set_filter_verbs"],
                 "auxiliary_collector_fields_compacted":metrics["other_typed_field_require"],
+                "collector_match_only_predicates":metrics["collector_selection_match_only"],
                 "record_wrappers":metrics["record_wrapper"],
                 "record_field_requirements":metrics["record_field_require"],
                 "source_match_normalizations":notes_all,
