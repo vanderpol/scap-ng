@@ -13,9 +13,9 @@ import zipfile
 import yaml
 
 ITEM_ALIAS = "at_least_one_all_match"
-FIELD_ALIAS = "at_least_one_matches"
+FIELD_ALIAS = "at_least_one_all_match"
 ITEM_PAIR = {"existence":"one_or_more", "match":"all"}
-FIELD_PAIR = {"existence":"one_or_more", "match":"one_or_more"}
+FIELD_PAIR = {"existence":"one_or_more", "match":"all"}
 
 
 def shorten_pair(node, *, pair, label):
@@ -106,6 +106,7 @@ def measure(archive_path):
         "structural_identity_only":True,
         "presets":{"item":{"name":ITEM_ALIAS, "expansion":ITEM_PAIR},
                    "field":{"name":FIELD_ALIAS, "expansion":FIELD_PAIR}},
+        "interpretation":"At least one is found and all found match expectations. Scope is determined by whether the preset belongs to a Test or State field; error, unknown and incomplete rules remain unchanged.",
         "totals":dict(counts),
         "by_benchmark":{k:dict(v) for k,v in sorted(by_benchmark.items())},
         "item_existence_match_pairs":{f"{k[0]} / {k[1]}":v for k,v in sorted(item_pairs.items())},
