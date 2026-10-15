@@ -42,103 +42,8 @@
       ]
     },
     "object_entity_base": {
-      "type": "object",
-      "required": [
-        "value",
-        "operation"
-      ],
-      "properties": {
-        "value": {
-          "oneOf": [
-            {
-              "type": [
-                "string",
-                "number",
-                "integer",
-                "boolean"
-              ]
-            },
-            {
-              "$ref": "#/$defs/literal_collection"
-            },
-            {
-              "$ref": "#/$defs/variable_reference"
-            }
-          ],
-          "description": "An Object selector selects collection targets and SHALL NOT consume Organizational Input; direct {input: ...} is permitted only for expected-State comparisons."
-        },
-        "operation": {
-          "$ref": "#/$defs/comparison_operation"
-        },
-        "datatype": {
-          "$ref": "#/$defs/native_datatype"
-        },
-        "value_match": {
-          "$ref": "#/$defs/match_quantifier"
-        },
-        "redact_result": {
-          "type": "boolean",
-          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
-          "const": true
-        }
-      },
-      "allOf": [
-        {
-          "if": {
-            "required": [
-              "value_match"
-            ]
-          },
-          "then": {
-            "properties": {
-              "value": {
-                "oneOf": [
-                  {
-                    "$ref": "#/$defs/variable_reference"
-                  },
-                  {
-                    "$ref": "#/$defs/literal_collection"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "value": {
-                "oneOf": [
-                  {
-                    "$ref": "#/$defs/variable_reference"
-                  },
-                  {
-                    "$ref": "#/$defs/literal_collection"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "value"
-            ]
-          },
-          "then": {
-            "required": [
-              "value_match"
-            ]
-          }
-        },
-        {
-          "not": {
-            "required": [
-              "variable_match"
-            ]
-          }
-        },
-        {
-          "$ref": "#/$defs/authoring_type_resolution"
-        }
-      ]
+      "$ref": "assessment-language.schema.json#/$defs/object_selector_predicate",
+      "description": "Version-local 0.4 Object selector, no 0.3 value+operation longhand."
     },
     "state_entity_base": {
       "$ref": "assessment-language.schema.json#/$defs/scalar_field_predicate"
@@ -693,6 +598,19 @@
         "capability": {
           "type": "string",
           "minLength": 1
+        },
+        "select": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/object_entity_base",
+            "description": "Required comparison-as-key Object selector predicate; native capability schemas constrain actual field names."
+          },
+          "description": "Native Object selectors use the same single 0.4 comparison-as-key grammar as State predicates, but SHALL NOT use a State/Item require or Organizational Input."
         }
       },
       "not": {
@@ -701,7 +619,7 @@
         ]
       },
       "additionalProperties": true,
-      "description": "Consumer-local Object. Capability-specific structure is validated against the corresponding generated capability schema and semantic rules."
+      "description": "Consumer-local native Object. Fields inside select use the 0.4 comparison-as-key selector grammar; capability-specific field names and other collector shapes are separately constrained by native capability schemas."
     },
     "object_use": {
       "oneOf": [
