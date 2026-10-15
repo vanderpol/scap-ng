@@ -1,0 +1,50 @@
+name: 0.4 RHEL9 Win11 Server2025 shorthand comparison
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-three-benchmark-quantifier.yml
+      - tools/research_04_three_benchmark_quantifier.py
+      - tools/research_04_rhel9_compact_preview.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Verify normalized original RHEL9 field-none and new aliases
+        run: |
+          PYTHONPATH=tools python tools/test_research_04_rhel9_compact_preview.py -v
+          PYTHONPATH=tools python tools/test_research_04_field_key_authoring.py -v
+      - name: Retrieve immutable 0.3 six-STIG authoring source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Survey three STIGs; fail if any shared Assessment missing or source differs
+        run: |
+          PYTHONPATH=tools python tools/research_04_three_benchmark_quantifier.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/three-benchmark-shortcuts.json \
+            --markdown work/three-benchmark-shortcuts.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-win11-server2025-quantifier-04
+          path: |
+            work/three-benchmark-shortcuts.json
+            work/three-benchmark-shortcuts.md
+          if-no-files-found: error
+          retention-days: 90
