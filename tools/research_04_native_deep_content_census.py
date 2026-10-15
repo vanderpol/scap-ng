@@ -20,10 +20,12 @@ import research_04_rhel9_compact_preview as corpus
 from research_04_three_benchmark_quantifier import BENCHMARKS
 from research_04_one_grammar_proof import make_single,benchmark_dir
 from generate_capability_schema_v04 import generate
+from migrate_v04_enum_selectors import migrate,restore
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPPINGS=ROOT/"schema"/"v0.4.0"/"capability-mappings"/"supported"
 SUPPORTED={p.stem:p for p in MAPPINGS.glob("*.json")}
+SUPPORTED_MAPPING_DATA={name:json.loads(path.read_text(encoding="utf-8")) for name,path in SUPPORTED.items()}
 SHARED={
     s["$id"]:s for p in (ROOT/"schema"/"v0.4.0").glob("*.schema.json")
     if (s:=json.loads(p.read_text(encoding="utf-8")))
@@ -71,10 +73,15 @@ def audit(zip_path):
                 a=(original or {}).get("assessment") if isinstance(original,dict) else None
                 if not isinstance(a,dict) or a.get("mode")!="automated":continue
                 source,_,normalizations=make_single(original)
+                authored,migrations=migrate(source,SUPPORTED_MAPPING_DATA)
+                if restore(authored,migrations)!=source:
+                    raise ValueError(f"Enum-selector migration broke original source: {path}")
+                counts["enum_selector_occurrences_explicitly_migrated"]+=len(migrations)
+                if migrations:counts["assessments_with_enum_migration"]+=1
                 counts["assessments"]+=1
                 if normalizations:counts["assessments_with_model_normalizations"]+=1
                 all_valid=True
-                for test_name,test in (source["assessment"].get("tests") or {}).items():
+                for test_name,test in (authored["assessment"].get("tests") or {}).items():
                     if not isinstance(test,dict):continue
                     counts["test_occurrences"]+=1
                     cap=test.get("capability")
