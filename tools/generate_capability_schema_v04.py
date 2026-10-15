@@ -105,9 +105,12 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     result["x-specification-version"] = VERSION
     defs = result["$defs"]
 
-    # Fixed-result Tests have no Object/State source but still use a presence
-    # requirement. Other Test properties are generated in the common path.
-    if "object" not in defs:
+    # Only a mapping with an explicit native.fixed_result is a fixed-result
+    # capability. Ordinary native no-Object capabilities such as
+    # windows.passwordpolicy, audit subcategories and independent.family have
+    # normal State predicates and paired requirements; they SHALL go through
+    # the full common path below even though no Object schema exists.
+    if mapping.get("native",{}).get("fixed_result") is not None:
         old_test = defs["test"]
         old_test["required"] = sorted(
             (set(old_test["required"]) - {"existence", "match"}) | {"require"}
@@ -127,7 +130,7 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         return result
 
     native_selector_fields = _selector_fields(mapping,repo_root)
-    select = defs["object"]["properties"].get("select")
+    select = defs.get("object",{}).get("properties",{}).get("select")
     if select is not None:
         for name in list(select.get("properties", {})):
             if name not in native_selector_fields:
