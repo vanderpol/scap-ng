@@ -30,8 +30,8 @@ def lower(source: dict) -> dict:
         raise UnsupportedFacade("Check identifier must be a stable, nonempty slug")
     if source["evaluate"] != {"check": name}:
         raise UnsupportedFacade("Explicit evaluate.check required; no implicit order")
-    exact_keys(check, {"on","select","expect","require","evidence"}, "check")
-    if check["on"] != "linux.partition":
+    exact_keys(check, {"resource","select","expect","require","evidence"}, "check")
+    if check["resource"] != "linux.partition":
         raise UnsupportedFacade("Only the proven linux.partition capability is supported")
     exact_keys(check["select"], {"mount_point"}, "select")
     selector=check["select"]["mount_point"]
@@ -74,7 +74,7 @@ def lower(source: dict) -> dict:
 RESEARCH_SAMPLE = r"""
 checks:
   home-mounted-nosuid-option:
-    on: linux.partition
+    resource: linux.partition
     select:
       mount_point:
         matches_regex: '.*\\/home'
