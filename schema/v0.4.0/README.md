@@ -14,6 +14,12 @@ This directory is a complete physically independent version-local copy-forward o
 - Windows record and nested field requirements are distinct. Object Set filters use `include:` or `exclude:` on a field-key predicate.
 - `evaluate`, `for_each`, typed Variable graphs, manual choices and collected Items/results do not acquire new semantics.
 
+## Native generator and real-content evidence
+
+The [version-local native 0.4 capability generator](../../tools/generate_capability_schema_v04.py) successfully emits JSON Schema draft contracts for **all 100 supported reviewed capability mappings** ([successful 100-capability CI](https://github.com/vanderpol/scap-ng/actions/runs/38759490558)). The frozen 0.3 generator remains unchanged. This proves schema generation, reference locality and selected native field-name checks, **not** acceptance of all real authored Tests.
+
+A separate [real-source deep validation census](https://github.com/vanderpol/scap-ng/actions/runs/38760164659) resolved the referenced automated/applicability Assessments from RHEL 9, Windows 11 and Windows Server 2025 and recorded **541 Test occurrence failures out of 1,407** against the newly generated native capability schemas. The audit ran successfully *as an audit*, but the deep content acceptance gate is **not yet passing**. Main clusters involve reviewed enum Object selectors, special fixed-result Test requirements, WMI/cmdlet collection/selection grammar and complex Set/foreach sources. Details and remedies are tracked in [#228](https://github.com/vanderpol/scap-ng/issues/228). Do not add legacy YAML alternatives or classify these as manual/shell-only solely to make the schemas pass.
+
 ## Promotion gates still open
 
 Generic inline/shared Object selector grammar has focused positive/negative tests ([passing CI](https://github.com/vanderpol/scap-ng/actions/runs/38757998163)); **capability-specific selector names and datatype/operation narrowing** remain open. WMI/cmdlet `selection_match`, list edge cases, strong cross-capability scope/type validation, generated v0.4 capability schemas, complete migration lowering and six-valued reference parity still need completion. 0.3 compilation/validation is **not** asserted to implement 0.4. Variable source-module imports and variable debug graphs are separate [research #223](https://github.com/vanderpol/scap-ng/issues/223), **not** adopted language features.
