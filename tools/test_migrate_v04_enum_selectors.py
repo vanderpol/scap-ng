@@ -1,14 +1,22 @@
-from copy import deepcopy
 #!/usr/bin/env python3
+from copy import deepcopy
+import json
+from pathlib import Path
 import unittest
 from oval_result_truth_tables import aggregate_check
 from migrate_v04_enum_selectors import migrate,restore
+
+RIGHTS=json.loads(
+    (Path(__file__).resolve().parents[1]/
+     "schema/v0.4.0/capability-mappings/supported/windows.userright.json")
+    .read_text(encoding="utf-8")
+)["native"]["selector_value_enums"]["userright"]
 
 MAP={
  "windows.registry":{"native":{"selector_value_enums":{
      "hive":["local_machine","current_user"]}}},
  "windows.userright":{"native":{"selector_value_enums":{
-     "userright":["SE_NETWORK_LOGON_NAME"]}}},
+     "userright":RIGHTS}}},
 }
 
 class NativeEnumSelectorMigration(unittest.TestCase):
@@ -49,7 +57,7 @@ class NativeEnumSelectorMigration(unittest.TestCase):
         old={"assessment":{
             "variables":{"this-constant-variable-represents-all-user-rights-variable":{
                 "kind":"constant","datatype":"string",
-                "expression":{"literal":["SE_NETWORK_LOGON_NAME"]},
+                "expression":{"literal":RIGHTS},
                 "title":"This constant_variable represents all user rights"}},
             "tests":{"one-test":{
                 "capability":"windows.userright",
@@ -59,7 +67,7 @@ class NativeEnumSelectorMigration(unittest.TestCase):
         }}
         new,notes=migrate(old,MAP)
         selector=new["assessment"]["tests"]["one-test"]["object"]["select"]["userright"]
-        self.assertEqual(selector,{"equals":["SE_NETWORK_LOGON_NAME"],
+        self.assertEqual(selector,{"equals":RIGHTS,
                                    "datatype":"string","value_match":"all"})
         self.assertEqual(len(notes),1)
         self.assertEqual(notes[0]["classification"],"constant_full_enum_implicit_all_source_exact")
@@ -98,8 +106,9 @@ class NativeEnumSelectorMigration(unittest.TestCase):
              "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}},
         ):
             with self.subTest(variant=variant):
+                variant={"title":"This constant_variable represents all user rights",**variant}
                 old={"assessment":{
-                    "variables":{"all-rights-variable":variant},
+                    "variables":{"this-constant-variable-represents-all-user-rights-variable":variant},
                     "tests":{"one-test":{
                         "capability":"windows.userright",
                         "object":{"capability":"windows.userright",
@@ -115,7 +124,7 @@ class NativeEnumSelectorMigration(unittest.TestCase):
             "variables":{"different-variable":{
                 "kind":"constant","datatype":"string",
                 "title":"This constant_variable represents all user rights",
-                "expression":{"literal":["SE_NETWORK_LOGON_NAME"]}}},
+                "expression":{"literal":RIGHTS}}},
             "tests":{"test":{
                 "capability":"windows.userright",
                 "object":{"capability":"windows.userright",
