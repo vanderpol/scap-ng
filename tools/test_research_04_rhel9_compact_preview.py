@@ -64,10 +64,41 @@ class CompactPreview(unittest.TestCase):
         short,c=compact_assessment(original,1)
         self.assertEqual(short["assessment"]["tests"]["absence"]["require"],"none_exist")
         self.assertEqual(canonical_assessment(short),original)
-        with self.assertRaisesRegex(ValueError,"requires a Test without States"):
+        with self.assertRaisesRegex(ValueError,"not enabled"):
             expand_require({"require":"none_exist"},scope="field")
         with self.assertRaisesRegex(ValueError,"requires a Test without States"):
             expand_require({"require":"none_exist"},scope="test",state_free=False)
+
+    def test_explicit_field_none_exist_is_not_test_absence_or_no_state_matching(self):
+        import research_04_rhel9_compact_preview as preview
+        original={"assessment":{"mode":"automated","tests":{"field-absent":{
+            "capability":"independent.textfilecontent54",
+            "existence":"one_or_more","match":"all",
+            "states":[{"field":"stdout_line",
+                       "value":"forbidden output","operation":"equals",
+                       "existence":"none","match":"all"}]}}}}
+        old=preview.FIELD_ABSENCE_ENABLED
+        try:
+            preview.FIELD_ABSENCE_ENABLED=True
+            short,stats=compact_assessment(original,2)
+            test=short["assessment"]["tests"]["field-absent"]
+            self.assertEqual(test["states"][0]["stdout_line"]["require"],"none_exist")
+            self.assertEqual(test["require"],"at_least_one_all_match")
+            self.assertEqual(stats["field_require:none_exist"],1)
+            self.assertEqual(canonical_assessment(short),original)
+            with self.assertRaisesRegex(ValueError,"requires a Test without States"):
+                expand_require({"require":"none_exist"},scope="test",state_free=False)
+            # Negative match is not missing entities; it is never rewritten.
+            negative={"field":"stdout_line","value":"forbidden",
+                      "operation":"equals","existence":"one_or_more","match":"none"}
+            original["assessment"]["tests"]["field-absent"]["states"].append(negative)
+            short,stats=compact_assessment(original,2)
+            state=short["assessment"]["tests"]["field-absent"]["states"][1]["stdout_line"]
+            self.assertEqual(state["match"],"none")
+            self.assertNotIn("require",state)
+            self.assertEqual(canonical_assessment(short),original)
+        finally:
+            preview.FIELD_ABSENCE_ENABLED=old
 
     def test_odd_none_pair_kept_explicit_for_exact_source(self):
         original={"assessment":{"mode":"automated","tests":{"absence":{
