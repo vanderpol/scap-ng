@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from copy import deepcopy
 import json
 from pathlib import Path
 import zipfile
@@ -48,6 +49,13 @@ SHARED={
     s["$id"]:s for p in (ROOT/"schema"/"v0.4.0").glob("*.schema.json")
     if (s:=json.loads(p.read_text(encoding="utf-8")))
 }
+ROOT_ASSESSMENT_SCHEMA=SHARED["https://scap-ng.dev/schema/v0.4.0/assessment.schema.json"]
+ROOT_ASSESSMENT_REGISTRY=Registry().with_resources(
+    (uri,Resource.from_contents(schema)) for uri,schema in SHARED.items()
+)
+ROOT_ASSESSMENT_VALIDATOR=Draft202012Validator(
+    ROOT_ASSESSMENT_SCHEMA,registry=ROOT_ASSESSMENT_REGISTRY
+)
 
 
 def validator_for(capability,cache):
@@ -98,6 +106,7 @@ def audit(zip_path,benchmarks=BENCHMARKS):
             by_capability=Counter()
             issue_types=Counter()
             samples=[]
+            root_failures=[]
             for path,original in sorted(docs.items()):
                 a=(original or {}).get("assessment") if isinstance(original,dict) else None
                 if not isinstance(a,dict) or a.get("mode")!="automated":continue
@@ -113,6 +122,32 @@ def audit(zip_path,benchmarks=BENCHMARKS):
                 if migrations:counts["assessments_with_enum_migration"]+=1
                 counts["assessments"]+=1
                 if normalizations:counts["assessments_with_model_normalizations"]+=1
+                # Confirm the complete authored Assessment, not merely its
+                # separately generated native Test fragments, obeys the
+                # independent v0.4.0 grammar. Version promotion is explicit;
+                # do not rewrite the immutable 0.3 source input.
+                promoted=deepcopy(authored)
+                spec=(promoted["assessment"].get("specification") or {})
+                if spec.get("version")!="0.3.0":
+                    raise ValueError(f"Unexpected source spec for 0.4 migration: {path}: {spec}")
+                spec["version"]="0.4.0"
+                issues=list(ROOT_ASSESSMENT_VALIDATOR.iter_errors(promoted))
+                if issues:
+                    counts["full_assessment_schema_fail"]+=1
+                    for issue in issues[:3]:
+                        if len(root_failures)<90:
+                            root_failures.append({
+                                "benchmark":benchmark,"file":path,
+                                "instance_path":list(map(str,issue.absolute_path)),
+                                "schema_path":list(map(str,issue.absolute_schema_path)),
+                                "validator":issue.validator,
+                                "message":issue.message[:650],
+                                "suberrors":[{"path":list(map(str,e.path)),
+                                              "message":e.message[:250]}
+                                             for e in issue.context[:4]],
+                            })
+                else:
+                    counts["full_assessment_schema_pass"]+=1
                 all_valid=True
                 for test_name,test in (authored["assessment"].get("tests") or {}).items():
                     if not isinstance(test,dict):continue
@@ -166,6 +201,7 @@ def audit(zip_path,benchmarks=BENCHMARKS):
                 "test_status_by_capability":dict(by_capability),
                 "top_error_kinds":[{"kind":k,"count":n} for k,n in issue_types.most_common(40)],
                 "failure_samples":samples,
+                "full_assessment_failure_samples":root_failures,
             }
     return {"status":"research only; 0.4 deep schema audit, not scanner parity",
             "source":"immutable 0.3 six-STIG authoring ZIP",
@@ -206,7 +242,11 @@ def main():
                 print("DEEP_NATIVE_04_VARIABLE_SOURCE",b,json.dumps(
                     example["variable_source_definitions"],sort_keys=True
                 )[:5000],flush=True)
-        bad+=r["counts"].get("native_test_fail",0)+r["counts"].get("unsupported_capability_test",0)
+        for issue in r.get("full_assessment_failure_samples",[])[:7]:
+            print("DEEP_NATIVE_04_FULL_DOCUMENT_ERROR",b,json.dumps(issue,sort_keys=True),flush=True)
+        bad+=(r["counts"].get("native_test_fail",0)
+              +r["counts"].get("unsupported_capability_test",0)
+              +r["counts"].get("full_assessment_schema_fail",0))
     if bad and args.strict:raise SystemExit(f"{bad} unresolved deep native Test validation failures")
 
 
