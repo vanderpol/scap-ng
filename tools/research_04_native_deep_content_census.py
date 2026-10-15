@@ -52,6 +52,17 @@ def validator_for(capability,cache):
     return v
 
 
+def _variable_refs(node):
+    if isinstance(node,dict):
+        if isinstance(node.get("variable"),str):
+            yield node
+        for child in node.values():
+            yield from _variable_refs(child)
+    elif isinstance(node,list):
+        for child in node:
+            yield from _variable_refs(child)
+
+
 def audit(zip_path):
     reports={}
     cache={}
@@ -116,6 +127,16 @@ def audit(zip_path):
                                     } for child in err.context[:6]],
                                     "require":test.get("require"),
                                     "object_excerpt":str(test.get("object"))[:1000],
+                                    # Diagnose source selector semantics before
+                                    # choosing a 0.4 Variable syntax/quantifier.
+                                    "variable_source_definitions": {
+                                        name: (a.get("variables") or {}).get(name)
+                                        for name in sorted({
+                                            v.get("variable")
+                                            for v in _variable_refs(test.get("object"))
+                                            if isinstance(v.get("variable"),str)
+                                        })
+                                    } if cap=="windows.userright" else {},
                                 })
                 if all_valid:counts["assessments_all_native_tests_pass"]+=1
             reports[benchmark]={
@@ -156,6 +177,10 @@ def main():
             shown.add(group)
             if len(shown)>9:break
             print("DEEP_NATIVE_04_SAMPLE",b,json.dumps(example,sort_keys=True),flush=True)
+            if example.get("variable_source_definitions"):
+                print("DEEP_NATIVE_04_VARIABLE_SOURCE",b,json.dumps(
+                    example["variable_source_definitions"],sort_keys=True
+                )[:5000],flush=True)
         bad+=r["counts"].get("native_test_fail",0)+r["counts"].get("unsupported_capability_test",0)
     if bad and args.strict:raise SystemExit(f"{bad} unresolved deep native Test validation failures")
 
