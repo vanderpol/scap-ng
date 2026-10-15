@@ -13,6 +13,36 @@ collection inputs are left unchanged for their respective source rules.
 from copy import deepcopy
 
 
+def _certified_constant_enum(document, variable_id, allowed):
+    """Constrain the research rewrite to one fully known, unique enum domain.
+
+    This is a structural source proof, not a claim that 0.4 live scanner or
+    OVAL object var_check semantics have been independently verified.
+    """
+    if not isinstance(variable_id,str) or not isinstance(allowed,list) or not allowed:
+        return None
+    assessment=document.get("assessment",document)
+    variables=assessment.get("variables",{}) if isinstance(assessment,dict) else {}
+    variable=variables.get(variable_id) if isinstance(variables,dict) else None
+    if not isinstance(variable,dict):
+        return None
+    if variable.get("kind")!="constant" or variable.get("datatype")!="string":
+        return None
+    expression=variable.get("expression")
+    if not isinstance(expression,dict) or set(expression)!={"literal"}:
+        return None
+    values=expression["literal"]
+    if not isinstance(values,list) or not values:
+        return None
+    if any(not isinstance(v,str) for v in values):
+        return None
+    if len(values)!=len(set(values)) or len(allowed)!=len(set(allowed)):
+        return None
+    if len(values)!=len(allowed) or set(values)!=set(allowed):
+        return None
+    return values
+
+
 def migrate(document, supported_mappings):
     out=deepcopy(document)
     changes=[]
@@ -38,7 +68,29 @@ def migrate(document, supported_mappings):
                         )
                     select[field]={"equals":val}
                     changes.append({"path":path+["select",field],"source_value":val,
-                                    "capability":curcap,"field":field})
+                                    "capability":curcap,"field":field,
+                                    "classification":"source_exact_literal_enum"})
+                elif isinstance(val,dict) and set(val)=={"variable"}:
+                    # This source has an explicit, named, constant Variable.
+                    # Do NOT rewrite arbitrary variable references or infer
+                    # value_match from an unexamined dynamic value population.
+                    values=_certified_constant_enum(out,val["variable"],allowed)
+                    if values is not None:
+                        # Exactly one string from a unique enum domain can
+                        # equal any observed enum value. The check semantics
+                        # and exceptional collection states still require
+                        # their own OVAL reference-model proof before release.
+                        new={"equals":list(values),"datatype":"string",
+                             "value_match":"one"}
+                        select[field]=new
+                        changes.append({
+                            "path":path+["select",field],
+                            "source_value":deepcopy(val),
+                            "target_value":deepcopy(new),
+                            "capability":curcap,"field":field,
+                            "classification":"constant_full_enum_model_pending",
+                            "literal_count":len(values),
+                        })
         for key,val in node.items():
             walk(val,path+[key],curcap)
     walk(out,[],None)
@@ -52,7 +104,8 @@ def restore(document,changes):
         for key in note["path"][:-1]:
             target=target[key]
         field=note["path"][-1]
-        if target[field]!={"equals":note["source_value"]}:
+        expected=note.get("target_value",{"equals":note["source_value"]})
+        if target[field]!=expected:
             raise ValueError(f"Enum migration source proof mismatch at {note['path']}")
         target[field]=note["source_value"]
     return out
