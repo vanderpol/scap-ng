@@ -16,9 +16,29 @@ class QuantifierAliasTests(unittest.TestCase):
         self.assertEqual(expand_pair(alias,pair=ITEM_PAIR,label=ITEM_ALIAS),data)
     def test_field_roundtrip_preserves_predicate(self):
         data={"field":"mount_options","value":"nosuid","operation":"equals",
-              "existence":"one_or_more","match":"one_or_more"}
+              "existence":"one_or_more","match":"all"}
         alias=shorten_pair(data,pair=FIELD_PAIR,label=FIELD_ALIAS)
         self.assertEqual(expand_pair(alias,pair=FIELD_PAIR,label=FIELD_ALIAS),data)
+    def test_distinct_home_mount_field_semantics_remain_explicit(self):
+        # The real /home nosuid check uses at-least-one matching FIELD,
+        # not every field; this must never silently adopt the common preset.
+        home={"field":"mount_options","value":"nosuid","operation":"equals",
+              "existence":"one_or_more","match":"one_or_more"}
+        with self.assertRaisesRegex(ValueError,"does not match"):
+            shorten_pair(home,pair=FIELD_PAIR,label=FIELD_ALIAS)
+
+    def test_same_preset_in_two_distinct_scopes(self):
+        self.assertEqual(ITEM_ALIAS,FIELD_ALIAS)
+        self.assertEqual(ITEM_PAIR,FIELD_PAIR)
+        item={"existence":"one_or_more","match":"all"}
+        field={"field":"f","value":"v","existence":"one_or_more","match":"all"}
+        self.assertEqual(
+            expand_pair(shorten_pair(item,pair=ITEM_PAIR,label=ITEM_ALIAS),pair=ITEM_PAIR,label=ITEM_ALIAS),
+            item)
+        self.assertEqual(
+            expand_pair(shorten_pair(field,pair=FIELD_PAIR,label=FIELD_ALIAS),pair=FIELD_PAIR,label=FIELD_ALIAS),
+            field)
+
     def test_no_missing_pair_defaults(self):
         with self.assertRaisesRegex(ValueError,"partial"):
             shorten_pair({"match":"all"},pair=ITEM_PAIR,label=ITEM_ALIAS)
