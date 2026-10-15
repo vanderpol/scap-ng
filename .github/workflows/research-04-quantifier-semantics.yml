@@ -1,0 +1,31 @@
+name: 0.4 quantifier rewrite semantic counterexamples
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-quantifier-semantics.yml
+      - tools/research_04_quantifier_semantic_duality.py
+      - tools/oval_result_truth_tables.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Prove result-level duality and capture unsafe rewrite counterexamples
+        run: |
+          PYTHONPATH=tools python tools/research_04_quantifier_semantic_duality.py \
+            --output work/oval-quantifier-semantics.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oval-quantifier-semantic-counterexamples-04
+          path: work/oval-quantifier-semantics.json
+          if-no-files-found: error
