@@ -156,6 +156,52 @@ def generate(mapping: dict, repo_root: Path) -> dict:
             }]}
             select["properties"][name] = selector
 
+    # Set operands MUST reuse the native version-local Object contract.
+    # The generic common.set_expression validates structural operations but
+    # cannot enforce that nested collection uses this capability's native
+    # selector names, nullable values, foreach binding or typed selectors.
+    # A separate native recursion preserves those constraints for nested Sets.
+    defs["native_set_operand"]={
+        "oneOf":[
+            {
+                "type":"object",
+                "required":["object","filters"],
+                "properties":{
+                    "object":{"oneOf":[
+                        {"$ref": COMMON + "#/$defs/object_reference"},
+                        {"$ref":"#/$defs/object"},
+                    ]},
+                    "filters":{"type":"array","items":{
+                        "$ref": COMMON + "#/$defs/state_filter"
+                    }},
+                },
+                "additionalProperties":False,
+            },
+            {
+                "type":"object",
+                "required":["set"],
+                "properties":{"set":{"$ref":"#/$defs/native_set_expression"}},
+                "additionalProperties":False,
+            },
+        ],
+    }
+    defs["native_set_expression"]={
+        "type":"object",
+        "required":["operator","operands"],
+        "properties":{
+            "operator":{"enum":["union","intersection","difference"]},
+            "operands":{"type":"array","minItems":1,
+                        "items":{"$ref":"#/$defs/native_set_operand"}},
+        },
+        "allOf":[{
+            "if":{"properties":{"operator":{"const":"difference"}},
+                  "required":["operator"]},
+            "then":{"properties":{"operands":{"maxItems":2}}},
+        }],
+        "additionalProperties":False,
+    }
+    defs["object"]["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
+
     state_fields, records = _generated_state_fields(mapping,repo_root)
     entries = []
     for name,dtypes in sorted(state_fields.items()):
