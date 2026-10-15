@@ -175,14 +175,50 @@ def canonical_assessment(short):
     return unfold_document(out)
 
 def archive_contents(z):
+    # Preserve all RHEL9 Benchmark/Rule/manual/applicability files, plus only
+    # shared automated Assessments actually referenced by RHEL9 Rules.
+    # Manual source files are fallbacks available via tailoring, not default
+    # manual execution counts.
     docs={}
     raw={}
-    for name in z.namelist():
+    archive_names=z.namelist()
+    for name in archive_names:
         if not name.startswith(SOURCE_PREFIX) or name.endswith("/"):
             continue
         raw[name]=z.read(name)
         if name.endswith((".yaml",".yml")):
             docs[name]=yaml.safe_load(raw[name])
+    refs=set()
+    for name,doc in docs.items():
+        if "/rules/" not in name:
+            continue
+        rule=(doc or {}).get("rule") or {}
+        choice=(rule.get("assessment_choices") or {}).get("automated")
+        if isinstance(choice,dict) and choice.get("assessment"):
+            refs.add(choice["assessment"])
+    locally_available={
+        (doc or {}).get("assessment",{}).get("id")
+        for doc in docs.values() if isinstance(doc,dict)
+        and isinstance(doc.get("assessment"),dict)
+    }
+    wanted=refs-locally_available
+    matched=set()
+    for name in archive_names:
+        if not name.startswith("authoring/shared/") or not name.endswith((".yaml",".yml")):
+            continue
+        body=z.read(name)
+        doc=yaml.safe_load(body)
+        assessment=(doc or {}).get("assessment") if isinstance(doc,dict) else None
+        if not isinstance(assessment,dict) or assessment.get("id") not in wanted:
+            continue
+        if assessment["id"] in matched:
+            raise ValueError(f"Duplicate shared Assessment id: {assessment['id']}")
+        matched.add(assessment["id"])
+        docs[name]=doc
+        raw[name]=body
+    missing=wanted-matched
+    if missing:
+        raise ValueError(f"Unresolved RHEL9 shared automated Assessments: {sorted(missing)[:12]}")
     return docs,raw
 
 def benchmark_rule_paths(docs):
@@ -200,7 +236,15 @@ def info_for_rule(rid,rule,automated_metrics):
     selected=rule.get("assessment_choices") or {}
     choices=selected.get("automated")
     manual=bool(selected.get("manual"))
+    default_choice=rule.get("default_assessment_choice")
+    if default_choice not in {"automated","manual"}:
+        raise ValueError(f"Rule {rid} has unknown default Assessment choice: {default_choice}")
+    if default_choice not in selected:
+        raise ValueError(f"Rule {rid} default does not exist in choices: {default_choice}")
     row={"rule_id":rid,"rule_title":rule.get("title"),
+         "default_assessment_choice":default_choice,
+         "automated_by_default":default_choice=="automated",
+         "manual_by_default":default_choice=="manual",
          "automated_choice":bool(choices),
          "manual_choice":manual,
          "classification":"manual_only" if not choices else "automated_assessment_missing",
@@ -301,10 +345,12 @@ def make_report(docs,raw,stage1,stage2):
         rows.append(info_for_rule(rid,rule,m2))
     aggregate=Counter(row["classification"] for row in rows)
     auto=[row for row in rows if row["automated_choice"]]
-    if len(auto)!=50:
-        raise ValueError(f"RHEL9 published content expected 50 automated choices; got {len(auto)}")
-    if not sum(row["classification"]=="manual_only" for row in rows)==395:
-        raise ValueError("Manual-only count mismatch")
+    if len(auto)!=417:
+        raise ValueError(f"RHEL9 source has 417 automated Rule choices; got {len(auto)}")
+    if sum(row["classification"]=="manual_only" for row in rows)!=28:
+        raise ValueError("RHEL9 expected 28 manual-only Rules")
+    if not all(row["manual_choice"] for row in rows):
+        raise ValueError("Some Rules lost their manual tailoring choice")
     stage1_pair_residuals=sum(m["remaining_pairs"] for m in m1.values())
     stage2_pair_residuals=sum(m["remaining_pairs"] for m in m2.values())
     if stage1_pair_residuals!=stage2_pair_residuals:
@@ -322,7 +368,11 @@ def make_report(docs,raw,stage1,stage2):
         "rules":{
             "total":len(rows),
             "automated_choices":len(auto),
+            "automated_default":sum(row["automated_by_default"] for row in rows),
+            "manual_default":sum(row["manual_by_default"] for row in rows),
+            "manual_choices":sum(row["manual_choice"] for row in rows),
             "manual_only":aggregate["manual_only"],
+            "both_automated_and_manual_choices":sum(row["manual_choice"] and row["automated_choice"] for row in rows),
             "automated_all_quantifiers_compact":aggregate["all_quantifiers_use_presets"],
             "automated_needing_explicit_quantifier_pairs":aggregate["requires_explicit_quantifier_pairs"],
             "automated_presets_not_full_language_compaction":True,
@@ -337,9 +387,16 @@ def make_report(docs,raw,stage1,stage2):
             "stage1_field_key_plus_require":dict(c1),
             "stage2_plus_scalar_comparison":dict(c2),
         },
+        "source_file_inventory":{
+            "rhel9_rule_files":len(rule_docs),
+            "rhel9_local_automated_files":len(actual_auto),
+            "rhel9_manual_files":sum("/assessments/manual/" in p and p.startswith(SOURCE_PREFIX) for p in raw),
+            "rhel9_applicability_files":sum("/assessments/applicability/" in p and p.startswith(SOURCE_PREFIX) for p in raw),
+            "included_shared_assessment_files":sum(p.startswith("authoring/shared/") and "/assessments/" in p for p in raw),
+        },
         "limited_claims":[
             "Every automated and applicability Assessment compiles to exactly the original parsed 0.3 YAML document.",
-            "All Rule and Benchmark source YAML files are copied byte-for-byte; manual Assessments copied untouched.",
+            "All Rule and Benchmark source YAML files are copied byte-for-byte; manual Assessments copied untouched, and shared automated Assessments are included by resolved ID.",
             "Only existence+match pairs exactly included in the three named research presets are shortened.",
             "Uncovered pair does not mean Rule must be manually assessed; it means some automated YAML remains explicit.",
             "Only scalar equals and regex comparisons may use short comparisons; typed, Variable, array and other comparisons remain canonical.",
@@ -363,8 +420,11 @@ The research compiler removes that marker and restores the exact parsed 0.3 Asse
 ## Coverage
 
 - **{rules["total"]}** Rule files in the released RHEL 9 Benchmark
-- **{rules["automated_choices"]}** Rules include an automated choice
-- **{rules["manual_only"]}** Rules have only manual choices; *not* counted as 'requiring longhand'
+- **{rules["automated_default"]}** Rules default to automated assessment
+- **{rules["manual_default"]}** Rules default to manual assessment
+- **{rules["automated_choices"]}** Rules offer an automated choice
+- **{rules["manual_choices"]}** Rules offer a manual fallback via tailoring
+- **{rules["manual_only"]}** Rules offer only manual assessment; *not* counted as 'requiring longhand'
 - **{rules["automated_all_quantifiers_compact"]}** automated Rules: all Test+State existence/match pairs expressible by the available three presets
 - **{rules["automated_needing_explicit_quantifier_pairs"]}** automated Rules: at least one pair remains in original longhand
 - **{rules["multi_test_evaluate_among_automated"]}** automated Rules have complex/multi-Test evaluation that remains explicit and unchanged
@@ -377,7 +437,8 @@ Counts classify YAML **presentation** only, not correctness or automatic scan co
 
 ## Layout
 
-`authoring/rhel_9/` — entire release authoring tree with only automated/applicability Assessment YAML changed.
+`authoring/rhel_9/` — complete original RHEL9 Benchmark, Rules, manual, automated and applicability files.
+`authoring/shared/assessments/` — only the original reusable Assessments actually referenced by RHEL9 automated choices, compacted in this research preview.
 `research/REPORT.json` — raw counts, pair distributions, and per-Rule classifications.
 `research/RULE-CLASSIFICATION.csv` — every Rule, explicit vs preset presence.
 `research/EXAMPLES.md` — source-derived examples with exact original and compact forms.
