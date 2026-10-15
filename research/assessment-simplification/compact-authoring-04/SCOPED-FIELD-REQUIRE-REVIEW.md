@@ -6,7 +6,7 @@
 
 ## Exactly what each scope means
 
-- **Test `require`** controls the population of collected items and matching States. It remains mandatory, separate, and unchanged by this proposal.
+- **Test `collected_items_require`** explicitly controls the population of collected items and matching States. It replaces only the ambiguous Test-level key `require` in the **revised meeting research candidate**. The underlying source requirement remains mandatory and semantically unchanged.
 - **Test `state_fields_require`** declares the requirement for *ordinary scalar State fields* across that Test's State expressions.
 - **Logical State group's `state_fields_require`** overrides the Test field scope for its scalar descendants, including nested groups, when that particular State alternative needs a different requirement.
 - **Individual field `require`** overrides the nearest explicit State field scope only for that field. If neither a field nor its enclosing Test/group declares one, validation **SHALL fail**. Explicit but redundant same-value overrides should be rejected to keep authoring unambiguous.
@@ -22,7 +22,7 @@ tests:
   editionid-enterprise-or-enterprises-test:
     capability: windows.registry
     # unchanged source Object omitted here for readability
-    require: at_least_one_exists_and_all_match   # collected item/State matching
+    collected_items_require: at_least_one_exists_and_all_match   # collected item/State matching
     state_fields_require: at_least_one_exists_and_all_match
     states_match: any                            # either edition alternative
     states:
@@ -53,7 +53,7 @@ states:
     state_fields_require: at_least_one_exists_and_all_match
 ```
 
-The omitted regex values are only for excerpt readability; the complete native content remains unchanged in conversion. `none_exist` is about the **`stderr_line` field**, not about requiring zero collected command-result items. The Test `require` is independently retained. The original predicate is not removed merely because an absent field cannot equal a value.
+The omitted regex values are only for excerpt readability; the complete native content remains unchanged in conversion. `none_exist` is about the **`stderr_line` field**, not about requiring zero collected command-result items. The Test `collected_items_require` is independently retained. The original predicate is not removed merely because an absent field cannot equal a value.
 
 ## Proof across six released benchmark sources
 
@@ -80,4 +80,4 @@ The after-count includes each new Test/group `state_fields_require` and every re
 3. Extend the reference-model tests for absent/error/unknown/incomplete fields; structural inverse is evidence of expression preservation, **not** scanner-result conformance. No SCAP-NG scanner exists yet.
 4. Only then update the normative schema, compiler and separate authoring preview; do not silently rewrite the already-published 0.4 research ZIPs.
 
-Rejected shortcuts: undocumented `require` defaults; overriding Test `require` using a field declaration; inheriting scalar field requirements into Windows record subfields; deleting an apparently contradictory comparison from an absent-field predicate; silently flattening nested `and`/`or` structures.
+Rejected shortcuts: undocumented `require` defaults; overriding Test `collected_items_require` using a field declaration; inheriting scalar field requirements into Windows record subfields; deleting an apparently contradictory comparison from an absent-field predicate; silently flattening nested `and`/`or` structures.

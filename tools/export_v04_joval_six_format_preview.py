@@ -41,9 +41,13 @@ def migrate_assessment(doc,path,cache):
     if not isinstance(spec,dict) or spec.get("version")!="0.3.0":
         raise ValueError("Unexpected original specification at "+path)
     spec["version"]="0.4.0"
+    for tid,test in (scoped["assessment"].get("tests") or {}).items():
+        if "collected_items_require" in test or "require" not in test:
+            raise ValueError("Test-level require spelling inconsistent: "+path+" "+tid)
+        test["collected_items_require"]=test.pop("require")
     expected=deepcopy(modern)
     expected["assessment"]["specification"]["version"]="0.4.0"
-    if expand(scoped)!=expected or validate(scoped,cache)!=expected:
+    if validate(scoped,cache)!=expected:
         raise ValueError("Scoped syntax expansion/schema/native mismatch "+path)
     return scoped,notes,migrations,stats
 
@@ -108,9 +112,9 @@ def create(source_zip,out_dir):
         "This is NOT a normative schema release or executable scanner bundle.",
         "",
         "The proposed language uses actual field names, comparator verbs, explicit",
-        "Test requirements, and/or State logic, and explicit inherited requirements",
+        "Test collected_items_require, and/or State logic, and explicit inherited requirements",
         "from Test to State group to individual field. Native Windows record fields",
-        "and the Test's collected-item requirement remain independent.",
+        "and the explicit Test collected_items_require remain independent.",
         "",
         "JSON and YAML files contain the same parsed content; their internal",
         "path references are retained from published YAML for traceability.",

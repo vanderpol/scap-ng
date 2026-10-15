@@ -4,7 +4,7 @@
 
 ## What to review first (about five minutes)
 
-The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015) contains two complete corresponding authoring ZIPs: one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
+The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r2) contains two complete corresponding authoring ZIPs: one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
 
 ### Representative content
 
@@ -22,7 +22,7 @@ The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/
 The value of the redesign is straightforward: authors name actual observed fields and comparison operations, rather than having to follow indirect Object/Test/State entities or repeat `field`, `operation`, `value`, `existence`, `match` at every node.
 
 The important distinctions remain explicit:
-1. Test `require` concerns collected Items and State matching. It is never a hidden field default.
+1. Test `collected_items_require` concerns collected Items and State matching. It is never a hidden field default. Individual field/record `require` remains scoped locally.
 2. The **proposed** `state_fields_require` declares common requirements for ordinary State fields at the Test or logical State group level. A particular field can override it using its own `require`. Missing effective requirements are errors, not defaults.
 3. `and`/`or` represent logical State expressions; `states_match: any` combines alternative State entries, and `value_match` independently governs multiple expected operands from arrays/Variables.
 4. Native records retain record and record-field semantics, including absent/error/unknown behavior; scalar field inheritance does not silently enter record members.
@@ -31,7 +31,7 @@ The important distinctions remain explicit:
 Example (selected State lines from Windows 11 `SV-253254`, not a complete Assessment):
 
 ```yaml
-require: at_least_one_exists_and_all_match
+collected_items_require: at_least_one_exists_and_all_match
 state_fields_require: at_least_one_exists_and_all_match
 states_match: any
 states:
