@@ -220,6 +220,38 @@ def decode_filter_tree(node):
             out[key]=decode_filter_tree(value)
     return out
 
+def encode_auxiliary_pairs(node,notes,counters,path="assessment"):
+    """The one grammar must include nested Object collection/select field pairs.
+
+    Unlike Test pairs, these are field/value predicates inside collectors,
+    e.g., Windows WMI cmdlet Object.collect.select.fields.property. Preserve
+    their original pair exactly; no Test/State-free shortcut applies.
+    """
+    if isinstance(node,list):
+        return [encode_auxiliary_pairs(v,notes,counters,f"{path}[{i}]")
+                for i,v in enumerate(node)]
+    if not isinstance(node,dict):
+        return deepcopy(node)
+    out={k:encode_auxiliary_pairs(v,notes,counters,f"{path}.{k}")
+         for k,v in node.items()}
+    if "existence" in out or "match" in out:
+        out=from_source_pair(out,scope="collector_field",with_states=True,
+                             notes=notes,label=path)
+        counters["other_typed_field_require"]+=1
+        counters[f"other_typed_field_location:{path.split('.fields.')[0] if '.fields.' in path else path}"]+=1
+    return out
+
+
+def decode_auxiliary_pairs(node):
+    if isinstance(node,list):
+        return [decode_auxiliary_pairs(v) for v in node]
+    if not isinstance(node,dict):
+        return deepcopy(node)
+    out={k:decode_auxiliary_pairs(v) for k,v in node.items()}
+    if isinstance(out.get("require"),str) and out["require"] in PAIR_BY_NAME:
+        out=back_to_source_pair(out,scope="collector_field",with_states=True)
+    return out
+
 def operator_enum():
     # Use pinned 0.3 authoritative operator vocabulary, not freehand aliases.
     schema=json.loads((Path(__file__).resolve().parents[1]/
@@ -292,7 +324,8 @@ def lower_single(compact):
         if isinstance(test.get("states"),list):
             test["states"]=decode_states(test["states"])
         tests[tid]=test
-    return unfold_document(out)
+    out=unfold_document(out)
+    return decode_auxiliary_pairs(out)
 
 def normalize_inert_source_checks(original,notes):
     out=deepcopy(original)
@@ -392,6 +425,7 @@ def audit(source):
                 "assessments_with_state_free_model_normalizations":metrics["model_normalized_assessments"],
                 "field_key_predicates":metrics["field_key"],
                 "object_set_filters_compacted":metrics["object_set_filter_verbs"],
+                "auxiliary_collector_fields_compacted":metrics["other_typed_field_require"],
                 "record_wrappers":metrics["record_wrapper"],
                 "record_field_requirements":metrics["record_field_require"],
                 "source_match_normalizations":notes_all,
