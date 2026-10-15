@@ -243,7 +243,7 @@ def encode_auxiliary_pairs(node,notes,counters,path="assessment"):
         # collection properties are selected*. It has only source 'match':
         # inventing an Item/State existence pair would be a hidden default.
         # This distinct collector-only aggregation is not a Test require.
-        if ".object.collect.select.fields." not in path:
+        if not (".object.collect." in path and ".fields." in path):
             raise ValueError(f"Unclassified match-only field semantics: {path} {repr(out)[:600]}")
         out["selection_match"]=out.pop("match")
         counters["collector_selection_match_only"]+=1
@@ -259,7 +259,7 @@ def decode_auxiliary_pairs(node,path="assessment"):
     if isinstance(out.get("require"),str) and out["require"] in PAIR_BY_NAME:
         out=back_to_source_pair(out,scope="collector_field",with_states=True)
     if "selection_match" in out:
-        if ".object.collect.select.fields." not in path:
+        if not (".object.collect." in path and ".fields." in path):
             raise ValueError(f"selection_match in unsupported scope: {path}")
         if "match" in out:
             raise ValueError("Conflicting selection match names")
