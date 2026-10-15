@@ -1,0 +1,43 @@
+name: 0.4 compile-shortcuts six-STIG proof
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-compiled-authoring-macros.yml
+      - tools/research_04_compiled_authoring_macros.py
+      - tools/test_research_04_compiled_authoring_macros.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Check shorthand refusal and exact expansion tests
+        run: PYTHONPATH=tools python tools/test_research_04_compiled_authoring_macros.py -v
+      - name: Download six-STIG canonical 0.3 authoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Prove complete Assessment identity with eligible macros
+        run: |
+          python tools/research_04_compiled_authoring_macros.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/compiled-macro-proofs.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compiled-macro-six-stig-proofs
+          path: work/compiled-macro-proofs.json
+          if-no-files-found: error
