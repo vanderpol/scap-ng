@@ -2,6 +2,8 @@
 
 **Not a vote, not accepted 0.4 syntax.** Canonical 0.3 is the common output for both ideas below. The numbers here refer to the verified six-STIG evidence; [full-corpus analysis #225](https://github.com/vanderpol/scap-ng/issues/225) is a separate gate.
 
+**Full-corpus evidence now measured:** [Findings](FINDINGS.md) from 65 original OVAL packages show `one_or_more/all` in **6,054/10,061** structured Tests and **7,103/7,211** structured State fields; **692** further source Tests are State-free absence checks. This measures source OVAL identities, not the historical generated-Assessment occurrences.
+
 ## Same check: RHEL 9 SV-257851, /home nosuid
 
 **Current canonical SCAP-NG 0.3** (source-derived; metadata omitted):
