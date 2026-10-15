@@ -17,6 +17,21 @@ The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/
 | Windows Server DNS | Domain-specific Windows DNS assessment patterns |
 | Apache 2.4 UNIX | Variables, multi-step configuration discovery and remaining complex native checks |
 
+## Windows 11 SV-253495 — why some requirements remain on individual States
+
+This source-backed example deserves special review. It contains seven Tests: **five** single-field `windows.userright` Tests and **two** `windows.wmi.query` record Tests. On the user-right Tests, `collected_items_require: at_least_one_exists_and_some_match` means at least one assigned trustee must match, while `trustee_name.require: at_least_one_exists_and_all_match` constrains each field's cardinality. The two scopes **cannot be merged**. For a single-field Test, the automatic minimum-declaration authoring form keeps `require` on the field, because moving it to `state_fields_require` saves no declarations.
+
+A **semantically identical alternative**, useful if explicit scope separation reads better, is:
+
+```yaml
+collected_items_require: at_least_one_exists_and_some_match
+state_fields_require: at_least_one_exists_and_all_match
+states:
+  - trustee_name: {case_insensitive_equals: Guests}
+```
+
+The real WMI Tests contain `result.record.require` and `result.record.fields.domainrole.require`. Although their phrases happen to match, they quantify **different populations** (records and record members); the scalar State-field scope is deliberately not inherited into records. Whether to favor Test-level field scopes for every single-field Test is **an authoring style decision**, not a missing semantic feature. No extra inheritance level across unrelated Tests is proposed for 0.4.
+
 ## Proposal: one human-readable Assessment grammar
 
 The value of the redesign is straightforward: authors name actual observed fields and comparison operations, rather than having to follow indirect Object/Test/State entities or repeat `field`, `operation`, `value`, `existence`, `match` at every node.
