@@ -100,16 +100,30 @@ def analyze_package(src:Path):
                         original=ET.tostring(test,encoding="utf-8")
                         key=(capability,identity)
                         fingerprint=hashlib.sha256(original).hexdigest()
-                        if key in tests_seen and tests_seen[key]==fingerprint:
+                        fingerprints=tests_seen.setdefault(key,set())
+                        if fingerprint in fingerprints:
                             continue
-                        if key in tests_seen and tests_seen[key]!=fingerprint:
-                            unmatched.append({"identity":identity,"issue":"Test ID reused with different XML"})
-                        tests_seen[key]=fingerprint
+                        if fingerprints:
+                            unmatched.append({"identity":identity,
+                                "issue":"Scoped OVAL Test ID reused across components; counted separately"})
+                        fingerprints.add(fingerprint)
                         stratum=kind(source_name,capability)
                         c=counts[stratum]
                         c["tests"]+=1
                         c[f"capability:{capability}"]+=1
                         existence,match,e_origin,m_origin=test_pairs(test)
+                        has_state_ref=any(local(child.tag)=="state" for child in test)
+                        if match=="none exist":
+                            # Deprecated OVAL value. In a Test explicitly
+                            # requiring zero Items and containing no States,
+                            # the match aggregation cannot affect results.
+                            # The project's approved 0.3 normalizer handles
+                            # exactly this guarded IIS source pattern.
+                            if existence=="none_exist" and not has_state_ref:
+                                c["deprecated_none_exist_check_normalized_state_free"]+=1
+                                match="all"
+                            else:
+                                c["deprecated_none_exist_check_unsafe"]+=1
                         p=(EXIST.get(existence),CHECK.get(match))
                         if p[0] is None or p[1] is None:
                             c[f"unresolved_test_pair:{existence}/{match}"]+=1
@@ -119,7 +133,6 @@ def analyze_package(src:Path):
                         c[f"check_origin:{m_origin}"]+=1
                         if p==("one_or_more","all"):
                             c["item_common_all_match"]+=1
-                        has_state_ref=any(local(child.tag)=="state" for child in test)
                         if not has_state_ref and p[0]=="none":
                             c["state_free_none_exist"]+=1
                             c[f"state_free_none_original_match:{p[1]}"]+=1
@@ -135,11 +148,13 @@ def analyze_package(src:Path):
                         serialized=ET.tostring(state,encoding="utf-8")
                         key=(capability,identity)
                         fp=hashlib.sha256(serialized).hexdigest()
-                        if key in states_seen and states_seen[key]==fp:
+                        fingerprints=states_seen.setdefault(key,set())
+                        if fp in fingerprints:
                             continue
-                        if key in states_seen and states_seen[key]!=fp:
-                            unmatched.append({"identity":identity,"issue":"State ID reused with different XML"})
-                        states_seen[key]=fp
+                        if fingerprints:
+                            unmatched.append({"identity":identity,
+                                "issue":"Scoped OVAL State ID reused across components; counted separately"})
+                        fingerprints.add(fp)
                         c=counts[kind(source_name,capability)]
                         c["states"]+=1
                         for entity in state:
@@ -172,8 +187,8 @@ def analyze_package(src:Path):
         "source":source_name,
         "source_oval_documents":source_docs,
         "source_xml_files_parsed":parsed_xml,
-        "distinct_source_test_identities":len(tests_seen),
-        "distinct_source_state_identities":len(states_seen),
+        "distinct_source_test_identities":sum(len(v) for v in tests_seen.values()),
+        "distinct_source_state_identities":sum(len(v) for v in states_seen.values()),
         "strata":{k:dict(v) for k,v in sorted(counts.items())},
         "warnings":unmatched[:35],
         "total_warnings":len(unmatched),
@@ -202,7 +217,7 @@ def aggregate(packages:list[Path]):
         "limitations":[
             "This is a direct source OVAL 5.12.3 Test and State-field entity census, not a runtime NG scanner result.",
             "Counts unique OVAL Test/State identities within each individual benchmark. Shared references are not duplicated within that package.",
-            "Unspecified OVAL check_existence and State-entity entity_check use their documented effective defaults; missing Test.check is reported as unresolved.",
+            "Unspecified OVAL check_existence and State-entity entity_check use documented effective defaults; deprecated Test.check='none exist' is normalized to 'all' ONLY for State-free, explicit none_exist Tests; unproven cases stay unresolved.",
             "macOS and independent.shellcommand are excluded from primary structured rankings.",
             "Four known independent.sqlext packages are included in source accounting, but that test type is not an NG conversion success.",
             "Source-mapping names are the published OVAL test family, not claims that the current native converter on main passes all sources.",
