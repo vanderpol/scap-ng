@@ -65,7 +65,7 @@ evaluate:
             lower(self.d)
 
     def test_unknown_capability_rejected(self):
-        self.d["checks"]["home-mounted-nosuid-option"]["on"] = "linux.fake"
+        self.d["checks"]["home-mounted-nosuid-option"]["resource"] = "linux.fake"
         with self.assertRaisesRegex(UnsupportedFacade, "capability"):
             lower(self.d)
 
