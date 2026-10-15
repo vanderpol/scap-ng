@@ -119,6 +119,25 @@ class V04ObjectSelectorTests(unittest.TestCase):
                 self.assertFalse(self.valid(predicate))
                 self.assertTrue(errors(assessment_with_directory(predicate)))
 
+    def test_collector_record_field_has_independent_selection_match(self):
+        collector=Draft202012Validator(
+            {"$id":COMMON["$id"],"$defs":COMMON["$defs"],
+             "$ref":"#/$defs/object_record_field"},
+            resolver=RefResolver.from_schema(COMMON,store=STORE),
+        )
+        good={"equals":"tpmpresent,tpmready","selection_match":"all"}
+        self.assertFalse(list(collector.iter_errors(good)))
+        for broken in (
+            {"equals":"tpmpresent,tpmready"},
+            {"equals":"tpmpresent","match":"all"},
+            {"equals":"tpmpresent","selection_match":"all","require":"none_exist"},
+            {"value":"tpmpresent","operation":"equals","selection_match":"all"},
+            {"equals":"tpmpresent","selection_match":"all",
+             "not_equal":"tpmready"},
+        ):
+            with self.subTest(broken=broken):
+                self.assertTrue(list(collector.iter_errors(broken)))
+
     def test_native_object_without_select_remains_possible(self):
         # Native collectors can have capability-specific sources other than
         # select (e.g. Variable/cmdlet). This test does not validate them;
