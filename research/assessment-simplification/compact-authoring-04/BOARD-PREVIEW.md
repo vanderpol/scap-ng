@@ -57,6 +57,32 @@ The compact check must expand to the **exact canonical comparison/evaluation sem
 
 **Editor/template approach:** A user chooses `linux.partition`, selects `/home`, expects `nosuid`, chooses **at least one Item, all Items match**, chooses **at least one matching mount option**, and saves the **full canonical block above**. No new standard syntax or alternative parser is needed.
 
+## Field names directly: an alternative worth comparing
+
+A source-only name-as-key form eliminates the extra `field:` property:
+
+```yaml
+# Canonical 0.3
+- field: mount_options
+  value: nosuid
+  operation: equals
+  existence: one_or_more
+  match: one_or_more
+```
+
+```yaml
+# Candidate 0.4 primary shape
+- mount_options:
+    value: nosuid
+    operation: equals
+    existence: one_or_more
+    match: one_or_more
+```
+
+With the independently proposed comparison shorthand, the nested payload could read `equals: nosuid`; **none of the existence or match rules disappear**. [Full evaluation](FIELD-AS-KEY.md): all **922** predicates in **318** six-STIG Assessments round-tripped structurally; 119 had an actual field named `value` and required schema-shape disambiguation. Original 65-source OVAL contained **1,335** such `value` fields. Keep State arrays so duplicate field comparisons and logical branches remain representable.
+
+A single **canonical** 0.4 field-key grammar could avoid Easter-egg aliases more effectively than permitting two spellings of every State. That choice requires Board design review and migration planning; no syntax was changed.
+
 ## Other instructive check: absence-only
 
 A Windows Test with no State can currently specify:
