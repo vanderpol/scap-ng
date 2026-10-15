@@ -30,7 +30,7 @@ The following is a *new experimental authoring view*, **not valid NG 0.3 syntax*
 ```yaml
 checks:
   home-mounted-nosuid-option:
-    on: linux.partition
+    resource: linux.partition
     select:
       mount_point:
         matches_regex: '.*\\/home'
@@ -50,13 +50,13 @@ evaluate:
   check: home-mounted-nosuid-option
 ```
 
-The proposed `on` is the capability type. A schema supplies *allowed field names and operator types*, **not** default semantic quantifiers. `select` describes collection, `expect` holds field comparisons and field-value cardinality, and `require.items` expresses Item cardinality and matching. `evaluate` remains explicit for complex AND/OR/XOR trees.
+The proposed `resource` is the capability type. A schema supplies *allowed field names and operator types*, **not** default semantic quantifiers. `select` describes collection, `expect` holds field comparisons and field-value cardinality, and `require.items` expresses Item cardinality and matching. `evaluate` remains explicit for complex AND/OR/XOR trees.
 
 This short form has a narrow, mechanical lowering:
 
 | Experimental field | Exact canonical 0.3 field |
 |---|---|
-| `on: linux.partition` | Test and private Object `capability` |
+| `resource: linux.partition` | Test and private Object `capability` |
 | `select.mount_point.matches_regex` | `object.select.mount_point.value` + `operation: pattern_match` |
 | `expect.mount_options.equals` | `states: [{field: mount_options, operation: equals, value: nosuid}]` |
 | `expect.mount_options.values.exists/match` | Embedded State `existence/match` |
