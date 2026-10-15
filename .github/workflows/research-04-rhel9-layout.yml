@@ -49,6 +49,8 @@ jobs:
               choices.append((v['id'],v.get('assessment_choices') or {}))
             from collections import Counter
             print('CHOICE SUMMARY',dict(Counter(('auto' if 'automated' in c else 'no_auto')+'_'+('manual' if 'manual' in c else 'no_manual') for rid,c in choices)))
+            print('DEFAULT CHOICES',dict(Counter((yaml.safe_load(z.read(x))['rule'].get('default_assessment_choice','<missing>')) for x in rules)))
+            print('DEFAULT_AUTOMATED_NO_CHOICE',[(rid,c) for rid,c in choices if 'automated' not in c][:3])
             print('AUTO IDS FIRST',[(rid,c['automated']['assessment']) for rid,c in choices if 'automated' in c][:24])
             for x in shared[:4]:
               y=yaml.safe_load(z.read(x));print('SHARED FILE SAMPLE',x,str(y)[:700])
