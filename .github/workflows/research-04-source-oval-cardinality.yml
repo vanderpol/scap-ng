@@ -1,0 +1,43 @@
+name: 0.4 pinned 65-source original OVAL cardinality census
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-source-oval-cardinality.yml
+      - tools/research_04_source_oval_macro_census.py
+      - tools/test_research_04_source_oval_macro_census.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit guard for OVAL Test vs entity scopes and deduplication
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_research_04_source_oval_macro_census.py -v
+      - name: Measure all pinned original SCAP 1.4 OVAL source Tests/States
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_04_source_oval_macro_census.py \
+            niwc/Current \
+            --output work/full-65-source-oval-cardinality.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-65-source-oval-cardinality
+          path: work/full-65-source-oval-cardinality.json
+          if-no-files-found: error
