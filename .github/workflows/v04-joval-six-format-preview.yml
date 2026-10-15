@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - tools/export_v04_joval_six_format_preview.py
+      - tools/test_v04_joval_rule_choice_closure.py
       - tools/research_04_scoped_schema.py
       - tools/research_04_scoped_state_require.py
       - .github/workflows/v04-joval-six-format-preview.yml
@@ -32,6 +33,10 @@ jobs:
           mkdir -p work
           gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
             --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Focused Rule Assessment choice closure tests
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_v04_joval_rule_choice_closure.py
       - name: Six complete benchmark source-preserving YAML and JSON previews
         run: |
           PYTHONPATH=tools python tools/export_v04_joval_six_format_preview.py \
