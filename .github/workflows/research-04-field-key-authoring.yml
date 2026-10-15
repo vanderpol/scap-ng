@@ -1,0 +1,44 @@
+name: 0.4 field-as-key six-STIG research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-field-key-authoring.yml
+      - tools/research_04_field_key_authoring.py
+      - tools/test_research_04_field_key_authoring.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Test field-key source grammar strictness and exact reconstruction
+        run: PYTHONPATH=tools python tools/test_research_04_field_key_authoring.py -v
+      - name: Retrieve immutable 0.3 six-STIG authoring snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+          test -s work/scap-ng-0.3-six-stig-authoring.zip
+      - name: Census and exact parsed reconstruction of current State predicates
+        run: |
+          python tools/research_04_field_key_authoring.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/field-key-04-census.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: field-key-six-stig-research
+          path: work/field-key-04-census.json
+          if-no-files-found: error
