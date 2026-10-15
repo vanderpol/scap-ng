@@ -120,6 +120,10 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         }
         old_test["properties"].pop("existence",None)
         old_test["properties"].pop("match",None)
+        # Fixed-result native capabilities have no authored Object or State
+        # predicate. Drop 0.3's legacy named State wrapper and do not provide
+        # a second authoring spelling through unused schema definitions.
+        defs.pop("state",None)
         return result
 
     native_selector_fields = _selector_fields(mapping,repo_root)
