@@ -1,0 +1,44 @@
+name: 0.4 absence-only shorthand exactness audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-none-existence-alias.yml
+      - tools/research_04_none_exist_alias.py
+      - tools/test_research_04_none_exist_alias.py
+      - tools/oval_result_truth_tables.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Test complete/incomplete/error/unknown outcomes and preset refusal rules
+        run: PYTHONPATH=tools python tools/test_research_04_none_exist_alias.py -v
+      - name: Download immutable 0.3 six-STIG authoring ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Prove full sampled State-free Test and State field expansions
+        run: |
+          python tools/research_04_none_exist_alias.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/none-exist-presets.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: none-exist-six-stig-proof
+          path: work/none-exist-presets.json
+          if-no-files-found: error
