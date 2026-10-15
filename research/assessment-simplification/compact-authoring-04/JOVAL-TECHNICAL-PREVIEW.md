@@ -21,7 +21,7 @@ Feature highlights: **SV-257889** (OVAL ObjectComponent → separately proved op
 
 ## What to review first (about five minutes)
 
-The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r2) contains two complete corresponding authoring ZIPs: one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
+The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) contains two complete corresponding authoring ZIPs, now **4,001 authored documents each** (including the 12 previously omitted shared manual Assessments). All **2,958 Rule Assessment-choice links resolve**, as verified by the [new closure gate](https://github.com/vanderpol/scap-ng/issues/230): one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
 
 ### Representative content
 
