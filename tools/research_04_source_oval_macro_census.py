@@ -259,8 +259,16 @@ def main():
         print("SOURCE_STRATUM",k,"TESTS",c.get("tests",0),"STATES",c.get("states",0),
               "STATE_FIELDS",c.get("state_field_entities",0))
         for label in ("item_common_all_match","field_common_all_match",
-                      "state_free_none_exist"):
+                      "state_free_none_exist","states_with_repeated_field_names",
+                      "repeated_field_instances_extra","state_entity_variable_reference",
+                      "nested_record_field_structures","record_valued_state_entities"):
             print(" ",label,c.get(label,0))
+        print(" ", "FIELD_NAME_COLLISIONS",
+              sorted(((key,n) for key,n in c.items() if key.startswith("field_name_collision:")),
+                     key=lambda row:(-row[1],row[0])))
+        print(" ", "TOP_FIELD_NAMES",
+              sorted(((key,n) for key,n in c.items() if key.startswith("field_name:")),
+                     key=lambda row:(-row[1],row[0]))[:12])
         for prefix in ("items_pair:","field_pair:","unresolved_test_pair:","unresolved_entity_pair:"):
             values=sorted(((name,n) for name,n in c.items() if name.startswith(prefix)),
                           key=lambda x:(-x[1],x[0]))
