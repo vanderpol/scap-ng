@@ -1,0 +1,73 @@
+name: 0.4 RHEL9 compact authoring preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-rhel9-compact-preview.yml
+      - tools/research_04_rhel9_compact_preview.py
+      - tools/test_research_04_rhel9_compact_preview.py
+      - tools/research_04_field_key_authoring.py
+      - tools/research_04_quantifier_aliases.py
+      - tools/research_04_compiled_authoring_macros.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Fail-closed composition and reversal unit tests
+        run: |
+          PYTHONPATH=tools python tools/test_research_04_rhel9_compact_preview.py -v
+          PYTHONPATH=tools python tools/test_research_04_field_key_authoring.py -v
+      - name: Retrieve immutable published six-STIG authoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+          test -s work/scap-ng-0.3-six-stig-authoring.zip
+      - name: Build whole RHEL9 research authoring preview and exact 0.3 proof
+        run: |
+          python tools/research_04_rhel9_compact_preview.py \
+            --authoring-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/rhel9-compact-04-research-authoring.zip \
+            --report-out work/rhel9-compact-04-metrics.json
+          unzip -tq work/rhel9-compact-04-research-authoring.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-compact-04-research-authoring
+          path: |
+            work/rhel9-compact-04-research-authoring.zip
+            work/rhel9-compact-04-metrics.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path("work/rhel9-compact-04-metrics.json").read_text())
+          r=result["rules"]
+          print("PREVIEW_04_RULE_SUMMARY",json.dumps(r,sort_keys=True))
+          print("PREVIEW_04_ASSESSMENT_SUMMARY",json.dumps(result["assessments"]["stage2_plus_scalar_comparison"],sort_keys=True))
+          with open(__import__("os").environ["GITHUB_STEP_SUMMARY"],"a") as f:
+              f.write("## Research-only RHEL 9 compact authoring preview\n\n")
+              for key,val in r.items():
+                  if key!="classification_counts":
+                      f.write(f"- **{key}**: {val}\n")
+              f.write("\nFull original Benchmark + Rule + manual content included. ")
+              f.write("Every automated/applicability Assessment recompiles to identical parsed 0.3. ")
+              f.write("No runtime scanner equivalence claimed.\n")
+          PY
