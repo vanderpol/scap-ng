@@ -50,8 +50,8 @@ def from_source_pair(node, *, scope, with_states, notes, label):
     out=deepcopy(node)
     exist=out.get("existence")
     match=out.get("match")
-    if exist is None and match is None:
-        return out
+    if exist is None or match is None:
+        raise ValueError(f"Missing explicit existence/match at {label}: {exist}/{match}")
     if exist not in EXISTS or match not in MATCHES:
         raise ValueError(f"Unrecognized source pair at {label}: {exist}/{match}")
     if "require" in out:
@@ -163,7 +163,9 @@ def encode_operations(tree,counters,operations):
         return [encode_operations(x,counters,operations) for x in tree]
     if not isinstance(tree,dict):
         return deepcopy(tree)
-    if "operation" in tree and "value" in tree and tree["operation"] in operations:
+    if "operation" in tree and "value" in tree:
+        if tree["operation"] not in operations:
+            raise ValueError(f"Nonstandard comparison operator: {tree['operation']}")
         op=tree["operation"]
         key=OP_ALIAS.get(op,op)
         if key in tree:
