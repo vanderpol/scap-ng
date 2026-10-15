@@ -1,0 +1,42 @@
+name: 0.4 explicit Test group field requirement research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/research_04_scoped_state_require.py
+      - .github/workflows/research-04-scoped-state-require.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  six-anchor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema
+      - name: Download immutable original six-STIG source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Six-anchor Test/group/field scope source inversion
+        run: |
+          PYTHONPATH=tools python tools/research_04_scoped_state_require.py \
+            --source-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output work/scoped-require-review.json --six-anchor
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v04-explicit-scoped-field-require-six-anchor-proof
+          path: work/scoped-require-review.json
+          retention-days: 90
+          if-no-files-found: error
