@@ -6,6 +6,8 @@
 
 The source is the **immutable published six-STIG 0.3 authoring ZIP**. The preview includes the complete RHEL 9 Benchmark and its **445 Rules**, every unchanged local manual Assessment, local automated/applicability Assessments, and **only those shared Assessments referenced by RHEL 9 Rules** (not the entire six-STIG shared catalog). Each changed Assessment opts into an explicit `authoring_format: scap-ng-compact-research/0.4`. The experimental compiler lowers it back to the **identical parsed published 0.3 Assessment**; all Rule, Benchmark, and manual bytes are unchanged.
 
+**Follow-up evidence:** [Five-preset sensitivity study](PRESET-SENSITIVITY.md) found **398/417** automated-by-default Rules can express every Test/State existence/match pair with five explicit presets, versus **269/417** under the original three. This was an additional source-equivalence experiment; the downloadable ZIP below **still uses the original three proposed presets** and has not been silently changed.
+
 ## Correct default-assessment accounting
 
 | RHEL 9 Rule selection | Rule count |
