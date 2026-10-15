@@ -123,6 +123,32 @@ class CapabilityV04Tests(unittest.TestCase):
         bad["require"]="only_one_exists"
         self.assertTrue(validate(schema,"test",bad))
 
+    def test_nested_set_uses_native_selector_names_not_open_generic_object(self):
+        schema=materialize("unix.file")
+        nested={
+            "capability":"unix.file",
+            "object_title":"Directories",
+            "select":{
+                "directory":{
+                    "equals":["/lib","/lib64"],
+                    "datatype":"string","value_match":"one"
+                },
+                "name":None,
+            },
+            "filesystem":"all",
+            "traversal":{"max_depth":None,"recurse":"symlinks_and_directories"},
+        }
+        top={
+            "capability":"unix.file",
+            "set":{"operator":"union","operands":[
+                {"object":nested,"filters":[]}
+            ]},
+        }
+        self.assertFalse(validate(schema,"object",top))
+        bad=deepcopy(top)
+        bad["set"]["operands"][0]["object"]["select"]["made_up"]={"equals":"x"}
+        self.assertTrue(validate(schema,"object",bad))
+
     def test_registry_literal_value_field_keeps_its_name(self):
         schema=materialize("windows.registry")
         state={"value":{"equals":"4",
