@@ -14,7 +14,8 @@ import json
 from pathlib import Path
 import zipfile
 
-from jsonschema import Draft202012Validator,RefResolver
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 import research_04_rhel9_compact_preview as corpus
 from research_04_three_benchmark_quantifier import BENCHMARKS
 from research_04_one_grammar_proof import make_single,benchmark_dir
@@ -33,10 +34,17 @@ def validator_for(capability,cache):
     if capability in cache:return cache[capability]
     mapping=json.loads(SUPPORTED[capability].read_text(encoding="utf-8"))
     schema=generate(mapping,ROOT)
-    store={**SHARED,schema["$id"]:schema}
+    # Draft 2020-12 local references (for instance within filesystem
+    # traversal and native collector schemas) need their own resource scope.
+    # Legacy RefResolver can resolve them against the wrong external root in
+    # unevaluatedProperties; use the official version-local Registry instead.
+    registry=Registry().with_resources(
+        (uri,Resource.from_contents(document))
+        for uri,document in {**SHARED,schema["$id"]:schema}.items()
+    )
     v=Draft202012Validator(
         {"$id":schema["$id"],"$defs":schema["$defs"],"$ref":"#/$defs/test"},
-        resolver=RefResolver.from_schema(schema,store=store)
+        registry=registry
     )
     cache[capability]=v
     return v
