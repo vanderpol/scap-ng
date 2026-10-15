@@ -1,0 +1,44 @@
+name: Research RHEL9 package layout discovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-rhel9-layout.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable six-STIG source authoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - run: |
+          python - <<'PY'
+          import zipfile,yaml,collections,json
+          p='work/scap-ng-0.3-six-stig-authoring.zip'
+          with zipfile.ZipFile(p) as z:
+            entries=sorted(n for n in z.namelist() if n.startswith('authoring/rhel_9/') and n.endswith(('.yaml','.yml')))
+            print('RHEL9 TOTAL',len(entries))
+            bypath=collections.Counter('/'.join(x.split('/')[2:4]) for x in entries)
+            print('PATH COUNTS',bypath.most_common(25))
+            print('FIRST FILES',entries[:30])
+            ben=[x for x in entries if 'benchmark' in x.split('/')[-1]]
+            print('BENCHMARK FILES',ben)
+            for x in ben[:2]:
+              y=yaml.safe_load(z.read(x));print('BENCHMARK',x,'keys',list(y) if isinstance(y,dict) else type(y));print(str(y)[:2400])
+            rules=[x for x in entries if '/rules/' in x]
+            auto=[x for x in entries if '/assessments/automated/' in x]
+            manual=[x for x in entries if '/assessments/manual/' in x]
+            print('COUNTS','rules',len(rules),'automated',len(auto),'manual',len(manual))
+            for x in rules[:3]:
+              y=yaml.safe_load(z.read(x)); print('RULE SAMPLE',x,str(y)[:1600])
+            for x in auto[:2]:
+              y=yaml.safe_load(z.read(x)); print('AUTOMATED SAMPLE',x,str(y)[:2400])
+          PY
