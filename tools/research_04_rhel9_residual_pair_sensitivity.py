@@ -25,6 +25,7 @@ def source_sensitivity(path):
     previous=dict(preview.PAIR_ALIASES)
     inverse=dict(preview.PAIR_INVERSE)
     earlier_field_absence=preview.FIELD_ABSENCE_ENABLED
+    earlier_exact_one=preview.EXACT_ONE_NATURAL_ENABLED
     try:
         preview.PAIR_ALIASES.update(ADDITIONAL)
         preview.PAIR_INVERSE.update({
@@ -40,12 +41,12 @@ def source_sensitivity(path):
         third_report=preview.make_report(docs,raw,third,third)
         # Preserve explicit OVAL cardinality "only one exists" rather than
         # trying to make exact-one collection equivalent to one-or-more.
-        preview.PAIR_ALIASES[("one","all")]="exactly_one_all_match"
-        preview.PAIR_INVERSE["exactly_one_all_match"]={"existence":"one","match":"all"}
+        preview.EXACT_ONE_NATURAL_ENABLED=True
         fourth=preview.single_stage(docs,2)
         fourth_report=preview.make_report(docs,raw,fourth,fourth)
     finally:
         preview.FIELD_ABSENCE_ENABLED=earlier_field_absence
+        preview.EXACT_ONE_NATURAL_ENABLED=earlier_exact_one
         preview.PAIR_ALIASES.clear();preview.PAIR_ALIASES.update(previous)
         preview.PAIR_INVERSE.clear();preview.PAIR_INVERSE.update(inverse)
     a=first_report["rules"]
@@ -84,9 +85,11 @@ def source_sensitivity(path):
         "after_field_none_exist_alias":classify_metric(third_report),
         "after_exactly_one_exists_alias":classify_metric(fourth_report),
         "exactly_one_added_occurrences":(
-            fourth[2]["test_require:exactly_one_all_match"] -
-            third[2]["test_require:exactly_one_all_match"]
+            fourth[2]["test_require:only_one_exists"] +
+            fourth[2]["test_require:only_one_exists_and_matches"]
         ),
+        "exact_one_state_free_tests":fourth[2]["test_require:only_one_exists"],
+        "exact_one_with_state_tests":fourth[2]["test_require:only_one_exists_and_matches"],
         "field_none_exist_added_occurrences":(
             third[2]["field_require:none_exist"] - second[2]["field_require:none_exist"]
         ),
