@@ -7429,7 +7429,14 @@
       ],
       "properties": {
         "require": {
-          "$ref": "#/$defs/paired_requirement"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/paired_requirement"
+            },
+            {
+              "$ref": "#/$defs/presence_requirement"
+            }
+          ]
         },
         "states": {
           "type": "array",
@@ -7512,6 +7519,25 @@
             "required": [
               "states_match"
             ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "states"
+            ],
+            "properties": {
+              "states": {
+                "type": "array"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "$ref": "#/$defs/paired_requirement"
+              }
+            }
           }
         }
       ],
