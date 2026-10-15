@@ -13,6 +13,10 @@ Both ZIPs include complete, human-readable automated Assessment YAML, required s
 
 **Limits:** Pre-alpha *authoring-only* review material, **not** compiled `.scapng` scanner bundles or normative 0.4 approval. Rule/Benchmark/manual files are intentionally byte-for-byte from published 0.3 content for context; some retain 0.3 metadata. GitHub Actions research artifacts have a 90-day retention period. The earlier RHEL9 compact research release remains historical only.
 
+## Most current six-STIG YAML + JSON preview for reviewers
+
+**[Permanent pre-alpha discussion prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015)** contains all six STIG authoring conversions in **both formats**, including the scoped field-requirement candidate (Test/group/field) and human `and`/`or` logic. [Joval meeting reading guide](JOVAL-TECHNICAL-PREVIEW.md). All 1,396 converted Assessments and 2,144 native Tests passed the candidate overlay, explicit scope inverse, full 0.4 base and native schema checks; JSON values mirror YAML. **Pre-alpha, not Board-approved or scanner-compiled.** The separate earlier RHEL9 preview remains historical.
+
 **Start with [0.4 scope and release gates](0.4-SCOPE-AND-RELEASE-GATES.md).** It explicitly includes actual field names in State predicates, a human-readable `require` vocabulary, operator-as-key comparisons, native typed arrays, and Windows record fields. One **authoring** grammar is the goal, not a second optional set of hidden YAML shortcuts.
 
 [Short Board preview](ONE-GRAMMAR-BOARD-PREVIEW.md) · [Human terminology and semantics](HUMAN-VERBIAGE-PROPOSAL.md) · [Focused draft JSON Schema fragment](assessment-language-fragment.schema.json) · [Schema validation workflow](https://github.com/vanderpol/scap-ng/actions/runs/38740807220) · [Research issue #227](https://github.com/vanderpol/scap-ng/issues/227).

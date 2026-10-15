@@ -4,6 +4,10 @@
 
 This directory is a complete physically independent version-local copy-forward of the 0.3 schema and capability mapping surface. Versioned metadata, IDs and references identify v0.4.0; each unchanged file preserves its substantive modification date.
 
+## Meeting-ready six-STIG YAML + JSON review packet (October 15, 2026)
+
+**[Download the pinned Joval discussion preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015)**, with **six complete source-backed STIG authoring sets in both YAML and JSON**. [Short technical meeting guide](../../research/assessment-simplification/compact-authoring-04/JOVAL-TECHNICAL-PREVIEW.md). The generated scoped State-field requirements and `and`/`or` group spelling are **research candidates**, not yet adopted by the base 0.4 schema; they validate via [research schema overlay](../../tools/research_04_scoped_schema.py), fully explicit scope expansion, full 0.4 Assessment validation and native capability schemas. Both formats have equivalent parsed values. This is **not** a scanner bundle and the JSON mirror retains source YAML reference strings.
+
 ## Draft Assessment grammar
 
 - A single versioned authoring grammar: no mixed legacy `field:/value:/operation:/existence:/match:` State forms.
