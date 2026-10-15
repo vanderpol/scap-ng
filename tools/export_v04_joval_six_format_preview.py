@@ -29,6 +29,93 @@ def benchmark_content(z,benchmark):
     corpus.SOURCE_PREFIX="authoring/"+resolve_benchmark_dir(folders,benchmark)+"/"
     try:return corpus.archive_contents(z)
     finally:corpus.SOURCE_PREFIX=old
+def include_shared_rule_choices(source_zip, docs, raw, benchmark):
+    """Resolve ALL Rule Assessment choices, including shared manual choices."""
+    local = {}
+    for path, doc in docs.items():
+        assessment = (doc or {}).get("assessment") if isinstance(doc, dict) else None
+        if not isinstance(assessment, dict):
+            continue
+        ident = assessment.get("id")
+        if not isinstance(ident, str) or not ident:
+            raise ValueError("Assessment is missing an ID: " + path)
+        if ident in local and local[ident] != path:
+            raise ValueError(f"Duplicate Assessment ID {ident}: {local[ident]} and {path}")
+        local[ident] = path
+    required = {}
+    for path, doc in docs.items():
+        if "/rules/" not in path:
+            continue
+        rule = (doc or {}).get("rule") or {}
+        choices = rule.get("assessment_choices") or {}
+        default = rule.get("default_assessment_choice")
+        if default not in choices:
+            raise ValueError(f"Rule {path} default Assessment choice {default!r} is not declared")
+        for name, choice in choices.items():
+            ident = choice.get("assessment") if isinstance(choice, dict) else None
+            if not isinstance(ident, str) or not ident:
+                raise ValueError(f"Rule {path} choice {name} has no Assessment ID")
+            if ident not in local:
+                required.setdefault(ident, []).append((path, name))
+    found = {}
+    for name in source_zip.namelist():
+        if not name.startswith("authoring/shared/") or not name.endswith((".yaml", ".yml")):
+            continue
+        body = source_zip.read(name)
+        doc = yaml.safe_load(body)
+        assessment = doc.get("assessment") if isinstance(doc, dict) else None
+        ident = assessment.get("id") if isinstance(assessment, dict) else None
+        if ident not in required:
+            continue
+        if ident in found:
+            raise ValueError(f"Ambiguous shared Assessment ID {ident}: {found[ident]} and {name}")
+        found[ident] = name
+        if name in raw and raw[name] != body:
+            raise ValueError("Shared source collision: " + name)
+        docs[name] = doc
+        raw[name] = body
+    missing = set(required) - set(found)
+    if missing:
+        raise ValueError(f"{benchmark}: unresolved source Rule Assessment choice IDs: "
+                         + repr([(ident, required[ident]) for ident in sorted(missing)][:10]))
+    return len(found)
+
+
+def audit_rule_assessment_choices(docs):
+    """Fail closed when a packaged Rule choice lacks a packaged Assessment."""
+    by_id = {}
+    rules = []
+    for path, doc in docs.items():
+        if not isinstance(doc, dict):
+            continue
+        assessment = doc.get("assessment")
+        if isinstance(assessment, dict):
+            ident = assessment.get("id")
+            if not isinstance(ident, str) or not ident:
+                raise ValueError("Assessment has no ID: " + path)
+            if ident in by_id and by_id[ident] != path:
+                raise ValueError(f"Duplicate packaged Assessment ID {ident}: {by_id[ident]} and {path}")
+            by_id[ident] = path
+        if isinstance(doc.get("rule"), dict):
+            rules.append((path, doc["rule"]))
+    bad = []
+    links = 0
+    for path, rule in rules:
+        choices = rule.get("assessment_choices") or {}
+        default = rule.get("default_assessment_choice")
+        if default not in choices:
+            bad.append((path, "missing default choice", default))
+        for name, choice in choices.items():
+            ident = choice.get("assessment") if isinstance(choice, dict) else None
+            links += 1
+            if ident not in by_id:
+                bad.append((path, name, ident))
+    if bad:
+        raise ValueError(f"Unresolved packaged Rule Assessment choices ({len(bad)}): {bad[:15]!r}")
+    return {"rules": len(rules), "choice_links": links, "unique_assessments": len(by_id),
+            "unresolved_choices": 0, "duplicate_assessment_ids": 0}
+
+
 def migrate_assessment(doc,path,cache):
     source,_,notes=make_single(doc)
     check_no_parallel_comparison_or_cardinality_grammar(source)
@@ -53,11 +140,13 @@ def migrate_assessment(doc,path,cache):
 
 def create(source_zip,out_dir):
     raws={};ydocs={};jdocs={};prior_sha={}
-    by_stig={};provenance=[];cache={};examples={}
+    by_stig={};provenance=[];cache={};examples={};package_docs={}
     with zipfile.ZipFile(source_zip) as z:
         if z.testzip() is not None:raise ValueError("Corrupt original ZIP")
         for bench in SIX_ANCHORS:
             docs,raw=benchmark_content(z,bench)
+            added=include_shared_rule_choices(z,docs,raw,bench)
+            print('RULE_CHOICE_SHARED_INCLUDED',bench,added,flush=True)
             rules=corpus.benchmark_rule_paths(docs)
             if not rules:raise ValueError("No Rules in "+bench)
             counts=Counter()
@@ -88,6 +177,9 @@ def create(source_zip,out_dir):
                     jbody=(json.dumps(jsonable(doc),ensure_ascii=False,indent=2,allow_nan=False)+"\n").encode()
                     if jsonable(yaml.safe_load(ybody))!=json.loads(jbody):
                         raise ValueError("YAML/JSON content mismatch "+path)
+                    if path in package_docs and package_docs[path] != doc:
+                        raise ValueError("Parsed document collision: " + path)
+                    package_docs[path] = doc
                     jpath=path.rsplit(".",1)[0]+".json"
                     if path in ydocs and ydocs[path]!=ybody:raise ValueError("Shared YAML conflict "+path)
                     if jpath in jdocs and jdocs[jpath]!=jbody:raise ValueError("Shared JSON conflict "+jpath)
@@ -100,6 +192,8 @@ def create(source_zip,out_dir):
             counts["rules"]=len(rules)
             by_stig[bench]=dict(counts)
             print("SIX_STIG",bench,json.dumps(dict(counts),sort_keys=True),flush=True)
+    reference_audit=audit_rule_assessment_choices(package_docs)
+    print("RULE_CHOICE_CLOSURE",json.dumps(reference_audit,sort_keys=True),flush=True)
     totals=Counter()
     for vals in by_stig.values():
         for key,val in vals.items():totals[key]+=val
@@ -160,7 +254,8 @@ def create(source_zip,out_dir):
     readme=("\n".join(index)).encode()
     manifest={"status":"REVIEW ONLY: 0.4 PRE-ALPHA, NOT APPROVED OR SCANNABLE",
               "source_zip_sha256":digest(source_zip.read_bytes()),
-              "benchmarks":by_stig,"totals":dict(totals),"provenance":provenance,
+              "benchmarks":by_stig,"totals":dict(totals),"rule_choice_closure":reference_audit,
+              "provenance":provenance,
               "review_examples":sorted(examples)}
     supplementary={
         "MEETING-START-HERE.md":readme,
@@ -182,7 +277,8 @@ def create(source_zip,out_dir):
     (out_dir/"MEETING-START-HERE.md").write_bytes(readme)
     (out_dir/"REVIEW-MANIFEST.json").write_text(
         json.dumps({"status":manifest["status"],"totals":manifest["totals"],
-                    "benchmarks":by_stig,"archives":archives},indent=2,sort_keys=True)+"\n")
+                    "benchmarks":by_stig,"rule_choice_closure":reference_audit,
+                    "archives":archives},indent=2,sort_keys=True)+"\n")
     print("SIX_STIG_JOVAL_PREVIEW",json.dumps(archives,sort_keys=True),flush=True)
 
 def main():
