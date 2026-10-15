@@ -25,7 +25,7 @@ from migrate_v04_enum_selectors import migrate,restore
 SIX_ANCHORS=(*BENCHMARKS,"oracle_linux_9","windows_server_dns","apache_2_4_unix")
 
 
-def resolve_resolve_benchmark_dir(folders,benchmark):
+def resolve_benchmark_dir(folders,benchmark):
     if benchmark in BENCHMARKS:
         return benchmark_dir(folders,benchmark)
     names={
