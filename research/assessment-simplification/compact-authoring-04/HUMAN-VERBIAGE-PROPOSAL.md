@@ -147,11 +147,11 @@ require: none_exist
 require: at_least_one_exists
 ```
 
-Prior Windows 11 and Server 2025 source contains `none/one`, `none/one_or_more` and `one_or_more/one_or_more` Tests without States. The reference OVAL result model showed these checks do not consult the `match` aggregator in **480** investigated combinations of collection status, count and check selection. The converter can normalize their ignored match to `all`, with a provenance report. A live-scanner differential is still needed before calling that behavior vendor-proven.
+Prior Windows 11 and Server 2025 source contains `none/one`, `none/one_or_more` and `one_or_more/one_or_more` Tests without States. The reference OVAL result model showed these checks do not consult the `match` aggregator in **480** investigated combinations of collection status, count and check selection. The converter can normalize their ignored match to `all`, with a provenance report. This is a **reference-model semantic proof**, not exact source identity. Scanner behavior can be compared when a scanner exists; it is not a pre-alpha specification gate.
 
 ### One troublesome source outlier is preserved, not rewritten
 
-RHEL 9 boot-loader password SV-257789 has a Test using `none/all` **with a State**. Our prototype does **not delete or replace the State**. It emits `require: none_exist` and retains the State untouched, so compiled content is an **exact parsed structural match** to 0.3. We should separately determine whether that State is redundant under real OVAL scanner behavior, especially with zero Items and incomplete/error flags. Until then, do not silently remove it and do not change its evaluator method merely for aesthetic uniformity.
+RHEL 9 boot-loader password SV-257789 has a Test using `none/all` **with a State**. Our prototype does **not delete or replace the State**. It emits `require: none_exist` and retains the State untouched, so compiled content is an **exact parsed structural match** to 0.3. We should separately determine whether that State is redundant using OVAL 5.12.3 schema semantics and an executable reference model, particularly for zero Items and incomplete/error flags; a future scanner can later confirm its implementation. Until then, do not silently remove it and do not change its evaluator method merely for aesthetic uniformity.
 
 ## What the measured prototype proves
 
@@ -170,7 +170,7 @@ The one-grammar prototype compiled every existing automated Assessment reference
 | Nested record wrappers preserved | **0** | **36** | **59** |
 | Native comparison operations transformed | **2,387** | **1,061** | **1,300** |
 
-**921/921** default-automated Rules are representable within this single candidate syntax. This is *syntactic/structural completeness*, **not** proof that every one is scan-capable or simpler to author, and **not** equivalence of live vendor results. It required a complete controlled vocabulary, including rare logical cases. Of the **942** Assessment documents, **930** reconstructed exactly and **12** had State-free matching normalization supported by the reference truth model. These twelve are *documents*, not numbers of normalized Test occurrences.
+**921/921** default-automated Rules are representable within this single candidate syntax. This is *syntactic/structural completeness*, **not** proof of vendor execution behavior or author usability. There are no SCAP-NG scanners yet, and scanner availability is **not** a condition for adopting an authoring specification. It required a complete controlled vocabulary, including rare logical cases. Of the **942** Assessment documents, **930** reconstructed exactly and **12** had State-free matching normalization supported by the reference truth model. These twelve are *documents*, not numbers of normalized Test occurrences.
 
 **No newly introduced shell-command or manual fallback** was needed to represent any tested Test, State, record or selector. Pre-existing `independent.shellcommand` content remains what it was; this work does not magically replace it with native checks.
 
@@ -179,7 +179,7 @@ The one-grammar prototype compiled every existing automated Assessment reference
 The [OVAL result-table study](https://github.com/vanderpol/scap-ng/actions/runs/38734873333) verified:
 
 - **1,554** nonempty six-valued combinations: aggregating *none satisfy P* equals aggregating *all satisfy exact complement of P* at the **aggregation level**. Another **2,064** Test/collection contexts preserved that identity, **conditional on actual comparison outcomes being exact complements**. A regex or complex native operator is **not automatically invertible**; there is no generic `not_pattern_match` in 0.3.
-- **520** cases: when `only_one_exists` is the existence requirement, `match: all` and `match: one` aggregate the same at a Test, because the existence gate prevents multiple existing Items; this is a candidate semantic normalization, subject to live-scanner parity.
+- **520** cases: when `only_one_exists` is the existence requirement, `match: all` and `match: one` aggregate the same at a Test, because the existence gate prevents multiple existing Items; this is a candidate semantic normalization to be assessed against the normative OVAL truth tables and an independent reference model. Scanner parity is a later implementation test.
 - **480** State-free-Test checks: `match` values are inoperative in the reference evaluator.
 - Counterexamples show **only one Item exists** is not the same as **one Item matches**, **no Items exist** is not the same as **none matches**, and record missing subfields produce **error**, not success. Naive Boolean rewrites lose `error` and `unknown` propagation.
 
@@ -188,9 +188,9 @@ That means there is **no justification for rewriting an automated registry/WMI/t
 ## Remaining approval gates
 
 1. Create a **complete 0.4 JSON Schema** using the selected single grammar, native capability-specific field names and operation types, with forbidden/invalid fixtures (especially record nesting, fields literally called `value`, array `value_match`, absence, and contradictory requirements).
-2. Compare old OVAL 5.12.3 / 0.3 / candidate 0.4 outcomes against a conformant evaluator on representative true, false, error, unknown, not applicable, incomplete and zero-item cases. Treat OpenSCAP as useful but not independently authoritative.
+2. Build and test a specification-level reference semantics using pinned OVAL 5.12.3 truth tables and canonical 0.3 mappings. For any proposed semantic rewrite, exhaustively test meaningful true, false, error, unknown, not-evaluated, not-applicable, incomplete, zero-item and duplicated-Item cases. Keep exact round-trip proofs separate from model-equivalent normalizations. **No SCAP-NG scanner exists in pre-alpha; scanner conformance testing is deferred to implementation.**
 3. Investigate the rare `none_exist` Test with States; preserve its exact source semantics until adjudicated.
 4. Have novice content authors review names, especially `optional`, negative matching, `one` versus `only one matches`, and the complete 20-pair migration inventory. Make **one** spelling normative, with concise field-key and record examples.
 5. Extend the structural proof to the remaining non-macOS full SCAP 1.4 source corpus and handle known deprecated/SQL errors explicitly. No commitment to unsupported tests, hidden defaults or shell fallbacks.
 
-**Bottom line:** One authoring grammar appears feasible for RHEL 9, Windows 11 and Server 2025, including their unusual pairs and Windows records. We do **not** need a second authoring dialect or wholesale semantic test-method rewrites to attain representation coverage. This remains a proposal until the validator and runtime semantic tests are complete.
+**Bottom line:** One authoring grammar appears feasible for RHEL 9, Windows 11 and Server 2025, including their unusual pairs and Windows records. We do **not** need a second authoring dialect or wholesale semantic test-method rewrites to attain representation coverage. This remains a proposal until the capability-aware validator and specification-level semantic tests are complete. Scanner conformance is a later release milestone.
