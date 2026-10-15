@@ -100,6 +100,32 @@ class CompactPreview(unittest.TestCase):
         finally:
             preview.FIELD_ABSENCE_ENABLED=old
 
+    def test_scoped_human_exact_one_names_are_truthful(self):
+        import research_04_rhel9_compact_preview as preview
+        old=preview.EXACT_ONE_NATURAL_ENABLED
+        try:
+            preview.EXACT_ONE_NATURAL_ENABLED=True
+            doc={"assessment":{"mode":"automated","tests":{
+                "bare":{"existence":"one","match":"all","object":{"capability":"unix.file"}},
+                "with-state":{"existence":"one","match":"all",
+                    "states":[{"field":"owner_uid","operation":"equals","value":0,
+                               "existence":"one_or_more","match":"all"}]}}}}
+            short,stats=compact_assessment(doc,2)
+            ts=short["assessment"]["tests"]
+            self.assertEqual(ts["bare"]["require"],"only_one_exists")
+            self.assertEqual(ts["with-state"]["require"],"only_one_exists_and_matches")
+            self.assertEqual(canonical_assessment(short),doc)
+            self.assertEqual(stats["test_require:only_one_exists"],1)
+            self.assertEqual(stats["test_require:only_one_exists_and_matches"],1)
+            with self.assertRaisesRegex(ValueError,"requires a Test without States"):
+                expand_require({"require":"only_one_exists"},scope="test",state_free=False)
+            with self.assertRaisesRegex(ValueError,"requires at least one State"):
+                expand_require({"require":"only_one_exists_and_matches"},scope="test",state_free=True)
+            with self.assertRaisesRegex(ValueError,"only on Tests"):
+                expand_require({"require":"only_one_exists_and_matches"},scope="field")
+        finally:
+            preview.EXACT_ONE_NATURAL_ENABLED=old
+
     def test_odd_none_pair_kept_explicit_for_exact_source(self):
         original={"assessment":{"mode":"automated","tests":{"absence":{
             "existence":"none","match":"one","reported_elements":"all"}}}}
