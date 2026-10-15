@@ -1,6 +1,6 @@
 # SCAP-NG roadmap
 
-Updated: October 8, 2026. **0.3.0 is the active pre-alpha release checkpoint**;
+Updated: October 15, 2026. **0.3.0 remains the active pre-alpha release checkpoint**;
 0.2.0 is historical and does not require rebuilding as a 0.3 gate.
 
 ## Now — finish the 0.3 checkpoint
@@ -24,6 +24,14 @@ as the single authoritative release checklist.
 No new 0.3 feature design is required. Shared Observation and changes to
 `evaluate` are deferred; see the
 [scope boundary](specification/deferred-after-0.3.md).
+
+## 0.4 — single authoring-language draft (research in progress)
+
+The project-owner-directed [0.4 scope and validation gates](research/assessment-simplification/compact-authoring-04/0.4-SCOPE-AND-RELEASE-GATES.md) propose **one standard human-readable Assessment grammar**, including direct State field names (`owner_uid:` rather than `field: owner_uid`), explicit human-language `require` semantics, typed comparator keys, nested Windows record fields, and preservation of existing Object/State literal arrays and `value_match`. No hidden optional compact dialect and no unrelated `evaluate` redesign.
+
+[Three-benchmark source reconstruction](https://github.com/vanderpol/scap-ng/actions/runs/38737558392) demonstrated representation for all **921** default-automated Linux/Windows Rules; [focused draft syntax validation](https://github.com/vanderpol/scap-ng/actions/runs/38740807220) passed on **942** automated/applicability Assessment fragments. These proofs justify a **draft**, not an approved normative version. Next: finalize readable names and edge outcomes, build a full independent `schema/v0.4.0/` snapshot with capability validation, and run the maintained six-anchor suite before a version checkpoint.
+
+No SCAP-NG scanner exists yet. Implementation/scanner parity is a **later milestone**, not a condition for drafting or adopting authoring syntax. Keep the current 0.3 release and Board vote unchanged until a distinct promotion decision. [Owner research tracking #227](https://github.com/vanderpol/scap-ng/issues/227).
 
 ## Next — independent implementation and conformance
 
