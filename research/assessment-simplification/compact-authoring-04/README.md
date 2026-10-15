@@ -2,6 +2,17 @@
 
 **Pre-alpha specification draft in progress — not approved, not a release.** The existing 0.3 specification, scanner bundle format and Board Discussion #213 remain unchanged.
 
+## Latest real 0.4 interim authoring preview (RHEL 9 and Windows 11)
+
+**[Download the verified current-format RHEL 9 and Windows 11 authoring ZIPs](https://github.com/vanderpol/scap-ng/actions/runs/38798029627/artifacts/12002887248)**. The one GitHub Actions artifact contains **two distinct ZIPs**, plus a summary manifest. These use the *current single 0.4 grammar*, not the historical three-preset compact experiment.
+
+- **RHEL 9:** 423 automated/applicability Assessment documents, 658 native Tests, 445 original Rules; all 423 parsed Assessments round-trip source-exactly.
+- **Windows 11:** 251 automated/applicability Assessment documents, 364 native Tests, 257 original Rules; 245 source-exact and six separately established State-free normalizations. Its 219 reviewed enum-selector migrations retain source inverse proofs, including the original OVAL implicit `var_check: all` for the 45-element user-right Variable.
+
+Both ZIPs include complete, human-readable automated Assessment YAML, required shared Assessments, source Rules and Benchmark, original manual alternatives, and `REVIEW-FIRST.md` and `provenance.json`. **All transformed Assessment files passed the complete 0.4 schema and native capability-specific Test validation**, plus inverse source checks ([passing generator CI](https://github.com/vanderpol/scap-ng/actions/runs/38798029627)).
+
+**Limits:** Pre-alpha *authoring-only* review material, **not** compiled `.scapng` scanner bundles or normative 0.4 approval. Rule/Benchmark/manual files are intentionally byte-for-byte from published 0.3 content for context; some retain 0.3 metadata. GitHub Actions research artifacts have a 90-day retention period. The earlier RHEL9 compact research release remains historical only.
+
 **Start with [0.4 scope and release gates](0.4-SCOPE-AND-RELEASE-GATES.md).** It explicitly includes actual field names in State predicates, a human-readable `require` vocabulary, operator-as-key comparisons, native typed arrays, and Windows record fields. One **authoring** grammar is the goal, not a second optional set of hidden YAML shortcuts.
 
 [Short Board preview](ONE-GRAMMAR-BOARD-PREVIEW.md) · [Human terminology and semantics](HUMAN-VERBIAGE-PROPOSAL.md) · [Focused draft JSON Schema fragment](assessment-language-fragment.schema.json) · [Schema validation workflow](https://github.com/vanderpol/scap-ng/actions/runs/38740807220) · [Research issue #227](https://github.com/vanderpol/scap-ng/issues/227).

@@ -14,6 +14,10 @@ This directory is a complete physically independent version-local copy-forward o
 - Windows record and nested field requirements are distinct. Object Set filters use `include:` or `exclude:` on a field-key predicate.
 - `evaluate`, `for_each`, typed Variable graphs, manual choices and collected Items/results do not acquire new semantics.
 
+## Current real-world 0.4 authoring previews
+
+The [strictly validated interim RHEL 9 and Windows 11 authoring preview](https://github.com/vanderpol/scap-ng/actions/runs/38798029627/artifacts/12002887248) provides two distinct ZIPs containing complete real automated/applicability Assessment YAML in the present one-grammar 0.4 draft. Source Rules, Benchmark, manual alternatives and referenced shared content are present for context, with YAML/source inversion and native Test validation recorded in each ZIP's `provenance.json`. These are **not** scanner bundles or a normative release. The 90-day Actions artifact is research evidence, not a permanent distribution.
+
 ## Native generator and real-content evidence
 
 The [version-local native 0.4 capability generator](../../tools/generate_capability_schema_v04.py) successfully emits JSON Schema draft contracts for **all 100 supported reviewed capability mappings** ([successful 100-capability CI](https://github.com/vanderpol/scap-ng/actions/runs/38759490558)). The frozen 0.3 generator remains unchanged. This proves schema generation, reference locality and selected native field-name checks, **not** acceptance of all real authored Tests.
