@@ -378,6 +378,15 @@ def make_report(docs,raw,stage1,stage2):
             "automated_presets_not_full_language_compaction":True,
             "multi_test_evaluate_among_automated":sum(bool(row["original_evaluate_complex"]) for row in auto),
             "automated_with_unsupported_comparison_aliases":sum(bool(row["comparison_longhand_count"]) for row in auto),
+            "automated_no_pair_or_comparison_longhand":sum(
+                row["quantifier_longhand_count"]==0 and row["comparison_longhand_count"]==0
+                for row in auto),
+            "automated_no_pair_or_comparison_longhand_and_simple_evaluate":sum(
+                row["quantifier_longhand_count"]==0 and row["comparison_longhand_count"]==0
+                and not row["original_evaluate_complex"] for row in auto),
+            "automated_any_pair_or_comparison_longhand":sum(
+                row["quantifier_longhand_count"]>0 or row["comparison_longhand_count"]>0
+                for row in auto),
             "classification_counts":dict(aggregate),
         },
         "assessments":{
@@ -429,6 +438,8 @@ The research compiler removes that marker and restores the exact parsed 0.3 Asse
 - **{rules["automated_needing_explicit_quantifier_pairs"]}** automated Rules: at least one pair remains in original longhand
 - **{rules["multi_test_evaluate_among_automated"]}** automated Rules have complex/multi-Test evaluation that remains explicit and unchanged
 - **{rules["automated_with_unsupported_comparison_aliases"]}** automated Rules contain comparison operations not eligible for simple scalar equals/regex aliases
+- **{rules["automated_no_pair_or_comparison_longhand"]}** automated Rules have **no longhand quantifier pairs or comparison operations** after both research transformations (other complex YAML may remain)
+- **{rules["automated_no_pair_or_comparison_longhand_and_simple_evaluate"]}** of those also have a direct single-Test `evaluate` expression
 - **{totals.get("field_key_compacted",0)}** field predicates authored as their actual field name
 - **{totals.get("test_explicit_pair",0)+totals.get("field_explicit_pair",0)}** exact quantifier-pair instances not covered by proposed presets
 
