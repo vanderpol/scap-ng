@@ -85,6 +85,10 @@ The new Joval preview output separately validates **each complete candidate Asse
 
 **Known open issues:** unusual human-readable `require` names, approval of Test/group/field scoping, reference six-valued missing/error/unknown behavior, provenance of multi-valued Variables, future compiler packaging/signing, and live scanner conformance. Current published 0.3 converter regressions are separately tracked in [issue #226](https://github.com/vanderpol/scap-ng/issues/226).
 
+## Open question: native `if/else` versus lossless OVAL `AND/OR`
+
+**[Joval conditional review questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md)** detail the decision we need before normalizing any OVAL branch tree. The real **SV-278001** and **SV-258004** examples read well as `if/else`, but ordinary OVAL `OR(AND(G,P),AND(NOT G,Q))` and procedural `if` differ for **81 of 216** generic six-state input combinations. We must distinguish author-authored procedural branching from lossless source conversion; `error`, `unknown`, `not_evaluated`, `not_applicable`, skipped-branch evidence and applicability are not mere syntax questions. Bring the question sheet to Joval. **The actual source-faithful Assessment remains unchanged in the showcase.**
+
 ## Questions for the Joval authors
 
 - Are the Test/item, logical group, and individual field requirement scopes a clean evaluation model, including six-valued OVAL semantics and potentially incomplete collection?
