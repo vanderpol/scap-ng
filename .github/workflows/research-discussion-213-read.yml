@@ -1,0 +1,75 @@
+name: Read-only review of Discussion 213 replies and reactions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-discussion-213-read.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read current Discussion 213 and all threaded replies
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner=context.repo.owner, name=context.repo.repo;
+            const q=`query($owner:String!,$name:String!) {
+              repository(owner:$owner,name:$name){
+                discussion(number:213){
+                  number title url body createdAt updatedAt
+                  author{login}
+                  reactionGroups{content users{totalCount}}
+                  comments(first:100){
+                    totalCount pageInfo{hasNextPage endCursor}
+                    nodes{
+                      id url body createdAt updatedAt author{login}
+                      reactionGroups{content users{totalCount}}
+                      replies(first:100){
+                        totalCount pageInfo{hasNextPage endCursor}
+                        nodes{
+                          id url body createdAt updatedAt author{login}
+                          reactionGroups{content users{totalCount}}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }`;
+            const result=await github.graphql(q,{owner,name});
+            const d=result.repository?.discussion;
+            if(!d) throw Error('Discussion 213 unavailable');
+            if(d.comments.pageInfo.hasNextPage || d.comments.nodes.length!==d.comments.totalCount)
+              throw Error('Top-level comments truncated; do not report incomplete counts');
+            for(const c of d.comments.nodes)
+              if(c.replies.pageInfo.hasNextPage || c.replies.nodes.length!==c.replies.totalCount)
+                throw Error('Replies truncated at '+c.url);
+            const reactions=x=>Object.fromEntries((x.reactionGroups||[]).filter(g=>g.users.totalCount>0).map(g=>[g.content,g.users.totalCount]));
+            const comments=d.comments.nodes.map(c=>({
+              url:c.url,author:c.author?.login,createdAt:c.createdAt,updatedAt:c.updatedAt,
+              body:c.body,reactions:reactions(c),
+              replies:c.replies.nodes.map(r=>({
+                url:r.url,author:r.author?.login,createdAt:r.createdAt,updatedAt:r.updatedAt,
+                body:r.body,reactions:reactions(r)
+              }))
+            }));
+            const votes=comments.filter(c=>/scap-ng-canonical-vote:\s*[A-D]-/i.test(c.body)).map(c=>({
+              option:(c.body.match(/scap-ng-canonical-vote:\s*([A-D])-/i)||[])[1],
+              url:c.url,reacts:c.reactions,replyCount:c.replies.length
+            }));
+            core.info('REVIEW_213_OVERVIEW='+JSON.stringify({
+              url:d.url,title:d.title,createdAt:d.createdAt,updatedAt:d.updatedAt,
+              postReactions:reactions(d),topLevelComments:d.comments.totalCount,
+              totalReplies:comments.reduce((n,c)=>n+c.replies.length,0),voteComments:votes
+            }));
+            core.info('REVIEW_213_ALL_COMMENTS_BEGIN');
+            for(const c of comments)core.info(JSON.stringify(c));
+            core.info('REVIEW_213_ALL_COMMENTS_END');
+            core.info('REVIEW_213_OPENING_BODY_BEGIN\n'+d.body+'\nREVIEW_213_OPENING_BODY_END');
