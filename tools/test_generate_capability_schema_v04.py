@@ -11,7 +11,8 @@ import json
 from pathlib import Path
 import unittest
 
-from jsonschema import Draft202012Validator, RefResolver
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 from generate_capability_schema_v04 import generate
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -35,12 +36,17 @@ def materialize(capability):
 
 
 def validate(schema,definition,value):
-    resolver=RefResolver.from_schema(schema,store={**STORE,schema["$id"]:schema})
-    # Supply the generated schema as the actual validation root. Nested
-    # state_expression references are intentionally document-relative.
+    # Reference scopes must remain local to each 0.4 schema document. A
+    # native nested Set traverses traversal/collector schemas that themselves
+    # reference other $defs; legacy RefResolver can bind those to the wrong
+    # document, so use a proper Draft 2020-12 resource Registry.
+    registry=Registry().with_resources(
+        (uri,Resource.from_contents(doc))
+        for uri,doc in {**STORE,schema["$id"]:schema}.items()
+    )
     v=Draft202012Validator(
         {"$id":schema["$id"],"$defs":schema["$defs"],
-         "$ref":f"#/$defs/{definition}"},resolver=resolver
+         "$ref":f"#/$defs/{definition}"},registry=registry
     )
     return list(v.iter_errors(value))
 
