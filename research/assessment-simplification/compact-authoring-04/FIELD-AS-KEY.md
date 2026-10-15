@@ -39,6 +39,66 @@ states:
 
 The second proposal combines two **independently tested** transformations. `mount_options: nosuid` alone is **not** recommended: an untyped bare scalar does not specify the comparison operator, entity existence, or matching quantifier.
 
+## Does field-as-key conflict with static-Variable arrays or quantifier shorthand?
+
+**No conflict in the proven source model**, provided three independent quantifier scopes are kept distinct and the compiler lowers in a deterministic order. [Combined 0.4 integration CI](https://github.com/vanderpol/scap-ng/actions/runs/38727447660) verifies six tests using the actual v0.3.0 common JSON Schema, the static-literal folding implementation, field-as-key transformation and `require` alias helper. This is still authoring/structural validation, **not scanner differential testing**.
+
+The **real RHEL 9 SV-257923** `unix.file` Object selector uses the following canonical 0.3 directory array after folding a static Variable:
+
+```yaml
+object:
+  capability: unix.file
+  select:
+    directory:
+      value:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+      operation: equals
+      datatype: string
+      value_match: one
+```
+
+`value_match: one` controls each candidate directory's comparison to the **four expected names**. It **cannot** be replaced by a Test or State `require` shorthand.
+
+An **illustrative combined check** (not claimed to be the content of SV-257923) could retain the Object above while adopting:
+
+```yaml
+states:
+  - owner_uid:
+      equals: 0
+      require: at_least_one_all_match
+require: at_least_one_all_match
+```
+
+The **State** preset expands to `existence: one_or_more, match: all` for the `owner_uid` field; the **Test** preset separately expands to that same pair for collected filesystem Items. The expression `equals: 0` is another independently proposed comparison alias.
+
+For RHEL 9 **SV-257851** `mount_options`, the original field pair is `one_or_more/one_or_more`, **not** `one_or_more/all`:
+
+```yaml
+states:
+  - mount_options:
+      equals: nosuid
+      require: at_least_one_some_match
+```
+
+Here `at_least_one_some_match` is a **research-only shorthand** that precisely expands to `existence: one_or_more` plus `match: one_or_more`. This name and combined compact grammar are not normative 0.4 features. In either check, a field-level preset never changes `value_match`.
+
+### Separate list roles
+
+- `object.select.directory.value: [ ... ]`: a **collection of expected selector values**, previously held by a constant Variable; the associated `value_match` stays explicit.
+- `states: [ ... ]`: an **ordered list of distinct State predicates**; a field-key mapping occurs *inside each entry*, retaining repeated fields and logical groups.
+- `states[*].field_name.value: [ ... ]`: an **expected State value collection**; its own `value_match` is still required, independent of State `require`, Test `require` and the outer State list.
+
+The source proof additionally uses a constant integer array in an expected State field, a constant string array in an Object selector, a field literally named `value` with an array, and two different Test/State `require` expansions. The exact parsed source Assessment reconstructs after all transformations.
+
+### Important compiler ordering and provenance
+
+The static-Variable normalizer records paths to each replaced `value` node. Changing `field: owner_uid` to the nested `owner_uid:` mapping changes **State path coordinates**. Therefore the compiler must either (a) normalize field-key syntax into canonical State predicates **before** running static-Variable expansion/recording provenance, or (b) run the static fold first and update provenance paths, with inverse operations in reverse order. The integration test deliberately verifies that **re-expanding a path-based proof in the wrong order fails**; expanding `require`, lowering field keys, and only then restoring the static source Variable produces exact source identity.
+
+Existing canonical 0.3 JSON Schema requires `value_match` on both Object and State literal arrays. The new test confirms malformed arrays that omit it are rejected; a field-key rewrite must **not** make that property optional. There is no underlying contradiction—just a required staging/validation contract.
+
 ## Published six-STIG proof
 
 The [CI run](https://github.com/vanderpol/scap-ng/actions/runs/38721946322) downloaded the frozen six-STIG 0.3 authoring ZIP and tested a research-only compiler.
