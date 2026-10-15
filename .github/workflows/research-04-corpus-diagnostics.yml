@@ -1,4 +1,4 @@
-name: 0.4 corpus failure diagnostics
+name: 0.4 full corpus tally diagnostics
 
 on:
   workflow_dispatch:
@@ -17,24 +17,25 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: shorthand-census-04-batch-*
-          run-id: 38715777388
+          name: full-corpus-shorthand-04-report
+          run-id: 38716331301
           github-token: ${{ github.token }}
-          path: downloads
-      - name: Summarize representative pinned conversions without hiding errors
+          path: work
+      - name: Inspect the underlying 0.3 research vocabulary safely
         run: |
           python - <<'PY'
           from pathlib import Path
-          import collections,json
-          paths=sorted(Path("downloads").rglob("status/*.json"))
-          rows=[json.loads(p.read_text()) for p in paths]
-          print("STATUS_COUNT",len(rows))
-          print("STATUSES",dict(collections.Counter(r["status"] for r in rows)))
-          selected=("rhel_9","ms_windows_11","active_directory_domain",
-                    "apache_server_2-4_unix_server","ms_sql_server_2022_instance")
-          for row in rows:
-              if row["key"] in selected:
-                  print("=== SOURCE",row["source_artifact"])
-                  print("STATUS",row["status"])
-                  print("ERROR_TAIL",row.get("failure_tail","<none>")[-5000:])
+          import json
+          r=json.loads(Path("work/full-corpus-shorthand-04.json").read_text())
+          print("BENCHMARKS",r["benchmarks_total"],r["benchmarks_generated"],
+                r["benchmarks_expected_sql_blockers"])
+          print("TOTALS",r["totals"])
+          for scope in ("primary_structured","shell_command","macos_atypical"):
+              m=r["categories"].get(scope,{})
+              print("=== GROUP",scope)
+              for prefix in ("items_pair:","field_pair:","capability:",
+                             "selector_macro:","state_macro:"):
+                  entries=sorted(((key,v) for key,v in m.items() if key.startswith(prefix)),
+                                 key=lambda row:(-row[1],row[0]))
+                  print(prefix,entries[:15])
           PY
