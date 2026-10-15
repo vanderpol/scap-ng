@@ -1,0 +1,42 @@
+name: 0.4 draft one-grammar schema validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-04-draft-language-schema.yml
+      - research/assessment-simplification/compact-authoring-04/assessment-language-fragment.schema.json
+      - tools/test_research_04_single_grammar_schema.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  draft-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema
+      - name: Retrieve immutable 0.3 six-STIG authoring fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Validate candidate 0.4 Test/State/record structure and real content
+        run: |
+          PYTHONPATH=tools python tools/test_research_04_single_grammar_schema.py \
+            --source-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --report work/draft-schema-results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: draft-04-schema-validation
+          path: work/draft-schema-results.json
+          if-no-files-found: error
