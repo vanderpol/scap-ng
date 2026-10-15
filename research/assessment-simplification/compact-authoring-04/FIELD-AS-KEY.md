@@ -74,6 +74,23 @@ states:
 
 The input schema must discriminate canonical longhand (a string `field` property), compact field-key mapping (exactly one field name mapped to a predicate) and logical groups (`all/any/one/odd` mapped to arrays). Thus a field *named* `field` or `all` can be disambiguated **by payload type**, without hard-coded reserved-name exclusions. The capability schema must still define which field names are **valid for the selected Test capability**; arbitrary unknown YAML keys must fail.
 
+## All 65 original OVAL sources: field vocabulary is genuinely diverse
+
+The [65-benchmark source census](https://github.com/vanderpol/scap-ng/actions/runs/38722189621) also succeeded on the pinned NIWC OVAL 5.12.3 source. After excluding macOS, opaque shell-command Tests and unsupported SQL extensions, it found **7,211** native structured State-field occurrences (5,074 distinct original State identities).
+
+| Source attribute shape | Observed structured occurrences |
+| --- | ---: |
+| Field literally named `value` | **1,335 / 7,211 (18.5%)** |
+| Field named `subexpression` | **1,151** |
+| Field named `type` | **1,069** |
+| State-field uses a Variable reference | **571** |
+| Record-valued State field | **286** |
+| Original State definitions with repeated direct child field names | **0 observed** |
+
+These are **source OVAL State-field occurrences**, not counts of emitted 0.3 State predicates. Record fields may have nested structures, and Variables must remain fully typed/declared after lowering. We preserve ordered State arrays anyway: more than one independent predicate for the same field can be valid at an Assessment level even if it did not appear as repeated direct State entities in this OVAL census.
+
+**Key finding:** A blanket rule reserving `value` would unnecessarily exclude almost one-fifth of structured source-field occurrences. A *typed* field-key schema distinguishes the field name from the comparison operand by **nesting**, not by banning reserved words.
+
 ## Authoring complexity edge cases
 
 - **Repeated same field / different expectations:** retain separate ordered list entries. `states: {field_name: ...}` alone is NOT a universal replacement; duplicate YAML keys collapse or fail.
