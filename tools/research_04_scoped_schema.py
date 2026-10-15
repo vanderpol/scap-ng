@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Research-only 0.4 scoped-State requirement validator (not accepted normative schema).
 
-Use the existing full v0.4 schema with a version-local *in-memory* research
-Assessment-language variant, then expand explicit scopes and validate the
+Use the existing full v0.4 schema with version-local *in-memory* research
+Assessment and Assessment-language variants, then expand explicit scopes and validate the
 unchanged canonical full document and every native capability Test. This does
 not silently alter the accepted 0.3 or proposed 0.4 JSON Schema snapshots.
 """
@@ -48,7 +48,21 @@ def candidate_language():
             "additionalProperties":False,
         })
     defs["state_entry"]={"oneOf":entries}
-    defs["test"]["properties"]["state_fields_require"]={
+    test=defs["test"]
+    if test["required"]!=["require"] or "require" not in test["properties"]:
+        raise ValueError("Unexpected baseline Test requirement grammar")
+    test["required"]=["collected_items_require"]
+    test["properties"]["collected_items_require"]=test["properties"].pop("require")
+    test.setdefault("not",{}).setdefault("anyOf",[]).append(
+        {"required":["require"]}
+    )
+    for condition in test.get("allOf",[]):
+        for section in ("if","then","else"):
+            if isinstance(condition.get(section),dict):
+                props=condition[section].get("properties",{})
+                if "require" in props:
+                    props["collected_items_require"]=props.pop("require")
+    test["properties"]["state_fields_require"]={
         "$ref":"#/$defs/paired_requirement",
     }
     defs["test"].setdefault("allOf",[]).append({
@@ -61,13 +75,35 @@ def candidate_language():
     return lang
 
 CANDIDATE_LANGUAGE=candidate_language()
+CANDIDATE_ASSESSMENT=deepcopy(ROOT_ASSESSMENT_SCHEMA)
+root_test=CANDIDATE_ASSESSMENT["properties"]["assessment"]["properties"]["tests"]["additionalProperties"]
+if "require" not in root_test["required"] or "require" not in root_test["properties"]:
+    raise ValueError("Unexpected baseline complete Test shape")
+root_test["required"]=[
+    "collected_items_require" if item=="require" else item
+    for item in root_test["required"]
+]
+root_test["properties"]["collected_items_require"]=root_test["properties"].pop("require")
+root_test.setdefault("not",{}).setdefault("anyOf",[]).append({"required":["require"]})
+Draft202012Validator.check_schema(CANDIDATE_ASSESSMENT)
 REGISTRY=Registry().with_resources([
-    (uri,Resource.from_contents(CANDIDATE_LANGUAGE if uri==LANG_URI else schema))
+    (uri,Resource.from_contents(
+        CANDIDATE_LANGUAGE if uri==LANG_URI else CANDIDATE_ASSESSMENT
+        if uri==ROOT_ASSESSMENT_SCHEMA["$id"] else schema))
     for uri,schema in SHARED.items()
 ])
 CANDIDATE_VALIDATOR=Draft202012Validator(
-    ROOT_ASSESSMENT_SCHEMA,registry=REGISTRY
+    CANDIDATE_ASSESSMENT,registry=REGISTRY
 )
+
+def to_base_test_require(document):
+    """Map the explicit candidate Test population spelling to baseline 0.4."""
+    out=deepcopy(document)
+    for tid,test in (out.get("assessment",{}).get("tests") or {}).items():
+        if "require" in test or "collected_items_require" not in test:
+            raise ValueError("Test must specify only collected_items_require: "+tid)
+        test["require"]=test.pop("collected_items_require")
+    return out
 
 def fail(errors,which):
     first=next(iter(errors),None)
@@ -78,7 +114,7 @@ def validate(document,cache=None):
     """Return fully-expanded native valid Assessment; never accept hidden fields."""
     if cache is None:cache={}
     fail(CANDIDATE_VALIDATOR.iter_errors(document),"scoped candidate syntax")
-    explicit=expand(document)
+    explicit=to_base_test_require(expand(document))
     fail(ROOT_ASSESSMENT_VALIDATOR.iter_errors(explicit),"expanded base 0.4 schema")
     for tid,test in (explicit.get("assessment",{}).get("tests") or {}).items():
         capability=test.get("capability")
