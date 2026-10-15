@@ -76,8 +76,25 @@ def analyze_benchmark(archive,benchmark):
     previous_inverse=p.PAIR_INVERSE.copy()
     previous_none=p.FIELD_ABSENCE_ENABLED
     try:
-        p.SOURCE_PREFIX=f"authoring/{benchmark}/"
         with zipfile.ZipFile(archive) as z:
+            available=sorted({
+                name.split("/")[1] for name in z.namelist()
+                if name.startswith("authoring/") and "/rules/" in name
+            })
+            # Resolve the released six-STIG directory spelling, not guessed
+            # repository names. Fail on ambiguous matches.
+            by_request={
+                "rhel_9":lambda n:"rhel" in n.lower() and "9" in n,
+                "windows_11":lambda n:("win" in n.lower() and "11" in n and "server" not in n.lower()),
+                "windows_server_2025":lambda n:("win" in n.lower() and "2025" in n),
+            }
+            predicate=by_request[benchmark]
+            matched=[n for n in available if predicate(n)]
+            if len(matched)!=1:
+                raise ValueError(
+                    f"Expected unique source for {benchmark}: matched={matched}, available={available}"
+                )
+            p.SOURCE_PREFIX=f"authoring/{matched[0]}/"
             docs,raw=p.archive_contents(z)
         rules=p.benchmark_rule_paths(docs)
         if not rules:
