@@ -48,9 +48,10 @@ def fold_node(entry,counts:Counter):
         if not isinstance(field,str) or not field.strip():
             counts["non_literal_or_empty_fields_unmodified"]+=1
             return deepcopy(entry)
-        if field in RESERVED:
-            counts[f"reserved_field_name:{field}"]+=1
-            return deepcopy(entry)
+        # In a separate field-key grammar, a field called "value", "field",
+        # or "all" is valid. Disambiguate by the shape of its payload:
+        # a mapping is a field, while logical all/any/one/odd require lists.
+        # This eliminates a troublesome real Windows Registry exception.
         payload={k:deepcopy(v) for k,v in entry.items() if k!="field"}
         # A non-empty payload retains all comparison metadata. Do not let
         # this macro invent a field predicate without explicit data.
@@ -72,18 +73,16 @@ def fold_node(entry,counts:Counter):
 def unfold_node(entry):
     if not isinstance(entry,dict):
         return deepcopy(entry)
-    if "field" in entry:
+    # Canonical longhand has a string-valued field property. A compact
+    # field named "field" is distinguishable because its payload is a map.
+    if "field" in entry and (len(entry)!=1 or not isinstance(entry["field"],dict)):
         return deepcopy(entry)
     if len(entry)!=1:
-        return deepcopy(entry)
+        raise ValueError("A compact State entry must have one field key")
     key=next(iter(entry))
     payload=entry[key]
-    if key in LOGICAL:
-        if not isinstance(payload,list):
-            raise ValueError("Malformed logical branch in State")
+    if key in LOGICAL and isinstance(payload,list):
         return {key:[unfold_node(x) for x in payload]}
-    if key in RESERVED:
-        raise ValueError(f"Ambiguous reserved field-key name: {key}")
     if not isinstance(key,str) or not key.strip():
         raise ValueError("A compact field key must be a nonempty string")
     if not isinstance(payload,dict) or not payload:
@@ -149,7 +148,7 @@ def audit(archive):
                     if not isinstance(test,dict):
                         continue
                     for predicate in (test.get("states") or []):
-                        if isinstance(predicate,dict) and "field" in predicate and predicate["field"] not in RESERVED:
+                        if isinstance(predicate,dict) and "field" in predicate:
                             compact=fold_node(predicate,Counter())
                             examples.append({"file":name,"test":test_id,
                                              "before":predicate,"after":compact})
@@ -170,7 +169,7 @@ def audit(archive):
         "limitations":[
             "The six-STIG snapshot only; primary full-corpus OVAL source field-entity counts are a separate measure.",
             "Dynamic field keys are only accepted within a strictly versioned compact source schema, not canonical NG.",
-            "Reserved ambiguous names remain canonical longhand.",
+            "Names colliding with comparison or logical keywords, e.g. Windows Registry value, remain valid compact field keys because map versus list/string payload shapes are disjoint.",
             "The compiler still needs capability-specific field enumeration, schema validation and complete semantic conformance.",
             "This counts one predicate per source list entry, preserving duplicate field entries and ordering.",
         ],
