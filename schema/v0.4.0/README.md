@@ -31,6 +31,16 @@ semantics). See [#228](https://github.com/vanderpol/scap-ng/issues/228)
 and the pinned-source verification workflow. This is a source-semantic
 conversion guard, not a scanner correctness claim.
 
+## Verified six-anchor draft integration
+
+The complete six-STIG native-structure audit covers RHEL 9, Oracle Linux 9,
+Windows 11, Windows Server 2025, Windows Server DNS and Apache. It validates
+the complete authored automated Assessment document as well as each generated
+capability-specific Test schema, preserving individual source re-expansion
+and distinguishing source-exact changes from separately documented State-free
+model normalizations. This is **not** scanner execution and does not promote
+a candidate semantic change to normative specification.
+
 ## Promotion gates still open
 
 Generic inline/shared Object selector grammar has focused positive/negative tests ([passing CI](https://github.com/vanderpol/scap-ng/actions/runs/38757998163)); **capability-specific selector names and datatype/operation narrowing** remain open. WMI/cmdlet `selection_match`, list edge cases, strong cross-capability scope/type validation, generated v0.4 capability schemas, complete migration lowering and six-valued reference parity still need completion. 0.3 compilation/validation is **not** asserted to implement 0.4. Variable source-module imports and variable debug graphs are separate [research #223](https://github.com/vanderpol/scap-ng/issues/223), **not** adopted language features.

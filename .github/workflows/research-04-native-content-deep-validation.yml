@@ -1,4 +1,4 @@
-name: 0.4 six-anchor native schema deep audit
+name: 0.4 strict six-anchor authoring schema gate
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
       - tools/generate_capability_schema_v04.py
       - tools/migrate_v04_enum_selectors.py
       - tools/test_migrate_v04_enum_selectors.py
+      - schema/v0.4.0/**
       - .github/workflows/research-04-native-content-deep-validation.yml
   workflow_dispatch:
 
@@ -40,6 +41,7 @@ jobs:
           PYTHONPATH=tools python tools/research_04_native_deep_content_census.py \
             --source-zip work/scap-ng-0.3-six-stig-authoring.zip \
             --six-anchor \
+            --strict \
             --output work/deep-native-content-census.json
       - uses: actions/upload-artifact@v4
         if: always()

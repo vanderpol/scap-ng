@@ -19,7 +19,10 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 import research_04_rhel9_compact_preview as corpus
 from research_04_three_benchmark_quantifier import BENCHMARKS
-from research_04_one_grammar_proof import make_single,benchmark_dir
+from research_04_one_grammar_proof import (
+    make_single,benchmark_dir,lower_single,normalize_inert_source_checks,
+    check_no_parallel_comparison_or_cardinality_grammar,
+)
 from generate_capability_schema_v04 import generate
 from migrate_v04_enum_selectors import migrate,restore
 
@@ -111,6 +114,18 @@ def audit(zip_path,benchmarks=BENCHMARKS):
                 a=(original or {}).get("assessment") if isinstance(original,dict) else None
                 if not isinstance(a,dict) or a.get("mode")!="automated":continue
                 source,_,normalizations=make_single(original)
+                check_no_parallel_comparison_or_cardinality_grammar(source)
+                recovered=lower_single(source)
+                expected=normalize_inert_source_checks(original,normalizations)
+                if recovered!=expected:
+                    raise ValueError(
+                        f"Six-anchor 0.4->0.3 source reconstruction mismatch: {path}"
+                    )
+                counts["source_reconstruction_verified"]+=1
+                if normalizations:
+                    counts["source_reconstruction_model_equivalent"]+=1
+                else:
+                    counts["source_reconstruction_exact"]+=1
                 authored,migrations=migrate(source,SUPPORTED_MAPPING_DATA)
                 if restore(authored,migrations)!=source:
                     raise ValueError(f"Enum-selector migration broke original source: {path}")
@@ -212,6 +227,7 @@ def audit(zip_path,benchmarks=BENCHMARKS):
                 "No live SCAP-NG scanner is available or required in pre-alpha.",
                 "Pinned Windows 11 and Server 2025 source OVAL omit var_check on the full-enum constant userright selector. The OVAL 5.12.3 schema documents effective var_check=all; the 0.4 explicit array preserves ALL rather than guessing ONE. Scanner/runtime parity remains separate.",
                 "Unknown or unmapped native Test types remain explicitly counted, not replaced by shell commands/manual.",
+                "Every tested 0.4 Assessment re-expands to its original parsed 0.3 Assessment or an individually recorded State-free, six-valued-reference-model normalization; this is not live scanner parity.",
             ]}
 
 
