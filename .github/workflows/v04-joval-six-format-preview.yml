@@ -1,0 +1,68 @@
+name: 0.4 six-STIG YAML and JSON Joval meeting preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/export_v04_joval_six_format_preview.py
+      - tools/research_04_scoped_schema.py
+      - tools/research_04_scoped_state_require.py
+      - .github/workflows/v04-joval-six-format-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verified-discussion-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned research dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Retrieve immutable source release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work
+      - name: Six complete benchmark source-preserving YAML and JSON previews
+        run: |
+          PYTHONPATH=tools python tools/export_v04_joval_six_format_preview.py \
+            --source-zip work/scap-ng-0.3-six-stig-authoring.zip \
+            --output-dir work/joval-review
+          cd work/joval-review
+          sha256sum -c <(python -c 'import json; a=json.load(open("REVIEW-MANIFEST.json")); print("\n".join(x["sha256"]+"  "+x["file"] for x in a["archives"]))')
+      - name: Publish inspectable workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-v04-joval-six-stig-yaml-json-review
+          path: work/joval-review/*
+          retention-days: 90
+          if-no-files-found: error
+      - name: Publish durable clearly labeled pre-alpha discussion release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REVIEW_TAG: v0.4.0-joval-meeting-preview-20261015
+        run: |
+          if gh release view "$REVIEW_TAG" >/dev/null 2>&1; then
+            echo "::notice::Discussion preview tag already exists; preserving immutable release."
+            exit 0
+          fi
+          gh release create "$REVIEW_TAG" \
+            work/joval-review/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            work/joval-review/scap-ng-v0.4-joval-six-stig-json.zip \
+            work/joval-review/MEETING-START-HERE.md \
+            work/joval-review/REVIEW-MANIFEST.json \
+            --target "$GITHUB_SHA" \
+            --title "SCAP-NG 0.4 pre-alpha — Joval technical discussion preview (Oct 15, 2026)" \
+            --notes "Research discussion preview only; not the 0.4 specification or a scanner bundle. Six full authoring STIGs in both YAML and JSON, verified current source reconstruction, scoped-requirement candidate, 0.4 base/native schema checks, source hashes and exceptions. Begin with MEETING-START-HERE.md. Content pinned to this commit; 0.3 release content unchanged." \
+            --prerelease
