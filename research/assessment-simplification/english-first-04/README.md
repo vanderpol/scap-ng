@@ -5,6 +5,18 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
+## October 16 corpus checkpoint — source-backed, fail-closed
+
+- [Full six-STIG structural census](https://github.com/vanderpol/scap-ng/actions/runs/38908329365): **872 unique automated Assessments / 1,375 distinct named Tests**, from the SHA-256 pinned r3 authoring ZIP. **918** Tests use simple scalar State fields, **675** have native `collect` parameters, **387** have no States, **219** use State-level logical groups, **66** use records, **145** use Sets, **139** reference Variables inside their Object definitions, and **114** have **no explicit Object** (legitimate built-in collector capabilities, not necessarily broken content). These categories overlap.
+- [Presence-only grammar proof](https://github.com/vanderpol/scap-ng/actions/runs/38909206051): **63/387** State-free Tests have exact source Test-node reconstruction using an explicit `require.collected_items: none | exactly_one | at_least_one | all_exist | may_be_absent` vocabulary plus their original `where`/`collect` definitions. **324** have more complex Object/Set/metadata structures and were rejected, not dropped. **126** negative validation guards passed.
+- [DNS/Apache command Test proof](https://github.com/vanderpol/scap-ng/actions/runs/38908788030): **3** additional distinct Test nodes reconstructed exactly, keeping command/Variable references, Bash/PowerShell selection, original error flags and field/cardinality requirements. **12** mutation guards passed.
+- [Previous full-corpus narrow grammar audit](https://github.com/vanderpol/scap-ng/actions/runs/38907185233): **39** source-exact field/selector Test nodes, with **1,336** unsupported by that initial translator. The 63 presence-only and 3 shell examples are disjoint from these 39, giving **105 separately tested Test-node reconstructions** across complementary prototypes (**7.6% of 1,375**). **These are not yet one unified grammar or scanner-conformance evidence.**
+- [Proven multi-Test Boolean-tree inversion](https://github.com/vanderpol/scap-ng/actions/runs/38907309219): four real RHEL, Win11, DNS and Apache Assessments retain their original named-Test `all_of`/`any_of` graphs. **A counterexample** shows why WMI alternative States cannot always be collapsed into per-record membership.
+
+**New architectural consequence:** do not require a `where` or `collect` block for a built-in capability that has **no source Object**. For example, real Windows `passwordpolicy` Tests inspect the typed platform policy collector directly; inserting a fake Object or collector command to satisfy an authoring template would change meaning. Treat Objectless, selected, explicitly collected, Set-composed and Object-expanding paths as genuine acquisition cases of **one** future language.
+
+**Next highest-value work:** a single human-readable AST that covers those five acquisition paths, both Test and field quantifiers without undocumented defaults, record-level constraints, and source-faithful derived commands. Do not equate a growing *Test-node* exact-inversion count with full Assessment conversion, six-state scanner/evidence parity or user comprehension. Current 0.4 base and released content remain unchanged.
+
 ## Leading readability sketch, not yet legal 0.4
 
 ~~~yaml
