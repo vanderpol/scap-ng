@@ -68,9 +68,11 @@ FIELD_MODES={
 
 def field_to_human(node, inherited=False):
  if not isinstance(node,dict):raise ValueError("State field not a mapping")
+ if inherited and "require" in node:
+  # An explicit exceptional leaf must remain explicit even under a Test/group default.
+  return {"local_override":field_to_human(node,inherited=False)}
  mode = ("inherited" if inherited else FIELD_MODES.get(node.get("require")))
  if mode is None:raise ValueError("unverified field presence/cardinality")
- if inherited and "require" in node:raise ValueError("cannot silently override inherited fields")
  operations=set(node)-{"require"}
  if len(operations)!=1 or next(iter(operations)) not in FIELD_OPS:
   raise ValueError("unmodeled field comparator")
@@ -84,6 +86,8 @@ def field_to_human(node, inherited=False):
 
 def field_to_native(node, inherited=False):
  if not isinstance(node,dict) or not node:raise ValueError("empty human field")
+ if inherited and set(node)=={"local_override"}:
+  return field_to_native(node["local_override"],inherited=False)
  if set(node)=={"no_values_exist","source_comparison"}:
   if inherited or node["no_values_exist"] is not True:raise ValueError("invalid absence mode")
   expr=node["source_comparison"]
@@ -124,12 +128,18 @@ def state_to_human(node, inherited=False):
   return out
  exact(node,(next(iter(node)),),"single State")
  name,sub=next(iter(node.items()))
- if name=="result" and isinstance(sub,dict) and "record" in sub:
+ if isinstance(sub,dict) and "record" in sub:
   exact(sub,("record",),"record wrapper")
   record=sub["record"]
   exact(record,("fields","require"),"record")
-  if record["require"]!=FIELD_REQ: raise ValueError("record cardinality")
-  return {"result":{"at_least_one_record_exists":True,"every_record":{
+  record_mode={
+   "at_least_one_exists_and_all_match":"every_record",
+   "at_least_one_exists_and_some_match":"some_record",
+  }.get(record["require"])
+  if record_mode is None:raise ValueError("unproven record cardinality")
+  if not isinstance(record["fields"],dict) or not record["fields"]:
+   raise ValueError("missing record fields")
+  return {name:{"at_least_one_record_exists":True,record_mode:{
    key:field_to_human(value) for key,value in record["fields"].items()}}}
  return {name:field_to_human(sub,inherited=inherited)}
 
@@ -148,12 +158,17 @@ def state_to_native(node, inherited=False):
   return result
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
- if name=="result" and isinstance(sub,dict) and "at_least_one_record_exists" in sub:
-  exact(sub,("at_least_one_record_exists","every_record"),"records")
-  if sub["at_least_one_record_exists"] is not True or not sub["every_record"]:raise ValueError("record existence")
-  return {"result":{"record":{"fields":{
-   key:field_to_native(val) for key,val in sub["every_record"].items()},
-   "require":FIELD_REQ}}}
+ if isinstance(sub,dict) and "at_least_one_record_exists" in sub:
+  record_keys=set(sub)&{"every_record","some_record"}
+  if len(record_keys)!=1:raise ValueError("ambiguous record matching")
+  record_mode=next(iter(record_keys))
+  exact(sub,("at_least_one_record_exists",record_mode),"records")
+  if sub["at_least_one_record_exists"] is not True or not isinstance(sub[record_mode],dict) or not sub[record_mode]:
+   raise ValueError("record existence")
+  source_mode=("at_least_one_exists_and_all_match" if record_mode=="every_record" else "at_least_one_exists_and_some_match")
+  return {name:{"record":{"fields":{
+   key:field_to_native(val) for key,val in sub[record_mode].items()},
+   "require":source_mode}}}
  return {name:field_to_native(sub,inherited=inherited)}
 
 def readable_source(src):
