@@ -7,7 +7,7 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 ## Start with four diverse, complete research Assessments
 
-**[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
+**[Concise external reviewer one-pager](RESEARCH-REVIEW-ONE-PAGER.md)** · **[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
 
 ## Latest full-Assessment source inversion — 800 of 872
 
