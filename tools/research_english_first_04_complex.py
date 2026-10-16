@@ -124,7 +124,7 @@ def state_to_human(node, inherited=False):
   return out
  exact(node,(next(iter(node)),),"single State")
  name,sub=next(iter(node.items()))
- if name=="result":
+ if name=="result" and isinstance(sub,dict) and "record" in sub:
   exact(sub,("record",),"record wrapper")
   record=sub["record"]
   exact(record,("fields","require"),"record")
@@ -148,7 +148,7 @@ def state_to_native(node, inherited=False):
   return result
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
- if name=="result":
+ if name=="result" and isinstance(sub,dict) and "at_least_one_record_exists" in sub:
   exact(sub,("at_least_one_record_exists","every_record"),"records")
   if sub["at_least_one_record_exists"] is not True or not sub["every_record"]:raise ValueError("record existence")
   return {"result":{"record":{"fields":{
@@ -245,7 +245,7 @@ def native_source(src):
 
 def human_test(test):
  supported={"test_title","capability","object","states","reported_elements",
-            "collected_items_require","states_match","state_fields_require"}
+            "collected_items_require","states_match","state_fields_require","variable"}
  if set(test)-supported:raise ValueError("extra Test attributes "+repr(set(test)-supported))
  if test.get("reported_elements")!="all":
   raise ValueError("unproven output")
@@ -258,6 +258,9 @@ def human_test(test):
           "report_elements":"all"}
   if "object" in test:
    result["gather"]=readable_source(test["object"])
+  if "variable" in test:
+   if not isinstance(test["variable"],str) or not test["variable"]:raise ValueError("invalid direct Test Variable")
+   result["input_from"]={"variable":test["variable"]}
   return result
  if item_mode not in ITEM_REQS:
   raise ValueError("unproven output or Item scope")
@@ -283,11 +286,14 @@ def human_test(test):
   readable["gather"]=readable_source(test["object"])
  if inherited:
   readable["all_state_fields_exist"]=True
+ if "variable" in test:
+  if not isinstance(test["variable"],str) or not test["variable"]:raise ValueError("invalid direct Test Variable")
+  readable["input_from"]={"variable":test["variable"]}
  return readable
 
 def native_test(src):
  mandatory={"check","inspect","require","report_elements"}
- permitted=mandatory|{"all_state_fields_exist","gather"}
+ permitted=mandatory|{"all_state_fields_exist","gather","input_from"}
  if not isinstance(src,dict) or set(src)-permitted or not mandatory.issubset(src):
   raise ValueError("unrecognized check shape")
  if src["report_elements"]!="all":raise ValueError("unsupported reporting")
@@ -303,6 +309,11 @@ def native_test(src):
   native={"test_title":src["check"],"capability":src["inspect"],
           "reported_elements":"all","collected_items_require":item_mode}
   if "gather" in src:native["object"]=native_source(src["gather"])
+  if "input_from" in src:
+   exact(src["input_from"],("variable",),"Test input")
+   var=src["input_from"]["variable"]
+   if not isinstance(var,str) or not var:raise ValueError("invalid Test Variable source")
+   native["variable"]=var
   return native
  if len(require)!=2:raise ValueError("Item existence and matching must be explicit")
  presence=[k for k in require if k in {"at_least_one_item_exists","items_may_be_absent",
@@ -330,6 +341,11 @@ def native_test(src):
  if "gather" in src:
   native["object"]=native_source(src["gather"])
  if inherited:native["state_fields_require"]=FIELD_REQ
+ if "input_from" in src:
+  exact(src["input_from"],("variable",),"Test input")
+  var=src["input_from"]["variable"]
+  if not isinstance(var,str) or not var:raise ValueError("invalid Test Variable source")
+  native["variable"]=var
  return native
 
 def to_human(a):
