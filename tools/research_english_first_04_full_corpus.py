@@ -102,7 +102,8 @@ def main():
         "counts": result["counts"],
         "per_benchmark": result["per_benchmark"],
         "common_rejections": list(result["common_rejection_reasons"].items())[:12],
-        "exact_examples": result["exact_assessments"][:10],
+        "exact_examples": result["exact_assessments"][:5],
+        "rejected_examples": result["rejected_examples"],
     }, indent=2))
 
 
