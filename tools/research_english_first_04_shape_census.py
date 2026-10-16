@@ -172,7 +172,15 @@ def inspect(archive):
                     add_sample("object_variable", path, test_id)
                 if obj is None:
                     counts["unresolved_or_unusual_objects"] += 1
+                    status["unusual_source_"+type(test.get("object")).__name__] += 1
                     add_sample("unresolved_object", path, test_id)
+                    if len(examples["unusual_object_detail"]) < EXAMPLES_LIMIT:
+                        examples["unusual_object_detail"].append({
+                            "source": path, "test_id": test_id,
+                            "object_type": type(test.get("object")).__name__,
+                            "object_sample": repr(test.get("object"))[:250],
+                            "test_keys": sorted(test),
+                        })
                 if not isinstance(test.get("test_title"), str) or not test.get("test_title"):
                     counts["missing_title"] += 1
                 if "states" not in test:
