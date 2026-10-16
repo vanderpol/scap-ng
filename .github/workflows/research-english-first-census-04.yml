@@ -11,6 +11,7 @@ on:
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_references.py
+      - tools/research_english_first_04_publish.py
       - tools/research_english_first_04_six_state.py
       - tools/research_english_first_04_none_exist_state_boundary.py
       - tools/research_english_first_04_scope_guards.py
@@ -21,7 +22,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   full-six-stig:
@@ -110,6 +111,12 @@ jobs:
         run: |
           python tools/research_english_first_04_scope_guards.py \
             --output english-first-04-variable-record-set-boundaries.json
+
+      - name: Publish phone-friendly reports directly on github.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/research_english_first_04_publish.py
 
       - name: Upload full evidence ledger
         if: always()
