@@ -191,6 +191,8 @@ evaluate:
 
 **What succeeds:** all five Tests, full dynamic command Variables and OR/AND graph reconstruct exactly. Numeric signature validity checks retain both 48-hour minimum and 168-hour maximum. An absence-only stdout Test retains its otherwise redundant source comparator rather than silently deleting it.
 
+**Authoring dependency, not a magic identifier:** the `command-get-issigned-setting-each-forward-lookup-zone-variable` definition concatenates a PowerShell command with `stdout_line` values from the named `list-all-forward-lookup-zones-object`. The other two command Variables similarly use that same zone collection for ZoneSigningKey and KeySigningKey validity periods. An author must define the shared zone source and all three command expressions before referencing them in the five Checks. The [reference graph audit](../../../tools/research_english_first_04_references.py) now checks those names and detects cycles, but does not validate command behavior.
+
 **Still awkward:** the command `variable` reference is readable only after opening the `metadata.variables` expression graph in the full file. We have *not* proved that replacing it with a simpler per-zone `for_each` would preserve execution, multiplicity, or result status.
 
 ## 4. Apache UNIX — required vs optional settings across included files
@@ -219,6 +221,8 @@ require:
 ```
 
 **What succeeds:** exact presence requirements for required versus optional config fields are kept distinct; shell parameters, stderr/exit settings, regex capture, four Tests, 18 Variables, shared discovery and `all_of` reconstruct.
+
+**Authoring dependency:** the source chain discovers Apache executable/install paths, derives `HTTPD_ROOT` and `SERVER_CONFIG_FILE`, finds included or loaded configuration files, and builds commands to inspect the required and optional directives. The 18 Variables are **not** interchangeable or one flat list. Their dependencies are now classified by the [graph audit](../../../tools/research_english_first_04_references.py); only a source-backed, reversible simplification could replace them.
 
 **Still awkward:** the dependency graph is not yet expressed in natural language; shortening it to `load Apache config` would lose important discovery semantics and provenance without further proof.
 
