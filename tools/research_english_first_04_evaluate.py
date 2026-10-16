@@ -54,6 +54,38 @@ def stats(node):
     return 1 + sum(p[0] for p in parts), sum(p[1] for p in parts)
 
 
+def reject_naive_wmi_alternative_merge():
+    """OVAL-permitted repeated records make State-OR != per-record membership.
+
+    Source Win11 SV-253495 has two independent WMI record States, each with
+    domainrole field require one_or_more/all and record require one_or_more/all,
+    with states_match any. OVAL wmi57_item.result is 0..unbounded.
+    """
+    from oval_result_truth_tables import TRUE, FALSE, aggregate_check
+    checks = 0
+    def original(values):
+        state_1 = aggregate_check("all", [TRUE if v == "1" else FALSE for v in values])
+        state_3 = aggregate_check("all", [TRUE if v == "3" else FALSE for v in values])
+        return aggregate_check("at least one", [state_1, state_3])
+    def tempting_but_wrong(values):
+        return aggregate_check("all",
+                               [TRUE if v in {"1", "3"} else FALSE for v in values])
+    for values in (["1"], ["3"], ["0"], ["1", "1"], ["3", "3"], ["0", "1"]):
+        if original(values) != tempting_but_wrong(values):
+            raise AssertionError("Unexpected divergence in control input " + repr(values))
+        checks += 1
+    mixed = ["1", "3"]
+    if original(mixed) != FALSE or tempting_but_wrong(mixed) != TRUE:
+        raise AssertionError("WMI mixed-record counterexample disappeared")
+    return {"control_populations": checks,
+            "source": "Win11 SV-253495 WMI domainrole State alternatives",
+            "typed_field": "windows.wmi57_item.result: 0..unbounded records",
+            "counterexample_record_values": mixed,
+            "source_state_alternatives": "false",
+            "incorrect_per_record_one_of": "true",
+            "conclusion": "Never lower alternative whole-States to membership on each record"}
+
+
 def run(root):
     results = []
     for ident, path in FIXTURES.items():
@@ -88,6 +120,7 @@ def run(root):
         else:
             raise AssertionError("unsupported/invalid graph was accepted " + repr(graph))
     return {"cases": results, "total_graphs": len(results),
+            "wmi_alternative_merge_counterexample": reject_naive_wmi_alternative_merge(),
             "negative_inputs_rejected": rejects,
             "proof": "exact named-Test composition only, not scanner parity or rewritten conditional semantics"}
 
