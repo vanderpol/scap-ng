@@ -10,6 +10,7 @@ on:
       - tools/research_english_first_04_scalar.py
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
+      - tools/research_english_first_04_references.py
       - tools/research_english_first_04_six_state.py
       - tools/research_english_first_04_none_exist_state_boundary.py
       - tools/research_english_first_04_scope_guards.py
@@ -88,6 +89,12 @@ jobs:
             --output english-first-04-compact-layout-report.json \
             --examples-dir english-first-04-compact-layout-examples
 
+      - name: Audit named source and variable references with cycle guards
+        run: |
+          python tools/research_english_first_04_references.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-reference-graph-report.json
+
       - name: Cross-check six-state Item cardinalities with independent evaluator
         run: |
           python tools/research_english_first_04_six_state.py \
@@ -117,6 +124,7 @@ jobs:
             english-first-04-generic-scalar.json
             english-first-04-full-assessment-census.json
             english-first-04-compact-layout-report.json
+            english-first-04-reference-graph-report.json
             english-first-04-six-state-cardinality.json
             english-first-04-none-exist-state-boundary.json
             english-first-04-variable-record-set-boundaries.json
