@@ -26,6 +26,7 @@ def analyze_references(document):
     names = {"source": set(sources), "variable": set(variables)}
     dependencies = {f"{kind}:{name}": set()
                     for kind, ids in names.items() for name in ids}
+    dependencies.update({"check:" + name: set() for name in checks})
     missing, malformed = [], []
     counts = Counter()
 
