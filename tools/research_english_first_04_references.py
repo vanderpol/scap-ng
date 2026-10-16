@@ -132,11 +132,26 @@ def analyze_references(document):
         if state.get(node, 0) == 0:
             walk(node)
 
+    # Longest prerequisite chain exposes authoring/dependency complexity.
+    # A cycle is a separate diagnostic; never assign it a fictional depth.
+    memo = {}
+    def longest_path(node):
+        if node in memo:
+            return memo[node]
+        tail = max((longest_path(other) for other in sorted(dependencies[node])),
+                   key=len, default=[])
+        memo[node] = [node] + tail
+        return memo[node]
+    longest = (max((longest_path(node) for node in sorted(dependencies)),
+                   key=len, default=[])) if not cycles else []
+
     return {"counts": {**dict(counts), "named_sources": len(sources),
                        "named_variables": len(variables),
                        "dependency_edges": sum(map(len, dependencies.values()))},
             "missing": sorted(set(missing)), "malformed": sorted(set(malformed)),
-            "cycles": sorted(cycles)}
+            "cycles": sorted(cycles),
+            "max_dependency_depth": max(0, len(longest) - 1),
+            "longest_chain": longest}
 
 
 def self_test():
@@ -197,6 +212,7 @@ def audit_corpus(archive):
     counts = Counter()
     findings = []
     failures = []
+    deep_examples = []
     with zipfile.ZipFile(archive) as zipped:
         if zipped.testzip():
             raise ValueError("source archive CRC mismatch")
@@ -220,6 +236,9 @@ def audit_corpus(archive):
                 continue
             counts["audited_assessments"] += 1
             report = analyze_references(compacted)
+            deep_examples.append({"path": path,
+                                  "depth": report["max_dependency_depth"],
+                                  "longest_chain": report["longest_chain"]})
             for key, value in report["counts"].items():
                 counts[key] += value
             if any(report[key] for key in ("missing", "malformed", "cycles")):
@@ -232,6 +251,8 @@ def audit_corpus(archive):
         raise AssertionError("compact grammar regression")
     return {"status": "REFERENCE CLASSIFICATION ONLY, NOT SCANNER CONFORMANCE",
             "counts": dict(counts), "findings": findings,
+            "deepest_dependency_examples": sorted(deep_examples,
+                key=lambda row: (-row["depth"], row["path"]))[:12],
             "unsupported_examples": failures, "source_sha256": PINNED}
 
 
