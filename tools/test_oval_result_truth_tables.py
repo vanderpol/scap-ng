@@ -264,6 +264,17 @@ class CollectedObjectControlFlow(unittest.TestCase):
             TRUE,
         )
 
+    def test_incomplete_exact_one_composition(self):
+        self.assertEqual(
+            evaluate_collected_object_test("incomplete", existence="only_one_exists",
+                check="only one", exists=1, item_results=[FALSE]), FALSE)
+        self.assertEqual(
+            evaluate_collected_object_test("incomplete", existence="only_one_exists",
+                check="at least one", exists=1, item_results=[TRUE]), UNKNOWN)
+        self.assertEqual(
+            evaluate_collected_object_test("incomplete", existence="all_exist",
+                check="at least one", exists=1, item_results=[TRUE]), UNKNOWN)
+
     def test_incomplete_nonmatching_items_do_not_prove_all_future_items_fail(self):
         # A partial population with no match may later gain a matching Item.
         for mode in ("at least one", "only one"):

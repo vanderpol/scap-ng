@@ -304,8 +304,9 @@ def evaluate_collected_object_test(
             raise ValueError("complete Test with State requires item_results")
         return aggregate_check(check, item_results)
 
-    # OVAL 5.12.3 says an incomplete collection is unknown except where
-    # sufficient evidence already determines the Test result.
+    # OVAL 5.12.3 incomplete collections require a result that cannot
+    # change under *any* valid future Item/status outcome. Existence and
+    # matching are independent scopes but the final verdict depends on both.
     if existence == "none_exist" and exists >= 1:
         return FALSE
     if existence == "only_one_exists" and exists > 1:
@@ -314,14 +315,30 @@ def evaluate_collected_object_test(
     if has_state:
         if item_results is None:
             raise ValueError("incomplete Test with State requires item_results")
-        # A partial FALSE result is not automatically irreversible. In
-        # particular, a partial population containing only nonmatching Items
-        # does not prove that "at least one" or "only one" will remain false:
-        # additional Items may make either Test true. Consult the explicit
-        # early-termination contract instead of aggregating a partial batch.
-        decisive = decisive_partial_check(check, item_results)
-        if decisive is not None:
-            return decisive
+        # For exactly one observed Item, a currently failed comparison and
+        # only_one_exists is conclusively false: if no further Items appear,
+        # the comparison fails; if another appears, existence fails instead.
+        # Conversely, a current success is NOT final, because a second Item
+        # would invalidate only_one_exists.
+        if existence == "only_one_exists":
+            if exists == 1 and len(item_results) == 1:
+                if aggregate_check(check, item_results) == FALSE:
+                    return FALSE
+            return UNKNOWN
+
+        # Under all_exist, the unseen part of an incomplete population could
+        # still contain an absent/error Item, so even an observed passing
+        # comparison cannot settle the combined verdict.
+        if existence == "all_exist":
+            return UNKNOWN
+
+        # These existence checks are monotone once one observed Item exists.
+        # No later Item can invalidate their truth, although later State
+        # comparisons can still change a nondecisive check result.
+        if existence in {"at_least_one_exists", "any_exist"} and exists >= 1:
+            decisive = decisive_partial_check(check, item_results)
+            if decisive is not None:
+                return decisive
 
     return UNKNOWN
 

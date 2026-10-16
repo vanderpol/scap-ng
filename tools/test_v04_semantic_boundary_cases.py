@@ -46,6 +46,22 @@ class SourcePinnedBoundaryTests(unittest.TestCase):
                     if key in case}
                 self.assertEqual(evaluate_collected_object_test(**kwargs), case["expected"])
 
+    def test_incomplete_exactly_one_existence_and_matching_are_joint(self):
+        # A single observed failed State proves failure under exactly-one
+        # existence: no future Item => match fails; any future Item =>
+        # only-one existence fails.
+        self.assertEqual(evaluate_collected_object_test(
+            "incomplete", existence="only_one_exists",
+            check="only one", exists=1, item_results=["false"]), "false")
+        # A passing State cannot prove true before the Item count is final.
+        self.assertEqual(evaluate_collected_object_test(
+            "incomplete", existence="only_one_exists",
+            check="at least one", exists=1, item_results=["true"]), "unknown")
+        # All-exist is not monotonic, so later missing Items could invalidate it.
+        self.assertEqual(evaluate_collected_object_test(
+            "incomplete", existence="all_exist",
+            check="at least one", exists=1, item_results=["true"]), "unknown")
+
     def test_incomplete_collections_only_return_irreversible_check_results(self):
         # Independent expected table, not computed by decisive_partial_check.
         # Each enumerated row is a *partial* observed population; unobserved
