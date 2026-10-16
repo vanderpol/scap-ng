@@ -56,8 +56,7 @@ def audit(package, output):
             native_choices=choices,
             native_default=native['default_assessment_choice'],
             omitted_source_selectors=(
-                set(fallbacks) if fully_quarantined_automated
-                else {selector for selector in fallbacks if selector != 'default'}
+                set(fallbacks)
             ),
             quarantined=fully_quarantined_automated,
         )

@@ -94,6 +94,25 @@ class SelectorSourceBindingTests(unittest.TestCase):
             quarantined=True, omitted_source_selectors=("default", "automated"))
         self.assertTrue(any("fully quarantined" in e for e in errs))
 
+    def test_quarantined_bad_automated_and_default_with_valid_source_manual(self):
+        # Real source-defect shape: the automated choice is intentionally
+        # absent; a verified manual method replaces the source default.
+        errs, lookup = check(
+            ["manual", "automated", "default"],
+            {"manual": self.M, "default": self.M},
+            {"manual": self.M}, "manual",
+            omitted_source_selectors=("automated", "default"))
+        self.assertEqual(errs, [])
+        self.assertEqual(lookup["manual"], "manual")
+
+    def test_bad_default_fallback_cannot_pick_automated(self):
+        errs, _ = check(
+            ["automated", "manual", "default"],
+            {"automated": self.A, "manual": self.M, "default": self.A},
+            {"automated": self.A, "manual": self.M}, "automated",
+            omitted_source_selectors=("default",))
+        self.assertTrue(any("source-backed manual" in e for e in errs))
+
     def test_undocumented_fallback_fails(self):
         errs, _ = check(
             ["default", "automated"],

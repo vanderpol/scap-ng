@@ -44,8 +44,9 @@ def audit_normalized_selection(
         problems.append("source has duplicate selectors")
     if not isinstance(source_bindings, dict):
         return ["source selector binding map is absent"], {}
-    if set(source_bindings) != source_set:
-        problems.append("source selector/evidence key set differs")
+    missing_bindings = source_set - set(source_bindings)
+    if missing_bindings - omitted or set(source_bindings) - source_set:
+        problems.append("source selector/evidence key set differs beyond documented fallbacks")
     if omitted - source_set:
         problems.append("fallback identifies nonexistent source selector")
     if not isinstance(native_choices, dict) or not native_choices:
@@ -92,11 +93,16 @@ def audit_normalized_selection(
 
     # The source's first selected method remains default when no unselected
     # check exists. Do not force a new literal 'default' choice.
-    if "default" not in valid and not omitted and source_order:
+    if "default" not in source_set and not omitted and source_order:
         first = source_order[0]
         if first in valid and native.get(native_default) != valid[first]:
             problems.append("source first named Assessment default binding changed")
 
+    if "default" in omitted and not quarantined:
+        # A source-invalid default check may only fall back to a source-backed
+        # named manual choice, never silently choose another automated method.
+        if native_default != "manual" or "manual" not in lookup:
+            problems.append("source default fallback is not source-backed manual")
     extra = set(native.values()) - set(valid.values())
     if extra:
         problems.append("native Rule introduces unsupported Assessment reference")
