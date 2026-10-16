@@ -1,0 +1,45 @@
+name: English-first 0.4 losslessness research
+on:
+  push:
+    paths:
+      - .github/workflows/research-english-first-04.yml
+      - tools/research_english_first_04.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  narrow-source-inversion:
+    name: Pinned two-case Test inversion and OVAL six-state charts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SCAP-NG (trunk only)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout pinned unmodified STIG authoring fixtures
+        uses: actions/checkout@v4
+        with:
+          repository: vanderpol/scap-ng-editor-sample-data
+          ref: 99cbceae8d594c44cb509df95975ac1676a2b44a
+          path: sample-data
+          persist-credentials: false
+
+      - name: Install YAML parsing
+        run: python -m pip install 'PyYAML==6.0.3'
+
+      - name: Compare source Tests and reference OVAL boundaries
+        run: |
+          python tools/research_english_first_04.py \
+            --fixture-root sample-data \
+            --report english-first-04-research-report.json
+
+      - name: Upload source-backed report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-first-v04-two-case-research
+          path: english-first-04-research-report.json
+          if-no-files-found: warn
