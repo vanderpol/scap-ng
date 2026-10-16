@@ -2,7 +2,7 @@
 
 **October 16, 2026. Research only; NOT SCAP-NG 0.4 syntax, a normative proposal, or a scanner.** The goal is to see whether a security administrator can read source-backed checks without OVAL expertise *while* preserving every source Object, State, Item requirement, Variable and Boolean group.
 
-**[Download the four complete experimental YAML Assessments and verification JSON from the latest successful CI artifact](https://github.com/vanderpol/scap-ng/actions/workflows/research-english-first-04.yml)**. Workflow artifacts include `english-first-04-complete-examples/*.research.yaml` plus the source-comparison report. The translator [source](../../../tools/research_english_first_04_complex.py) reversibly converts each *whole* pinned Assessment back to its unmodified 0.4 preview structure and rejects unsupported mutations. **Structural equality is not a six-state scanner or original OVAL execution proof.** Full files, not the abbreviated excerpts below, are the actual research output.
+**[Download the four complete experimental YAML Assessments and verification JSON](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856)** (passing pinned-source CI run). Workflow artifacts include `english-first-04-complete-examples/*.research.yaml` plus the source-comparison report. The translator [source](../../../tools/research_english_first_04_complex.py) reversibly converts each *whole* pinned Assessment back to its unmodified 0.4 preview structure and rejects unsupported mutations. **Structural equality is not a six-state scanner or original OVAL execution proof.** Full files, not the abbreviated excerpts below, are the actual research output.
 
 ## 1. Linux — account-derived file permissions
 
