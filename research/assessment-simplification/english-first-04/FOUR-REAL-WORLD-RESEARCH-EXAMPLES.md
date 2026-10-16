@@ -49,19 +49,20 @@ check: Local initialization files for non-system users have mode 0740 or less pe
 inspect: unix.file
 gather:
   union:
-    - inspect: unix.file
-      for_each_source:
-        item: user
-        in: only-non-system-users-uid-999-home-dirs-excluding-root-object
-      where:
-        directory:
-          from: user.home_dir
-        name:
-          matches_regex: '^\.[^\s\.]+'
-      filesystem: all
-      traversal:
-        max_depth: 1
-        recurse: symlinks
+    - from:
+        inspect: unix.file
+        for_each_source:
+          item: user
+          in: only-non-system-users-uid-999-home-dirs-excluding-root-object
+        where:
+          directory:
+            from: user.home_dir
+          name:
+            matches_regex: '^\.[^\s\.]+'
+        filesystem: all
+        traversal:
+          max_depth: 1
+          recurse: symlinks
       exclude_if:
         - type:
             is: directory
