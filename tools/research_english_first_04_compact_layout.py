@@ -23,6 +23,13 @@ PINNED = "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d"
 LIFTABLE = {"where", "collect", "filesystem", "traversal", "description"}
 BASE_CHECK = {"check", "inspect", "require", "report_elements", "all_state_fields_exist", "all_state_fields_when_present", "input_from"}
 EXTENDED = {"gather", "from"} | LIFTABLE
+READABLE_MATCH_KEYS = {
+    "every_collected_item": "every_item_must_match",
+    "some_collected_item": "at_least_one_item_matches",
+    "exactly_one_collected_item": "exactly_one_item_matches",
+    "no_collected_item": "no_item_may_match",
+}
+NATIVE_MATCH_KEYS = {v: k for k, v in READABLE_MATCH_KEYS.items()}
 
 
 def compact(original):
@@ -33,6 +40,14 @@ def compact(original):
     for name, check in doc["checks"].items():
         if set(check) - BASE_CHECK - {"gather"}:
             raise ValueError("unrecognized input check keys: " + name)
+        requirement = check.get("require")
+        if not isinstance(requirement, dict):
+            raise ValueError("missing requirement map")
+        for source, readable in READABLE_MATCH_KEYS.items():
+            if source in requirement:
+                if readable in requirement:
+                    raise ValueError("ambiguous Item matching")
+                requirement[readable] = requirement.pop(source)
         if "gather" not in check:
             continue
         gather = check["gather"]
@@ -68,6 +83,14 @@ def expand(compact_doc):
     for name, check in doc["checks"].items():
         if set(check) - BASE_CHECK - EXTENDED:
             raise ValueError("unexpected check property " + name)
+        requirement = check.get("require")
+        if not isinstance(requirement, dict):
+            raise ValueError("missing Item requirements")
+        for readable, source in NATIVE_MATCH_KEYS.items():
+            if readable in requirement:
+                if source in requirement:
+                    raise ValueError("ambiguous Item matching")
+                requirement[source] = requirement.pop(readable)
         flat = set(check) & LIFTABLE
         has_from = "from" in check
         has_gather = "gather" in check
