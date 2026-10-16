@@ -10,7 +10,9 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 - [Full six-STIG structural census](https://github.com/vanderpol/scap-ng/actions/runs/38908329365): **872 unique automated Assessments / 1,375 distinct named Tests**, from the SHA-256 pinned r3 authoring ZIP. **918** Tests use simple scalar State fields, **675** have native `collect` parameters, **387** have no States, **219** use State-level logical groups, **66** use records, **145** use Sets, **139** reference Variables inside their Object definitions, and **114** have **no explicit Object** (legitimate built-in collector capabilities, not necessarily broken content). These categories overlap.
 - [Presence-only grammar proof](https://github.com/vanderpol/scap-ng/actions/runs/38909206051): **63/387** State-free Tests have exact source Test-node reconstruction using an explicit `require.collected_items: none | exactly_one | at_least_one | all_exist | may_be_absent` vocabulary plus their original `where`/`collect` definitions. **324** have more complex Object/Set/metadata structures and were rejected, not dropped. **126** negative validation guards passed.
 - [DNS/Apache command Test proof](https://github.com/vanderpol/scap-ng/actions/runs/38908788030): **3** additional distinct Test nodes reconstructed exactly, keeping command/Variable references, Bash/PowerShell selection, original error flags and field/cardinality requirements. **12** mutation guards passed.
-- [Previous full-corpus narrow grammar audit](https://github.com/vanderpol/scap-ng/actions/runs/38907185233): **39** source-exact field/selector Test nodes, with **1,336** unsupported by that initial translator. The 63 presence-only and 3 shell examples are disjoint from these 39, giving **105 separately tested Test-node reconstructions** across complementary prototypes (**7.6% of 1,375**). **These are not yet one unified grammar or scanner-conformance evidence.**
+- [Previous full-corpus narrow grammar audit](https://github.com/vanderpol/scap-ng/actions/runs/38907185233): **39** source-exact field/selector Test nodes, with **1,336** unsupported by that initial translator. The 63 presence-only and 3 shell examples are disjoint from these 39.
+- [Objectless native system-wide Test research](https://github.com/vanderpol/scap-ng/actions/runs/38909973142): **77/114** source-exact Test reconstructions across Windows audit policies, password/lockout policies and OS-family checks. An intuitive source-backed example is `inspect: windows.passwordpolicy` plus `require.min_passwd_len.at_least: 14`, without manufacturing an Object; **37** more-complex Tests reject fail-closed. **154** negative validation guards passed.
+- **Combined research reach:** the disjoint experimental groups reconstruct **182/1,375 (13.2%) distinct Test nodes** exactly. These **are not yet one unified grammar** or full-Assessment / scanner semantic conformance.
 - [Proven multi-Test Boolean-tree inversion](https://github.com/vanderpol/scap-ng/actions/runs/38907309219): four real RHEL, Win11, DNS and Apache Assessments retain their original named-Test `all_of`/`any_of` graphs. **A counterexample** shows why WMI alternative States cannot always be collapsed into per-record membership.
 
 **New architectural consequence:** do not require a `where` or `collect` block for a built-in capability that has **no source Object**. For example, real Windows `passwordpolicy` Tests inspect the typed platform policy collector directly; inserting a fake Object or collector command to satisfy an authoring template would change meaning. Treat Objectless, selected, explicitly collected, Set-composed and Object-expanding paths as genuine acquisition cases of **one** future language.
@@ -58,6 +60,21 @@ It also tests rejection of mutated source cardinalities and unknown operator/ext
 | Apache SV-214228 multi-file configuration and optional fields | Two KeepAlive command Test inversions passed, preserving optional field semantics; all four Tests and the discovery Variable graph not yet modeled |
 
 **The two favorable cases are NOT a claim about full source Assessment parity.** A green structural inversion is necessary, not sufficient, for complete six-state runtime/evidence parity. No SCAP-NG 0.4 scanner exists yet.
+
+## Key readability lesson from the new objectless cases
+
+The English-first format cannot mandate `where` or `collect` for every Test. For real Windows password-policy content, the typed capability **is** the system-data acquisition contract. This complete **research-only** Test-node illustration is sourced from Windows 11 SV-253303:
+
+~~~yaml
+check: "'Minimum password length' is set to at least '14' characters"
+inspect: windows.passwordpolicy
+require:
+  min_passwd_len:
+    at_least: 14
+report_elements: all
+~~~
+
+The operator has a narrowly verified source expansion: Test **one-or-more Items, all match**, field **one-or-more values, all match**, source greater-than-or-equal comparator, and original reporting policy. This is an explicit operator contract, **not** permission to infer those quantifiers for every field/capability. Research approval and independent six-state runtime proof remain open.
 
 ## Required research gates before a decision
 
