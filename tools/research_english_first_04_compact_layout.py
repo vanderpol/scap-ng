@@ -21,7 +21,7 @@ from research_english_first_04_complex import to_human, to_native
 
 PINNED = "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d"
 LIFTABLE = {"where", "collect", "filesystem", "traversal", "description"}
-BASE_CHECK = {"check", "inspect", "require", "report_elements", "all_state_fields_exist", "input_from"}
+BASE_CHECK = {"check", "inspect", "require", "report_elements", "all_state_fields_exist", "all_state_fields_when_present", "input_from"}
 EXTENDED = {"gather", "from"} | LIFTABLE
 
 
