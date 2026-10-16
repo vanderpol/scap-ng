@@ -12,12 +12,14 @@
 
 **Authoring question:** Can you tell why the domain-role check requires *whole-record/State* alternatives instead of a single membership comparison?
 
-## Before — complete existing 0.4 Assessment
+## Complete assessments — side by side
 
-Full source including metadata, Tests, shared Objects, Variables (where used), source selectors and evaluate tree. Nothing omitted.
+Both columns include the **complete** original and proposed YAML; no checks, sources, Variables, or evaluation branches have been omitted. The view is intended for a wide desktop browser. If the table is wider than the viewport, scroll horizontally inside the rendered table. Standalone YAML links remain above.
 
-```yaml
-assessment:
+<table>
+<thead><tr><th align="left" width="50%">BEFORE — Current 0.4</th><th align="left" width="50%">AFTER — English-first research</th></tr></thead>
+<tbody><tr>
+<td valign="top" width="50%"><pre><code>assessment:
   id: SV-253495.automated
   version: 2
   assessment_title: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations
@@ -148,15 +150,8 @@ assessment:
       select:
         userright:
           equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
-      object_title: null
-```
-
-## After — complete generated English-first research Assessment
-
-Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
-
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+      object_title: null</code></pre></td>
+<td valign="top" width="50%"><pre><code># EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-253495.automated
@@ -284,8 +279,10 @@ evaluate:
   - all_of:
     - test: system-standalone-windows-server-or-workstation-test
     - test: deny-log-on-through-remote-desktop-services-guests-test
-  - test: deny-log-on-through-remote-desktop-services-everyone-test
-```
+  - test: deny-log-on-through-remote-desktop-services-everyone-test</code></pre></td>
+</tr></tbody>
+</table>
+
 
 ## What to tell us
 
