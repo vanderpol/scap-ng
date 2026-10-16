@@ -7,6 +7,16 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **[Authoring consistency working draft](AUTHORING-CONSISTENCY-WORKING-DRAFT.md)** — one proposed location for each collection operation, set-composition vocabulary, named-source resolution, and acceptance gates. This is research guidance, **not an approved schema**. The [source-backed examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) now show the Linux referenced collection in the same English-first style rather than switching back to the 0.4 source vocabulary.
 
+## Direct links — six-STIG reference and validation reports
+
+- **[Six-STIG research workflow: latest runs](https://github.com/vanderpol/scap-ng/actions/workflows/research-english-first-census-04.yml)** — select a successful run, then its **Artifacts** section.
+- **[Last previously verified six-STIG research run (October 16)](https://github.com/vanderpol/scap-ng/actions/runs/38922336217)** — earlier structural and six-state results. This run **predates the new reference graph report**; it should not be cited as proving that new check.
+- **Reference graph report:** `english-first-04-reference-graph-report.json`, inside the run artifact `english-first-v04-six-stig-source-census`. It reports missing or malformed references, cycles, and longest source/variable dependency chains. **The new report's successful run and permanent artifact URL have not yet been verified**, so the workflow link above is the authoritative entry point; no guessed artifact URL is provided.
+- **[Reference graph audit implementation](https://github.com/vanderpol/scap-ng/blob/main/tools/research_english_first_04_references.py)** and **[workflow/report artifact configuration](https://github.com/vanderpol/scap-ng/blob/main/.github/workflows/research-english-first-census-04.yml)**.
+- **[Authoring consistency and verification criteria](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/english-first-04/AUTHORING-CONSISTENCY-WORKING-DRAFT.md)**.
+
+The Actions artifact is a ZIP containing the JSON report, not a separately hosted JSON page. Artifacts can expire; a stable direct link to the report itself requires publishing the verified JSON into the repository or an enduring release asset.
+
 ## Six-state research checkpoint — 125,268 matched generic cases
 
 The [passing six-STIG and six-state workflow](https://github.com/vanderpol/scap-ng/actions/runs/38921900743) adds two independent implementations of **generic OVAL 5.12.3 Item outcome aggregation**, cross-checking **all 10 currently mapped existence × Item-match combinations plus five State-free presence modes** over complete/incomplete/not-collected/error/not-applicable/does-not-exist flags and six individual result statuses. **125,268 generic cases agreed**. **12 empty-population cases remain undefined by our generic reference helper** and are explicitly excluded, never treated as passes.
