@@ -130,6 +130,10 @@ Another Test in this Assessment permits a missing optional directive while requi
 
 The full file contains more collection and Variable dependencies; these excerpts are for comprehension, not a replacement for the authoring archive.
 
+## Full multi-Test worked examples
+
+See the [three larger real-world Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md) for contiguous, byte-exact excerpts of Windows 11 user rights and role branches, DNS zone processing with dynamic Variables, and Apache configuration discovery with four Test results. These examples expose what 0.4 simplifies **and** what remains verbose; they are not separately runnable from their excerpts.
+
 ## The semantic questions we need answered
 
 1. **Absent versus incomplete:** Does the proposed combination of collected-Item, ordinary field and record requirements retain OVAL `true`, `false`, `unknown`, `error`, `not_evaluated` and `not_applicable` outcomes when Items are missing, partial or failed? [Boundary review](INCOMPLETE-ITEM-SEMANTICS-REVIEW.md).
