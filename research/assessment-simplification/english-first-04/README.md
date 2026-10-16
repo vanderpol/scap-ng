@@ -9,6 +9,14 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
 
+## Latest full-Assessment source inversion — 800 of 872
+
+[PASS: complete six-STIG source-structure research census](https://github.com/vanderpol/scap-ng/actions/runs/38914506962): **800 / 872 unique automated Assessments (91.7%)** reconstruct **the entire original Assessment data model exactly** through the experimental English-first YAML representation. Those 800 documents include **1,230 named Tests**. **72 source Assessments** remain unsupported and have explicit fail-closed classifications. **800 negative guards** reject invalid new source clauses. The fixed-input archive is SHA-256-pinned; [generated full four-Assessment review samples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) are independently checked against original source.
+
+**This is substantially stronger than the older 370 *individual Test* check, but not equivalent to full SCAP 1.4 migration or scanner result parity.** Do not add the 370 and 1,230: they are different, overlapping research denominators. The research representation is still not ratified as one intuitive grammar; it often retains long acquisition graphs and unpolished phrases. **A large exact round-trip number cannot substitute for author readability testing or six-state runtime conformance.**
+
+The 72 failures are currently concentrated in unusual field operations (24 first-failure cases), State-field grouping (17), field cardinality (12), Test Variables (12), and a few unusual record/State shapes. Fix only with source-backed semantics, not default coercion.
+
 ## October 16 corpus checkpoint — source-backed, fail-closed
 
 - [Full six-STIG structural census](https://github.com/vanderpol/scap-ng/actions/runs/38908329365): **872 unique automated Assessments / 1,375 distinct named Tests**, from the SHA-256 pinned r3 authoring ZIP. **918** Tests use simple scalar State fields, **675** have native `collect` parameters, **387** have no States, **219** use State-level logical groups, **66** use records, **145** use Sets, **139** reference Variables inside their Object definitions, and **114** have **no explicit Object** (legitimate built-in collector capabilities, not necessarily broken content). These categories overlap.
@@ -22,7 +30,7 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **New architectural consequence:** do not require a `where` or `collect` block for a built-in capability that has **no source Object**. For example, real Windows `passwordpolicy` Tests inspect the typed platform policy collector directly; inserting a fake Object or collector command to satisfy an authoring template would change meaning. Treat Objectless, selected, explicitly collected, Set-composed and Object-expanding paths as genuine acquisition cases of **one** future language.
 
-**Next highest-value work:** a single human-readable AST that covers those five acquisition paths, both Test and field quantifiers without undocumented defaults, record-level constraints, and source-faithful derived commands. Do not equate a growing *Test-node* exact-inversion count with full Assessment conversion, six-state scanner/evidence parity or user comprehension. Current 0.4 base and released content remain unchanged.
+**Next highest-value work:** finish the **72 outliers**, then reduce the author-facing complexity of the actual source-complete English-first AST—especially shared collections, long Variable/command graphs, nested records, conditional State scopes, and the ambiguous Item names—without making a separate fallback language. The 800-document round-trip proof does **not** establish six-state scanner/evidence parity or user comprehension. Current 0.4 base and released content remain unchanged.
 
 ## Leading readability sketch, not yet legal 0.4
 
