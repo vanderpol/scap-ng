@@ -1,25 +1,29 @@
-# Six-STIG research reports — readable on github.com
+# Six-STIG research reports (accessible through github.com)
 
-**Pre-alpha research; not approved SCAP-NG 0.4 syntax or scanner-conformance evidence.**
+**Research only, not adopted SCAP-NG syntax or scanner validation.**
 
-This page is for networks and phones that cannot access GitHub Actions artifact downloads. Reports are being moved to ordinary Markdown and JSON files directly under this repository, so readers do not need to download ZIP artifacts from GitHub's separate artifact-hosting domains.
+Published from workflow run 38932589417:
+https://github.com/vanderpol/scap-ng/actions/runs/38932589417
 
-**[Read the verified six-STIG checkpoint in Markdown](2026-10-16-verified-checkpoint.md)** — full table of corpus coverage, complexity counts, six-state comparisons and remaining limitations, hosted entirely on github.com.
+Read these pages directly in GitHub; no Actions artifact ZIP is needed.
 
-## Latest previously verified results
+[Earlier verified checkpoint](2026-10-16-verified-checkpoint.md)
+(from run 38922336217; before the new reference-graph audit).
 
-| Research gate | Previously verified result | Evidence |
+| Report | Markdown report | Source JSON |
 | --- | --- | --- |
-| Whole source-Assessment structural reconstruction | 871 of 872 automated Assessments (1,374 of 1,375 Tests) | [Six-STIG run 38922336217](https://github.com/vanderpol/scap-ng/actions/runs/38922336217) |
-| Generic six-state comparison | 125,268 agreed defined cases; 12 excluded empty-population cases | [Six-STIG and six-state run 38922336217](https://github.com/vanderpol/scap-ng/actions/runs/38922336217) |
-| Remaining unusual source shape | A Linux boot-loader check combines none_exist with an attached State | [Research explanation](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/english-first-04/README.md) |
+| Named source and variable reference graph | [Read online](english-first-04-reference-graph-report.md) | [Read JSON](english-first-04-reference-graph-report.json) |
+| Compact authoring layout | [Read online](english-first-04-compact-layout-report.md) | [Read JSON](english-first-04-compact-layout-report.json) |
+| Full Assessment source inversion | [Read online](english-first-04-full-assessment-census.md) | [Read JSON](english-first-04-full-assessment-census.json) |
+| Six-state cardinality comparison | [Read online](english-first-04-six-state-cardinality.md) | [Read JSON](english-first-04-six-state-cardinality.json) |
+| Unresolved none_exist State boundary | [Read online](english-first-04-none-exist-state-boundary.md) | [Read JSON](english-first-04-none-exist-state-boundary.json) |
+| Variable, record and Set boundary guards | [Read online](english-first-04-variable-record-set-boundaries.md) | [Read JSON](english-first-04-variable-record-set-boundaries.json) |
+| Six-STIG Test census | [Read online](english-first-04-six-stig-census.md) | [Read JSON](english-first-04-six-stig-census.json) |
+| Assessment source-shape census | [Read online](english-first-04-shape-census.md) | Over online size threshold; summary available |
+| State-free presence checks | [Read online](english-first-04-state-free-presence.md) | [Read JSON](english-first-04-state-free-presence.json) |
+| Built-in Objectless collectors | [Read online](english-first-04-objectless.md) | [Read JSON](english-first-04-objectless.json) |
+| Typed common scalar checks | [Read online](english-first-04-generic-scalar.md) | [Read JSON](english-first-04-generic-scalar.json) |
 
-These are **historical verified figures**, not confirmation that the newer direct-Set and reference-dependency audit has passed. Structural reconstruction is **not** original OVAL runtime/evidence parity.
-
-## Updated report publishing
-
-The [six-STIG workflow](https://github.com/vanderpol/scap-ng/actions/workflows/research-english-first-census-04.yml) is being configured to publish each successful audit as a Markdown summary and, where the JSON is small enough for GitHub's online viewer, the source JSON. Once publication succeeds, this page will automatically list the report links (including the named source and variable reference graph).
-
-The existing ZIP artifacts remain optional, not the primary way to read results.
-
-Tracking: [English-first research issue #235](https://github.com/vanderpol/scap-ng/issues/235).
+The pinned six-STIG source-inversion and six-state
+reference checks are not independent OVAL scanner/evidence proof.
+Unresolved edge cases must remain visible.
