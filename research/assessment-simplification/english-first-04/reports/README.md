@@ -4,6 +4,8 @@
 
 This page is for networks and phones that cannot access GitHub Actions artifact downloads. Reports are being moved to ordinary Markdown and JSON files directly under this repository, so readers do not need to download ZIP artifacts from GitHub's separate artifact-hosting domains.
 
+**[Read the verified six-STIG checkpoint in Markdown](2026-10-16-verified-checkpoint.md)** — full table of corpus coverage, complexity counts, six-state comparisons and remaining limitations, hosted entirely on github.com.
+
 ## Latest previously verified results
 
 | Research gate | Previously verified result | Evidence |
