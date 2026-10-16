@@ -6,6 +6,7 @@ Use OVAL 5.12.3 reference-combiner helpers and explicitly documented research
 filter behavior; do not extrapolate unsupported nested-collector semantics.
 """
 from copy import deepcopy
+from itertools import product
 import json
 from pathlib import Path
 import unittest
@@ -44,6 +45,36 @@ class SourcePinnedBoundaryTests(unittest.TestCase):
                      "does_not_exist", "error", "not_collected", "item_results")
                     if key in case}
                 self.assertEqual(evaluate_collected_object_test(**kwargs), case["expected"])
+
+    def test_incomplete_collections_only_return_irreversible_check_results(self):
+        # Independent expected table, not computed by decisive_partial_check.
+        # Each enumerated row is a *partial* observed population; unobserved
+        # Items may have any of the six values. 0..3 observed Items exercises
+        # 1,036 quantifier/population combinations.
+        states = ("true", "false", "error", "unknown",
+                  "not evaluated", "not applicable")
+        checks = ("all", "at least one", "only one", "none satisfy")
+        count = 0
+        for n in range(4):
+            for observed in product(states, repeat=n):
+                for check in checks:
+                    with self.subTest(observed=observed, check=check):
+                        if check == "all" and "false" in observed:
+                            expected = "false"
+                        elif check == "at least one" and "true" in observed:
+                            expected = "true"
+                        elif check == "only one" and observed.count("true") >= 2:
+                            expected = "false"
+                        elif check == "none satisfy" and "true" in observed:
+                            expected = "false"
+                        else:
+                            expected = "unknown"
+                        self.assertEqual(evaluate_collected_object_test(
+                            "incomplete", existence="at_least_one_exists",
+                            has_state=True, check=check, exists=n,
+                            item_results=list(observed)), expected)
+                        count += 1
+        self.assertEqual(count, 1036)
 
     def test_record_and_record_member_scopes_are_independent(self):
         for case in FIXTURES["records"]:

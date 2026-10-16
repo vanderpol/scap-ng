@@ -264,6 +264,22 @@ class CollectedObjectControlFlow(unittest.TestCase):
             TRUE,
         )
 
+    def test_incomplete_nonmatching_items_do_not_prove_all_future_items_fail(self):
+        # A partial population with no match may later gain a matching Item.
+        for mode in ("at least one", "only one"):
+            with self.subTest(mode=mode):
+                self.assertEqual(
+                    evaluate_collected_object_test(
+                        "incomplete", existence="at_least_one_exists",
+                        exists=1, check=mode, item_results=[FALSE]),
+                    UNKNOWN)
+        # Empty partial collections also remain UNKNOWN.
+        self.assertEqual(
+            evaluate_collected_object_test(
+                "incomplete", existence="at_least_one_exists",
+                exists=0, check="at least one", item_results=[]),
+            UNKNOWN)
+
     def test_missing_matching_collected_object_record_is_unknown(self):
         self.assertEqual(evaluate_missing_collected_object_record(), UNKNOWN)
 

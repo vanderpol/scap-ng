@@ -314,11 +314,14 @@ def evaluate_collected_object_test(
     if has_state:
         if item_results is None:
             raise ValueError("incomplete Test with State requires item_results")
-        check_result = aggregate_check(check, item_results)
-        if check_result == FALSE:
-            return FALSE
-        if check == "at least one" and check_result == TRUE:
-            return TRUE
+        # A partial FALSE result is not automatically irreversible. In
+        # particular, a partial population containing only nonmatching Items
+        # does not prove that "at least one" or "only one" will remain false:
+        # additional Items may make either Test true. Consult the explicit
+        # early-termination contract instead of aggregating a partial batch.
+        decisive = decisive_partial_check(check, item_results)
+        if decisive is not None:
+            return decisive
 
     return UNKNOWN
 
