@@ -6,6 +6,7 @@
 
 - **[Short 0.4 overview](ASSESSMENT-REVIEW-OVERVIEW.md)** — three embedded real NG Test examples: Linux mount selection, Windows registry alternatives, and user-right cardinality. Suitable as the main pre-read.
 - **[Detailed technical examples](ASSESSMENT-REVIEW-TECHNICAL.md)** — Windows WMI record scoping, DNS exact-one checks, Apache Variables, proof boundaries, and guidance on Test versus private/shared Object titles.
+- **[Three complex source-backed Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md)** — Windows multi-Test role logic, DNS zone Variables and Apache configuration discovery; substantial real excerpts with explicit strengths and limitations.
 - **[Conditional semantics questions](../conditional-10/CONDITIONAL-REVIEW-QUESTIONS.md)** — six-state behavior, `if/else` versus faithful OVAL Boolean graphs, and evidence collection.
 
 **Optional full content:** [ten original OVAL → NG YAML/JSON comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015) and [six-STIG r3 authoring preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) (YAML + JSON). The release tags are historical immutable identifiers, not audience restrictions. r3 contains all six representative STIGs, repairs 12 shared manual Assessment files, and resolves all 2,958 Rule Assessment-choice links. Both are **pre-alpha research**, not scanner-conformant 0.4 binaries.
