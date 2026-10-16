@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 import zipfile
 import yaml
-from research_english_first_04_complex import to_human, to_native
+from research_english_first_04_complex import to_human, to_native, human_test
 
 SHA = "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d"
 
@@ -53,11 +53,26 @@ def census(archive):
                                   if "variable" in t), None)
                     if match is None:
                         match = next(iter(tests.items()), ("<none>", {}))
+                    problematic = []
+                    for tid, test_node in tests.items():
+                        try:
+                            human_test(test_node)
+                        except (ValueError, TypeError, AttributeError, KeyError) as inner:
+                            problematic.append({
+                                "test": tid,
+                                "reason": type(inner).__name__ + ": " + str(inner)[:160],
+                                "test_keys": sorted(test_node),
+                                "test_variable": repr(test_node.get("variable"))[:300],
+                                "states": repr(test_node.get("states"))[:1800],
+                                "item_mode": test_node.get("collected_items_require"),
+                                "state_fields_mode": test_node.get("state_fields_require"),
+                            })
                     rejected_diagnostics.append({
                         "source": file, "category": category,
                         "test": match[0], "test_keys": sorted(match[1]),
                         "test_variable": repr(match[1].get("variable"))[:1000],
                         "states_example": repr(match[1].get("states"))[:1600],
+                        "failing_tests": problematic[:5],
                     })
                 continue
             if restored != source:
