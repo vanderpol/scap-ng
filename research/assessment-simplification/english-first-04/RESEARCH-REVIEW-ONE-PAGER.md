@@ -17,7 +17,7 @@ Can a security administrator understand a complete Assessment without knowing OV
 | **Windows Server DNS SV-259345** | Dynamically generated zone commands, exact-one stdout, five Tests/three alternatives | `gather.collect`, `exactly_one_is`, named `all_of`/`any_of`; command-building Variables preserved |
 | **Apache 2.4 SV-214228** | Discover installation and included config; four required/optional directive Tests, 18 local Variables | `when_present_matches_regex` vs required values, preserved source command Variables and error handling |
 
-**Source verification:** [CI](https://github.com/vanderpol/scap-ng/actions/runs/38913249970) reconstructed all **four entire source-Assessment dictionaries exactly** (not just excerpts). The broader [six-STIG census](https://github.com/vanderpol/scap-ng/actions/runs/38914506962) reconstructed **800/872 complete automated Assessments (91.7%)**, with 72 unsupported source shapes rejected. These are **structural round trips of the existing 0.4 preview**, not independent six-state scanner/OVAL runtime proofs.
+**Source verification:** [CI](https://github.com/vanderpol/scap-ng/actions/runs/38913249970) reconstructed all **four entire source-Assessment dictionaries exactly** (not just excerpts). The expanded [six-STIG census](https://github.com/vanderpol/scap-ng/actions/runs/38917654846) now reconstructs **865/872 complete automated Assessments (99.2%)**, with seven source shapes explicitly rejected and 865 invalid-input guards passed. These are **structural round trips of the existing 0.4 preview**, not independent six-state scanner/OVAL runtime proofs.
 
 ## Three questions for technical reviewers
 
