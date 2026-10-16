@@ -30,25 +30,29 @@ def exact(node,keys,what):
  if not isinstance(node,dict) or set(node)!=set(keys):
   raise ValueError("unexpected "+what+": "+repr(node)[:160])
 
-def field_to_human(node):
- if not isinstance(node,dict) or node.get("require")!=FIELD_REQ: raise ValueError("wrong field scope")
+def field_to_human(node, inherited=False):
+ if not isinstance(node,dict): raise ValueError("field must be a mapping")
+ if inherited:
+  if "require" in node:raise ValueError("group-inherited State field cannot override")
+ else:
+  if node.get("require")!=FIELD_REQ:raise ValueError("wrong field scope")
  ops=set(node)-{"require"}
  if len(ops)!=1 or next(iter(ops)) not in FIELD_OPS: raise ValueError("unsupported field op")
  op=next(iter(ops))
  return {FIELD_OPS[op]:deepcopy(node[op])}
 
-def field_to_native(node):
+def field_to_native(node, inherited=False):
  if not isinstance(node,dict) or len(node)!=1: raise ValueError("invalid human field")
  op,val=next(iter(node.items()))
  if op not in REVERSE_OPS: raise ValueError("unknown field operator")
- return {"require":FIELD_REQ,REVERSE_OPS[op]:deepcopy(val)}
+ return ({REVERSE_OPS[op]:deepcopy(val)} if inherited else {"require":FIELD_REQ,REVERSE_OPS[op]:deepcopy(val)})
 
-def state_to_human(node):
+def state_to_human(node, inherited=False):
  if not isinstance(node,dict): raise ValueError("State not a mapping")
  if "and" in node:
   if set(node)!={"and","state_fields_require"} or node["state_fields_require"]!=FIELD_REQ:
    raise ValueError("unsupported group fields scope")
-  return {"all_of":[state_to_human(child) for child in node["and"]],
+  return {"all_of":[state_to_human(child, inherited=True) for child in node["and"]],
           "all_fields_must_exist":True}
  exact(node,(next(iter(node)),),"single State")
  name,sub=next(iter(node.items()))
@@ -59,14 +63,14 @@ def state_to_human(node):
   if record["require"]!=FIELD_REQ: raise ValueError("record cardinality")
   return {"result":{"at_least_one_record_exists":True,"every_record":{
    key:field_to_human(value) for key,value in record["fields"].items()}}}
- return {name:field_to_human(sub)}
+ return {name:field_to_human(sub,inherited=inherited)}
 
-def state_to_native(node):
+def state_to_native(node, inherited=False):
  if not isinstance(node,dict): raise ValueError("human State not a mapping")
  if "all_of" in node:
   exact(node,("all_of","all_fields_must_exist"),"group")
   if node["all_fields_must_exist"] is not True or not node["all_of"]: raise ValueError("invalid group")
-  return {"and":[state_to_native(child) for child in node["all_of"]],
+  return {"and":[state_to_native(child,inherited=True) for child in node["all_of"]],
           "state_fields_require":FIELD_REQ}
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
@@ -76,7 +80,7 @@ def state_to_native(node):
   return {"result":{"record":{"fields":{
    key:field_to_native(val) for key,val in sub["every_record"].items()},
    "require":FIELD_REQ}}}
- return {name:field_to_native(sub)}
+ return {name:field_to_native(sub,inherited=inherited)}
 
 def readable_source(src):
  if isinstance(src,str): return {"source":src}
