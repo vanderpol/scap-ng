@@ -2,7 +2,7 @@
 
 **For technical discussion on October 16, 2026.** This is a **pre-alpha authoring-language candidate**, not a final standard, OVAL Board decision, or executable scanner bundle. The current 0.3 release is not changed.
 
-**For tomorrow's 20-minute technical review, [start with the one-page meeting card](JOVAL-MEETING-2026-10-16.md).** The detailed discussion and source excerpts remain below.
+**For the October 16 technical review, [start with the one-page meeting card](JOVAL-MEETING-2026-10-16.md).** The detailed discussion and source excerpts remain below.
 
 ## Start with the original OVAL → NG 0.4 feature showcase
 
