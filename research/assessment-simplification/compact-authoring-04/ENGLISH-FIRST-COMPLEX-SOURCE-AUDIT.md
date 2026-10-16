@@ -41,8 +41,7 @@ checks:
     where:
       userright: {equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
     require:
-      trustee_name:
-        includes_value_ignoring_case: Guests  # INTENT ONLY; unproven shortcut
+      trustee_name: {includes_value_ignoring_case: Guests}  # unproven shortcut
 # Additional named checks: standalone, local_account, domain_admins,
 # enterprise_admins, everyone; their full source must be preserved.
 evaluate:
@@ -52,7 +51,7 @@ evaluate:
     - everyone
 ```
 
-**Readability correction — this example is not yet a proved translation:** The previous draft omitted useful collection context in the standalone excerpt and repeated `exist: at_least_one` / `matching: all`, which is essentially OVAL terminology in new wrappers. That failed the stated author-comprehension goal. The replacement above is only a **plain-English intent sketch**: `inspect: windows.userright` specifies the typed native collector and `where.userright` identifies **exactly which right to retrieve**. A capability-specific `includes_value_ignoring_case` would be easy for a security administrator to read, **but it is not implemented or proven faithful**.
+**Readability correction — this example is not yet a proved translation:** The previous draft omitted useful collection context in the standalone excerpt and repeated `exist: at_least_one` / `matching: all`, which is essentially OVAL terminology in new wrappers. That failed the stated author-comprehension goal. The replacement above is only a **plain-English intent sketch**: `inspect: windows.userright` specifies the typed native collector and `where.userright` identifies **exactly which right to retrieve**. The inline YAML map makes the child relationship explicit even on narrow screens: `trustee_name` is the field, and `includes_value_ignoring_case` is its proposed predicate. This capability-specific shortcut may be intuitive, **but it is not implemented or proven faithful**.
 
 The exact real [SV-253495 Test](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) currently requires **at least one collected user-right Item, some collected Items matching the State, and for each qualifying Item at least one `trustee_name` field value with all its observed field values equal to `Guests` ignoring case**. Simple “includes Guests somewhere” can give a different answer if a collected Item has multiple `trustee_name` values. Error/unknown/incomplete outcomes can also differ. The concise shorthand **must not be promoted to standard syntax** until the Windows capability's Item/value cardinality and six-state behavior are proven equivalent. If it cannot be proven, this case is a real counterexample to unlimited English-first compaction.
 
