@@ -8,6 +8,9 @@ on:
       - tools/research_english_first_04_presence.py
       - tools/research_english_first_04_objectless.py
       - tools/research_english_first_04_scalar.py
+      - tools/research_english_first_04_full_corpus.py
+      - tools/research_english_first_04_complex.py
+      - tools/research_english_first_04_evaluate.py
       - tools/research_english_first_04.py
   workflow_dispatch:
 
@@ -67,6 +70,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-generic-scalar.json
 
+      - name: Count exact complete Assessment source reconstruction across all six STIGs
+        run: |
+          python tools/research_english_first_04_full_corpus.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-full-assessment-census.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,4 +87,5 @@ jobs:
             english-first-04-state-free-presence.json
             english-first-04-objectless.json
             english-first-04-generic-scalar.json
+            english-first-04-full-assessment-census.json
           if-no-files-found: warn
