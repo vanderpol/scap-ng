@@ -1,0 +1,48 @@
+name: English-first six-STIG grammar census
+on:
+  push:
+    paths:
+      - .github/workflows/research-english-first-census-04.yml
+      - tools/research_english_first_04_census.py
+      - tools/research_english_first_04.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-six-stig:
+    name: Classify every unique automated Test fail-closed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout research scripts from main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install pinned parser
+        run: python -m pip install 'PyYAML==6.0.3'
+
+      - name: Fetch published immutable r3 YAML authoring ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern 'scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --dir work
+
+      - name: Audit Test-by-Test and reject unsupported shapes
+        run: |
+          python tools/research_english_first_04_census.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-six-stig-census.json
+
+      - name: Upload full evidence ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-first-v04-six-stig-source-census
+          path: english-first-04-six-stig-census.json
+          if-no-files-found: warn
