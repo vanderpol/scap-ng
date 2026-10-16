@@ -12,12 +12,14 @@
 
 **What to assess:** Can you identify the collected system data, source definitions, value/Item requirements and final evaluation without referring to another file?
 
-## Before — full existing 0.4 Assessment
+## Complete assessments — side by side
 
-Everything below is the unchanged, pinned 0.4 preview file (metadata, sources, Tests, evaluate).
+Both columns contain **every line** of their respective full YAML checks. Use a wide desktop browser for the two-column view. If the rendered table overflows, scroll it horizontally; the original files remain available from the links above.
 
-```yaml
-assessment:
+<table>
+<thead><tr><th align="left" width="50%">BEFORE — Current 0.4</th><th align="left" width="50%">AFTER — English-first research</th></tr></thead>
+<tbody><tr>
+<td valign="top" width="50%"><pre><code>assessment:
   id: ng.shared.home-is-mounted-with-the-nosuid-option
   version: 1
   assessment_title: Linux must prevent files with the setuid and setgid bit set from being executed on file systems
@@ -45,15 +47,8 @@ assessment:
       reported_elements: all
       collected_items_require: at_least_one_exists_and_all_match
   evaluate:
-    test: home-mounted-nosuid-option-test
-```
-
-## After — full experimental English-first Assessment
-
-The following is a **complete hand-assembled** compact research YAML using the same source-to-English naming contract. It has not been independently tested through the full converter in this commit.
-
-```yaml
-# RESEARCH ONLY — full English-first candidate for this exact pinned 0.4 Assessment.
+    test: home-mounted-nosuid-option-test</code></pre></td>
+<td valign="top" width="50%"><pre><code># RESEARCH ONLY — full English-first candidate for this exact pinned 0.4 Assessment.
 # Consistent with the experimental compact-layout mapping; not normative 0.4 or scanner proof.
 metadata:
   id: ng.shared.home-is-mounted-with-the-nosuid-option
@@ -82,8 +77,10 @@ checks:
         matches_regex: .*\/home
     description: null
 evaluate:
-  test: home-mounted-nosuid-option-test
-```
+  test: home-mounted-nosuid-option-test</code></pre></td>
+</tr></tbody>
+</table>
+
 
 ## Your review
 
