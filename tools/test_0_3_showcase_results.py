@@ -112,7 +112,9 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         choices = rule["assessment_choices"]
         self.assertIn("automated", choices)
         self.assertIn("manual", choices)
-        self.assertEqual(choices["default"], choices["automated"])
+        self.assertEqual(rule["default_assessment_choice"], "automated")
+        self.assertNotIn("default", choices,
+                         "Publisher default is a selector, not a duplicate Assessment")
         self.assertEqual(
             choices["automated"]["assessment"],
             "home-is-mounted-with-the-nosuid-option",

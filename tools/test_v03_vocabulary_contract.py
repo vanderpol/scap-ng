@@ -30,17 +30,37 @@ class V03VocabularyContractTests(unittest.TestCase):
             defs["filesystem_scope"]["enum"],
             ["all","local","same"],
         )
-        self.assertEqual(
-            defs["comparison_operation"]["enum"],
-            [
-                "equals","not_equal",
-                "case_insensitive_equals","case_insensitive_not_equal",
-                "greater_than","greater_than_or_equal",
-                "less_than","less_than_or_equal",
-                "bitwise_and","bitwise_or","pattern_match",
-                "subset_of","superset_of",
-            ],
+        # The 0.3 contract has expanded from the generic 13 operators
+        # to include deliberately *typed* OVAL-compatible families.
+        # This is an independent explicit expected set, not schema-derived.
+        generic = [
+            "equals", "not_equal",
+            "case_insensitive_equals", "case_insensitive_not_equal",
+            "greater_than", "greater_than_or_equal",
+            "less_than", "less_than_or_equal",
+            "bitwise_and", "bitwise_or", "pattern_match",
+            "subset_of", "superset_of",
+        ]
+        order = ["equals", "not_equal", "greater_than",
+                 "greater_than_or_equal", "less_than", "less_than_or_equal"]
+        typed = (
+            ["float_" + operation for operation in order]
+            + ["binary_equals", "binary_not_equal"]
+            + ["version_" + operation for operation in order]
+            + ["ipv4_" + operation for operation in order]
+            + ["ipv4_subset_of", "ipv4_superset_of"]
+            + ["ipv6_" + operation for operation in order]
+            + ["ipv6_subset_of", "ipv6_superset_of"]
+            + ["rpm_evr_" + operation for operation in order]
+            + ["debian_evr_" + operation for operation in order]
+            + ["fileset_revision_" + operation for operation in order]
+            + ["ios_version_" + operation for operation in order]
         )
+        expected = generic + typed
+        actual = defs["comparison_operation"]["enum"]
+        self.assertEqual(len(expected), 67)
+        self.assertEqual(len(actual), len(set(actual)), "duplicate comparison operators")
+        self.assertEqual(actual, expected)
 
     def test_generated_03_test_schema_uses_existence_and_match(self):
         mapping=self.mapping("unix.file.json")
