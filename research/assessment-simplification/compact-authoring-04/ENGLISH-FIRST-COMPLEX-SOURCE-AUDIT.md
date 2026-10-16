@@ -41,11 +41,16 @@ checks:
     where:
       userright:
         equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+    expect:
+      trustee_name:
+        case_insensitive_equals: Guests
+        observed_values:
+          exist: at_least_one
+          matching: all
     require:
-      at_least_one_item_exists: true
-      at_least_one_collected_item:
-        trustee_name:
-          equals_ignoring_case: Guests
+      collected_items:
+        exist: at_least_one
+        satisfying: at_least_one
 # Additional named checks: standalone, local_account, domain_admins,
 # enterprise_admins, everyone; their full source must be preserved.
 evaluate:
@@ -54,6 +59,8 @@ evaluate:
     - all_of: [standalone, guests_denied]
     - everyone
 ```
+
+**Readability correction:** The first draft mixed `at_least_one_item_exists: true` (Boolean) and `at_least_one_collected_item: {trustee_name: ...}` (a predicate map). That looked like a missing `true` value and concealed the original field-value requirement. This corrected **research-only** sketch gives each part one job: `expect` describes which fields match; `require.collected_items.exist` counts collected user-right Items; `require.collected_items.satisfying` counts how many Items satisfy `expect`; `observed_values` separately requires at least one `trustee_name` value and all observed values to equal Guests ignoring case. It corresponds structurally to original `collected_items_require: at_least_one_exists_and_some_match` and field `require: at_least_one_exists_and_all_match`. All six-state behavior still requires independent proof. **No Boolean is missing**, and no new normative schema has been adopted.
 
 **Works for people:** typed data source, purpose, alternatives, and referenced checks are in one reading flow. **New challenges:** `one_of: ['1','3']` must not casually collapse two record State alternatives or alter `value_match`/six-state semantics. The user-right collection may contain many principals; `at_least_one_collected_item` is essential and must not become `every_collected_item`. Need separate record and nested-field cardinality and a clear way to define/reuse a named Object once.
 
