@@ -35,6 +35,35 @@ READABLE_MATCH_KEYS = {
 NATIVE_MATCH_KEYS = {v: k for k, v in READABLE_MATCH_KEYS.items()}
 SET_OPERATIONS = {"union", "difference", "intersection", "complement"}
 
+# Deliberate human reading order, independent of YAML mapping semantics.
+# Define data acquisition before criteria. Preserve all keys and values.
+DISPLAY_ORDER = (
+    "check", "inspect", "description", "from", "gather", "where",
+    "collect", "filesystem", "traversal", "input_from",
+    "all_state_fields_exist", "all_state_fields_when_present",
+    "require", "report_elements",
+)
+
+
+def in_reading_order(check):
+    unknown = set(check) - set(DISPLAY_ORDER)
+    if unknown:
+        raise ValueError("unrecognized human display keys: " + repr(sorted(unknown)))
+    return {key: check[key] for key in DISPLAY_ORDER if key in check}
+
+
+def require_acquisition_before_criteria(check):
+    keys = list(check)
+    if keys != list(in_reading_order(check)):
+        raise AssertionError("check keys not in canonical top-down reading order")
+    if "require" not in check:
+        raise AssertionError("check lost its requirement")
+    for key in ("from", "gather", "where", "collect", "filesystem",
+                "traversal", "input_from"):
+        if key in check and keys.index(key) > keys.index("require"):
+            raise AssertionError("data source appears after State requirements")
+
+
 
 def compact_source(original):
     """Remove the redundant 'combine' wrapper, retaining every Set operand."""
@@ -148,6 +177,10 @@ def compact(original):
                 del check["gather"]
         # If gather is complex (Set or for_each) retain it visibly, but
         # without duplicating its inspect when both capabilities agree.
+    doc["checks"] = {name: in_reading_order(check)
+                     for name, check in doc["checks"].items()}
+    for check in doc["checks"].values():
+        require_acquisition_before_criteria(check)
     return doc
 
 
@@ -315,6 +348,8 @@ def inspect(archive, examples_dir=None):
             long = yaml.safe_dump(verbose, sort_keys=False, allow_unicode=True)
             total_verbose += len(long)
             total_compact += len(short)
+            for check in compacted["checks"].values():
+                require_acquisition_before_criteria(check)
             for key, item in compacted["checks"].items():
                 source = verbose["checks"][key]
                 if "from" in item:
