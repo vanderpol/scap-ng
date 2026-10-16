@@ -68,6 +68,15 @@ FIELD_MODES={
 
 def field_to_human(node, inherited=False):
  if not isinstance(node,dict):raise ValueError("State field not a mapping")
+ if "datatype" in node or "value_match" in node:
+  attrs={k:deepcopy(v) for k,v in node.items() if k in {"datatype","value_match"}}
+  comparison=field_to_human({k:v for k,v in node.items() if k not in attrs},inherited=inherited)
+  if "datatype" in attrs and (not isinstance(attrs["datatype"],str) or not attrs["datatype"]):
+   raise ValueError("unsupported data type")
+  if "value_match" in attrs and attrs["value_match"] not in {"all","one","one_or_more","none","odd"}:
+   raise ValueError("unsupported operand value match")
+  return {"compare":comparison,**({"data_type":attrs["datatype"]} if "datatype" in attrs else {}),
+          **({"value_match":attrs["value_match"]} if "value_match" in attrs else {})}
  if inherited and "require" in node:
   # An explicit exceptional leaf must remain explicit even under a Test/group default.
   return {"local_override":field_to_human(node,inherited=False)}
@@ -86,6 +95,17 @@ def field_to_human(node, inherited=False):
 
 def field_to_native(node, inherited=False):
  if not isinstance(node,dict) or not node:raise ValueError("empty human field")
+ if "compare" in node:
+  if set(node)-{"compare","data_type","value_match"}:raise ValueError("unknown comparison modifier")
+  raw=field_to_native(node["compare"],inherited=inherited)
+  if "data_type" in node:
+   if not isinstance(node["data_type"],str) or not node["data_type"]:raise ValueError("invalid datatype")
+   raw["datatype"]=node["data_type"]
+  if "value_match" in node:
+   if node["value_match"] not in {"all","one","one_or_more","none","odd"}:
+    raise ValueError("invalid operand value_match")
+   raw["value_match"]=node["value_match"]
+  return raw
  if inherited and set(node)=={"local_override"}:
   return field_to_native(node["local_override"],inherited=False)
  if set(node)=={"no_values_exist","source_comparison"}:
@@ -135,6 +155,7 @@ def state_to_human(node, inherited=False):
   record_mode={
    "at_least_one_exists_and_all_match":"every_record",
    "at_least_one_exists_and_some_match":"some_record",
+   "at_least_one_exists_and_only_one_matches":"exactly_one_matching_record",
   }.get(record["require"])
   if record_mode is None:raise ValueError("unproven record cardinality")
   if not isinstance(record["fields"],dict) or not record["fields"]:
@@ -159,13 +180,15 @@ def state_to_native(node, inherited=False):
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
  if isinstance(sub,dict) and "at_least_one_record_exists" in sub:
-  record_keys=set(sub)&{"every_record","some_record"}
+  record_keys=set(sub)&{"every_record","some_record","exactly_one_matching_record"}
   if len(record_keys)!=1:raise ValueError("ambiguous record matching")
   record_mode=next(iter(record_keys))
   exact(sub,("at_least_one_record_exists",record_mode),"records")
   if sub["at_least_one_record_exists"] is not True or not isinstance(sub[record_mode],dict) or not sub[record_mode]:
    raise ValueError("record existence")
-  source_mode=("at_least_one_exists_and_all_match" if record_mode=="every_record" else "at_least_one_exists_and_some_match")
+  source_mode={"every_record":"at_least_one_exists_and_all_match",
+               "some_record":"at_least_one_exists_and_some_match",
+               "exactly_one_matching_record":"at_least_one_exists_and_only_one_matches"}[record_mode]
   return {name:{"record":{"fields":{
    key:field_to_native(val) for key,val in sub[record_mode].items()},
    "require":source_mode}}}
