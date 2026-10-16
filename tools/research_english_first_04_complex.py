@@ -158,13 +158,24 @@ def readable_source(src):
     raise ValueError("bad Set operand")
    element={"from":readable_source(operand["object"])}
    if "filters" in operand:
-    preds=[]
-    for x in operand["filters"]:
-     exact(x,("exclude",),"filter action")
-     if not isinstance(x["exclude"],dict) or len(x["exclude"])!=1:raise ValueError("filter field")
-     key,val=next(iter(x["exclude"].items()))
-     preds.append({key:field_to_human(val)})
-    element["exclude_if"]=preds
+    filters=operand["filters"]
+    if not isinstance(filters,list):raise ValueError("filter list not an array")
+    sequence=[]
+    for x in filters:
+     if not isinstance(x,dict) or len(x)!=1:raise ValueError("filter action")
+     action,condition=next(iter(x.items()))
+     if action not in {"include","exclude"}:raise ValueError("unsupported filter action")
+     if not isinstance(condition,dict) or len(condition)!=1:raise ValueError("filter field")
+     key,val=next(iter(condition.items()))
+     sequence.append((action,{key:field_to_human(val)}))
+    actions={action for action,_ in sequence}
+    if len(actions)==1:
+     action=sequence[0][0]
+     element[action+"_if"]=[pred for _,pred in sequence]
+    elif not sequence:
+     element["exclude_if"]=[]
+    else:
+     element["ordered_filters"]=[{action+"_if":pred} for action,pred in sequence]
    parts.append(element)
   out["combine"]={spec["operator"]:parts}
  return out
@@ -187,15 +198,29 @@ def native_source(src):
   if op not in {"union","difference","intersection","complement"} or not isinstance(parts,list) or not parts:raise ValueError("bad Set")
   operands=[]
   for item in parts:
-   if not isinstance(item,dict) or set(item)-{"from","exclude_if"} or "from" not in item:raise ValueError("bad operand")
+   if not isinstance(item,dict) or set(item)-{"from","exclude_if","include_if","ordered_filters"} or "from" not in item:
+    raise ValueError("bad operand")
+   flags=set(item)&{"exclude_if","include_if","ordered_filters"}
+   if len(flags)>1:raise ValueError("cannot mix filter presentation modes")
    orig={"object":native_source(item["from"])}
-   if "exclude_if" in item:
-    if not isinstance(item["exclude_if"],list):raise ValueError("filters must be a list")
+   if flags:
+    action=next(iter(flags))
+    if not isinstance(item[action],list):raise ValueError("filters must be a list")
     original=[]
-    for f in item["exclude_if"]:
-     if not isinstance(f,dict) or len(f)!=1:raise ValueError("invalid filter")
-     key,val=next(iter(f.items()))
-     original.append({"exclude":{key:field_to_native(val)}})
+    if action in {"exclude_if","include_if"}:
+     mode=action[:-3]
+     for field in item[action]:
+      if not isinstance(field,dict) or len(field)!=1:raise ValueError("invalid filter")
+      key,val=next(iter(field.items()))
+      original.append({mode:{key:field_to_native(val)}})
+    else:
+     for entry in item[action]:
+      if not isinstance(entry,dict) or len(entry)!=1:raise ValueError("invalid ordered filter")
+      key,field=next(iter(entry.items()))
+      if key not in {"exclude_if","include_if"} or not isinstance(field,dict) or len(field)!=1:
+       raise ValueError("invalid ordered action")
+      name,value=next(iter(field.items()))
+      original.append({key[:-3]:{name:field_to_native(value)}})
     orig["filters"]=original
    operands.append(orig)
   out["set"]={"operator":op,"operands":operands}
