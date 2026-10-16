@@ -5,6 +5,8 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
+**[Start here: decision brief](DECISION-BRIEF.md)** — what is proved, what remains unproved, and what evidence would justify adopting (or rejecting) the English-first grammar. The detailed report statistics below are supporting evidence, not the adoption decision.
+
 **[Authoring consistency working draft](AUTHORING-CONSISTENCY-WORKING-DRAFT.md)** — one proposed location for each collection operation, set-composition vocabulary, named-source resolution, and acceptance gates. This is research guidance, **not an approved schema**. The [source-backed examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) now show the Linux referenced collection in the same English-first style rather than switching back to the 0.4 source vocabulary.
 
 ## Six-STIG reports you can read on github.com
