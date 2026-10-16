@@ -266,7 +266,6 @@ checks:
         stdout_line:
           matches_regex: \s*KeepAlive On
     report_elements: all
-    description: Gather all KeepAlive data from httpd and all Include conf files
     collect:
       shell: bash
       command:
@@ -274,6 +273,7 @@ checks:
       pattern: .+
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    description: Gather all KeepAlive data from httpd and all Include conf files
   if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test:
     check: If the KeepAlive directive is defined in other loaded configuration files,
       verify it is configured to On
@@ -284,7 +284,6 @@ checks:
         stdout_line:
           when_present_matches_regex: \s*KeepAlive On
     report_elements: all
-    description: Gather all KeepAlive data from all loaded conf files
     collect:
       shell: bash
       command:
@@ -292,6 +291,7 @@ checks:
       pattern: .+
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    description: Gather all KeepAlive data from all loaded conf files
   verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test:
     check: Verify that MaxKeepAliveRequests is defined and is configured to 100 or
       greater httpd.conf/apache2.conf or included conf files
@@ -302,8 +302,6 @@ checks:
         subexpression:
           at_least: 100
     report_elements: all
-    description: Gather all MaxKeepAliveRequests data from httpd and all Include conf
-      files
     collect:
       shell: bash
       command:
@@ -311,6 +309,8 @@ checks:
       pattern: MaxKeepAliveRequests (\d+)
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    description: Gather all MaxKeepAliveRequests data from httpd and all Include conf
+      files
   if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test:
     check: If the MaxKeepAliveRequests directive is defined in other loaded configuration
       files, verify it is configured to 100 or greater
@@ -321,7 +321,6 @@ checks:
         subexpression:
           when_present_at_least: 100
     report_elements: all
-    description: Gather all MaxKeepAliveRequests data from all loaded conf files
     collect:
       shell: bash
       command:
@@ -329,6 +328,7 @@ checks:
       pattern: MaxKeepAliveRequests (\d+)
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    description: Gather all MaxKeepAliveRequests data from all loaded conf files
 evaluate:
   all_of:
   - test: verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test
