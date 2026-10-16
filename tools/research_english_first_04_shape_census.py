@@ -126,6 +126,7 @@ def inspect(archive):
         raise ValueError(f"r3 asset digest mismatch: {digest} expected {PINNED_SHA256}")
     counts, caps, object_shapes, by_capability = Counter(), Counter(), Counter(), defaultdict(Counter)
     status, operators, field_reqs, item_reqs = Counter(), Counter(), Counter(), Counter()
+    extra_object_keys = Counter()
     examples, cases = defaultdict(list), []
     def add_sample(category, path, test_id):
         if len(examples[category]) < EXAMPLES_LIMIT:
@@ -155,6 +156,9 @@ def inspect(archive):
                 shape, rootkeys, loops, variable = collect_details(obj)
                 object_shapes[shape] += 1
                 by_capability[cap][shape] += 1
+                if isinstance(obj, dict):
+                    for option in set(obj) - {"capability", "select", "collect", "object_title"}:
+                        extra_object_keys[option] += 1
                 status[origin] += 1
                 if "collect" in rootkeys:
                     counts["collect_object_tests"] += 1
@@ -240,6 +244,7 @@ def inspect(archive):
         "scope": "872 unique automated Assessment documents; 1375 named Test nodes",
         "counts": dict(counts),
         "object_shape": dict(object_shapes.most_common()),
+        "additional_object_options": dict(extra_object_keys.most_common()),
         "object_origin": dict(status.most_common()),
         "capability": dict(caps.most_common()),
         "capability_collection_cross_tab": {k: dict(v.most_common()) for k, v in by_capability.items()},
@@ -262,6 +267,7 @@ def main():
     print(json.dumps({
         "counts": report["counts"],
         "object_shape": report["object_shape"],
+        "additional_object_options": report["additional_object_options"],
         "object_origin": report["object_origin"],
         "item_requirements_top": list(report["item_requirements"].items())[:15],
         "field_requirements_top": list(report["field_requirements"].items())[:12],
