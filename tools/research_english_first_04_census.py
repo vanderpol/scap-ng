@@ -45,15 +45,18 @@ def try_candidate(original):
         if not isinstance(states, list) or len(states) != 1:
             return None, "userright_complex_states"
         field = states[0].get("trustee_name") if isinstance(states[0], dict) else None
-        if not isinstance(field, dict) or set(field) != {"case_insensitive_equals", "require"}:
-            return None, "userright_complex_trustee"
-        if field["require"] != "at_least_one_exists_and_all_match":
+        if not isinstance(field, dict) or field.get("require") != "at_least_one_exists_and_all_match":
             return None, "userright_field_cardinality"
+        if set(field) == {"case_insensitive_equals", "require"}:
+            predicate = {"includes_ignoring_case": field["case_insensitive_equals"]}
+        elif set(field) == {"matches_regex", "require"}:
+            predicate = {"matches_regex": field["matches_regex"]}
+        else:
+            return None, "userright_complex_trustee"
         if set(where) != {"userright"}:
             return None, "userright_complex_selector"
         return {"check": title, "inspect": cap, "where": where,
-                "require": {"trustee_name": {
-                    "includes_ignoring_case": field["case_insensitive_equals"]}}}, None
+                "require": {"trustee_name": predicate}}, None
     if cap == "windows.registry":
         if not isinstance(states, list) or len(states) != 2:
             return None, "registry_not_two_alternatives"
