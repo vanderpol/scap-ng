@@ -5,6 +5,10 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
+## Start with four diverse, complete research Assessments
+
+**[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
+
 ## October 16 corpus checkpoint — source-backed, fail-closed
 
 - [Full six-STIG structural census](https://github.com/vanderpol/scap-ng/actions/runs/38908329365): **872 unique automated Assessments / 1,375 distinct named Tests**, from the SHA-256 pinned r3 authoring ZIP. **918** Tests use simple scalar State fields, **675** have native `collect` parameters, **387** have no States, **219** use State-level logical groups, **66** use records, **145** use Sets, **139** reference Variables inside their Object definitions, and **114** have **no explicit Object** (legitimate built-in collector capabilities, not necessarily broken content). These categories overlap.
