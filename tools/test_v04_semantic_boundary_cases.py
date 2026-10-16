@@ -181,7 +181,7 @@ class SourcePinnedBoundaryTests(unittest.TestCase):
             {"result": {"record": {
                 "require": "at_least_one_exists_and_some_match",
                 "fields": {"domainrole": {
-                    "equals": 5, "require": "only_one_exists_and_all_match"}}}}
+                    "equals": 5, "require": "only_one_exists_and_all_match"}}}}}
         ]}}}}
         compacted, _ = compact(source)
         restored = expand(compacted)
