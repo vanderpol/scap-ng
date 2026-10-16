@@ -1,0 +1,48 @@
+name: 0.4 reference six-state semantic boundary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v04-reference-sixstate-boundary.yml
+      - tools/oval_result_truth_tables.py
+      - tools/test_oval_result_truth_tables_exhaustive.py
+      - tools/research_04_quantifier_semantic_duality.py
+      - tools/test_conditional_conformance.py
+      - tools/assessment_expression.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reference-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test-only dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Pinned OVAL 5.12.3 independent result-chart oracle
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_oval_result_truth_tables_exhaustive.py
+      - name: Existing conditional six-state and skip-evidence fixtures
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_conditional_conformance.py
+      - name: Quantifier duality proofs and non-equivalence counterexamples
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work
+          python tools/research_04_quantifier_semantic_duality.py --output work/REFERENCE-SEMANTIC-BOUNDARY.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-reference-sixstate-boundary
+          path: work/REFERENCE-SEMANTIC-BOUNDARY.json
+          if-no-files-found: warn
