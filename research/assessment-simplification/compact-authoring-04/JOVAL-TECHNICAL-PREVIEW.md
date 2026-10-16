@@ -2,6 +2,8 @@
 
 **For technical discussion on October 16, 2026.** This is a **pre-alpha authoring-language candidate**, not a final standard, OVAL Board decision, or executable scanner bundle. The current 0.3 release is not changed.
 
+**For tomorrow's 20-minute technical review, [start with the one-page meeting card](JOVAL-MEETING-2026-10-16.md).** The detailed discussion and source excerpts remain below.
+
 ## Start with the original OVAL → NG 0.4 feature showcase
 
 **[Download the ten real OVAL-single/NG side-by-side comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)**. The 86 KB ZIP is a better starting point for the Joval meeting than the multi-megabyte six-STIG bundles. It contains actual archived OVAL single XML, the **correct** linked 0.4 authoring Assessment in **YAML and JSON**, and its Rule, grouped together by SV-ID. **[Open the concise showcase guide](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-oval-to-ng-showcase-20261015/SHOWCASE-START-HERE.md)** for real side-by-side static Variable and Set/filter examples and the validated, separately labeled conditional illustration.
