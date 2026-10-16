@@ -7,6 +7,7 @@ filter behavior; do not extrapolate unsupported nested-collector semantics.
 """
 from copy import deepcopy
 from itertools import product
+from itertools import product
 import json
 from pathlib import Path
 import unittest
@@ -237,6 +238,48 @@ class SourcePinnedBoundaryTests(unittest.TestCase):
         self.assertEqual(record["require"], "at_least_one_exists_and_some_match")
         self.assertEqual(record["fields"]["domainrole"]["require"],
                          "only_one_exists_and_all_match")
+
+    def test_scoped_require_inheritance_exhaustive_small_trees(self):
+        # Four independent scalar-field requirements across nested AND/OR
+        # branches, including actual field names colliding with operator
+        # spellings. Record and record-member quantifiers are separate.
+        # No semantics may be lost when the authoring overlay deduplicates
+        # repeated scalar field requirements.
+        requirements = (
+            "at_least_one_exists_and_all_match",
+            "at_least_one_exists_and_some_match",
+            "none_exist",
+            "only_one_exists_and_all_match",
+        )
+        cases=0
+        for a,b,c,d in product(requirements,repeat=4):
+            for group_type in ("all","any"):
+                original = {"assessment":{"tests":{"fixture":{
+                    "states":[
+                        {group_type:[
+                            {"and":{"equals":7,"require":a}},
+                            {"mount_options":{"equals":"nosuid","require":b}},
+                            {"all":[
+                                {"or":{"equals":"value","require":c}},
+                                {"name":{"matches_regex":"^x","require":d}},
+                            ]},
+                        ]},
+                        {"recorddata":{"record":{
+                            "require":b,
+                            "fields":{"domainrole":{"equals":5,"require":a}},
+                        }}},
+                    ]
+                }}}}
+                compacted,_=compact(original)
+                self.assertEqual(expand(compacted),original)
+                result=compacted["assessment"]["tests"]["fixture"]["states"]
+                # The record is never converted to or inherited from an
+                # ordinary scalar State requirement.
+                self.assertEqual(
+                    result[1]["recorddata"]["record"]["fields"]["domainrole"]["require"],
+                    a)
+                cases+=1
+        self.assertEqual(cases,512)
 
     def test_research_scope_rejects_hidden_defaults(self):
         invalid = {"assessment": {"tests": {"x": {"states": [
