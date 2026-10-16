@@ -27,6 +27,23 @@ The full source-structure census now stands at **871/872 complete unique automat
 
 **What passed:** reference-model equality of generic result aggregations and source-structure inversion. **What has not passed:** independent end-to-end OVAL XML → native collections → scanner/evidence parity, including real multi-valued States and missing data. The exact wording of the 0.4 normative authoring grammar remains open.
 
+## Human reading order (research presentation rule)
+
+Assessment authors should encounter **source data before assertions**. We found that the early experimental translator emitted `require` (State) above its corresponding `gather`/`where`/`collect` (Object); this is confusing even though YAML mapping order does not affect the scanner's evaluation semantics. Both [the base research translator](../../../tools/research_english_first_04_complex.py) and [compact research renderer](../../../tools/research_english_first_04_compact_layout.py) now emit a canonical display order:
+
+```yaml
+check: /home is mounted with the nosuid option
+inspect: linux.partition
+where:
+  mount_point:
+    matches_regex: '.*\\/home'
+require:
+  mount_options:
+    includes_value: nosuid
+```
+
+For more advanced Assessments, put named `sources` **before** `checks`; within each check use `check` → `inspect` → `from` / `gather` / `where` / `collect` → `input_from` → `require` → `report_elements`; finally put the whole-Assessment `evaluate` tree after the checks. This is one YAML grammar with a consistent display order, **not procedural ordering or a second syntax**. The complete six-STIG CI asserts this order while also proving exact source round-trip. Vocabulary is still experimental, and shortening a requirement must separately preserve native cardinality/error semantics.
+
 ## Start with four diverse, complete research Assessments
 
 **[Concise external reviewer one-pager](RESEARCH-REVIEW-ONE-PAGER.md)** · **[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
