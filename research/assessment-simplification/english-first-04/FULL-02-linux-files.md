@@ -12,12 +12,14 @@
 
 **What to assess:** Can you identify the collected system data, source definitions, value/Item requirements and final evaluation without referring to another file?
 
-## Before — full existing 0.4 Assessment
+## Complete assessments — side by side
 
-Everything below is the unchanged, pinned 0.4 preview file (metadata, sources, Tests, evaluate).
+Both columns include the **complete** original and proposed YAML; no checks, sources, Variables, or evaluation branches have been omitted. The view is intended for a wide desktop browser. If the table is wider than the viewport, scroll horizontally inside the rendered table. Standalone YAML links remain above.
 
-```yaml
-assessment:
+<table>
+<thead><tr><th align="left" width="50%">BEFORE — Current 0.4</th><th align="left" width="50%">AFTER — English-first research</th></tr></thead>
+<tbody><tr>
+<td valign="top" width="50%"><pre><code>assessment:
   id: ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive
   version: 1
   assessment_title: Linux local initialization files must have mode 0740 or less permissive.
@@ -154,7 +156,7 @@ assessment:
               home_dir:
                 require: at_least_one_exists_and_all_match
                 equals: /
-      object_title: only non-system users (uid>999) home-dirs excluding root directory
+      object_title: only non-system users (uid&gt;999) home-dirs excluding root directory
     only-root-users-uid-0-home-dirs-excluding-root-directory-object:
       capability: unix.password
       set:
@@ -170,15 +172,8 @@ assessment:
               home_dir:
                 require: at_least_one_exists_and_all_match
                 equals: /
-      object_title: only root users (uid=0) home-dirs excluding root directory
-```
-
-## After — full experimental English-first Assessment
-
-The following is the **complete generated** research YAML that reconstructs the original source structure. It is not yet an approved standard.
-
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+      object_title: only root users (uid=0) home-dirs excluding root directory</code></pre></td>
+<td valign="top" width="50%"><pre><code># EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive
@@ -199,7 +194,7 @@ sources:
         matches_regex: '[\w]+'
   only-non-system-users-uid-999-home-dirs-excluding-root-object:
     inspect: unix.password
-    description: only non-system users (uid>999) home-dirs excluding root directory
+    description: only non-system users (uid&gt;999) home-dirs excluding root directory
     difference:
     - from: users-username-object
       exclude_if:
@@ -314,8 +309,10 @@ checks:
 evaluate:
   all_of:
   - test: local-initialization-files-non-system-users-have-mode-0740-or-test
-  - test: local-initialization-files-root-have-mode-0740-or-less-permissive-test
-```
+  - test: local-initialization-files-root-have-mode-0740-or-less-permissive-test</code></pre></td>
+</tr></tbody>
+</table>
+
 
 ## Your review
 
