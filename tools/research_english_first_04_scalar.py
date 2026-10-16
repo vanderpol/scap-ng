@@ -44,7 +44,7 @@ def candidate_for(test, ass):
     obj = resolved_object(test, ass)
     if obj is None:
         return None, "no_typed_object"
-    if set(obj) - {"capability", "select", "collect"} or not ({"select", "collect"} & set(obj)):
+    if set(obj) - {"capability", "select", "collect", "filesystem", "traversal"} or not ({"select", "collect"} & set(obj)):
         return None, "complex_object_or_set"
     if obj.get("capability") != test.get("capability"):
         return None, "capability_mismatch"
@@ -80,13 +80,16 @@ def candidate_for(test, ass):
         result["where"] = deepcopy(obj["select"])
     if "collect" in obj:
         result["collect"] = deepcopy(obj["collect"])
+    for option in ("filesystem", "traversal"):
+        if option in obj:
+            result[option] = deepcopy(obj[option])
     return result, None
 
 
 def lower(c):
     if not isinstance(c, dict):
         raise ValueError("scalar check must be a YAML map")
-    valid = {"check", "inspect", "where", "collect", "require", "report_elements"}
+    valid = {"check", "inspect", "where", "collect", "filesystem", "traversal", "require", "report_elements"}
     if set(c) - valid or not {"check", "inspect", "require", "report_elements"}.issubset(c):
         raise ValueError("unexpected or missing Test properties")
     if not ({"where", "collect"} & set(c)):
@@ -122,6 +125,14 @@ def lower(c):
         if not isinstance(c["collect"], dict):
             raise ValueError("collector must be mapping")
         obj["collect"] = deepcopy(c["collect"])
+    if "filesystem" in c:
+        if not isinstance(c["filesystem"], str) or not c["filesystem"]:
+            raise ValueError("filesystem option must be explicit nonempty string")
+        obj["filesystem"] = c["filesystem"]
+    if "traversal" in c:
+        if not isinstance(c["traversal"], dict):
+            raise ValueError("traversal option must be a native map")
+        obj["traversal"] = deepcopy(c["traversal"])
     return {
         "test_title": c["check"], "capability": c["inspect"],
         "object": obj,
