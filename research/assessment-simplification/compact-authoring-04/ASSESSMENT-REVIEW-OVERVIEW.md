@@ -107,6 +107,8 @@ That same [SV-253495 file](https://github.com/vanderpol/scap-ng-editor-sample-da
 
 The [three complex source-backed Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md) show the **full multi-Test logic** for Windows role-dependent user rights, DNS zone/Variable processing and Apache configuration discovery. This is where the Slang-inspired readability goals meet actual OVAL complexity. The short samples above are deliberately the entry point, not the completeness argument.
 
+**English-first 0.4 research:** [Read the complex-source stress test](ENGLISH-FIRST-COMPLEX-SOURCE-AUDIT.md) to compare the new `check → inspect → where/collect → require` wording against real Windows, RHEL, DNS and Apache Assessments. This is a proposed presentation, not validated normative syntax.
+
 ## Suggested review flow (20 minutes)
 
 | Time | Open this sample or evidence | Question for reviewers |
