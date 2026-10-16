@@ -57,6 +57,15 @@ In 0.4, `mount_options` and `equals` are directly readable, and the two `require
       collected_items_require: at_least_one_exists_and_all_match
 ```
 
+**Why `some` for the State, but `all` for the Test?**
+
+- **Inside each filesystem Item:** `mount_options` may include `rw`, `nodev`, and `nosuid`. At least **one option** must exist and equal `nosuid`; requiring every option to equal `nosuid` would be wrong.
+- **Across collected filesystem Items:** at least **one filesystem** must be selected, and **every selected filesystem** must satisfy that mount-option check. If the selector finds two mounts and just one has `nosuid`, the Test fails.
+
+In plain English: **“Find at least one matching filesystem; every filesystem found must include `nosuid` among its mount options.”** These are two independent collections and two independent quantifiers, not a contradiction.
+
+**Selector caveat:** the current source-derived `matches_regex: .*\\/home` can select more than just an exact `/home` mount. This is why the Test-level `all` matters. Tightening that regex may be desirable for new content, but must **not** be silently done during source-faithful conversion.
+
 **2. Windows 11 — EditionId may be Enterprise *or* EnterpriseS** ([SV-253254](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253254.automated.yaml)). One Test expresses two allowed State alternatives. Item and State-field requirements are explicit and separate.
 
 ```yaml
