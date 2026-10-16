@@ -6,6 +6,7 @@ on:
       - tools/research_english_first_04_census.py
       - tools/research_english_first_04_shape_census.py
       - tools/research_english_first_04_presence.py
+      - tools/research_english_first_04_objectless.py
       - tools/research_english_first_04.py
   workflow_dispatch:
 
@@ -53,6 +54,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-state-free-presence.json
 
+      - name: Prove typed system-wide Objectless Test readably without inventing Objects
+        run: |
+          python tools/research_english_first_04_objectless.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-objectless.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -62,4 +69,5 @@ jobs:
             english-first-04-six-stig-census.json
             english-first-04-shape-census.json
             english-first-04-state-free-presence.json
+            english-first-04-objectless.json
           if-no-files-found: warn
