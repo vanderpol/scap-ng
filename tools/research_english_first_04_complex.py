@@ -255,8 +255,10 @@ def to_native(c):
  if c["sources"]:doc["shared_objects"]={k:native_source(v) for k,v in c["sources"].items()}
  return doc
 
-def run(root):
+def run(root, examples_dir=None):
  out=[];negative=0
+ if examples_dir:
+  Path(examples_dir).mkdir(parents=True,exist_ok=True)
  for label,path in CASES.items():
   with (Path(root)/path).open(encoding="utf8") as f:
    original=yaml.safe_load(f)["assessment"]
@@ -264,6 +266,17 @@ def run(root):
   converted=to_native(readable)
   if converted!=original:
    raise AssertionError("full source mismatch "+label+"\n"+repr(converted)[:2500]+"\n"+repr(original)[:2500])
+  if examples_dir:
+   text_header=(
+    "# RESEARCH ONLY - experimental English-first YAML, NOT current SCAP-NG v0.4\n"
+    "# Exact full source-Assessment structure reconstruction verified by CI.\n"
+    "# NOT scanner runnable; no OVAL six-state runtime/evidence proof.\n"
+    "# Pinned original: vanderpol/scap-ng-editor-sample-data@99cbceae8d594c44cb509df95975ac1676a2b44a\n"
+    "# File: "+path+"\n\n"
+   )
+   (Path(examples_dir)/(label+".research.yaml")).write_text(
+    text_header+yaml.safe_dump(readable,sort_keys=False,allow_unicode=True,width=105),
+    encoding="utf8")
   bad=deepcopy(readable)
   first=next(iter(bad["checks"].values()))
   first["require"].pop(next(iter(first["require"])))
@@ -293,8 +306,9 @@ def main():
  p=argparse.ArgumentParser()
  p.add_argument("--fixture-root",required=True)
  p.add_argument("--report")
+ p.add_argument("--examples-dir")
  args=p.parse_args()
- result=run(args.fixture_root)
+ result=run(args.fixture_root,examples_dir=args.examples_dir)
  if args.report:Path(args.report).write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
  print(json.dumps({"cases":[{k:v for k,v in case.items() if k!="readable_first_check"} for case in result["cases"]],
                    "negative_guards":result["negative_guards"]},indent=2))
