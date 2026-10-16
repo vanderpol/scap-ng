@@ -22,6 +22,7 @@ def census(archive):
     if digest != SHA:
         raise ValueError("Pinned source digest mismatch")
     counts, by_benchmark, by_reject, passed, rejected = Counter(), {}, Counter(), [], []
+    rejected_diagnostics = []
     with zipfile.ZipFile(archive) as z:
         if z.testzip():
             raise ValueError("Corrupted six-STIG source ZIP")
@@ -44,8 +45,20 @@ def census(archive):
                 by_benchmark[benchmark]["rejected"] += 1
                 category = f"{type(exc).__name__}: {str(exc)[:100]}"
                 by_reject[category] += 1
-                if len(rejected) < 35:
+                if len(rejected) < 46:
                     rejected.append({"source": file, "reason": category})
+                if len([row for row in rejected_diagnostics if row["category"] == category]) < 2:
+                    tests = source.get("tests") or {}
+                    match = next(((tid, t) for tid, t in tests.items()
+                                  if "variable" in t), None)
+                    if match is None:
+                        match = next(iter(tests.items()), ("<none>", {}))
+                    rejected_diagnostics.append({
+                        "source": file, "category": category,
+                        "test": match[0], "test_keys": sorted(match[1]),
+                        "test_variable": repr(match[1].get("variable"))[:1000],
+                        "states_example": repr(match[1].get("states"))[:1600],
+                    })
                 continue
             if restored != source:
                 counts["rejected_structural_difference"] += 1
@@ -86,6 +99,7 @@ def census(archive):
         "common_rejection_reasons": dict(by_reject.most_common(35)),
         "exact_assessments": passed,
         "rejected_examples": rejected,
+        "rejected_diagnostics": rejected_diagnostics,
         "warning": "No 0.4 schema change, full SCAP 1.4 lossless migration or actual collected evidence proof"
     }
 
@@ -104,6 +118,7 @@ def main():
         "common_rejections": list(result["common_rejection_reasons"].items())[:12],
         "exact_examples": result["exact_assessments"][:5],
         "rejected_examples": result["rejected_examples"],
+        "diagnostic_samples": result["rejected_diagnostics"],
     }, indent=2))
 
 
