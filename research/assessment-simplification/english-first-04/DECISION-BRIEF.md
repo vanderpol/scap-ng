@@ -2,6 +2,12 @@
 
 **As of 2026-10-16 (pre-alpha). Not a specification proposal, release candidate or Board approval request.** Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235), semantics [#229](https://github.com/vanderpol/scap-ng/issues/229). This is a technical checkpoint to decide whether more research is justified.
 
+## Updated source-proof checkpoint (October 16)
+
+The initial 39-Test experiment below is historical. **Current research has expanded to [800 of 872 complete unique automated Assessments, containing 1,230 named Tests](https://github.com/vanderpol/scap-ng/actions/runs/38914506962)**, each reconstructing the entire source Assessment dictionary exactly; 72 Assessments reject fail-closed and 800 mutation guards pass. [Four fully generated source-backed research YAML examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) cover RHEL Set/`for_each` collection, Windows WMI/user rights, DNS zone Variables, and Apache configuration Variables.
+
+**This changes the scale assessment, not the normative decision.** The proposed readable representation has promising *structural reach*, but its author-facing wording is uneven and independently validated OVAL six-state collection/evidence parity is still missing. Keep the research presentation distinct from the frozen 0.4 review packet. See [current complete checkpoint](README.md#latest-full-assessment-source-inversion--800-of-872).
+
 ## Verdict
 
 **CONTINUE RESEARCH. DO NOT PROPOSE GRAMMAR ADOPTION YET.**
