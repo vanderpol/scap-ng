@@ -116,6 +116,63 @@ The draft's `state_fields_require` map in this illustration would need to inheri
 
 **Narrow recommendation:** compare A, B and D with a human exercise first; C (`includes_value`) is an operator/computed-membership feature and can be considered separately. Choose **one** normative spelling for 0.4 once proven. This is not a request to add a second dialect.
 
+## E. English-first, resource-first reading test
+
+**This is an illustration, not a schema decision.** Start from the real RHEL 9 requirement in ordinary words:
+
+> Select partitions whose mount points match the source `.*\\/home` regex. Find at least one. Every selected partition must have `nosuid` among its `mount_options` values.
+
+Try a native authoring structure with a single local **inspect → where → expect** sequence:
+
+```yaml
+# EXPERIMENTAL, not valid native SCAP-NG v0.4 today
+inspect: linux.partition
+where:
+  mount_point: {matches_regex: '.*\\/home'}
+expect:
+  items_found: at_least_one
+  every_item:
+    mount_options:
+      includes_value: nosuid
+```
+
+**Why this feels natural:** `items_found` is the collected-Item existence requirement; `every_item` is the collected-Item matching requirement; `includes_value` is a **precise multi-value membership predicate**, not substring search. The capability schema must type `mount_options` as a suitable multi-valued field, and the predicate must lower to *field existence one_or_more + field match one_or_more + equals nosuid*. Any incomplete/error/unknown behavior must be preserved. The original selector regex can match mounts other than exact `/home`, and must not be narrowed for a prettier example.
+
+**Other real cases, same sentence-first design** (illustrative field blocks; entire Test/selector not repeated):
+
+```yaml
+# DNS SV-259345: "each collected result has exactly one stdout_line,
+# and that line must equal 'True'"
+expect:
+  items_found: at_least_one
+  every_item:
+    stdout_line:
+      values_found: exactly_one
+      every_value:
+        equals: 'True'
+
+# Apache SV-214228: "if a KeepAlive line is present, every one must match"
+expect:
+  items_found: at_least_one  # demonstrate scope; original source must be checked
+  every_item:
+    stdout_line:
+      values_found: optional
+      every_value:
+        matches_regex: '\\s*KeepAlive On'
+```
+
+**Important design risk:** `includes_value` is a *compound* operator, while `values_found` + `every_value` expose two axes. We do **not** want to publish two permanent alternatives for the same source meaning. Before deciding, test whether an entirely compositional form such as `items_found` + `items_passing` + `values_found` + `values_matching` is easier to understand than these ordinary-English predicate words. Existing OVAL includes unusual combinations (including no Item existence with State comparisons) that cannot be omitted for the sake of a happy-path demonstration. A human-readable editor sentence **does not replace** an exact serialized source contract.
+
+### Concrete design discipline for E
+
+1. Write one plain-English sentence for every example **before** its YAML, and ask a new reader to predict pass/fail/unknown on actual populations.
+2. One concept per word: `found` / `items` names collection counts, `item(s)_passing` the Test result aggregator, `value(s)` field populations, `record(s)` nested record populations. Use `matching` for predicate outcomes, not existence.
+3. For everyday checks, prefer familiar verbs (`includes_value`, `every_item`, `exactly_one_value`), **only** where the complete source semantic meaning can be made intrinsic by the typed capability schema. No undocumented defaults or overloaded substring behavior.
+4. Require **one grammar**, not an English facade plus a second “canonical authoring” syntax. Mechanically lower that one grammar to the existing evaluated semantics; avoid two equivalent accepted spellings.
+5. Reject any proposed macro whose precise six-state, incomplete-collection, negative-match or evidence behavior is not independently proven. Test source-preserving transformations, especially exact-one, optional, no-State, nested WMI record and `value_match` arrays.
+
+**Ranking proposal:** test A (fused enum), B (generic pairs), D (separate scope nouns) and E (English-first vocabulary) with blind novices and experienced OVAL authors. If E cannot express outliers without a second grammar, prefer D or improve the one compositional grammar rather than standardizing E prematurely.
+
 ## Apply the same idea to harder real content
 
 | Real example | Existing label | Candidate structured form | Important scope |
