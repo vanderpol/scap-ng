@@ -230,9 +230,9 @@ want. For lossless migration of an existing OVAL branch tree, a declarative
 `case/when` form defined by explicit desugaring may be safer if we decide the
 readability improvement is worth adding another surface form.
 
-## Joval meeting questions
+## Technical review questions
 
-The **[October 16, 2026 Joval conditional question sheet](JOVAL-IF-ELSE-QUESTIONS.md)** distinguishes native procedural selection from faithful OVAL Boolean aggregation, records the 135/216 versus 81/216 six-state finding, and lists the open evaluation, applicability, short-circuit, evidence and migration gates. Its questions are explicitly non-normative; no automatic conditional conversion is authorized.
+The [conditional semantics question sheet](CONDITIONAL-REVIEW-QUESTIONS.md) distinguishes native procedural selection from faithful OVAL Boolean aggregation, documents the 135/216 versus 81/216 six-state finding, and identifies open evaluation, applicability, short-circuit, evidence and migration gates. These questions are non-normative; automatic conditional conversion is not authorized.
 
 ## Next research
 
