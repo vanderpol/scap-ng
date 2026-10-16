@@ -6,6 +6,7 @@
 
 - **[Short 0.4 overview](ASSESSMENT-REVIEW-OVERVIEW.md)** — three embedded real NG Test examples: Linux mount selection, Windows registry alternatives, and user-right cardinality. Suitable as the main pre-read.
 - **[Detailed technical examples](ASSESSMENT-REVIEW-TECHNICAL.md)** — Windows WMI record scoping, DNS exact-one checks, Apache Variables, proof boundaries, and guidance on Test versus private/shared Object titles.
+- **[English-first complex-source stress test](ENGLISH-FIRST-COMPLEX-SOURCE-AUDIT.md)** — experimental source-grounded sketches for Windows user rights, RHEL user→file collection, DNS, Apache and registry; explicitly lists non-lossless risks.
 - **[Three complex source-backed Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md)** — Windows multi-Test role logic, DNS zone Variables and Apache configuration discovery; substantial real excerpts with explicit strengths and limitations.
 - **[Conditional semantics questions](../conditional-10/CONDITIONAL-REVIEW-QUESTIONS.md)** — six-state behavior, `if/else` versus faithful OVAL Boolean graphs, and evidence collection.
 
