@@ -18,6 +18,12 @@ CASES={
  "apache_configuration":"focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml",
 }
 FIELD_REQ="at_least_one_exists_and_all_match"
+ALTERNATE_FIELD_SCOPE="may_be_absent_and_all_match"
+TEST_FIELD_SCOPES={
+ FIELD_REQ:"all_state_fields_exist",
+ ALTERNATE_FIELD_SCOPE:"all_state_fields_when_present",
+}
+REVERSE_TEST_FIELD_SCOPES={v:k for k,v in TEST_FIELD_SCOPES.items()}
 FIELD_OPS={"equals":"is","case_insensitive_equals":"equals_ignoring_case",
            "matches_regex":"matches_regex","greater_than":"greater_than","less_than":"less_than",
            "greater_than_or_equal":"at_least","less_than_or_equal":"at_most",
@@ -156,6 +162,7 @@ def state_to_human(node, inherited=False):
    "at_least_one_exists_and_all_match":"every_record",
    "at_least_one_exists_and_some_match":"some_record",
    "at_least_one_exists_and_only_one_matches":"exactly_one_matching_record",
+   "at_least_one_exists_and_none_match":"no_matching_record",
   }.get(record["require"])
   if record_mode is None:raise ValueError("unproven record cardinality")
   if not isinstance(record["fields"],dict) or not record["fields"]:
@@ -180,7 +187,7 @@ def state_to_native(node, inherited=False):
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
  if isinstance(sub,dict) and "at_least_one_record_exists" in sub:
-  record_keys=set(sub)&{"every_record","some_record","exactly_one_matching_record"}
+  record_keys=set(sub)&{"every_record","some_record","exactly_one_matching_record","no_matching_record"}
   if len(record_keys)!=1:raise ValueError("ambiguous record matching")
   record_mode=next(iter(record_keys))
   exact(sub,("at_least_one_record_exists",record_mode),"records")
@@ -188,7 +195,8 @@ def state_to_native(node, inherited=False):
    raise ValueError("record existence")
   source_mode={"every_record":"at_least_one_exists_and_all_match",
                "some_record":"at_least_one_exists_and_some_match",
-               "exactly_one_matching_record":"at_least_one_exists_and_only_one_matches"}[record_mode]
+               "exactly_one_matching_record":"at_least_one_exists_and_only_one_matches",
+               "no_matching_record":"at_least_one_exists_and_none_match"}[record_mode]
   return {name:{"record":{"fields":{
    key:field_to_native(val) for key,val in sub[record_mode].items()},
    "require":source_mode}}}
@@ -305,7 +313,7 @@ def human_test(test):
  states=test["states"]
  if not isinstance(states,list) or not states:raise ValueError("no States")
  inherited=("state_fields_require" in test)
- if inherited and test["state_fields_require"]!=FIELD_REQ:
+ if inherited and test["state_fields_require"] not in TEST_FIELD_SCOPES:
   raise ValueError("unproven Test-level field inheritance")
  mode=test.get("states_match")
  if mode in {"any","all"}:
@@ -323,7 +331,7 @@ def human_test(test):
  if "object" in test:
   readable["gather"]=readable_source(test["object"])
  if inherited:
-  readable["all_state_fields_exist"]=True
+  readable[TEST_FIELD_SCOPES[test["state_fields_require"]]]=True
  if "variable" in test:
   if not isinstance(test["variable"],str) or not test["variable"]:raise ValueError("invalid direct Test Variable")
   readable["input_from"]={"variable":test["variable"]}
@@ -331,12 +339,14 @@ def human_test(test):
 
 def native_test(src):
  mandatory={"check","inspect","require","report_elements"}
- permitted=mandatory|{"all_state_fields_exist","gather","input_from"}
+ permitted=mandatory|set(REVERSE_TEST_FIELD_SCOPES)|{"gather","input_from"}
  if not isinstance(src,dict) or set(src)-permitted or not mandatory.issubset(src):
   raise ValueError("unrecognized check shape")
  if src["report_elements"]!="all":raise ValueError("unsupported reporting")
- inherited=("all_state_fields_exist" in src)
- if inherited and src["all_state_fields_exist"] is not True:
+ active_scopes=set(src)&set(REVERSE_TEST_FIELD_SCOPES)
+ if len(active_scopes)>1:raise ValueError("ambiguous State field scopes")
+ inherited=bool(active_scopes)
+ if inherited and src[next(iter(active_scopes))] is not True:
   raise ValueError("state-fields inheritance must be explicit")
  require=src["require"]
  if not isinstance(require,dict):raise ValueError("Item requirement")
@@ -378,7 +388,7 @@ def native_test(src):
          "reported_elements":"all","collected_items_require":REV_ITEMS[(p,a)],**mode}
  if "gather" in src:
   native["object"]=native_source(src["gather"])
- if inherited:native["state_fields_require"]=FIELD_REQ
+ if inherited:native["state_fields_require"]=REVERSE_TEST_FIELD_SCOPES[next(iter(active_scopes))]
  if "input_from" in src:
   exact(src["input_from"],("variable",),"Test input")
   var=src["input_from"]["variable"]
