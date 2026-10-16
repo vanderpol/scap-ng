@@ -9,6 +9,7 @@ on:
       - tools/research_english_first_04_objectless.py
       - tools/research_english_first_04_scalar.py
       - tools/research_english_first_04_full_corpus.py
+      - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_complex.py
       - tools/research_english_first_04_evaluate.py
       - tools/research_english_first_04.py
@@ -76,6 +77,13 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-full-assessment-census.json
 
+      - name: Audit compact acquisition layout against full pinned source
+        run: |
+          python tools/research_english_first_04_compact_layout.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-compact-layout-report.json \
+            --examples-dir english-first-04-compact-layout-examples
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,4 +96,6 @@ jobs:
             english-first-04-objectless.json
             english-first-04-generic-scalar.json
             english-first-04-full-assessment-census.json
+            english-first-04-compact-layout-report.json
+            english-first-04-compact-layout-examples/
           if-no-files-found: warn
