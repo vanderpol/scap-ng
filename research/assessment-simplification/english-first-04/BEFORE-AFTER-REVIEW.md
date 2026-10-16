@@ -1,213 +1,36 @@
-# SCAP-NG 0.4 — before/after authoring review
+# SCAP-NG 0.4 — complete before-and-after Assessment review
 
-**For design feedback · 16 October 2026 · Pre-alpha experiment, NOT approved 0.4 syntax**
+**October 16, 2026 · Pre-alpha research · Not a specification adoption request**
 
-**The decision question:** *Is the proposed English-first form more consistent and easier to write from scratch than the current 0.4 preview, without compromising source meaning?*
+**Your feedback question:** Which format makes it easier to understand **and author a complete check**—existing 0.4 or proposed English-first—without needing to guess what a referenced collection or Variable means?
 
-Start with the two Linux and Windows samples below; then examine DNS and Apache. **The small extracts on this page illustrate the difference; use the links to review complete Assessments with every Test, source, Variable and evaluation tree.** Both versions are normal GitHub files, accessible on a restricted github.com network without downloading Actions artifacts.
+Each comparison below includes **both complete YAML documents directly on its own Markdown page**: metadata, source collections, variables, checks, field/Item requirements, and final evaluation. **There are no shortened snippets or omitted parts in the paired YAML blocks.** They can be read entirely on `github.com`, including on a phone or restricted proxy network.
 
-**How these pairs were produced.** The **before** files are the unchanged, pinned 0.4 r3 source examples. The **after** files are the complete research-only compact English-first representations generated from those same Assessments. The converter reconstructed the original complete source dictionaries exactly for all four in the passing six-STIG run [38934771985](https://github.com/vanderpol/scap-ng/actions/runs/38934771985) (871/872 total). That is **source-structure identity, not proof of SCAP 1.4 runtime, collection evidence, or six-state scanner equivalence**.
+## Open a full comparison
 
-| Real assessment | Before: complete current 0.4 | After: complete experimental English-first |
+| Order | Assessment | Why review it |
 | --- | --- | --- |
-| **RHEL 9 — SV-257889** local initialization-file permissions | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml) | [View full English-first version](comparisons/linux-initialization.research.yaml) |
-| **Windows 11 — SV-253495** Remote Desktop deny-rights | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) | [View full English-first version](comparisons/win11-role-rights.research.yaml) |
-| **Windows Server DNS — SV-259345** zone signing | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_server_dns/assessments/automated/SV-259345.automated.yaml) | [View full English-first version](comparisons/dns-zone-signing.research.yaml) |
-| **Apache 2.4 UNIX — SV-214228** loaded config directives | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml) | [View full English-first version](comparisons/apache-keepalive.research.yaml) |
+| 1 | **[RHEL 9 — /home with nosuid (full check)](FULL-01-linux-home.md)** | Smallest complete before/after: selector, multi-value mount option, presence and evaluation |
+| 2 | **[RHEL 9 — account-derived initialization-file permissions (full check)](FULL-02-linux-files.md)** | All named account sources, union/difference, per-user file collection and eight permission fields |
+| 3 | **[Windows 11 — Remote Desktop deny rights (full check)](FULL-03-win11-rights.md)** | Seven Tests, WMI record scoping, named Windows sources and three OR alternatives |
+| 4 | **[Windows Server DNS — zone signing and RRSIG validity (full check)](FULL-04-dns.md)** | Five Tests, three command-building Variables, shared zone discovery and evaluation tree |
+| 5 | **[Apache UNIX — included configuration and directives (full check)](FULL-05-apache.md)** | Four Tests, 18 local Variables, source discovery chain, required versus optional conditions |
 
-## First: one straightforward Linux check
+Each page starts with **what changed**, followed by the complete 0.4 YAML and complete experimental YAML. The highlights are editorial; they do **not** modify the YAML under review.
 
-**RHEL 9 SV-257851: /home must use `nosuid`.** [Complete original 0.4 check](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/home-mounted-nosuid-option.assessment.yaml).
+## How to judge
 
-**Before — 0.4 Test excerpt**
+- **Comprehension:** Can you understand how the entire check works, including where inputs come from and how the final result is determined?
+- **Authorability:** Could you write the proposed version of a new DISA check from scratch with a short vocabulary reference?
+- **Consistency:** Are `inspect`, `where`, `collect`, `from`, `gather`, Set operators and `require` placed predictably?
+- **Faithfulness:** Where might shorthand obscure counts, missing data, records, dynamic collection or six technical result states?
 
-~~~yaml
-capability: linux.partition
-object:
-  capability: linux.partition
-  select:
-    mount_point:
-      matches_regex: .*\/home
-states:
-  - mount_options:
-      require: at_least_one_exists_and_some_match
-      equals: nosuid
-collected_items_require: at_least_one_exists_and_all_match
-~~~
+You can give feedback per example instead of making a single decision on the whole proposal. The most useful comments are **what you would change in the after version**, especially where you have to hunt for definitions.
 
-**After — same intent using the source-exact experimental naming/placement convention (short Test excerpt)**
+## Proof boundaries
 
-~~~yaml
-inspect: linux.partition
-where:
-  mount_point:
-    matches_regex: .*\/home
-require:
-  at_least_one_item_exists: true
-  every_item_must_match:
-    mount_options:
-      some_values_is: nosuid
-~~~
+The four complex **after** files are generated by the experimental compact-layout translator from the pinned existing 0.4 Assessment files and were reconstructed with exact source-dictionary equality in the [six-STIG research workflow](https://github.com/vanderpol/scap-ng/actions/runs/38934771985). The **simple Linux after** was assembled using the same mapping and is clearly labeled as not separately round-trip tested on its page.
 
-In both versions, **every selected mount Item** must match but **at least one value of its `mount_options` field** must equal `nosuid`. The source regex is preserved, not silently tightened to an exact `/home` match. The excerpts omit metadata and reporting attributes; do not treat them as complete documents.
+**Structural equality is not SCAP 1.4 runtime/evidence parity.** One `none_exist` plus State source shape remains unresolved outside these examples. Human authoring usability has not yet been established. Nothing here changes the normative 0.4 schema or scanner.
 
-**Authoring question:** Do the new `where` and `require` keywords make this easier to write? Or would you choose clearer words for `some_values_is`?
-
-## 1. RHEL 9 — account-derived file inspections
-
-*Hard question: where does the account collection come from, and could you define it yourself?* The source first collects accounts, subtracts excluded accounts, then inspects each user's home directory. **Neither version infers filtering rules from an ID.**
-
-**Before — original 0.4 source excerpt**
-
-~~~yaml
-shared_objects:
-  only-non-system-users-uid-999-home-dirs-excluding-root-object:
-    capability: unix.password
-    set:
-      operator: difference
-      operands:
-        - object: users-username-object
-          filters:
-            - exclude:
-                user_id:
-                  require: at_least_one_exists_and_all_match
-                  less_than: 1000
-            - exclude:
-                home_dir:
-                  require: at_least_one_exists_and_all_match
-                  equals: /
-~~~
-
-**After — generated English-first excerpt, same required filters**
-
-~~~yaml
-sources:
-  only-non-system-users-uid-999-home-dirs-excluding-root-object:
-    inspect: unix.password
-    difference:
-      - from: users-username-object
-        exclude_if:
-          - user_id:
-              less_than: 1000
-          - home_dir:
-              is: /
-~~~
-
-The complete after file still defines `users-username-object`; shows a one-operand `union` for per-user `unix.file` discovery, its `for_each_source.in` reference, filesystem traversal and `exclude_if` filter; and retains the two distinct Item-count requirements and all eight file-permission conditions. **Do not judge this from the compact snippet alone.**
-
-**Authoring question:** Is `sources` + `difference` + `for_each_source` predictable, or should collections have a different placement/name?
-
-## 2. Windows 11 — record-scoped, role-dependent rights
-
-*Hard question: do the rules express separate Items, States and WMI records without conflating their matching requirements?*
-
-**Before — original 0.4 Guest user-right Test excerpt**
-
-~~~yaml
-deny-log-on-through-remote-desktop-services-guests-test:
-  test_title: Deny log on through Remote Desktop Services - Guests
-  capability: windows.userright
-  object: windows-userright-object
-  states:
-    - trustee_name:
-        require: at_least_one_exists_and_all_match
-        case_insensitive_equals: Guests
-  reported_elements: all
-  collected_items_require: at_least_one_exists_and_some_match
-~~~
-
-**After — generated English-first Guest Test excerpt**
-
-~~~yaml
-deny-log-on-through-remote-desktop-services-guests-test:
-  check: Deny log on through Remote Desktop Services - Guests
-  inspect: windows.userright
-  require:
-    at_least_one_item_exists: true
-    at_least_one_item_matches:
-      trustee_name:
-        equals_ignoring_case: Guests
-  report_elements: all
-  from: windows-userright-object
-~~~
-
-The complete pair includes all **seven named Tests**, their WMI `DomainRole` record alternatives and the **three branches** of the final evaluation. Joining the WMI alternatives into a simple `domainrole in [1, 3]` check could **change semantics**, so the after retains two whole-State alternatives.
-
-**Authoring question:** Is the separate `from` reference discoverable? Would you know when to write `every_item_must_match` versus `at_least_one_item_matches`?
-
-## 3. Windows Server DNS — derived command inputs
-
-*Hard question: do you understand where the generated PowerShell commands come from?*
-
-**Before — original 0.4 Test acquisition excerpt**
-
-~~~yaml
-capability: independent.shellcommand
-object:
-  capability: independent.shellcommand
-  object_title: The 'IsSigned' setting for each forward lookup zone
-  collect:
-    shell: powershell
-    command:
-      variable: command-get-issigned-setting-each-forward-lookup-zone-variable
-    error_if_exit_status_not_0: false
-    error_if_stderr_exists: false
-~~~
-
-**After — generated English-first Test acquisition excerpt**
-
-~~~yaml
-inspect: independent.shellcommand
-collect:
-  shell: powershell
-  command:
-    variable: command-get-issigned-setting-each-forward-lookup-zone-variable
-  error_if_exit_status_not_0: false
-  error_if_stderr_exists: false
-~~~
-
-The complete before and after versions both retain **three command-building Variables**, the shared forward-zone collection, **five Tests**, and their OR/AND evaluation tree. A reader must still trace the Variable expression referencing the zone collection's `stdout_line`.
-
-**Authoring question:** Is moving `collect` next to `inspect` an improvement if it leaves the Variable graph difficult to author?
-
-## 4. Apache UNIX — required and optional configuration
-
-*Hard question: can you trace the discovery of loaded configuration files and understand required versus optional directive checks?*
-
-**Before — original 0.4 optional KeepAlive State**
-
-~~~yaml
-states:
-  - stdout_line:
-      require: may_be_absent_and_all_match
-      matches_regex: \s*KeepAlive On
-reported_elements: all
-collected_items_require: at_least_one_exists_and_all_match
-~~~
-
-**After — generated English-first optional KeepAlive requirement**
-
-~~~yaml
-require:
-  at_least_one_item_exists: true
-  every_item_must_match:
-    stdout_line:
-      when_present_matches_regex: \s*KeepAlive On
-report_elements: all
-~~~
-
-Both complete versions retain **18 local Variables** and four Tests. The reference audit reports an **Apache prerequisite chain of up to 10 edges**—preserving the graph has not made its authoring easy.
-
-**Authoring question:** Does `when_present_matches_regex` express the rule clearly, and how would you prefer to reuse the deep configuration-discovery graph?
-
-## The feedback most useful for the 0.4 decision
-
-Please judge **the complete before/after files**, not just line counts. In particular:
-
-1. **Readability:** which version makes each check's intention clearer?
-2. **Consistency:** could you predict where to put `inspect`, `where`, `collect`, `from`, `gather`, `difference` and `union`?
-3. **Authorability:** if handed a new DISA check, which version could you write without copying an existing assessment?
-4. **Missing clarity:** what references, source graph steps or quantifiers still need an explanatory paragraph?
-5. **Decision:** adopt the complete approach, adopt selected improvements to 0.4, or keep researching?
-
-**Current recommendation: keep researching, not adopt yet.** Complete 0.4 source-structure reversibility is promising, but direct authorability, user comprehension and independent SCAP 1.4 result/evidence equivalence remain unproven. Track findings under [#235](https://github.com/vanderpol/scap-ng/issues/235). Supporting [technical census](reports/README.md) is evidence, not the decision memo.
+Research issue [#235](https://github.com/vanderpol/scap-ng/issues/235) · [Authoring consistency working draft](AUTHORING-CONSISTENCY-WORKING-DRAFT.md) · [Decision brief](DECISION-BRIEF.md).
