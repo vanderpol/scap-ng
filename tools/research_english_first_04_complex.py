@@ -20,7 +20,10 @@ CASES={
 FIELD_REQ="at_least_one_exists_and_all_match"
 FIELD_OPS={"equals":"is","case_insensitive_equals":"equals_ignoring_case",
            "matches_regex":"matches_regex","greater_than":"greater_than","less_than":"less_than",
-           "greater_than_or_equal":"at_least","less_than_or_equal":"at_most"}
+           "greater_than_or_equal":"at_least","less_than_or_equal":"at_most",
+           "not_equal":"is_not","case_insensitive_not_equal":"is_not_ignoring_case",
+           "version_greater_than_or_equal":"version_at_least",
+           "bitwise_and":"bitwise_and"}
 REVERSE_OPS={v:k for k,v in FIELD_OPS.items()}
 ITEM_REQS={
  "at_least_one_exists_and_all_match":("at_least_one_item_exists","every_collected_item"),
@@ -106,11 +109,19 @@ def field_to_native(node, inherited=False):
 
 def state_to_human(node, inherited=False):
  if not isinstance(node,dict): raise ValueError("State not a mapping")
- if "and" in node:
-  if set(node)!={"and","state_fields_require"} or node["state_fields_require"]!=FIELD_REQ:
+ if "and" in node or "or" in node:
+  op="and" if "and" in node else "or"
+  if set(node)-{op,"state_fields_require"}:
    raise ValueError("unsupported group fields scope")
-  return {"all_of":[state_to_human(child, inherited=True) for child in node["and"]],
-          "all_fields_must_exist":True}
+  local_scope="state_fields_require" in node
+  if local_scope and node["state_fields_require"]!=FIELD_REQ:
+   raise ValueError("unsupported group field requirements")
+  if not isinstance(node[op],list) or not node[op]:
+   raise ValueError("empty State group")
+  key="all_of" if op=="and" else "any_of_fields"
+  out={key:[state_to_human(child,inherited=inherited or local_scope) for child in node[op]]}
+  if local_scope:out["all_fields_must_exist"]=True
+  return out
  exact(node,(next(iter(node)),),"single State")
  name,sub=next(iter(node.items()))
  if name=="result":
@@ -124,11 +135,17 @@ def state_to_human(node, inherited=False):
 
 def state_to_native(node, inherited=False):
  if not isinstance(node,dict): raise ValueError("human State not a mapping")
- if "all_of" in node:
-  exact(node,("all_of","all_fields_must_exist"),"group")
-  if node["all_fields_must_exist"] is not True or not node["all_of"]: raise ValueError("invalid group")
-  return {"and":[state_to_native(child,inherited=True) for child in node["all_of"]],
-          "state_fields_require":FIELD_REQ}
+ if "all_of" in node or "any_of_fields" in node:
+  key="all_of" if "all_of" in node else "any_of_fields"
+  if set(node)-{key,"all_fields_must_exist"}:raise ValueError("unrecognized State group attributes")
+  local_scope="all_fields_must_exist" in node
+  if local_scope and node["all_fields_must_exist"] is not True:raise ValueError("invalid local group scope")
+  children=node[key]
+  if not isinstance(children,list) or not children:raise ValueError("empty group")
+  op="and" if key=="all_of" else "or"
+  result={op:[state_to_native(child,inherited=inherited or local_scope) for child in children]}
+  if local_scope:result["state_fields_require"]=FIELD_REQ
+  return result
  exact(node,(next(iter(node)),),"single human State")
  name,sub=next(iter(node.items()))
  if name=="result":
