@@ -11,6 +11,7 @@ on:
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_six_state.py
+      - tools/research_english_first_04_none_exist_state_boundary.py
       - tools/oval_result_truth_tables.py
       - tools/research_english_first_04_complex.py
       - tools/research_english_first_04_evaluate.py
@@ -91,6 +92,12 @@ jobs:
           python tools/research_english_first_04_six_state.py \
             --output english-first-04-six-state-cardinality.json
 
+      - name: Isolate none_exist State source corner cases without guessing
+        run: |
+          python tools/research_english_first_04_none_exist_state_boundary.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-none-exist-state-boundary.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -105,5 +112,6 @@ jobs:
             english-first-04-full-assessment-census.json
             english-first-04-compact-layout-report.json
             english-first-04-six-state-cardinality.json
+            english-first-04-none-exist-state-boundary.json
             english-first-04-compact-layout-examples/
           if-no-files-found: warn
