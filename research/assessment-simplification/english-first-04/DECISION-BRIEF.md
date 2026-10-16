@@ -1,50 +1,44 @@
-# SCAP-NG 0.4 — English-first authoring: interim research decision
+# English-first SCAP-NG: decision brief
 
-**As of 2026-10-16 (pre-alpha). Not a specification proposal, release candidate or Board approval request.** Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235), semantics [#229](https://github.com/vanderpol/scap-ng/issues/229). This is a technical checkpoint to decide whether more research is justified.
+**16 October 2026 · Pre-alpha research · Not a specification approval request**
 
-## Updated source-proof checkpoint (October 16)
+## Decision now
 
-The initial 39-Test experiment below is historical. **Current research reconstructs [865 of 872 complete unique automated Assessments, containing 1,351 named Tests](https://github.com/vanderpol/scap-ng/actions/runs/38917654846)** with exact Assessment-dictionary equality; seven Assessments remain unsupported and 865 mutation guards pass. [Four fully generated source-backed research YAML examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) cover RHEL Set/`for_each` collection, Windows WMI/user rights, DNS zone Variables, and Apache configuration Variables.
+**Continue researching the English-first design. Do not adopt it as the 0.4 grammar yet.** Keep the current 0.4 preview and release artifacts unchanged.
 
-**This changes the scale assessment, not the normative decision.** The proposed readable representation has promising *structural reach*, but its author-facing wording is uneven and independently validated OVAL six-state collection/evidence parity is still missing. Keep the research presentation distinct from the frozen 0.4 review packet. See [current complete checkpoint](README.md#latest-full-assessment-source-inversion--865-of-872).
+The six-STIG reports are *engineering evidence*, not evidence that a person can comfortably write a new assessment. We should not ask reviewers to choose a vocabulary based on corpus statistics alone.
 
-## Verdict
+## What has actually been demonstrated
 
-**CONTINUE RESEARCH. DO NOT PROPOSE GRAMMAR ADOPTION YET.**
+| Finding | Decision relevance |
+| --- | --- |
+| **871/872** complete existing 0.4 Assessment dictionaries reconstruct through the experimental language | Strong structural coverage of current converted content |
+| **5.21% shorter YAML** in the newer compact layout | Less repetition, but modest size reduction is **not** a usability measurement |
+| **0 missing, malformed or cyclic references** across 871 audited Assessments | The research reference graph is internally connected; this does not prove correct behavior |
+| **Apache collection dependencies reach 10 edges** | A major human-authoring complexity problem remains |
+| **125,268 supported six-state combinations agree**, with 12 unresolved empty-reference cases | Useful model-level assurance; still **not** OVAL scanner or collected-evidence parity |
+| **1 Assessment remains unsupported** (`none_exist` plus attached State) | Needs explicit semantic resolution, not an automatic rewrite |
 
-The English-first approach now has reproducible evidence beyond readable screenshots. The experimental grammar now structurally covers most six-STIG 0.4 Assessment graphs. However, **a source-structure round trip does not prove original SCAP 1.4 runtime/evidence parity**, and unfamiliar authors have not demonstrated comprehension of the full complex YAML.
+Source: [current six-STIG reports, run 38932589417](reports/README.md). This is pinned-source research, not a claim of equivalence to the original SCAP 1.4 XML in execution.
 
-## Evidence — genuinely tested
+## The four examples we should actually review
 
-- [PASS: four pinned individual source Test inversions, six-state generic reference checks](https://github.com/vanderpol/scap-ng/actions/runs/38907309219). RHEL9 SV-257851 nosuid; Windows 11 SV-253495 user-right equality and regular-expression checks; Windows 11 SV-253254 two allowed registry-State alternatives. Each demonstrated macro is capability- and field-scoped, fails closed on unsupported operators/changed cardinalities, and expands to **exact existing 0.4 source Test structure**.
-- [PASS: four full real Test-composition tree inversions](https://github.com/vanderpol/scap-ng/actions/runs/38907309219). RHEL9 SV-257889 (2 referenced Tests), Windows 11 SV-253495 (8 Test references, 7 unique), DNS SV-259345 (5), Apache SV-214228 (4). Every Test ref and grouping is unchanged when native AND/OR becomes readable all_of/any_of. **This proves Boolean graph encoding, not faithful execution of the underlying Tests or safe procedural conditionals.**
-- [PASS: full unique-archive fail-closed census](https://github.com/vanderpol/scap-ng/actions/runs/38907185233). The immutable r3 six-STIG YAML ZIP has **872 unique automated Assessment files with 1,375 named Test nodes**. Under our **four currently implemented narrow operator/shape templates**, **39 Tests (2.84%)** pass exact source Test inversion. **1,336 remain unsupported by the prototype.** This ratio is not an upper bound on what an English-first grammar could eventually express. No unsupported Test was presented as lossless.
-- Pinned official [OVAL 5.12.3 Windows userright_item](https://oval-community-guidelines.readthedocs.io/en/base/oval-schema-documentation/windows-system-characteristics-schema.html#userright-item) documents trustee_name as 0..1 per Item; [OVAL Linux partition_item](https://oval-community-guidelines.readthedocs.io/en/base/oval-schema-documentation/linux-system-characteristics-schema.html#partition-item) has mount_options 0..unbounded. This allows **different capability-specific operators** with exactly declared semantics rather than hidden count defaults.
+| Real assessment | What the reader should judge | Current limitation |
+| --- | --- | --- |
+| [RHEL 9 SV-257889 — derived initialization-file checks](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#1-linux--account-derived-file-permissions) | Can I discover and author the account collection, foreach, filters, and file checks without guessing? | Named-source and Set syntax still require explanation |
+| [Windows 11 SV-253495 — Remote Desktop rights](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#2-windows-11--remote-desktop-rights-depend-on-domain-role) | Can I clearly express nested WMI records and all three role-dependent alternatives? | Compact rewrites can accidentally change whole-State semantics |
+| [DNS SV-259345 — signing and validity](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#3-windows-server-dns--dynamic-zone-names-and-three-passing-alternatives) | Can I author commands derived from discovered zones? | Command Variable graph remains difficult to write |
+| [Apache SV-214228 — loaded configuration](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#4-apache-unix--required-vs-optional-settings-across-included-files) | Can I follow and author configuration discovery once and reuse it across checks? | Up to 10 dependency edges; repetition still dominates |
 
-## What still blocks 0.4
+The linked excerpts are not independently executable full files; see their source and proof boundaries before comparing designs.
 
-1. **Real collection graphs:** 395 candidate Tests lack a selector/title that the narrow compiler currently knows how to present locally, and 114 have an unresolved/non-inline Object shape under this prototype. These are **research-tool limitations**, not evidence that real Test content lacks collection or should be skipped.
-2. **More vocabulary:** 584 Tests have other capabilities/shapes; 172 registry Tests do not have the prototype's exact two-State pattern; more windows.userright and Linux cases also fail strict whitelist. Need general but readable typed operators covering *all* 20 existence × match combinations, not a handful of happy-path aliases.
-3. **Dynamic composition:** RHEL account→file for_each, DNS command Variables, Apache config discovery, nested Windows WMI records, Set filters, organizational inputs and reusable Objects require explicit lifecycle/evidence semantics, not shortened captions hiding complexity.
-4. **Six-state conformance:** Reference chart tests and source-structure identity are not independent target scanning. Need OVAL → native source conversion and NG assessment execution parity, including incomplete Item streams, errors, unknown, not collected, not applicable, and evidence/provenance.
-5. **One real grammar:** The same Check–Inspect–Where/Collect–Require design must express all the above without a second, OVAL-flavored fallback authoring language. No unspoken Boolean defaults.
+## What must be shown before an adoption decision
 
-## Meeting-use recommendation
+1. **A real side-by-side:** current 0.4, complete English-first proposal, and a plain-English explanation for the **same** source check (not an abbreviated showcase).
+2. **An authoring exercise:** unfamiliar authors attempt one simple and one difficult check *from scratch*, using only a short vocabulary reference. Track mistakes, lookups and ambiguity—not just whether they can read YAML.
+3. **One consistent grammar:** `inspect`, `where`, `collect`, `from`, `gather`, Set operations and `require` must have predictable placement. All referenced sources and Variables must be defined and discoverable.
+4. **Semantic gate:** preserve every original collection, filter, cardinality, six-state and evidence behavior; resolve the boot-loader counterexample rather than hiding it. Structural round-tripping is necessary but not sufficient.
 
-**Do not ask the vendor to review the current English-first YAML as the proposed v0.4 standard.** It is too early, even though the research is moving in a favorable direction.
+**Next proposed decision:** after those tests, choose between adopting a demonstrably better English-first grammar, improving the existing 0.4 grammar selectively, or rejecting the redesign.
 
-**If time allows**, a focused technical question *is* useful:
-
-> The OVAL schema says a Windows user-right trustee_name can occur at most once per Item, while Linux mount_options can repeat. Do you see any pitfalls in designing capability-specific, typed shorthand that expands into the exact existing Test/State/Item semantics, while leaving full six-state behavior to the canonical evaluator?
-
-A second useful technical challenge: ask for concrete source counterexamples involving a single capability with multiple collected Items, missing field statuses, nested records or vendor-dependent collection flags.
-
-## Next work, not delegated to the scanner/editor
-
-- Broaden the source-inversion lowerer first to whole composite Test patterns while retaining typed, explicit collection and strict provenance. Audit unsupported reasons per STIG, not just total failure counts.
-- Add exact nested WMI record/field and nonstandard quantifier cases, then DNS/Apache Variable/Dataflow cases and RHEL multi-population foreach.
-- Diff results against independent OVAL 5.12.3 six-state model fixtures, with negative counterexamples, and eventually scanner implementation.
-- Recheck author readability with full YAML including selectors, not cropped State snippets.
-- Only once broad six-STIG coverage is demonstrably stable, consider all 65 STIG packages and decide whether to change the 0.4 candidate schema.
-
-**Source proof links:** [research overview](README.md), [source-inversion code](../../../tools/research_english_first_04.py), [entire six-STIG audit code](../../../tools/research_english_first_04_census.py), [real complex named-Test graph proof](../../../tools/research_english_first_04_evaluate.py).
+Supporting detail: [consistency draft](AUTHORING-CONSISTENCY-WORKING-DRAFT.md) · [four source-backed examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) · [research issue #235](https://github.com/vanderpol/scap-ng/issues/235).
