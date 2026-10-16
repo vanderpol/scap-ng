@@ -4,15 +4,15 @@
 
 ## Updated source-proof checkpoint (October 16)
 
-The initial 39-Test experiment below is historical. **Current research has expanded to [800 of 872 complete unique automated Assessments, containing 1,230 named Tests](https://github.com/vanderpol/scap-ng/actions/runs/38914506962)**, each reconstructing the entire source Assessment dictionary exactly; 72 Assessments reject fail-closed and 800 mutation guards pass. [Four fully generated source-backed research YAML examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) cover RHEL Set/`for_each` collection, Windows WMI/user rights, DNS zone Variables, and Apache configuration Variables.
+The initial 39-Test experiment below is historical. **Current research reconstructs [865 of 872 complete unique automated Assessments, containing 1,351 named Tests](https://github.com/vanderpol/scap-ng/actions/runs/38917654846)** with exact Assessment-dictionary equality; seven Assessments remain unsupported and 865 mutation guards pass. [Four fully generated source-backed research YAML examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) cover RHEL Set/`for_each` collection, Windows WMI/user rights, DNS zone Variables, and Apache configuration Variables.
 
-**This changes the scale assessment, not the normative decision.** The proposed readable representation has promising *structural reach*, but its author-facing wording is uneven and independently validated OVAL six-state collection/evidence parity is still missing. Keep the research presentation distinct from the frozen 0.4 review packet. See [current complete checkpoint](README.md#latest-full-assessment-source-inversion--800-of-872).
+**This changes the scale assessment, not the normative decision.** The proposed readable representation has promising *structural reach*, but its author-facing wording is uneven and independently validated OVAL six-state collection/evidence parity is still missing. Keep the research presentation distinct from the frozen 0.4 review packet. See [current complete checkpoint](README.md#latest-full-assessment-source-inversion--865-of-872).
 
 ## Verdict
 
 **CONTINUE RESEARCH. DO NOT PROPOSE GRAMMAR ADOPTION YET.**
 
-The English-first approach now has reproducible evidence beyond readable screenshots. But only a narrow class of Test predicates is proved; the capability/collection model is not yet broadly expressive enough to qualify as a lossless replacement for SCAP 1.4/OVAL.
+The English-first approach now has reproducible evidence beyond readable screenshots. The experimental grammar now structurally covers most six-STIG 0.4 Assessment graphs. However, **a source-structure round trip does not prove original SCAP 1.4 runtime/evidence parity**, and unfamiliar authors have not demonstrated comprehension of the full complex YAML.
 
 ## Evidence — genuinely tested
 
