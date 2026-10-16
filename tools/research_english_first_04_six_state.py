@@ -126,7 +126,9 @@ def main():
                                   exists=n,does_not_exist=absent,error=err,not_collected=uncollected)
                         try:
                             expected=evaluate_collected_object_test(flag,**args)
-                        except AssertionError:
+                        except (AssertionError, ValueError) as exc:
+                            if not (isinstance(exc, ValueError) and "requires at least one input" in str(exc)) and not isinstance(exc, AssertionError):
+                                raise
                             # The reference's aggregate_check(empty) is not defined.
                             # Never turn this corner into an invented passing result.
                             tally["unresolved_empty_reference"]+=1
