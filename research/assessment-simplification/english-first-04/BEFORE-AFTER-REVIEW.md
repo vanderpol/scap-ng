@@ -4,7 +4,7 @@
 
 **Your feedback question:** Which format makes it easier to understand **and author a complete check**—existing 0.4 or proposed English-first—without needing to guess what a referenced collection or Variable means?
 
-Each comparison opens a **two-column view** on GitHub: **Before (current 0.4) on the left, After (English-first research) on the right**, with a brief summary of differences above the pair. Both columns contain the **complete YAML documents**—metadata, collections, variables, checks, Item/field requirements and final evaluation. On your wide monitor you can inspect the two versions together; on a phone the table may require horizontal scrolling. No Actions artifact downloads are needed.
+Each comparison below includes **both complete YAML documents directly on its own Markdown page**: metadata, source collections, variables, checks, field/Item requirements, and final evaluation. **There are no shortened snippets or omitted parts in the paired YAML blocks.** They can be read entirely on `github.com`, including on a phone or restricted proxy network.
 
 ## Open a full comparison
 
