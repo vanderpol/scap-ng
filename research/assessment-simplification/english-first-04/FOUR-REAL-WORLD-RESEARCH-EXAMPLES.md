@@ -77,6 +77,35 @@ require:
     all_fields_must_exist: true
 ```
 
+**Where does the `for_each_source.in` name come from?** The identifier is an exact reference to a named Object in this same source Assessment. It is defined under `shared_objects` in the original 0.4 preview (and under `sources` in the English-first experiment). It is **not** inferred from the English words in the identifier. Below is the defining portion of the [original source file](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml), with descriptive titles omitted:
+
+```yaml
+shared_objects:
+  users-username-object:
+    capability: unix.password
+    select:
+      username:
+        matches_regex: '[\w]+'
+
+  only-non-system-users-uid-999-home-dirs-excluding-root-object:
+    capability: unix.password
+    set:
+      operator: difference
+      operands:
+        - object: users-username-object
+          filters:
+            - exclude:
+                user_id:
+                  require: at_least_one_exists_and_all_match
+                  less_than: 1000
+            - exclude:
+                home_dir:
+                  require: at_least_one_exists_and_all_match
+                  equals: /
+```
+
+The filter removes accounts with user IDs below 1000 and accounts with `/` as their home directory, subject to the original field existence/match semantics. The remaining account records provide `user.home_dir` for file discovery. **The short authoring sketch is not self-contained**: the full Assessment must retain these named source definitions and their exact semantics. This original-schema extract is included to explain the reference, **not** to introduce a second English-first syntax.
+
 **What succeeds:** source account→file projection, Set union/filter and eight-field check are representable in one reversible YAML tree; the root-user Test separately requires at least one file.
 
 **Still under review:** `for_each_source` expands collection from users, whereas `every_item_must_match` evaluates the collected files. The real source contains a **one-operand union**; this excerpt keeps it visible rather than silently deleting the source operation. Removing that union or replacing `combine.union` with `gather.union` needs a fail-closed round-trip proof. No scanner has proved actual traversal behavior.
