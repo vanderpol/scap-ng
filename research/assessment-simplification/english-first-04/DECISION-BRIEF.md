@@ -32,7 +32,7 @@ Source: [current six-STIG reports, run 38932589417](reports/README.md). This is 
 | [DNS SV-259345 — signing and validity](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#3-windows-server-dns--dynamic-zone-names-and-three-passing-alternatives) | Can I author commands derived from discovered zones? | Command Variable graph remains difficult to write |
 | [Apache SV-214228 — loaded configuration](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md#4-apache-unix--required-vs-optional-settings-across-included-files) | Can I follow and author configuration discovery once and reuse it across checks? | Up to 10 dependency edges; repetition still dominates |
 
-The linked excerpts are not independently executable full files; see their source and proof boundaries before comparing designs.
+For **complete, self-contained before-and-after documents**, use the [five full comparison pages](BEFORE-AFTER-REVIEW.md). The earlier four-source research page contains abbreviated excerpts for technical context; do not base the authoring decision on those alone.
 
 ## What must be shown before an adoption decision
 
