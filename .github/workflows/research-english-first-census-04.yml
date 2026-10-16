@@ -5,6 +5,7 @@ on:
       - .github/workflows/research-english-first-census-04.yml
       - tools/research_english_first_04_census.py
       - tools/research_english_first_04_shape_census.py
+      - tools/research_english_first_04_presence.py
       - tools/research_english_first_04.py
   workflow_dispatch:
 
@@ -46,6 +47,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-shape-census.json
 
+      - name: Prove presence-only authoring for native collected/selected Items
+        run: |
+          python tools/research_english_first_04_presence.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-state-free-presence.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -54,4 +61,5 @@ jobs:
           path: |
             english-first-04-six-stig-census.json
             english-first-04-shape-census.json
+            english-first-04-state-free-presence.json
           if-no-files-found: warn
