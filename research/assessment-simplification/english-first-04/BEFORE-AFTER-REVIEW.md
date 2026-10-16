@@ -6,7 +6,7 @@
 
 Start with the two Linux and Windows samples below; then examine DNS and Apache. **The small extracts on this page illustrate the difference; use the links to review complete Assessments with every Test, source, Variable and evaluation tree.** Both versions are normal GitHub files, accessible on a restricted github.com network without downloading Actions artifacts.
 
-**How these pairs were produced.** The **before** files are the unchanged, pinned 0.4 r3 source examples. The **after** files are the complete research-only compact English-first representations generated from those same Assessments. The converter reconstructed the original complete source dictionaries exactly for all four in the passing six-STIG run [38932589417](https://github.com/vanderpol/scap-ng/actions/runs/38932589417) (871/872 total). That is **source-structure identity, not proof of SCAP 1.4 runtime, collection evidence, or six-state scanner equivalence**.
+**How these pairs were produced.** The **before** files are the unchanged, pinned 0.4 r3 source examples. The **after** files are the complete research-only compact English-first representations generated from those same Assessments. The converter reconstructed the original complete source dictionaries exactly for all four in the passing six-STIG run [38934771985](https://github.com/vanderpol/scap-ng/actions/runs/38934771985) (871/872 total). That is **source-structure identity, not proof of SCAP 1.4 runtime, collection evidence, or six-state scanner equivalence**.
 
 | Real assessment | Before: complete current 0.4 | After: complete experimental English-first |
 | --- | --- | --- |
@@ -14,6 +14,44 @@ Start with the two Linux and Windows samples below; then examine DNS and Apache.
 | **Windows 11 — SV-253495** Remote Desktop deny-rights | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) | [View full English-first version](comparisons/win11-role-rights.research.yaml) |
 | **Windows Server DNS — SV-259345** zone signing | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_server_dns/assessments/automated/SV-259345.automated.yaml) | [View full English-first version](comparisons/dns-zone-signing.research.yaml) |
 | **Apache 2.4 UNIX — SV-214228** loaded config directives | [View 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml) | [View full English-first version](comparisons/apache-keepalive.research.yaml) |
+
+## First: one straightforward Linux check
+
+**RHEL 9 SV-257851: /home must use `nosuid`.** [Complete original 0.4 check](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/home-mounted-nosuid-option.assessment.yaml).
+
+**Before — 0.4 Test excerpt**
+
+~~~yaml
+capability: linux.partition
+object:
+  capability: linux.partition
+  select:
+    mount_point:
+      matches_regex: .*\/home
+states:
+  - mount_options:
+      require: at_least_one_exists_and_some_match
+      equals: nosuid
+collected_items_require: at_least_one_exists_and_all_match
+~~~
+
+**After — same intent using the source-exact experimental naming/placement convention (short Test excerpt)**
+
+~~~yaml
+inspect: linux.partition
+where:
+  mount_point:
+    matches_regex: .*\/home
+require:
+  at_least_one_item_exists: true
+  every_item_must_match:
+    mount_options:
+      some_values_is: nosuid
+~~~
+
+In both versions, **every selected mount Item** must match but **at least one value of its `mount_options` field** must equal `nosuid`. The source regex is preserved, not silently tightened to an exact `/home` match. The excerpts omit metadata and reporting attributes; do not treat them as complete documents.
+
+**Authoring question:** Do the new `where` and `require` keywords make this easier to write? Or would you choose clearer words for `some_values_is`?
 
 ## 1. RHEL 9 — account-derived file inspections
 
