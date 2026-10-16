@@ -77,34 +77,30 @@ require:
     all_fields_must_exist: true
 ```
 
-**Where does the `for_each_source.in` name come from?** The identifier is an exact reference to a named Object in this same source Assessment. It is defined under `shared_objects` in the original 0.4 preview (and under `sources` in the English-first experiment). It is **not** inferred from the English words in the identifier. Below is the defining portion of the [original source file](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml), with descriptive titles omitted:
+**Where does the `for_each_source.in` name come from?** It is an exact reference to a named collection under `sources` in this same Assessment; the interpreter never parses the words in the identifier as filtering rules. To make the example understandable from scratch, here are the two required source definitions in the **same experimental English-first layout**:
 
 ```yaml
-shared_objects:
+sources:
   users-username-object:
-    capability: unix.password
-    select:
+    inspect: unix.password
+    where:
       username:
         matches_regex: '[\w]+'
 
   only-non-system-users-uid-999-home-dirs-excluding-root-object:
-    capability: unix.password
-    set:
-      operator: difference
-      operands:
-        - object: users-username-object
-          filters:
-            - exclude:
-                user_id:
-                  require: at_least_one_exists_and_all_match
-                  less_than: 1000
-            - exclude:
-                home_dir:
-                  require: at_least_one_exists_and_all_match
-                  equals: /
+    inspect: unix.password
+    difference:
+      - from: users-username-object
+        exclude_if:
+          - user_id:
+              require: at_least_one_exists_and_all_match
+              less_than: 1000
+          - home_dir:
+              require: at_least_one_exists_and_all_match
+              equals: /
 ```
 
-The filter removes accounts with user IDs below 1000 and accounts with `/` as their home directory, subject to the original field existence/match semantics. The remaining account records provide `user.home_dir` for file discovery. **The short authoring sketch is not self-contained**: the full Assessment must retain these named source definitions and their exact semantics. This original-schema extract is included to explain the reference, **not** to introduce a second English-first syntax.
+`difference` above is the proposed direct spelling for the original `set.operator: difference`; no extra `combine` layer is needed. The actual requirements exclude user IDs below 1000 and home directory `/`, retaining the source field-presence requirements. Each remaining account supplies `user.home_dir` for `for_each_source`. Titles and the rest of the Assessment are omitted here, so this is an explanatory excerpt, **not a standalone runnable file**. See the [complete pinned 0.4 source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml).
 
 **What succeeds:** source account→file projection, Set union/filter and eight-field check are representable in one reversible YAML tree; the root-user Test separately requires at least one file.
 
