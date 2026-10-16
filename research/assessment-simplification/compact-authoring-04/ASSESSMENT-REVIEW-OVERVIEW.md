@@ -100,12 +100,12 @@ The [three complex source-backed Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md) sh
 
 ## Suggested review flow (20 minutes)
 
-| Time | Focus | Question for reviewers |
+| Time | Open this sample or evidence | Question for reviewers |
 | --- | --- | --- |
-| **0–5 min** | Examples above | Are collection, State-field and nested-record requirement scopes clear and distinct? |
-| **5–10 min** | Windows registry/user-right/WMI records | Which missing, duplicate, error, unknown, or incomplete Item scenarios break these quantifiers? |
-| **10–15 min** | RHEL `for_each` and Windows conditional source | When is conversion demonstrably equivalent, and when must we preserve the OVAL graph? |
-| **15–20 min** | Counterexamples and next tests | Can we capture 1–3 source-backed cases with expected six-state results? |
+| **0–5 min** | [Three embedded NG examples](#three-ng-examples-from-the-actual-six-stig-r3-content) | Are the Object, Item and field requirements clear? |
+| **5–10 min** | [Win11 SV-253254 registry source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253254.automated.yaml) and [SV-253495 WMI record excerpt](ASSESSMENT-REVIEW-TECHNICAL.md#1-windows-wmi-a-record-is-not-its-field) | Do missing/duplicate record fields, errors or incomplete Items change the intended result? |
+| **10–15 min** | [RHEL9 SV-257889 faithful vs `for_each` example](../foreach-07/REVIEW.md#production-example-rhel-9-sv-257889) and [Windows Server 2025 SV-278001 conditional sketch](../conditional-10/EXAMPLES.md#windows-server-2025-sv-278001) | Which rewrites preserve OVAL semantics? **Both are research illustrations; the conditional sketch is not a proven rewrite.** |
+| **15–20 min** | [Incomplete-Item result table](INCOMPLETE-ITEM-SEMANTICS-REVIEW.md#the-bug-the-added-tests-caught) and [machine-readable six-state boundary cases](../../../tests/v04-semantic-boundaries/cases.json) | Which outcomes or collection scenarios need new counterexample tests? |
 
 **Important conditional warning:** `OR(AND(G,P),AND(NOT G,Q))` is **not generally equivalent** to a procedural `if G then P else Q`; [81 of 216 generic six-state combinations differ](../conditional-10/CONDITIONAL-REVIEW-QUESTIONS.md). The converter does not silently replace that OVAL Boolean graph.
 
