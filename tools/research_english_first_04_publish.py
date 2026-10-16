@@ -128,6 +128,9 @@ def publish():
         "",
         "Read these pages directly in GitHub; no Actions artifact ZIP is needed.",
         "",
+        "[Earlier verified checkpoint](2026-10-16-verified-checkpoint.md)",
+        "(from run 38922336217; before the new reference-graph audit).",
+        "",
         "| Report | Markdown report | Source JSON |",
         "| --- | --- | --- |",
     ]
