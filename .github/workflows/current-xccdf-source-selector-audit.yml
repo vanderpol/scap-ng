@@ -1,0 +1,34 @@
+name: Current XCCDF source selector audit contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/scap_upconvert_v003/audit_selector_mapping.py'
+      - 'tools/scap_upconvert_v003/audit_full_review.py'
+      - 'tools/scap_upconvert_v003/test_audit_selector_mapping.py'
+      - '.github/workflows/current-xccdf-source-selector-audit.yml'
+  pull_request:
+    paths:
+      - 'tools/scap_upconvert_v003/audit_selector_mapping.py'
+      - 'tools/scap_upconvert_v003/audit_full_review.py'
+      - 'tools/scap_upconvert_v003/test_audit_selector_mapping.py'
+      - '.github/workflows/current-xccdf-source-selector-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  normalized-choice-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source/native selector identity invariants
+        env:
+          PYTHONPATH: tools
+        run: python tools/scap_upconvert_v003/test_audit_selector_mapping.py -v
