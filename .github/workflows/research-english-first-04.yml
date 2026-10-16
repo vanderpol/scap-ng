@@ -5,6 +5,7 @@ on:
       - .github/workflows/research-english-first-04.yml
       - tools/research_english_first_04.py
       - tools/research_english_first_04_evaluate.py
+      - tools/research_english_first_04_shell.py
   workflow_dispatch:
 
 permissions:
@@ -43,6 +44,12 @@ jobs:
             --fixture-root sample-data \
             --report english-first-04-evaluate-graph-report.json
 
+      - name: Prove complete command/error collection in real DNS and Apache Tests
+        run: |
+          python tools/research_english_first_04_shell.py \
+            --fixture-root sample-data \
+            --report english-first-04-shell-tests.json
+
       - name: Upload source-backed report
         if: always()
         uses: actions/upload-artifact@v4
@@ -51,4 +58,5 @@ jobs:
           path: |
             english-first-04-research-report.json
             english-first-04-evaluate-graph-report.json
+            english-first-04-shell-tests.json
           if-no-files-found: warn
