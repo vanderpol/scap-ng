@@ -1,0 +1,38 @@
+name: 0.4 semantic boundary regression fixtures
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/test_v04_semantic_boundary_cases.py'
+      - 'tests/v04-semantic-boundaries/**'
+      - 'tools/oval_result_truth_tables.py'
+      - 'tools/research_04_scoped_state_require.py'
+      - '.github/workflows/v04-semantic-boundary-cases.yml'
+  pull_request:
+    paths:
+      - 'tools/test_v04_semantic_boundary_cases.py'
+      - 'tests/v04-semantic-boundaries/**'
+      - 'tools/oval_result_truth_tables.py'
+      - 'tools/research_04_scoped_state_require.py'
+      - '.github/workflows/v04-semantic-boundary-cases.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused-reference-boundaries:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install controlled fixture dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Run pinned expected outcome and negative-scope tests
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_v04_semantic_boundary_cases.py -v
