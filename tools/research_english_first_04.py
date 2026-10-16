@@ -60,6 +60,17 @@ FIXTURES = {
             },
         },
     },
+    "win11_sv253495_local_account": {
+        "source": "focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml",
+        "test": "deny-log-on-through-remote-desktop-services-local-account-test",
+        "candidate": {
+            "check": "Deny log on through Remote Desktop Services - Local account",
+            "inspect": "windows.userright",
+            "where": {"userright": {"equals": "SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME"}},
+            "require": {"trustee_name": {
+                "matches_regex": r"^(?i)(NT Authority\\)?Local account$"}},
+        },
+    },
     "win11_sv253495_guests": {
         "source": "focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml",
         "test": "deny-log-on-through-remote-desktop-services-guests-test",
@@ -148,8 +159,16 @@ def lower(candidate):
         return lower_registry(candidate)
     if cap not in PROVEN_MACROS:
         raise ValueError("unsupported capability: " + str(cap))
-    contract = PROVEN_MACROS[cap]
+    contract = deepcopy(PROVEN_MACROS[cap])
     field, verb = contract["field"], contract["verb"]
+    # Windows userright has two independently source-backed readable operations:
+    # case-insensitive equality and the unchanged original regular expression.
+    if (cap == "windows.userright" and
+            isinstance(candidate.get("require"), dict) and
+            isinstance(candidate["require"].get("trustee_name"), dict) and
+            set(candidate["require"]["trustee_name"]) == {"matches_regex"}):
+        verb = "matches_regex"
+        contract["op"] = "matches_regex"
     exact(candidate["where"], (contract["selector"][0],), "Object selector")
     exact(candidate["where"][contract["selector"][0]],
           (contract["selector"][1],), "selector comparator")
