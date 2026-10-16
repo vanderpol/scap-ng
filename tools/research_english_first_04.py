@@ -32,6 +32,34 @@ FIXTURES = {
             "require": {"mount_options": {"includes_value": "nosuid"}},
         },
     },
+    "win11_sv253254_editionid": {
+        "source": "focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253254.automated.yaml",
+        "test": "editionid-enterprise-or-enterprises-test",
+        "candidate": {
+            "check": "EditionID is Enterprise or EnterpriseS",
+            "inspect": "windows.registry",
+            "where": {
+                "hive": {"equals": "local_machine"},
+                "key": {"equals": r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"},
+                "name": {"equals": "EditionId"},
+            },
+            "require": {
+                "at_least_one_item_exists": True,
+                "every_collected_item": {
+                    "any_of": [
+                        {"all_of": [
+                            {"type": {"equals": "string"}},
+                            {"value": {"all_values_equal": "Enterprise"}},
+                        ]},
+                        {"all_of": [
+                            {"type": {"equals": "string"}},
+                            {"value": {"all_values_equal": "EnterpriseS"}},
+                        ]},
+                    ]
+                },
+            },
+        },
+    },
     "win11_sv253495_guests": {
         "source": "focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml",
         "test": "deny-log-on-through-remote-desktop-services-guests-test",
@@ -67,10 +95,57 @@ def exact(node, keys, context):
         raise ValueError(f"unsupported {context}: expected exactly {sorted(keys)}, got {node}")
 
 
+def lower_registry(candidate):
+    """Preserve real Win11 EditionId two-State alternatives without merging."""
+    where = candidate["where"]
+    exact(where, ("hive", "key", "name"), "registry selector")
+    for selector in ("hive", "key", "name"):
+        exact(where[selector], ("equals",), selector)
+    requirement = candidate["require"]
+    exact(requirement, ("at_least_one_item_exists", "every_collected_item"), "registry requirement")
+    if requirement["at_least_one_item_exists"] is not True:
+        raise ValueError("explicit Item existence required")
+    exact(requirement["every_collected_item"], ("any_of",), "Item requirement")
+    branches = requirement["every_collected_item"]["any_of"]
+    if not isinstance(branches, list) or len(branches) != 2:
+        raise ValueError("real source requires two State alternatives")
+    states = []
+    for branch in branches:
+        exact(branch, ("all_of",), "State alternative")
+        children = branch["all_of"]
+        if not isinstance(children, list) or len(children) != 2:
+            raise ValueError("Each State alternative must have type and value")
+        exact(children[0], ("type",), "registry type predicate")
+        exact(children[0]["type"], ("equals",), "registry type comparator")
+        if children[0]["type"]["equals"] != "string":
+            raise ValueError("only source-verified string type is eligible")
+        exact(children[1], ("value",), "registry value predicate")
+        exact(children[1]["value"], ("all_values_equal",), "registry value operator")
+        target = children[1]["value"]["all_values_equal"]
+        if not isinstance(target, str) or not target:
+            raise ValueError("nonempty literal expected")
+        states.append({"and": [
+            {"type": {"equals": "string"}},
+            {"value": {"equals": target}},
+        ]})
+    return {
+        "test_title": candidate["check"],
+        "capability": "windows.registry",
+        "object": {"capability": "windows.registry", "select": deepcopy(where)},
+        "states": states,
+        "reported_elements": "all",
+        "states_match": "any",
+        "state_fields_require": "at_least_one_exists_and_all_match",
+        "collected_items_require": "at_least_one_exists_and_all_match",
+    }
+
+
 def lower(candidate):
     """Exactly and explicitly expand a typed macro to source-equivalent Test."""
     exact(candidate, ("check", "inspect", "where", "require"), "Assessment")
     cap = candidate["inspect"]
+    if cap == "windows.registry":
+        return lower_registry(candidate)
     if cap not in PROVEN_MACROS:
         raise ValueError("unsupported capability: " + str(cap))
     contract = PROVEN_MACROS[cap]
@@ -132,8 +207,12 @@ def verify_fixtures(root):
             if mutate.startswith("wrong Item"):
                 altered["collected_items_require"] = value
             else:
-                field = PROVEN_MACROS[row["candidate"]["inspect"]]["field"]
-                altered["states"][0][field]["require"] = value
+                cap = row["candidate"]["inspect"]
+                if cap == "windows.registry":
+                    altered["state_fields_require"] = value
+                else:
+                    field = PROVEN_MACROS[cap]["field"]
+                    altered["states"][0][field]["require"] = value
             if altered == lowered:
                 raise AssertionError("unexpected acceptance of " + mutate)
             rejected.append(case_id + ": " + mutate)
